@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using System.Xml;
 
     /// <summary>
     /// Class to uniquely identify test results
@@ -215,6 +216,44 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     }
 
     /// <summary>
+    /// The test timer interval class.
+    /// </summary>
+    /// <remarks>Primary responsibility is to persist the info in XML</remarks>
+    internal sealed class TimerInfo : IXmlTestStore
+    {
+        private TimerResult Result { get; }
+
+        public TimerInfo(TimerResult result)
+        {
+            Result = result;
+        }
+
+        /// <summary>
+        /// Gets the interval name
+        /// </summary>
+        public string Name => Result.Name;
+
+        /// <summary>
+        /// Gets the interval start time
+        /// </summary>
+        public DateTime StartTime => Result.StartTime.UtcDateTime;
+
+        /// <summary>
+        /// Gets the interval duration
+        /// </summary>
+        public TimeSpan Duration => Result.Duration;
+
+        public void Save(XmlElement element,
+            XmlTestStoreParameters parameters)
+        {
+            var helper = new XmlPersistence();
+
+            helper.SaveSimpleField(element, "@name", this.Name, string.Empty);
+            helper.SaveSimpleField(element, "@duration", this.Duration, default(TimeSpan));
+            helper.SaveSimpleField(element, "@startTime", this.StartTime, default(DateTime));
+        }
+    }
+    /// <summary>
     /// Class for test result.
     /// </summary>
     internal class TestResult : ITestResult, IXmlTestStore
@@ -253,6 +292,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// Information provided by data collectors for the test case
         /// </summary>
         private List<CollectorDataEntry> collectorDataEntries = new List<CollectorDataEntry>();
+
+        /// <summary>
+        /// Timer results from test run
+        /// </summary>
+        private List<TimerInfo> timers = new List<TimerInfo>();
 
         #endregion
 
@@ -558,6 +602,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             }
         }
 
+        internal void AddTimerEntries(IEnumerable<TimerResult> timersToAdd)
+        {
+            foreach (var timer in timersToAdd)
+            {
+                var timerInfo = new TimerInfo(timer);
+                this.timers.Add(timerInfo);
+            }
+        }
 
         #region IXmlTestStore Members
 
@@ -598,6 +650,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             helper.SaveSimpleField(element, "@relativeResultsDirectory", this.relativeTestResultsDirectory, null);
             helper.SaveIEnumerable(this.resultFiles.Keys, element, "ResultFiles", "@path", "ResultFile", parameters);
             helper.SaveIEnumerable(this.collectorDataEntries, element, "CollectorDataEntries", ".", "Collector", parameters);
+            helper.SaveIEnumerable(this.timers, element, "Timers", ".", "Timer", parameters);
 
             if (this.dataRowInfo >= 0)
                 helper.SaveSimpleField(element, "@dataRowInfo", this.dataRowInfo, -1);

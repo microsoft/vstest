@@ -33,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.TestCase = testCase;
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
+            this.Timers = new Collection<TimerResult>();
 
             // Default start and end time values for a test result are initialized to current timestamp
             // to maintain compatibility.
@@ -85,6 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         [DataMember]
         public Collection<TestResultMessage> Messages { get; private set; }
+
+        [DataMember]
+        public Collection<TimerResult> Timers { get; private set; }
 
         /// <summary>
         /// Gets or sets test result ComputerName.
@@ -176,6 +180,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     CultureInfo.CurrentUICulture,
                     Resources.Resources.TestResultTextMessagesFormat,
                     testMessages.ToString());
+            }
+
+            if (this.Timers.Any())
+            {
+                var timerMessages = new StringBuilder();
+                foreach (var timer in this.Timers)
+                {
+                    timerMessages.AppendFormat(
+                        CultureInfo.CurrentUICulture,
+                        Resources.Resources.TestResultTimerFormat,
+                        timer.Name,
+                        timer.StartTime.ToString("O"),
+                        timer.Duration.ToString("c"));
+                }
+
+                result.AppendLine();
+                result.AppendFormat(CultureInfo.CurrentUICulture,
+                    Resources.Resources.TestResultTimerMessagesFormat,
+                    timerMessages);
             }
 
             return result.ToString();
@@ -306,6 +329,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get;
             private set;
+        }
+    }
+
+    [DataContract]
+    public class TimerResult
+    {
+        [DataMember]
+        public string Name { get; }
+        [DataMember]
+        public DateTimeOffset StartTime { get; }
+        [DataMember]
+        public TimeSpan Duration { get; }
+
+        public TimerResult(string name,
+            DateTimeOffset startTime,
+            TimeSpan duration)
+        {
+            this.Name = name;
+            this.StartTime = startTime;
+            this.Duration = duration;
         }
     }
 

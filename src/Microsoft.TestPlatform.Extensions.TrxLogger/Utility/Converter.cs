@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Text;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -113,12 +112,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             if (rockSteadyTestResult.Duration != null)
                 testResult.Duration = rockSteadyTestResult.Duration;
 
-            // Clear exsting messages and store rocksteady result messages.
+            // Clear existing messages and store rocksteady result messages.
             testResult.TextMessages = null;
             UpdateResultMessages(testResult, rockSteadyTestResult);
 
             // Save result attachments to target location.
             UpdateTestResultAttachments(rockSteadyTestResult, testResult, testRun, trxFileDirectory, true);
+
+            if (rockSteadyTestResult.Timers != null)
+            {
+                testResult.AddTimerEntries(rockSteadyTestResult.Timers);
+            }
 
             return testResult;
         }
