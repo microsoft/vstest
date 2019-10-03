@@ -432,6 +432,24 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            Assert.IsFalse(this.htmlLogger.HtmlFilePath.Contains("__"));
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
             Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("sample_net451"));
         }
 

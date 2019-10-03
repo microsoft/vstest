@@ -292,9 +292,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 if (framework != null)
                 {
                     framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
 
-                logFilePrefixValue = logFilePrefixValue + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
+                logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
                 this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
             }
             else
