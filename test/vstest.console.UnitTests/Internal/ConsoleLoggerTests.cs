@@ -347,7 +347,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
-        public void InQuietModeTestErrorMessageShowShouldShowTestRunFailed()
+        public void InQuietModeTestErrorMessageShouldShowTestRunFailed()
         {
             // Setup
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
@@ -588,6 +588,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, 5, 1, 1, 1, "1h 6m", "TestSource"), OutputLevel.Information), Times.Once);
+        }
+
+        [TestMethod]
+        [DataRow("noraml")]
+        [DataRow("detailed")]
+        public void TestResultHandlerShouldWriteToConsoleShouldNotShowformatedFailedTestsForOtherThanQuietVebosity(string verbosityLevel)
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", verbosityLevel);
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            foreach (var testResult in this.GetTestResultsObject())
+            {
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
+            }
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+            loggerEvents.WaitForEventCompletion();
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, 5, 1, 1, 1, "1h 6m", "(TestSource)"), OutputLevel.Information), Times.Never);
+        }
+
+
+        [TestMethod]
+        [DataRow("noraml")]
+        [DataRow("detailed")]
+        public void TestResultHandlerShouldWriteToConsoleShouldShowformatedPassesdTestsForOtherThanQuietVebosity(string verbosityLevel)
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", verbosityLevel);
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            foreach (var testResult in this.GetPassedTestResultsObject())
+            {
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
+            }
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+            loggerEvents.WaitForEventCompletion();
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, 2, 1, 0, 1, "1m 2s", "TestSource"), OutputLevel.Information), Times.Never);
         }
 
         [TestMethod]

@@ -107,10 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private Verbosity verbosityLevel = Verbosity.Minimal;
 #endif
 
-        private int testsTotal = 0;
-        private int testsPassed = 0;
-        private int testsFailed = 0;
-        private int testsSkipped = 0;
         private bool testRunHasErrorMessages = false;
 
         #endregion
@@ -155,7 +151,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public Verbosity VerbosityLevel => verbosityLevel;
 
-        public ConcurrentDictionary<string, SourceSummary> SummaryDictionary { get; private set; }
+        /// <summary>
+        /// Dictionary of summary of each source. 
+        /// </summary>
+        private ConcurrentDictionary<string, SourceSummary> SourceSummaryDictionary { get; set; }
 
         #endregion
 
@@ -192,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            SummaryDictionary = new ConcurrentDictionary<string, SourceSummary>();
+            SourceSummaryDictionary = new ConcurrentDictionary<string, SourceSummary>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -471,14 +470,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
             SourceSummary summary;
-            if (!SummaryDictionary.TryGetValue(e.Result.TestCase.Source, out summary))
+            if (!SourceSummaryDictionary.TryGetValue(e.Result.TestCase.Source, out summary))
             {
                 summary = new SourceSummary();
-                SummaryDictionary.TryAdd(e.Result.TestCase.Source, summary);
+                SourceSummaryDictionary.TryAdd(e.Result.TestCase.Source, summary);
             }
 
             // Update the test count statistics based on the result of the test. 
-            this.testsTotal++;
             summary.TotalTests++;
             summary.TimeSpan += e.Result.Duration;
             var testDisplayName = e.Result.DisplayName;
@@ -498,7 +496,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 case TestOutcome.Skipped:
                     {
-                        this.testsSkipped++;
                         summary.SkippedTests++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
@@ -523,7 +520,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 case TestOutcome.Failed:
                     {
-                        this.testsFailed++;
                         summary.FailedTests++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
@@ -545,7 +541,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 case TestOutcome.Passed:
                     {
-                        this.testsPassed++;
                         summary.PassedTests++;
                         if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
@@ -632,13 +627,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             // Stop the progress indicator as we are about to print the summary
             this.progressIndicator?.Stop();
+            SourceSummary summary;
             Output.WriteLine(string.Empty, OutputLevel.Information);
-
             if (verbosityLevel == Verbosity.Quiet)
             {
-                foreach (var sd in SummaryDictionary.ToArray())
+                foreach (var sd in SourceSummaryDictionary.ToArray())
                 {
-                    var summary = SummaryDictionary[sd.Key];
+                    summary = SourceSummaryDictionary[sd.Key];
 
                     // Failed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
                     if (summary.FailedTests > 0)
@@ -651,6 +646,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     }
                 }
                 return;
+            }
+            var testsPassed = 0;
+            var testsFailed = 0;
+            var testsSkipped = 0;
+            var testsTotal = 0;
+            foreach (var sd in SourceSummaryDictionary.ToArray())
+            {
+                summary = SourceSummaryDictionary[sd.Key];
+                testsPassed = summary.PassedTests;
+                testsFailed = summary.FailedTests;
+                testsSkipped = summary.SkippedTests;
+                testsTotal = summary.TotalTests;
             }
 
             // Printing Run-level Attachments
@@ -676,7 +683,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 Output.Error(false, CommandLineResources.TestRunAborted);
             }
-            else if (this.testsFailed > 0 || this.testRunHasErrorMessages)
+            else if (testsFailed > 0 || this.testRunHasErrorMessages)
             {
                 Output.Error(false, CommandLineResources.TestRunFailed);
             }
