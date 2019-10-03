@@ -206,14 +206,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
             var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
 
-            // If Testhost.exe is available use it
+            // If testhost.exe is available use it
             bool testHostExeFound = false;
             if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
                 var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
                 var fullExePath = Path.Combine(sourceDirectory, exeName);
+                EqtTrace.Verbose("DotnetTestHostManager: test host exe path : " + fullExePath);
 
-                // check for testhost.exe in sourceDirectory. If not found, check this in nuget folder.
+                // check for testhost.exe in sourceDirectory. If not found, check in nuget folder.
                 if (this.fileHelper.Exists(fullExePath))
                 {
                     startInfo.FileName = fullExePath;
@@ -227,18 +228,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
                         var testHostNugetPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(testHostPath).FullName).FullName);
 
-                        var testHostExePath = Path.Combine(testHostNugetPath.FullName, "build", "netcoreapp2.1", folderName, exeName);
+                        var testHostExeNugetPath = Path.Combine(testHostNugetPath.FullName, "build", "netcoreapp2.1", folderName, exeName);
 
-                        if (this.fileHelper.Exists(testHostExePath))
+                        if (this.fileHelper.Exists(testHostExeNugetPath))
                         {
-                            EqtTrace.Verbose("DotnetTestHostManager: testhost.exe/testhost.x86.exe found at path: " + testHostExePath);
-                            startInfo.FileName = testHostExePath;
+                            EqtTrace.Verbose("DotnetTestHostManager: Testhost.exe/testhost.x86.exe found at path: " + testHostExeNugetPath);
+                            startInfo.FileName = testHostExeNugetPath;
                             testHostExeFound = true;
                         }
                     }
                 }
             }
-            else if (!testHostExeFound)
+
+            if (!testHostExeFound)
             {
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 

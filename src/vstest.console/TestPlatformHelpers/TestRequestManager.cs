@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -75,17 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
                   new ProcessHelper())
         {
-        }
-
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher)
-        {
-            this.testPlatform = testPlatform;
-            this.commandLineOptions = commandLineOptions;
-            this.testRunResultAggregator = testRunResultAggregator;
-            this.testPlatformEventSource = testPlatformEventSource;
-            this.inferHelper = inferHelper;
-            this.metricsPublisher = metricsPublisher;
-            this.processHelper = new ProcessHelper();
         }
 
         internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper)
@@ -397,27 +385,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
 
                     // Choose default architecture based on the framework
-                    // For .NET core, the default platform architecture should be x64.
+                    // For .NET core, the default platform architecture should be based on the process.
+                    // For a 64 bit process, 
                     Architecture defaultArchitecture = Architecture.X64;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                     || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        string currentProcess = this.processHelper.GetProcessName(this.processHelper.GetCurrentProcessId());
-                        if (currentProcess.StartsWith("vstest.console"))
-                        {
-                            defaultArchitecture = Architecture.X64;
-                        }
-                        else
-                        {
-                            if (Environment.Is64BitProcess)
-                            {
-                                defaultArchitecture = Architecture.X64;
-                            }
-                            else
-                            {
-                                defaultArchitecture = Architecture.X86;
-                            }
-                        }
+                        var currentProcessName = this.processHelper.GetProcessName(this.processHelper.GetCurrentProcessId());
+                        defaultArchitecture = (currentProcessName.StartsWith("vstest.console") || Environment.Is64BitProcess) ? Architecture.X64 : Architecture.X86;
+                    }
+                    else
+                    {
+                        defaultArchitecture = Architecture.X86;
                     }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
