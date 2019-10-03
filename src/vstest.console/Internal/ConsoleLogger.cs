@@ -633,32 +633,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var testsSkipped = 0;
             var testsTotal = 0;
             Output.WriteLine(string.Empty, OutputLevel.Information);
-            if (verbosityLevel == Verbosity.Quiet)
-            {
-                foreach (var sd in this.sourceSummaryDictionary.ToArray())
-                {
-                    summary = this.sourceSummaryDictionary[sd.Key];
-
-                    // Failed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                    if (summary.FailedTests > 0)
-                    {
-                        Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
-                    }
-                    else
-                    {
-                        Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
-                    }
-                }
-                return;
-            }
 
             foreach (var sd in this.sourceSummaryDictionary.ToArray())
             {
                 summary = this.sourceSummaryDictionary[sd.Key];
-                testsPassed = summary.PassedTests;
-                testsFailed = summary.FailedTests;
-                testsSkipped = summary.SkippedTests;
-                testsTotal = summary.TotalTests;
+                summary = this.sourceSummaryDictionary[sd.Key];
+                testsPassed += summary.PassedTests;
+                testsFailed += summary.FailedTests;
+                testsSkipped += summary.SkippedTests;
+                testsTotal += summary.TotalTests;
+
+                if (verbosityLevel == Verbosity.Quiet)
+                {
+                    if (summary.FailedTests > 0)
+                    {
+                        // Failed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
+                        Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
+                    }
+                    else
+                    {
+                        // Passed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
+                        Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
+                    }
+                }
+            }
+            if (verbosityLevel == Verbosity.Quiet)
+            {
+                return;
             }
 
             // Printing Run-level Attachments
