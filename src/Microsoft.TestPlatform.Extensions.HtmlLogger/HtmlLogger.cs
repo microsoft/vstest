@@ -141,11 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             if (parameters.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && parameters.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue))
             {
-                var htmlParameterErrorMsg = string.Format(CultureInfo.CurrentCulture,
-                        HtmlResource.PrefixAndNameProvidedError);
-
+                var htmlParameterErrorMsg = string.Format(CultureInfo.CurrentCulture, HtmlResource.PrefixAndNameProvidedError);
                 EqtTrace.Error(htmlParameterErrorMsg);
-                 throw new ArgumentException(htmlParameterErrorMsg);
+                throw new ArgumentException(htmlParameterErrorMsg);
             }
 
             this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
@@ -284,7 +282,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassPercentage = (PassedTests * 100) / TotalTests,
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
-
             if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
 
