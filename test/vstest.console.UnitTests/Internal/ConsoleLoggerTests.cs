@@ -598,9 +598,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
-        [DataRow("noraml")]
+        [DataRow("normal")]
         [DataRow("detailed")]
-        public void TestResultHandlerShouldNotShowformattedFailedTestsAndPassedForOtherThanQuietVebosity(string verbosityLevel)
+        public void TestResultHandlerShouldNotShowformattedFailedTestsAndPassedTestsForOtherThanQuietVebosity(string verbosityLevel)
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();

@@ -627,7 +627,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             // Stop the progress indicator as we are about to print the summary
             this.progressIndicator?.Stop();
-            SourceSummary summary;
             var testsPassed = 0;
             var testsFailed = 0;
             var testsSkipped = 0;
@@ -636,8 +635,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             foreach (var sd in this.sourceSummaryDictionary.ToArray())
             {
-                summary = this.sourceSummaryDictionary[sd.Key];
-                summary = this.sourceSummaryDictionary[sd.Key];
+                var summary = this.sourceSummaryDictionary[sd.Key];
                 testsPassed += summary.PassedTests;
                 testsFailed += summary.FailedTests;
                 testsSkipped += summary.SkippedTests;
@@ -657,6 +655,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     }
                 }
             }
+
             if (verbosityLevel == Verbosity.Quiet)
             {
                 return;
