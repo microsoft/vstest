@@ -98,6 +98,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 .Returns(Architecture.X86);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
                 .Returns(new FrameworkName(Constants.DotNetFramework40));
+            this.mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
         }
 
         [TestCleanup]
@@ -1148,7 +1150,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
-            var mockProcessHelper = new Mock<IProcessHelper>();
 
             string testCaseFilterValue = "TestFilter";
             payload.TestPlatformOptions = new TestPlatformOptions { TestCaseFilter = testCaseFilterValue };
@@ -1158,7 +1159,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                mockProcessHelper.Object);
+                this.mockProcessHelper.Object);
 
             this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 

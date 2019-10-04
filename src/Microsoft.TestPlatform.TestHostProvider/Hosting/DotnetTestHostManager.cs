@@ -212,23 +212,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
                 var fullExePath = Path.Combine(sourceDirectory, exeName);
-                EqtTrace.Verbose("DotnetTestHostManager: test host exe path : " + fullExePath);
 
                 // check for testhost.exe in sourceDirectory. If not found, check in nuget folder.
                 if (this.fileHelper.Exists(fullExePath))
                 {
+                    EqtTrace.Verbose("DotnetTestHostManager: Testhost.exe/testhost.x86.exe found at path: " + fullExePath);
                     startInfo.FileName = fullExePath;
                     testHostExeFound = true;
                 }
                 else
                 {
                     // Check if testhost.dll is found in nuget folder.
-                    if (testHostPath.Contains("microsoft.testplatform.testhost"))
+                    if (testHostPath.IndexOf("microsoft.testplatform.testhost", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
+                        // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
+                        // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
                         var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
-                        var testHostNugetPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(testHostPath).FullName).FullName);
-
-                        var testHostExeNugetPath = Path.Combine(testHostNugetPath.FullName, "build", "netcoreapp2.1", folderName, exeName);
+                        var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent.Parent.Parent;
+                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
 
                         if (this.fileHelper.Exists(testHostExeNugetPath))
                         {

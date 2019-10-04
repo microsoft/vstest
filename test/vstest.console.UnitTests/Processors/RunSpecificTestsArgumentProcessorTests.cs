@@ -64,6 +64,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockMetricsPublisherTask = Task.FromResult(this.mockMetricsPublisher.Object);
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
         }
 
         [TestMethod]

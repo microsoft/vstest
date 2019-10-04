@@ -387,16 +387,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     // Choose default architecture based on the framework
                     // For .NET core, the default platform architecture should be based on the process.
                     // For a 64 bit process, 
-                    Architecture defaultArchitecture = Architecture.X64;
+                    Architecture defaultArchitecture = Architecture.X86;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                     || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         var currentProcessName = this.processHelper.GetProcessName(this.processHelper.GetCurrentProcessId());
-                        defaultArchitecture = (currentProcessName.StartsWith("vstest.console") || Environment.Is64BitProcess) ? Architecture.X64 : Architecture.X86;
-                    }
-                    else
-                    {
-                        defaultArchitecture = Architecture.X86;
+                        defaultArchitecture = (currentProcessName.StartsWith("dotnet", StringComparison.OrdinalIgnoreCase) && !Environment.Is64BitProcess) ? Architecture.X86: Architecture.X64;
                     }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
