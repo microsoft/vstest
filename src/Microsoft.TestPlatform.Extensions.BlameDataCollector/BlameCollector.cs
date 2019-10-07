@@ -126,6 +126,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 var collectDumpNode = this.configurationElement[Constants.DumpModeKey];
                 this.collectProcessDumpOnTrigger = collectDumpNode != null;
+
                 if (this.collectProcessDumpOnTrigger)
                 {
                     this.ValidateAndAddTriggerBasedProcessDumpParameters(collectDumpNode);
@@ -198,8 +199,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
                 }
             }
-            catch (FileNotFoundException ex)
+            catch (Exception ex)
             {
+                // Eat up any exception here and log it but proceed with killing the test host process.
                 EqtTrace.Error(ex);
             }
 
@@ -485,7 +487,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 XmlElement resultsDirectoryElement = this.configurationElement["ResultsDirectory"];
                 string resultsDirectory = resultsDirectoryElement != null ? resultsDirectoryElement.InnerText : string.Empty;
-                return resultsDirectory;
+
+                return Environment.ExpandEnvironmentVariables(resultsDirectory);
             }
             catch (NullReferenceException exception)
             {
