@@ -1578,7 +1578,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5}).
+        ///   Looks up a localized string similar to Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5})..
         /// </summary>
         internal static string TestRunSummaryPassed {
             get {

@@ -622,7 +622,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, 2, 1, 0, 1, "1m 2s", "TestSourcePassed"), OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, 5, 1, 1, 1, "1h 6m", "(TestSource)"), OutputLevel.Information), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, 5, 1, 1, 1, "1h 6m", "TestSource"), OutputLevel.Information), Times.Never);
         }
 
         [TestMethod]

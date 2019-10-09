@@ -738,6 +738,6 @@
     <value>Failed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5}).</value>
   </data>
   <data name="TestRunSummaryPassed" xml:space="preserve">
-    <value>Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5})</value>
+    <value>Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5}).</value>
   </data>
 </root>

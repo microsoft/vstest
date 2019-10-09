@@ -1663,7 +1663,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassed">
-        <source>Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5})</source>
+        <source>Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. Time: {4}. ({5}).</source>
         <target state="new">Passed! Total:{0}  Pass:{1}  Fail:{2}  Skip:{3} Time:{4}  Source:{5}</target>
         <note></note>
       </trans-unit>
