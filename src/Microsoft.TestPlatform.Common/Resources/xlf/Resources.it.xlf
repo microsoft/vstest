@@ -276,7 +276,7 @@
       </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">
         <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
-        <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
+        <target state="translated">Non è stato possibile caricare le estensioni dal file '{0}'. Per altre informazioni, usare /diag.</target>
         <note></note>
       </trans-unit>
     </body>

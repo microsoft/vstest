@@ -221,9 +221,9 @@
       將結果記錄至 Visual Studio 測試結果檔案 (TRX)
       以指定的 LogFileName，在 TestResults 目錄中建立檔案。
 
-      變更主控台記錄器的記錄訊息詳細資訊等級，如下所示
+      變更主控台記錄器的記錄訊息詳細程度等級，如下所示
       範例: /logger:console;verbosity=&lt;預設為 "normal"&gt;
-      詳細資訊的允許值: quiet、minimal、normal 以及 detailed。
+      詳細程度的允許值: quiet、minimal、normal 以及 detailed。
 
       變更主控台記錄器的診斷等級前置詞，如下所示
       範例: /logger:console;prefix=&lt;預設為 "false"&gt;
@@ -298,7 +298,7 @@
                 testproject*.dll my*project.dll</source>
         <target state="translated">[TestFileNames]
       從指定的檔案或萬用字元模式執行測試。分隔多個測試檔名稱或模式
-      由空格分隔。將主控台記錄器詳細資訊設定為詳細來檢視符合的測試檔案。
+      由空格分隔。將主控台記錄器詳細程度設定為詳細來檢視符合的測試檔案。
       範例: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</target>
@@ -1578,9 +1578,9 @@
       將結果記錄至 Visual Studio 測試結果檔案 (TRX)
       以指定的 LogFileName，在 TestResults 目錄中建立檔案。
 
-      變更主控台記錄器的記錄訊息詳細資訊等級，如下所示
+      變更主控台記錄器的記錄訊息詳細程度等級，如下所示
       範例: /logger:console;verbosity=&lt;預設為 "minimal"&gt;
-      詳細資訊的允許值: quiet、minimal、normal 以及 detailed。
+      詳細程度的允許值: quiet、minimal、normal 以及 detailed。
 
       變更主控台記錄器的診斷等級前置詞，如下所示
       範例: /logger:console;prefix=&lt;預設為 "false"&gt;
