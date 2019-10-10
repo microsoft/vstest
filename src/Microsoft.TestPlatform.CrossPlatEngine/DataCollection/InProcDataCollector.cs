@@ -67,9 +67,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.assemblyLoadContext = assemblyLoadContext;
 
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
-            this.dataCollectorType =
-                assembly?.GetTypes()
+
+            if (codeBase == Constants.CoverletDataCollectorCodebase)
+            {
+                // if inproc data collector is coverlet we skip version check to allow upgrade throught nuget package upgrade
+                this.dataCollectorType =
+                    assembly?.GetTypes()
+                    .FirstOrDefault(x => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
+            }
+            else
+            {
+                this.dataCollectorType =
+                    assembly?.GetTypes()
                     .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
+            }
 
             this.AssemblyQualifiedName = this.dataCollectorType?.AssemblyQualifiedName;
         }

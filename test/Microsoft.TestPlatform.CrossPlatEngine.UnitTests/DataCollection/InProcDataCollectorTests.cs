@@ -5,7 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 {
     using System.IO;
     using System.Reflection;
-
+    using Coverlet.Collector.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -71,6 +71,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.inProcDataCollector = new InProcDataCollector(
                 string.Empty,
                 typeInfo.AssemblyQualifiedName,
+                typeInfo,
+                string.Empty,
+                this.assemblyLoadContext.Object);
+
+            Assert.IsNotNull(this.inProcDataCollector.AssemblyQualifiedName);
+            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void InProcDataCollectorLoadCoverlet()
+        {
+            var typeInfo = typeof(CoverletInProcDataCollector).GetTypeInfo();
+
+            this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
+                .Returns(typeInfo.Assembly);
+
+            this.inProcDataCollector = new InProcDataCollector(
+                "coverlet.collector.dll",
+                "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=9.9.9.9, Culture=neutral, PublicKeyToken=null",
                 typeInfo,
                 string.Empty,
                 this.assemblyLoadContext.Object);
