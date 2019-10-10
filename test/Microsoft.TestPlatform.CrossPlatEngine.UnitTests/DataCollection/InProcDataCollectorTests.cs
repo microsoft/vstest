@@ -64,7 +64,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void InProcDataCollectorShouldInitializeIfAssemblyContainsAnyInProcDataCollector()
         {
             var typeInfo = typeof(TestableInProcDataCollector).GetTypeInfo();
-            
+
             this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Returns(typeInfo.Assembly);
 
@@ -84,12 +84,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var typeInfo = typeof(CoverletInProcDataCollector).GetTypeInfo();
 
+            Assert.AreEqual("9.9.9.9", typeInfo.Assembly.GetName().Version.ToString());
+
             this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Returns(typeInfo.Assembly);
 
             this.inProcDataCollector = new InProcDataCollector(
                 "coverlet.collector.dll",
-                "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=9.9.9.9, Culture=neutral, PublicKeyToken=null",
+                "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
                 typeInfo,
                 string.Empty,
                 this.assemblyLoadContext.Object);

@@ -5,7 +5,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
 
-[assembly: AssemblyKeyFileAttribute("key.snk")]
+[assembly: AssemblyKeyFile("key.snk")]
+[assembly: AssemblyVersion("9.9.9.9")]
 
 namespace Coverlet.Collector.DataCollection
 {
