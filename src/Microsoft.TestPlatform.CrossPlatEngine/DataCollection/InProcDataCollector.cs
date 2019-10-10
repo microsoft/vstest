@@ -69,20 +69,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
 
+            Func<Type, bool> filterPredicate;
             if (Path.GetFileName(codeBase) == Constants.CoverletDataCollectorCodebase)
             {
-                // if inproc data collector is coverlet we skip version check to allow upgrade throught nuget package upgrade
-                this.dataCollectorType =
-                    assembly?.GetTypes()
-                    .FirstOrDefault(x => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
+                // If we're loading coverlet collector we skip to check the version of assembly
+                // to allow upgrade throught nuget package
+                filterPredicate = (x) => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
             }
             else
             {
-                this.dataCollectorType =
-                    assembly?.GetTypes()
-                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
+                filterPredicate = (x) => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
             }
 
+            this.dataCollectorType = assembly?.GetTypes().FirstOrDefault(filterPredicate);
             this.AssemblyQualifiedName = this.dataCollectorType?.AssemblyQualifiedName;
         }
 
