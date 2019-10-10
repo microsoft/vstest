@@ -90,9 +90,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 .Returns(typeInfo.Assembly);
 
             this.inProcDataCollector = new InProcDataCollector(
-                "coverlet.collector.dll",
+                typeInfo.Assembly.Location,
                 "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-                typeInfo,
+                typeof(InProcDataCollection).GetTypeInfo(),
                 string.Empty,
                 this.assemblyLoadContext.Object);
 

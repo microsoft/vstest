@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
 
@@ -68,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
 
-            if (codeBase == Constants.CoverletDataCollectorCodebase)
+            if (Path.GetFileName(codeBase) == Constants.CoverletDataCollectorCodebase)
             {
                 // if inproc data collector is coverlet we skip version check to allow upgrade throught nuget package upgrade
                 this.dataCollectorType =
