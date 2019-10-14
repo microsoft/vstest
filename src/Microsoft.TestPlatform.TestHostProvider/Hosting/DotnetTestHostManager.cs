@@ -111,8 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         /// <summary>
         /// Gets a value indicating whether the test host supports protocol version check
+        /// By default this is set to true. For host package version 15.0.0, this will be set to false;
         /// </summary>
-        internal virtual bool IsVersionCheckRequired => !this.hostPackageVersion.StartsWith("15.0.0");
+        internal virtual bool IsVersionCheckRequired => true;
 
         /// <summary>
         /// Gets a value indicating whether the test host supports protocol version check
@@ -422,6 +423,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                             testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
                             this.hostPackageVersion = testhostPackage.Version;
+                            this.IsVersionCheckRequired = !(this.hostPackageVersion.StartsWith("15.0.0"));
                             EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
                         }
                     }

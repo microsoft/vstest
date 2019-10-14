@@ -608,7 +608,7 @@ function Create-NugetPackages
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.targets -Force
 	
 	$testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
-    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCorePackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.targets" $testhostCorePackageDir\Microsoft.TestPlatform.TestHost.targets -Force
     
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"

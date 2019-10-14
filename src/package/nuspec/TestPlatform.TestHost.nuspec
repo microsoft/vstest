@@ -47,7 +47,7 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.dll" target="build\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.exe" target="build\netcoreapp2.1\x86\" />
 
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp2.1\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.TestHost.targets" target="build\netcoreapp2.1\" />
     
     <!-- UWP -->
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\testhost.dll" target="lib\uap10.0\" />
