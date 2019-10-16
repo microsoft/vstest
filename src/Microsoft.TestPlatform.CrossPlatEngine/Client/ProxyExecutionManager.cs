@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
             
-            // remove this line once we figure out why coverlet inrpoc DC is not initialized via runsetting inproc node.
+            // remove this line once we figure out why coverlet inproc DC is not initialized via runsetting inproc node.
             extensions = extensions.Concat(TestPluginCache.Instance.GetExtensionPaths(ProxyExecutionManager.CoverletDataCollector, true)).ToList();
 
             // Filter out non existing extensions

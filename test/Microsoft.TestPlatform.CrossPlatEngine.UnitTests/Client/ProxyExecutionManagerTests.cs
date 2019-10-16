@@ -303,11 +303,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void StartTestRunShouldInitializeExtensionsWithExistingDataCOllectorExtensions()
+        public void StartTestRunShouldInitializeExtensionsOnlyWithCoverletDataCollectorExtensions()
         {
             TestPluginCache.Instance = null;
-            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll", "abc.DataCollector.dll" }, false);
-            var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll", "abc.DataCollector.dll" };
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll", "abc.DataCollector.dll", "xyz.coverlet.collector.dll" }, false);
+            var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll", "xyz.coverlet.collector.dll" };
 
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
@@ -324,6 +324,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockFileHelper.Setup(fh => fh.Exists("abc.TestAdapter.dll")).Returns(true);
             this.mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
             this.mockFileHelper.Setup(fh => fh.Exists("abc.DataCollector.dll")).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.Exists("xyz.coverlet.collector.dll")).Returns(true); 
 
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
