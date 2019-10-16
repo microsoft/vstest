@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 return this.isVersionCheckRequired;
             }
 
-            set
+            private set
             {
                 this.isVersionCheckRequired = value;
             }
@@ -218,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
-            var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
+            string testHostPath = string.Empty;
 
             // If testhost.exe is available use it
             bool testHostExeFound = false;
@@ -237,6 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 else
                 {
                     // Check if testhost.dll is found in nuget folder.
+                    testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
                     if (testHostPath.IndexOf("microsoft.testplatform.testhost", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
