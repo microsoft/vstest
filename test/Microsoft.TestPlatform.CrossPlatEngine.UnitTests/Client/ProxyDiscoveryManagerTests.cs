@@ -493,6 +493,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once);
         }
 
+        [TestMethod]
+        public void AbortShouldSendTestDiscoveryCancelIfCommunicationSuccessful()
+        {
+            var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            this.testDiscoveryManager.Abort();
+
+            this.mockRequestSender.Verify(s => s.SendTestDiscoveryCancel(), Times.Once);
+        }
+
         private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)
         {
             TestPluginCache.Instance = null;

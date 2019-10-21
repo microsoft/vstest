@@ -318,6 +318,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
                     }
 
+                case MessageType.CancelDiscovery:
+                    jobQueue.Pause();
+                    this.testHostManagerFactoryReady.Wait();
+                    testHostManagerFactory.GetDiscoveryManager().Abort();
+                    break;
+
                 case MessageType.CancelTestRun:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();

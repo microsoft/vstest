@@ -140,7 +140,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Abort()
         {
-            // This is no-op for the moment. There is no discovery abort message?
+            // Cancel fast, try to stop testhost deployment/launch
+            this.CancellationTokenSource.Cancel();
+
+            if (this.isCommunicationEstablished)
+            {
+                this.RequestSender.SendTestDiscoveryCancel();
+            }
         }
 
         /// <inheritdoc/>

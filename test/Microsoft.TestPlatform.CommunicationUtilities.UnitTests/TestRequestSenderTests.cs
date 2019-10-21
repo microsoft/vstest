@@ -202,6 +202,19 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockChannel.Verify(mockChannel => mockChannel.Send(MessageType.CancelTestRun), Times.Never);
         }
 
+        [TestMethod]
+        public void SendTestDiscoveryCancelShouldSendTestDiscoveryCancelMessage()
+        {
+            var serializedCancelMessage = "Message : TestDiscovery.Cancel";
+            this.SetupFakeCommunicationChannel();
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
+            this.mockDataSerializer.Setup(ds => ds.SerializeMessage(MessageType.CancelDiscovery)).Returns(serializedCancelMessage);
+
+            this.testRequestSender.SendTestDiscoveryCancel();
+
+            this.mockChannel.Verify(mockChannel => mockChannel.Send(serializedCancelMessage), Times.Once);
+        }
+
         [DataTestMethod]
         [DataRow("")]
         [DataRow(" ")]

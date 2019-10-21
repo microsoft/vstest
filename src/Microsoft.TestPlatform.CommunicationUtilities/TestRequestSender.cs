@@ -318,6 +318,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
+        public void SendTestDiscoveryCancel()
+        {
+            if (this.IsOperationComplete())
+            {
+                EqtTrace.Verbose("TestRequestSender: SendTestDiscoveryCancel: Operation is already complete. Skip error message.");
+                return;
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.SendTestDiscoveryCancel: Sending test discovery cancel.");
+            }
+
+            this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
+        }
+
+        /// <inheritdoc />
         public void SendTestRunCancel()
         {
             if (this.IsOperationComplete())

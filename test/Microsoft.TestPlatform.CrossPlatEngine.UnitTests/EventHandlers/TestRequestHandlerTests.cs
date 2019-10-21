@@ -286,7 +286,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.SendSessionEnd();
         }
 
-        // ProcessRequestsExecutionCancelShouldStopRequestProcessing
+        [TestMethod]
+        public void ProcessRequestsDiscoveryCancelShouldCancelDiscovery()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.CancelDiscovery, string.Empty);
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            mockDiscoveryManager.Verify(dm => dm.Abort(), Times.Once);
+            this.SendSessionEnd();
+        }
 
         [TestMethod]
         public void ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage()
@@ -311,8 +321,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             mockExecutionManager.Verify(e => e.Abort(It.IsAny<ITestRunEventsHandler>()));
             this.SendSessionEnd();
         }
-
-        // ProcessRequestsExecutionAbortShouldStopRequestProcessing
 
         [TestMethod]
         public void SendExecutionCompleteShouldSendTestRunCompletePayloadOnChannel()
