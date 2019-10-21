@@ -156,6 +156,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private ConcurrentDictionary<string, SourceSummary> sourceSummaryDictionary { get; set; }
 
+        private string targetFramework;
+
         #endregion
 
         #region ITestLoggerWithParameters
@@ -225,6 +227,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (noprogressExists)
             {
                 bool.TryParse(noprogress, out DisableProgress);
+            }
+
+            if (this.verbosityLevel == Verbosity.Quiet)
+            {
+                this.targetFramework = parameters[DefaultLoggerParameterNames.TargetFramework];
             }
 
             Initialize(events, String.Empty);
@@ -646,12 +653,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     if (summary.FailedTests > 0)
                     {
                         // Failed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                        Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
+                        Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
                     }
                     else
                     {
                         // Passed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                        Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
+                        Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
                     }
                 }
             }
