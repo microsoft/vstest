@@ -735,9 +735,9 @@
     <value>A total of {0} test files matched the specified pattern.</value>
   </data>
   <data name="TestRunSummaryFailed" xml:space="preserve">
-    <value>Failed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. ({4}) {5} ({6}).</value>
+    <value>Failed! Total: {0}. Pass: {1}. Fail: {2}. Skip: {3}. ({4}) {5} ({6}).</value>
   </data>
   <data name="TestRunSummaryPassed" xml:space="preserve">
-    <value>Passed!  Total: {0}.  Pass: {1}.  Fail: {2}.  Skip: {3}. ({4}) {5} ({6}).</value>
+    <value>Passed! Total: {0}. Pass: {1}. Fail: {2}. Skip: {3}. ({4}) {5} ({6}).</value>
   </data>
 </root>

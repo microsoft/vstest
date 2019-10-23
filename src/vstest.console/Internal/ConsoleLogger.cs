@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
+    using NuGet.Frameworks;
     using CommandLineResources = Resources.Resources;
     /// <summary>
     /// Logger for sending output to the console.
@@ -232,6 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (this.verbosityLevel == Verbosity.Quiet)
             {
                 this.targetFramework = parameters[DefaultLoggerParameterNames.TargetFramework];
+                this.targetFramework = NuGetFramework.Parse(this.targetFramework).GetShortFolderName();
             }
 
             Initialize(events, String.Empty);
@@ -603,28 +604,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var time = new List<string>();
             if (duration.Hours > 0)
             {
-                time.Add(duration.Hours + "h");
+                time.Add(duration.Hours + " h");
             }
 
             if (duration.Minutes > 0)
             {
-                time.Add(duration.Minutes + "m");
+                time.Add(duration.Minutes + " m");
             }
 
             if (duration.Hours == 0)
             {
                 if (duration.Seconds > 0)
                 {
-                    time.Add(duration.Seconds + "s");
+                    time.Add(duration.Seconds + " s");
                 }
 
                 if (duration.Milliseconds > 0 && duration.Minutes == 0)
                 {
-                    time.Add(duration.Milliseconds + "ms");
+                    time.Add(duration.Milliseconds + " ms");
                 }
             }
 
-            return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
+            return time.Count == 0 ? "< 1 ms" : string.Join(" ", time);
         }
 
         /// <summary>
@@ -657,8 +658,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     }
                     else
                     {
-                        // Passed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                        Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
+                        if (summary.SkippedTests > 0)
+                        {
+                            Output.Information(false, ConsoleColor.Yellow, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
+                        }
+                        else
+                        {
+                            // Passed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
+                            Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
+                        }
                     }
                 }
             }
