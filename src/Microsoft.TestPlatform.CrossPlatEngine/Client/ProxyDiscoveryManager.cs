@@ -142,11 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             // Cancel fast, try to stop testhost deployment/launch
             this.CancellationTokenSource.Cancel();
-
-            if (this.isCommunicationEstablished)
-            {
-                this.RequestSender.EndSession();
-            }
+            this.Close();
         }
 
         /// <inheritdoc/>

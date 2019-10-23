@@ -363,7 +363,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
                 }
 
-                this.channel.Send(this.dataSerializer.SerializeMessage(MessageType.SessionEnd));
+                this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.SessionEnd));
             }
         }
 
