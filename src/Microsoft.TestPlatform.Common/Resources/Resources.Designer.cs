@@ -349,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to find a datacollector with friendly name &apos;[0}&apos;..
+        ///   Looks up a localized string similar to Unable to find a datacollector with friendly name &apos;{0}&apos;..
         /// </summary>
         internal static string UnableToFetchUriString {
             get {
