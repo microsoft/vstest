@@ -88,11 +88,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendTestRunAbort();
 
         /// <summary>
-        /// Send the request to cancel the test discovery
-        /// </summary>
-        void SendTestDiscoveryCancel();
-
-        /// <summary>
         /// Handle client process exit
         /// </summary>
         /// <param name="stdError">Standard error output</param>

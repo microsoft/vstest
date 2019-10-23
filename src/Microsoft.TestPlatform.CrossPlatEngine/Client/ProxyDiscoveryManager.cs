@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (this.isCommunicationEstablished)
             {
-                this.RequestSender.SendTestDiscoveryCancel();
+                this.RequestSender.EndSession();
             }
         }
 

@@ -287,18 +287,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         [TestMethod]
-        public void ProcessRequestsDiscoveryCancelShouldCancelDiscovery()
-        {
-            var message = this.dataSerializer.SerializePayload(MessageType.CancelDiscovery, string.Empty);
-
-            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
-            this.SendMessageOnChannel(message);
-
-            mockDiscoveryManager.Verify(dm => dm.Abort(), Times.Once);
-            this.SendSessionEnd();
-        }
-
-        [TestMethod]
         public void ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, string.Empty);

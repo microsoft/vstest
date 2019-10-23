@@ -505,7 +505,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testDiscoveryManager.Abort();
 
-            this.mockRequestSender.Verify(s => s.SendTestDiscoveryCancel(), Times.Once);
+            this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
         }
 
         private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)
