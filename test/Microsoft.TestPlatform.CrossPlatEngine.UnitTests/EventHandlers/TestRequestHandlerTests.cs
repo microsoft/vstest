@@ -286,8 +286,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.SendSessionEnd();
         }
 
-        // ProcessRequestsExecutionCancelShouldStopRequestProcessing
-
         [TestMethod]
         public void ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage()
         {
@@ -311,8 +309,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             mockExecutionManager.Verify(e => e.Abort(It.IsAny<ITestRunEventsHandler>()));
             this.SendSessionEnd();
         }
-
-        // ProcessRequestsExecutionAbortShouldStopRequestProcessing
 
         [TestMethod]
         public void SendExecutionCompleteShouldSendTestRunCompletePayloadOnChannel()
