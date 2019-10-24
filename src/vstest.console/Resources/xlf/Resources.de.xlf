@@ -1656,14 +1656,9 @@
         <target state="translated">Insgesamt {0} Testdateien stimmten mit dem angegebenen Muster überein.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="TestRunSummaryFailed">
-        <source>Failed! Total: {0}. Pass: {1}. Fail: {2}. Skip: {3}. ({4}) {5} ({6}).</source>
-        <target state="new">Failed!  Pass:{0}  Fail:{1}  Skip:{2}  Time:{3}  Source:{4}</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="TestRunSummaryPassed">
-        <source>Passed! Total: {0}. Pass: {1}. Fail: {2}. Skip: {3}. ({4}) {5} ({6}).</source>
-        <target state="new">Passed! Total:{0}  Pass:{1}  Fail:{2}  Skip:{3} Time:{4}  Source:{5}</target>
+      <trans-unit id="TestRunSummary">
+        <source>{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</source>
+        <target state="new">{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</target>
         <note></note>
       </trans-unit>
     </body>

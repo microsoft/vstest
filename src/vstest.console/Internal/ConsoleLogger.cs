@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private const char PassedTestIndicator = '\u221a';
 
-        /// <summary>
+         /// <summary>
         /// Indicator for failed tests
         /// </summary>
         private const char FailedTestIndicator = 'X';
@@ -66,6 +66,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v1";
 
         /// <summary>
+        /// Represents failed tests. 
+        /// </summary>
+        private const string Failed = "Failed";
+
+        /// <summary>
         /// Alternate user friendly string to uniquely identify the console logger.
         /// </summary>
         public const string FriendlyName = "Console";
@@ -74,6 +79,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Parameter for Verbosity
         /// </summary>
         public const string VerbosityParam = "verbosity";
+
+        /// <summary>
+        ///  Represents Passed tests.
+        /// </summary>
+        private const string Passed = "Passed";
 
         /// <summary>
         /// Parameter for log message prefix
@@ -232,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (this.verbosityLevel == Verbosity.Quiet)
             {
                 this.targetFramework = parameters[DefaultLoggerParameterNames.TargetFramework];
-                this.targetFramework = NuGetFramework.Parse(this.targetFramework).GetShortFolderName();
+                this.targetFramework = !string.IsNullOrEmpty(this.targetFramework) ? NuGetFramework.Parse(this.targetFramework).GetShortFolderName() : this.targetFramework;
             }
 
             Initialize(events, String.Empty);
@@ -651,23 +661,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (verbosityLevel == Verbosity.Quiet)
                 {
-                    if (summary.FailedTests > 0)
-                    {
-                        // Failed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                        Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
-                    }
-                    else
-                    {
-                        if (summary.SkippedTests > 0)
-                        {
-                            Output.Information(false, ConsoleColor.Yellow, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
-                        }
-                        else
-                        {
-                            // Passed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                            Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), targetFramework));
-                        }
-                    }
+                    var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
+                    var resultString = summary.FailedTests > 0 ? Failed : Passed;
+                    var color = summary.FailedTests > 0 ? ConsoleColor.Red : summary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
+                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString ,summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), frameworkString);
+                    Output.Information(false, color, outputLine);
                 }
             }
 

@@ -1551,11 +1551,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed! Total: {0}. Pass: {1}. Fail: {2}. Skip: {3}. ({4}) {5} ({6})..
+        ///   Looks up a localized string similar to {0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}..
         /// </summary>
-        internal static string TestRunSummaryFailed {
+        internal static string TestRunSummary {
             get {
-                return ResourceManager.GetString("TestRunSummaryFailed", resourceCulture);
+                return ResourceManager.GetString("TestRunSummary", resourceCulture);
             }
         }
         
@@ -1574,15 +1574,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         internal static string TestRunSummaryForCanceledOrAbortedRun {
             get {
                 return ResourceManager.GetString("TestRunSummaryForCanceledOrAbortedRun", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Passed! Total: {0}. Pass: {1}. Fail: {2}. Skip: {3}. ({4}) {5} ({6})..
-        /// </summary>
-        internal static string TestRunSummaryPassed {
-            get {
-                return ResourceManager.GetString("TestRunSummaryPassed", resourceCulture);
             }
         }
         
