@@ -30,7 +30,7 @@ There are many ways to contribute to VSTest
 - [Packaging](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0014-Packaging.md)
 - [Telemetry](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0015-Telemetry.md)
 - [Loggers Information From RunSettings](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0016-Loggers-Information-From-RunSettings.md)
-- [TestCase FullyQualifiedName](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0017-TestCase-FullyQualifiedName.md)
+- [Properties for TestCases in Managed Code](https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md)
 - [Skip Default Adapters](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0018-Skip-Default-Adapters.md)
 - [Disable Appdomain While Running Tests](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0019-Disable-Appdomain-While-Running-Tests.md)
 - [Improving Logic To Pass Sources To Adapters](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0020-Improving-Logic-To-Pass-Sources-To-Adapters.md)
