@@ -56,9 +56,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         internal static bool AppendPrefix;
 
         /// <summary>
-        /// Bool to decide whether progress indicator should be disabled.
+        /// Bool to decide whether progress indicator should be enabled.
         /// </summary>
-        internal static bool DisableProgress;
+        internal static bool EnableProgress;
 
         /// <summary>
         /// Uri used to uniquely identify the console logger.
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Parameter for disabling progress
         /// </summary>
-        public const string NoProgressParam = "noprogress";
+        public const string ProgressIndicatorParam = "progress";
 
         #endregion
 
@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 ConsoleLogger.Output = ConsoleOutput.Instance;
             }
 
-            if (this.progressIndicator == null && !Console.IsOutputRedirected && !DisableProgress)
+            if (this.progressIndicator == null && !Console.IsOutputRedirected && EnableProgress)
             {
                 // Progress indicator needs to be displayed only for cli experience.
                 this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
@@ -219,10 +219,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 bool.TryParse(prefix, out AppendPrefix);
             }
 
-            var noprogressExists = parameters.TryGetValue(ConsoleLogger.NoProgressParam, out string noprogress);
-            if (noprogressExists)
+            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out string enableProgress);
+            if (progressArgExists)
             {
-                bool.TryParse(noprogress, out DisableProgress);
+                bool.TryParse(enableProgress, out EnableProgress);
             }
 
             Initialize(events, String.Empty);
