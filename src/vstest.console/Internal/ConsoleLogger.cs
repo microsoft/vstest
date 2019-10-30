@@ -232,7 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 bool.TryParse(noprogress, out DisableProgress);
             }
 
-            if (this.verbosityLevel == Verbosity.Quiet)
+            if (this.verbosityLevel == Verbosity.Quiet || this.verbosityLevel == Verbosity.Minimal)
             {
                 this.targetFramework = parameters[DefaultLoggerParameterNames.TargetFramework];
                 this.targetFramework = !string.IsNullOrEmpty(this.targetFramework) ? NuGetFramework.Parse(this.targetFramework).GetShortFolderName() : this.targetFramework;
@@ -652,7 +652,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 testsSkipped += summary.SkippedTests;
                 testsTotal += summary.TotalTests;
 
-                if (verbosityLevel == Verbosity.Quiet)
+                if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
                 {
                     var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
                     var resultString = summary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
@@ -662,7 +662,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            if (verbosityLevel == Verbosity.Quiet)
+            if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
             {
                 return;
             }

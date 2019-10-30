@@ -63,10 +63,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeWithParametersShouldThrowExceptionIfEventsIsNull()
         {
+            var parameters = new Dictionary<string, string>
+            {
+                { "param1", "value" },
+                { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            };
+
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                var parameters = new Dictionary<string, string>();
-                parameters.Add("parma1", "value");
                 this.consoleLogger.Initialize(null, parameters);
             });
         }
@@ -92,8 +96,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeWithParametersShouldSetVerbosityLevel()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "minimal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "minimal" },
+                { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            };
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
             Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, this.consoleLogger.VerbosityLevel);
@@ -102,8 +109,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeWithParametersShouldDefaultToNormalVerbosityLevelForInvalidVerbosity()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "random");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "" },
+                { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            };
+
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
 #if NET451
@@ -116,26 +127,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeWithParametersShouldSetPrefixValue()
         {
-            var parameters = new Dictionary<string, string>();
-
+            var parameters = new Dictionary<string, string>
+            {
+                { "prefix", "true" },
+                { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            };
             Assert.IsFalse(ConsoleLogger.AppendPrefix);
 
-            parameters.Add("prefix", "true");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
             Assert.IsTrue(ConsoleLogger.AppendPrefix);
-
             ConsoleLogger.AppendPrefix = false;
         }
 
         [TestMethod]
         public void InitializeWithParametersShouldSetNoProgress()
         {
-            var parameters = new Dictionary<string, string>();
+            var parameters = new Dictionary<string, string>
+            {
+                { "noprogress", "true" },
+                { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            };
 
             Assert.IsFalse(ConsoleLogger.DisableProgress);
-
-            parameters.Add("noprogress", "true");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
             Assert.IsTrue(ConsoleLogger.DisableProgress);
@@ -573,16 +587,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
         }
 
-        [DataRow(".NETFramework,version=v4.5.1", "(net451)")]
-        [DataRow(null, null)]
+        [DataRow(".NETFramework,version=v4.5.1", "(net451)", "quiet")]
+        [DataRow(".NETFramework,version=v4.5.1", "(net451)", "minimal")]
+        [DataRow(null, null, "quiet")]
+        [DataRow(null, null, "minimal")]
         [TestMethod]
-        public void TestResultHandlerShouldShowFailedTestsAndPassedTestsForQuietVebosity(string framework, string expectedFramework)
+        public void TestResultHandlerShouldShowFailedTestsAndPassedTestsForQuietVebosity(string framework, string expectedFramework, string verbosityLevel)
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>
             {
-                { "verbosity", "quiet" },
+                { "verbosity", verbosityLevel },
                 { DefaultLoggerParameterNames.TargetFramework , framework}
             };
             this.consoleLogger.Initialize(loggerEvents, parameters);
@@ -690,8 +706,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "minimal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "minimal" },
+                { DefaultLoggerParameterNames.TargetFramework , "net451"}
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             foreach (var testResult in this.GetTestResultsObject())
