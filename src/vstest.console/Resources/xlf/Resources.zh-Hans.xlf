@@ -1660,6 +1660,16 @@
         <target state="new">{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="Failed">
+        <source>Failed</source>
+        <target state="new">Failed</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Passed">
+        <source>Passed</source>
+        <target state="new">Passed</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

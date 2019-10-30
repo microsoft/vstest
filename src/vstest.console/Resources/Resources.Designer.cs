@@ -550,6 +550,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed.
+        /// </summary>
+        internal static string Failed {
+            get {
+                return ResourceManager.GetString("Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed   {0}.
         /// </summary>
         internal static string FailedTestIndicator {
@@ -1094,6 +1103,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         internal static string ParentProcessIdArgumentHelp {
             get {
                 return ResourceManager.GetString("ParentProcessIdArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Passed.
+        /// </summary>
+        internal static string Passed {
+            get {
+                return ResourceManager.GetString("Passed", resourceCulture);
             }
         }
         

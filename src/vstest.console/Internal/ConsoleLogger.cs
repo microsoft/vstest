@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private const char PassedTestIndicator = '\u221a';
 
-         /// <summary>
+        /// <summary>
         /// Indicator for failed tests
         /// </summary>
         private const char FailedTestIndicator = 'X';
@@ -66,11 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v1";
 
         /// <summary>
-        /// Represents failed tests. 
-        /// </summary>
-        private const string Failed = "Failed";
-
-        /// <summary>
         /// Alternate user friendly string to uniquely identify the console logger.
         /// </summary>
         public const string FriendlyName = "Console";
@@ -79,11 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Parameter for Verbosity
         /// </summary>
         public const string VerbosityParam = "verbosity";
-
-        /// <summary>
-        ///  Represents Passed tests.
-        /// </summary>
-        private const string Passed = "Passed";
 
         /// <summary>
         /// Parameter for log message prefix
@@ -118,6 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 #endif
 
         private bool testRunHasErrorMessages = false;
+
+        /// <summary>
+        /// Framework on which the test runs.
+        /// </summary>
+        private string targetFramework;
 
         #endregion
 
@@ -165,8 +160,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Dictionary of summary of each source. 
         /// </summary>
         private ConcurrentDictionary<string, SourceSummary> sourceSummaryDictionary { get; set; }
-
-        private string targetFramework;
 
         #endregion
 
@@ -496,7 +489,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Update the test count statistics based on the result of the test. 
             summary.TotalTests++;
-            summary.TimeSpan += e.Result.Duration;
+            summary.Duration += e.Result.Duration;
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -662,9 +655,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 if (verbosityLevel == Verbosity.Quiet)
                 {
                     var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
-                    var resultString = summary.FailedTests > 0 ? Failed : Passed;
+                    var resultString = summary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
                     var color = summary.FailedTests > 0 ? ConsoleColor.Red : summary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
-                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString ,summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last(), frameworkString);
+                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.Duration), sd.Key.Split('\\').Last(), frameworkString);
                     Output.Information(false, color, outputLine);
                 }
             }
