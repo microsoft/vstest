@@ -10,7 +10,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -20,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -40,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -166,6 +165,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string FailedToFindInstalledUnitTestExtensions {
             get {
                 return ResourceManager.GetString("FailedToFindInstalledUnitTestExtensions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load extensions from file &apos;{0}&apos;. Please use /diag for more information..
+        /// </summary>
+        internal static string FailedToLoadAdapaterFile {
+            get {
+                return ResourceManager.GetString("FailedToLoadAdapaterFile", resourceCulture);
             }
         }
         
@@ -337,6 +345,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string TestCaseFilterFormatException {
             get {
                 return ResourceManager.GetString("TestCaseFilterFormatException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to find a datacollector with friendly name &apos;[0}&apos;..
+        /// </summary>
+        internal static string UnableToFetchUriString {
+            get {
+                return ResourceManager.GetString("UnableToFetchUriString", resourceCulture);
             }
         }
         

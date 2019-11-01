@@ -300,7 +300,7 @@ Fehlerdetails: {1}: {2}</target>
       </trans-unit>
       <trans-unit id="PrefixAndNameProvidedError">
         <source>The parameters LogFileName and LogFilePrefix cannot be used together. </source>
-        <target state="new">The parameters LogFileName and LogFilePrefix cannot be given together. </target>
+        <target state="translated">Os parâmetros LogFileName e LogFilePrefix não podem ser usados juntos. </target>
         <note></note>
       </trans-unit>
     </body>

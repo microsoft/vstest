@@ -712,7 +712,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
         [TestMethod]
         [DataRow("results")]
-        [DataRow("results.trx")]
         public void CustomTrxFileNameShouldBeConstructedFromRelativeLogFilePrefixParameter(string prefixName)
         {
             this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);

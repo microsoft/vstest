@@ -240,10 +240,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         EqtTrace.Info("Discovery Session Initialize.");
                         this.testHostManagerFactoryReady.Wait();
+                        var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
                         var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                         jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
+                                testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions, discoveryEventsHandler), 0);
                         break;
                     }
 
@@ -265,10 +266,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         EqtTrace.Info("Execution Session Initialize.");
                         this.testHostManagerFactoryReady.Wait();
+                        var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
                         var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                         jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
+                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testInitializeEventsHandler), 0);
                         break;
                     }
 

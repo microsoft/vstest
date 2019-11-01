@@ -20,8 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <param name="environmentVariables">Environment variables to set while bootstrapping the process.</param>
         /// <param name="errorCallback">Call back for to read error stream data</param>
         /// <param name="exitCallBack">Call back for on process exit</param>
+        /// <param name="outputCallback">Call back for on process output</param>
         /// <returns>The process created.</returns>
-        object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack);
+        object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallback);
 
         /// <summary>
         /// Gets the current process file path.

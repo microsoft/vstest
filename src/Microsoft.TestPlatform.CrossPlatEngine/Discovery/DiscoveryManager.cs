@@ -63,10 +63,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Initializes the discovery manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
+        public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
         {
             this.testPlatformEventSource.AdapterSearchStart();
-
+            this.testDiscoveryEventsHandler = eventHandler;
             if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
             {
                 // Start using these additional extensions
@@ -76,6 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
             this.testPlatformEventSource.AdapterSearchStop();
+            
         }
 
         /// <summary>
@@ -107,6 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
                 }
 
+                
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
