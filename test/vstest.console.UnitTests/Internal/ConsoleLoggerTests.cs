@@ -66,7 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var parameters = new Dictionary<string, string>
             {
                 { "param1", "value" },
-                { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
 
             Assert.ThrowsException<ArgumentNullException>(() =>
@@ -112,7 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var parameters = new Dictionary<string, string>
             {
                 { "verbosity", "" },
-                { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
 
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
@@ -130,7 +128,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var parameters = new Dictionary<string, string>
             {
                 { "prefix", "true" },
-                { DefaultLoggerParameterNames.TargetFramework , "net451"}
             };
             Assert.IsFalse(ConsoleLogger.AppendPrefix);
 
@@ -143,17 +140,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeWithParametersShouldSetNoProgress()
         {
-            var parameters = new Dictionary<string, string>
-            {
-                { "noprogress", "true" },
-                { DefaultLoggerParameterNames.TargetFramework , "net451"}
-            };
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("noprogress", "true");
 
             Assert.IsFalse(ConsoleLogger.DisableProgress);
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
             Assert.IsTrue(ConsoleLogger.DisableProgress);
-
             ConsoleLogger.DisableProgress = false;
         }
 
@@ -1107,13 +1100,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine(" AdditionalInfoCategory AnotherAdditionalInfoCategory", OutputLevel.Information), Times.Once());
         }
 
+        [DataRow("quiet")]
+        [DataRow("Normal")]
+        [DataRow("minimal")]
+        [DataRow("detailed")]
         [TestMethod]
-        public void AttachmentInformationShouldBeWrittenToConsoleIfAttachmentsArePresent()
+        public void AttachmentInformationShouldBeWrittenToConsoleIfAttachmentsArePresent(string verbosityLevel)
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            parameters.Add("verbosity", verbosityLevel);
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var attachmentSet = new AttachmentSet(new Uri("test://uri"), "myattachmentset");
