@@ -221,7 +221,7 @@
       fichier de résultats des tests Visual Studio (TRX), utilisez /logger:trx[;LogFileName=&lt;nom de fichier unique par défaut&gt;]
       Crée un fichier dans le répertoire TestResults avec le LogFileName indiqué.
 
-      Change le niveau de détail des messages du journaliseur de la console, comme indiqué ci-dessous
+      Change le niveau de verbosité des messages du journaliseur de la console, comme indiqué ci-dessous
       Exemple : /logger:console;verbosity=&lt;"normal" par défaut&gt;
       Valeurs autorisées pour verbosity : quiet, minimal, normal et detailed.
 
@@ -297,7 +297,7 @@
                 testproject*.dll my*project.dll</source>
         <target state="translated">[TestFileNames]
       Exécutez des tests à partir des fichiers ou des modèles de caractères génériques spécifiés. Séparez plusieurs modèles ou noms de fichiers de test
-      par des espaces. Affectez au journaliseur de console un niveau de détail élevé pour voir les fichiers de test correspondants.
+      par des espaces. Affectez à la verbosité du journaliseur de console la valeur Detailed pour voir les fichiers de test correspondants.
       Exemples : mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</target>
@@ -1577,7 +1577,7 @@
       fichier de résultats des tests Visual Studio (TRX), utilisez /logger:trx[;LogFileName=&lt;nom de fichier unique par défaut&gt;]
       Crée un fichier dans le répertoire TestResults avec le LogFileName indiqué.
 
-      Change le niveau de détail des messages du journaliseur de la console, comme indiqué ci-dessous
+      Change le niveau de verbosité des messages du journaliseur de la console, comme indiqué ci-dessous
       Exemple : /logger:console;verbosity=&lt;"minimal" par défaut&gt;
       Valeurs autorisées pour verbosity : quiet, minimal, normal et detailed.
 
