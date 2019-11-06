@@ -37,6 +37,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool skipDefaultAdapters;
         private readonly IFileHelper fileHelper;
 
+        // Only send coverlet inproc datacollector dll to be initialized via testhost, 
+        // ideally this should get initialized via InProcessDC Node in runsettings, but 
+        // somehow it is failing, hence putting this ugly HACK, to fix issues like
+        // https://developercommunity.visualstudio.com/content/problem/738856/could-not-load-file-or-assembly-microsoftintellitr.html
+        private const string CoverletDataCollector = "coverlet.collector.dll";
+
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
 
@@ -261,7 +267,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
-            extensions = extensions.Concat(TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.DataCollectorEndsWithPattern, true)).ToList();
+            
+            // remove this line once we figure out why coverlet inproc DC is not initialized via runsetting inproc node.
+            extensions = extensions.Concat(TestPluginCache.Instance.GetExtensionPaths(ProxyExecutionManager.CoverletDataCollector, true)).ToList();
 
             // Filter out non existing extensions
             var nonExistingExtensions = extensions.Where(extension => !this.fileHelper.Exists(extension));

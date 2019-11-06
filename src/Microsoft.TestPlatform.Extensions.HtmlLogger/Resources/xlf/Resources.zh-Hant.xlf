@@ -22,12 +22,17 @@
     <body>
       <trans-unit id="HtmlFilePath">
         <source>Html test results file : {0}</source>
-        <target state="new">Obtained Html File's Path is {0}</target>
+        <target state="translated">Html 測試結果檔案: {0}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="HtmlLoggerError">
         <source>Html Logger Error : {0}</source>
-        <target state="new">Html Logger Error : {0}</target>
+        <target state="translated">Html 記錄器錯誤: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PrefixAndNameProvidedError">
+        <source>The parameters LogFileName and LogFilePrefix cannot be given together.</source>
+        <target state="translated">不能同時指定參數 LogFileName 和 LogFilePrefix。</target>
         <note></note>
       </trans-unit>
     </body>

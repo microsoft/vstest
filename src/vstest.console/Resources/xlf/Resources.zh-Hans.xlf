@@ -217,12 +217,13 @@
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
         <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      为测试结果指定一个记录器。例如，若要将结果记录到 Visual Studio 测试结果文件(TRX)中，请使用/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      为测试结果指定一个记录器。例如，若要将结果记录到 
+       Visual Studio 测试结果文件(TRX)中，请使用/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       使用给定的  LogFileName 在 TestResults 目录中创建文件。
 
-     更改控制台记录器的日志消息中的详细级别，如下所示
+     更改控制台记录器的日志消息中的详细程度，如下所示
       示例: /logger:console;verbosity&lt;Defaults to "normal"&gt;
-      允许的详细级别的值: quiet、minimal、normal 和 detailed。
+      允许的详细程度的值: quiet、minimal、normal 和 detailed。
 
       更改控制台记录器的诊断级别前缀，如下所示
       示例: /logger:console;prefix=&lt;Defaults to "false"&gt;
@@ -296,7 +297,7 @@
                 testproject*.dll my*project.dll</source>
         <target state="translated">[TestFileNames]
       从指定的文件或通配符模式运行测试。通过空格将多个测试文件或模式分隔开来。
-      将控制台记录器详细级别设置为“详细”以查看匹配的测试文件。
+      将控制台记录器详细程度设置为“详细”以查看匹配的测试文件。
       示例: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</target>
@@ -1576,9 +1577,9 @@
       Visual Studio 测试结果文件(TRX)中，请使用 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       使用给定的  LogFileName 在 TestResults 目录中创建文件。
 
-     更改控制台记录器的日志消息中的详细级别，如下所示
+     更改控制台记录器的日志消息中的详细程度，如下所示
       示例: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      允许的详细级别的值: quiet、minimal、normal 和 detailed。
+      允许的详细程度的值: quiet、minimal、normal 和 detailed。
 
       更改控制台记录器的诊断级别前缀，如下所示
       示例: /logger:console;prefix=&lt;Defaults to "false"&gt;

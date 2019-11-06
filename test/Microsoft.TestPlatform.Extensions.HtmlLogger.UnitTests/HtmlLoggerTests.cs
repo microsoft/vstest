@@ -118,7 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestMessageHandlerShouldNotInitializelistForInformationErrorAndWarningMessages()
         {
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageInformational,null);
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageInformational, null);
             Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning, null);
         }
 
@@ -162,7 +162,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         {
             var passTestCase1 = CreateTestCase("Pass1");
             var passResult1 = new ObjectModel.TestResult(passTestCase1) { Outcome = TestOutcome.Passed };
-            
+
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passResult1).Object);
 
             Assert.AreEqual(this.htmlLogger.TotalTests, 1, "Total Tests");
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldKeepTrackOfPassedResult()
         {
-            var passTestCase2 = CreateTestCase("Pass2");       
+            var passTestCase2 = CreateTestCase("Pass2");
             var passResult2 = new ObjectModel.TestResult(passTestCase2) { Outcome = TestOutcome.Passed };
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passResult2).Object);
@@ -182,7 +182,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldKeepTrackOfSkippedResult()
         {
-         
+
             var skipTestCase1 = CreateTestCase("Skip1");
             var skipResult1 = new ObjectModel.TestResult(skipTestCase1) { Outcome = TestOutcome.Skipped };
 
@@ -202,7 +202,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 TestCase = { FullyQualifiedName = "abc" }
             };
 
-            this.htmlLogger.TestResultHandler(new object(),new Mock<TestResultEventArgs>(passTestResultExpected).Object);
+            this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passTestResultExpected).Object);
 
             Assert.AreEqual("abc", this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().DisplayName);
         }
@@ -265,7 +265,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             TimeSpan ts3 = new TimeSpan(0, 0, 1, 0, 1);
             Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts3), "1m");
-;
+            ;
             TimeSpan ts4 = new TimeSpan(0, 1, 0, 2, 3);
             Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts4), "1h");
 
@@ -380,7 +380,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             var passResult2 = new ObjectModel.TestResult(passTestCase2) { Outcome = TestOutcome.Passed };
             var failResult1 = new ObjectModel.TestResult(failTestCase1) { Outcome = TestOutcome.Failed };
             var skipResult1 = new ObjectModel.TestResult(skipTestCase1) { Outcome = TestOutcome.Skipped };
-     
+
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passResult1).Object);
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passResult2).Object);
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(failResult1).Object);
@@ -401,7 +401,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         }
 
         [TestMethod]
-        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameIfParameterDirectoryIsNull()
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNamewithLogFileNameKey()
         {
             var parameters = new Dictionary<string, string>();
             parameters[HtmlLoggerConstants.LogFileNameKey] = null;
@@ -415,6 +415,91 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
             Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("TestResult"));
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefix()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            Assert.IsFalse(this.htmlLogger.HtmlFilePath.Contains("__"));
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("sample_net451"));
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixNull()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = null;
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+            {
+            }).Returns(new Mock<Stream>().Object);
+
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldThrowExceptionWithLogPrefixIfTargetFrameworkKeyIsNotPresent()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample.html";
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.ThrowsException<KeyNotFoundException>(() => this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero)));
+        }
+
+        [TestMethod]
+        public void IntializeShouldThrowExceptionIfBothPrefixAndNameProvided()
+        {
+            this.parameters[HtmlLoggerConstants.LogFileNameKey] = "results.html";
+            var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
+            this.parameters[HtmlLoggerConstants.LogFilePrefixKey] = "HtmlPrefix";
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+
+            Assert.ThrowsException<ArgumentException>(() => this.htmlLogger.Initialize(events.Object, this.parameters));
         }
 
         [TestMethod]
@@ -498,5 +583,5 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
 
 
-  
+
 

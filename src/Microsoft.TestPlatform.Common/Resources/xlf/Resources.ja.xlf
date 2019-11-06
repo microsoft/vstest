@@ -271,7 +271,7 @@
       </trans-unit>
       <trans-unit id="UnableToFetchUriString">
         <source>Unable to find a datacollector with friendly name '{0}'.</source>
-        <target state="new">Unable to find a datacollector with friendly name '[0}'.</target>
+        <target state="translated">フレンドリ名 '{0}' のデータコレクターが見つかりません。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">
