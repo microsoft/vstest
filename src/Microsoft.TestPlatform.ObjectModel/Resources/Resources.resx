@@ -286,10 +286,6 @@
     <value>  {0}:
 {1}</value>
   </data>
-  <data name="TestResultTimerFormat" xml:space="preserve">
-    <value>  {0} : {1} : {2}</value>
-    <comment>Timer name, start-time, and duration</comment>
-  </data>
   <data name="TestResultPropertyComputerNameLabel" xml:space="preserve">
     <value>Computer Name</value>
     <comment>The label of the test property ComputerName for test result.</comment>

@@ -87,6 +87,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public Collection<TestResultMessage> Messages { get; private set; }
 
+        /// <summary>
+        /// Gets the named timers for TestResult, if any.
+        /// </summary>
         [DataMember]
         public Collection<TimerResult> Timers { get; private set; }
 
@@ -184,12 +187,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             if (this.Timers.Any())
             {
+                // Timer name, start-time, and duration
+                const string testResultTimerFormat = "  {0} : {1} : {2}";
                 var timerMessages = new StringBuilder();
                 foreach (var timer in this.Timers)
                 {
                     timerMessages.AppendFormat(
                         CultureInfo.CurrentUICulture,
-                        Resources.Resources.TestResultTimerFormat,
+                        testResultTimerFormat,
                         timer.Name,
                         timer.StartTime.ToString("O"),
                         timer.Duration.ToString("c"));
@@ -332,13 +337,30 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
     }
 
+    /// <summary>
+    /// Named timer within the Timers collection of a TestResult.
+    /// </summary>
+    /// <remarks>
+    /// Class is immutable.
+    /// </remarks>
     [DataContract]
     public class TimerResult
     {
+        /// <summary>
+        /// Gets the name of the timer.
+        /// </summary>
         [DataMember]
         public string Name { get; }
+
+        /// <summary>
+        /// Gets the time the timer was started.
+        /// </summary>
         [DataMember]
         public DateTimeOffset StartTime { get; }
+
+        /// <summary>
+        /// Gets the duration of the timer.
+        /// </summary>
         [DataMember]
         public TimeSpan Duration { get; }
 
