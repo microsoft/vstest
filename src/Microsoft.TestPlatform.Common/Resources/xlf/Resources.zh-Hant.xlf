@@ -270,7 +270,7 @@
         <note />
       </trans-unit>
       <trans-unit id="UnableToFetchUriString">
-        <source>Unable to find a datacollector with friendly name '[0}'.</source>
+        <source>Unable to find a datacollector with friendly name '{0}'.</source>
         <target state="translated">找不到易記名稱為 '{0}' 的資料收集器。</target>
         <note></note>
       </trans-unit>

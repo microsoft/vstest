@@ -329,5 +329,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// Test sources property name
         /// </summary>
         public const string TestSourcesPropertyName = "TestSources";
+
+        /// <summary>
+        /// Coverlet inproc data collector codebase
+        /// </summary>
+        public const string CoverletDataCollectorCodebase = "coverlet.collector.dll";
+
+        /// <summary>
+        /// Coverlet inproc data collector type name
+        /// </summary>
+        public const string CoverletDataCollectorTypeName = "Coverlet.Collector.DataCollection.CoverletInProcDataCollector";
     }
 }
