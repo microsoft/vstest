@@ -140,6 +140,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             for (int index = 0; index < length; index++)
             {
                 var keyValuePair = args[index];
+                if (IsTestRunParameterUpadated(runSettingsProvider, keyValuePair))
+                {
+                    return;
+                }
+
                 var indexOfSeparator = keyValuePair.IndexOf("=");
                 if (indexOfSeparator <= 0 || indexOfSeparator >= keyValuePair.Length - 1)
                 {
@@ -152,12 +157,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     continue;
                 }
-
+              
                 // To determine whether to infer framework and platform.
                 UpdateFrameworkAndPlatform(key, value);
 
                 runSettingsProvider.UpdateRunSettingsNode(key, value);
             }
+        }
+
+        private bool IsTestRunParameterUpadated(IRunSettingsProvider runSettingsProvider, string key)
+        {
+            if (key.Contains("TestRunParameters.Parameter"))
+            {
+                runSettingsProvider.UpdateTestRunParmeterSettingsNode(key);
+                return true;
+            }
+            return false;
         }
 
         private void UpdateFrameworkAndPlatform(string key, string value)

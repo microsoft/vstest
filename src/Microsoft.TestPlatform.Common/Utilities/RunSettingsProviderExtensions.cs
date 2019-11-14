@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Utilities to get the run settings from the provider and the commandline options specified.
@@ -61,6 +62,83 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(xmlDocument, key, data);
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
+
+        public static void UpdateTestRunParmeterSettingsNode(this IRunSettingsProvider runSettingsProvider, string key)
+        {
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+            ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
+
+            var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
+            UpdateTestRunParmeterSettingsXmlDocument(xmlDocument, key);
+            runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
+        }
+
+        private static void UpdateTestRunParmeterSettingsXmlDocument(XmlDocument xmlDocument, string key)
+        {
+            var path = key.Split('.');
+            var parameterNode = path[1];
+            XmlNode parent = xmlDocument.DocumentElement;
+            var start = parameterNode.IndexOf("(");
+            var end = parameterNode.IndexOf(")");
+            var nodeParameter = path[1];
+            string parameters = null;
+            if (start != -1 || end != -1)
+            {
+                parameters = parameterNode.Substring(start + 1, end - start - 1);
+                nodeParameter = parameterNode.Substring(0, start);
+            }
+
+            const string testRunParameters = "TestRunParameters";
+            XmlNode testRunParameterNode = GetXmlNode(xmlDocument, testRunParameters) ?? xmlDocument.CreateElement(testRunParameters);
+            XmlElement element = xmlDocument.CreateElement(nodeParameter);
+            var keyValuePairList = GetAttributeKeyValuePairList(parameters);
+            var xPath = $"TestRunParameters/Parameter";
+            var xPathAttributes = "";
+            for (var j = 0; j < keyValuePairList.Count; j++)
+            {
+                var attributeKey = keyValuePairList[j].Key;
+                var attributeValue = keyValuePairList[j].Value;
+                element.SetAttribute(attributeKey, attributeValue);
+                xPathAttributes += $"[@{attributeKey}=\"{attributeValue}\"]";
+            }
+
+            xPath += xPathAttributes;
+            if (GetXmlNode(xmlDocument, xPath) == null)
+            {
+                testRunParameterNode.AppendChild(element);
+                parent.AppendChild(testRunParameterNode);
+            }
+        }
+        
+        private static List<KeyValuePair<string, string>> GetAttributeKeyValuePairList(string parameter)
+        {
+            List<KeyValuePair<string, string>> keyValuePairList = new List<KeyValuePair<string, string>>();
+            if (parameter == null)
+                return keyValuePairList;
+            string[] parameters = parameter.Split(',');
+            var length = parameters.Length;
+            for (int index = 0; index < length; index++)
+            {
+                var keyValuePair = parameters[index];
+                var indexOfSeparator = keyValuePair.IndexOf("=");
+                if (indexOfSeparator <= 0 || indexOfSeparator >= keyValuePair.Length - 1)
+                {
+                    continue;
+                }
+
+                var key = keyValuePair.Substring(0, indexOfSeparator).Trim();
+                var value = keyValuePair.Substring(indexOfSeparator + 1);
+
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    continue;
+                }
+
+                keyValuePairList.Add(new KeyValuePair<string, string>(key, value));
+            }
+            return keyValuePairList;
+        }
+
 
         public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider, string key, string xml)
         {

@@ -24,6 +24,7 @@ namespace vstest.console.UnitTests.Processors
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
         private const string RunSettingsWithDeploymentDisabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
         private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
+        private const string RunSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
 
         [TestInitialize]
         public void Init()
@@ -131,6 +132,17 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldValidateTestRunParameter()
+        {
+            var args = new string[] { "TestRunParameters.Parameter(name=weburl,value=http://localhost//abc)" };
+
+            this.executor.Initialize(args);
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(RunSettingsWithTestRunParameters, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
