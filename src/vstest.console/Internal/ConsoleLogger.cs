@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         public Verbosity VerbosityLevel => verbosityLevel;
 
         /// <summary>
-        /// Dictionary of summary of each source. 
+        /// Source level summary of test result.
         /// </summary>
         private ConcurrentDictionary<string, SourceSummary> sourceSummaryDictionary { get; set; }
 
@@ -232,7 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 bool.TryParse(noprogress, out DisableProgress);
             }
 
-            var noFrameworkExists = parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out this.targetFramework);
+            parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out this.targetFramework);
             this.targetFramework = !string.IsNullOrEmpty(this.targetFramework) ? NuGetFramework.Parse(this.targetFramework).GetShortFolderName() : this.targetFramework;
 
             Initialize(events, String.Empty);
