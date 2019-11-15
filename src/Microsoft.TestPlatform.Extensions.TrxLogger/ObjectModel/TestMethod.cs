@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             Debug.Assert(!string.IsNullOrEmpty(name), "name is null");
             Debug.Assert(!string.IsNullOrEmpty(className), "className is null");
-            this.name = name;
+            this.name = name.StartsWith($"{ClassName}.") ? name.Remove(0, $"{ClassName}.".Length) : name;
             this.className = className;
         }
 
