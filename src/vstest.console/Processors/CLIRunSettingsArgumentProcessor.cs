@@ -170,12 +170,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private bool TryUpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
         {
             var match = runSettingsProvider.GetTestRunParameterNodeMatch(node);
+
+            if (!node.Contains("TestRunParameters"))
+            {
+                return false;
+            }
+
             if (string.Compare(match.Value, node) == 0)
             {
                 runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
                 return true;
             }
-            return false;
+
+            var exceptionMessage = string.Format(CommandLineResources.InvalidTestRunParameterArgument, node);
+            throw new CommandLineException(exceptionMessage);
         }
 
         private void UpdateFrameworkAndPlatform(string key, string value)

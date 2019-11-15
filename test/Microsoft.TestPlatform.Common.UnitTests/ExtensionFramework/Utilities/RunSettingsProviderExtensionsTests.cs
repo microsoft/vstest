@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
-        public void UpdateTetsRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
+        public void UpdateTestRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
         {
             var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=weburl,value=http://localhost//abc)");
             var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";

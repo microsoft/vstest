@@ -827,6 +827,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The {0} argument is invalid..
+        /// </summary>
+        internal static string InvalidTestRunParameterArgument {
+            get {
+                return ResourceManager.GetString("InvalidTestRunParameterArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;UseVsixExtensions&apos; command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again..
         /// </summary>
         internal static string InvalidUseVsixExtensionsCommand {

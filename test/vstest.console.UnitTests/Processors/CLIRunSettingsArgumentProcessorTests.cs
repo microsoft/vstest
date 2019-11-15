@@ -14,6 +14,7 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
     public class CLIRunSettingsArgumentProcessorTests
@@ -143,6 +144,17 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(runSettingsWithTestRunParameters, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowErrorIfTestRunParameterNodeIsInValid()
+        {
+            var args = new string[] { "TestRunParameters.Parameter(foo=bar)" };
+            var str = string.Format(CommandLineResources.InvalidTestRunParameterArgument, args[0]);
+
+            CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(args));
+            Assert.AreEqual(str, ex.Message);
+
         }
 
         [TestMethod]

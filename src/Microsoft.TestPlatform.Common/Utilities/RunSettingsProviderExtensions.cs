@@ -25,32 +25,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <summary>
         /// Pattern used to find test run parameter node.
         /// </summary>
-        private const string TestRunParameters = "TestRunParameters";
+        private const string TestRunParametersString = "TestRunParameters";
 
         /// <summary>
         /// Pattern used to find parameter node.
         /// </summary>
-        private const string Parameter = "Parameter";
+        private const string ParameterString = "Parameter";
 
         /// <summary>
         /// Pattern that indicates Attribute name.
         /// </summary>
-        private const string AttributeName = "AttrName";
+        private const string AttributeNameString = "AttrName";
 
         /// <summary>
         /// Pattern that indicates  Attribute value.
         /// </summary>
-        private const string AttributeValue = "AttrValue";
+        private const string AttributeValueString = "AttrValue";
 
         /// <summary>
         /// Attribute name key for test run parameter node
         /// </summary>
-        private const string Name = "name";
+        private const string NameString = "name";
 
         /// <summary>
         /// Attribute value key for test run parameter node
         /// </summary>
-        private const string Value = "value";
+        private const string ValueString = "value";
 
         public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider, string runsettingsXml)
         {
@@ -102,9 +102,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns></returns>
         public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
         {
-            var attrName = $"(?<{AttributeName}>\\w+)";
-            var attrValue = $"(?<{AttributeValue}>.+)";
-            Regex regex = new Regex($"{TestRunParameters}.{Parameter}\\(name={attrName},value={attrValue}\\)");
+            var attrName = $"(?<{AttributeNameString}>\\w+)";
+            var attrValue = $"(?<{AttributeValueString}>.+)";
+            Regex regex = new Regex($"{TestRunParametersString}.{ParameterString}\\(name={attrName},value={attrValue}\\)");
             Match match = regex.Match(node);
             return match;
         }
@@ -119,14 +119,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
 
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
-            XmlNode testRunParameterNode = GetXmlNode(xmlDocument, TestRunParameters) ?? xmlDocument.CreateElement(TestRunParameters);
-            var attrName = match.Groups[AttributeName].Value;
-            var attrValue = match.Groups[AttributeValue].Value;
+            XmlNode testRunParameterNode = GetXmlNode(xmlDocument, TestRunParametersString) ?? xmlDocument.CreateElement(TestRunParametersString);
+            var attrName = match.Groups[AttributeNameString].Value;
+            var attrValue = match.Groups[AttributeValueString].Value;
+
             if (!TryOverRideAttributeName(testRunParameterNode, attrName, attrValue))
             {
-                XmlElement element = xmlDocument.CreateElement(Parameter);
-                element.SetAttribute(Name, attrName);
-                element.SetAttribute(Value, attrValue);
+                XmlElement element = xmlDocument.CreateElement(ParameterString);
+                element.SetAttribute(NameString, attrName);
+                element.SetAttribute(ValueString, attrValue);
                 testRunParameterNode.AppendChild(element);
                 xmlDocument.DocumentElement.AppendChild(testRunParameterNode);
             }
@@ -138,9 +139,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             foreach (XmlNode node in xmlNode.ChildNodes)
             {
-                if (string.Compare(node.Attributes[Name].Value, attrName) == 0)
+                if (string.Compare(node.Attributes[NameString].Value, attrName) == 0)
                 {
-                    node.Attributes[Value].Value = attrValue;
+                    node.Attributes[ValueString].Value = attrValue;
                     return true;
                 }
             }
