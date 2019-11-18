@@ -221,9 +221,9 @@
       Visual Studio use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Cria um arquivo no diretório TestResults com o LogFileName determinado.
 
-      Altere o nível de detalhes nas mensagens de log do agente de console, como mostrado abaixo
+      Altere o nível de detalhamento nas mensagens de log do agente de console, como mostrado abaixo
       Exemplo: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
-      Os valores permitidos para o nível de detalhes são: quiet, minimal, normal e detailed.
+      Os valores permitidos para o nível de detalhamento são: quiet, minimal, normal e detailed.
 
 Altere o prefixo de nível de diagnóstico do agente de console, como mostrado abaixo
       Exemplo: /logger:console;prefix=&lt;Defaults to "false"&gt;
@@ -1577,9 +1577,9 @@ Alterar o nível de rastreamento dos logs, como mostrado abaixo
       Visual Studio use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Cria um arquivo no diretório TestResults com o LogFileName determinado.
 
-      Altere o nível de detalhes nas mensagens de log do agente de console, como mostrado abaixo
+      Altere o nível de detalhamento nas mensagens de log do agente de console, como mostrado abaixo
       Exemplo: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Os valores permitidos para o nível de detalhes são: quiet, minimal, normal e detailed.
+      Os valores permitidos para o nível de detalhamento são: quiet, minimal, normal e detailed.
 
 Altere o prefixo de nível de diagnóstico do agente de console, como mostrado abaixo
       Exemplo: /logger:console;prefix=&lt;Defaults to "false"&gt;

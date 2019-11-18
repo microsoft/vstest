@@ -153,6 +153,9 @@
   <data name="FailedToFindInstalledUnitTestExtensions" xml:space="preserve">
     <value>Failed to find the list of installed unit test extensions. Reason: {0}</value>
   </data>
+  <data name="FailedToLoadAdapaterFile" xml:space="preserve">
+    <value>Failed to load extensions from file '{0}'. Please use /diag for more information.</value>
+  </data>
   <data name="FastFilterException" xml:space="preserve">
     <value>An error occured while creating Fast filter.</value>
   </data>
@@ -209,6 +212,9 @@
   </data>
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>
+  </data>
+  <data name="UnableToFetchUriString" xml:space="preserve">
+    <value>Unable to find a datacollector with friendly name '[0}'.</value>
   </data>
   <data name="VSInstallationNotFound" xml:space="preserve">
     <value>This option works only with vstest.console.exe installed as part of Visual Studio.</value>

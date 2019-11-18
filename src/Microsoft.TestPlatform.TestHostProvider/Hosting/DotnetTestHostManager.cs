@@ -67,6 +67,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private Architecture architecture;
 
+        private bool isVersionCheckRequired = true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
@@ -111,8 +113,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         /// <summary>
         /// Gets a value indicating whether the test host supports protocol version check
+        /// By default this is set to true. For host package version 15.0.0, this will be set to false;
         /// </summary>
-        internal virtual bool IsVersionCheckRequired => !this.hostPackageVersion.StartsWith("15.0.0");
+        internal virtual bool IsVersionCheckRequired
+        {
+            get
+            {
+                return this.isVersionCheckRequired;
+            }
+
+            private set
+            {
+                this.isVersionCheckRequired = value;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the test host supports protocol version check
@@ -203,14 +217,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", depsFilePath);
             }
 
-            // If Testhost.exe is available use it
-            var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
-            var fullExePath = Path.Combine(sourceDirectory, exeName);
-            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) && this.fileHelper.Exists(fullExePath))
+            var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
+            string testHostPath = string.Empty;
+
+            // If testhost.exe is available use it
+            bool testHostExeFound = false;
+            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
-                startInfo.FileName = fullExePath;
+                var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
+                var fullExePath = Path.Combine(sourceDirectory, exeName);
+
+                // check for testhost.exe in sourceDirectory. If not found, check in nuget folder.
+                if (this.fileHelper.Exists(fullExePath))
+                {
+                    EqtTrace.Verbose("DotnetTestHostManager: Testhost.exe/testhost.x86.exe found at path: " + fullExePath);
+                    startInfo.FileName = fullExePath;
+                    testHostExeFound = true;
+                }
+                else
+                {
+                    // Check if testhost.dll is found in nuget folder.
+                    testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
+                    if (testHostPath.IndexOf("microsoft.testplatform.testhost", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        // testhost.dll is present in path {testHostNugetRoot}\lib\netcoreapp2.1\testhost.dll
+                        // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
+                        var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
+                        var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent.Parent.Parent;
+                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
+
+                        if (this.fileHelper.Exists(testHostExeNugetPath))
+                        {
+                            EqtTrace.Verbose("DotnetTestHostManager: Testhost.exe/testhost.x86.exe found at path: " + testHostExeNugetPath);
+                            startInfo.FileName = testHostExeNugetPath;
+                            testHostExeFound = true;
+                        }
+                    }
+                }
             }
-            else
+
+            if (!testHostExeFound)
             {
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
@@ -226,9 +272,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 {
                     startInfo.FileName = this.dotnetHostHelper.GetDotnetPath();
                 }
-
-                var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
-                var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
                 args = "exec" + args;
@@ -346,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
                 cancellationToken.ThrowIfCancellationRequested();
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
+                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) as Process;
             }
             else
             {
@@ -394,6 +437,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                             testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
                             this.hostPackageVersion = testhostPackage.Version;
+                            this.IsVersionCheckRequired = !this.hostPackageVersion.StartsWith("15.0.0");
                             EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
                         }
                     }

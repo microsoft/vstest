@@ -244,6 +244,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             var testhostExePath = "testhost.x86.exe";
             this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
 
             var startInfo = this.GetDefaultStartInfo();
@@ -264,16 +265,155 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseTestHostExeIsPresentOnWindows()
+        public void GetTestHostProcessStartInfoShouldUseTestHostExeIfPresentOnWindows()
         {
             var testhostExePath = "testhost.exe";
             this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
 
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
             var startInfo = this.GetDefaultStartInfo();
 
             StringAssert.Contains(startInfo.FileName, testhostExePath);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseTestHostExeFromNugetIfNotFoundInSourceLocation()
+        {
+            var testhostExePath = "testhost.exe";
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+
+            string runtimeConfigFileContent =
+@"{
+    ""runtimeOptions"": {
+        ""additionalProbingPaths"": [
+            ""C:\\packages""
+            ]
+        }
+}";
+
+            string depsFileContent =
+@"{
+    ""runtimeTarget"": {
+        ""name"": "".NETCoreApp,Version=v1.0"",
+        ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
+    },
+    ""compilationOptions"": {},
+    ""targets"": {
+        "".NETCoreApp,Version=v1.0"": {
+            ""microsoft.testplatform.testhost/15.0.0-Dev"": {
+                ""dependencies"": {
+                    ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
+                    ""Newtonsoft.Json"": ""9.0.1""
+                },
+                ""runtime"": {
+                    ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
+                    ""lib/netstandard1.5/Microsoft.TestPlatform.CrossPlatEngine.dll"": { },
+                    ""lib/netstandard1.5/Microsoft.VisualStudio.TestPlatform.Common.dll"": { },
+                    ""lib/netstandard1.5/testhost.dll"": { }
+                }
+            }
+        }
+    },
+    ""libraries"": {
+        ""microsoft.testplatform.testhost/15.0.0-Dev"": {
+        ""type"": ""package"",
+        ""serviceable"": true,
+        ""sha512"": ""sha512-enO8sZmjbhXOfiZ6hV2ncaknaHnQbrGVsHUJzzu2Dmoh4fHFro4BF1Y4+sb4LOQhu4b3DFYPRj1ncd1RQK6HmQ=="",
+        ""path"": ""microsoft.testplatform.testhost/15.0.0-Dev"",
+        ""hashPath"": ""microsoft.testplatform.testhost.15.0.0-Dev""
+        }
+    }
+}";
+
+            MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+
+            MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+
+            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
+
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseTestHostX86ExeFromNugetIfNotFoundInSourceLocation()
+        {
+            var testhostExePath = "testhost.x86.exe";
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x86\\testhost.x86.exe")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+
+            string runtimeConfigFileContent =
+@"{
+    ""runtimeOptions"": {
+        ""additionalProbingPaths"": [
+            ""C:\\packages""
+            ]
+        }
+}";
+
+            string depsFileContent =
+@"{
+    ""runtimeTarget"": {
+        ""name"": "".NETCoreApp,Version=v1.0"",
+        ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
+    },
+    ""compilationOptions"": {},
+    ""targets"": {
+        "".NETCoreApp,Version=v1.0"": {
+            ""microsoft.testplatform.testhost/15.0.0-Dev"": {
+                ""dependencies"": {
+                    ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
+                    ""Newtonsoft.Json"": ""9.0.1""
+                },
+                ""runtime"": {
+                    ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
+                    ""lib/netstandard1.5/Microsoft.TestPlatform.CrossPlatEngine.dll"": { },
+                    ""lib/netstandard1.5/Microsoft.VisualStudio.TestPlatform.Common.dll"": { },
+                    ""lib/netstandard1.5/testhost.dll"": { }
+                }
+            }
+        }
+    },
+    ""libraries"": {
+        ""microsoft.testplatform.testhost/15.0.0-Dev"": {
+        ""type"": ""package"",
+        ""serviceable"": true,
+        ""sha512"": ""sha512-enO8sZmjbhXOfiZ6hV2ncaknaHnQbrGVsHUJzzu2Dmoh4fHFro4BF1Y4+sb4LOQhu4b3DFYPRj1ncd1RQK6HmQ=="",
+        ""path"": ""microsoft.testplatform.testhost/15.0.0-Dev"",
+        ""hashPath"": ""microsoft.testplatform.testhost.15.0.0-Dev""
+        }
+    }
+}";
+
+            MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+
+            MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+
+            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
+
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            StringAssert.Contains(startInfo.FileName, "C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x86\\testhost.x86.exe");
         }
 
         [TestMethod]
@@ -799,9 +939,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
                             It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
-                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                            It.IsAny<Action<object>>(),
+                            It.IsAny<Action<object, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
 
@@ -822,9 +963,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
                             It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
-                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                            It.IsAny<Action<object>>(),
+                            It.IsAny<Action<object, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
                         exitCallback(process);

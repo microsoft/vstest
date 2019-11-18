@@ -141,13 +141,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         public void InitializeWithParametersShouldSetNoProgress()
         {
             var parameters = new Dictionary<string, string>();
-            parameters.Add("noprogress", "true");
 
-            Assert.IsFalse(ConsoleLogger.DisableProgress);
+            Assert.IsFalse(ConsoleLogger.EnableProgress);
+
+            parameters.Add("progress", "true");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.IsTrue(ConsoleLogger.DisableProgress);
-            ConsoleLogger.DisableProgress = false;
+            Assert.IsTrue(ConsoleLogger.EnableProgress);
+
+            ConsoleLogger.EnableProgress = false;
         }
 
         [TestMethod]

@@ -269,6 +269,16 @@
         <target state="translated">요청한 대로 작업을 취소하는 중입니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="UnableToFetchUriString">
+        <source>Unable to find a datacollector with friendly name '[0}'.</source>
+        <target state="new">Unable to find a datacollector with friendly name '[0}'.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FailedToLoadAdapaterFile">
+        <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
+        <target state="translated">'{0}' 파일에서 확장을 로드하지 못했습니다. 자세한 내용을 보려면 /diag를 사용하세요.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

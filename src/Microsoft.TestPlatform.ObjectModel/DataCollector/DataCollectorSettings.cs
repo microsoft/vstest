@@ -201,12 +201,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             }
 
-            if (string.IsNullOrWhiteSpace(settings.FriendlyName))
-            {
-                throw new SettingsException(
-                    String.Format(CultureInfo.CurrentCulture, Resources.Resources.MissingDataCollectorAttributes, "FriendlyName"));
-            }
-
             reader.Read();
             if (!empty)
             {

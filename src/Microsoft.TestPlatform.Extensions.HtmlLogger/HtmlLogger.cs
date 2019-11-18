@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
     using HtmlResource = Resources.Resources;
     using HtmlLoggerConstants = Constants;
+    using NuGet.Frameworks;
 
     /// <summary>
     /// Logger for generating Html.
@@ -137,6 +138,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             parametersDictionary = parameters;
+
+            if (parameters.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && parameters.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue))
+            {
+                var htmlParameterErrorMsg = string.Format(CultureInfo.CurrentCulture, HtmlResource.PrefixAndNameProvidedError);
+                EqtTrace.Error(htmlParameterErrorMsg);
+                throw new ArgumentException(htmlParameterErrorMsg);
+            }
+
             this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
         }
 
@@ -153,12 +162,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
+                    if (TestRunDetails.RunLevelMessageInformational == null)
+                    {
+                        TestRunDetails.RunLevelMessageInformational = new List<string>();
+                    }
+
                     TestRunDetails.RunLevelMessageInformational.Add(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
-                    break;
                 case TestMessageLevel.Error:
+                    if (TestRunDetails.RunLevelMessageErrorAndWarning == null)
+                    {
+                        TestRunDetails.RunLevelMessageErrorAndWarning = new List<string>();
+                    }
+
                     TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 default:
@@ -265,11 +282,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassPercentage = (PassedTests * 100) / TotalTests,
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
-            var isLogFileNameParameterExists = parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey,
-                               out string logFileNameValue);
-            if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
+            if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
-                HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+
+                var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
+                if (framework != null)
+                {
+                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    logFilePrefixValue = logFilePrefixValue + "_" + framework;
+                }
+
+                logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
+                this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
+            }
+            else
+            {
+                if (parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue))
+                {
+                    this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+                }
             }
 
             PopulateHtmlFile();
@@ -402,7 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                         time.Add(duration.Milliseconds + "ms");
                     }
                 }
-            }     
+            }
 
             return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
         }

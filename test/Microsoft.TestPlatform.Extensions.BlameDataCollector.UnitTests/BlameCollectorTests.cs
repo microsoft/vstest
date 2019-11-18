@@ -190,6 +190,73 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// Initializing with collect dump for hang should kill test host process even if an error
+        /// occurs during capturing the dump. Basically it should not throw.
+        /// </summary>
+        [TestMethod]
+        public void InitializeWithDumpForHangShouldCaptureKillTestHostOnTimeoutEvenIfGetDumpFileFails()
+        {
+            this.blameDataCollector = new TestableBlameCollector(
+                this.mockBlameReaderWriter.Object,
+                this.mockProcessDumpUtility.Object,
+                null,
+                this.mockFileHelper.Object);
+
+            var hangBasedDumpcollected = new ManualResetEventSlim();
+
+            this.mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
+            this.mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
+            this.mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()));
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
+
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(false, false, true, 0),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            hangBasedDumpcollected.Wait(1000);
+            this.mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Once);
+        }
+
+        /// <summary>
+        /// Initializing with collect dump for hang should kill test host process even if an error
+        /// occurs during attaching it as a datacollector attachment. Basically it should not throw.
+        /// </summary>
+        [TestMethod]
+        public void InitializeWithDumpForHangShouldCaptureKillTestHostOnTimeoutEvenIfAttachingDumpFails()
+        {
+            this.blameDataCollector = new TestableBlameCollector(
+                this.mockBlameReaderWriter.Object,
+                this.mockProcessDumpUtility.Object,
+                null,
+                this.mockFileHelper.Object);
+
+            var dumpFile = "abc_hang.dmp";
+            var hangBasedDumpcollected = new ManualResetEventSlim();
+
+            this.mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
+            this.mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
+            this.mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()));
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(dumpFile);
+            this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some other exception"));
+
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(false, false, true, 0),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            hangBasedDumpcollected.Wait(1000);
+            this.mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Once);
+            this.mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
+        }
+
+        /// <summary>
         /// The trigger session ended handler should write to file if test start count is greater.
         /// </summary>
         [TestMethod]
@@ -593,7 +660,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The trigger test host launcehd handler should not break if start process dump throws unknown exceptions and report message with stack trace
+        /// The trigger test host launched handler should not break if start process dump throws unknown exceptions and report message with stack trace
         /// </summary>
         [TestMethod]
         public void TriggerTestHostLaunchedHandlerShouldCatchAllUnexpectedExceptionsAndReportMessageWithStackTrace()

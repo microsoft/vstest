@@ -27,9 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Architecture from sources.
         /// </summary>
-        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms)
+        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture)
         {
-            Architecture architecture = Constants.DefaultPlatform;
+            var architecture = defaultArchitecture;
             try
             {
                 if (sources != null && sources.Count > 0)
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
 
                         if (!finalArch.Equals(arch))
                         {
-                            finalArch = Constants.DefaultPlatform;
+                            finalArch = defaultArchitecture;
                             EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
                         }
                     }

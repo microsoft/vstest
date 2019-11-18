@@ -51,7 +51,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <summary>
         ///  Log file parameter key
         /// </summary>
-        public const string LogFileNameKey = "LogFileName"; 
+        public const string LogFileNameKey = "LogFileName";
+
+        /// <summary>
+        ///  Log file prefix parameter key
+        /// </summary>
+        public const string LogFilePrefixKey = "LogFilePrefix";
 
         public static readonly TestProperty ExecutionIdProperty = TestProperty.Register("ExecutionId", ExecutionIdPropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(TestResult));
 

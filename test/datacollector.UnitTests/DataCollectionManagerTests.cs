@@ -24,9 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private string defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
         private string defaultDataCollectionSettings = "<DataCollector friendlyName=\"{0}\" uri=\"{1}\" assemblyQualifiedName=\"{2}\" codebase=\"{3}\" {4} />";
         private string dataCollectorSettings;
-
-        private string dataCollectorSettingsWithWrongFriendlyName, dataCollectorSettingsWithoutFriendlyName, dataCollectorSettingsEnabled, dataCollectorSettingsDisabled;
-
+        private string friendlyName;
+        private string uri;
         private Mock<IMessageSink> mockMessageSink;
         private Mock<DataCollector2> mockDataCollector;
         private List<KeyValuePair<string, string>> envVarList;
@@ -34,18 +33,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
         public DataCollectionManagerTests()
         {
-            var friendlyName = "CustomDataCollector";
-            var uri = "my://custom/datacollector";
-
+            this.friendlyName = "CustomDataCollector";
+            this.uri = "my://custom/datacollector";
             this.envVarList = new List<KeyValuePair<string, string>>();
             this.mockDataCollector = new Mock<DataCollector2>();
             this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(this.envVarList);
-
-            this.dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectorSettingsWithWrongFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, "anyFriendlyName", uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectorSettingsWithoutFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, string.Empty, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
-            this.dataCollectorSettingsEnabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
-            this.dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
+            this.dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, this.friendlyName, this.uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
             this.mockMessageSink = new Mock<IMessageSink>();
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
@@ -74,7 +67,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollector()
         {
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
+            var dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettings);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
@@ -83,7 +77,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldNotAddDataCollectorIfItIsDisabled()
         {
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsDisabled);
+            var dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsDisabled);
 
             Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
@@ -92,17 +87,72 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldAddDataCollectorIfItIsEnabled()
         {
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsEnabled);
+            var dataCollectorSettingsEnabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsEnabled);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
 
+        [TestMethod]
+        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsCorrect()
+        {
+            var dataCollectorSettingsWithWrongFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, "anyFriendlyName", uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongFriendlyName);
+
+            Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
+            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        }
 
         [TestMethod]
-        public void InitializeDataCollectorsShouldNotLoadDataCollectorIfFriendlyNameIsNotCorrect()
+        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNotCorrect()
         {
-            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsWithWrongFriendlyName);
+            var dataCollectorSettingsWithWrongUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, "my://custom/WrongDatacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongUri);
+
+            Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
+            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNull()
+        {
+            var dataCollectorSettingsWithNullUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("uri=\"\"", string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullUri);
+
+            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
+            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNullAndUriIsCorrect()
+        {
+            var dataCollectorSettingsWithNullFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, string.Empty, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullFriendlyName);
+
+            Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
+            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsEmpty()
+        {
+            var dataCollectorSettingsWithEmptyUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+            Assert.ThrowsException<ArgumentNullException>(() => this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyUri));
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsEmptyAndUriIsCorrect()
+        {
+            var dataCollectorSettingsWithEmptyFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+            Assert.ThrowsException<ArgumentNullException>(() => this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithEmptyFriendlyName));
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorsShouldNotLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsNotCorrect()
+        {
+            var dataCollectorSettingsWithWrongFriendlyNameAndWrongUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, "anyFriendlyName", "datacollector://data", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithWrongFriendlyNameAndWrongUri);
 
             Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
@@ -118,15 +168,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeDataCollectorsShouldNotAddDataCollectorIfFriendlyNameIsNotSpecifiedByDataCollector()
-        {
-            Assert.ThrowsException<SettingsException>(() =>
-            {
-                this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsWithoutFriendlyName);
-            });
         }
 
         [TestMethod]
@@ -437,6 +478,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             else
             {
                 dataCollectorUri = string.Empty;
+                return false;
+            }
+        }
+
+        protected override bool IsUriValid(string uri)
+        {
+            if (uri.Equals("my://custom/datacollector"))
+            {
+                return true;
+            }
+            else
+            {
                 return false;
             }
         }
