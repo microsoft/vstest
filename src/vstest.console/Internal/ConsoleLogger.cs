@@ -619,7 +619,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     time.Add(duration.Seconds + " s");
                 }
 
-                if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                if (duration.Milliseconds > 0 && duration.Minutes == 0 && duration.Seconds == 0) 
                 {
                     time.Add(duration.Milliseconds + " ms");
                 }

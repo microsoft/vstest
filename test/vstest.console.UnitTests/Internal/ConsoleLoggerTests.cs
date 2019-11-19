@@ -748,10 +748,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
         [DataRow("[1 h 2 m]", new int[5] { 0, 1, 2, 3, 78 })]
         [DataRow("[4 m 3 s]", new int[5] { 0, 0, 4, 3, 78 })]
-        [DataRow("[3 s 78 ms]", new int[5] { 0, 0, 0, 3, 78 })]
+        [DataRow("[3 s]", new int[5] { 0, 0, 0, 3, 78 })]
         [DataRow("[78 ms]", new int[5] { 0, 0, 0, 0, 78 })]
         [DataRow("[1 h]", new int[5] { 0, 1, 0, 5, 78 })]
         [DataRow("[5 m]", new int[5] { 0, 0, 5, 0, 78 })]
+        [DataRow("[4 s]", new int[5] { 0, 0, 0, 4, 0 })]
         [DataTestMethod]
         public void TestResultHandlerForTestResultWithDurationShouldPrintDurationInfo(string expectedDuration, int[] timeSpanArgs)
         {
