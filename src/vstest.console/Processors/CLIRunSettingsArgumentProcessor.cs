@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             var match = runSettingsProvider.GetTestRunParameterNodeMatch(node);
 
-            if (!node.Contains("TestRunParameters"))
+            if (!node.Contains(Constants.TestRunParametersString))
             {
                 return false;
             }

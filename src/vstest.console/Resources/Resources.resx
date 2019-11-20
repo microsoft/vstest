@@ -735,6 +735,7 @@
     <value>A total of {0} test files matched the specified pattern.</value>
   </data>
   <data name="InvalidTestRunParameterArgument" xml:space="preserve">
-    <value>The {0} argument is invalid.</value>
+    <value>The test run parameter argument '{0}' is invalid. Please use the format below.
+Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</value>
   </data>
 </root>

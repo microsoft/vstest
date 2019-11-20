@@ -1659,6 +1659,13 @@
         <target state="translated">{0} archivos de prueba en total coincidieron con el patrón especificado.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestRunParameterArgument">
+        <source>The test run parameter argument '{0}' is invalid. Please use the format below.
+Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</source>
+        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
+Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

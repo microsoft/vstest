@@ -121,7 +121,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string DataCollectorSettingName = "DataCollector";
 
-        public const string TestRunParametersName = "TestRunParameters";
+        /// <summary>
+        /// Pattern used to find test run parameter node.
+        /// </summary>
+        public const string TestRunParametersString = "TestRunParameters";
+
+        /// <summary>
+        /// Pattern used to find parameter node.
+        /// </summary>
+        public const string ParameterString = "Parameter";
+
+        /// <summary>
+        /// Pattern that indicates Attribute name.
+        /// </summary>
+        public const string AttributeNameString = "AttrName";
+
+        /// <summary>
+        /// Pattern that indicates  Attribute value.
+        /// </summary>
+        public const string AttributeValueString = "AttrValue";
+
+        /// <summary>
+        /// Attribute name key for test run parameter node
+        /// </summary>
+        public const string NameString = "name";
+
+        /// <summary>
+        /// Attribute value key for test run parameter node
+        /// </summary>
+        public const string ValueString = "value";
 
         /// <summary>
         /// Type of the unit test extension. (Extension author will use this name while authoring their Vsix)

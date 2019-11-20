@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                 string.Format(
                                     CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.TestRunParametersName,
+                                    Constants.TestRunParametersString,
                                     reader.Name));
                     }
 

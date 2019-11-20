@@ -134,10 +134,12 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
+        [DataRow("TestRunParameters.Parameter(name= \"weburl\",value= \"http://localhost//abc\")")]
+        [DataRow("TestRunParameters.Parameter(name= weburl ,value= http://localhost//abc)" )]
         [TestMethod]
-        public void InitializeShouldValidateTestRunParameter()
+        public void InitializeShouldValidateTestRunParameter(string arg)
         {
-            var args = new string[] { "TestRunParameters.Parameter(name=weburl,value=http://localhost//abc)" };
+            var args = new string[] {arg };
 
             this.executor.Initialize(args);
             var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
@@ -154,7 +156,6 @@ namespace vstest.console.UnitTests.Processors
 
             CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(args));
             Assert.AreEqual(str, ex.Message);
-
         }
 
         [TestMethod]
