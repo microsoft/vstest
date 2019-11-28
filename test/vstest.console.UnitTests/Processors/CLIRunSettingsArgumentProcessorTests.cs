@@ -210,11 +210,14 @@ namespace vstest.console.UnitTests.Processors
 
         private static readonly List<object[]> validTestCases = new List<object[]>
         {
+            new object[] { "TestRunParameters.Parameter(name=\"weburl\",value=\"&><\")" ,
+             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"&amp;&gt;&lt;\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+            },
             new object[] { "TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")" ,
              "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
             },
-            new object[] { "TestRunParameters.Parameter(name= \"asf123\",value= \"2324346a!@#$%^*()_+-=':;.,/?{}[]|\")" ,
-             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"asf123\" value=\"2324346a!@#$%^*()_+-=':;.,/?{}[]|\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+            new object[] { "TestRunParameters.Parameter(name= \"a_sf123_12\",value= \"2324346a!@#$%^*()_+-=':;.,/?{}[]|\")" ,
+             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"a_sf123_12\" value=\"2324346a!@#$%^*()_+-=':;.,/?{}[]|\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
             },
             new object[] { "TestRunParameters.Parameter(name = \"weburl\",value = \"http://localhost//abc\")" ,
              "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>"

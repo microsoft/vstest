@@ -141,7 +141,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
             Assert.AreEqual(runSettingsWithTestRunParameters, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
-
         }
 
         [TestMethod]
@@ -155,7 +154,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
             Assert.AreEqual(runSettingsWithTestRunParametersOverRode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
-
         }
 
         [TestMethod]

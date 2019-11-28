@@ -148,10 +148,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
 
                 var indexOfSeparator = arg.IndexOf("=");
+
                 if (indexOfSeparator <= 0 || indexOfSeparator >= arg.Length - 1)
                 {
                     continue;
                 }
+
                 var key = arg.Substring(0, indexOfSeparator).Trim();
                 var value = arg.Substring(indexOfSeparator + 1);
 
