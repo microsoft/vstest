@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateTestRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
         {
-            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=weburl,value=http://localhost//abc)");
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")");
             var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
 
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  </RunSettings>");
@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             var runSettingsWithTestRunParametersOverRode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//def\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
 
             this.runSettingsProvider.UpdateRunSettings(runSettingsWithTestRunParameters);
-            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=weburl,value=http://localhost//def)");
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//def\")");
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
             Assert.AreEqual(runSettingsWithTestRunParametersOverRode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);

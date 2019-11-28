@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             var attrName = $"(?<{Constants.AttributeNameString}>\\w+)";
             var attrValue = $"(?<{Constants.AttributeValueString}>.+)";
-            Regex regex = new Regex($"{Constants.TestRunParametersString}.{Constants.ParameterString}\\(name=\\s*\"{attrName}\"\\s*,value=\\s*\"{attrValue}\"\\s*\\)");
+            Regex regex = new Regex($"{Constants.TestRunParametersString}.{Constants.ParameterString}\\(name\\s*=\\s*\"{attrName}\"\\s*,value\\s*=\\s*\"{attrValue}\"\\)");
             Match match = regex.Match(node);
             return match;
         }

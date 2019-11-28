@@ -134,29 +134,92 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
-        [DataRow("TestRunParameters.Parameter(name= \"weburl\",value= \"http://localhost//abc\")")]
-        [DataRow("TestRunParameters.Parameter(name= weburl ,value= http://localhost//abc)" )]
-        [TestMethod]
-        public void InitializeShouldValidateTestRunParameter(string arg)
+        [DynamicData(nameof(ValidTestCases), DynamicDataSourceType.Method)]
+        [DataTestMethod]
+        public void InitializeShouldValidateTestRunParameter(string arg, string runSettingsWithTestRunParameters)
         {
-            var args = new string[] {arg };
+            var args = new string[] { arg };
 
             this.executor.Initialize(args);
-            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(runSettingsWithTestRunParameters, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
-        [TestMethod]
-        public void InitializeShouldThrowErrorIfTestRunParameterNodeIsInValid()
+        [DynamicData(nameof(InvalidTestCases), DynamicDataSourceType.Method)]
+        [DataTestMethod]
+        public void InitializeShouldThrowErrorIfTestRunParameterNodeIsInValid(string arg)
         {
-            var args = new string[] { "TestRunParameters.Parameter(foo=bar)" };
-            var str = string.Format(CommandLineResources.InvalidTestRunParameterArgument, args[0]);
+            var args = new string[] { arg };
+            var str = string.Format(CommandLineResources.InvalidTestRunParameterArgument, arg);
 
             CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(args));
+
             Assert.AreEqual(str, ex.Message);
         }
+
+        [DataRow("Testameter.Parameter(name=\"asf\",value=\"rgq\")")]
+        [DataRow("TestRunParameter.Parameter(name=\"asf\",value=\"rgq\")")]
+        [TestMethod]
+        public void InitializeShouldThrowErrorIfTestRunParameterNodeNameIsInValid(string arg)
+        {
+            var args = new string[] { arg };
+            var str = string.Format(CommandLineResources.MalformedRunSettingsKey);
+
+            CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize(args));
+
+            Assert.AreEqual(str, ex.Message);
+        }
+
+        public static IEnumerable<object[]> InvalidTestCases()
+        {
+            return invalidTestCases;
+        }
+
+        private static readonly List<object[]> invalidTestCases = new List<object[]>
+        {
+            new object[] { "TestRunParameters.Parameter(name=asf,value=rgq)" },
+            new object[] {  "TestRunParameters.Parameter(name=\"asf\",value=\"rgq\" )"},
+            new object[] { "TestRunParameters.Parameter( name=\"asf\",value=\"rgq\")" },
+            new object[] { "TestRunParametersParameter(name=\"asf\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Paramete(name=\"asf\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parametername=\"asf\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(ame=\"asf\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name\"asf\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\" value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",alue=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",value\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",value=\"rgq\"" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",value=\"rgq\")wfds" },
+            new object[] { "TestRunParameters.Parameter(name=\"\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",value=\"\")" },
+            new object[] { "TestRunParameters.Parameter(name=asf\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf,value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",value=rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf\",value=\"rgq)" },
+            new object[] { "TestRunParameters.Parameter(name=\"asf@#!\",value=\"rgq\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"\",value=\"fgf\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"gag\",value=\"\")" },
+            new object[] { "TestRunParameters.Parameter(name=\"gag\")" }
+        };
+
+        public static IEnumerable<object[]> ValidTestCases()
+        {
+            return validTestCases;
+        }
+
+        private static readonly List<object[]> validTestCases = new List<object[]>
+        {
+            new object[] { "TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")" ,
+             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+            },
+            new object[] { "TestRunParameters.Parameter(name= \"asf123\",value= \"2324346a!@#$%^*()_+-=':;.,/?{}[]|\")" ,
+             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"asf123\" value=\"2324346a!@#$%^*()_+-=':;.,/?{}[]|\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+            },
+            new object[] { "TestRunParameters.Parameter(name = \"weburl\",value = \"http://localhost//abc\")" ,
+             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+            },
+        };
 
         [TestMethod]
         public void InitializeShouldIgnoreThrowExceptionIfKeyHasWhiteSpace()
