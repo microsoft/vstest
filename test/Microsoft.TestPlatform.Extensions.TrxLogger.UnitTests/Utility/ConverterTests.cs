@@ -167,9 +167,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
 
             var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+            var expectedTestName = fullyQualifiedName.StartsWith(expectedClassName) ? fullyQualifiedName.Remove(0, $"{expectedClassName}.".Length) : fullyQualifiedName;
 
             Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
-            Assert.AreEqual(testName, unitTestElement.TestMethod.Name);
+            Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);
         }
 
         private static TestCase CreateTestCase(string fullyQualifiedName)
