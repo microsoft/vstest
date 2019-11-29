@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <remarks>If there is no test run parameters section defined in the settings xml a blank dictionary is returned.</remarks>
         public static Dictionary<string, object> GetTestRunParameters(string settingsXml)
         {
-            var nodeValue = GetNodeValue<Dictionary<string, object>>(settingsXml, Constants.TestRunParametersString, TestRunParameters.FromXml);
+            var nodeValue = GetNodeValue<Dictionary<string, object>>(settingsXml, Constants.TestRunParametersName, TestRunParameters.FromXml);
             if (nodeValue == default(Dictionary<string, object>))
             {
                 // Return default.

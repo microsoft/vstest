@@ -827,7 +827,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         
         /// <summary>
         ///   Looks up a localized string similar to The test run parameter argument &apos;{0}&apos; is invalid. Please use the format below.
-        ///Format : TestRunParameters.Parameter(name=&quot;&lt;name&gt;&quot;, value=&quot;&lt;value&gt;&quot;).
+        ///     Format: TestRunParameters.Parameter(name=&quot;&lt;name&gt;&quot;, value=&quot;&lt;value&gt;&quot;).
         /// </summary>
         internal static string InvalidTestRunParameterArgument {
             get {

@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 var arg = args[index];
 
-                if (TryUpdateTestRunParameterNode(runSettingsProvider, arg))
+                if (UpdateTestRunParameterNode(runSettingsProvider, arg))
                 {
                     continue;
                 }
@@ -169,14 +169,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
-        private bool TryUpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+        private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
         {
-            var match = runSettingsProvider.GetTestRunParameterNodeMatch(node);
-
-            if (!node.Contains(Constants.TestRunParametersString))
+            if (!node.Contains(Constants.TestRunParametersName))
             {
                 return false;
             }
+
+            var match = runSettingsProvider.GetTestRunParameterNodeMatch(node);
 
             if (string.Compare(match.Value, node) == 0)
             {
