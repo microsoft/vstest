@@ -147,13 +147,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         public void UpdateTetsRunParameterSettingsNodeShouldOverrideValueIfKeyIsAlreadyPresent()
         {
             var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
-            var runSettingsWithTestRunParametersOverRode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//def\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var runSettingsWithTestRunParametersOverrode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//def\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
 
             this.runSettingsProvider.UpdateRunSettings(runSettingsWithTestRunParameters);
             var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//def\")");
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
-            Assert.AreEqual(runSettingsWithTestRunParametersOverRode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runSettingsWithTestRunParametersOverrode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]

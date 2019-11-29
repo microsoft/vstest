@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var attrName = match.Groups[AttributeNameString].Value;
             var attrValue = match.Groups[AttributeValueString].Value;
 
-            if (!TryOverRideAttributeValue(testRunParameterNode, attrName, attrValue))
+            if (!TryOverrideAttributeValue(testRunParameterNode, attrName, attrValue))
             {
                 XmlElement element = xmlDocument.CreateElement(ParameterString);
                 element.SetAttribute(NameString, attrName);
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
-        private static bool TryOverRideAttributeValue(XmlNode xmlNode, string attrName, string attrValue)
+        private static bool TryOverrideAttributeValue(XmlNode xmlNode, string attrName, string attrValue)
         {
             foreach (XmlNode node in xmlNode.ChildNodes)
             {
