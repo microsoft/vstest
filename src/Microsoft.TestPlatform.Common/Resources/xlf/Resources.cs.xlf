@@ -274,6 +274,11 @@
         <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="UnknownUniqueIdentifier">
+        <source>Assembly '{0}' doesn't contain execution uri.</source>
+        <target state="new">Assembly '{0}' doesn't contain execution uri.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

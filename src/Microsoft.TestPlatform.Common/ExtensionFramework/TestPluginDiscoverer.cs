@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
@@ -157,6 +158,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 catch (Exception e)
                 {
+                    TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, e.InnerException.Message.ToString());
+                    ConsoleOutput.Instance.Information(false, ConsoleColor.Yellow, e.InnerException.Message.ToString());
                     EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
                 }
             }

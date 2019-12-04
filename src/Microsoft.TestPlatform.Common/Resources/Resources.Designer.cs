@@ -349,6 +349,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Assembly &apos;{0}&apos; doesn&apos;t contain execution uri..
+        /// </summary>
+        internal static string UnknownUniqueIdentifier {
+            get {
+                return ResourceManager.GetString("UnknownUniqueIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This option works only with vstest.console.exe installed as part of Visual Studio..
         /// </summary>
         internal static string VSInstallationNotFound {

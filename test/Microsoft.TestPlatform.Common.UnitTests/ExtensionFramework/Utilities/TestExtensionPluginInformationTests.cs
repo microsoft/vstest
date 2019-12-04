@@ -4,12 +4,14 @@
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 {
     using System;
+    using System.Globalization;
     using System.Linq;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
     [TestClass]
     public class TestExtensionPluginInformationTests
     {
@@ -52,6 +54,15 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
             this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
             
             CollectionAssert.AreEqual(new object[] { DefaultExtensionURI }, this.testPluginInformation.Metadata.ToArray());
+        }
+
+        [TestMethod]
+        public void TestLoggerPluginInformationShouldThrowExceptionWithNoExtensionUri()
+        {
+            Type type = typeof(DummyTestExtensionWithNoExtensionUri);
+            var message = string.Format(CultureInfo.CurrentUICulture, CommonResources.UnknownUniqueIdentifier, type.Module);
+            InvalidLoggerException ex = Assert.ThrowsException<InvalidLoggerException>(() => new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithNoExtensionUri)));
+            Assert.AreEqual(message, ex.Message);
         }
 
         #region Implementation

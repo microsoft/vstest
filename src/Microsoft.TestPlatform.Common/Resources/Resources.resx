@@ -213,6 +213,9 @@
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>
   </data>
+  <data name="UnknownUniqueIdentifier" xml:space="preserve">
+    <value>Assembly '{0}' doesn't contain execution uri.</value>
+  </data>
   <data name="VSInstallationNotFound" xml:space="preserve">
     <value>This option works only with vstest.console.exe installed as part of Visual Studio.</value>
   </data>

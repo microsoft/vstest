@@ -5,10 +5,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
     /// The test extension plugin information.
@@ -18,7 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="type"> The test Logger Type. </param>
+        /// <param name="type"> The test 
+        /// Type. </param>
         public TestExtensionPluginInformation(Type type)
             : base(type)
         {
@@ -67,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         private static string GetExtensionUri(Type testLoggerType)
         {
             string extensionUri = string.Empty;
-            
+
             object[] attributes = testLoggerType.GetTypeInfo().GetCustomAttributes(typeof(ExtensionUriAttribute), false).ToArray();
             if (attributes != null && attributes.Length > 0)
             {
@@ -77,6 +80,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 {
                     extensionUri = extensionUriAttribute.ExtensionUri;
                 }
+
+            }
+
+            if (string.IsNullOrEmpty(extensionUri))
+            {
+                throw new InvalidLoggerException(string.Format(CultureInfo.CurrentUICulture, CommonResources.UnknownUniqueIdentifier, testLoggerType.Module));
             }
 
             return extensionUri;
