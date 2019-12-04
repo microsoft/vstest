@@ -269,9 +269,14 @@
         <target state="translated">Операция отменяется в соответствии с запросом.</target>
         <note />
       </trans-unit>
+      <trans-unit id="UnableToFetchUriString">
+        <source>Unable to find a datacollector with friendly name '{0}'.</source>
+        <target state="translated">Не удается найти объект сбора данных с понятным именем "{0}".</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">
         <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
-        <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
+        <target state="translated">Не удалось загрузить расширения из файла "{0}". Для получения дополнительных сведений используйте /diag.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="UnknownUniqueIdentifier">

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
 
@@ -67,10 +68,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.assemblyLoadContext = assemblyLoadContext;
 
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
-            this.dataCollectorType =
-                assembly?.GetTypes()
-                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
 
+            Func<Type, bool> filterPredicate;
+            if (Path.GetFileName(codeBase) == Constants.CoverletDataCollectorCodebase)
+            {
+                // If we're loading coverlet collector we skip to check the version of assembly
+                // to allow upgrade throught nuget package
+                filterPredicate = (x) => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
+            }
+            else
+            {
+                filterPredicate = (x) => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
+            }
+
+            this.dataCollectorType = assembly?.GetTypes().FirstOrDefault(filterPredicate);
             this.AssemblyQualifiedName = this.dataCollectorType?.AssemblyQualifiedName;
         }
 
@@ -143,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
+                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(Environment.ExpandEnvironmentVariables(codeBase));
             }
             catch (Exception ex)
             {

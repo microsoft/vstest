@@ -22,12 +22,17 @@
     <body>
       <trans-unit id="HtmlFilePath">
         <source>Html test results file : {0}</source>
-        <target state="new">Obtained Html File's Path is {0}</target>
+        <target state="translated">HTML-Testergebnisdatei: {0}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="HtmlLoggerError">
         <source>Html Logger Error : {0}</source>
-        <target state="new">Html Logger Error : {0}</target>
+        <target state="translated">HTML-Protokollierungsfehler: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PrefixAndNameProvidedError">
+        <source>The parameters LogFileName and LogFilePrefix cannot be given together.</source>
+        <target state="translated">Die Parameter "LogFileName" und "LogFilePrefix" können nicht zusammen angegeben werden. </target>
         <note></note>
       </trans-unit>
     </body>

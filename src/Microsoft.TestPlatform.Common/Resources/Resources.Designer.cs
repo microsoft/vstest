@@ -354,6 +354,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string UnknownUniqueIdentifier {
             get {
                 return ResourceManager.GetString("UnknownUniqueIdentifier", resourceCulture);
+                }
+        }        
+
+        ///   Looks up a localized string similar to Unable to find a datacollector with friendly name &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnableToFetchUriString {
+            get {
+                return ResourceManager.GetString("UnableToFetchUriString", resourceCulture);
             }
         }
         

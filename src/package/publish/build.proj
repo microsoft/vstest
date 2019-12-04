@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="2.1.0-preview2-02522-03" />
+    <ToPublish Include="$(PackagePublishGlob)" />
+  </ItemGroup>
+  
+  <Target Name="PublishToCentralBlobFeed">
+    <PushToBlobFeed
+      ExpectedFeedUrl="$(CentralBlobFeedUrl)"
+      AccountKey="$(AccountKey)"
+      ItemsToPush="@(ToPublish)"
+      PassIfExistingItemIdentical="$(PassIfExistingItemIdentical)"
+      Overwrite="$(OverwriteCentralBlobFeed)" />
+  </Target>
+</Project>
