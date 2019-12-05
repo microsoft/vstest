@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -85,6 +86,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string NoProgressParam = "noprogress";
 
+        /// <summary>
+        ///  Property Id storing the ParentExecutionId.
+        /// </summary>
+        public const string ParentExecutionIdPropertyIdentifier = "ParentExecId";
+
+        /// <summary>
+        ///  Property Id storing the ExecutionId.
+        /// </summary>
+        public const string ExecutionIdPropertyIdentifier = "ExecutionId";
+
         #endregion
 
         internal enum Verbosity
@@ -107,11 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private Verbosity verbosityLevel = Verbosity.Minimal;
 #endif
 
-        private int testsTotal = 0;
-        private int testsPassed = 0;
-        private int testsFailed = 0;
-        private int testsSkipped = 0;
         private bool testRunHasErrorMessages = false;
+        private ConcurrentDictionary<Guid, TestOutcome> leafExecutionIdAndTestOutcomePairDictionary = new ConcurrentDictionary<Guid, TestOutcome>();
 
         #endregion
 
@@ -371,6 +379,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
 
+        private Guid GetParentExecutionId(TestResult testResult)
+        {
+            var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
+                property.Id.Equals(ParentExecutionIdPropertyIdentifier));
+            return parentExecutionIdProperty == null
+                ? Guid.Empty
+                : testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
+        }
+
+        private Guid GetExecutionId(TestResult testResult)
+        {
+            var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
+                property.Id.Equals(ExecutionIdPropertyIdentifier));
+            var executionId = Guid.Empty;
+
+            if (executionIdProperty != null)
+            {
+                executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
+            }
+
+            return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
+        }
+
         #endregion
 
         #region Event Handlers
@@ -468,9 +499,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
 
-            // Update the test count statistics based on the result of the test. 
-            this.testsTotal++;
-
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -484,11 +512,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
             }
 
+            var executionId = GetExecutionId(e.Result);
+            var parentExecutionId = GetParentExecutionId(e.Result);
+
+            if (parentExecutionId != null && leafExecutionIdAndTestOutcomePairDictionary.ContainsKey(parentExecutionId))
+            {
+                leafExecutionIdAndTestOutcomePairDictionary.TryRemove(parentExecutionId, out var value);
+            }
+
+            leafExecutionIdAndTestOutcomePairDictionary.TryAdd(executionId, e.Result.Outcome);
+
             switch (e.Result.Outcome)
             {
                 case TestOutcome.Skipped:
                     {
-                        this.testsSkipped++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
                             break;
@@ -512,7 +549,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 case TestOutcome.Failed:
                     {
-                        this.testsFailed++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
                             break;
@@ -533,7 +569,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 case TestOutcome.Passed:
                     {
-                        this.testsPassed++;
                         if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
                             // Pause the progress indicator before displaying test result information
@@ -617,6 +652,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
+            var testsTotal = 0;
+            var testsPassed = 0;
+            var testsFailed = 0;
+            var testsSkipped = 0;
             // Stop the progress indicator as we are about to print the summary
             this.progressIndicator?.Stop();
             Output.WriteLine(string.Empty, OutputLevel.Information);
@@ -636,6 +675,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
+            foreach (KeyValuePair<Guid, TestOutcome> entry in leafExecutionIdAndTestOutcomePairDictionary)
+            {
+                testsTotal++;
+                switch (entry.Value)
+                {
+                    case TestOutcome.Failed:
+                        testsFailed++;
+                        break;
+                    case TestOutcome.Passed:
+                        testsPassed++;
+                        break;
+                    case TestOutcome.Skipped:
+                        testsSkipped++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             if (e.IsCanceled)
             {
                 Output.Error(false, CommandLineResources.TestRunCanceled);
@@ -644,7 +702,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 Output.Error(false, CommandLineResources.TestRunAborted);
             }
-            else if (this.testsFailed > 0 || this.testRunHasErrorMessages)
+            else if (testsFailed > 0 || this.testRunHasErrorMessages)
             {
                 Output.Error(false, CommandLineResources.TestRunFailed);
             }
