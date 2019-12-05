@@ -259,6 +259,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (!testHostExeFound)
             {
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+                if (testHostPath == string.Empty)
+                {
+                    testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
+                }
 
                 // This host manager can create process start info for dotnet core targets only.
                 // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
