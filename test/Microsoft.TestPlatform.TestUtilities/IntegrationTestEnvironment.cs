@@ -57,6 +57,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             // Need to remove this assumption when we move to a CDP.
             this.PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
             this.ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
+            this.TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
             this.RunnerFramework = "net451";
         }
 
@@ -194,6 +195,15 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
+        /// Gets the test artifacts directory.
+        /// </summary>
+        public string TestArtifactsDirectory
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets the application type.
         /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
         /// </summary>
@@ -292,6 +302,31 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             return dependencyProps;
+        }
+
+        /// <summary>
+        /// Gets the full path to a test asset.
+        /// </summary>
+        /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.csproj</c></param>
+        /// <returns>Full path to the test asset.</returns>
+        /// <remarks>
+        /// Test assets follow several conventions:
+        /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
+        /// (b) They are built for provided build configuration.
+        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
+        /// produce <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c>
+        /// </remarks>
+        public string GetTestProject(string assetName)
+        {
+            var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
+            var assetPath = Path.Combine(
+                this.TestAssetsPath,
+                simpleAssetName,
+                assetName);
+
+            Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);
+
+            return assetPath;
         }
     }
 }

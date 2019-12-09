@@ -47,7 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewtonSoftDependency", "..\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDomainGetAssembliesTestProject", "..\AppDomainGetAssembliesTestProject\AppDomainGetAssembliesTestProject.csproj", "{BF090BCE-CC7D-4359-93E2-30F2B454F751}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmentVariablesTestProject", "..\EnvironmentVariablesTestProject\EnvironmentVariablesTestProject.csproj", "{BA53C202-55D6-4BBC-A24A-444B2D5F6309}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentVariablesTestProject", "..\EnvironmentVariablesTestProject\EnvironmentVariablesTestProject.csproj", "{BA53C202-55D6-4BBC-A24A-444B2D5F6309}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectFileRunSettingsTestProject", "..\ProjectFileRunSettingsTestProject\ProjectFileRunSettingsTestProject.csproj", "{A0113409-56D3-4060-BD94-A4BA4739712D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +149,10 @@ Global
 		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0113409-56D3-4060-BD94-A4BA4739712D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0113409-56D3-4060-BD94-A4BA4739712D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0113409-56D3-4060-BD94-A4BA4739712D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0113409-56D3-4060-BD94-A4BA4739712D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
