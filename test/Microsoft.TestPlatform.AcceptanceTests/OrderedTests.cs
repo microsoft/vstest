@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateFailedTests("FailingTest1");
             this.ValidateSkippedTests("FailingTest2");
             // Parent test result should fail as inner results contain failing test.
-            this.ValidateSummaryStatus(2, 2, 1);
+            this.ValidateSummaryStatus(2, 1, 1);
         }
     }
 }

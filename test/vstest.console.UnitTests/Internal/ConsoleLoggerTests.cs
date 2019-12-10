@@ -1047,7 +1047,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
-        public void ResultscountInhierarchicalOrder()
+        public void ResultsInHeirarchichalOrderShouldReportCorrectCount()
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();

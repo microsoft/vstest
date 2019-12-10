@@ -379,6 +379,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
 
+        /// <summary>
+        /// Returns the parent Execution id of given test result. 
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns></returns>
         private Guid GetParentExecutionId(TestResult testResult)
         {
             var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
@@ -388,6 +393,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 : testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
         }
 
+        /// <summary>
+        /// Returns execution id of given test result
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns></returns>
         private Guid GetExecutionId(TestResult testResult)
         {
             var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
@@ -652,6 +662,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
+            //System.Diagnostics.Debugger.Launch();
             var testsTotal = 0;
             var testsPassed = 0;
             var testsFailed = 0;
