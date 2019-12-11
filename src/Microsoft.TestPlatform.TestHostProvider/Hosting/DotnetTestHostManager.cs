@@ -259,7 +259,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (!testHostExeFound)
             {
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
-                if (testHostPath == string.Empty)
+
+                if (string.IsNullOrEmpty(testHostPath))
                 {
                     testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
                 }

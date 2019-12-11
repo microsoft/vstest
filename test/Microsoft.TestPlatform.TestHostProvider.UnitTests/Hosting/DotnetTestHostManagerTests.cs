@@ -253,7 +253,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnix()
+        public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnixWithTestHostDllPath()
         {
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
@@ -262,6 +262,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var startInfo = this.GetDefaultStartInfo();
 
             StringAssert.Contains(startInfo.FileName, "dotnet");
+            StringAssert.Contains(startInfo.Arguments, "testhost.dll");
         }
 
         [TestMethod]
