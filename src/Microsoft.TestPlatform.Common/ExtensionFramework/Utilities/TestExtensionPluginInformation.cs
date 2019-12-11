@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         private static string GetExtensionUri(Type testLoggerType)
         {
             string extensionUri = string.Empty;
-            
+
             object[] attributes = testLoggerType.GetTypeInfo().GetCustomAttributes(typeof(ExtensionUriAttribute), false).ToArray();
             if (attributes != null && attributes.Length > 0)
             {
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 }
             }
 
-            if(EqtTrace.IsErrorEnabled && string.IsNullOrEmpty(extensionUri))
+            if (EqtTrace.IsErrorEnabled && string.IsNullOrEmpty(extensionUri))
             {
                 EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attibute.", testLoggerType.ToString(), testLoggerType.Module.Name);
             }
