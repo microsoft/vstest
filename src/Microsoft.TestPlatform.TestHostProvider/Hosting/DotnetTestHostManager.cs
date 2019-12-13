@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendlyName = "DotnetTestHost";
         private const string TestAdapterRegexPattern = @"TestAdapter.dll";
-        private const string DataCollectorRegexPattern = @"Collector.dll";
+        private const string CoverletDataCollectorRegexPattern = @"coverlet.collector.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
         private IEnvironment platformEnvironment;
@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (extensions != null && extensions.Any())
             {
-                extensionPaths.AddRange(extensions.Where(x => x.EndsWith(DataCollectorRegexPattern, StringComparison.OrdinalIgnoreCase)));
+                extensionPaths.AddRange(extensions.Where(x => x.EndsWith(CoverletDataCollectorRegexPattern, StringComparison.OrdinalIgnoreCase)));
             }
 
             return extensionPaths;
