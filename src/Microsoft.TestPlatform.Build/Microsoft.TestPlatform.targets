@@ -31,7 +31,7 @@ Copyright (c) .NET Foundation. All rights reserved.
 
     <Microsoft.TestPlatform.Build.Tasks.VSTestTask
       TestFileFullPath="$(TargetPath)"
-      VSTestSetting="$(VSTestSetting)"
+      VSTestSetting="$([MSBuild]::ValueOrDefault($(VSTestSetting), '$(RunSettingsFilePath)'))"
       VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
       VSTestFramework="$(TargetFrameworkMoniker)"
       VSTestPlatform="$(PlatformTarget)"

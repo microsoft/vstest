@@ -213,6 +213,19 @@ function Invoke-Build
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Publish-PatchedDotnet { 
+    Write-Log "Publish-PatchedDotnet: Copy local dotnet installation to testArtifacts"
+    $dotnetPath = "$env:TP_TOOLS_DIR\dotnet\"
+    
+    $dotnetTestArtifactsPath = "$env:TP_TESTARTIFACTS\dotnet\" 
+    $dotnetTestArtifactsSdkPath = "$env:TP_TESTARTIFACTS\dotnet\sdk\$env:DOTNET_CLI_VERSION\"
+    Copy-Item $dotnetPath $dotnetTestArtifactsPath -Force -Recurse
+
+    Write-Log "Publish-PatchedDotnet: Copy VSTest task artifacts to local dotnet installation to allow `dotnet test` to run with it"
+    $buildArtifactsPath = "$env:TP_ROOT_DIR\src\Microsoft.TestPlatform.Build\bin\$TPB_Configuration\$TPB_TargetFrameworkNS2_0\*"
+    Copy-Item $buildArtifactsPath $dotnetTestArtifactsSdkPath -Force
+}
+
 function Publish-Package
 {
     $timer = Start-Timer
@@ -901,9 +914,11 @@ Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
+Publish-PatchedDotnet
 Publish-Tests
 Create-VsixPackage
 Create-NugetPackages
 Generate-Manifest
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
+ 

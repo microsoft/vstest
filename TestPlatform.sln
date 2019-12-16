@@ -179,7 +179,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Exte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests", "test\Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests\Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests.csproj", "{41248B96-6E15-4E5E-A78F-859897676814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coverlet.collector", "test\TestAssets\coverlet.collector\coverlet.collector.csproj", "{F1D8630D-97D5-4CD7-BC18-A5E1779FA6E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coverlet.collector", "test\TestAssets\coverlet.collector\coverlet.collector.csproj", "{F1D8630D-97D5-4CD7-BC18-A5E1779FA6E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectFileRunSettingsTestProject", "test\TestAssets\ProjectFileRunSettingsTestProject\ProjectFileRunSettingsTestProject.csproj", "{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -911,6 +913,18 @@ Global
 		{F1D8630D-97D5-4CD7-BC18-A5E1779FA6E3}.Release|x64.Build.0 = Release|Any CPU
 		{F1D8630D-97D5-4CD7-BC18-A5E1779FA6E3}.Release|x86.ActiveCfg = Release|Any CPU
 		{F1D8630D-97D5-4CD7-BC18-A5E1779FA6E3}.Release|x86.Build.0 = Release|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Release|x64.Build.0 = Release|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -988,6 +1002,7 @@ Global
 		{236A71E3-01DA-4679-9DFF-16A8E079ACFF} = {5E7F18A8-F843-4C8A-AB02-4C7D9205C6CF}
 		{41248B96-6E15-4E5E-A78F-859897676814} = {020E15EA-731F-4667-95AF-226671E0C3AE}
 		{F1D8630D-97D5-4CD7-BC18-A5E1779FA6E3} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
+		{8E87F6E4-E884-4404-B2E5-CBFB28038AE5} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0541B30C-FF51-4E28-B172-83F5F3934BCD}

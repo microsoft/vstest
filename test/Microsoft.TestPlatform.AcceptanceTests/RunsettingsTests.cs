@@ -478,6 +478,37 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         #endregion
 
+        #region RunSettings defined in project file
+        /// <summary>
+        /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test 
+        /// checks that the settings were honored by translating an inconlusive test to failed "result", instead of the default "skipped".
+        /// This test depends on Microsoft.TestPlatform.Build\Microsoft.TestPlatform.targets being previously copied into the 
+        /// artifacts/testArtifacts/dotnet folder. This will allow the local copy of dotnet to pickup the VSTest msbuild task.
+        /// </summary>
+        /// <param name="runnerInfo"></param>
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var projectName = "ProjectFileRunSettingsTestProject.csproj";
+            var projectPath = this.GetProjectFullPath(projectName);
+            this.InvokeDotnetTest(projectPath);
+            this.ValidateSummaryStatus(0, 1, 0);
+
+            // make sure that we can revert the project settings back by providing a config from commandline 
+            // keeping this in the same test, because it is easier to see that we are reverting settings that 
+            // are honored by dotnet test, instead of just using the default, which would produce the same 
+            // result
+            var settingsPath = this.GetProjectAssetFullPath(projectName, "inconclusive.runsettings");
+            this.InvokeDotnetTest($"{projectPath} --settings {settingsPath}");
+            this.ValidateSummaryStatus(0, 0, 1);
+        }
+
+        #endregion
+
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
             var runsettingsPath = Path.Combine(
