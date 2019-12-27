@@ -1656,6 +1656,13 @@
         <target state="translated">总共 {0} 个测试文件与指定模式相匹配。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidTestRunParameterArgument">
+        <source>The test run parameter argument '{0}' is invalid. Please use the format below.
+     Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
+        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
+Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// The argument processor for runsettings passed as argument through cli
@@ -139,14 +140,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             for (int index = 0; index < length; index++)
             {
-                var keyValuePair = args[index];
-                var indexOfSeparator = keyValuePair.IndexOf("=");
-                if (indexOfSeparator <= 0 || indexOfSeparator >= keyValuePair.Length - 1)
+                var arg = args[index];
+
+                if (UpdateTestRunParameterNode(runSettingsProvider, arg))
                 {
                     continue;
                 }
-                var key = keyValuePair.Substring(0, indexOfSeparator).Trim();
-                var value = keyValuePair.Substring(indexOfSeparator + 1);
+
+                var indexOfSeparator = arg.IndexOf("=");
+
+                if (indexOfSeparator <= 0 || indexOfSeparator >= arg.Length - 1)
+                {
+                    continue;
+                }
+
+                var key = arg.Substring(0, indexOfSeparator).Trim();
+                var value = arg.Substring(indexOfSeparator + 1);
 
                 if (string.IsNullOrWhiteSpace(key))
                 {
@@ -158,6 +167,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 runSettingsProvider.UpdateRunSettingsNode(key, value);
             }
+        }
+
+        private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+        {
+            if (!node.Contains(Constants.TestRunParametersName))
+            {
+                return false;
+            }
+
+            var match = runSettingsProvider.GetTestRunParameterNodeMatch(node);
+
+            if (string.Compare(match.Value, node) == 0)
+            {
+                runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
+                return true;
+            }
+
+            var exceptionMessage = string.Format(CommandLineResources.InvalidTestRunParameterArgument, node);
+            throw new CommandLineException(exceptionMessage);
         }
 
         private void UpdateFrameworkAndPlatform(string key, string value)
