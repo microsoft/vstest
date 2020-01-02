@@ -527,7 +527,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             if (parentExecutionId != null && leafExecutionIdAndTestOutcomePairDictionary.ContainsKey(parentExecutionId))
             {
-                leafExecutionIdAndTestOutcomePairDictionary.TryRemove(parentExecutionId, out var value);
+                leafExecutionIdAndTestOutcomePairDictionary.TryRemove(parentExecutionId, out _);
             }
 
             leafExecutionIdAndTestOutcomePairDictionary.TryAdd(executionId, e.Result.Outcome);
@@ -662,7 +662,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            //System.Diagnostics.Debugger.Launch();
             var testsTotal = 0;
             var testsPassed = 0;
             var testsFailed = 0;
