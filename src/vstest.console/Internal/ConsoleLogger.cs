@@ -525,7 +525,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var executionId = GetExecutionId(e.Result);
             var parentExecutionId = GetParentExecutionId(e.Result);
 
-            if (parentExecutionId != null && leafExecutionIdAndTestOutcomePairDictionary.ContainsKey(parentExecutionId))
+            if (parentExecutionId != Guid.Empty && leafExecutionIdAndTestOutcomePairDictionary.ContainsKey(parentExecutionId))
             {
                 leafExecutionIdAndTestOutcomePairDictionary.TryRemove(parentExecutionId, out _);
             }
