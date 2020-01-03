@@ -796,13 +796,13 @@ function Locate-VsInstallPath
 
    Try
    {
-       Write-Verbose "VSWhere command line: $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath"
+       Write-Verbose "VSWhere command line: $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath"
        if ($TPB_CIBuild) {
-           $vsInstallPath = & $vswhere -latest -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -products * -requires $requiredPackageIds -property installationPath
        }
        else {
            # Allow using pre release versions of VS for dev builds
-           $vsInstallPath = & $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath
        }
    }
    Catch [System.Management.Automation.MethodInvocationException]
