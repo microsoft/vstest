@@ -295,6 +295,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             this.TestExtensions?.InvalidateCache();
         }
 
+        /// <summary>
+        /// Add search directories to assembly resolver
+        /// </summary>
+        /// <param name="directories"></param>
+        public void AddResolverSearchDirectories(string[] directories)
+        {
+            assemblyResolver.AddSearchDirectories(directories);
+        }
+
         #endregion
 
         #region Utility methods
@@ -486,7 +495,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
         }
 
-        private void SetupAssemblyResolver(string extensionAssembly)
+        protected void SetupAssemblyResolver(string extensionAssembly)
         {
             IList<string> resolutionPaths;
 

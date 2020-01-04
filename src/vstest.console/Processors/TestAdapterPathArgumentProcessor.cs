@@ -150,6 +150,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         /// <summary>
         /// Initializes with the argument that was provided with the command.
+        /// Pay attention, move code out of Initialize will interfere with CollectArgumentProcessor.Execute(),
+        /// it expects initialized RunConfiguration.TestAdaptersPaths element.
         /// </summary>
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)

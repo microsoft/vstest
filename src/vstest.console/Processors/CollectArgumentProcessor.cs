@@ -7,12 +7,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
 
     using System.Globalization;
+    using System.IO;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -58,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new CollectArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new CollectArgumentExecutor(RunSettingsManager.Instance, new FileHelper()));
                 }
 
                 return this.executor;
@@ -71,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
     }
 
-    
+
     internal class CollectArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override string CommandName => CollectArgumentProcessor.CommandName;
@@ -90,11 +93,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// <inheritdoc />
     internal class CollectArgumentExecutor : IArgumentExecutor
     {
-        private IRunSettingsProvider runSettingsManager;
+        private readonly IRunSettingsProvider runSettingsManager;
+        private readonly IFileHelper _fileHelper;
         internal static List<string> EnabledDataCollectors = new List<string>();
-        internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
             this.runSettingsManager = runSettingsManager;
+            this._fileHelper = fileHelper;
         }
 
         /// <inheritdoc />
@@ -113,16 +118,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     argument));
             }
 
-            if(InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
+            if (InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
             {
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
             AddDataCollectorToRunSettings(argument, this.runSettingsManager);
         }
 
+        /// <summary>
+        /// We try to fix inproc coverlet codebase searching coverlet.collector.dll assembly inside adaptersPaths
+        /// </summary>
+        private void FixCoverletInProcessCollectorCodeBase()
+        {
+            DataCollectionRunSettings inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(this.runSettingsManager.ActiveRunSettings.SettingsXml);
+            if (DoesDataCollectorSettingsExist(CoverletConstants.CoverletDataCollectorFriendlyName, inProcDataCollectionRunSettings, out DataCollectorSettings inProcDataCollector))
+            {
+                foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(this.runSettingsManager.ActiveRunSettings.SettingsXml))
+                {
+                    string collectorPath = Path.Combine(adapterPath, CoverletConstants.CoverletDataCollectorCodebase);
+                    if (_fileHelper.Exists(collectorPath))
+                    {
+                        inProcDataCollector.CodeBase = collectorPath;
+                        runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
+                        EqtTrace.Verbose("CoverletDataCollector in-process codeBase updated to '{0}'", inProcDataCollector.CodeBase);
+                        break;
+                    }
+                }
+            }
+        }
+
         /// <inheritdoc />
         public ArgumentProcessorResult Execute()
         {
+            FixCoverletInProcessCollectorCodeBase();
             return ArgumentProcessorResult.Success;
         }
 
@@ -198,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings) ?? new DataCollectionRunSettings();
-            var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settings) 
+            var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settings)
                 ?? new DataCollectionRunSettings(
                     Constants.InProcDataCollectionRunSettingsName,
                     Constants.InProcDataCollectorsSettingName,
