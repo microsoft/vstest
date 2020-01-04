@@ -131,6 +131,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private void FixCoverletInProcessCollectorCodeBase()
         {
             DataCollectionRunSettings inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(this.runSettingsManager.ActiveRunSettings.SettingsXml);
+
+            if (inProcDataCollectionRunSettings is null)
+            {
+                return;
+            }
+
             if (DoesDataCollectorSettingsExist(CoverletConstants.CoverletDataCollectorFriendlyName, inProcDataCollectionRunSettings, out DataCollectorSettings inProcDataCollector))
             {
                 foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(this.runSettingsManager.ActiveRunSettings.SettingsXml))
