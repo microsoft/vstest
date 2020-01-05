@@ -285,7 +285,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public Message ReceiveMessage()
         {
             var rawMessage = this.ReceiveRawMessage();
-            return this.dataSerializer.DeserializeMessage(rawMessage);
+            if (!string.IsNullOrEmpty(rawMessage))
+            {
+                return this.dataSerializer.DeserializeMessage(rawMessage);
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -317,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             lock (this.receiveSyncObject)
             {
                 // Reading message on binaryreader is not thread-safe
-                return this.binaryReader.ReadString();
+                return this.binaryReader?.ReadString();
             }
         }
 
