@@ -94,12 +94,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class CollectArgumentExecutor : IArgumentExecutor
     {
         private readonly IRunSettingsProvider runSettingsManager;
-        private readonly IFileHelper _fileHelper;
+        private readonly IFileHelper fileHelper;
         internal static List<string> EnabledDataCollectors = new List<string>();
         internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
             this.runSettingsManager = runSettingsManager;
-            this._fileHelper = fileHelper;
+            this.fileHelper = fileHelper;
         }
 
         /// <inheritdoc />
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(this.runSettingsManager.ActiveRunSettings.SettingsXml))
                 {
                     string collectorPath = Path.Combine(adapterPath, CoverletConstants.CoverletDataCollectorCodebase);
-                    if (_fileHelper.Exists(collectorPath))
+                    if (fileHelper.Exists(collectorPath))
                     {
                         inProcDataCollector.CodeBase = collectorPath;
                         runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
