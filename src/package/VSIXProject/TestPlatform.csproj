@@ -30,7 +30,7 @@
     <VsixInputFileLocation>$(TestPlatformRoot)artifacts\$(Configuration)\net451\win7-x64</VsixInputFileLocation>
     <OutputPath>$(TestPlatformRoot)artifacts\$(Configuration)\VSIX</OutputPath>
     <ExtensionInstallationFolder>TestPlatform</ExtensionInstallationFolder>
-    <ExtensionInstallationRelativeToVS>Common7\IDE\Extensions\TestPlatform</ExtensionInstallationRelativeToVS>
+    <ExtensionInstallationRelativeToVS>[installDir]\Common7\IDE\Extensions\TestPlatform</ExtensionInstallationRelativeToVS>
 
     <!-- Disable warning that there are no source files. It is intentional. -->
     <NoWarn>$(NoWarn);2008</NoWarn>

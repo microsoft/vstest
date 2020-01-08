@@ -121,6 +121,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string DataCollectorSettingName = "DataCollector";
 
+        /// <summary>
+        /// Pattern used to find test run parameter node.
+        /// </summary>
         public const string TestRunParametersName = "TestRunParameters";
 
         /// <summary>

@@ -78,7 +78,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "LATEST"
+$env:DOTNET_CLI_VERSION = "3.1.100-preview2-014569"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -211,6 +211,19 @@ function Invoke-Build
     Set-ScriptFailedOnError
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Publish-PatchedDotnet { 
+    Write-Log "Publish-PatchedDotnet: Copy local dotnet installation to testArtifacts"
+    $dotnetPath = "$env:TP_TOOLS_DIR\dotnet\"
+    
+    $dotnetTestArtifactsPath = "$env:TP_TESTARTIFACTS\dotnet\" 
+    $dotnetTestArtifactsSdkPath = "$env:TP_TESTARTIFACTS\dotnet\sdk\$env:DOTNET_CLI_VERSION\"
+    Copy-Item $dotnetPath $dotnetTestArtifactsPath -Force -Recurse
+
+    Write-Log "Publish-PatchedDotnet: Copy VSTest task artifacts to local dotnet installation to allow `dotnet test` to run with it"
+    $buildArtifactsPath = "$env:TP_ROOT_DIR\src\Microsoft.TestPlatform.Build\bin\$TPB_Configuration\$TPB_TargetFrameworkNS2_0\*"
+    Copy-Item $buildArtifactsPath $dotnetTestArtifactsSdkPath -Force
 }
 
 function Publish-Package
@@ -685,8 +698,8 @@ function Update-LocalizedResources
     }
 
     $localizationProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "Localize\Localize.proj"
-    Write-Verbose "& $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true"
-    & $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true
+    Write-Verbose "& $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true -nodeReuse:False"
+    & $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true -nodeReuse:False
 
     Set-ScriptFailedOnError
 
@@ -783,13 +796,13 @@ function Locate-VsInstallPath
 
    Try
    {
-       Write-Verbose "VSWhere command line: $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath"
+       Write-Verbose "VSWhere command line: $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath"
        if ($TPB_CIBuild) {
-           $vsInstallPath = & $vswhere -latest -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -products * -requires $requiredPackageIds -property installationPath
        }
        else {
            # Allow using pre release versions of VS for dev builds
-           $vsInstallPath = & $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath
        }
    }
    Catch [System.Management.Automation.MethodInvocationException]
@@ -901,9 +914,11 @@ Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
+Publish-PatchedDotnet
 Publish-Tests
 Create-VsixPackage
 Create-NugetPackages
 Generate-Manifest
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
+ 

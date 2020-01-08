@@ -85,6 +85,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string ProgressIndicatorParam = "progress";
 
+        /// <summary>
+        ///  Property Id storing the ParentExecutionId.
+        /// </summary>
+        public const string ParentExecutionIdPropertyIdentifier = "ParentExecId";
+
+        /// <summary>
+        ///  Property Id storing the ExecutionId.
+        /// </summary>
+        public const string ExecutionIdPropertyIdentifier = "ExecutionId";
+
         #endregion
 
         internal enum Verbosity
@@ -157,9 +167,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         public Verbosity VerbosityLevel => verbosityLevel;
 
         /// <summary>
-        /// Source level summary of test result.
+        /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
+        /// tracking counts per source for the minimal and quiet output.
         /// </summary>
-        private ConcurrentDictionary<string, SourceSummary> sourceSummaryDictionary { get; set; }
+        private ConcurrentDictionary<string, ConcurrentDictionary<Guid, TestResult>> leafTestOutcomesPerSource { get; set; }
 
         #endregion
 
@@ -196,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            this.sourceSummaryDictionary = new ConcurrentDictionary<string, SourceSummary>();
+            this.leafTestOutcomesPerSource = new ConcurrentDictionary<string, ConcurrentDictionary<Guid, TestResult>>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -381,6 +392,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
 
+        /// <summary>
+        /// Returns the parent Execution id of given test result. 
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns></returns>
+        private Guid GetParentExecutionId(TestResult testResult)
+        {
+            var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
+                property.Id.Equals(ParentExecutionIdPropertyIdentifier));
+            return parentExecutionIdProperty == null
+                ? Guid.Empty
+                : testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Returns execution id of given test result
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns></returns>
+        private Guid GetExecutionId(TestResult testResult)
+        {
+            var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
+                property.Id.Equals(ExecutionIdPropertyIdentifier));
+            var executionId = Guid.Empty;
+
+            if (executionIdProperty != null)
+            {
+                executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
+            }
+
+            return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
+        }
+
         #endregion
 
         #region Event Handlers
@@ -477,16 +521,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
-            SourceSummary summary;
-            if (!this.sourceSummaryDictionary.TryGetValue(e.Result.TestCase.Source, out summary))
+            ConcurrentDictionary<Guid, TestResult> leafTestOutcomes;
+            if (!this.leafTestOutcomesPerSource.TryGetValue(e.Result.TestCase.Source, out leafTestOutcomes))
             {
-                summary = new SourceSummary();
-                this.sourceSummaryDictionary.TryAdd(e.Result.TestCase.Source, summary);
+                leafTestOutcomes = new ConcurrentDictionary<Guid, TestResult>();
+                this.leafTestOutcomesPerSource.TryAdd(e.Result.TestCase.Source, leafTestOutcomes);
             }
 
-            // Update the test count statistics based on the result of the test. 
-            summary.TotalTests++;
-            summary.Duration += e.Result.Duration;
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -500,11 +541,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
             }
 
+            var executionId = GetExecutionId(e.Result);
+            var parentExecutionId = GetParentExecutionId(e.Result);
+
+            if (parentExecutionId != Guid.Empty && leafTestOutcomes.ContainsKey(parentExecutionId))
+            {
+                leafTestOutcomes.TryRemove(parentExecutionId, out _);
+            }
+
+            leafTestOutcomes.TryAdd(executionId, e.Result);
+
             switch (e.Result.Outcome)
             {
                 case TestOutcome.Skipped:
                     {
-                        summary.SkippedTests++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
                             break;
@@ -528,7 +578,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 case TestOutcome.Failed:
                     {
-                        summary.FailedTests++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
                             break;
@@ -549,7 +598,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 case TestOutcome.Passed:
                     {
-                        summary.PassedTests++;
                         if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
                             // Pause the progress indicator before displaying test result information
@@ -619,7 +667,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     time.Add(duration.Seconds + " s");
                 }
 
-                if (duration.Milliseconds > 0 && duration.Minutes == 0 && duration.Seconds == 0) 
+                if (duration.Milliseconds > 0 && duration.Minutes == 0 && duration.Seconds == 0)
                 {
                     time.Add(duration.Milliseconds + " ms");
                 }
@@ -656,22 +704,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            foreach (var sd in this.sourceSummaryDictionary.ToArray())
+            foreach (var sd in this.leafTestOutcomesPerSource)
             {
-                var summary = this.sourceSummaryDictionary[sd.Key];
-                passedTests += summary.PassedTests;
-                failedTests += summary.FailedTests;
-                skippedTests += summary.SkippedTests;
-                totalTests += summary.TotalTests;
+                var source = sd.Value;
+                var sourceSummary = new SourceSummary();
 
-                if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                foreach (var result in source.Values)
                 {
-                    var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
-                    var resultString = summary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
-                    var color = summary.FailedTests > 0 ? ConsoleColor.Red : summary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
-                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.Duration), sd.Key.Split('\\').Last(), frameworkString);
-                    Output.Information(false, color, outputLine);
+                    sourceSummary.Duration += result.Duration;
+                    sourceSummary.TotalTests++;
+                    switch (result.Outcome)
+                    {
+                        case TestOutcome.Passed:
+                            sourceSummary.PassedTests++;
+                            break;
+                        case TestOutcome.Failed:
+                            sourceSummary.FailedTests++;
+                            break;
+                        case TestOutcome.Skipped:
+                            sourceSummary.SkippedTests++;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                    {
+                        var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
+                        var resultString = sourceSummary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
+                        var color = sourceSummary.FailedTests > 0 ? ConsoleColor.Red : sourceSummary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
+                        var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString, sourceSummary.TotalTests, sourceSummary.PassedTests, sourceSummary.FailedTests, sourceSummary.SkippedTests, GetFormattedDurationString(sourceSummary.Duration), sd.Key.Split('\\').Last(), frameworkString);
+                        Output.Information(false, color, outputLine);
+                    }
                 }
+
+                passedTests += sourceSummary.PassedTests;
+                failedTests += sourceSummary.FailedTests;
+                skippedTests += sourceSummary.SkippedTests;
+                totalTests += sourceSummary.TotalTests;
             }
 
             if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)

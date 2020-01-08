@@ -106,7 +106,18 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
-            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+            this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+            this.FormatStandardOutCome();
+        }
+
+
+        /// <summary>
+        /// Invokes <c>vstest.console</c> with specified arguments.
+        /// </summary>
+        /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
+        public void InvokeDotnetTest(string arguments)
+        {
+            this.ExecutePatchedDotnet("test", arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
             this.FormatStandardOutCome();
         }
 
@@ -353,6 +364,17 @@ namespace Microsoft.TestPlatform.TestUtilities
             return this.testEnvironment.GetTestAsset(assetName, targetFramework);
         }
 
+        protected string GetProjectFullPath(string projectName)
+        {
+            return this.testEnvironment.GetTestProject(projectName);
+        }
+
+        protected string GetProjectAssetFullPath(string projectName, string assetName)
+        {
+            var projectPath = this.testEnvironment.GetTestProject(projectName);
+            return Path.Combine(Path.GetDirectoryName(projectPath), assetName);
+        } 
+
         protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
         {
             string adapterRelativePath = string.Empty;
@@ -478,7 +500,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private void Execute(string args, out string stdOut, out string stdError, out int exitCode)
+        private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode)
         {
             if (this.IsNetCoreRunner())
             {
@@ -487,46 +509,88 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             this.arguments = args;
 
-            using (Process vstestconsole = new Process())
+            this.ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
+        }
+
+        /// <summary>
+        /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to 
+        /// do your builds or to run general tests, unless you want your changes to be reflected.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="args"></param>
+        /// <param name="stdOut"></param>
+        /// <param name="stdError"></param>
+        /// <param name="exitCode"></param>
+        private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
+        {
+            var environmentVariables = new Dictionary<string, string> {
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0" 
+            };
+            
+            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe"); ;
+            this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+        }
+
+        private void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
+        {
+            if (string.IsNullOrWhiteSpace(path))
             {
-                Console.WriteLine("IntegrationTestBase.Execute: Starting vstest.console.exe");
-                vstestconsole.StartInfo.FileName = this.GetConsoleRunnerPath();
-                vstestconsole.StartInfo.Arguments = args;
-                vstestconsole.StartInfo.UseShellExecute = false;
+                throw new ArgumentException("Executable path must not be null or whitespace.", nameof(path));
+            }
+
+            var executableName = Path.GetFileName(path);
+
+            using (Process process = new Process())
+            {
+                Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
+                process.StartInfo.FileName = path;
+                process.StartInfo.Arguments = args;
+                process.StartInfo.UseShellExecute = false;
                 //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;
-                vstestconsole.StartInfo.RedirectStandardError = true;
-                vstestconsole.StartInfo.RedirectStandardOutput = true;
-                vstestconsole.StartInfo.CreateNoWindow = true;
-                vstestconsole.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-                vstestconsole.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+                if (environmentVariables != null) {
+                    foreach (var variable in environmentVariables) {
+                        if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key)) {
+                            process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
+                        } 
+                        else
+                        {
+                            process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
+                        }
+                    }
+                }
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();
-                vstestconsole.OutputDataReceived += (sender, eventArgs) =>
+                process.OutputDataReceived += (sender, eventArgs) =>
                 {
                     stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
                 };
 
-                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
 
-                Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
-                Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);
+                Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
+                Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                vstestconsole.Start();
-                vstestconsole.BeginOutputReadLine();
-                vstestconsole.BeginErrorReadLine();
-                if (!vstestconsole.WaitForExit(80 * 1000))
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                if (!process.WaitForExit(80 * 1000))
                 {
-                    Console.WriteLine("IntegrationTestBase.Execute: Timed out waiting for vstest.console.exe. Terminating the process.");
-                    vstestconsole.Kill();
+                    Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
+                    process.Kill();
                 }
                 else
                 {
                     // Ensure async buffers are flushed
-                    vstestconsole.WaitForExit();
+                    process.WaitForExit();
                 }
 
                 stopwatch.Stop();
@@ -535,11 +599,11 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
-                exitCode = vstestconsole.ExitCode;
+                exitCode = process.ExitCode;
 
                 Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
                 Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
-                Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", exitCode);
+                Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
             }
         }
 

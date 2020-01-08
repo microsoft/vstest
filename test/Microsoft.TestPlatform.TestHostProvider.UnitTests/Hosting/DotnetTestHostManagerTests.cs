@@ -253,7 +253,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnix()
+        public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnixWithTestHostDllPath()
         {
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
@@ -262,6 +262,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var startInfo = this.GetDefaultStartInfo();
 
             StringAssert.Contains(startInfo.FileName, "dotnet");
+            StringAssert.Contains(startInfo.Arguments, "testhost.dll");
         }
 
         [TestMethod]
@@ -569,13 +570,23 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestPlatformExtensionsShouldAddDataCollectorsExtensionsIfPresent()
+        public void GetTestPlatformExtensionsShouldOnlyAddCoverletDataCollectorsExtensionsIfPresent()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string> { "abc.datacollector.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string> { "coverlet.collector.dll" });
 
             Assert.AreEqual(1, extensions.Count());
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldNotAddNonCoverletDataCollectorsExtensionsIfPresent()
+        {
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string> { "abc.dataollector.dll" });
+
+            Assert.AreEqual(0, extensions.Count());
         }
 
         [TestMethod]

@@ -5,7 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 {
     using System.IO;
     using System.Reflection;
-
+    using Coverlet.Collector.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -64,7 +64,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void InProcDataCollectorShouldInitializeIfAssemblyContainsAnyInProcDataCollector()
         {
             var typeInfo = typeof(TestableInProcDataCollector).GetTypeInfo();
-            
+
             this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
                 .Returns(typeInfo.Assembly);
 
@@ -72,6 +72,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 string.Empty,
                 typeInfo.AssemblyQualifiedName,
                 typeInfo,
+                string.Empty,
+                this.assemblyLoadContext.Object);
+
+            Assert.IsNotNull(this.inProcDataCollector.AssemblyQualifiedName);
+            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, typeInfo.AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void InProcDataCollectorLoadCoverlet()
+        {
+            var typeInfo = typeof(CoverletInProcDataCollector).GetTypeInfo();
+
+            Assert.AreEqual("9.9.9.9", typeInfo.Assembly.GetName().Version.ToString());
+
+            this.assemblyLoadContext.Setup(alc => alc.LoadAssemblyFromPath(It.IsAny<string>()))
+                .Returns(typeInfo.Assembly);
+
+            this.inProcDataCollector = new InProcDataCollector(
+                typeInfo.Assembly.Location,
+                "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+                typeof(InProcDataCollection).GetTypeInfo(),
                 string.Empty,
                 this.assemblyLoadContext.Object);
 
