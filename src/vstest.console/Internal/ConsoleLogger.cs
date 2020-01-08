@@ -118,6 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 #endif
 
         private bool testRunHasErrorMessages = false;
+        private ConcurrentDictionary<Guid, TestOutcome> leafExecutionIdAndTestOutcomePairDictionary = new ConcurrentDictionary<Guid, TestOutcome>();
 
         /// <summary>
         /// Framework on which the test runs.
