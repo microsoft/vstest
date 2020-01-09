@@ -118,7 +118,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 #endif
 
         private bool testRunHasErrorMessages = false;
-        private ConcurrentDictionary<Guid, TestOutcome> leafExecutionIdAndTestOutcomePairDictionary = new ConcurrentDictionary<Guid, TestOutcome>();
 
         /// <summary>
         /// Framework on which the test runs.
@@ -171,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
         /// tracking counts per source for the minimal and quiet output.
         /// </summary>
-        private ConcurrentDictionary<string, ConcurrentDictionary<Guid, TestResult>> leafTestOutcomesPerSource { get; set; }
+        private ConcurrentDictionary<Guid, TestResult> leafTestResults { get; set; }
 
         #endregion
 
@@ -208,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            this.leafTestOutcomesPerSource = new ConcurrentDictionary<string, ConcurrentDictionary<Guid, TestResult>>();
+            this.leafTestResults = new ConcurrentDictionary<Guid, TestResult>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -522,13 +521,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
-            ConcurrentDictionary<Guid, TestResult> leafTestOutcomes;
-            if (!this.leafTestOutcomesPerSource.TryGetValue(e.Result.TestCase.Source, out leafTestOutcomes))
-            {
-                leafTestOutcomes = new ConcurrentDictionary<Guid, TestResult>();
-                this.leafTestOutcomesPerSource.TryAdd(e.Result.TestCase.Source, leafTestOutcomes);
-            }
-
+            
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -545,12 +538,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var executionId = GetExecutionId(e.Result);
             var parentExecutionId = GetParentExecutionId(e.Result);
 
-            if (parentExecutionId != Guid.Empty && leafTestOutcomes.ContainsKey(parentExecutionId))
+            if (parentExecutionId != Guid.Empty && leafTestResults.ContainsKey(parentExecutionId))
             {
-                leafTestOutcomes.TryRemove(parentExecutionId, out _);
+                leafTestResults.TryRemove(parentExecutionId, out _);
             }
 
-            leafTestOutcomes.TryAdd(executionId, e.Result);
+            leafTestResults.TryAdd(executionId, e.Result);
 
             switch (e.Result.Outcome)
             {
@@ -705,24 +698,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            foreach (var sd in this.leafTestOutcomesPerSource)
+            var leafTestResultsPerSource = this.leafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
+            foreach (var sd in leafTestResultsPerSource)
             {
-                var source = sd.Value;
+                var source = sd.Key;
                 var sourceSummary = new SourceSummary();
 
-                foreach (var result in source.Values)
+                foreach (var result in sd.ToArray())
                 {
-                    sourceSummary.Duration += result.Duration;
-                    sourceSummary.TotalTests++;
+                    sourceSummary.Duration += result.Duration;                    
                     switch (result.Outcome)
                     {
                         case TestOutcome.Passed:
+                            sourceSummary.TotalTests++;
                             sourceSummary.PassedTests++;
                             break;
                         case TestOutcome.Failed:
+                            sourceSummary.TotalTests++;
                             sourceSummary.FailedTests++;
                             break;
                         case TestOutcome.Skipped:
+                            sourceSummary.TotalTests++;
                             sourceSummary.SkippedTests++;
                             break;
                         default:

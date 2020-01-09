@@ -909,16 +909,16 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
+# Install-DotNetCli
 Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
-Publish-PatchedDotnet
-Publish-Tests
-Create-VsixPackage
-Create-NugetPackages
-Generate-Manifest
+# Publish-PatchedDotnet
+# Publish-Tests
+# Create-VsixPackage
+# Create-NugetPackages
+# Generate-Manifest
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
  
