@@ -12,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Utilities to get the run settings from the provider and the commandline options specified.
@@ -19,6 +21,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     internal static class RunSettingsProviderExtensions
     {
         public const string EmptyRunSettings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+
+        /// <summary>
+        /// Pattern used to find parameter node.
+        /// </summary>
+        private const string ParameterString = "Parameter";
+
+        /// <summary>
+        /// Pattern that indicates Attribute name.
+        /// </summary>
+        private const string AttributeNameString = "AttrName";
+
+        /// <summary>
+        /// Pattern that indicates  Attribute value.
+        /// </summary>
+        private const string AttributeValueString = "AttrValue";
+
+        /// <summary>
+        /// Attribute name key for test run parameter node
+        /// </summary>
+        private const string NameString = "name";
+
+        /// <summary>
+        /// Attribute value key for test run parameter node
+        /// </summary>
+        private const string ValueString = "value";
 
         public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider, string runsettingsXml)
         {
@@ -60,6 +87,61 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
             RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(xmlDocument, key, data);
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
+        }
+
+        /// <summary>
+        /// Matches with test run parameter node pattern and returns that match.
+        /// </summary>
+        /// <param name="runSettingsProvider"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
+        {
+            var attrName = $"(?<{AttributeNameString}>\\w+)";
+            var attrValue = $"(?<{AttributeValueString}>.+)";
+            Regex regex = new Regex($"{Constants.TestRunParametersName}.{ParameterString}\\(name\\s*=\\s*\"{attrName}\"\\s*,\\s*value\\s*=\\s*\"{attrValue}\"\\)");
+            Match match = regex.Match(node);
+            return match;
+        }
+
+        /// <summary>
+        /// If test run parameter exists already it will override with new value otherwise this will add new test run parameter.
+        /// </summary>
+        /// <param name="runSettingsProvider"></param>
+        /// <param name="match"></param>
+        public static void UpdateTestRunParameterSettingsNode(this IRunSettingsProvider runSettingsProvider, Match match)
+        {
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+
+            var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
+            XmlNode testRunParameterNode = GetXmlNode(xmlDocument, Constants.TestRunParametersName) ?? xmlDocument.CreateElement(Constants.TestRunParametersName);
+            var attrName = match.Groups[AttributeNameString].Value;
+            var attrValue = match.Groups[AttributeValueString].Value;
+
+            if (!TryOverrideAttributeValue(testRunParameterNode, attrName, attrValue))
+            {
+                XmlElement element = xmlDocument.CreateElement(ParameterString);
+                element.SetAttribute(NameString, attrName);
+                element.SetAttribute(ValueString, attrValue);
+                testRunParameterNode.AppendChild(element);
+                xmlDocument.DocumentElement.AppendChild(testRunParameterNode);
+            }
+
+            runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
+        }
+
+        private static bool TryOverrideAttributeValue(XmlNode xmlNode, string attrName, string attrValue)
+        {
+            foreach (XmlNode node in xmlNode.ChildNodes)
+            {
+                if (string.Compare(node.Attributes[NameString].Value, attrName) == 0)
+                {
+                    node.Attributes[ValueString].Value = attrValue;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider, string key, string xml)
@@ -133,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             return node;
-        }        
+        }
 
         private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
         {

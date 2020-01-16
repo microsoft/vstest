@@ -78,7 +78,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "3.1.100-preview2-014569"
+$env:DOTNET_CLI_VERSION = "3.1.100"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -796,13 +796,13 @@ function Locate-VsInstallPath
 
    Try
    {
-       Write-Verbose "VSWhere command line: $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath"
+       Write-Verbose "VSWhere command line: $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath"
        if ($TPB_CIBuild) {
-           $vsInstallPath = & $vswhere -latest -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -products * -requires $requiredPackageIds -property installationPath
        }
        else {
            # Allow using pre release versions of VS for dev builds
-           $vsInstallPath = & $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath
        }
    }
    Catch [System.Management.Automation.MethodInvocationException]

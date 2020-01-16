@@ -1046,6 +1046,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
         }
 
+        [TestMethod]
+        public void ResultsInHeirarchichalOrderShouldReportCorrectCount()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            TestCase testCase1 = CreateTestCase("TestCase1");
+            TestCase testCase2 = CreateTestCase("TestCase2");
+            TestCase testCase3 = CreateTestCase("TestCase3");
+
+            Guid parentExecutionId = Guid.NewGuid();
+            TestProperty ParentExecIdProperty = TestProperty.Register("ParentExecId", "ParentExecId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+            TestProperty ExecutionIdProperty = TestProperty.Register("ExecutionId", "ExecutionId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+            TestProperty TestTypeProperty = TestProperty.Register("TestType", "TestType" , typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            result1.SetPropertyValue(ExecutionIdProperty, parentExecutionId);
+
+            var result2 = new ObjectModel.TestResult(testCase2) { Outcome = TestOutcome.Passed};
+            result2.SetPropertyValue(ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue(ParentExecIdProperty, parentExecutionId);
+
+            var result3 = new ObjectModel.TestResult(testCase3) { Outcome = TestOutcome.Failed };
+            result3.SetPropertyValue(ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue(ParentExecIdProperty, parentExecutionId);
+
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(result1));
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(result2));
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(result3));
+
+            loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(1, 0, 0, 0));
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 1), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, 1), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryTotalTests, 2), OutputLevel.Information), Times.Once());
+        }
+
+        private TestCase CreateTestCase(string testCaseName)
+        {
+            return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
+        }
+
         private void Setup()
         {
             this.mockRequestData = new Mock<IRequestData>();

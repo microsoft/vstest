@@ -13,7 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
     using System;
     using System.Reflection;
 
-
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -823,6 +822,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         internal static string InvalidTestCaseFilterValueForSpecificTests {
             get {
                 return ResourceManager.GetString("InvalidTestCaseFilterValueForSpecificTests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The test run parameter argument &apos;{0}&apos; is invalid. Please use the format below.
+        ///     Format: TestRunParameters.Parameter(name=\&quot;&lt;name&gt;\&quot;, value=\&quot;&lt;value&gt;\&quot;).
+        /// </summary>
+        internal static string InvalidTestRunParameterArgument {
+            get {
+                return ResourceManager.GetString("InvalidTestRunParameterArgument", resourceCulture);
             }
         }
         

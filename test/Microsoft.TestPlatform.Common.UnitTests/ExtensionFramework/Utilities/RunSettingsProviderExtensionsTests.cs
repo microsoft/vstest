@@ -4,13 +4,14 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities
 {
     using System;
-    
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using System.Text.RegularExpressions;
 
     [TestClass]
     public class RunSettingsProviderExtensionsTests
@@ -24,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             runSettingsProvider = new TestableRunSettingsProvider();
         }
-        
+
         [TestMethod]
         public void UpdateRunSettingsShouldUpdateGivenSettingsXml()
         {
@@ -131,6 +132,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
+        public void UpdateTestRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
+        {
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")");
+            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  </RunSettings>");
+            this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
+
+            Assert.AreEqual(runSettingsWithTestRunParameters, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void UpdateTetsRunParameterSettingsNodeShouldOverrideValueIfKeyIsAlreadyPresent()
+        {
+            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var runSettingsWithTestRunParametersOverrode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//def\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+
+            this.runSettingsProvider.UpdateRunSettings(runSettingsWithTestRunParameters);
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//def\")");
+            this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
+
+            Assert.AreEqual(runSettingsWithTestRunParametersOverrode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
         public void UpdateRunSettingsNodeShouldUpdateKeyIfAlreadyPresent()
         {
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
@@ -203,7 +229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <TargetPlatform>x86</TargetPlatform></RunConfiguration>  </RunSettings>");
             Assert.AreEqual("x86", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.TargetPlatform"));
         }
-        
+
         private class TestableRunSettingsProvider : IRunSettingsProvider
         {
             public RunSettings ActiveRunSettings
@@ -211,7 +237,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
                 get;
                 set;
             }
-
             public void SetActiveRunSettings(RunSettings runSettings)
             {
                 this.ActiveRunSettings = runSettings;
