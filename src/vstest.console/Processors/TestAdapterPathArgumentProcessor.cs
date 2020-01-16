@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.TestAdapterPath;
 
         public override string HelpContentResourceName => CommandLineResources.TestAdapterPathHelp;
 

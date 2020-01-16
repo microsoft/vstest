@@ -122,41 +122,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
-            AddDataCollectorToRunSettings(argument, this.runSettingsManager);
+            AddDataCollectorToRunSettings(argument, this.runSettingsManager, this.fileHelper);
         }
 
         /// <summary>
-        /// We try to fix inproc coverlet codebase searching coverlet.collector.dll assembly inside adaptersPaths
+        /// Returns coverlet codebase searching coverlet.collector.dll assembly inside adaptersPaths
         /// </summary>
-        private void FixCoverletInProcessCollectorCodeBase()
+        private static string GetCoverletCodeBasePath(IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
         {
-            DataCollectionRunSettings inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(this.runSettingsManager.ActiveRunSettings.SettingsXml);
-
-            if (inProcDataCollectionRunSettings is null)
+            foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(runSettingProvider.ActiveRunSettings.SettingsXml))
             {
-                return;
-            }
-
-            if (DoesDataCollectorSettingsExist(CoverletConstants.CoverletDataCollectorFriendlyName, inProcDataCollectionRunSettings, out DataCollectorSettings inProcDataCollector))
-            {
-                foreach (string adapterPath in RunSettingsUtilities.GetTestAdaptersPaths(this.runSettingsManager.ActiveRunSettings.SettingsXml))
+                string collectorPath = Path.Combine(adapterPath, CoverletConstants.CoverletDataCollectorCodebase);
+                if (fileHelper.Exists(collectorPath))
                 {
-                    string collectorPath = Path.Combine(adapterPath, CoverletConstants.CoverletDataCollectorCodebase);
-                    if (fileHelper.Exists(collectorPath))
-                    {
-                        inProcDataCollector.CodeBase = collectorPath;
-                        runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
-                        EqtTrace.Verbose("CoverletDataCollector in-process codeBase updated to '{0}'", inProcDataCollector.CodeBase);
-                        break;
-                    }
+                    EqtTrace.Verbose("CoverletDataCollector in-process codeBase path '{0}'", collectorPath);
+                    return collectorPath;
                 }
             }
+
+            return null;
         }
 
         /// <inheritdoc />
         public ArgumentProcessorResult Execute()
         {
-            FixCoverletInProcessCollectorCodeBase();
             return ArgumentProcessorResult.Success;
         }
 
@@ -180,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Enables coverlet inproc datacollector
         /// </summary>
-        internal static void EnableCoverletInProcDataCollector(string argument, DataCollectionRunSettings dataCollectionRunSettings)
+        internal static void EnableCoverletInProcDataCollector(string argument, DataCollectionRunSettings dataCollectionRunSettings, IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
         {
             DataCollectorSettings dataCollectorSettings = null;
 
@@ -190,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 dataCollectorSettings = new DataCollectorSettings();
                 dataCollectorSettings.FriendlyName = argument;
                 dataCollectorSettings.AssemblyQualifiedName = CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
-                dataCollectorSettings.CodeBase = CoverletConstants.CoverletDataCollectorCodebase;
+                dataCollectorSettings.CodeBase = GetCoverletCodeBasePath(runSettingProvider, fileHelper) ?? CoverletConstants.CoverletDataCollectorCodebase;
                 dataCollectorSettings.IsEnabled = true;
                 dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
             }
@@ -220,7 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return false;
         }
 
-        internal static void AddDataCollectorToRunSettings(string argument, IRunSettingsProvider runSettingsManager)
+        internal static void AddDataCollectorToRunSettings(string argument, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
             EnabledDataCollectors.Add(argument.ToLower());
 
@@ -246,7 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (string.Equals(argument, CoverletConstants.CoverletDataCollectorFriendlyName, StringComparison.OrdinalIgnoreCase))
             {
                 // Add inproc data collector to runsetings if coverlet code coverage is enabled
-                EnableCoverletInProcDataCollector(argument, inProcDataCollectionRunSettings);
+                EnableCoverletInProcDataCollector(argument, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
                 runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
             }
         }
