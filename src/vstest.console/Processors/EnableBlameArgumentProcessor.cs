@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(),new FileHelper()));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
                 }
 
                 return this.executor;
