@@ -189,6 +189,26 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsNormalWithCapitalN()
+        {
+            this.vsTestTask.VSTestVerbosity = "Normal";
+
+            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToQuietIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsQuietWithCapitalQ()
+        {
+            this.vsTestTask.VSTestVerbosity = "Quiet";
+
+            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        }
+
+        [TestMethod]
         public void CreateArgumentShouldPreserveWhiteSpaceInLogger()
         {
             this.vsTestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx" };

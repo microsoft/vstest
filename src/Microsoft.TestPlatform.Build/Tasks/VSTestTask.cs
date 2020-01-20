@@ -247,11 +247,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 var quietTestLogging = new List<string>() {"q", "quiet"};
 
                 string vsTestVerbosity = "minimal";
-                if (normalTestLogging.Contains(this.VSTestVerbosity))
+                if (normalTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
                 {
                     vsTestVerbosity = "normal";
                 }
-                else if (quietTestLogging.Contains(this.VSTestVerbosity))
+                else if (quietTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
                 {
                     vsTestVerbosity = "quiet";
                 }
