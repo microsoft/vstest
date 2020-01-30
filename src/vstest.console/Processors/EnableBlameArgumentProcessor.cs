@@ -18,7 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
@@ -61,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment()));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment(), new FileHelper()));
                 }
 
                 return this.executor;
@@ -111,13 +112,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private IEnvironment environment;
 
+        /// <summary>
+        /// For file related operation
+        /// </summary>
+        private readonly IFileHelper fileHelper;
+
         #region Constructor
 
-        internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment)
+        internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IFileHelper fileHelper)
         {
             this.runSettingsManager = runSettingsManager;
             this.environment = environment;
             this.Output = ConsoleOutput.Instance;
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -182,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, this.runSettingsManager);
 
             // Add Blame Data Collector
-            CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);
+            CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager, this.fileHelper);
 
 
             // Add default run settings if required.

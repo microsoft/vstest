@@ -37,16 +37,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         VsixExtensions = 5,
 
         /// <summary>
+        /// Priority of processors related to Run Settings.
+        /// </summary>
+        RunSettings = 6,
+
+        /// <summary>
         /// Priority of TestAdapterPathArgumentProcessor.
         /// The priority of TestAdapterPath processor is more than the logger because logger initialization
         /// loads the extensions which are incomplete if custom test adapter is enabled
         /// </summary>
-        TestAdapterPath = 6,
-
-        /// <summary>
-        /// Priority of processors related to Run Settings.
-        /// </summary>
-        RunSettings = 10,
+        TestAdapterPath = 10,
 
         /// <summary>
         /// Priority of processors that needs to update runsettings.
