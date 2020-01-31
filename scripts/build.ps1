@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "", # Will set this later by reading TestPlatform.Settings.targets file.
+    [System.String] $Version, # Will set this later by reading TestPlatform.Settings.targets file.
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -65,8 +65,12 @@ $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 # Set Version from scripts/build/TestPlatform.Settings.targets
 if([string]::IsNullOrWhiteSpace($Version))
 {
-$Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix
-$Version = ($Version).Trim()
+    $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | 
+        Where-Object { $_ } | 
+        ForEach-Object { $_.Trim() }
+        Select-Object -First 1 
+
+    Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"
 }
 
 #
@@ -564,12 +568,12 @@ function Create-VsixPackage
         Update-VsixVersion $vsixProjectDir
 
         # Build vsix project to get TestPlatform.vsix
-        Write-Verbose "$msbuildPath\msbuild.exe $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
-        & $msbuildPath\msbuild.exe "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
+        Write-Verbose "$msbuildPath $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
+        & $msbuildPath "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
     }
     else
-    {
-        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
+    { 
+        throw ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
@@ -769,17 +773,16 @@ function PrintAndExit-OnError([System.String] $output)
 function Locate-MSBuildPath 
 {
     $vsInstallPath = Locate-VsInstallPath
+    $msbuildPath = Get-ChildItem (Join-Path -path $vsInstallPath -childPath "MSBuild\*\Bin\MSBuild.exe")
 
-    if([string]::IsNullOrEmpty($vsInstallPath))
-    {
-        return $null
+    Write-Verbose "found msbuild : '$($msbuildPath -join "','")'"
+    $msBuild = $msBuildPath | Select-Object -First 1
+    Write-Verbose "msbuildPath is : '$($msbuildPath -join "','")'"
+    if ($null -eq $msBuild -or 0 -eq $msBuild.Count) { 
+        throw "MSBuild not found."
     }
 
-    $vsInstallPath = Resolve-Path -path $vsInstallPath
-    $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
-
-    Write-Verbose "msbuildPath is : $msbuildPath"
-    return $msbuildPath
+    return $msBuild.FullName
 }
 
 function Locate-VsInstallPath
@@ -796,22 +799,31 @@ function Locate-VsInstallPath
 
    Try
    {
-       Write-Verbose "VSWhere command line: $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath"
        if ($TPB_CIBuild) {
-           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -products * -requires $requiredPackageIds -property installationPath
+           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath"
+           $vsInstallPath = & $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath
        }
        else {
            # Allow using pre release versions of VS for dev builds
-           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath
+           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath"
+           $vsInstallPath = & $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath
        }
    }
    Catch [System.Management.Automation.MethodInvocationException]
    {
-       Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
+       throw "Failed to find VS installation with requirements: $requiredPackageIds"
    }
 
-   Write-Verbose "VSInstallPath is : $vsInstallPath"
-   return $vsInstallPath
+   if ($null -eq $vsInstallPath -or 0 -eq @($vsInstallPath).Count) {
+        throw "Failed to find VS installation with requirements: $requiredPackageIds"
+   }
+   else { 
+        Write-Verbose "Found VS installation with requirements '$($requiredPackageIds -join "','")'  : '$($vsInstallPath -join "','")'."
+   }
+
+   $vsPath = $vsInstallPath | Select-Object -First 1
+   Write-Verbose "VSInstallPath is : $vsPath"
+   return $vsPath
 }
 
 function Update-VsixVersion($vsixProjectDir)
