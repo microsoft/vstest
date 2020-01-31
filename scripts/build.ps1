@@ -67,7 +67,7 @@ if([string]::IsNullOrWhiteSpace($Version))
 {
     $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | 
         Where-Object { $_ } | 
-        ForEach-Object { $_.Trim() }
+        ForEach-Object { $_.Trim() } |
         Select-Object -First 1 
 
     Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"
