@@ -588,7 +588,7 @@
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="translated">Ke spouštění testů se používá režim izolace, protože v parametrech spouštění se povolily adaptéry diagnostických dat. Pokud chcete toto upozornění potlačit, použijte parametr /InIsolation.</target>
+        <target state="translated">Ke spouštění testů se používá režim izolace, protože v nastavení Runsettings se povolily adaptéry diagnostických dat. Pokud chcete toto upozornění potlačit, použijte parametr /InIsolation.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
@@ -1419,7 +1419,7 @@
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
-        <target state="translated">Nejméně jeden z parametrů spouštění obsahuje neplatný token.</target>
+        <target state="translated">Nejméně jedno z nastavení Runsettings obsahuje neplatný token.</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryArgumentHelp">
@@ -1659,8 +1659,8 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">Argument parametru testovacího běhu {0} není platný. Použijte prosím formát uvedený níže.
+     Formát: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>
