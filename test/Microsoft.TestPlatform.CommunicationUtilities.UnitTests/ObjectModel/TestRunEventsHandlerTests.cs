@@ -13,13 +13,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
     [TestClass]
     public class TestRunEventsHandlerTests
     {
-        private Mock<ITestRequestHandler> mockClient;
+        private Mock<ITestRequestHandler2> mockClient;
         private TestRunEventsHandler testRunEventHandler;
 
         [TestInitialize]
         public void InitializeTests()
         {
-            this.mockClient = new Mock<ITestRequestHandler>();
+            this.mockClient = new Mock<ITestRequestHandler2>();
             this.testRunEventHandler = new TestRunEventsHandler(this.mockClient.Object);
         }
 

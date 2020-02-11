@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-    public class TestRequestHandler : ITestRequestHandler
+    public class TestRequestHandler : ITestRequestHandler2
     {
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
@@ -205,6 +205,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             waitHandle.Wait();
             this.onAckMessageRecieved = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            var data = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttached,
+                pid, protocolVersion);
+            this.SendData(data);
+
+            return false; // ??
         }
 
         public void OnMessageReceived(object sender, MessageReceivedEventArgs messageReceivedArgs)

@@ -15,15 +15,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
     /// <summary>
     /// The test run events handler.
     /// </summary>
-    public class TestRunEventsHandler : ITestRunEventsHandler
+    public class TestRunEventsHandler : ITestRunEventsHandler2
     {
-        private ITestRequestHandler requestHandler;
+        private ITestRequestHandler2 requestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunEventsHandler"/> class.
         /// </summary>
         /// <param name="requestHandler">test request handler</param>
-        public TestRunEventsHandler(ITestRequestHandler requestHandler)
+        public TestRunEventsHandler(ITestRequestHandler2 requestHandler)
         {
             this.requestHandler = requestHandler;
         }
@@ -94,8 +94,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// <returns>ProcessId of the launched process</returns>
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+            else
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+
             EqtTrace.Info("Sending LaunchProcessWithDebuggerAttached on additional test process: {0}", testProcessStartInfo?.FileName);
             return this.requestHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
+        /// <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
+            return this.requestHandler.AttachDebuggerToProcess(pid);
         }
     }
 }

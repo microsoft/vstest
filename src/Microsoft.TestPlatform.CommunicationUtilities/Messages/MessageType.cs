@@ -148,6 +148,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// </summary>
         public const string LaunchAdapterProcessWithDebuggerAttachedCallback = "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback";
 
+        public const string AttachDebuggerToProcess = "TestExecution.AttachDebuggerToProcess";
+
         /// <summary>
         /// Data Collection Message
         /// </summary>

@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
-    public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
+    public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     {
         /// <summary>
         /// The criteria/config for this test run request.
@@ -657,6 +657,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             }
 
             return processId;
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            throw new NotImplementedException("Not implemented");
         }
 
         /// <summary>
