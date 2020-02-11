@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     /// <summary>
     /// Handle to the framework which is passed to the test executors.
     /// </summary>
-    internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle, IDisposable
+    internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisposable
     {
         /// <summary>
         /// boolean that gives the value of EnableShutdownAfterTestRun. 
@@ -108,6 +108,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             };
 
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            if (pid < 0)
+            {
+                throw new ArgumentOutOfRangeException("PID cannot be negative.");
+            }
+            if (!(this.testRunEventsHandler is ITestRunEventsHandler2))
+            {
+                throw new NotSupportedException("Operation not supported.");
+            }
+
+            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
 

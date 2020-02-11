@@ -189,6 +189,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets a flag indicating the test case should be run on an external process other
+        /// than testhost.
+        /// </summary>
+        [DataMember]
+        public bool UsesCustomTestHostProcess
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Returns the TestProperties currently specified in this TestObject.
         /// </summary>
         public override IEnumerable<TestProperty> Properties
@@ -348,6 +358,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty LineNumber = TestProperty.Register("TestCase.LineNumber", LineNumberLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly TestProperty UsesCustomTestHostProcess = TestProperty.Register(
+                id: "TestCase.UsesCustomTestHostProcess",
+                label: "UsesCustomTestHostProcess",
+                category: string.Empty,
+                description: string.Empty,
+                valueType: typeof(bool),
+                validateValueCallback: (object value) => value is bool,
+                attributes: TestPropertyAttributes.Hidden,
+                owner: typeof(TestCase));
 
         internal static TestProperty[] Properties { get; } =
         {
