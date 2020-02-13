@@ -9,7 +9,7 @@
     <MSTestFrameworkVersion>1.4.0</MSTestFrameworkVersion>
     <MSTestAdapterVersion>1.4.0</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
-    
+
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.3.1</XUnitAdapterVersion>
     <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
@@ -22,7 +22,7 @@
     <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
-    <JsonNetVersion>9.0.1</JsonNetVersion>
+    <JsonNetVersion>11.0.2</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.0.0-preview-2148743</TestPlatformExternalsVersion>
 
