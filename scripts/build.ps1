@@ -65,10 +65,10 @@ $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 # Set Version from scripts/build/TestPlatform.Settings.targets
 if([string]::IsNullOrWhiteSpace($Version))
 {
-    $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | 
-        Where-Object { $_ } | 
+    $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix |
+        Where-Object { $_ } |
         ForEach-Object { $_.Trim() } |
-        Select-Object -First 1 
+        Select-Object -First 1
 
     Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"
 }
@@ -76,9 +76,9 @@ if([string]::IsNullOrWhiteSpace($Version))
 #
 # Dotnet configuration
 #
-# Disable first run since we want to control all package sources 
+# Disable first run since we want to control all package sources
 Write-Verbose "Setup dotnet configuration."
-$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
@@ -175,7 +175,7 @@ function Install-DotNetCli
     #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
         #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
     #}
-    
+
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -217,11 +217,11 @@ function Invoke-Build
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Publish-PatchedDotnet { 
+function Publish-PatchedDotnet {
     Write-Log "Publish-PatchedDotnet: Copy local dotnet installation to testArtifacts"
     $dotnetPath = "$env:TP_TOOLS_DIR\dotnet\"
-    
-    $dotnetTestArtifactsPath = "$env:TP_TESTARTIFACTS\dotnet\" 
+
+    $dotnetTestArtifactsPath = "$env:TP_TESTARTIFACTS\dotnet\"
     $dotnetTestArtifactsSdkPath = "$env:TP_TESTARTIFACTS\dotnet\sdk\$env:DOTNET_CLI_VERSION\"
     Copy-Item $dotnetPath $dotnetTestArtifactsPath -Force -Recurse
 
@@ -258,11 +258,11 @@ function Publish-Package
     Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
-    
+
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
-	
+
     Write-Log "Package: Publish src\SettingsMigrator\SettingsMigrator.csproj"
     Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework $fullCLRPackageDir
 
@@ -271,7 +271,7 @@ function Publish-Package
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     # Publish testhost
-    
+
     Write-Log "Package: Publish testhost\testhost.csproj"
     Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCorePackageDir
@@ -298,7 +298,7 @@ function Publish-Package
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
-    
+
     New-Item -ItemType directory -Path $fullCLRPackageDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force -recurse
 
@@ -312,7 +312,7 @@ function Publish-Package
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     Copy-Item $platformAbstractionUap\* $testhostUapPackageDir -Force
-    
+
     # Publish msdia
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
@@ -335,7 +335,7 @@ function Publish-Package
     foreach($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
-        
+
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
@@ -383,7 +383,7 @@ function Publish-Package
     foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
-        
+
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
@@ -395,11 +395,11 @@ function Publish-Package
     }
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
-    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\11.0.2\lib\net45\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $fullCLRPackageDir -Force"
     Copy-Item $newtonsoft $fullCLRPackageDir -Force
 
-    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll"
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
     Copy-Item $newtonsoft $coreCLR20PackageDir -Force
 
@@ -415,10 +415,10 @@ function Publish-Package
     }
 
     Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
-    
+
     # Copy Microsoft.VisualStudio.Telemetry APIs
     $testPlatformDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace\Common7\IDE\Extensions\TestPlatform"
-    
+
     if (-not (Test-Path $testPlatformDirectory)) {
         New-Item $testPlatformDirectory -Type Directory -Force | Out-Null
     }
@@ -436,7 +436,7 @@ function Publish-Package
 
 function Publish-Tests
 {
-	if($TPB_PublishTests)	
+	if($TPB_PublishTests)
 	{
 		$dotnetExe = Get-DotNetPath
 		Write-Log "Publish-Tests: Started."
@@ -444,7 +444,7 @@ function Publish-Tests
 		# Adding only Perf project for now
 		$fullCLRTestDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework"
 		$fullCLRPerfTestAssetDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets"
-    
+
 		$mstest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject"
 		$mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
 		Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $mstest10kPerfProjectDir
@@ -537,7 +537,7 @@ function Create-VsixPackage
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force    
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
@@ -550,13 +550,13 @@ function Create-VsixPackage
         New-Item $legacyTestImpactComComponentsDir -Type Directory -Force | Out-Null
     }
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
-    
+
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
 
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
-    
+
     # Create vsix only when msbuild is installed.
     if(![string]::IsNullOrEmpty($msbuildPath))
     {
@@ -572,7 +572,7 @@ function Create-VsixPackage
         & $msbuildPath "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
     }
     else
-    { 
+    {
         throw ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
     }
 
@@ -599,7 +599,7 @@ function Create-NugetPackages
                      "TestPlatform.TestHost.nuspec",
                      "TestPlatform.CLI.nuspec",
                      "TestPlatform.Build.nuspec",
-                     "TestPlatform.Extensions.TrxLogger.nuspec", 
+                     "TestPlatform.Extensions.TrxLogger.nuspec",
                      "Microsoft.NET.Test.Sdk.nuspec",
                      "Microsoft.TestPlatform.nuspec",
                      "Microsoft.TestPlatform.Portable.nuspec",
@@ -623,10 +623,10 @@ function Create-NugetPackages
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.props -Force
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.targets -Force
-	
+
 	$testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
     Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCorePackageDir\Microsoft.TestPlatform.TestHost.props -Force
-    
+
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
 
@@ -770,7 +770,7 @@ function PrintAndExit-OnError([System.String] $output)
     }
 }
 
-function Locate-MSBuildPath 
+function Locate-MSBuildPath
 {
     $vsInstallPath = Locate-VsInstallPath
     $msbuildPath = Get-ChildItem (Join-Path -path $vsInstallPath -childPath "MSBuild\*\Bin\MSBuild.exe")
@@ -778,7 +778,7 @@ function Locate-MSBuildPath
     Write-Verbose "found msbuild : '$($msbuildPath -join "','")'"
     $msBuild = $msBuildPath | Select-Object -First 1
     Write-Verbose "msbuildPath is : '$($msbuildPath -join "','")'"
-    if ($null -eq $msBuild -or 0 -eq $msBuild.Count) { 
+    if ($null -eq $msBuild -or 0 -eq $msBuild.Count) {
         throw "MSBuild not found."
     }
 
@@ -817,7 +817,7 @@ function Locate-VsInstallPath
    if ($null -eq $vsInstallPath -or 0 -eq @($vsInstallPath).Count) {
         throw "Failed to find VS installation with requirements: $requiredPackageIds"
    }
-   else { 
+   else {
         Write-Verbose "Found VS installation with requirements '$($requiredPackageIds -join "','")'  : '$($vsInstallPath -join "','")'."
    }
 
@@ -840,7 +840,7 @@ function Update-VsixVersion($vsixProjectDir)
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[0])$($vsixVersionSuffix[1])"
     }
 
-    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") }
     Set-Content -path "$vsixProjectDir\source.extension.vsixmanifest" -value $manifestContentWithVersion
 
     Write-Log "Update-VsixVersion: Completed."
@@ -933,4 +933,3 @@ Create-NugetPackages
 Generate-Manifest
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
- 
