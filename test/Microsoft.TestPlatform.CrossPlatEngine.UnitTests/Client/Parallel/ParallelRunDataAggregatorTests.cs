@@ -319,7 +319,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(false, runMetrics.TryGetValue(TelemetryDataConstants.RunState, out value);
+            Assert.AreEqual(false, runMetrics.TryGetValue(TelemetryDataConstants.RunState, out value));
         }
 
         [TestMethod]
