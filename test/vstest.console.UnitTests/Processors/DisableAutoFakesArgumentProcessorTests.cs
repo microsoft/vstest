@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void DisableAutoFakesArgumentProcessorExecutorShouldSetCommandLineDisableAutoFakeValueAsPerArgumentProvided()
         {
             this.disableAutoFakesArgumentProcessor.Executor.Value.Initialize("true");
-            Assert.AreEqual(CommandLineOptions.Instance.DisableAutoFakes, true);
+            Assert.IsTrue(CommandLineOptions.Instance.DisableAutoFakes);
         }
     }
 }

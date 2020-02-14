@@ -118,8 +118,8 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestMessageHandlerShouldNotInitializelistForInformationErrorAndWarningMessages()
         {
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageInformational, null);
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning, null);
+            Assert.IsNull(this.htmlLogger.TestRunDetails.RunLevelMessageInformational);
+            Assert.IsNull(this.htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning);
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(failResult1).Object);
 
-            Assert.AreEqual(this.htmlLogger.FailedTests, 1, "Failed Tests");
+            Assert.AreEqual(1, this.htmlLogger.FailedTests, "Failed Tests");
         }
 
         [TestMethod]
@@ -165,7 +165,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passResult1).Object);
 
-            Assert.AreEqual(this.htmlLogger.TotalTests, 1, "Total Tests");
+            Assert.AreEqual(1, this.htmlLogger.TotalTests, "Total Tests");
         }
 
         [TestMethod]
@@ -176,7 +176,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(passResult2).Object);
 
-            Assert.AreEqual(this.htmlLogger.PassedTests, 1, "Passed Tests");
+            Assert.AreEqual(1, this.htmlLogger.PassedTests, "Passed Tests");
         }
 
         [TestMethod]
@@ -188,7 +188,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(skipResult1).Object);
 
-            Assert.AreEqual(this.htmlLogger.SkippedTests, 1, "Skipped Tests");
+            Assert.AreEqual(1, this.htmlLogger.SkippedTests, "Skipped Tests");
         }
 
         [TestMethod]
@@ -246,46 +246,46 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             var result = this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First();
 
-            Assert.AreEqual(result.DisplayName, "def");
-            Assert.AreEqual(result.ErrorMessage, "error message");
-            Assert.AreEqual(result.ErrorStackTrace, "Error stack trace");
-            Assert.AreEqual(result.FullyQualifiedName, "fully");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().Source, "abc/def.dll");
-            Assert.AreEqual(result.Duration, "1s");
+            Assert.AreEqual("def", result.DisplayName);
+            Assert.AreEqual("error message", result.ErrorMessage);
+            Assert.AreEqual("Error stack trace", result.ErrorStackTrace);
+            Assert.AreEqual("fully", result.FullyQualifiedName);
+            Assert.AreEqual("abc/def.dll", this.htmlLogger.TestRunDetails.ResultCollectionList.First().Source);
+            Assert.AreEqual("1s", result.Duration);
         }
 
         [TestMethod]
         public void GetFormattedDurationStringShouldGiveCorrectFormat()
         {
             TimeSpan ts1 = new TimeSpan(0, 0, 0, 0, 1);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts1), "1ms");
+            Assert.AreEqual("1ms", htmlLogger.GetFormattedDurationString(ts1));
 
             TimeSpan ts2 = new TimeSpan(0, 0, 0, 1, 0);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts2), "1s");
+            Assert.AreEqual("1s", htmlLogger.GetFormattedDurationString(ts2));
 
             TimeSpan ts3 = new TimeSpan(0, 0, 1, 0, 1);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts3), "1m");
-            ;
+            Assert.AreEqual("1m", htmlLogger.GetFormattedDurationString(ts3));
+
             TimeSpan ts4 = new TimeSpan(0, 1, 0, 2, 3);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts4), "1h");
+            Assert.AreEqual("1h", htmlLogger.GetFormattedDurationString(ts4));
 
             TimeSpan ts5 = new TimeSpan(0, 1, 2, 3, 4);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts5), "1h 2m");
+            Assert.AreEqual("1h 2m", htmlLogger.GetFormattedDurationString(ts5));
 
             TimeSpan ts6 = new TimeSpan(0, 0, 1, 2, 3);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts6), "1m 2s");
+            Assert.AreEqual("1m 2s", htmlLogger.GetFormattedDurationString(ts6));
 
             TimeSpan ts7 = new TimeSpan(0, 0, 0, 1, 3);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts7), "1s 3ms");
+            Assert.AreEqual("1s 3ms", htmlLogger.GetFormattedDurationString(ts7));
 
             TimeSpan ts8 = new TimeSpan(2);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts8), "< 1ms");
+            Assert.AreEqual("< 1ms", htmlLogger.GetFormattedDurationString(ts8));
 
             TimeSpan ts10 = new TimeSpan(1, 0, 0, 1, 3);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts10), "> 1d");
+            Assert.AreEqual("> 1d", htmlLogger.GetFormattedDurationString(ts10));
 
             TimeSpan ts9 = new TimeSpan(0, 0, 0, 0, 0);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts9), null);
+            Assert.IsNull(htmlLogger.GetFormattedDurationString(ts9));
         }
 
         [TestMethod]
@@ -302,7 +302,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(2, this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -320,9 +320,9 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result2).Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.Count, 2);
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().Source, "abc.dll");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.Last().Source, "def.dll");
+            Assert.AreEqual(2, this.htmlLogger.TestRunDetails.ResultCollectionList.Count);
+            Assert.AreEqual("abc.dll", this.htmlLogger.TestRunDetails.ResultCollectionList.First().Source);
+            Assert.AreEqual("def.dll", this.htmlLogger.TestRunDetails.ResultCollectionList.Last().Source);
         }
 
         [TestMethod]
@@ -333,7 +333,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().FailedResultList.Count, 1);
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.ResultCollectionList.First().FailedResultList.Count);
         }
 
         [TestMethod]
@@ -351,7 +351,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result1).Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, 1, "test handler is adding parent result correctly");
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, "test handler is adding parent result correctly");
             Assert.IsNull(this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().InnerTestResults, "test handler is adding child result correctly");
 
             var result2 = new ObjectModel.TestResult(testCase2);
@@ -365,8 +365,8 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result2).Object);
             this.htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result3).Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, 1, "test handler is adding parent result correctly");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().InnerTestResults.Count, 2, "test handler is adding child result correctly");
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.Count, "test handler is adding parent result correctly");
+            Assert.AreEqual(2, this.htmlLogger.TestRunDetails.ResultCollectionList.First().ResultList.First().InnerTestResults.Count, "test handler is adding child result correctly");
         }
 
         [TestMethod]
@@ -392,12 +392,12 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Summary.TotalTests, 4, "summary should keep track of total tests");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Summary.FailedTests, 1, "summary should keep track of failed tests");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Summary.PassedTests, 2, "summary should keep track of passed tests");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Summary.SkippedTests, 1, "summary should keep track of passed tests");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Summary.PassPercentage, 50, "summary should keep track of passed tests");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Summary.TotalRunTime, null, "summary should keep track of passed tests");
+            Assert.AreEqual(4, this.htmlLogger.TestRunDetails.Summary.TotalTests, 4, "summary should keep track of total tests");
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.FailedTests, 1, "summary should keep track of failed tests");
+            Assert.AreEqual(2, this.htmlLogger.TestRunDetails.Summary.PassedTests, 2, "summary should keep track of passed tests");
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.SkippedTests, 1, "summary should keep track of passed tests");
+            Assert.AreEqual(50, this.htmlLogger.TestRunDetails.Summary.PassPercentage, 50, "summary should keep track of passed tests");
+            Assert.IsNull(this.htmlLogger.TestRunDetails.Summary.TotalRunTime, "summary should keep track of passed tests");
         }
 
         [TestMethod]
