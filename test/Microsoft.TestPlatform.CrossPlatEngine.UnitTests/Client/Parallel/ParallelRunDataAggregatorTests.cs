@@ -215,7 +215,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.Aggregate(new TestRunStatistics(12, stats1), null, null, TimeSpan.Zero, false, false, null, null);
 
             runStats = aggregator.GetAggregatedRunStats();
-            Assert.AreEqual(12, runStats.ExecutedTests, 12, "RunStats must have aggregated data.");
+            Assert.AreEqual(12, runStats.ExecutedTests, "RunStats must have aggregated data.");
             Assert.AreEqual(2, runStats.Stats[TestOutcome.Passed], "RunStats must have aggregated data.");
             Assert.AreEqual(3, runStats.Stats[TestOutcome.Failed], "RunStats must have aggregated data.");
             Assert.AreEqual(1, runStats.Stats[TestOutcome.Skipped], "RunStats must have aggregated data.");
