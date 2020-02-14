@@ -25,10 +25,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Constants.DefaultBatchSize, runConfiguration.BatchSize);
             Assert.AreEqual(0, runConfiguration.TestSessionTimeout);
             Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
-            Assert.AreEqual(null, runConfiguration.SolutionDirectory);
+            Assert.IsNull(runConfiguration.SolutionDirectory);
             Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
-            Assert.AreEqual(null, runConfiguration.BinariesRoot);
-            Assert.AreEqual(null, runConfiguration.TestAdaptersPaths);
+            Assert.IsNull(runConfiguration.BinariesRoot);
+            Assert.IsNull(runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
             Assert.IsFalse(runConfiguration.DisableAppDomain);
             Assert.IsFalse(runConfiguration.DisableParallelization);

@@ -70,7 +70,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             var testLoggerManager = new DummyTestLoggerManager();
             string result = testLoggerManager.GetResultsDirectory(null);
-            Assert.AreEqual(null, result);
+            Assert.IsNull(result);
         }
 
         [TestMethod]

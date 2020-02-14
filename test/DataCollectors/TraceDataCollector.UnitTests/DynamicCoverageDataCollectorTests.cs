@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
             this.collector.Initialize(null, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
 
-            Assert.AreEqual(null, actualConfig);
+            Assert.IsNull(actualConfig);
         }
 
         [TestMethod]
