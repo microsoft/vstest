@@ -97,16 +97,16 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var expectedSolutionPath = Environment.ExpandEnvironmentVariables("%temp%");
             Assert.AreEqual(expectedSolutionPath, runConfiguration.SolutionDirectory);
 
-            Assert.AreEqual(true, runConfiguration.TreatTestAdapterErrorsAsWarnings);
+            Assert.IsTrue(runConfiguration.TreatTestAdapterErrorsAsWarnings);
             Assert.AreEqual(@"E:\x\z", runConfiguration.BinariesRoot);
             Assert.AreEqual(@"C:\a\b;D:\x\y", runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(2, runConfiguration.MaxCpuCount);
             Assert.AreEqual(5, runConfiguration.BatchSize);
             Assert.AreEqual(10000, runConfiguration.TestSessionTimeout);
-            Assert.AreEqual(true, runConfiguration.DisableAppDomain);
-            Assert.AreEqual(true, runConfiguration.DisableParallelization);
-            Assert.AreEqual(true, runConfiguration.DesignMode);
-            Assert.AreEqual(true, runConfiguration.InIsolation);
+            Assert.IsTrue(runConfiguration.DisableAppDomain);
+            Assert.IsTrue(runConfiguration.DisableParallelization);
+            Assert.IsTrue(runConfiguration.DesignMode);
+            Assert.IsTrue(runConfiguration.InIsolation);
             Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
         }

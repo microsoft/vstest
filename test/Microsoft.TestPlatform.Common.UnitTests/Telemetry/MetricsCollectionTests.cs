@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
             object value;
-            Assert.AreEqual(true, this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value));
+            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value));
             Assert.AreEqual("DummyValue", value);
         }
 
@@ -33,13 +33,13 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
             object value;
-            Assert.AreEqual(true, this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value));
+            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value));
             Assert.AreEqual("DummyValue", value);
 
             this.metricsCollection.Add("DummyMessage", "newValue");
 
             object newValue;
-            Assert.AreEqual(true, this.metricsCollection.Metrics.TryGetValue("DummyMessage", out newValue));
+            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out newValue));
             Assert.AreEqual("newValue", newValue);
         }
 
@@ -50,8 +50,8 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection.Add("DummyMessage2", "DummyValue");
 
             Assert.AreEqual(2, this.metricsCollection.Metrics.Count);
-            Assert.AreEqual(true, this.metricsCollection.Metrics.ContainsKey("DummyMessage"));
-            Assert.AreEqual(true, this.metricsCollection.Metrics.ContainsKey("DummyMessage2"));
+            Assert.IsTrue(this.metricsCollection.Metrics.ContainsKey("DummyMessage"));
+            Assert.IsTrue(this.metricsCollection.Metrics.ContainsKey("DummyMessage2"));
         }
 
         [TestMethod]

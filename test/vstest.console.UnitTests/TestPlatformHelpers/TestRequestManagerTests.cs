@@ -315,7 +315,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-            Assert.AreEqual(true, disableAppDomain);
+            Assert.IsTrue(disableAppDomain);
         }
 
         [TestMethod]
@@ -1126,7 +1126,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-            Assert.AreEqual(true, disableAppDomain);
+            Assert.IsTrue(disableAppDomain);
         }
 
         [TestMethod]

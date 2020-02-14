@@ -52,9 +52,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
-            Assert.AreEqual(true, capabilities.AllowMultiple);
+            Assert.IsTrue(capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(true, capabilities.IsSpecialCommand);
+            Assert.IsTrue(capabilities.IsSpecialCommand);
         }
 
         #endregion

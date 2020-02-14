@@ -56,7 +56,7 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(true, capabilities.AllowMultiple);
+            Assert.IsTrue(capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
             Assert.AreEqual(false, capabilities.IsSpecialCommand);
         }
