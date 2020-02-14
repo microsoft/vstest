@@ -1427,7 +1427,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
             Assert.AreEqual("a", traits.ToArray()[0].Name);
-            Assert.AreEqual("b", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1483,7 +1483,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
             Assert.AreEqual("a", traits.ToArray()[0].Name);
-            Assert.AreEqual("b", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1540,7 +1540,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
             Assert.AreEqual("a", traits.ToArray()[0].Name);
-            Assert.AreEqual("b", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1597,7 +1597,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
             Assert.AreEqual("a", traits.ToArray()[0].Name);
-            Assert.AreEqual("b", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
