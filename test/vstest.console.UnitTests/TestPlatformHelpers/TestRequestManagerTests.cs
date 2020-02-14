@@ -110,7 +110,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             // Opt out the Telemetry
             Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
-        
+
         [TestMethod]
         public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
         {
@@ -210,7 +210,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Assert.AreEqual(testCaseFilterValue, actualDiscoveryCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
-            Assert.AreEqual(createDiscoveryRequestCalled, 1, "CreateDiscoveryRequest must be invoked only once.");
+            Assert.AreEqual(1, createDiscoveryRequestCalled, "CreateDiscoveryRequest must be invoked only once.");
             Assert.AreEqual(2, actualDiscoveryCriteria.Sources.Count(), "All Sources must be used for discovery request");
             Assert.AreEqual("a", actualDiscoveryCriteria.Sources.First(), "First Source in list is incorrect");
             Assert.AreEqual("b", actualDiscoveryCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
@@ -315,7 +315,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-            Assert.IsTrue(disableAppDomain);
+            Assert.AreEqual(true, disableAppDomain);
         }
 
         [TestMethod]
@@ -1017,7 +1017,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
                 this.mockProcessHelper.Object);
-            
+
             // Act.
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
@@ -1126,7 +1126,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-            Assert.IsTrue(disableAppDomain);
+            Assert.AreEqual(true, disableAppDomain);
         }
 
         [TestMethod]
@@ -1165,7 +1165,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Assert.AreEqual(testCaseFilterValue, observedCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
-            Assert.AreEqual(createRunRequestCalled, 1, "CreateRunRequest must be invoked only once.");
+            Assert.AreEqual(1, createRunRequestCalled, "CreateRunRequest must be invoked only once.");
             Assert.AreEqual(2, observedCriteria.Sources.Count(), "All Sources must be used for discovery request");
             Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
             Assert.AreEqual("b", observedCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");

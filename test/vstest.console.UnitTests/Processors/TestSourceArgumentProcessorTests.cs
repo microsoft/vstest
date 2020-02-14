@@ -49,11 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsNull(capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.None, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
             Assert.IsTrue(capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.AlwaysExecute);
             Assert.IsTrue(capabilities.IsSpecialCommand);
         }
 

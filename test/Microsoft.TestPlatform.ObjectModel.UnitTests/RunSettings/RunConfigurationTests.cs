@@ -30,10 +30,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(null, runConfiguration.BinariesRoot);
             Assert.AreEqual(null, runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
-            Assert.AreEqual(false, runConfiguration.DisableAppDomain);
-            Assert.AreEqual(false, runConfiguration.DisableParallelization);
-            Assert.AreEqual(false, runConfiguration.DesignMode);
-            Assert.AreEqual(false, runConfiguration.InIsolation);
+            Assert.IsFalse(runConfiguration.DisableAppDomain);
+            Assert.IsFalse(runConfiguration.DisableParallelization);
+            Assert.IsFalse(runConfiguration.DesignMode);
+            Assert.IsFalse(runConfiguration.InIsolation);
             Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(Constants.DefaultExecutionThreadApartmentState, runConfiguration.ExecutionThreadApartmentState);
         }
@@ -107,7 +107,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.IsTrue(runConfiguration.DisableParallelization);
             Assert.IsTrue(runConfiguration.DesignMode);
             Assert.IsTrue(runConfiguration.InIsolation);
-            Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
+            Assert.IsFalse(runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
         }
 

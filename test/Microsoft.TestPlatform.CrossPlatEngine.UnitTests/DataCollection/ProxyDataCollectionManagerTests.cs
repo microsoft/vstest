@@ -198,7 +198,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
             Assert.AreEqual(0, result.EnvironmentVariables.Count);
-            Assert.AreEqual(false, result.AreTestCaseLevelEventsRequired);
+            Assert.IsFalse(result.AreTestCaseLevelEventsRequired);
             Assert.AreEqual(0, result.DataCollectionEventsPort);
         }
 

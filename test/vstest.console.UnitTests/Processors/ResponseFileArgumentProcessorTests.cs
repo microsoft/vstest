@@ -39,11 +39,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             StringAssert.Contains(capabilities.HelpContentResourceName, "Read response file for more options");
 
             Assert.AreEqual(HelpContentPriority.ResponseFileArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
             Assert.IsTrue(capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.AlwaysExecute);
             Assert.IsTrue(capabilities.IsSpecialCommand);
         }
 
