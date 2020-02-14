@@ -392,11 +392,11 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
 
-            Assert.AreEqual(4, this.htmlLogger.TestRunDetails.Summary.TotalTests, 4, "summary should keep track of total tests");
-            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.FailedTests, 1, "summary should keep track of failed tests");
-            Assert.AreEqual(2, this.htmlLogger.TestRunDetails.Summary.PassedTests, 2, "summary should keep track of passed tests");
-            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.SkippedTests, 1, "summary should keep track of passed tests");
-            Assert.AreEqual(50, this.htmlLogger.TestRunDetails.Summary.PassPercentage, 50, "summary should keep track of passed tests");
+            Assert.AreEqual(4, this.htmlLogger.TestRunDetails.Summary.TotalTests, "summary should keep track of total tests");
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.FailedTests, "summary should keep track of failed tests");
+            Assert.AreEqual(2, this.htmlLogger.TestRunDetails.Summary.PassedTests, "summary should keep track of passed tests");
+            Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.SkippedTests, "summary should keep track of passed tests");
+            Assert.AreEqual(50, this.htmlLogger.TestRunDetails.Summary.PassPercentage, "summary should keep track of passed tests");
             Assert.IsNull(this.htmlLogger.TestRunDetails.Summary.TotalRunTime, "summary should keep track of passed tests");
         }
 
