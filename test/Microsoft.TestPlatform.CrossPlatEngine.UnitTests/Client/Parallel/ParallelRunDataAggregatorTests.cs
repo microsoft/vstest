@@ -6,6 +6,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
