@@ -77,7 +77,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet2, null);
 
-            Assert.AreEqual(1, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have aggregated data.");
+            Assert.AreEqual(2, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have aggregated data.");
         }
 
         [TestMethod]
