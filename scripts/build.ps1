@@ -228,6 +228,10 @@ function Publish-PatchedDotnet {
     Write-Log "Publish-PatchedDotnet: Copy VSTest task artifacts to local dotnet installation to allow `dotnet test` to run with it"
     $buildArtifactsPath = "$env:TP_ROOT_DIR\src\Microsoft.TestPlatform.Build\bin\$TPB_Configuration\$TPB_TargetFrameworkNS2_0\*"
     Copy-Item $buildArtifactsPath $dotnetTestArtifactsSdkPath -Force
+
+    Write-Log "Publish-PatchedDotnet: Copy vstest.console.dll artifact to local dotnet installation to allow `dotnet test` to run with it"
+    $buildArtifactsPath = "$env:TP_ROOT_DIR\src\vstest.console\bin\$TPB_Configuration\$TPB_TargetFrameworkCore20\vstest.console.dll"
+    Copy-Item $buildArtifactsPath $dotnetTestArtifactsSdkPath -Force
 }
 
 function Publish-Package

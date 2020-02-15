@@ -524,10 +524,10 @@ namespace Microsoft.TestPlatform.TestUtilities
         private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
         {
             var environmentVariables = new Dictionary<string, string> {
-                ["DOTNET_MULTILEVEL_LOOKUP"] = "0" 
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
             
-            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe"); ;
+            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe");
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
