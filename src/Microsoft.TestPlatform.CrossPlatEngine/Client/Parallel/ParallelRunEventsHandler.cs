@@ -174,6 +174,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             return this.actualRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return this.actualRunEventsHandler.AttachDebuggerToProcess(pid);
+        }
+
         private void ConvertToRawMessageAndSend(string messageType, object payload)
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);

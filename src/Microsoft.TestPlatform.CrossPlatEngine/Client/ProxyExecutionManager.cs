@@ -200,6 +200,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
+        ///  <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return this.baseTestRunEventsHandler.AttachDebuggerToProcess(pid);
+        }
+
         /// <summary>
         /// Aborts the test run.
         /// </summary>

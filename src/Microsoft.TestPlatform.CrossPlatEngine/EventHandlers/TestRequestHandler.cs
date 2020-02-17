@@ -39,7 +39,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private ManualResetEventSlim sessionCompleted;
 
-        private Action<Message> onAckMessageRecieved;
+        private Action<Message> onAckMessageReceived;
+        private Action<Message> onResultMessageReceived;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestHandler" />.
@@ -48,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageReceived)
         {
             this.communicationEndpointFactory = communicationEndpointFactory;
             this.ConnectionInfo = connectionInfo;
@@ -56,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
-            this.onAckMessageRecieved = onAckMessageRecieved;
+            this.onAckMessageReceived = onAckMessageReceived;
             this.jobQueue = jobQueue;
         }
 
@@ -67,7 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
-            this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
+            this.onAckMessageReceived = (message) => { throw new NotImplementedException(); };
+            this.onResultMessageReceived = (message) => { throw new NotImplementedException(); };
 
             this.jobQueue = new JobQueue<Action>(
                 (action) => { action(); },
@@ -190,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var waitHandle = new ManualResetEventSlim(false);
             Message ackMessage = null;
-            this.onAckMessageRecieved = (ackRawMessage) =>
+            this.onAckMessageReceived = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -203,17 +205,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             EqtTrace.Verbose("Waiting for LaunchAdapterProcessWithDebuggerAttached ack");
             waitHandle.Wait();
-            this.onAckMessageRecieved = null;
+            this.onAckMessageReceived = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
         }
 
         public bool AttachDebuggerToProcess(int pid)
         {
-            var data = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttached,
-                pid, protocolVersion);
+            Message resultMessage = null;
+            var waitHandle = new ManualResetEventSlim(false);
+
+            this.onResultMessageReceived = (resultRawMessage) =>
+            {
+                resultMessage = resultRawMessage;
+                waitHandle.Set();
+            };
+
+            var data = dataSerializer.SerializePayload(
+                MessageType.AttachDebuggerToProcess,
+                new TestProcessAttachDebuggerPayload(pid),
+                protocolVersion);
             this.SendData(data);
 
-            return false; // ??
+            EqtTrace.Verbose("Waiting for AttachDebuggerToProcess result ...");
+            waitHandle.Wait();
+
+            this.onResultMessageReceived = null;
+            return this.dataSerializer.DeserializePayload<bool>(resultMessage);
         }
 
         public void OnMessageReceived(object sender, MessageReceivedEventArgs messageReceivedArgs)
@@ -334,7 +351,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     break;
 
                 case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
-                    this.onAckMessageRecieved?.Invoke(message);
+                    this.onAckMessageReceived?.Invoke(message);
+                    break;
+
+                case MessageType.AttachDebuggerToProcessCallback:
+                    this.onResultMessageReceived?.Invoke(message);
                     break;
 
                 case MessageType.AbortTestRun:

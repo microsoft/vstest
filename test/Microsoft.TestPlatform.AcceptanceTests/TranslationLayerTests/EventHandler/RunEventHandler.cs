@@ -75,5 +75,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // No op
             return -1;
         }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return false;
+        }
     }
 }

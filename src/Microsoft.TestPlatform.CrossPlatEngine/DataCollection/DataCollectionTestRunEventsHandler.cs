@@ -157,6 +157,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return this.testRunEventsHandler.AttachDebuggerToProcess(pid);
+        }
+
         /// <summary>
         /// The get combined attachment sets.
         /// </summary>

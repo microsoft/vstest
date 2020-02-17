@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
-    public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
+    public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
         /// <summary>
         /// The criteria/config for this test run request.

@@ -293,5 +293,11 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
             // No op
             return -1;
         }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            // No op
+            return false;
+        }
     }
 }
