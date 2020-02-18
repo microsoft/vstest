@@ -86,5 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="testProcessStartInfo">Process start info</param>
         /// <returns>ProcessId of the launched process</returns>
         int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo);
+
+        bool AttachDebuggerToProcess(int pid);
     }
 }
