@@ -93,8 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             this.requestHandler.InitializeCommunication();
 
             // Initialize DataCollection Communication if data collection port is provided.
-            var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
-            if (dcPort > 0)
+            var hasDataCollectionPortArgument = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, DataCollectionPortArgument, out var dcPort);
+            if (hasDataCollectionPortArgument)
             {
                 this.ConnectToDatacollector(dcPort);
             }
@@ -176,22 +176,35 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private void SetParentProcessExitCallback(IDictionary<string, string> argsDictionary)
         {
             // Attach to exit of parent process
-            var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
-            EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: Monitoring parent process with id: '{0}'",
-                parentProcessId);
+            var hasParentProcessArgument = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, ParentProcessIdArgument, out var parentProcessId);
 
-            // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
-            if (parentProcessId != -1)
+            if (!hasParentProcessArgument)
             {
-                this.processHelper.SetExitCallback(
-                    parentProcessId,
-                    (obj) =>
-                    {
-                        EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: ParentProcess '{0}' Exited.",
-                            parentProcessId);
-                        new PlatformEnvironment().Exit(1);
-                    });
+                throw new ArgumentException($"Argument {ParentProcessIdArgument} was not specified.");
             }
+
+            EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: Monitoring parent process with id: '{0}'", parentProcessId);
+
+            if (parentProcessId == -1)
+            {
+                // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
+                return;
+            }
+
+            if (parentProcessId == 0)
+            {
+                //TODO: should there be a warning / error in this case, on windows and linux we are most likely not started by this PID 0, because it's Idle process on Windows, and Swapper on Linux, and similarly in docker
+                // Trying to attach to 0 will cause access denied error on Windows
+            }
+
+            this.processHelper.SetExitCallback(
+                parentProcessId,
+                (obj) =>
+                {
+                    EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: ParentProcess '{0}' Exited.",
+                        parentProcessId);
+                    new PlatformEnvironment().Exit(1);
+                });
         }
 
         private static TestHostConnectionInfo GetConnectionInfo(IDictionary<string, string> argsDictionary)

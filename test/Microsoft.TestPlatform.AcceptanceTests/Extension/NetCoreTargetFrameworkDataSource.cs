@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 this.dataRows.Add(new object[]
                 {
-                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
+                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
                 });
             }
 
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 this.dataRows.Add(new object[]
                 {
-                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
+                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
                 });
             }
         }
