@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
 
         /// <summary>
-        /// Invokes <c>vstest.console</c> with specified arguments.
+        /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
         /// </summary>
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeDotnetTest(string arguments)
@@ -527,7 +527,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0" 
             };
             
-            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe"); ;
+            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe");
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 

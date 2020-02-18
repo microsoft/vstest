@@ -17,6 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs;..\testhost.x86\UnitTestClient.cs" />
+    <Compile Include="..\testhost.x86\TestPlatformTraceListener.cs" Link="TestPlatformTraceListener.cs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>

@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
             {
                 errorMessage =
-                    "The active test run was aborted. Reason: Process is terminating due to StackOverflowException.\r\n";
+                    "The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.\r\n";
             }
 
             // Assert

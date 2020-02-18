@@ -207,6 +207,19 @@ function Invoke-Build
 
     Set-ScriptFailedOnError
 
+    Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Invoke-TestAssetsBuild
+{
+    $timer = Start-Timer
+    Write-Log "Invoke-TestAssetsBuild: Start test assets build."
+    $dotnetExe = Get-DotNetPath
+
+    # clean up packages that we built from the cache so we grab them from the source
+    $packages = $TPB_TestAssets_Solution | Split-Path | Join-Path -ChildPath packages
+    Get-ChildItem $packages -Filter "Microsoft.*" | Remove-Item -Recurse -Force -Confirm:$false -Verbose
+
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -214,7 +227,17 @@ function Invoke-Build
 
     Set-ScriptFailedOnError
 
-    Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
+    Write-Log "Invoke-TestAssetsBuild: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Copy-PackageIntoStaticDirectory { 
+    # packages are published into folder based on configuration, but 
+    # nuget does not understand that, and does not support wildcards in paths 
+    # in order to be able to use the produced packages for acceptance tests we
+    # need to put them in folder that is not changing it's name based on config
+    $tpPackagesPath = "$env:TP_OUT_DIR\$TPB_Configuration\packages\"
+    $tpPackagesDestination = "$env:TP_TESTARTIFACTS"
+    Copy-Item $tpPackagesPath $tpPackagesDestination -Force -Filter *.nupkg -Verbose -Recurse
 }
 
 function Publish-PatchedDotnet { 
@@ -926,11 +949,13 @@ Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
-Publish-PatchedDotnet
 Publish-Tests
 Create-VsixPackage
 Create-NugetPackages
 Generate-Manifest
+Publish-PatchedDotnet
+Copy-PackageIntoStaticDirectory
+Invoke-TestAssetsBuild
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
  

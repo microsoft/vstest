@@ -294,7 +294,14 @@ namespace Microsoft.TestPlatform.TestUtilities
                     {
                         if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
                         {
-                            dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                            if (!dependencyProps.ContainsKey(props.Name))
+                            {
+                                dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                            }
+                            else
+                            {
+                                dependencyProps[props.Name] = string.Join(", ", dependencyProps[props.Name], props.ReadElementContentAsString());
+                            }
                         }
                         props.Read();
                     }

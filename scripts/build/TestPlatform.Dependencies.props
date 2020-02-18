@@ -4,10 +4,17 @@
     <VSSdkBuildToolsVersion>15.8.3247</VSSdkBuildToolsVersion>
 
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
-    <NETTestSdkPreviousVersion>15.5.0</NETTestSdkPreviousVersion>
 
-    <MSTestFrameworkVersion>1.4.0</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>1.4.0</MSTestAdapterVersion>
+    <!-- Pick up the version from the parameters that the build script provides, which in turn takes it from TestPlatform.Settings.targets either directly
+    or via vsts-prevbuild.ps1 when running in CI pipeline -->
+    <NETTestSdkPreviousVersion>$(Version)</NETTestSdkPreviousVersion>
+    <NETTestSdkPreviousVersion Condition="'$(NETTestSdkPreviousVersion)' == ''">16.6.0-dev</NETTestSdkPreviousVersion>
+
+    <!-- 99.99.99-dev is a placeholder to be easy to find, you will see it fail the build if you build without using the build script -->
+    <NETTestSdkPreviousVersion Condition="'$(NETTestSdkPreviousVersion)' == ''">99.99.99-dev</NETTestSdkPreviousVersion>
+
+    <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>2.1.0</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
     
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
