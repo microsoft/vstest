@@ -216,9 +216,14 @@ function Invoke-TestAssetsBuild
     Write-Log "Invoke-TestAssetsBuild: Start test assets build."
     $dotnetExe = Get-DotNetPath
 
-    # clean up packages that we built from the cache so we grab them from the source
+    
     $packages = $TPB_TestAssets_Solution | Split-Path | Join-Path -ChildPath packages
-    Get-ChildItem $packages -Filter "Microsoft.*" | Remove-Item -Recurse -Force -Confirm:$false -Verbose
+    if (Test-Path $packages) {
+        # remove all microsoft packages from our packages folder so we 
+        # get the ones that we've just built instead of taking them from the cache
+        # on package restore
+        Get-ChildItem $packages -Filter "Microsoft.*" | Remove-Item -Recurse -Force -Confirm:$false
+    }
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
