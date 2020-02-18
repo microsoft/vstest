@@ -573,6 +573,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldWriteToConsoleShouldShowPassedTestsForNormalVebosityWithCustomIndicators()
+        {
+            string passedIndiecator = "Passed";
+            string failedIndiecator = "Failed";
+            string skippedIndicator = "Skipped";
+
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            parameters.Add("passedTestIndicator", passedIndiecator);
+            parameters.Add("failedTestIndicator", failedIndiecator);
+            parameters.Add("skippedTestIndicator", skippedIndicator);
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            foreach (var testResult in this.GetTestResultsObject())
+            {
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
+            }
+            loggerEvents.WaitForEventCompletion();
+
+            string preFix = "  ";
+            string postFix = " ";
+            string passedResult = preFix + passedIndiecator + postFix;
+            string failedResult = preFix + failedIndiecator + postFix;
+            string skilledResult = preFix + skippedIndicator + postFix;
+            this.mockOutput.Verify(o => o.Write(passedResult, OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine("TestName [1h 2m]", OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.Write(failedResult, OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine("TestName [4m 5s]", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.Write(skilledResult, OutputLevel.Information), Times.Exactly(3));
+            this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
+            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(5));
+            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
+        }
+
+        [TestMethod]
         public void TestResultHandlerShouldNotShowNotStdOutMsgOfPassedTestIfVerbosityIsNormal()
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);

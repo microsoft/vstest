@@ -39,17 +39,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Unicode for tick
         /// </summary>
-        private const char PassedTestIndicator = '\u221a';
+        private static string PassedTestIndicator = "\u221a";
 
         /// <summary>
         /// Indicator for failed tests
         /// </summary>
-        private const char FailedTestIndicator = 'X';
+        private static string FailedTestIndicator = "X";
 
         /// <summary>
         /// Indicated skipped and not run tests
         /// </summary>
-        private const char SkippedTestIndicator = '!';
+        private static string SkippedTestIndicator = "!";
 
         /// <summary>
         /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
@@ -80,6 +80,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Parameter for log message prefix
         /// </summary>
         public const string PrefixParam = "prefix";
+
+        /// <summary>
+		/// Parameter for log message for a passed test
+		/// </summary>
+        public const string PassedTestIndicatorParam = "passedTestIndicator";
+
+        /// <summary>
+		/// Parameter for log message for a failed test
+		/// </summary>
+        public const string FailedTestIndicatorParam = "failedTestIndicator";
+
+        /// <summary>
+		/// Parameter for log message for a skipped test
+		/// </summary>
+        public const string SkippedTestIndicatorParam = "skippedTestIndicator";
 
         /// <summary>
         /// Parameter for disabling progress
@@ -231,6 +246,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (progressArgExists)
             {
                 bool.TryParse(enableProgress, out EnableProgress);
+            }
+
+            var passedTestIndiectorExists = parameters.TryGetValue(ConsoleLogger.PassedTestIndicatorParam, out string passedIndicator);
+            if (passedTestIndiectorExists)
+            {
+                PassedTestIndicator = passedIndicator;
+            }
+
+            var failedTestIndecatorExists = parameters.TryGetValue(ConsoleLogger.FailedTestIndicatorParam, out string failedIndicator);
+            if (failedTestIndecatorExists)
+            {
+                FailedTestIndicator = failedIndicator;
+            }
+
+            var skippedTestIndiectorExists = parameters.TryGetValue(ConsoleLogger.SkippedTestIndicatorParam, out string skippedIndicator);
+            if (passedTestIndiectorExists)
+            {
+                SkippedTestIndicator = skippedIndicator;
             }
 
             Initialize(events, String.Empty);
