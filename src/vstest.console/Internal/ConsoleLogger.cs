@@ -39,17 +39,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Unicode for tick
         /// </summary>
-        private static string PassedTestIndicator = "\u221a";
+        private const string PassedTestIndicatorDefault = "\u221a";
 
         /// <summary>
         /// Indicator for failed tests
         /// </summary>
-        private static string FailedTestIndicator = "X";
+        private const string FailedTestIndicatorDefault = "X";
 
         /// <summary>
         /// Indicated skipped and not run tests
         /// </summary>
-        private static string SkippedTestIndicator = "!";
+        private const string SkippedTestIndicatorDefault = "!";
 
         /// <summary>
         /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
@@ -132,7 +132,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         // Keep default verbosity for x-plat command line as minimal
         private Verbosity verbosityLevel = Verbosity.Minimal;
 #endif
-
+        private string PassedTestIndicator = PassedTestIndicatorDefault;
+        private string FailedTestIndicator = FailedTestIndicatorDefault;
+        private string SkippedTestIndicator = SkippedTestIndicatorDefault;
         private bool testRunHasErrorMessages = false;
         private ConcurrentDictionary<Guid, TestOutcome> leafExecutionIdAndTestOutcomePairDictionary = new ConcurrentDictionary<Guid, TestOutcome>();
 
