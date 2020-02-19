@@ -92,9 +92,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // Initialize Communication with vstest.console
             this.requestHandler.InitializeCommunication();
 
-            // Initialize DataCollection Communication if data collection port is provided.
-            var hasDataCollectionPortArgument = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, DataCollectionPortArgument, out var dcPort);
-            if (hasDataCollectionPortArgument)
+            // skipping because 0 is the default value, and also the value the the callers use when they
+            // call with the parameter specified, but without providing an actual port
+            var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
+            if (dcPort > 0)
             {
                 this.ConnectToDatacollector(dcPort);
             }
