@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
     using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -661,7 +662,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
         public bool AttachDebuggerToProcess(int pid)
         {
-            throw new NotImplementedException("Not implemented");
+            if (!(this.testRunCriteria.TestHostLauncher is ITestHostLauncher2))
+            {
+                return false;
+            }
+
+            return (this.testRunCriteria.TestHostLauncher as ITestHostLauncher2).AttachDebuggerToProcess(pid);
         }
 
         /// <summary>

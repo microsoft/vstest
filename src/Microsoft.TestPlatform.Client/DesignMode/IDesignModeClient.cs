@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <returns>Process id of the launched test host.</returns>
         int LaunchCustomHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken);
 
+        bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
+
         /// <summary>
         /// Handles parent process exit
         /// </summary>

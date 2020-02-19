@@ -37,11 +37,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         private object ackLockObject = new object();
 
+        private object responseLockObject = new object();
+
         private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
 
         private IEnvironment platformEnvironment;
 
         protected Action<Message> onAckMessageReceived;
+
+        protected Action<Message> onResponseMessageReceived;
 
         private TestSessionMessageLogger testSessionMessageLogger;
 
@@ -226,6 +230,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.AttachDebuggerToProcessCallback:
+                            this.onResponseMessageReceived?.Invoke(message);
+                            break;
+
                         case MessageType.SessionEnd:
                             {
                                 EqtTrace.Info("DesignModeClient: Session End message received from server. Closing the connection.");
@@ -298,6 +306,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     throw new TestPlatformException(ackPayload.ErrorMessage);
                 }
+            }
+        }
+
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            lock (this.responseLockObject)
+            {
+                var waitHandle = new AutoResetEvent(false);
+                Message responseMessage = null;
+                this.onResponseMessageReceived = (responseRawMessage) =>
+                {
+                    responseMessage = responseRawMessage;
+                    waitHandle.Set();
+                };
+
+                this.communicationManager.SendMessage(MessageType.AttachDebuggerToProcess, pid);
+
+                WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
+
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
+                this.onAckMessageReceived = null;
+
+                var response = this.dataSerializer.DeserializePayload<bool>(responseMessage);
+                return response;
             }
         }
 
@@ -416,7 +448,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
-
         #endregion
     }
 }

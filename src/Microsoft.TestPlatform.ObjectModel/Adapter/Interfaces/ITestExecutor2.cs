@@ -30,5 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         /// <param name="runContext">Context to use when executing the tests.</param>
         /// <param param name="frameworkHandle">Handle to the framework to record results and to do framework operations.</param>
         void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle2 frameworkHandle);
+
+        bool ShouldAttachToTestHost(IEnumerable<string> sources, IRunContext runContext);
     }
 }
