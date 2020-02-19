@@ -33,9 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             try
             {
                 TestPlatformEventSource.Instance.TestHostStart();
-#if !NET451
-                TestPlatformTraceListener.Setup();
-#endif
                 Run(args);
             }
             catch (Exception ex)

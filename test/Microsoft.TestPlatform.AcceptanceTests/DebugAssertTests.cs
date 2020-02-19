@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
 
     [TestClass]
     public class DebugAssertTests : AcceptanceTestBase
@@ -13,15 +14,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
         {
+            // when debugging this test in case it starts failing, be aware that the default behavior of Debug.Assert 
+            // is to not crash the process when we are running in debug, and debugger is attached
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var projectName = "CrashingOnDebugAssertTestProject.csproj";
-            var projectPath = this.GetProjectFullPath(projectName);
-            this.InvokeDotnetTest(projectPath);
+            var assemblyPath = this.BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            this.InvokeVsTest(arguments);
 
             // this will have failed tests when it works and crash the process when it does not
-            // because crashin processes is what a failed Debug.Assert does by default
-            this.ValidateSummaryStatus(1, 0, 0);
+            // because crashing processes is what a failed Debug.Assert does by default
+            this.ValidateSummaryStatus(0, failedTestsCount: 4, 0);
+            StringAssert.Contains(this.StdOut, "Test method CrashingOnDebugAssertTestProject.DebugTests.DebugAssert threw exception: Microsoft.VisualStudio.TestPlatform.ObjectModel.DebugAssertException: Method Debug.Assert failed");
         }
     }
 }

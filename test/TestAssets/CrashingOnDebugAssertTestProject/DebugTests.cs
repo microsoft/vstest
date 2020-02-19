@@ -7,9 +7,27 @@ namespace CrashingOnDebugAssertTestProject
     public class DebugTests
     {
         [TestMethod]
-        public void AssertDebug()
+        public void DebugAssert()
         {
-            Debug.Assert(true == false);
+            Debug.Assert(false);
+        }
+
+        [TestMethod]
+        public void DebugFail()
+        {
+            Debug.Fail("fail");
+        }
+
+        [TestMethod]
+        public void TraceAssert()
+        {
+            Trace.Assert(false);
+        }
+
+        [TestMethod]
+        public void TraceFail()
+        {
+            Trace.Fail("fail");
         }
     }
 }

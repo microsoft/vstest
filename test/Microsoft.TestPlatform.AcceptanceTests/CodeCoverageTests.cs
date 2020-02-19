@@ -61,11 +61,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = CreateArguments(runnerInfo, targetPlatform, withRunsettings, out var trxFilePath);
 
-            Environment.SetEnvironmentVariable("VSTEST_RUNNER_DEBUG", "0");
-            Environment.SetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT", "20");
             this.InvokeVsTest(arguments);
-            Environment.SetEnvironmentVariable("VSTEST_RUNNER_DEBUG", "0");
-            Environment.SetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT", "10");
 
             this.ValidateSummaryStatus(1, 1, 1);
 

@@ -84,6 +84,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
             }
 
+#if !NET451
+            TestHostTraceListener.Setup();
+#endif
+
             this.SetParentProcessExitCallback(argsDictionary);
 
             this.requestHandler.ConnectionInfo =

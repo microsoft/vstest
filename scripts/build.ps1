@@ -179,6 +179,14 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Clear-Package {
+    # find all microsoft packages that have the same version as we specified
+    # this is cache-busting the nuget packages, so we don't reuse them from cache 
+    # after we built new ones
+    $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName 
+    $devPackages | Remove-Item -Force -Recurse -Confirm:$false 
+}
+
 function Restore-Package
 {
     $timer = Start-Timer
@@ -217,14 +225,6 @@ function Invoke-TestAssetsBuild
     $dotnetExe = Get-DotNetPath
 
     
-    $packages = $TPB_TestAssets_Solution | Split-Path | Join-Path -ChildPath packages
-    if (Test-Path $packages) {
-        # remove all microsoft packages from our packages folder so we 
-        # get the ones that we've just built instead of taking them from the cache
-        # on package restore
-        Get-ChildItem $packages -Filter "Microsoft.*" | Remove-Item -Recurse -Force -Confirm:$false
-    }
-
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -950,6 +950,7 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 Install-DotNetCli
+Clear-Package
 Restore-Package
 Update-LocalizedResources
 Invoke-Build
