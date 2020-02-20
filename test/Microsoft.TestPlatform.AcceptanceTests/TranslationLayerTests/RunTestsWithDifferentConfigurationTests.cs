@@ -62,8 +62,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        //[NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -100,8 +100,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
+                numOfProcessCreatedTask.Result.Count,
+                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
         }
 
         [TestMethod]
@@ -178,8 +178,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var numberOfProcessCreated = numOfProcessCreatedTask.Result;
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numberOfProcessCreated,
-                $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated}");
+                numberOfProcessCreated.Count,
+                $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated.Count} ({ string.Join(", ", numberOfProcessCreated) })");
         }
 
         private IList<string> GetTestAssemblies()

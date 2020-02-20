@@ -94,7 +94,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
             this.ValidateSummaryStatus(2, 2, 2);
             this.ExitCodeEquals(1); // failing tests
         }

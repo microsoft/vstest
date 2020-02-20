@@ -250,8 +250,13 @@ function Copy-PackageIntoStaticDirectory {
 function Publish-PatchedDotnet { 
     Write-Log "Publish-PatchedDotnet: Copy local dotnet installation to testArtifacts"
     $dotnetPath = "$env:TP_TOOLS_DIR\dotnet\"
-    
+
     $dotnetTestArtifactsPath = "$env:TP_TESTARTIFACTS\dotnet\" 
+    
+    if (Test-Path $dotnetTestArtifactsPath) { 
+        Remove-Item -Force -Recurse $dotnetTestArtifactsPath
+    }
+
     $dotnetTestArtifactsSdkPath = "$env:TP_TESTARTIFACTS\dotnet\sdk\$env:DOTNET_CLI_VERSION\"
     Copy-Item $dotnetPath $dotnetTestArtifactsPath -Force -Recurse
 

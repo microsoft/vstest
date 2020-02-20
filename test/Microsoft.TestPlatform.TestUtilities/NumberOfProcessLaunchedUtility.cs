@@ -28,17 +28,17 @@ namespace TestPlatform.TestUtilities
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public static async Task<int> NumberOfProcessCreated(CancellationTokenSource cts, string processName)
+        public static async Task<ICollection<string>> NumberOfProcessCreated(CancellationTokenSource cts, string processName)
         {
             return await NumberOfProcessCreated(cts, new[] { processName });
         }
             
-        public static async Task<int> NumberOfProcessCreated(CancellationTokenSource cts, IEnumerable<string> processNames)
+        public static async Task<ICollection<string>> NumberOfProcessCreated(CancellationTokenSource cts, IEnumerable<string> processNames)
         {
             var processesBeforeRun = GetProcesses(processNames);
 
-            var numOfProcessTask = Task.Run(() => NumberOfProcessLaunchedDuringRun(cts.Token, processesBeforeRun, processNames));
-            return await numOfProcessTask;
+            var processesCreated = Task.Run(() => NumberOfProcessLaunchedDuringRun(cts.Token, processesBeforeRun, processNames));
+            return await processesCreated;
         }
 
         /// <summary>
@@ -56,13 +56,13 @@ namespace TestPlatform.TestUtilities
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public static int NumberOfProcessLaunchedDuringRun(
+        public static ICollection<string> NumberOfProcessLaunchedDuringRun(
             CancellationToken token,
             IEnumerable<Process> processesBeforeRun,
             IEnumerable<string> processNames)
         {
             var existingProcessIDs = processesBeforeRun.Select(p => p.Id).ToList();
-            var startedCount = 0;
+            var startedNames = new List<string>();
 
             while (!token.IsCancellationRequested)
             {
@@ -75,12 +75,12 @@ namespace TestPlatform.TestUtilities
                         continue;
                     }
 
-                    startedCount++;
+                    startedNames.Add(process.ProcessName);
                     existingProcessIDs.Add(process.Id);
                 }
             }
 
-            return startedCount;
+            return startedNames;
         }
 
         private static IEnumerable<Process> GetProcesses(IEnumerable<string> processNames)

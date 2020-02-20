@@ -64,28 +64,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return targetFramework;
         }
 
-        protected string GetTestHostProcessName(string targetPlatform)
-        {
-            var testHostProcessName = string.Empty;
-            if (this.IsDesktopTargetFramework())
-            {
-                if (string.Equals(targetPlatform, "x86", StringComparison.OrdinalIgnoreCase))
-                {
-                    testHostProcessName = "testhost.x86";
-                }
-                else
-                {
-                    testHostProcessName = "testhost";
-                }
-            }
-            else
-            {
-                testHostProcessName = "dotnet";
-            }
-
-            return testHostProcessName;
-        }
-
         /// <summary>
         /// Default RunSettings
         /// </summary>

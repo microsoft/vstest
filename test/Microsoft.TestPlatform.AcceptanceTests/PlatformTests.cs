@@ -23,12 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x64";
-            string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
-            string desktopHostProcessName = "testhost";
-
-            SetExpectedParams(ref expectedNumOfProcessCreated, ref testhostProcessName, desktopHostProcessName);
-            this.RunTestExecutionWithPlatform(platformArg, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestExecutionWithPlatform(platformArg, "testhost", 1);
         }
 
         /// <summary>
@@ -42,33 +37,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x86";
-            string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
-            string desktopHostProcessName = "testhost.x86";
-
-            SetExpectedParams(ref expectedNumOfProcessCreated, ref testhostProcessName, desktopHostProcessName);
-            this.RunTestExecutionWithPlatform(platformArg, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
         }
 
         private void SetExpectedParams(ref int expectedNumOfProcessCreated, ref string testhostProcessName, string desktopHostProcessName)
         {
-            if (this.IsDesktopTargetFramework())
-            {
-                testhostProcessName = desktopHostProcessName;
-                expectedNumOfProcessCreated = 1;
-            }
-            else
-            {
-                testhostProcessName = "dotnet";
-                if (this.IsDesktopRunner())
-                {
-                    expectedNumOfProcessCreated = 1;
-                }
-                else
-                {
-                    expectedNumOfProcessCreated = 2;
-                }
-            }
+            testhostProcessName = desktopHostProcessName;
+            expectedNumOfProcessCreated = 1;
         }
 
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
@@ -91,8 +66,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result} args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
+                numOfProcessCreatedTask.Result.Count,
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(1, 1, 1);
         }
     }
