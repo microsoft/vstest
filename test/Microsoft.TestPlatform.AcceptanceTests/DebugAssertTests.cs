@@ -22,9 +22,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
 
-            // this will have failed tests when it works and crash the process when it does not
-            // because crashing processes is what a failed Debug.Assert does by default
-            this.ValidateSummaryStatus(0, failedTestsCount: 4, 0);
+            // this will have failed tests when our trace listener works and crash the testhost process when it does not
+            // because crashing processes is what a failed Debug.Assert does by default, unless you have a debugger attached
+            this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 4, 0);
             StringAssert.Contains(this.StdOut, "Test method CrashingOnDebugAssertTestProject.DebugTests.DebugAssert threw exception: Microsoft.VisualStudio.TestPlatform.ObjectModel.DebugAssertException: Method Debug.Assert failed");
         }
     }

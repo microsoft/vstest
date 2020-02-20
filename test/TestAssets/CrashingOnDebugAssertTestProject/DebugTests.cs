@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CrashingOnDebugAssertTestProject
@@ -28,6 +29,13 @@ namespace CrashingOnDebugAssertTestProject
         public void TraceFail()
         {
             Trace.Fail("fail");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(DebugAssertException))]
+        public void CatchingExceptionFromDebugAssert()
+        {
+            Debug.Assert(false);
         }
     }
 }
