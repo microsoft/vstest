@@ -184,9 +184,9 @@ function Clear-Package {
     # this is cache-busting the nuget packages, so we don't reuse them from cache 
     # after we built new ones
     if (Test-Path $env:TP_PACKAGES_DIR) {
-    $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName 
-    $devPackages | Remove-Item -Force -Recurse -Confirm:$false 
-}
+        $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName 
+        $devPackages | Remove-Item -Force -Recurse -Confirm:$false
+    }
 }
 
 function Restore-Package

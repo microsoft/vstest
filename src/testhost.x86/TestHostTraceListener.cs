@@ -4,7 +4,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
-#if !NET451
+#if NETCOREAPP
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.Diagnostics;
