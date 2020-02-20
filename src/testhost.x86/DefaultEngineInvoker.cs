@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
             }
 
-#if !NET451
+#if NETCOREAPP
             TestHostTraceListener.Setup();
 #endif
 

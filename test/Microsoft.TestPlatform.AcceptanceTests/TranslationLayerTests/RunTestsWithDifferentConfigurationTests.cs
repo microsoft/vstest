@@ -153,13 +153,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             int expectedNumOfProcessCreated = 1;
             var testhostProcessNames = new[] { "testhost", "dotnet" };
 
-            // sdk is now generating .exe for netcoreapp applications as well
-            // and we are running testhost.exe all the time
-            // keeping this here in case we see this behavior differ somewhere
-            // to remind us that this was not always the case
-            // testhostProcessName = this.IsDesktopTargetFramework() ? "testhost" : "dotnet";
-
-
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts, testhostProcessNames);

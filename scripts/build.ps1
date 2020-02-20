@@ -167,9 +167,9 @@ function Install-DotNetCli
 
     # Pull in additional shared frameworks.
     # Get netcoreapp2.1 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.1.0")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.1.0' -Channel 'release/2.1.0'
-    }
+    
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -Runtime -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -Runtime -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
     #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
@@ -228,8 +228,8 @@ function Invoke-TestAssetsBuild
 
     
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
-    Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:NETTestSdkVersion=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:NETTestSdkVersion=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
+    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:NETTestSdkVersion="$TPB_Version" -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError
