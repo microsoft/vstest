@@ -8,7 +8,7 @@
     <!-- Pick up the version from the parameters that the build script provides, which in turn takes it from TestPlatform.Settings.targets either directly
     or via vsts-prevbuild.ps1 when running in CI pipeline, a better way would be to specify this version directly in a props file, but that would require chagnes
     to both the local build and CI build pipelines, and that's not something I want to do in a single step -->
-    <NETTestSdkVersion>$(Version)</NETTestSdkVersion>
+    <NETTestSdkVersion>$(NETTestSdkVersion)</NETTestSdkVersion>
 
     <!-- 99.99.99-dev is a placeholder to be easy to find, you will see it fail the build, if you build without using the build script -->
     <NETTestSdkVersion Condition="'$(NETTestSdkVersion)' == ''">99.99.99-dev</NETTestSdkVersion>
