@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private object cancelSyncObject = new Object();
 
         /// <summary>
-        /// The run completion event which will be signalled on completion of test run.
+        /// The run completion event which will be signaled on completion of test run.
         /// </summary>
         private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
 
@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancelation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
+                EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
             }
 
             string message = String.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
             }
 
-            EqtTrace.Info("TestRunRequest.CancelAsync: Cancelled.");
+            EqtTrace.Info("TestRunRequest.CancelAsync: Canceled.");
         }
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             lock (this.syncObject)
             {
-                // If this object is disposed, dont do anything
+                // If this object is disposed, don't do anything
                 if (this.disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
@@ -428,7 +428,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            // This is required as TMI adapter is sending attachments as List which cannot be typecasted to Collection.
+                            // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                             runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                             this.runRequestTimeTracker.Elapsed);
 
@@ -488,7 +488,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 EqtTrace.Verbose("TestRunRequest:SendTestRunStatsChange: Starting.");
                 if (testRunChangedArgs.ActiveTests != null)
                 {
-                    // Do verbose check to save perf in iterating test cases
+                    // Do verbose check to save performance in iterating test cases
                     if (EqtTrace.IsVerboseEnabled)
                     {
                         foreach (TestCase testCase in testRunChangedArgs.ActiveTests)
@@ -500,7 +500,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 lock (this.syncObject)
                 {
-                    // If this object is disposed, dont do anything
+                    // If this object is disposed, don't do anything
                     if (this.disposed)
                     {
                         EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
@@ -526,7 +526,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             lock (this.syncObject)
             {
-                // If this object is disposed, dont do anything
+                // If this object is disposed, don't do anything
                 if (this.disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");

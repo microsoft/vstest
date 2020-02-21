@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 (message) => EqtTrace.Error(message));
             this.loggerEventQueue.Pause();
 
-            // Register for events from the test run message logger so they 
+            // Register for events from the test run message logger so they
             // can be raised to the loggers.
             this.testSessionMessageLogger = testSessionMessageLogger;
             this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
@@ -164,15 +164,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             // Allow currently queued events to flush from the queue.  This is done so that information
             // logged during initialization completes processing before we begin other tasks.  This is
-            // important for instance when errors are logged during initilization and need to be output
-            // to the console before we begin outputing other information to the console.
+            // important for instance when errors are logged during initialization and need to be output
+            // to the console before we begin outputting other information to the console.
             this.loggerEventQueue.Flush();
         }
 
         /// <summary>
         /// Raises a test run message event to the enabled loggers.
         /// </summary>
-        /// <param name="args">Arguments to to be raised.</param>
+        /// <param name="args">Arguments to be raised.</param>
         internal void RaiseTestRunMessage(TestRunMessageEventArgs args)
         {
             if (args == null)
@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             this.CheckDisposed();
 
-            // Sending 0 size as this event is not expected to contain any data. 
+            // Sending 0 size as this event is not expected to contain any data.
             this.SafeInvokeAsync(() => this.TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
         }
 
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Raises the test run start event to enabled loggers.
         /// </summary>
-        /// <param name="args">Arguments to to be raised.</param>
+        /// <param name="args">Arguments to be raised.</param>
         internal void RaiseTestRunStart(TestRunStartEventArgs args)
         {
             ValidateArg.NotNull<TestRunStartEventArgs>(args, "args");
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Raises a discovery start event to the enabled loggers.
         /// </summary>
-        /// <param name="args">Arguments to to be raised.</param>
+        /// <param name="args">Arguments to be raised.</param>
         internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args)
         {
             ValidateArg.NotNull<DiscoveryStartEventArgs>(args, "args");
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Raises a discovery message event to the enabled loggers.
         /// </summary>
-        /// <param name="args">Arguments to to be raised.</param>
+        /// <param name="args">Arguments to be raised.</param>
         internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args)
         {
             ValidateArg.NotNull<TestRunMessageEventArgs>(args, "args");
@@ -254,7 +254,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Raises discovered tests event to the enabled loggers.
         /// </summary>
-        /// <param name="args"> Arguments to to be raised. </param>
+        /// <param name="args"> Arguments to be raised. </param>
         internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args)
         {
             ValidateArg.NotNull<DiscoveredTestsEventArgs>(args, "args");
@@ -267,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Raises discovery complete event to the enabled loggers.
         /// </summary>
-        /// <param name="args"> Arguments to to be raised. </param>
+        /// <param name="args"> Arguments to be raised. </param>
         internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args)
         {
             ValidateArg.NotNull<DiscoveryCompleteEventArgs>(args, "args");
@@ -303,7 +303,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// for the events to be processed.
         /// </summary>
         /// <param name="stats">Specifies the stats of the test run.</param>
-        /// <param name="isCanceled">Specifies whether the test run is cancelled.</param>
+        /// <param name="isCanceled">Specifies whether the test run is canceled.</param>
         /// <param name="isAborted">Specifies whether the test run is aborted.</param>
         /// <param name="error">Specifies the error that occurs during the test run.</param>
         /// <param name="attachmentSet">Run level attachment sets</param>
@@ -314,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, elapsedTime);
 
-            // Sending 0 size as this event is not expected to contain any data. 
+            // Sending 0 size as this event is not expected to contain any data.
             this.SafeInvokeAsync(() => this.TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
 
             // Wait for the loggers to finish processing the messages for the run.
@@ -373,8 +373,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         }
 
         /// <summary>
-        /// The method parses the config file of vstest.console.exe to see if the Max Job Queue Length is defined. 
-        /// Return the Max Queue Length so defined or a default value specifed by TestPlatformDefaults.DefaultMaxLoggerEventsToCache
+        /// The method parses the config file of vstest.console.exe to see if the Max Job Queue Length is defined.
+        /// Return the Max Queue Length so defined or a default value specified by TestPlatformDefaults.DefaultMaxLoggerEventsToCache
         /// </summary>
         private int GetMaxNumberOfJobsInQueue()
         {
@@ -383,8 +383,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         }
 
         /// <summary>
-        /// The method parses the config file of vstest.console.exe to see if the Max Job Queue size is defined. 
-        /// Return the Max Queue size so defined or a default value specifed by TestPlatformDefaults.DefaultMaxJobQueueSize
+        /// The method parses the config file of vstest.console.exe to see if the Max Job Queue size is defined.
+        /// Return the Max Queue size so defined or a default value specified by TestPlatformDefaults.DefaultMaxJobQueueSize
         /// </summary>
         private int GetMaxBytesQueueCanHold()
         {
@@ -393,7 +393,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         }
 
         /// <summary>
-        /// Returns whether flow control on logger events queue should be enabled or not. Default is enabled. 
+        /// Returns whether flow control on logger events queue should be enabled or not. Default is enabled.
         /// </summary>
         private static bool IsBoundsEnabledOnLoggerEventQueue()
         {
@@ -439,7 +439,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         /// <summary>
         /// Get the appsetting value for the parameter appSettingKey. Use the parameter defaultValue if
-        /// value is not there or is invalid. 
+        /// value is not there or is invalid.
         /// </summary>
         private int GetSetting(string appSettingKey, int defaultValue)
         {

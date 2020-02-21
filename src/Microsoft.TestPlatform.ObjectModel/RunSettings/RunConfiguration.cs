@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class RunConfiguration : TestRunSettings
     {
-        #region private fields
+        #region Private Fields
 
         /// <summary>
         /// Platform architecture which rocksteady should use for discovery/execution

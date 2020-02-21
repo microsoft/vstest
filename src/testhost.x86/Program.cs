@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("TestHost: Error occured during initialization of TestHost : {0}", ex);
+                EqtTrace.Error("TestHost: Error occurred during initialization of TestHost : {0}", ex);
 
                 // Throw exception so that vstest.console get the exception message.
                 throw;

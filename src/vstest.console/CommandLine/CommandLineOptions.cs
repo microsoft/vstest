@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public bool InIsolation { get; set; }
 
         /// <summary>
-        /// Readonly collection of all available test sources
+        /// Read only collection of all available test sources
         /// </summary>
         public IEnumerable<string> Sources
         {

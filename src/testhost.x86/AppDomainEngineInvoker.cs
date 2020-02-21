@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     //if(appDomain != null)
                     //{
-                    // Donot unload appdomain as there are lot is issues reported against appdomain unload
+                    // Do not unload appdomain as there are lot is issues reported against appdomain unload
                     // any ways the process is going to die off.
                     // AppDomain.Unload(appDomain);
                     //}
@@ -259,7 +259,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     }
 
                     // Put it in the resolved assembly so that if below Assembly.Load call
-                    // triggers another assembly resolution, then we dont end up in stack overflow
+                    // triggers another assembly resolution, then we don't end up in stack overflow
                     resolvedAssemblies[args.Name] = null;
 
                     foreach (var path in resolverPaths)

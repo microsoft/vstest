@@ -104,14 +104,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                     {
                         // TODO Log to console and client.
                         EqtTrace.Info(
-                            "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
+                            "conflicts in Framework identifier of provided sources(test assemblies), using default framework:{0}",
                             framework);
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Failed to determine framework:{0}, using defaulf: {1}", ex, framework);
+                EqtTrace.Error("Failed to determine framework:{0}, using default: {1}", ex, framework);
             }
 
             if (EqtTrace.IsInfoEnabled)

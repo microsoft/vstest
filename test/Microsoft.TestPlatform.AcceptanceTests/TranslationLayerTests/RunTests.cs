@@ -150,8 +150,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert
 
-            // Not happy with this check, but have seen this behaviour on some machines.
-            // What this essentially means, that atleast run was aborted.
+            // Not happy with this check, but have seen this behavior on some machines.
+            // What this essentially means, that at least run was aborted.
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
             {
                 Assert.IsTrue(errorMessage.StartsWith(this.runEventHandler.LogMessage));

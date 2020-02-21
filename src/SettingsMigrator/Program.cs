@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         /// <summary>
         /// Main entry point. Hands off execution to Migrator.
         /// </summary>
-        /// <param name="args">Arguments on the commandline</param>
+        /// <param name="args">Arguments on the command line</param>
         /// <returns>Exit code</returns>
         public static int Main(string[] args)
         {

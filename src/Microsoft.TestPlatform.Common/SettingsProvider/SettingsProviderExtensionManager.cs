@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occured while loading extensions {0}", ex);
+                    EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
                 }
 
                 if (shouldThrowOnError)

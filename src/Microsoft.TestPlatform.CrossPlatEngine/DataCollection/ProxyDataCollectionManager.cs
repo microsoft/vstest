@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public void Dispose()
         {
-            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dospose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dispose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
             this.dataCollectionRequestSender.Close();
         }
 
@@ -340,7 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Update Extensions path folder in testadapterspaths in runsettings.
+        /// Update Extensions path folder in test adapters paths in runsettings.
         /// </summary>
         /// <param name="settingsXml"></param>
         private static string UpdateExtensionsFolderInRunSettings(string settingsXml)

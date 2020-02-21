@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public string Description { get; private set; }
 
         /// <summary>
-        /// Uri of the attchment.
+        /// Uri of the attachment.
         /// </summary>
         [DataMember]
         public Uri Uri { get; private set; }

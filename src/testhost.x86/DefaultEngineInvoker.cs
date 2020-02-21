@@ -256,8 +256,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     // The reason to wait infinitely, was remote debugging scenarios of UWP app,
                     // in such cases after the app gets launched, VS debugger takes control of it, & causes a lot of delay, which frequently causes timeout with vstest.console.
                     // One fix would be just double this timeout, but there is no telling how much time it can actually take.
-                    // Hence we are waiting here indefinelty, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
-                    // In other cases if vstest.console's timeout exceeds it will definitelty such down the app.
+                    // Hence we are waiting here indefinitely, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
+                    // In other cases if vstest.console's timeout exceeds it will definitely such down the app.
                     if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                     {
                         EqtTrace.Info("DefaultEngineInvoker.StartProcessingAsync: Connected to vstest.console, Starting process requests.");

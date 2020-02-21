@@ -23,8 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
     /// <summary>
     /// Operator in order of precedence.
-    /// Predence(And) > Predence(Or)
-    /// Precdence of OpenBrace and CloseBrace operators is not used, instead parsing code takes care of same.
+    /// Precedence(And) > Precedence(Or)
+    /// Precedence of OpenBrace and CloseBrace operators is not used, instead parsing code takes care of same.
     /// </summary>
     internal enum Operator
     {
@@ -135,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     break;
 
                 case Operation.Contains:
-                    // if any value in mulit-valued property contains 'this.Value' for 'Contains' to be true.
+                    // if any value in multi-valued property contains 'this.Value' for 'Contains' to be true.
                     if (null != multiValue)
                     {
                         foreach (string propertyValue in multiValue)

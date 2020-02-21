@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
 #endif
 
     /// <summary>
-    /// The perf analyzer.
+    /// The performance analyzer.
     /// </summary>
     public class PerfAnalyzer
     {

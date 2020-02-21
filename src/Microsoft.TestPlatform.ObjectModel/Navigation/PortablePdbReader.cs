@@ -22,13 +22,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         /// <summary>
         /// Metadata reader provider from portable pdb stream
-        /// To get Metadate reader
+        /// To get Metadata reader
         /// </summary>
         private MetadataReaderProvider provider;
 
         /// <summary>
         /// Metadata reader from portable pdb stream
-        /// To get method debug info from mehthod info
+        /// To get method debug info from method info
         /// </summary>
         private MetadataReader reader;
 

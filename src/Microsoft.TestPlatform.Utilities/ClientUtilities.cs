@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string RunsettingsDirectory = "RunSettingsDirectory";
 
         /// <summary>
-        /// Converts the relative paths in a runsetting file to absolue ones.
+        /// Converts the relative paths in a runsetting file to absolute ones.
         /// </summary>
         /// <param name="xmlDocument">Xml Document containing Runsettings xml</param>
         /// <param name="path">Path of the .runsettings xml file</param>

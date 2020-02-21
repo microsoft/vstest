@@ -338,7 +338,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Cancelling test run.");
+                EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Canceling test run.");
             }
             this.communicationManager.SendMessage(MessageType.CancelTestRun);
         }
@@ -358,7 +358,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Cancelling test discovery.");
+                EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Canceling test discovery.");
             }
             this.communicationManager.SendMessage(MessageType.CancelDiscovery);
         }
@@ -442,7 +442,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was revceived from the runner");
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was received from the runner");
                 }
                 else
                 {
@@ -766,7 +766,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                // Always unblock the Vstest.console thread which is indefintitely waiting on this ACK
+                // Always unblock the Vstest.console thread which is indefinitely waiting on this ACK
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload, this.protocolVersion);
             }
         }

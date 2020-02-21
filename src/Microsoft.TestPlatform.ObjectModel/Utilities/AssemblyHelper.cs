@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
     /// <summary>
-    /// Implementation of finding assembly referencies using "managed route", i.e. Assembly.Load.
+    /// Implementation of finding assembly references using "managed route", i.e. Assembly.Load.
     /// </summary>
     public static class AssemblyHelper
     {
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Checks whether the source assembly directly references given assembly or not.
-        /// Only assembly name and publickey token are match. Version is ignored for matching.
+        /// Only assembly name and public key token are match. Version is ignored for matching.
         /// Returns null if not able to check if source references assembly.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Finds platform and .Net framework version for a given test container.
-        /// If there is an error while infering this information, defaults (AnyCPU, None) are returned
+        /// If there is an error while inferring this information, defaults (AnyCPU, None) are returned
         /// for faulting container.
         /// </summary>
         /// <param name="testSource"></param>
@@ -314,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// When test run is targeted for .Net4.0, set target framework of test appdomain to be v4.0.
-        /// With this done tests would be executed in 4.0 compatiblity mode even when  .Net4.5 is installed.
+        /// With this done tests would be executed in 4.0 compatibility mode even when  .Net4.5 is installed.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Failure to set this property should be ignored.")]
         internal static void SetNETFrameworkCompatiblityMode(AppDomainSetup setup, IRunContext runContext)
@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
-                        EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatiblity mode.");
+                        EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatibility mode.");
                     }
                     setup.TargetFrameworkName = Constants.DotNetFramework40;
                 }

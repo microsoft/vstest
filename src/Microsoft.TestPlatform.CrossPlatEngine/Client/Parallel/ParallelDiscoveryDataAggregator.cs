@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #region Public Methods
 
         /// <summary>
-        /// Returns the Aggregated Metrcis.
+        /// Returns the Aggregated Metrics.
         /// </summary>
         /// <returns></returns>
         public IDictionary<string, object> GetAggregatedDiscoveryDataMetrics()

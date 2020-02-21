@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="cancellationToken">
         /// </param>
         /// <returns>
-        /// Returns true if Communation is established b/w runner and host
+        /// Returns true if Communication is established b/w runner and host
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
         {
@@ -235,7 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         /// <summary>
-        /// This method is exposed to enable drived classes to modify TestProcessStartInfo. E.g. DataCollection need additional environment variables to be passed, etc.  
+        /// This method is exposed to enable derived classes to modify TestProcessStartInfo. E.g. DataCollection need additional environment variables to be passed, etc.  
         /// </summary>
         /// <param name="testProcessStartInfo">
         /// The sources.
@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// This function will remove the unknown runsettings node from runsettings for old testhost who throws exception for unknown node.
         /// </summary>
         /// <param name="runsettingsXml">runsettings string</param>
-        /// <returns>runsetting after removing unrequired nodes</returns>
+        /// <returns>runsetting after removing un-required nodes</returns>
         protected string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
         {
             var updatedRunSettingsXml = runsettingsXml;
@@ -334,7 +334,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Failed to launch testhost process.
             var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
-            // Testhost launched but Timeout occured due to machine slowness.
+            // Testhost launched but Timeout occurred due to machine slowness.
             if (this.testHostLaunched)
             {
                 errorMsg = string.Format(

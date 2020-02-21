@@ -224,8 +224,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception ex)
             {
                 // Exception can occur if we are trying to cancel a test run on an executor where test run is not even fired
-                // we can safely ignore that as user is just cancelling the test run and we don't care about additional parallel executors
-                // as we will be disposing them off soon ansyway
+                // we can safely ignore that as user is just canceling the test run and we don't care about additional parallel executors
+                // as we will be disposing them off soon anyway
                 if (EqtTrace.IsWarningEnabled)
                 {
                     EqtTrace.Warning("AbstractParallelOperationManager: Exception while invoking an action on Proxy Manager instance: {0}", ex);

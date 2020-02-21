@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
         private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
+        private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;

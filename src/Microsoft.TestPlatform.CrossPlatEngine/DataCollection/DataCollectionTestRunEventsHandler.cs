@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The run attachments.
         /// </param>
         /// <param name="newAttachments">
-        /// The runcontext attachments.
+        /// The run context attachments.
         /// </param>
         /// <returns>
         /// The <see cref="Collection"/>.

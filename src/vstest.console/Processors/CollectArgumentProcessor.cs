@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <inheritdoc />
         public void Initialize(string argument)
         {
-            // 1. Disable all other data collectors. Enable only those data collectors that are explicitely specified by user.
+            // 1. Disable all other data collectors. Enable only those data collectors that are explicitly specified by user.
             // 2. Check if Code Coverage Data Collector is specified in runsettings, if not add it and also set enable to true.
 
             // if argument is null or doesn't contain any element, don't do anything.
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Returns coverlet codebase searching coverlet.collector.dll assembly inside adaptersPaths
+        /// Returns coverlet code base searching coverlet.collector.dll assembly inside adaptersPaths
         /// </summary>
         private static string GetCoverletCodeBasePath(IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
         {
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Enables coverlet inproc datacollector
+        /// Enables coverlet in-proc datacollector
         /// </summary>
         internal static void EnableCoverletInProcDataCollector(string argument, DataCollectionRunSettings dataCollectionRunSettings, IRunSettingsProvider runSettingProvider, IFileHelper fileHelper)
         {
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
             {
-                // Create a new setting with deafult values
+                // Create a new setting with default values
                 dataCollectorSettings = new DataCollectorSettings();
                 dataCollectorSettings.FriendlyName = argument;
                 dataCollectorSettings.AssemblyQualifiedName = CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             else
             {
-                // Set Assembly qualified name and codebase if not already set
+                // Set Assembly qualified name and code base if not already set
                 dataCollectorSettings.AssemblyQualifiedName = dataCollectorSettings.AssemblyQualifiedName ?? CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
                 dataCollectorSettings.CodeBase = dataCollectorSettings.CodeBase ?? CoverletConstants.CoverletDataCollectorCodebase;
                 dataCollectorSettings.IsEnabled = true;
@@ -248,17 +248,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         internal static class CoverletConstants
         {
             /// <summary>
-            /// Coverlet inproc data collector friendlyname
+            /// Coverlet in-proc data collector friendly name
             /// </summary>
             public const string CoverletDataCollectorFriendlyName = "XPlat Code Coverage";
 
             /// <summary>
-            /// Coverlet inproc data collector assembly qualified name
+            /// Coverlet in-proc data collector assembly qualified name
             /// </summary>
             public const string CoverletDataCollectorAssemblyQualifiedName = "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
 
             /// <summary>
-            /// Coverlet inproc data collector codebase
+            /// Coverlet in-proc data collector code base
             /// </summary>
             public const string CoverletDataCollectorCodebase = "coverlet.collector.dll";
         }

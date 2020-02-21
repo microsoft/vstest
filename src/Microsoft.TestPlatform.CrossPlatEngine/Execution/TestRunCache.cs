@@ -383,7 +383,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occured while checking for cache hit. {0}", ex);
+                        EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
                     }
                 }
             }

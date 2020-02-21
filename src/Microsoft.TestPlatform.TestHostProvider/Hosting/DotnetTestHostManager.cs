@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", runtimeConfigPath);
+                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, does not exist", runtimeConfigPath);
             }
 
             // Use the deps.json for test source
@@ -213,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", depsFilePath);
+                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, does not exist", depsFilePath);
             }
 
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
@@ -321,7 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
-            // We do not have scenario where netcore tests are deployed to remote machine, so no need to udpate sources
+            // We do not have scenario where netcore tests are deployed to remote machine, so no need to update sources
             return sources;
         }
 
@@ -361,7 +361,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Raises HostLaunched event
         /// </summary>
-        /// <param name="e">hostprovider event args</param>
+        /// <param name="e">host provider event args</param>
         private void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
@@ -370,7 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Raises HostExited event
         /// </summary>
-        /// <param name="e">hostprovider event args</param>
+        /// <param name="e">host provider event args</param>
         private void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)
@@ -476,7 +476,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.UnableToFindDepsFile, depsFilePath);
             }
 
-            // If we are here it means it couldnt resolve testhost.dll from nuget cache.
+            // If we are here it means it couldn't resolve testhost.dll from nuget cache.
             // Try resolving testhost from output directory of test project. This is required if user has published the test project
             // and is running tests in an isolated machine. A second scenario is self test: test platform unit tests take a project
             // dependency on testhost (instead of nuget dependency), this drops testhost to output path.
@@ -485,7 +485,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!this.fileHelper.Exists(testHostPath))
             {
-                // If deps file is not found, suggest adding Microsoft.Net.Test.Sdk reference to the project
+                // If dependency file is not found, suggest adding Microsoft.Net.Test.Sdk reference to the project
                 // Otherwise, suggest publishing the test project so that test host gets dropped next to the test source.
                 errorMessage = errorMessage ?? string.Format(CultureInfo.CurrentCulture, Resources.SuggestPublishTestProject, testHostPath);
                 throw new TestPlatformException(errorMessage);

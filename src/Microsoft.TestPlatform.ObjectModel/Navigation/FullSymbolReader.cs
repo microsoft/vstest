@@ -23,13 +23,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         private IDiaSession session;
 
         /// <summary>
-        /// Holds type symbols avaiable in the source.
+        /// Holds type symbols available in the source.
         /// </summary>
         private Dictionary<string, IDiaSymbol> typeSymbols = new Dictionary<string, IDiaSymbol>();
 
         /// <summary>
         /// Holds method symbols for all types in the source.
-        /// Methods in different types can have same name, hence seprated dicitionary is created for each type.
+        /// Methods in different types can have same name, hence separated dictionary is created for each type.
         /// Bug: Method overrides in same type are not handled (not a regression)
         /// ToDo(Solution): Use method token along with as identifier, this will always give unique method.The adapters would need to send this token to us to correct the behavior.
         /// </summary>
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// </param>
         /// <returns>
         /// <see cref="INavigationData"/>.
-        /// Returns INavigationData which contains filename and linenumber.
+        /// Returns INavigationData which contains filename and line number.
         /// </returns>
         public INavigationData GetNavigationData(string declaringTypeName, string methodName)
         {

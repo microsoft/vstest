@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// or null if no executing test case is in context</param>
         protected internal DataCollectionContext(SessionId sessionId, TestExecId testExecId)
         {
-            //todo
+            //TODO
             //EqtAssert.ParameterNotNull(sessionId, "sessionId");
 
             this.sessionId = sessionId;

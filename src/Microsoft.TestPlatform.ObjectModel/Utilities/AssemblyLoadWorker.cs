@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Get the target dot net framework string for the assembly
         /// </summary>
         /// <param name="path">Path of the assembly file</param>
-        /// <returns> String representation of the the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+        /// <returns> String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
         public string GetTargetFrameworkVersionStringFromPath(string path)
         {
             if (!File.Exists(path))
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Get the target dot net framework string for the assembly
         /// </summary>
         /// <param name="assembly">Assembly</param>
-        /// <returns>String representation of the the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+        /// <returns>String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
         internal static string GetTargetFrameworkStringFromAssembly(Assembly assembly)
         {
             var dotNetVersion = string.Empty;
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                 foreach (AssemblyName referencedAssembly in assemblies)
                 {
-                    // Check without version. Only name and publikey token.
+                    // Check without version. Only name and public key token.
                     if (string.Compare(referencedAssembly.Name, referenceAssemblyName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         byte[] publicKeyToken1 = referencedAssembly.GetPublicKeyToken();
@@ -237,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 frameworkVersion = a.ImageRuntimeVersion.Substring(0, 4).ToUpperInvariant();
 
                 // ImageRuntimeVersion for v4.0 & v4.5 are same and it return v4.0
-                // Since there is behaviourial differnece in both its important to differentiate them
+                // Since there is behavioral difference in both its important to differentiate them
                 // Using TargetFrameworkAttribute for the purpose.
                 if (string.Equals(frameworkVersion, "v4.0", StringComparison.OrdinalIgnoreCase))
                 {
@@ -316,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                         fs.Position = peHeader;
 
                         UInt32 signature = reader.ReadUInt32(); //peHeaderSignature
-                        // 0x00004550 is the letters "PE" followed by two terminating zeroes.
+                        // 0x00004550 is the letters "PE" followed by two terminating zeros.
                         if (signature != 0x00004550)
                         {
                             validImage = false;
@@ -324,7 +324,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                         if (validImage)
                         {
-                            //Read the image file header header.
+                            //Read the image file header.
                             machine = reader.ReadUInt16();
                             reader.ReadUInt16(); //NumberOfSections
                             reader.ReadUInt32(); //TimeDateStamp

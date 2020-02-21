@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         #region events
         /// <summary>
         /// Raised when host is launched successfully
-        /// Consumed by TestPlatform to initialize connection b/w test host and testplatform
+        /// Consumed by TestPlatform to initialize connection b/w test host and test platform
         /// </summary>
         event EventHandler<HostProviderEventArgs> HostLaunched;
 
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         void SetCustomLauncher(ITestHostLauncher customLauncher);
 
         /// <summary>
-        /// Gets the end point address and behaviour of TestRuntime
+        /// Gets the end point address and behavior of TestRuntime
         /// E.g. for phone device EndPoint:127.0.0.1:8080, ConnectionRole Host, TransportProtocol: Sockets
         /// </summary>
         /// <returns> Socket where the service is hosted by TestRuntime</returns>
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>Returns whether the test host lauched successfully or not.</returns>
+        /// <returns>Returns whether the test host launched successfully or not.</returns>
         Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>

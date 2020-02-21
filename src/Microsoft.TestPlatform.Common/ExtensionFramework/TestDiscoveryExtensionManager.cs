@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occured while loading extensions {0}", ex);
+                    EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
                 }
 
                 if (throwOnError)

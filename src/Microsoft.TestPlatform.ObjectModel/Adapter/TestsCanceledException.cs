@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 
 #if NET451
         /// <summary>
-        /// Seralization constructor.
+        /// Serialization constructor.
         /// </summary>
         protected TestCanceledException(SerializationInfo info, StreamingContext context)
             : base(info, context)

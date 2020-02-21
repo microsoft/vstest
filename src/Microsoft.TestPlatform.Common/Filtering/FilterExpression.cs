@@ -179,8 +179,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
             var fastFilterBuilder = FastFilter.CreateBuilder();
 
-            // This is based on standard parsing of inorder expression using two stacks (operand stack and operator stack)
-            // Predence(And) > Predence(Or)
+            // This is based on standard parsing of in order expression using two stacks (operand stack and operator stack)
+            // Precedence(And) > Precedence(Or)
             foreach (var inputToken in tokens)
             {
                 var token = inputToken.Trim();
@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         fastFilterBuilder.AddOperator(currentOperator);
 
                         // Always put only higher priority operator on stack.
-                        //  if lesser prioriy -- pop up the stack and process the operator to maintain operator precedence.
+                        //  if lesser priority -- pop up the stack and process the operator to maintain operator precedence.
                         //  if equal priority -- pop up the stack and process the operator to maintain operator associativity.
                         //  OpenBrace is special condition. & or | can come on top of OpenBrace for case like ((a=b)&c=d)
                         while (true)

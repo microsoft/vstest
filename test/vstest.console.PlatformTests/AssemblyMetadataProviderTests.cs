@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         private void LoadAssemblyIntoMemory(string assemblyPath)
         {
-            // Load the file into RAM in ahead to avoid perf number(expectedElapsedTime) dependence on disk read time.
+            // Load the file into RAM in ahead to avoid performance number(expectedElapsedTime) dependence on disk read time.
             File.ReadAllBytes(assemblyPath);
         }
     }

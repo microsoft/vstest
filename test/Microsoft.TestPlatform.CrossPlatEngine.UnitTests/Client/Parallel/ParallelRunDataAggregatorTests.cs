@@ -158,7 +158,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var aggregatedException = aggregator.GetAggregatedException() as AggregateException;
             Assert.IsNotNull(aggregatedException, "Aggregated exception must NOT be null");
             Assert.IsNotNull(aggregatedException.InnerExceptions, "Inner exception list must NOT be null");
-            Assert.AreEqual(aggregatedException.InnerExceptions.Count, 1, "Inner exception lsit must have one element");
+            Assert.AreEqual(aggregatedException.InnerExceptions.Count, 1, "Inner exception list must have one element");
             Assert.AreEqual(aggregatedException.InnerExceptions[0], exception1, "Inner exception must be the one set.");
 
             var exception2 = new NotSupportedException();
@@ -168,7 +168,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregatedException = aggregator.GetAggregatedException() as AggregateException;
             Assert.IsNotNull(aggregatedException, "Aggregated exception must NOT be null");
             Assert.IsNotNull(aggregatedException.InnerExceptions, "Inner exception list must NOT be null");
-            Assert.AreEqual(aggregatedException.InnerExceptions.Count, 2, "Inner exception lsit must have one element");
+            Assert.AreEqual(aggregatedException.InnerExceptions.Count, 2, "Inner exception list must have one element");
             Assert.AreEqual(aggregatedException.InnerExceptions[1], exception2, "Inner exception must be the one set.");
         }
 

@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // Save the name/value pair in the dictionary. Note that duplicate settings are
-                // overwritten with the last occurrance's value.
+                // overwritten with the last occurrence's value.
                 if (this.nameValuePairs.ContainsKey(settingName))
                 {
                     EqtTrace.Verbose(

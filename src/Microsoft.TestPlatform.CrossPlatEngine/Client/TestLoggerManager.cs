@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             foreach (var logger in loggers?.LoggerSettingsList ?? Enumerable.Empty<LoggerSettings>())
             {
-                // Dont add logger if its disabled.
+                // Don't add logger if its disabled.
                 if (!logger.IsEnabled)
                 {
                     continue;
@@ -581,7 +581,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "TestLoggerManager: Error occured while initializing the Logger assemblyQualifiedName : {0}, codeBase : {1} , Exception Details : {2}", assemblyQualifiedName, codeBase, ex);
+                    "TestLoggerManager: Error occurred while initializing the Logger assemblyQualifiedName : {0}, codeBase : {1} , Exception Details : {2}", assemblyQualifiedName, codeBase, ex);
                 return false;
             }
         }

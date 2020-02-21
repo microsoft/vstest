@@ -1899,7 +1899,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         #endregion
 
-        #region private methods
+        #region Private Methods
 
         /// <summary>
         /// Serialize and Deserialize message as it would happen for real.

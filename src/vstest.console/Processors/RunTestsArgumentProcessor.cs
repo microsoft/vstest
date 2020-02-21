@@ -237,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             /// <param name="e">RunCompletion args</param>
             private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
             {
-                // If run is not aborted/cancelled then check the count of executed tests.
+                // If run is not aborted/canceled then check the count of executed tests.
                 // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
                 if (!e.IsAborted && !e.IsCanceled)
                 {

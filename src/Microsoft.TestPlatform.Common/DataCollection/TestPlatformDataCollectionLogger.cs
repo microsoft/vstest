@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     exception.StackTrace);
             }
 
-            // Currently there is one type of DataCollectionMessage sent accross client for all message kind.
+            // Currently there is one type of DataCollectionMessage sent across client for all message kind.
             // If required new type can be created for different message type.
             var message = string.Format(
                 CultureInfo.CurrentCulture,

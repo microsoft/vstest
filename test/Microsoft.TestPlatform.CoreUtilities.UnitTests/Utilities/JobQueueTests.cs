@@ -262,7 +262,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     queue.QueueJob("job10", 0);
                     queue.QueueJob("job11", 0);
 
-                    // By this point surely the queue would have blocked atleast once, hence setting queue.enteredBlockingMethod true.
+                    // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
                     Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
 
@@ -319,7 +319,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     queue.QueueJob("job10", 10);
                     queue.QueueJob("job11", 10);
 
-                    // By this point surely the queue would have blocked atleast once, hence setting queue.enteredBlockingMethod true.
+                    // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
                     Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
                     // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
@@ -409,7 +409,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     // we check whether or not the queue size has exceeded the limit before actually queuing.
                     queue.QueueJob("job1", 8);
 
-                    // if queue.EnteredBlockingMethod is true, the enquing entered the over-ridden blocking method. This was not
+                    // if queue.EnteredBlockingMethod is true, the enqueuing entered the overridden blocking method. This was not
                     // intended.
                     Assert.IsFalse(queue.EnteredBlockingMethod, "Entered the over-ridden blocking method.");
                     jobProcessed.WaitOne();

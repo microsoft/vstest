@@ -344,7 +344,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 case MessageType.SessionAbort:
                     {
-                        // Dont do anything for now.
+                        // Don't do anything for now.
                         break;
                     }
 

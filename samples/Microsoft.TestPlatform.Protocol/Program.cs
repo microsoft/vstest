@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.Protocol
                         </RunSettings>";
             }
 
-            // Intialize the extensions
+            // Initialize the extensions
             if (testadapterPath != null)
             {
                 communicationManager.SendMessage(MessageType.ExtensionsInitialize, new List<string>() { testadapterPath });
@@ -262,7 +262,7 @@ namespace Microsoft.TestPlatform.Protocol
                 {
                     var testProcessStartInfo = dataSerializer.DeserializePayload<dynamic>(message);
 
-                    // Launch Test Host here and Send the acknowledgement
+                    // Launch Test Host here and Send the acknowledgment
                     var ackPayload = new CustomHostLaunchAckPayload() { HostProcessId = -1, ErrorMessage = null };
 
                     Process process = new Process();

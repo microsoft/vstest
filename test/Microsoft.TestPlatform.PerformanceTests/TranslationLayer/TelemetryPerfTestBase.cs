@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         /// <summary>
-        /// Used for posting the telemtery to AppInsights
+        /// Used for posting the telemetry to AppInsights
         /// </summary>
         /// <param name="perfScenario"></param>
         /// <param name="handlerMetrics"></param>

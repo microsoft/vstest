@@ -209,17 +209,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 if (EqtTrace.IsWarningEnabled)
                 {
-                    EqtTrace.Warning("TestExecutorWebService: Exception occured while calling test connection. {0}", ex);
+                    EqtTrace.Warning("TestExecutorWebService: Exception occurred while calling test connection. {0}", ex);
                 }
             }
         }
 
         /// <summary>
-        /// Initializes outproc and inproc data collectors.
+        /// Initializes out-proc and in-proc data collectors.
         /// </summary>
         private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
         {
-            // Initialize outproc data collectors if declared in run settings.
+            // Initialize out-proc data collectors if declared in run settings.
             if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
             {
                 var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);

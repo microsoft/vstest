@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         ///     The path to the extensions.
         /// </param>
         /// <returns>
-        /// A dictionary of assembly qualified name and testplugin information.
+        /// A dictionary of assembly qualified name and test plugin information.
         /// </returns>
         public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
         {
@@ -101,14 +101,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
         {
-            // For C++ UWP adatper, & OLD C# UWP(MSTest V1) adatper
+            // For C++ UWP adapter, & OLD C# UWP(MSTest V1) adapter
             // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.
             // Include these two dll's if so far no adapters(extensions) were found, & let Assembly.Load() fail if they are not present.
             extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
         }
 
         /// <summary>
-        /// Gets test extension information from the given colletion of files.
+        /// Gets test extension information from the given collection of files.
         /// </summary>
         /// <typeparam name="TPluginInfo">
         /// Type of Test Plugin Information.

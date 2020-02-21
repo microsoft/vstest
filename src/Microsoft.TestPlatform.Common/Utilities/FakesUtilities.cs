@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 throw new ArgumentNullException(nameof(runSettingsXml));
             }
             
-            // donot generate fakes for netcore
+            // do not generate fakes for netcore
             if (IsNetCoreFramework(runSettingsXml))
             {
                 return runSettingsXml;

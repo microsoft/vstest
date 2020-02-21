@@ -321,7 +321,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockRequestData.Object);
         }
 
-        #region Testable Implemetations
+        #region Testable Implementations
 
         private class TestableRunTestsWithSources : RunTestsWithSources
         {

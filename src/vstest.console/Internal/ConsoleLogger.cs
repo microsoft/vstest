@@ -756,7 +756,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         #endregion
 
         /// <summary>
-        /// Raises test run warning occured before console logger starts listening warning events.
+        /// Raises test run warning occurred before console logger starts listening warning events.
         /// </summary>
         /// <param name="warningMessage"></param>
         public static void RaiseTestRunWarning(string warningMessage)

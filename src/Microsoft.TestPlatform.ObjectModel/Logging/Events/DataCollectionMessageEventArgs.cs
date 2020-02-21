@@ -9,10 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
     /// <summary>
     /// EventArg used for raising data collector message event.
     /// </summary>
-    [DataContract]    
+    [DataContract]
     public class DataCollectionMessageEventArgs : TestRunMessageEventArgs
     {
-        #region constructor
+        #region Constructor
         /// <summary>
         /// Constructor
         /// </summary>
@@ -22,8 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         {
         }
         #endregion
-        
-        #region properties
+
+        #region Properties
 
         /// <summary>
         /// Friendly name of collector
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
             get;
             set;
         }
-        
+
         #endregion
     }
 }

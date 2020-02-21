@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         }
 
         /// <summary>
-        /// Wait for discovery completion completion
+        /// Wait for discovery completion
         /// </summary>
         /// <param name="timeout"> The timeout. </param>
         bool IRequest.WaitForCompletion(int timeout)
@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 try
                 {
                     // Raise onDiscoveredTests event if there are some tests in the last chunk. 
-                    // (We dont want to send the tests in the discovery complete event so that programming on top of 
+                    // (We don't want to send the tests in the discovery complete event so that programming on top of 
                     // RS client is easier i.e. user does not have to listen on discovery complete event.)
                     if (lastChunk != null && lastChunk.Count() > 0)
                     {

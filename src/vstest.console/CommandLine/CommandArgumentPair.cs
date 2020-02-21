@@ -87,12 +87,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
             Contract.Ensures(Argument != null);
 
-            // Find the index of the seperator (":")
+            // Find the index of the separator (":")
             int index = input.IndexOf(CommandArgumentPair.Separator, StringComparison.OrdinalIgnoreCase);
 
             if (index == -1)
             {
-                // No seperator was found, so use the input as the command.
+                // No separator was found, so use the input as the command.
                 this.Command = input;
                 this.Argument = String.Empty;
             }

@@ -354,7 +354,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// Cleans up resources allocated by the data collector
         /// </summary>
-        /// <param name="disposing">Not used since this class does not have a finaliser.</param>
+        /// <param name="disposing">Not used since this class does not have a finalizer.</param>
         protected override void Dispose(bool disposing)
         {
             // Unregister events

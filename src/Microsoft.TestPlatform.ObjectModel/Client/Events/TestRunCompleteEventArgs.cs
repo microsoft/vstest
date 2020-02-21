@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
         /// <summary>
         /// Gets the time elapsed in just running the tests.
-        /// Value is set to TimeSpan.Zero incase of any error.
+        /// Value is set to TimeSpan.Zero in case of any error.
         /// </summary>
         [DataMember]
         public TimeSpan ElapsedTimeInRunningTests { get; private set; }

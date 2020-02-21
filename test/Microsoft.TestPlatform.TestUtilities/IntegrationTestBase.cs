@@ -232,12 +232,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         public void StdOutputContains(string substring)
         {
-            Assert.IsTrue(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
+            Assert.IsTrue(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {this.standardTestOutput}");
         }
 
         public void StdOutputDoesNotContains(string substring)
         {
-            Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
+            Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {this.standardTestOutput}");
         }
 
         public void ExitCodeEquals(int exitCode)
@@ -256,7 +256,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
             foreach (var test in passedTests)
             {
-                // Check for tick or ? both, in some cases as unicode charater for tick is not available
+                // Check for tick or ? both, in some cases as unicode character for tick is not available
                 // in std out and gets replaced by ?
                 var flag = this.standardTestOutput.Contains("\\u221a " + test)
                            || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test))
@@ -620,7 +620,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Destination runsettings path where resulted file saves
         /// </param>
         /// <param name="runConfigurationDictionary">
-        /// Contains run configuratin settings
+        /// Contains run configuration settings
         /// </param>
         public static void CreateRunSettingsFile(string destinationRunsettingsPath, IDictionary<string, string> runConfigurationDictionary)
         {

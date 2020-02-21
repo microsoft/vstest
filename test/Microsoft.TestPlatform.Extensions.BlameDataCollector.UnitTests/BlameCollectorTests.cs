@@ -634,7 +634,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The trigger test host launcehd handler should not break if start process dump throws TestPlatFormExceptions and log error message
+        /// The trigger test host launched handler should not break if start process dump throws TestPlatFormExceptions and log error message
         /// </summary>
         [TestMethod]
         public void TriggerTestHostLaunchedHandlerShouldCatchTestPlatFormExceptionsAndReportMessage()

@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
             // Weird why DiaSession is now returning the first overloaded method
-            // as compared to before when it used to  retun second method
+            // as compared to before when it used to return second method
             this.ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;

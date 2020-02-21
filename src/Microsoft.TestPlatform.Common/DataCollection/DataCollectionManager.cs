@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (this.dataCollectorExtensionManager == null)
                 {
-                    // todo : change IMessageSink and use IMessageLogger instead.
+                    // TODO : change IMessageSink and use IMessageLogger instead.
                     this.dataCollectorExtensionManager = DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
                 }
 
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             this.attachmentManager.Initialize(sessionId, resultsDirectory, this.messageSink);
 
-            // Enviornment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
+            // Environment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
             // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
             var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 

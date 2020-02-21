@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             
             if (parallelRunComplete)
             {
-                // todo: use TestPluginCache to iterate over all IDataCollectorAttachments
+                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
                 {
                     var coverageHandler = new CodeCoverageDataAttachmentsHandler();
                     Uri attachementUri = coverageHandler.GetExtensionUri();

@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
     [TestClass]
     public class XmlRunSettingsUtilitiesTests
     {
-        #region private variables
+        #region Private Variables
 
         private readonly string runSettingsXmlWithDataCollectors = @"<RunSettings>
 <RunConfiguration>

@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Returns true if the file name specified is Windows reserved file name.
         /// </summary>
-        /// <param name="fileName">The name of the file. Note: only a file name, does not expect to contain dir separators.</param>
+        /// <param name="fileName">The name of the file. Note: only a file name, does not expect to contain directory separators.</param>
         internal static bool IsReservedFileName(string fileName)
         {
             Debug.Assert(!string.IsNullOrEmpty(fileName), "FileHelper.IsReservedFileName: the argument is null or empty string!");

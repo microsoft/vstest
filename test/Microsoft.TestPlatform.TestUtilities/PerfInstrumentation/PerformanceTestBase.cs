@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         }
 
         /// <summary>
-        /// The analyze perf data.
+        /// The analyze performance data.
         /// </summary>
         public void AnalyzePerfData()
         {

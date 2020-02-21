@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             var childNode = xmlDocument.SelectSingleNode(nodeXPath);
 
-            // Todo: There isn't an equivalent API to SecurityElement.Escape in Core yet. 
+            // TODO: There isn't an equivalent API to SecurityElement.Escape in Core yet. 
             // So trusting that the XML is always valid for now.
 #if NET451
             var secureInnerXml = SecurityElement.Escape(innerXml);

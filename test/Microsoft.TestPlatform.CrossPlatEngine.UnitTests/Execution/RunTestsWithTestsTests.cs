@@ -193,7 +193,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
         }
 
-        #region Testable Implemetations
+        #region Testable Implementations
 
         private class TestableRunTestsWithTests : RunTestsWithTests
         {
