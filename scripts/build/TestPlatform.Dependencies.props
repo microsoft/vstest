@@ -42,12 +42,3 @@
   <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 
 </Project>
-
-
-
-
-
-
-
-
-

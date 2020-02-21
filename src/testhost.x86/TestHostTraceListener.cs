@@ -17,7 +17,30 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             EqtTrace.Info("Setting up debug trace listener.");
             EqtTrace.Verbose("TestPlatformTraceListener.Setup: Removing listener {0}.", Trace.Listeners[0]);
-            Trace.Listeners[0] = new TestHostTraceListener();
+
+            // in the majority of cases there will be only a single DefaultTraceListener in this collection
+            // and we will replace that with our listener
+            if (Trace.Listeners.Count == 1 && Trace.Listeners[0] is DefaultTraceListener)
+            {
+                Trace.Listeners[0] = new TestHostTraceListener();
+            }
+            else
+            {
+               // if the user will register their own trace
+               // listener via configuration we won't replace them, only the DefaultTraceListener
+                var i = 0;
+                var listeners = new TraceListener[Trace.Listeners.Count];
+                Trace.Listeners.CopyTo(listeners, 0);
+                foreach (var listener in listeners)
+                {
+                    if (listener.GetType() == typeof(DefaultTraceListener))
+                    {
+                        Trace.Listeners[i] = new TestHostTraceListener();
+                    }
+                    i++;
+                }
+            }
+            
             EqtTrace.Verbose("TestPlatformTraceListener.Setup: Added test platform trace listener.");
 
 #if NETCOREAPP2_1
