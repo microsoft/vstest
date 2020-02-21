@@ -44,7 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 throw new ArgumentNullException(nameof(runSettingsXml));
             }
 
-            // do not generate fakes for netcore
             if (IsNetCoreFramework(runSettingsXml))
             {
                 return runSettingsXml;
@@ -85,11 +84,47 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
+            // The new Fakes implementation makes the decision to add the right datacollector uri to the configuration
+            // The old API exists for fallback measures. 
+            DataCollectorSettings fakesSettings;
+            if (!GetNewFakesSettings(runSettings, sources, out fakesSettings) && 
+                !GetFallbackFakesSettings(runSettings, sources, out fakesSettings))
+            {
+                return false;
+            }
+            
+            XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+            return true;
+        }
+
+        private static bool GetNewFakesSettings(
+            XmlDocument runSettings,
+            IEnumerable<string> sources,
+            out DataCollectorSettings dataCollectorSettings)
+        {
+            Func<IEnumerable<string>, bool, DataCollectorSettings> configurator;
+            // fakes supported?
+            if (!TryGetFakesDataCollectorConfigurator(out configurator))
+            {
+                dataCollectorSettings = null;
+                return false;
+            }
+
+            dataCollectorSettings = configurator(sources, false);
+            return true;
+        }
+
+        private static bool GetFallbackFakesSettings(
+            XmlDocument runSettings,
+            IEnumerable<string> sources,
+            out DataCollectorSettings dataCollectorSettings)
+        {
             Func<IEnumerable<string>, string> configurator;
 
             // fakes supported?
             if (!TryGetFakesDataCollectorConfigurator(out configurator))
             {
+                dataCollectorSettings = null;
                 return false;
             }
 
@@ -97,6 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var fakesConfiguration = configurator(sources);
             if (fakesConfiguration == null)
             {
+                dataCollectorSettings = null;
                 return false;
             }
 
@@ -115,7 +151,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             fakesSettings.Configuration = doc.DocumentElement;
-            XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+
+            dataCollectorSettings = fakesSettings;
             return true;
         }
 
@@ -161,6 +198,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 if (EqtTrace.IsInfoEnabled)
                 {
                     EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
+                }
+            }
+#endif
+            configurator = null;
+            return false;
+        }
+
+        private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, bool, DataCollectorSettings> configurator)
+        {
+#if NET451
+            try
+            {
+                Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
+
+                var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
+                if (type != null)
+                {
+                    var method = type.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
+                    if (method != null)
+                    {
+                        configurator = (Func<IEnumerable<string>, bool, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IEnumerable<string>, bool, DataCollectorSettings>));
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
                 }
             }
 #endif
