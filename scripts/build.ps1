@@ -168,8 +168,8 @@ function Install-DotNetCli
     # Pull in additional shared frameworks.
     # Get netcoreapp2.1 shared components.
     
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -Runtime -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -Runtime -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
     #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
