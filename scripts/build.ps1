@@ -239,7 +239,7 @@ function Invoke-TestAssetsBuild
     
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:NETTestSdkVersion="$TPB_Version" -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version="$TPB_Version" -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError
@@ -966,18 +966,18 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
-Clear-Package
-Restore-Package
-Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Publish-Tests
-Create-VsixPackage
-Create-NugetPackages
-Generate-Manifest
-Publish-PatchedDotnet
-Copy-PackageIntoStaticDirectory
+# Install-DotNetCli
+# Clear-Package
+# Restore-Package
+# Update-LocalizedResources
+# Invoke-Build
+# Publish-Package
+# Publish-Tests
+# Create-VsixPackage
+# Create-NugetPackages
+# Generate-Manifest
+# Publish-PatchedDotnet
+# Copy-PackageIntoStaticDirectory
 Invoke-TestAssetsBuild
  
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
