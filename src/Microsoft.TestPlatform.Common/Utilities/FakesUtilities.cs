@@ -44,11 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 throw new ArgumentNullException(nameof(runSettingsXml));
             }
 
-            if (IsNetCoreFramework(runSettingsXml))
-            {
-                return runSettingsXml;
-            }
-
             var doc = new XmlDocument();
             using (var xmlReader = XmlReader.Create(
                 new StringReader(runSettingsXml),
@@ -57,7 +52,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 doc.Load(xmlReader);
             }
 
-            return !TryAddFakesDataCollectorSettings(doc, sources) ? runSettingsXml : doc.OuterXml;
+            // The new datacollector is only used if the test does not target net framework
+            var isNetFramework = !IsNetCoreFramework(runSettingsXml);
+
+            return !TryAddFakesDataCollectorSettings(doc, sources, isNetFramework) ? runSettingsXml : doc.OuterXml;
         }
 
         private static bool IsNetCoreFramework(string runSettingsXml)
@@ -76,7 +74,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns>true if runSettings was modified; false otherwise.</returns>
         private static bool TryAddFakesDataCollectorSettings(
             XmlDocument runSettings,
-            IEnumerable<string> sources)
+            IEnumerable<string> sources,
+            bool isNetFramework)
         {
             // If user provided fakes settings don't do anything
             if (XmlRunSettingsUtilities.ContainsDataCollector(runSettings.CreateNavigator(), FakesMetadata.DataCollectorUri))
@@ -87,12 +86,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // The new Fakes implementation makes the decision to add the right datacollector uri to the configuration
             // The old API exists for fallback measures. 
             DataCollectorSettings fakesSettings;
-            if (!GetNewFakesSettings(runSettings, sources, out fakesSettings) && 
-                !GetFallbackFakesSettings(runSettings, sources, out fakesSettings))
+            if (!GetNewFakesSettings(runSettings, sources, isNetFramework, out fakesSettings) &&
+                !GetFallbackFakesSettings(runSettings, sources, isNetFramework, out fakesSettings))
             {
                 return false;
             }
-            
+
             XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
             return true;
         }
@@ -100,6 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         private static bool GetNewFakesSettings(
             XmlDocument runSettings,
             IEnumerable<string> sources,
+            bool isNetFramework,
             out DataCollectorSettings dataCollectorSettings)
         {
             Func<IEnumerable<string>, bool, DataCollectorSettings> configurator;
@@ -110,15 +110,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
-            dataCollectorSettings = configurator(sources, false);
+            dataCollectorSettings = configurator(sources, isNetFramework);
             return true;
         }
 
         private static bool GetFallbackFakesSettings(
             XmlDocument runSettings,
             IEnumerable<string> sources,
+            bool isNetFramework,
             out DataCollectorSettings dataCollectorSettings)
         {
+
+            //Do not generate Fakes if not Net Framework
+            if (!isNetFramework)
+            {
+                dataCollectorSettings = null;
+                return false;
+            }
+
             Func<IEnumerable<string>, string> configurator;
 
             // fakes supported?
