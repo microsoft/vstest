@@ -174,6 +174,11 @@ function Install-DotNetCli
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
+    "x64 dotnet"
+    & "$env:DOTNET_ROOT\dotnet.exe" --info
+    "x86 dotnet"
+    & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info
+
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
