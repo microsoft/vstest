@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var userConfigDoc = XDocument.Load(userConfigFile);
                 var testHostConfigDoc = XDocument.Load(testHostAppConfigFile);
 
-                // Merge user's config file and testHost config file and use merged one 
+                // Merge user's config file and testHost config file and use merged one
                 var mergedConfigDocument = MergeApplicationConfigFiles(userConfigDoc, testHostConfigDoc);
 
                 // Create a temp file with config
@@ -172,11 +172,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // Start with User's config file as the base
             var mergedDoc = new XDocument(userConfigDoc);
 
-            // Take testhost.exe Startup node 
+            // Take testhost.exe Startup node
             var startupNode = testHostConfigDoc.Descendants("startup")?.FirstOrDefault();
             if (startupNode != null)
             {
-                // Remove user's startup and add ours which supports NET35 
+                // Remove user's startup and add ours which supports NET35
                 mergedDoc.Descendants("startup")?.Remove();
                 mergedDoc.Root.Add(startupNode);
             }

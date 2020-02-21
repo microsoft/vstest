@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 argumentProcessor = WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor, pair.Argument);
             }
 
-            return argumentProcessor;         
+            return argumentProcessor;
         }
 
         /// <summary>

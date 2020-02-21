@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionEnvironmentVariable"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionEnvironmentVariable"/> class.
         /// </summary>
         /// <param name="variable">
         /// Variable name and requested value.

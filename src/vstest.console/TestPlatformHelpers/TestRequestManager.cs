@@ -301,7 +301,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
-            
+
             if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsTelemetry))
             {
                 foreach( var ciData in legacySettingsTelemetry)
@@ -386,7 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     // Choose default architecture based on the framework
                     // For .NET core, the default platform architecture should be based on the process.
-                    // For a 64 bit process, 
+                    // For a 64 bit process,
                     Architecture defaultArchitecture = Architecture.X86;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                     || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -699,7 +699,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
-        /// Checks whether Telemetry opted in or not. 
+        /// Checks whether Telemetry opted in or not.
         /// By Default opting out
         /// </summary>
         /// <returns>Returns Telemetry Opted out or not</returns>

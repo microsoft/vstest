@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
             StartTime = startTime,
             EndTime = DateTimeOffset.MaxValue
         };
-        
+
         [TestMethod]
         public void TestCaseSerialize2()
         {
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
 
             VerifyPerformanceResult("TestCaseSerialize2", 2000, sw.ElapsedMilliseconds);
         }
-        
+
         [TestMethod]
         public void TestCaseDeserialize2()
         {
@@ -72,7 +72,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
 
             VerifyPerformanceResult("TestCaseDeserialize2", 2000, sw.ElapsedMilliseconds);
         }
-        
+
         [TestMethod]
         public void TestResultSerialize2()
         {
@@ -86,7 +86,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
 
             VerifyPerformanceResult("TestResultSerialize2", 2000, sw.ElapsedMilliseconds);
         }
-        
+
         [TestMethod]
         public void TestResultDeserialize2()
         {

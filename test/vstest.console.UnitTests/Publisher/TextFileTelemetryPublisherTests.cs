@@ -24,10 +24,10 @@ namespace vstest.console.UnitTests.Publisher
             dummyDictionary.Add("DummyMessage://", "DummyValue");
             dummyDictionary.Add("Dummy2", "DummyValue2");
 
-            // Act.		
+            // Act.
             publishMetrics.LogToFile("dummyevent", dummyDictionary, mockFileHelper.Object);
 
-            // Verify.		
+            // Verify.
             mockFileHelper.Verify(fh => fh.CreateDirectory(It.IsAny<string>()), Times.Once);
         }
 
@@ -40,10 +40,10 @@ namespace vstest.console.UnitTests.Publisher
             dummyDictionary.Add("DummyMessage://", "DummyValue");
             dummyDictionary.Add("Dummy2", "DummyValue2");
 
-            // Act.		
+            // Act.
             publishMetrics.LogToFile("dummyevent", dummyDictionary, mockFileHelper.Object);
 
-            // Verify.		
+            // Verify.
             mockFileHelper.Verify(fh => fh.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }

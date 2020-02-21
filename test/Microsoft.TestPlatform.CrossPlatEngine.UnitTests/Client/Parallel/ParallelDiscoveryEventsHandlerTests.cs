@@ -47,7 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.mockTestDiscoveryEventsHandler.Object, this.mockParallelProxyDiscoveryManager.Object,
                 new ParallelDiscoveryDataAggregator(), this.mockDataSerializer.Object);
         }
-        
+
         [TestMethod]
         public void HandleDiscoveryCompleteShouldNotCallLastChunkResultsIfNotPresent()
         {
@@ -87,7 +87,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
 
-            // Raw message must be sent 
+            // Raw message must be sent
             this.mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
 
             this.mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveredTests(lastChunk), Times.Once);

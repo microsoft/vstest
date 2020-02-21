@@ -232,11 +232,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
             }
         }
-        
+
         /// <summary>
         /// Fetches the next data object for the concurrent executor to work on
         /// </summary>
-        /// <param name="source">sourcedata to work on - sourcefile or testCaseList</param>
+        /// <param name="source">source data to work on - source file or testCaseList</param>
         /// <returns>True, if data exists. False otherwise</returns>
         protected bool TryFetchNextSource<Y>(IEnumerator enumerator, out Y source)
         {

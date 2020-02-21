@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Diagnostics.Contracts;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    
+
     /// <summary>
     /// Breaks a string down into command and argument based on the following format:
     ///     /command:argument.
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         internal const string Separator = ":";
 
         #endregion
-        
+
         #region Properties
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "command");
             }
-            
+
             Contract.Ensures(Command == command);
             Contract.Ensures(Argument == argument);
 

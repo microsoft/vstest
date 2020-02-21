@@ -218,11 +218,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         || this.State == TestRunState.Canceled
                         || this.State == TestRunState.Aborted))
             {
-                // If run is already terminated, then we should not throw an exception. 
+                // If run is already terminated, then we should not throw an exception.
                 throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
             }
 
-            // This method is not synchronized as it can lead to dead-lock 
+            // This method is not synchronized as it can lead to dead-lock
             // (the runCompletionEvent cannot be raised unless that lock is released)
 
             // Wait for run completion (In case m_runCompletionEvent is closed, then waitOne will throw nice error)
@@ -337,7 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         ///  Raised when a test run event raw message is received from host
         ///  This is required if one wants to re-direct the message over the process boundary without any processing overhead
-        ///  All the run events should come as raw messages as well as proper serialized events like OnRunStatsChange 
+        ///  All the run events should come as raw messages as well as proper serialized events like OnRunStatsChange
         /// </summary>
         public event EventHandler<string> OnRawMessageReceived;
 
@@ -432,7 +432,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                             this.runRequestTimeTracker.Elapsed);
 
-                    // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
+                    // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests)
                     // by either engines - as both calculate at different points
                     // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
                     this.LoggerManager.HandleTestRunComplete(runCompletedEvent);
@@ -507,7 +507,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         return;
                     }
 
-                    // TODO: Invoke this event in a separate thread. 
+                    // TODO: Invoke this event in a separate thread.
                     // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
                     this.LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
                     this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");

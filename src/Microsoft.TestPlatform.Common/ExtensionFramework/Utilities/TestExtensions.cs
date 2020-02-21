@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <summary>
         /// Gets or sets test logger extensions.
         /// </summary>
-        internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }        
+        internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether are test hosts cached.
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             testExtensions.DataCollectors =
                 this.GetExtensionsDiscoveredFromAssembly<DataCollectorConfig>(
                     this.DataCollectors,
-                    extensionAssembly);                    
+                    extensionAssembly);
 
             if (testExtensions.TestDiscoverers.Any() || testExtensions.TestExecutors.Any() || testExtensions.TestSettingsProviders.Any() ||
                 testExtensions.TestLoggers.Any() || testExtensions.TestHosts.Any() || testExtensions.DataCollectors.Any())

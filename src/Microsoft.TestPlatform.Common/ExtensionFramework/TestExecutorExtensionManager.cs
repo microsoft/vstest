@@ -132,8 +132,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 foreach (var executor in executorExtensionManager.TestExtensions)
                 {
-                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to 
-                    // call executor.Value even if logging is not enabled. 
+                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to
+                    // call executor.Value even if logging is not enabled.
                     EqtTrace.Verbose("TestExecutorExtensionManager: Loading executor {0}", executor.Value);
                 }
             }

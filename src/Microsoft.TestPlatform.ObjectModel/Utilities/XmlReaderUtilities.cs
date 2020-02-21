@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         public static void ReadToRootNode(XmlReader reader)
         {
             ValidateArg.NotNull<XmlReader>(reader, "reader");
-            
+
             // Read to the root node.
             reader.ReadToNextElement();
 

@@ -22,13 +22,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle, IDisposable
     {
         /// <summary>
-        /// boolean that gives the value of EnableShutdownAfterTestRun. 
+        /// boolean that gives the value of EnableShutdownAfterTestRun.
         /// Default value is set to false in the constructor.
         /// </summary>
         private bool enableShutdownAfterTestRun;
 
         /// <summary>
-        /// Context in which the current run is executing. 
+        /// Context in which the current run is executing.
         /// </summary>
         private TestExecutionContext testExecutionContext;
 
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <param name="testRunCache"> The test run cache. </param>
         /// <param name="testExecutionContext"> The test execution context. </param>
         /// <param name="testRunEventsHandler">TestRun Events Handler</param>
-        public FrameworkHandle(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache, 
+        public FrameworkHandle(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache,
             TestExecutionContext testExecutionContext, ITestRunEventsHandler testRunEventsHandler)
             : base(testCaseEventsHandler, testRunCache)
         {
@@ -59,9 +59,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 
 
         /// <summary>
-        /// Give a hint to the execution framework to enable the shutdown of execution process after the test run is complete. This should be used only in out of process test runs when IRunContext.KeepAlive is true 
-        /// and should be used only when absolutely required as using it degrades the performance of the subsequent run. 
-        /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false. 
+        /// Give a hint to the execution framework to enable the shutdown of execution process after the test run is complete. This should be used only in out of process test runs when IRunContext.KeepAlive is true
+        /// and should be used only when absolutely required as using it degrades the performance of the subsequent run.
+        /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false.
         /// </summary>
         public bool EnableShutdownAfterTestRun
         {
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 
         protected virtual void Dispose(bool disposing)
         {
-            // If you need thread safety, use a lock around these 
+            // If you need thread safety, use a lock around these
             // operations, as well as in your methods that use the resource.
             if (!this.isDisposed)
             {

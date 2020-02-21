@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
         /// </summary>
         /// <param name="requestData">The Request Data for providing services and data for Run.</param>
         /// <param name="requestSender">Test request sender instance.</param>
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestData">The Request Data for Common services and data for Run.</param>

@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
     internal class PortablePdbReader : IDisposable
     {
         /// <summary>
-        /// Use to get method token 
+        /// Use to get method token
         /// </summary>
         private static readonly PropertyInfo MethodInfoMethodTokenProperty =
             typeof(MethodInfo).GetProperty("MetadataToken");
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         }
 
         /// <summary>
-        /// Gets dia navigation data from Metadata reader 
+        /// Gets dia navigation data from Metadata reader
         /// </summary>
         /// <param name="methodInfo">
         /// Method info.

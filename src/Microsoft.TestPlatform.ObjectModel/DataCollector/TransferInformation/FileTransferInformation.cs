@@ -10,14 +10,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
     /// <summary>
     /// Represents required and optional information needed for requesting a file transfer.
-    /// </summary>    
+    /// </summary>
     public class FileTransferInformation : BasicTransferInformation
     {
         private readonly IFileHelper fileHelper;
 
         #region Constructor
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileTransferInformation"/> class. 
+        /// Initializes a new instance of the <see cref="FileTransferInformation"/> class.
         /// </summary>
         /// <param name="context">
         /// The context in which the file is being sent.  Cannot be null.
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileTransferInformation"/> class. 
+        /// Initializes a new instance of the <see cref="FileTransferInformation"/> class.
         /// </summary>
         /// <param name="context">
         /// The context in which the file is being sent.  Cannot be null.

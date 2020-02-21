@@ -266,7 +266,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
             });
         }
 
-        /// <summary> 
+        /// <summary>
         /// Exception should be thrown if discovered tests event args is null.
         /// </summary>
         [TestMethod]

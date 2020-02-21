@@ -190,9 +190,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.store.Remove(property);
             }
         }
- 
+
         /// <summary>
-        /// Returns TestProperty's value 
+        /// Returns TestProperty's value
         /// </summary>
         /// <returns>property's value. default value is returned if the property is not present</returns>
         public T GetPropertyValue<T>(TestProperty property, T defaultValue, CultureInfo culture)

@@ -110,7 +110,7 @@ namespace Microsoft.TestPlatform.Protocol
                 case "discovery":
                     discoveredTestCases = DiscoverTests(testadapterPath, testAssembly, settingsXml);
                     break;
-               
+
                 case "runselected":
                     discoveredTestCases = DiscoverTests(testadapterPath, testAssembly, settingsXml);
                     RunSelectedTests(discoveredTestCases, settingsXml);
@@ -180,7 +180,7 @@ namespace Microsoft.TestPlatform.Protocol
                 {
                     dynamic discoveryCompletePayload =
                         JsonDataSerializer.Instance.DeserializePayload<dynamic>(message);
-                    
+
                     // Handle discovery complete here
                     isDiscoveryComplete = true;
                 }
@@ -193,14 +193,14 @@ namespace Microsoft.TestPlatform.Protocol
 
             return testCases;
         }
-        
+
         static void RunAllTests(List<string> sources, string settingsXml)
         {
             Console.WriteLine("Starting Operation: RunAll");
             communicationManager.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, new TestRunRequestPayload() { Sources = sources, RunSettings = settingsXml });
             RecieveRunMesagesAndHandleRunComplete();
         }
-        
+
         static void RunSelectedTests(dynamic testCases, string settingsXml)
         {
             Console.WriteLine("Starting Operation: RunSelected");

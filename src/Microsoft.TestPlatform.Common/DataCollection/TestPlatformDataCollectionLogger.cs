@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private readonly IMessageSink sink;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionLogger"/> class.
         /// </summary>
         /// <param name="sink">
         /// The underlying raw IMessageSink.  Cannot be null.

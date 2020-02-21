@@ -967,7 +967,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             {
                 exceptionMessage = ex.Message;
             }
-            
+
             Assert.AreEqual(string.Format(
                 Resources.InvalidSettingsXmlElement,
                 "Logger",

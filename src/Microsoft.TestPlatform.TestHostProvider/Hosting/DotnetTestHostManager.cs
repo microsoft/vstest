@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
             var sourceDirectory = Path.GetDirectoryName(sourcePath);
 
-            // Probe for runtimeconfig and deps file for the test source
+            // Probe for runtime config and deps file for the test source
             var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {

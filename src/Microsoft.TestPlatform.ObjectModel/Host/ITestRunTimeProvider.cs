@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <summary>
         /// Gets path of test sources, based on RuntimeProvider, and where the test is actually deployed(Remote Scenario).
         /// A test host manager may choose to accept input source as XML file, and provide appropriate source(dll/exe) which the adapters can actually consume
-        /// E.g. for UWP, input source could be "appxrecipe" file, which gives information about actual source exe.
+        /// E.g. for UWP, input source could be "appx recipe" file, which gives information about actual source exe.
         /// </summary>
         /// <param name="sources">List of test sources.</param>
         /// <returns>Updated List of test sources based on remote/local scenario.</returns>

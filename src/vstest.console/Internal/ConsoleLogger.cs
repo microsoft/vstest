@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Properties        
+        #region Properties 
 
         /// <summary>
         /// Gets instance of IOutput used for sending output.
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         }
 
         /// <summary>
-        /// Returns the parent Execution id of given test result. 
+        /// Returns the parent Execution id of given test result.
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>

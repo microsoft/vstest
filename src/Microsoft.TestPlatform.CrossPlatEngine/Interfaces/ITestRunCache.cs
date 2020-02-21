@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         ICollection<TestResult> TestResults { get; }
 
         ICollection<TestCase> InProgressTests { get; }
-        
         long TotalExecutedTests { get; }
 
         TestRunStatistics TestRunStatistics { get; }

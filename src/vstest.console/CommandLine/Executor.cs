@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;  
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -307,7 +307,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             Contract.Requires(argumentProcessors != null);
             Contract.Requires(processorFactory != null);
 
-            // Determine if any of the argument processors are actions. 
+            // Determine if any of the argument processors are actions.
             var isActionIncluded = argumentProcessors.Any((processor) => processor.Metadata.Value.IsAction);
 
             // If no action arguments have been provided, then add the default action argument.

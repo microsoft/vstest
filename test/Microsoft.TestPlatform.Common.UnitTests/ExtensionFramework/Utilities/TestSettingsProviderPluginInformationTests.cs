@@ -53,7 +53,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
             Assert.AreEqual(DefaultSettingsName, this.testPluginInformation.SettingsName);
         }
 
-        #region implementation
+        #region Implementation
 
         private class DummySettingProviderWithoutSettingsName
         {

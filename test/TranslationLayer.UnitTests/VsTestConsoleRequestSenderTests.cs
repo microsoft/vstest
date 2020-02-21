@@ -931,7 +931,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.SetupMockCommunicationForRunRequest(mockHandler);
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
                 Callback((string msg, object requestpayload, int protocol) => { receivedRequest = (TestRunRequestPayload)requestpayload; });
-            
+
             // Act.
             this.requestSender.StartTestRun(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, mockHandler.Object);
 
@@ -1938,7 +1938,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsTrue(connectionSuccess, "Connection must succeed.");
         }
-        
+
         private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
         {
             this.InitializeCommunication();

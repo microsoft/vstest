@@ -200,7 +200,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var properties = new Dictionary<string, object>();
             properties.Add("TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" });
-            
+
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
 
             this.mockTestEventsPublisher.Raise(x => x.SessionStart += null, new SessionStartEventArgs(properties));

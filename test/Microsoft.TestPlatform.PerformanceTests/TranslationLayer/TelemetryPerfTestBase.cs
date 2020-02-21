@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         private const string TelemetryInstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
         private TelemetryClient client;
         private DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
-        
+
         public TelemetryPerfTestbase()
         {
             client = new TelemetryClient();

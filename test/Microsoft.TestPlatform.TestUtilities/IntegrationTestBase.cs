@@ -373,7 +373,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var projectPath = this.testEnvironment.GetTestProject(projectName);
             return Path.Combine(Path.GetDirectoryName(projectPath), assetName);
-        } 
+        }
 
         protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
         {
@@ -513,7 +513,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to 
+        /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to
         /// do your builds or to run general tests, unless you want your changes to be reflected.
         /// </summary>
         /// <param name="command"></param>
@@ -524,9 +524,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
         {
             var environmentVariables = new Dictionary<string, string> {
-                ["DOTNET_MULTILEVEL_LOOKUP"] = "0" 
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
-            
+
             var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe"); ;
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
@@ -556,7 +556,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                     foreach (var variable in environmentVariables) {
                         if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key)) {
                             process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
-                        } 
+                        }
                         else
                         {
                             process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);

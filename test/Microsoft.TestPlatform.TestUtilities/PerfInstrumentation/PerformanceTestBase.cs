@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
     using System.Collections;
     using System.Collections.Generic;
 
-    using Microsoft.TestPlatform.TestUtilities;    
+    using Microsoft.TestPlatform.TestUtilities;
 
     /// <summary>
     /// The performance test base.

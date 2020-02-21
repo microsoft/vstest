@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             //unsubscrive session logger
             this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
 
-            this.testPlatformEventSource.AdapterSearchStop();          
+            this.testPlatformEventSource.AdapterSearchStop();
         }
 
         /// <summary>
@@ -139,7 +139,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
-                
             }
             catch (Exception e)
             {
@@ -225,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
             }
 
-            // Initialize inproc data collectors if declared in run settings.
+            // Initialize in-proc data collectors if declared in run settings.
             if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {
                 var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase, TestPluginCache.Instance);

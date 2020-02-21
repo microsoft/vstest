@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public class DiscoveryCompleteEventArgs : EventArgs
     {
         /// <summary>
-        /// Constructor for creating event args object 
+        /// Constructor for creating event args object
         /// </summary>
         /// <param name="totalTests">Total tests which got discovered</param>
         /// <param name="isAborted">Specifies if discovery has been aborted.</param>

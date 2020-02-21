@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
     {
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler2 discoveryEventHandler2;
-        
+
         public DiscoveryPerfTests()
         {
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();

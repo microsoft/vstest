@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 #endif
 
     /// <summary>
-    /// Exception thrown by the framework when an executor attempts to send 
-    /// test result to the framework when the test is canceled.  
+    /// Exception thrown by the framework when an executor attempts to send
+    /// test result to the framework when the test is canceled.
     /// </summary>
 #if NET451
     [Serializable]

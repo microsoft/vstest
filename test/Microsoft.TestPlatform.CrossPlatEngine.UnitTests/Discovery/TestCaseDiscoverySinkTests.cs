@@ -32,7 +32,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var sink = new TestCaseDiscoverySink(cache);
 
             var testCase = new TestCase("A.C.M", new Uri("executor://unittest"), "A");
-            
+
             sink.SendTestCase(testCase);
 
             // Assert that the cache has the test case.

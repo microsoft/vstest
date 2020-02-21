@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;      
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
     }
 
     internal class ListTestsTargetPathArgumentExecutor : IArgumentExecutor

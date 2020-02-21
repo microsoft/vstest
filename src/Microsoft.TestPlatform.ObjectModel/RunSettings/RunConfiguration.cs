@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Maximum number of cores that the engine can use to run tests in parallel
         /// </summary>
         private int maxCpuCount;
-        
+
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private long testSessionTimeout;
 
         /// <summary>
-        /// Directory in which rocksteady/adapter should keep their run specific data. 
+        /// Directory in which rocksteady/adapter should keep their run specific data.
         /// </summary>
         private string resultsDirectory;
 
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool disableParallelization;
 
         /// <summary>
-        /// True if test run is triggered 
+        /// True if test run is triggered
         /// </summary>
         private bool designMode;
 
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RunConfiguration"/> class. 
+        /// Initializes a new instance of the <see cref="RunConfiguration"/> class.
         /// </summary>
         public RunConfiguration() : base(Constants.RunConfigurationSettingsName)
         {
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// Gets or sets the design mode value.
         /// </summary>
         public bool DesignMode
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// Gets or sets a value indicating whether to run tests in isolation or not.
         /// </summary>
         public bool InIsolation

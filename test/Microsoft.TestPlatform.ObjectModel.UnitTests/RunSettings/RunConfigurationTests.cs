@@ -146,7 +146,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var runConfiguration = new RunConfiguration();
 
 #pragma warning disable 612, 618
-            
+
             runConfiguration.TargetFramework = Framework.FromString("Framework35");
             Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
@@ -176,7 +176,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            
+
             Assert.That.Throws<SettingsException>(
                     () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
                     .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
@@ -277,7 +277,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 </RunSettings>";
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
-            
+
             Assert.IsFalse(runConfiguration.DesignMode);
         }
 
@@ -319,7 +319,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 </RunSettings>";
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
-            
+
             Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
         }
 

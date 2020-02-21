@@ -43,9 +43,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                 // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
                 // Set LoaderOptimization to MultiDomainHost which means:
-                //   Indicates that the application will probably host unique code in multiple domains, 
-                //   and the loader must share resources across application domains only for globally available (strong-named) 
-                //   assemblies that have been added to the global assembly cache. 
+                //   Indicates that the application will probably host unique code in multiple domains,
+                //   and the loader must share resources across application domains only for globally available (strong-named)
+                //   assemblies that have been added to the global assembly cache.
                 setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
                 AppDomain ad = null;
@@ -163,8 +163,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Returns the full name (AssemblyName.FullName) of the referenced assemblies by the assembly on the specified path.
-        /// 
-        /// Returns null on failure and an empty array if there is no reference in the project. 
+        ///
+        /// Returns null on failure and an empty array if there is no reference in the project.
         /// </summary>
         /// <param name="source">Full path to the assembly to get dependencies for.</param>
         public static string[] GetReferencedAssemblies(string source)
@@ -176,9 +176,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
             // Set LoaderOptimization to MultiDomainHost which means:
-            //   Indicates that the application will probably host unique code in multiple domains, 
-            //   and the loader must share resources across application domains only for globally available (strong-named) 
-            //   assemblies that have been added to the global assembly cache. 
+            //   Indicates that the application will probably host unique code in multiple domains,
+            //   and the loader must share resources across application domains only for globally available (strong-named)
+            //   assemblies that have been added to the global assembly cache.
             setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             AppDomain ad = null;
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Get the target dot net framework string for the assembly
         /// </summary>
         /// <param name="path">Path of the assembly file</param>
-        /// <returns>String representation of the the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+        /// <returns>String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
         internal static string GetTargetFrameworkVersionString(string path)
         {
             Debug.Assert(!string.IsNullOrEmpty(path));
@@ -250,9 +250,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
             // Set LoaderOptimization to MultiDomainHost which means:
-            //   Indicates that the application will probably host unique code in multiple domains, 
-            //   and the loader must share resources across application domains only for globally available (strong-named) 
-            //   assemblies that have been added to the global assembly cache. 
+            //   Indicates that the application will probably host unique code in multiple domains,
+            //   and the loader must share resources across application domains only for globally available (strong-named)
+            //   assemblies that have been added to the global assembly cache.
             setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             if (File.Exists(path))

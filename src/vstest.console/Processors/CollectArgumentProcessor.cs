@@ -234,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (string.Equals(argument, CoverletConstants.CoverletDataCollectorFriendlyName, StringComparison.OrdinalIgnoreCase))
             {
-                // Add inproc data collector to runsetings if coverlet code coverage is enabled
+                // Add in-proc data collector to runsettings if coverlet code coverage is enabled
                 EnableCoverletInProcDataCollector(argument, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
                 runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
             }

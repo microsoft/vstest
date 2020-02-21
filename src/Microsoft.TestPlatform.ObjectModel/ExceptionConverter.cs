@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         public static Exception ConvertException(FaultException faultEx)
         {
-            ValidateArg.NotNull(faultEx, "faultEx");            
+            ValidateArg.NotNull(faultEx, "faultEx");
             if (faultEx.Code == null || faultEx.Code.Name == null)
             {
                 return new TestPlatformException(faultEx.Message, faultEx);
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Creates a strongly-typed exception that is represented by the exception name 
+        /// Creates a strongly-typed exception that is represented by the exception name
         /// passed as parameter
         /// </summary>
         /// <param name="exceptionType">Exception type class name</param>

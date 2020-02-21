@@ -30,14 +30,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private static List<string> UnloadableFiles = new List<string>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
+        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
         /// </summary>
         public TestPluginDiscoverer() : this(new FileHelper())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
+        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
         /// </summary>
         /// <param name="fileHelper">
         /// The file Helper.

@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                             "DisableAppDomain"
                         };
 
-                        // Find all invalid RunConfiguration Settings 
+                        // Find all invalid RunConfiguration Settings
                         runSettingsNavigator.MoveToFirstChild();
                         do
                         {
@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return false;
             }
 
-            // Explicitly blocking usage of data collectors through modes runsettings and testsettings except 
+            // Explicitly blocking usage of data collectors through modes runsettings and testsettings except
             // for couple of scenarios where the IDE generates the collector settings in the runsettings file even when
             // it has an embedded testsettings file. Longterm runsettings will be the single run configuration source
             // In-proc collectors are incompatible with testsettings
@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
             }
 
-            // TestSettings and collection is enabled in runsetttings.. the only allowed collectors are codecoverage and fakes
+            // TestSettings and collection is enabled in runsetttings.. the only allowed collectors are code coverage and fakes
             var datacollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runsettings);
             if (datacollectionSettings != null && datacollectionSettings.IsCollectionEnabled && datacollectionSettings.DataCollectorSettingsList != null)
             {
@@ -337,7 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     {
                         legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
                     }
-                    
+
                     var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
                     var deploymentAttributes = GetNodeAttributes(deploymentNode);
                     if (deploymentAttributes != null)

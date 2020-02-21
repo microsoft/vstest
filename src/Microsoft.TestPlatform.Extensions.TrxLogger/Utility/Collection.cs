@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     /// <summary>
-    /// Base class for Eqt Collections. 
+    /// Base class for Eqt Collections.
     /// Fast collection, default implementations (Add/Remove/etc) do not allow null items and ignore duplicates.
     /// </summary>
     internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         #endregion
 
         #region Fields
-        protected Hashtable container; 
+        protected Hashtable container;
 
         private string childElementName;
         #endregion
@@ -178,7 +178,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         #region IXmlTestStore Members
 
         /// <summary>
-        /// Default behavior is to create child elements with name same as name of type T. 
+        /// Default behavior is to create child elements with name same as name of type T.
         /// Does not respect IXmlTestStoreCustom.
         /// </summary>
         public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)

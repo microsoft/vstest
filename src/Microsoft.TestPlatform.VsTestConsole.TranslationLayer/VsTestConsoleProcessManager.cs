@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 SafelyTerminateProcess();
                 this.process.Dispose();
                 this.process = null;
-            }            
+            }
         }
 
         private void SafelyTerminateProcess()

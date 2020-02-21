@@ -251,7 +251,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 ConsoleLogger.RaiseTestRunWarning(message);
             }
-            
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
                 discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;

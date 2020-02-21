@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
                         // Get endline
                         lineNumber.GetLineNumberEnd(out uint endLine);
-                        
+
                         // The magic hex constant below works around weird data reported from GetSequencePoints.
                         // The constant comes from ILDASM's source code, which performs essentially the same test.
                         const uint Magic = 0xFEEFEE;
@@ -450,7 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         }
 
         /// <summary>
-        /// Update the method symbol cache. 
+        /// Update the method symbol cache.
         /// </summary>
         private static void UpdateMethodSymbolCache(string methodName, IDiaSymbol methodSymbol, Dictionary<string, IDiaSymbol> methodSymbolCache)
         {
@@ -458,8 +458,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             Debug.Assert(methodSymbol != null, "Method symbol cannot be null.");
             Debug.Assert(methodSymbolCache != null, "Method symbol cache cannot be null.");
 
-            // #827589, In case a type has overloaded methods, then there could be a method already in the 
-            // cache which should be disposed. 
+            // #827589, In case a type has overloaded methods, then there could be a method already in the
+            // cache which should be disposed.
             if (methodSymbolCache.TryGetValue(methodName, out IDiaSymbol oldSymbol))
             {
                 ReleaseComObject(ref oldSymbol);

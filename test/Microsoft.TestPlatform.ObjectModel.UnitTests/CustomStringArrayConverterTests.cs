@@ -68,7 +68,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(string.Empty, data[1]);
         }
 
-        
         [TestMethod]
         public void CustomStringArrayConverterShouldDeserializeNullValue()
         {

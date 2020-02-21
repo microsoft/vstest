@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Reflection;
 
     /// <summary>
-    /// Does the real work of finding references using Assembly.ReflectionOnlyLoadFrom. 
+    /// Does the real work of finding references using Assembly.ReflectionOnlyLoadFrom.
     /// The caller is supposed to create AppDomain and create instance of given class in there.
     /// </summary>
     internal class AssemblyLoadWorker : MarshalByRefObject
@@ -77,8 +77,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Returns the full name of the referenced assemblies by the assembly on the specified path.
-        /// 
-        /// Returns null on failure and an empty array if there is no reference in the project. 
+        ///
+        /// Returns null on failure and an empty array if there is no reference in the project.
         /// </summary>
         /// <param name="path">Path to the assembly file to load from.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Being created in a separate app-domain"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -89,9 +89,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             Assembly a = null;
             try
             {
-                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the 
-                // specified path only and does not let code to be executed by the assembly 
-                // in the loaded context. 
+                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
+                // specified path only and does not let code to be executed by the assembly
+                // in the loaded context.
                 a = Assembly.ReflectionOnlyLoadFrom(path);
             }
             catch
@@ -119,12 +119,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             Assembly a = null;
             try
             {
-                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the 
-                // specified path only and does not let code to be executed by the assembly 
-                // in the loaded context. 
+                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
+                // specified path only and does not let code to be executed by the assembly
+                // in the loaded context.
                 //
                 a = Assembly.ReflectionOnlyLoadFrom(path);
-                
+
                 Debug.Assert(a != null);
 
                 AssemblyName[] assemblies = a.GetReferencedAssemblies();
@@ -179,19 +179,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             procArchType = Architecture.Default.ToString();
             frameworkVersion = String.Empty;
-            
+
             try
             {
-                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the 
-                // specified path only and does not let code to be executed by the assembly 
-                // in the loaded context. 
+                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
+                // specified path only and does not let code to be executed by the assembly
+                // in the loaded context.
 
                 var a = Assembly.ReflectionOnlyLoadFrom(path);
                 Debug.Assert(a != null);
                 PortableExecutableKinds peKind;
                 ImageFileMachine machine;
                 a.ManifestModule.GetPEKind(out peKind, out machine);
-                
+
                 // conversion to string type is needed for below reason
                 // -- PortableExecutableKinds.Preferred32Bit and ImageFileMachine.ARM is available only
                 //    in .Net4.0 and above. Below code is compiled with .Net3.5 but runs in .Net4.0
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             const int IMAGE_FILE_MACHINE_ARM = 0x01c0;  // ARM Little-Endian
             const int IMAGE_FILE_MACHINE_THUMB = 0x01c2;  // ARM Thumb/Thumb-2 Little-Endian
             const int IMAGE_FILE_MACHINE_ARMNT = 0x01c4; // ARM Thumb-2 Little-Endian
-            
+
             try
             {
                 //get the input stream

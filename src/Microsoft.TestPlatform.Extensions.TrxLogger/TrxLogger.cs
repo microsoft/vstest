@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// </summary>
         public TrxLogger():
             this (new Utilities.Helpers.FileHelper())
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="fileHelper">The file helper interface.</param>

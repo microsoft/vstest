@@ -61,10 +61,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             ValidateArg.NotNull(condition, nameof(condition));
             this.condition = condition;
         }
-        #endregion        
+        #endregion
 
         /// <summary>
-        /// Create a new filter expression 'And'ing 'this' with 'filter'. 
+        /// Create a new filter expression 'And'ing 'this' with 'filter'.
         /// </summary>
         private FilterExpression And(FilterExpression filter)
         {
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         }
 
         /// <summary>
-        /// Create a new filter expression 'Or'ing 'this' with 'filter'. 
+        /// Create a new filter expression 'Or'ing 'this' with 'filter'.
         /// </summary>
         private FilterExpression Or(FilterExpression filter)
         {
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         }
 
         /// <summary>
-        /// Process the given operator from the filterStack. 
+        /// Process the given operator from the filterStack.
         /// Puts back the result of operation back to filterStack.
         /// </summary>
         private static void ProcessOperator(Stack<FilterExpression> filterStack, Operator op)
@@ -266,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
             }
-            
+
             fastFilter = fastFilterBuilder.ToFastFilter();
 
             return filterStack.Pop();
@@ -301,7 +301,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 }
             }
             return filterResult;
-        }     
+        }
 
         internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
         {
@@ -324,13 +324,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     if (last == FilterHelper.EscapeCharacter)
                     {
                         // Don't check if `current` is one of the special characters here.
-                        // Instead, we blindly let any character follows '\' pass though and 
+                        // Instead, we blindly let any character follows '\' pass though and
                         // relies on `FilterHelpers.Unescape` to report such errors.
                         tokenBuilder.Append(current);
 
                         if (current == FilterHelper.EscapeCharacter)
                         {
-                            // We just encountered "\\" (escaped '\'), this will set last to '\0' 
+                            // We just encountered "\\" (escaped '\'), this will set last to '\0'
                             // so the next char will not be treated as a suffix of escape sequence.
                             current = '\0';
                         }

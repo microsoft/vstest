@@ -62,7 +62,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
-            
+
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
             this.vstestConsoleWrapper?.EndSession();
 

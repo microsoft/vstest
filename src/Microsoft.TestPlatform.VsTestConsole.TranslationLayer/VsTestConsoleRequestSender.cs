@@ -598,7 +598,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
                 var isTestRunComplete = false;
 
-                // Cycle through the messages that the testhost sends. 
+                // Cycle through the messages that the testhost sends.
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
                 while (!isTestRunComplete)
                 {
@@ -661,7 +661,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
                 var isTestRunComplete = false;
 
-                // Cycle through the messages that the testhost sends. 
+                // Cycle through the messages that the testhost sends.
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
                 while (!isTestRunComplete)
                 {

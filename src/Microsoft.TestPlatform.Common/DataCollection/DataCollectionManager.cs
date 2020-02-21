@@ -648,7 +648,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         }
                         else
                         {
-                            // Data collector is overriding an already requested variable, possibly an error.                            
+                            // Data collector is overriding an already requested variable, possibly an error.
                             dataCollectionWrapper.Logger.LogError(
                                 this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
                                 string.Format(

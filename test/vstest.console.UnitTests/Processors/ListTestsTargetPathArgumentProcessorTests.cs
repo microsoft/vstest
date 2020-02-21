@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ListTestsTargetPathArgumentProcessorCapabilities capabilities = new ListTestsTargetPathArgumentProcessorCapabilities();
             Assert.AreEqual("/ListTestsTargetPath", capabilities.CommandName);
-            
+  
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 

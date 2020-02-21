@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         private IFileHelper fileHelper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Converter"/> class. 
+        /// Initializes a new instance of the <see cref="Converter"/> class.
         /// </summary>
         public Converter(IFileHelper fileHelper)
         {

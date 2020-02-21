@@ -63,8 +63,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             }
         }
 
-        
-
         [TestMethod]
         public void ExecutorInitializeWithValidTestCaseFilterShouldAddTestCaseFilterToCommandLineOptions()
         {
