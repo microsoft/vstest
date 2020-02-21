@@ -62,15 +62,15 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_TESTARTIFACTS = Join-Path $env:TP_OUT_DIR "testArtifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
-# Set Version from scripts/build/TestPlatform.Settings.targets
+# Set Version from scripts/build/TestPlatform.Settings.targets, when we are running locally and not providing the version as the parameter 
+# or when the build is done directly in VS
 if([string]::IsNullOrWhiteSpace($Version))
 {
-    $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | 
-        Where-Object { $_ } | 
+    $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup[0].TPVersionPrefix | 
         ForEach-Object { $_.Trim() } |
         Select-Object -First 1 
 
-    Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"
+    Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"    
 }
 
 #
@@ -102,7 +102,7 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_X64_Runtime = "win7-x64"
 $TPB_X86_Runtime = "win7-x86"
 
-# Version suffix is empty for RTM releases
+# Version suffix is empty for RTM release
 $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } else { $Version }
 $TPB_CIBuild = $CIBuild
 $TPB_PublishTests = $PublishTestArtifacts
@@ -115,6 +115,14 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 $Script:ScriptFailed = $false
 
 Import-Module "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
+
+# Update the version in the dependencies props to be the TPB_version version, this is not ideal but because changing how this is resolved would 
+# mean that we need to change the whole build process this is a solution with the least amount of impact, that does not require us to keep track of 
+# the version in multiple places
+$dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
+$dependencies = Get-Content -Raw -Encoding UTF8 $dependenciesPath
+$updatedDependencies = $dependencies -replace "<NETTestSdkVersion>.*?</NETTestSdkVersion>", "<NETTestSdkVersion>$TPB_Version</NETTestSdkVersion>"
+$updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath
 
 function Write-Log ([string] $message)
 {
@@ -222,7 +230,7 @@ function Invoke-Build
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError
@@ -239,7 +247,7 @@ function Invoke-TestAssetsBuild
     
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version="$TPB_Version" -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError
