@@ -163,22 +163,29 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
-    & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
 
     # Pull in additional shared frameworks.
     # Get netcoreapp2.1 shared components.
     
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
+    
+    $env:DOTNET_MULTILEVEL_LOOKUP=0
 
-    "x64 dotnet"
+    "---- dotnet environment variables"
+    Get-ChildItem "Env:\dotnet_*"
+    
+    "`n`n---- x64 dotnet"
     & "$env:DOTNET_ROOT\dotnet.exe" --info
-    "x86 dotnet"
+
+    "`n`n---- x86 dotnet"
     & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info
 
+    
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
