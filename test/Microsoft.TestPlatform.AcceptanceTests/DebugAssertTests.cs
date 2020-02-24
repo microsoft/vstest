@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             // this will have failed tests when our trace listener works and crash the testhost process when it does not
             // because crashing processes is what a failed Debug.Assert does by default, unless you have a debugger attached
-            this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 4, 0);
+            this.ValidateSummaryStatus(0, failedTestsCount: 4, 0);
             StringAssert.Contains(this.StdOut, "Test method CrashingOnDebugAssertTestProject.DebugTests.DebugAssert threw exception: Microsoft.VisualStudio.TestPlatform.ObjectModel.DebugAssertException: Method Debug.Assert failed");
         }
     }
