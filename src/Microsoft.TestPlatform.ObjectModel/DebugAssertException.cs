@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
 
-    public sealed class DebugAssertException : Exception
+    internal sealed class DebugAssertException : Exception
     {
         public DebugAssertException(string message, string stackTrace) : base(message)
         {

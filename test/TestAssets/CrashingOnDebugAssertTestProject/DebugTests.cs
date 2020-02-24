@@ -34,12 +34,5 @@ namespace CrashingOnDebugAssertTestProject
         {
             Trace.Fail("fail");
         }
-
-        [TestMethod]
-        [ExpectedException(typeof(DebugAssertException))]
-        public void CatchingExceptionFromDebugAssert()
-        {
-            Debug.Assert(false);
-        }
     }
 }
