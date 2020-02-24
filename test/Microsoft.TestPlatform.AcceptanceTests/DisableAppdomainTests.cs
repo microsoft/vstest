@@ -18,10 +18,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-            var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
+            var disableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
+            var disableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
 
-            RunTests(runnerInfo.RunnerFramework, string.Format("{0}\" \"{1}", diableAppdomainTest1, diableAppdomainTest2), 2);
+            RunTests(runnerInfo.RunnerFramework, string.Format("{0}\" \"{1}", disableAppdomainTest1, disableAppdomainTest2), 2);
         }
 
         [TestMethod]
@@ -30,9 +30,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var newtonSoftDependnecyTest = testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
+            var newtonSoftDependencyTest = testEnvironment.GetTestAsset("NewtonSoftDependency.dll", "net451");
 
-            RunTests(runnerInfo.RunnerFramework, newtonSoftDependnecyTest, 1);
+            RunTests(runnerInfo.RunnerFramework, newtonSoftDependencyTest, 1);
         }
 
         private void RunTests(string runnerFramework, string testAssembly, int passedTestCount)
@@ -48,8 +48,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "DisableAppDomain", "true" }
                                                  };
 
-            var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-            var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
+            var disableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
+            var disableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
             var arguments = PrepareArguments(
                 testAssembly,
                 string.Empty,
