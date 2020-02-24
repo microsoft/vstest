@@ -12,12 +12,11 @@ namespace testhost.UnitTests
     [TestClass]
     public class TestHostTraceListenerTests
     {
-        public void SetupTraceListener()
+        public TestHostTraceListenerTests()
         {
             // using this instead of class initialize to avoid crashing the whole process
-            // in case we break the class init behavior, which would make debugging tests 
-            // that touch ClassInitialize difficult
-            Trace.Listeners.Clear(); 
+            // in case we break the class init behavior due to some other changes
+            Trace.Listeners.Clear();
             Trace.Listeners.Add(new TestHostTraceListener());
         }
 
