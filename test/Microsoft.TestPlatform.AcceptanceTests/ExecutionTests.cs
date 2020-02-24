@@ -63,38 +63,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
             string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
-            if (this.IsDesktopTargetFramework())
-            {
-                testhostProcessName = "testhost.x86";
-                expectedNumOfProcessCreated = 2;
-            }
-            else
-            {
-                testhostProcessName = "dotnet";
-                if (this.IsDesktopRunner())
-                {
-                    expectedNumOfProcessCreated = 2;
-                }
-                else
-                {
-                    // Include launcher dotnet.exe
-                    expectedNumOfProcessCreated = 3;
-                }
-            }
+            // for the desktop we will run testhost.x86 in two copies, but for core 
+            // we will run a combination of testhost.x86 and dotnet, where the dotnet will be 
+            // the test console, and sometimes it will be the test host (e.g dotnet, dotnet, testhost.x86, or dotnet, testhost.x86, testhost.x86)
+            // based on the target framework
+            int expectedNumOfProcessCreated = this.IsDesktopRunner() ? 2 : 3;
+            var testhostProcessNames = new [] { "testhost.x86", "dotnet" };
 
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testhostProcessName);
+                testhostProcessNames);
 
             this.InvokeVsTest(arguments);
 
             cts.Cancel();
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
+                numOfProcessCreatedTask.Result.Count,
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
             this.ValidateSummaryStatus(2, 2, 2);
             this.ExitCodeEquals(1); // failing tests
         }

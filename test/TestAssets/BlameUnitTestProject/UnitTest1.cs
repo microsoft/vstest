@@ -4,7 +4,7 @@
 namespace BlameUnitTestProject
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.Runtime.CompilerServices;
+    using System;
 
     [TestClass]
     public class UnitTest1
@@ -17,13 +17,7 @@ namespace BlameUnitTestProject
         [TestMethod]
         public void TestMethod2()
         {
-            StackOverflowMethod();
-        }
-
-        [MethodImpl(MethodImplOptions.NoOptimization)]
-        void StackOverflowMethod()
-        {
-            StackOverflowMethod();
+            Environment.FailFast("Crash the process on purpose.");
         }
     }
 }
