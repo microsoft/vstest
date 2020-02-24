@@ -28,10 +28,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             Assert.IsNotNull(aggregator.RunCompleteArgsAttachments, "RunCompleteArgsAttachments list must not be null");
             Assert.IsNotNull(aggregator.RunContextAttachments, "RunContextAttachments list must not be null");
 
-            Assert.AreEqual(aggregator.Exceptions.Count, 0, "Exceptions List must be initialized as empty list.");
-            Assert.AreEqual(aggregator.ExecutorUris.Count, 0, "Exceptions List must be initialized as empty list.");
-            Assert.AreEqual(aggregator.RunCompleteArgsAttachments.Count, 0, "RunCompleteArgsAttachments List must be initialized as empty list.");
-            Assert.AreEqual(aggregator.RunContextAttachments.Count, 0, "RunContextAttachments List must be initialized as empty list");
+            Assert.AreEqual(0, aggregator.Exceptions.Count, "Exceptions List must be initialized as empty list.");
+            Assert.AreEqual(0, aggregator.ExecutorUris.Count, "Exceptions List must be initialized as empty list.");
+            Assert.AreEqual(0, aggregator.RunCompleteArgsAttachments.Count, "RunCompleteArgsAttachments List must be initialized as empty list.");
+            Assert.AreEqual(0, aggregator.RunContextAttachments.Count, "RunContextAttachments List must be initialized as empty list");
 
             Assert.IsFalse(aggregator.IsAborted, "Aborted must be false by default");
 
@@ -49,14 +49,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet1);
 
 
-            Assert.AreEqual(aggregator.RunCompleteArgsAttachments.Count, 1, "RunCompleteArgsAttachments List must have data.");
+            Assert.AreEqual(1, aggregator.RunCompleteArgsAttachments.Count, "RunCompleteArgsAttachments List must have data.");
 
             var attachmentSet2 = new Collection<AttachmentSet>();
             attachmentSet2.Add(new AttachmentSet(new Uri("x://hello2"), "hello2"));
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet2);
 
-            Assert.AreEqual(aggregator.RunCompleteArgsAttachments.Count, 2, "RunCompleteArgsAttachments List must have aggregated data.");
+            Assert.AreEqual(2, aggregator.RunCompleteArgsAttachments.Count, "RunCompleteArgsAttachments List must have aggregated data.");
         }
 
         [TestMethod]
@@ -69,14 +69,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet1, null);
 
-            Assert.AreEqual(aggregator.RunContextAttachments.Count, 1, "RunContextAttachments List must have data.");
+            Assert.AreEqual(1, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have data.");
 
             var attachmentSet2 = new Collection<AttachmentSet>();
             attachmentSet2.Add(new AttachmentSet(new Uri("x://hello2"), "hello2"));
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet2, null);
 
-            Assert.AreEqual(aggregator.RunContextAttachments.Count, 2, "RunContextAttachments List must have aggregated data.");
+            Assert.AreEqual(2, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have aggregated data.");
         }
 
         [TestMethod]
@@ -122,23 +122,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
                 runCompleteArgsAttachments: null);
 
-            Assert.AreEqual(aggregator.ElapsedTime, TimeSpan.Zero, "Timespan must be zero");
+            Assert.AreEqual(TimeSpan.Zero, aggregator.ElapsedTime, "Timespan must be zero");
 
             aggregator.Aggregate(null, null, null, TimeSpan.FromMilliseconds(100), isAborted: false, isCanceled: false, runContextAttachments: null,
                 runCompleteArgsAttachments: null);
 
-            Assert.AreEqual(aggregator.ElapsedTime, TimeSpan.FromMilliseconds(100), "Timespan must be 100ms");
+            Assert.AreEqual(TimeSpan.FromMilliseconds(100), aggregator.ElapsedTime, "Timespan must be 100ms");
 
 
             aggregator.Aggregate(null, null, null, TimeSpan.FromMilliseconds(200), isAborted: false, isCanceled: false, runContextAttachments: null,
                 runCompleteArgsAttachments: null);
 
-            Assert.AreEqual(aggregator.ElapsedTime, TimeSpan.FromMilliseconds(200), "Timespan should be Max of all 200ms");
+            Assert.AreEqual(TimeSpan.FromMilliseconds(200), aggregator.ElapsedTime, "Timespan should be Max of all 200ms");
 
             aggregator.Aggregate(null, null, null, TimeSpan.FromMilliseconds(150), isAborted: false, isCanceled: false, runContextAttachments: null,
              runCompleteArgsAttachments: null);
 
-            Assert.AreEqual(aggregator.ElapsedTime, TimeSpan.FromMilliseconds(200), "Timespan should be Max of all i.e. 200ms");
+            Assert.AreEqual(TimeSpan.FromMilliseconds(200), aggregator.ElapsedTime, "Timespan should be Max of all i.e. 200ms");
         }
 
         [TestMethod]
@@ -158,8 +158,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var aggregatedException = aggregator.GetAggregatedException() as AggregateException;
             Assert.IsNotNull(aggregatedException, "Aggregated exception must NOT be null");
             Assert.IsNotNull(aggregatedException.InnerExceptions, "Inner exception list must NOT be null");
-            Assert.AreEqual(aggregatedException.InnerExceptions.Count, 1, "Inner exception lsit must have one element");
-            Assert.AreEqual(aggregatedException.InnerExceptions[0], exception1, "Inner exception must be the one set.");
+            Assert.AreEqual(1, aggregatedException.InnerExceptions.Count, "Inner exception list must have one element");
+            Assert.AreEqual(exception1, aggregatedException.InnerExceptions[0], "Inner exception must be the one set.");
 
             var exception2 = new NotSupportedException();
             aggregator.Aggregate(null, null, exception: exception2, elapsedTime: TimeSpan.Zero, isAborted: false, isCanceled: false, runContextAttachments: null,
@@ -168,8 +168,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregatedException = aggregator.GetAggregatedException() as AggregateException;
             Assert.IsNotNull(aggregatedException, "Aggregated exception must NOT be null");
             Assert.IsNotNull(aggregatedException.InnerExceptions, "Inner exception list must NOT be null");
-            Assert.AreEqual(aggregatedException.InnerExceptions.Count, 2, "Inner exception lsit must have one element");
-            Assert.AreEqual(aggregatedException.InnerExceptions[1], exception2, "Inner exception must be the one set.");
+            Assert.AreEqual(2, aggregatedException.InnerExceptions.Count, "Inner exception list must have one element");
+            Assert.AreEqual(exception2, aggregatedException.InnerExceptions[1], "Inner exception must be the one set.");
         }
 
         [TestMethod]
@@ -179,18 +179,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null);
 
-            Assert.AreEqual(aggregator.ExecutorUris.Count, 0, "ExecutorUris List must not have data.");
+            Assert.AreEqual(0, aggregator.ExecutorUris.Count, "ExecutorUris List must not have data.");
 
             var uri1 = "x://hello1";
             aggregator.Aggregate(null, new List<string>() { uri1 }, null, TimeSpan.Zero, false, false, null, null);
 
-            Assert.AreEqual(aggregator.ExecutorUris.Count, 1, "ExecutorUris List must have data.");
+            Assert.AreEqual(1, aggregator.ExecutorUris.Count, "ExecutorUris List must have data.");
             Assert.IsTrue(aggregator.ExecutorUris.Contains(uri1), "ExecutorUris List must have correct data.");
 
             var uri2 = "x://hello2";
             aggregator.Aggregate(null, new List<string>() { uri2 }, null, TimeSpan.Zero, false, false, null, null);
 
-            Assert.AreEqual(aggregator.ExecutorUris.Count, 2, "ExecutorUris List must have aggregated data.");
+            Assert.AreEqual(2, aggregator.ExecutorUris.Count, "ExecutorUris List must have aggregated data.");
             Assert.IsTrue(aggregator.ExecutorUris.Contains(uri2), "ExecutorUris List must have correct data.");
         }
 
@@ -202,7 +202,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null);
 
             var runStats = aggregator.GetAggregatedRunStats();
-            Assert.AreEqual(runStats.ExecutedTests, 0, "RunStats must not have data.");
+            Assert.AreEqual(0, runStats.ExecutedTests, "RunStats must not have data.");
 
             var stats1 = new Dictionary<TestOutcome, long>();
             stats1.Add(TestOutcome.Passed, 2);
@@ -214,12 +214,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.Aggregate(new TestRunStatistics(12, stats1), null, null, TimeSpan.Zero, false, false, null, null);
 
             runStats = aggregator.GetAggregatedRunStats();
-            Assert.AreEqual(runStats.ExecutedTests, 12, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.Passed], 2, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.Failed], 3, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.Skipped], 1, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.NotFound], 4, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.None], 2, "RunStats must have aggregated data.");
+            Assert.AreEqual(12, runStats.ExecutedTests, "RunStats must have aggregated data.");
+            Assert.AreEqual(2, runStats.Stats[TestOutcome.Passed], "RunStats must have aggregated data.");
+            Assert.AreEqual(3, runStats.Stats[TestOutcome.Failed], "RunStats must have aggregated data.");
+            Assert.AreEqual(1, runStats.Stats[TestOutcome.Skipped], "RunStats must have aggregated data.");
+            Assert.AreEqual(4, runStats.Stats[TestOutcome.NotFound], "RunStats must have aggregated data.");
+            Assert.AreEqual(2, runStats.Stats[TestOutcome.None], "RunStats must have aggregated data.");
 
 
             var stats2 = new Dictionary<TestOutcome, long>();
@@ -232,12 +232,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.Aggregate(new TestRunStatistics(11, stats2), null, null, TimeSpan.Zero, false, false, null, null);
 
             runStats = aggregator.GetAggregatedRunStats();
-            Assert.AreEqual(runStats.ExecutedTests, 23, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.Passed], 5, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.Failed], 5, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.Skipped], 3, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.NotFound], 5, "RunStats must have aggregated data.");
-            Assert.AreEqual(runStats.Stats[TestOutcome.None], 5, "RunStats must have aggregated data.");
+            Assert.AreEqual(23, runStats.ExecutedTests, "RunStats must have aggregated data.");
+            Assert.AreEqual(5, runStats.Stats[TestOutcome.Passed], "RunStats must have aggregated data.");
+            Assert.AreEqual(5, runStats.Stats[TestOutcome.Failed], "RunStats must have aggregated data.");
+            Assert.AreEqual(3, runStats.Stats[TestOutcome.Skipped], "RunStats must have aggregated data.");
+            Assert.AreEqual(5, runStats.Stats[TestOutcome.NotFound], "RunStats must have aggregated data.");
+            Assert.AreEqual(5, runStats.Stats[TestOutcome.None], "RunStats must have aggregated data.");
         }
 
         [TestMethod]
@@ -248,7 +248,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateRunDataMetrics(null);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
-            Assert.AreEqual(runMetrics.Count, 0);
+            Assert.AreEqual(0, runMetrics.Count);
         }
 
         [TestMethod]
@@ -265,8 +265,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out value), true);
-            Assert.AreEqual(Convert.ToInt32(value), 4);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out value));
+            Assert.AreEqual(4, Convert.ToInt32(value));
         }
 
         [TestMethod]
@@ -283,8 +283,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, out value), true);
-            Assert.AreEqual(value, .04182);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, out value));
+            Assert.AreEqual(.04182, value);
         }
 
         [TestMethod]
@@ -301,8 +301,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, out value), true);
-            Assert.AreEqual(value, .04182);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, out value));
+            Assert.AreEqual(.04182, value);
         }
 
         [TestMethod]
@@ -319,7 +319,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out value), false);
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out value));
         }
 
         [TestMethod]
@@ -332,7 +332,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateRunDataMetrics(dict);
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.AreEqual(runMetrics.Count, 0);
+            Assert.AreEqual(0, runMetrics.Count);
         }
 
         [TestMethod]
@@ -345,7 +345,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateRunDataMetrics(null);
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.AreEqual(runMetrics.Count, 0);
+            Assert.AreEqual(0, runMetrics.Count);
         }
 
         [TestMethod]
@@ -362,8 +362,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value), true);
-            Assert.AreEqual(value, 1);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value));
+            Assert.AreEqual(1, value);
         }
 
         [TestMethod]
@@ -380,8 +380,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out value), true);
-            Assert.AreEqual(value, 2);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out value));
+            Assert.AreEqual(2, value);
         }
 
         [TestMethod]
@@ -395,7 +395,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value), false);
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value));
         }
 
         [TestMethod]
@@ -409,7 +409,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out value), false);
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out value));
         }
     }
 }

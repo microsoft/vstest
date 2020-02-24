@@ -573,8 +573,8 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
 
             Assert.AreEqual(2, envVars.Count);
-            Assert.AreEqual(envVars["RANDOM_PATH"], @"C:\temp");
-            Assert.AreEqual(envVars["RANDOM_PATH2"], @"C:\temp2");
+            Assert.AreEqual(@"C:\temp", envVars["RANDOM_PATH"]);
+            Assert.AreEqual(@"C:\temp2", envVars["RANDOM_PATH2"]);
         }
 
         [TestMethod]
@@ -592,7 +592,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
 
             Assert.AreEqual(1, envVars.Count);
-            Assert.AreEqual(envVars["RANDOM_PATH"], @"C:\temp");
+            Assert.AreEqual(@"C:\temp", envVars["RANDOM_PATH"]);
         }
 
         [TestMethod]

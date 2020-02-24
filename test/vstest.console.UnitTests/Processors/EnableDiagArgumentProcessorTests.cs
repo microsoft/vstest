@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsFalse(this.diagProcessor.Metadata.Value.IsAction);
             Assert.IsFalse(this.diagProcessor.Metadata.Value.IsSpecialCommand);
             Assert.AreEqual(EnableDiagArgumentProcessor.CommandName, this.diagProcessor.Metadata.Value.CommandName);
-            Assert.AreEqual(null, this.diagProcessor.Metadata.Value.ShortCommandName);
+            Assert.IsNull(this.diagProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.Diag, this.diagProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, this.diagProcessor.Metadata.Value.HelpPriority);
             Assert.AreEqual(CommandLineResources.EnableDiagUsage, this.diagProcessor.Metadata.Value.HelpContentResourceName);

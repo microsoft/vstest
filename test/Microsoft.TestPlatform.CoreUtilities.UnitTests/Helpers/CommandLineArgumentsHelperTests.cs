@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             string data = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, "--hello");
 
             Assert.IsTrue(argsDictionary.Count == 2);
-            Assert.AreEqual(null, data);
+            Assert.IsNull(data);
         }
 
         [TestMethod]
@@ -91,8 +91,8 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
 
             Assert.IsTrue(argsDictionary.Count == 2);
-            Assert.AreEqual(null, argsDictionary["--hello"]);
-            Assert.AreEqual(null, argsDictionary["--world"]);
+            Assert.IsNull(argsDictionary["--hello"]);
+            Assert.IsNull(argsDictionary["--world"]);
         }
 
         [TestMethod]

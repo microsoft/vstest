@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
             string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\udc00\\ufffe\\u0000";
-            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
+            Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
         }
 
         [TestMethod]
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             xmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
 
             string expectedResult = "\t\n\r 섣�";
-            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
+            Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
             string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
-            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
+            Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsFalse(isolationProcessor.Metadata.Value.IsAction);
             Assert.IsFalse(isolationProcessor.Metadata.Value.IsSpecialCommand);
             Assert.AreEqual(InIsolationArgumentProcessor.CommandName, isolationProcessor.Metadata.Value.CommandName);
-            Assert.AreEqual(null, isolationProcessor.Metadata.Value.ShortCommandName);
+            Assert.IsNull(isolationProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, isolationProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.InIsolationArgumentProcessorHelpPriority, isolationProcessor.Metadata.Value.HelpPriority);
             Assert.AreEqual("--InIsolation|/InIsolation" + Environment.NewLine + "      Runs the tests in an isolated process. This makes vstest.console.exe " + Environment.NewLine + "      process less likely to be stopped on an error in the tests, but tests " + Environment.NewLine + "      may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName);

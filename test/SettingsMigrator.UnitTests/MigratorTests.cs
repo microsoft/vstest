@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
 
                 var testSessionTimeoutNode = root.SelectSingleNode(@"/RunSettings/RunConfiguration/TestSessionTimeout");
                 Assert.IsNotNull(testSessionTimeoutNode, "There should be a TestSessionTimeout node");
-                Assert.AreEqual(testSessionTimeoutNode.InnerText, "60000", "Timeout value does not match.");
+                Assert.AreEqual("60000", testSessionTimeoutNode.InnerText, "Timeout value does not match.");
 
                 var dataCollectorNode = root.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
                 Assert.IsNotNull(dataCollectorNode, "There should be a DataCollector node");

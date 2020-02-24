@@ -25,15 +25,15 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Constants.DefaultBatchSize, runConfiguration.BatchSize);
             Assert.AreEqual(0, runConfiguration.TestSessionTimeout);
             Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
-            Assert.AreEqual(null, runConfiguration.SolutionDirectory);
+            Assert.IsNull(runConfiguration.SolutionDirectory);
             Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
-            Assert.AreEqual(null, runConfiguration.BinariesRoot);
-            Assert.AreEqual(null, runConfiguration.TestAdaptersPaths);
+            Assert.IsNull(runConfiguration.BinariesRoot);
+            Assert.IsNull(runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
-            Assert.AreEqual(false, runConfiguration.DisableAppDomain);
-            Assert.AreEqual(false, runConfiguration.DisableParallelization);
-            Assert.AreEqual(false, runConfiguration.DesignMode);
-            Assert.AreEqual(false, runConfiguration.InIsolation);
+            Assert.IsFalse(runConfiguration.DisableAppDomain);
+            Assert.IsFalse(runConfiguration.DisableParallelization);
+            Assert.IsFalse(runConfiguration.DesignMode);
+            Assert.IsFalse(runConfiguration.InIsolation);
             Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(Constants.DefaultExecutionThreadApartmentState, runConfiguration.ExecutionThreadApartmentState);
         }
@@ -97,17 +97,17 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var expectedSolutionPath = Environment.ExpandEnvironmentVariables("%temp%");
             Assert.AreEqual(expectedSolutionPath, runConfiguration.SolutionDirectory);
 
-            Assert.AreEqual(true, runConfiguration.TreatTestAdapterErrorsAsWarnings);
+            Assert.IsTrue(runConfiguration.TreatTestAdapterErrorsAsWarnings);
             Assert.AreEqual(@"E:\x\z", runConfiguration.BinariesRoot);
             Assert.AreEqual(@"C:\a\b;D:\x\y", runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(2, runConfiguration.MaxCpuCount);
             Assert.AreEqual(5, runConfiguration.BatchSize);
             Assert.AreEqual(10000, runConfiguration.TestSessionTimeout);
-            Assert.AreEqual(true, runConfiguration.DisableAppDomain);
-            Assert.AreEqual(true, runConfiguration.DisableParallelization);
-            Assert.AreEqual(true, runConfiguration.DesignMode);
-            Assert.AreEqual(true, runConfiguration.InIsolation);
-            Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
+            Assert.IsTrue(runConfiguration.DisableAppDomain);
+            Assert.IsTrue(runConfiguration.DisableParallelization);
+            Assert.IsTrue(runConfiguration.DesignMode);
+            Assert.IsTrue(runConfiguration.InIsolation);
+            Assert.IsFalse(runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
         }
 

@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
-            Assert.AreEqual(null, appDomainSetup.TargetFrameworkName);
+            Assert.IsNull(appDomainSetup.TargetFrameworkName);
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
-            Assert.AreEqual(null, appDomainSetup.TargetFrameworkName);
+            Assert.IsNull(appDomainSetup.TargetFrameworkName);
         }
     }
 }

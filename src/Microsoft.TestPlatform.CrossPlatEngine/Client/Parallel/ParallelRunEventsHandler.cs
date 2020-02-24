@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
-            ParallelRunDataAggregator runDataAggregator) : 
+            ParallelRunDataAggregator runDataAggregator) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
@@ -95,15 +95,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             // we get run complete events from each executor process
             // so we cannot "complete" the actual executor operation until all sources/testcases are consumed
-            // We should not block last chunk results while we aggregate overall run data 
+            // We should not block last chunk results while we aggregate overall run data
             if (lastChunkArgs != null)
             {
                 ConvertToRawMessageAndSend(MessageType.TestRunStatsChange, lastChunkArgs);
                 HandleTestRunStatsChange(lastChunkArgs);
             }
 
-            // Update runstats, executorUris, etc. 
-            // we need this data when we send the final runcomplete 
+            // Update runstats, executorUris, etc.
+            // we need this data when we send the final runcomplete
             this.runDataAggregator.Aggregate(
                 testRunCompleteArgs.TestRunStatistics,
                 executorUris,
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         protected void HandleParallelTestRunComplete(TestRunCompleteEventArgs completedArgs)
         {
             // In case of sequential execution - RawMessage would have contained a 'TestRunCompletePayload' object
-            // To send a rawmessge - we need to create rawmessage from an aggregated payload object 
+            // To send a rawmessge - we need to create rawmessage from an aggregated payload object
             var testRunCompletePayload = new TestRunCompletePayload()
             {
                 ExecutorUris = this.runDataAggregator.ExecutorUris,

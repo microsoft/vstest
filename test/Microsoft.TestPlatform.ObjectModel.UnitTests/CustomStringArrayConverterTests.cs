@@ -52,7 +52,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as string[];
 
             Assert.AreEqual(2, data.Length);
-            Assert.AreEqual(null, data[0]);
+            Assert.IsNull(data[0]);
             Assert.AreEqual("val", data[1]);
         }
 
@@ -74,7 +74,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as string[];
 
-            Assert.AreEqual(null, data);
+            Assert.IsNull(data);
         }
     }
 }

@@ -167,9 +167,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
             RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-            Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-            Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
-            Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
+            Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
+            Assert.AreEqual(Framework.DefaultFramework.ToString(), runConfiguration.TargetFramework.ToString());
+            Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
         }
 
         [TestMethod]
