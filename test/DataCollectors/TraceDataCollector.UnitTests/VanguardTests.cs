@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         public void StartShouldThrowOnInvalidCommandLine()
         {
             var expectedErrorMessage =
-                "Running event not received from CodeCoverage.exe. Check event logs for failure reason.";
+                "Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.";
             this.vanguardCommandBuilderMock
                 .Setup(c => c.GenerateCommandLine(
                     VanguardCommand.Collect,

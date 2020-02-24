@@ -416,7 +416,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             // Validate
             Assert.IsFalse(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
-            this.messageLoggerMock.Verify(logger => logger.SendMessage(TestMessageLevel.Warning, "Discovery of tests canceled."), Times.Once);
+            this.messageLoggerMock.Verify(logger => logger.SendMessage(TestMessageLevel.Warning, "Discovery of tests cancelled."), Times.Once);
         }
 
         [TestMethod]
