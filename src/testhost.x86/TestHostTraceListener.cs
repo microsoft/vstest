@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var listener = Trace.Listeners[i];
                 if (listener is DefaultTraceListener)
                 {
-                    EqtTrace.Verbose("TestPlatformTraceListener.Setup: Removing listener {0}.", Trace.Listeners[i]);
+                    EqtTrace.Verbose($"TestPlatformTraceListener.Setup: Replacing listener {0} with { nameof(TestHostTraceListener) }.", Trace.Listeners[i]);
                     Trace.Listeners[i] = new TestHostTraceListener();
                 }
             }

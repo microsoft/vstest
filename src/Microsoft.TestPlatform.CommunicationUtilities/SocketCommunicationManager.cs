@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
-    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -178,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 try
                 {
-                    EqtTrace.Verbose("SocketCommunicationManager : SetupClientAsync : Attempting to connect to the server {0}:{1}.", endpoint.Address, endpoint.Port);
+                    EqtTrace.Verbose("SocketCommunicationManager : SetupClientAsync : Attempting to connect to the server.");
                     await this.tcpClient.ConnectAsync(endpoint.Address, endpoint.Port);
 
                     if (this.tcpClient.Connected)
@@ -200,19 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 catch (Exception ex)
                 {
-                    // a simple backoff policy, otherwise this loop produces and incredible
-                    // amount of error logs when it cannot connect
-                    var delay = watch.ElapsedMilliseconds < 100
-                        ? 1
-                        : watch.ElapsedMilliseconds < 1000
-                            ? 10
-                            : 100;
-
-                    if ((watch.ElapsedMilliseconds + delay) < connectionTimeout)
-                    {
-                        await Task.Delay(delay);
-                        EqtTrace.Error($"Connection Failed with error {0}, retrying in {delay} ms", ex.ToString());
-                    }
+                    EqtTrace.Error("Connection Failed with error {0}, retrying", ex.ToString());
                 }
             }
             while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < connectionTimeout);
