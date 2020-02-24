@@ -12,27 +12,51 @@ namespace CrashingOnDebugAssertTestProject
     public class DebugTests
     {
         [TestMethod]
-        public void DebugAssert()
+        public void DebugAssertFailsTheTest()
         {
             Debug.Assert(false);
         }
 
         [TestMethod]
-        public void DebugFail()
+        public void DebugFailFailsTheTest()
         {
             Debug.Fail("fail");
         }
 
         [TestMethod]
-        public void TraceAssert()
+        public void TraceAssertFailsTheTest()
         {
             Trace.Assert(false);
         }
 
         [TestMethod]
-        public void TraceFail()
+        public void TraceFailFailsThetest()
         {
             Trace.Fail("fail");
+        }
+
+        [TestMethod]
+        public void TraceWriteDoesNotFailTheTest()
+        {
+            Trace.Write("hello");
+        }
+
+        [TestMethod]
+        public void TraceWriteLineDoesNotFailTheTest()
+        {
+            Trace.WriteLine("hello");
+        }
+
+        [TestMethod]
+        public void DebugWriteDoesNotFailTheTest()
+        {
+            Debug.Write("hello");
+        }
+
+        [TestMethod]
+        public void DebugWriteLineDoesNotFailTheTest()
+        {
+            Debug.WriteLine("hello");
         }
     }
 }

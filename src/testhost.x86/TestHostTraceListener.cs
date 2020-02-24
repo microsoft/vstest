@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Linq;
     using System.Reflection;
 
-    internal class TestHostTraceListener : TraceListener
+    internal class TestHostTraceListener : DefaultTraceListener
     {
         public static void Setup()
         {
@@ -60,14 +60,14 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
         }
 
-        public override void Write(string message)
+        public override void Fail(string message)
         {
             throw GetException(message);
         }
 
-        public override void WriteLine(string message)
+        public override void Fail(string message, string detailMessage)
         {
-            throw GetException(message);
+            throw GetException((message + Environment.NewLine + detailMessage));
         }
 
         public static void ShowDialog(string stackTrace, string message, string detailMessage, string _)
