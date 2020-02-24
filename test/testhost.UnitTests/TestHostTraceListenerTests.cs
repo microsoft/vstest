@@ -7,17 +7,35 @@ namespace testhost.UnitTests
 #if NETCOREAPP 
     using Microsoft.VisualStudio.TestPlatform.TestHost;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
 
     [TestClass]
     public class TestHostTraceListenerTests
     {
-        public TestHostTraceListenerTests()
+        TraceListener[] listeners;
+
+        [TestInitialize()]
+        public void Initialize()
         {
-            // using this instead of class initialize to avoid crashing the whole process
-            // in case we break the class init behavior due to some other changes
+            this.listeners = new TraceListener[Trace.Listeners.Count];
+            Trace.Listeners.CopyTo(this.listeners, 0);
+            // not using the TestHostTraceListener.Setup method here 
+            // because that detects only default trace listeners and there won't 
+            // be any when this is in production, so this would end up testing against
+            // an older version of the trace listener
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new TestHostTraceListener());
+        }
+
+        [TestCleanup()]
+        public void Cleanup() {
+            Trace.Listeners.Clear();
+            foreach(var listener in this.listeners)
+            {
+                Trace.Listeners.Add(listener);
+            }
         }
 
         [TestMethod]
@@ -70,6 +88,70 @@ namespace testhost.UnitTests
         public void DebugWriteLineDoesNotFailTheTest()
         {
             Debug.WriteLine("hello");
+        }
+    }
+
+    [TestClass]
+    public class TestHostTraceListenerRegistrationTests
+    {
+        TraceListener[] listeners;
+
+        [TestInitialize()]
+        public void Initialize()
+        {
+            this.listeners = new TraceListener[Trace.Listeners.Count];
+            Trace.Listeners.CopyTo(this.listeners, 0);
+        }
+
+        [TestCleanup()]
+        public void Cleanup()
+        {
+            Trace.Listeners.Clear();
+            foreach (var listener in this.listeners)
+            {
+                Trace.Listeners.Add(listener);
+            }
+        }
+
+        [TestMethod]
+        public void SetupReplacesDefaultTraceListener()
+        {
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new DefaultTraceListener());
+            TestHostTraceListener.Setup();
+            
+            // this is what will happen in the majority of cases, there will be a single 
+            // trace listener that will be the default trace listener and we will replace it 
+            // with ours
+            Assert.IsInstanceOfType(Trace.Listeners[0], typeof(TestHostTraceListener));
+        }
+
+        [TestMethod]
+        public void SetupKeepsNonDefaultTraceListeners()
+        {
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new DummyTraceListener());
+            Trace.Listeners.Add(new DefaultTraceListener());
+            Trace.Listeners.Add(new DummyTraceListener());
+            TestHostTraceListener.Setup();
+
+            Assert.IsInstanceOfType(Trace.Listeners[0], typeof(DummyTraceListener));
+            Assert.IsInstanceOfType(Trace.Listeners[1], typeof(TestHostTraceListener));
+            Assert.IsInstanceOfType(Trace.Listeners[2], typeof(DummyTraceListener));
+        }
+
+        private class DummyTraceListener : TraceListener
+        {
+            public List<string> Lines { get; } = new List<string>();
+            public override void Write(string message)
+            {
+                Lines.Add(message);
+            }
+
+            public override void WriteLine(string message)
+            {
+                Lines.Add(message);
+            }
         }
     }
 #endif
