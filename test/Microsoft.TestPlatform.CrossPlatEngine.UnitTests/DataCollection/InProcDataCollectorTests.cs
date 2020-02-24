@@ -44,7 +44,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 this.assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, null);
+            Assert.IsNull(this.inProcDataCollector.AssemblyQualifiedName);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 this.assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, null);
+            Assert.IsNull(this.inProcDataCollector.AssemblyQualifiedName);
         }
 
         [TestMethod]

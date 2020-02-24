@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
 
         /// <summary>
-        /// Invokes <c>vstest.console</c> with specified arguments.
+        /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
         /// </summary>
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeDotnetTest(string arguments)

@@ -130,10 +130,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 return;
             }
 
-            var source = new List<string>()
-                             {
-                                 this.GetAssetFullPath("SimpleTestProject3.dll")
-                             };
+            var source = new[] { this.GetAssetFullPath("SimpleTestProject3.dll") };
 
             this.vstestConsoleWrapper.RunTests(
                 source,
@@ -141,25 +138,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
                 this.runEventHandler);
 
-            var errorMessage = "The active test run was aborted. Reason: Process is terminated due to StackOverflowException.\r\n";
-            if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
-            {
-                errorMessage =
-                    "The active test run was aborted. Reason: Process is terminating due to StackOverflowException.\r\n";
-            }
+            var errorMessage = runnerInfo.TargetFramework == "net451"
+                ? "The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.\r\n"
+                : "The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.\r\n";
 
-            // Assert
-
-            // Not happy with this check, but have seen this behavior on some machines.
-            // What this essentially means, that at least run was aborted.
-            if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
-            {
-                Assert.IsTrue(errorMessage.StartsWith(this.runEventHandler.LogMessage));
-            }
-            else
-            {
-                Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
-            }
+            Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
         }
 
         [TestMethod]

@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
 
             string serializedPayload = this.jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
-            Assert.AreEqual(serializedPayload, "{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
+            Assert.AreEqual("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}", serializedPayload);
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             };
 
             Message message = this.jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
-            Assert.AreEqual(message?.MessageType, "dummy");
+            Assert.AreEqual("dummy", message?.MessageType);
         }
 
         [TestMethod]

@@ -468,8 +468,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -506,8 +506,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -542,8 +542,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -578,8 +578,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1426,8 +1426,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1482,8 +1482,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1539,8 +1539,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1596,8 +1596,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]

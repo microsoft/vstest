@@ -53,12 +53,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("--ResultsDirectory|/ResultsDirectory" + Environment.NewLine + "      Test results directory will be created in specified path if not exists." + Environment.NewLine + "      Example  /ResultsDirectory:<pathToResultsDirectory>", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ResultsDirectoryArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion

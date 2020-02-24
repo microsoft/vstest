@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(this.attachmentManager.AttachmentSets.Count, 0);
+            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
         }
 
         [TestMethod]

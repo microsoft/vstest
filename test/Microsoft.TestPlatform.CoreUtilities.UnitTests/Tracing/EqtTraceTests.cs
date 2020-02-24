@@ -50,7 +50,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
 #endif
-            Assert.AreEqual(true, EqtTrace.IsVerboseEnabled, "Expected trace state to be verbose actual state {0}", EqtTrace.IsVerboseEnabled);
+            Assert.IsTrue(EqtTrace.IsVerboseEnabled, "Expected trace state to be verbose actual state {0}", EqtTrace.IsVerboseEnabled);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Error;
 #endif
-            Assert.AreEqual(true, EqtTrace.IsErrorEnabled, "Expected trace state to be error actual state {0}", EqtTrace.IsErrorEnabled);
+            Assert.IsTrue(EqtTrace.IsErrorEnabled, "Expected trace state to be error actual state {0}", EqtTrace.IsErrorEnabled);
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
 #endif
-            Assert.AreEqual(true, EqtTrace.IsInfoEnabled, "Expected trace state to be info actual state {0}", EqtTrace.IsInfoEnabled);
+            Assert.IsTrue(EqtTrace.IsInfoEnabled, "Expected trace state to be info actual state {0}", EqtTrace.IsInfoEnabled);
         }
 
         [TestMethod]
@@ -83,7 +83,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
 #endif
-            Assert.AreEqual(true, EqtTrace.IsWarningEnabled, "Expected trace state to be warning actual state {0}", EqtTrace.IsWarningEnabled);
+            Assert.IsTrue(EqtTrace.IsWarningEnabled, "Expected trace state to be warning actual state {0}", EqtTrace.IsWarningEnabled);
         }
 
         [TestMethod]

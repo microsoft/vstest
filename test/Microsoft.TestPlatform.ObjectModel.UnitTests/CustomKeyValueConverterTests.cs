@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as KeyValuePair<string, string>[];
 
-            Assert.AreEqual(null, data);
+            Assert.IsNull(data);
         }
     }
 }

@@ -107,22 +107,22 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		{
 			CommandLineOptions.Instance.Reset();
 
-			// Opt out the Telemetry
-			Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
-		}
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
 
-		[TestMethod]
-		public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
-		{
-			CommandLineOptions.Instance.IsDesignMode = true;
-			this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-			var requestManager = new TestRequestManager(CommandLineOptions.Instance,
-				new Mock<ITestPlatform>().Object,
-				TestRunResultAggregator.Instance,
-				new Mock<ITestPlatformEventSource>().Object,
-				this.inferHelper,
-				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+        [TestMethod]
+        public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
+        {
+            CommandLineOptions.Instance.IsDesignMode = true;
+            this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
+            var requestManager = new TestRequestManager(CommandLineOptions.Instance,
+                new Mock<ITestPlatform>().Object,
+                TestRunResultAggregator.Instance,
+                new Mock<ITestPlatformEventSource>().Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask,
+                this.mockProcessHelper.Object);
 
 			Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
 		}
@@ -210,10 +210,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
 			Assert.AreEqual(testCaseFilterValue, actualDiscoveryCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
-			Assert.AreEqual(createDiscoveryRequestCalled, 1, "CreateDiscoveryRequest must be invoked only once.");
-			Assert.AreEqual(2, actualDiscoveryCriteria.Sources.Count(), "All Sources must be used for discovery request");
-			Assert.AreEqual("a", actualDiscoveryCriteria.Sources.First(), "First Source in list is incorrect");
-			Assert.AreEqual("b", actualDiscoveryCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
+            Assert.AreEqual(1, createDiscoveryRequestCalled, "CreateDiscoveryRequest must be invoked only once.");
+            Assert.AreEqual(2, actualDiscoveryCriteria.Sources.Count(), "All Sources must be used for discovery request");
+            Assert.AreEqual("a", actualDiscoveryCriteria.Sources.First(), "First Source in list is incorrect");
+            Assert.AreEqual("b", actualDiscoveryCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
 
 			// Default frequency is set to 10, unless specified in runsettings.
 			Assert.AreEqual(10, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
@@ -1009,17 +1009,17 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 					actualRequestData = requestData;
 				}).Returns(mockDiscoveryRequest.Object);
 
-			this.testRequestManager = new TestRequestManager(
-				CommandLineOptions.Instance,
-				this.mockTestPlatform.Object,
-				TestRunResultAggregator.Instance,
-				this.mockTestPlatformEventSource.Object,
-				this.inferHelper,
-				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask,
+                this.mockProcessHelper.Object);
 
-			// Act.
-			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
 			// Verify
 			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.Elements", out var legacySettingsNodes));
@@ -1165,10 +1165,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
 			Assert.AreEqual(testCaseFilterValue, observedCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
-			Assert.AreEqual(createRunRequestCalled, 1, "CreateRunRequest must be invoked only once.");
-			Assert.AreEqual(2, observedCriteria.Sources.Count(), "All Sources must be used for discovery request");
-			Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
-			Assert.AreEqual("b", observedCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
+            Assert.AreEqual(1, createRunRequestCalled, "CreateRunRequest must be invoked only once.");
+            Assert.AreEqual(2, observedCriteria.Sources.Count(), "All Sources must be used for discovery request");
+            Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
+            Assert.AreEqual("b", observedCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
 
 			// Check for the default value for the frequency
 			Assert.AreEqual(10, observedCriteria.FrequencyOfRunStatsChangeEvent);

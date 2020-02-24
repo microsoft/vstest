@@ -153,7 +153,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             // Verify Parameter Values.
             Assert.IsTrue(trp.ContainsKey("webAppUrl"));
-            Assert.AreEqual(trp["webAppUrl"], "http://localhost");
+            Assert.AreEqual("http://localhost", trp["webAppUrl"]);
         }
 
         [TestMethod]
@@ -180,11 +180,11 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             // Verify Parameter Values.
             Assert.IsTrue(trp.ContainsKey("webAppUrl"));
-            Assert.AreEqual(trp["webAppUrl"], "http://localhost");
+            Assert.AreEqual("http://localhost", trp["webAppUrl"]);
             Assert.IsTrue(trp.ContainsKey("webAppUserName"));
-            Assert.AreEqual(trp["webAppUserName"], "Admin");
+            Assert.AreEqual("Admin", trp["webAppUserName"]);
             Assert.IsTrue(trp.ContainsKey("webAppPassword"));
-            Assert.AreEqual(trp["webAppPassword"], "Password");
+            Assert.AreEqual("Password",trp["webAppPassword"]);
         }
 
         [TestMethod]
@@ -263,7 +263,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                                 </RunSettings>";
             var inProcDCRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settingsXml);
             Assert.IsNotNull(inProcDCRunSettings);
-            Assert.AreEqual(inProcDCRunSettings.DataCollectorSettingsList.Count, 1);
+            Assert.AreEqual(1, inProcDCRunSettings.DataCollectorSettingsList.Count);
         }
 
         [TestMethod]
@@ -726,7 +726,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                 </RunSettings>";
 
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggerRunSettingsNode);
-            Assert.AreEqual(loggerRunSettings.LoggerSettingsList.Count, 0);
+            Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
         }
 
         [TestMethod]
@@ -741,7 +741,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                 </RunSettings>";
 
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggerRunSettingsNode);
-            Assert.AreEqual(loggerRunSettings.LoggerSettingsList.Count, 0);
+            Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
         }
 
         [TestMethod]
@@ -823,7 +823,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                 </RunSettings>";
 
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggersNode);
-            Assert.AreEqual(loggerRunSettings.LoggerSettingsList.Count, 0);
+            Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
         }
 
         [TestMethod]
@@ -840,7 +840,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                 </RunSettings>";
 
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithEmptyLoggersNode);
-            Assert.AreEqual(loggerRunSettings.LoggerSettingsList.Count, 0);
+            Assert.AreEqual(0, loggerRunSettings.LoggerSettingsList.Count);
         }
 
         [TestMethod]
@@ -1185,7 +1185,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             var friendlyNameList = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingsXml).ToList<string>();
 
-            Assert.AreEqual(friendlyNameList.Count, 2, "There should be two friendly name");
+            Assert.AreEqual(2, friendlyNameList.Count, "There should be two friendly name");
             CollectionAssert.AreEqual(friendlyNameList, new List<string> { "DummyDataCollector1", "DummyDataCollector2" });
         }
 

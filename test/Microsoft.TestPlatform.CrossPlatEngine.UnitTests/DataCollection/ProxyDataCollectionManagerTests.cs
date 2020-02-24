@@ -198,7 +198,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
             Assert.AreEqual(0, result.EnvironmentVariables.Count);
-            Assert.AreEqual(false, result.AreTestCaseLevelEventsRequired);
+            Assert.IsFalse(result.AreTestCaseLevelEventsRequired);
             Assert.AreEqual(0, result.DataCollectionEventsPort);
         }
 
@@ -234,9 +234,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(result.Count, 1);
+            Assert.AreEqual(1, result.Count);
             Assert.IsNotNull(result[0]);
-            Assert.AreEqual(result[0].DisplayName, dispName);
+            Assert.AreEqual(dispName, result[0].DisplayName);
             Assert.AreEqual(uri, result[0].Uri);
         }
 

@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestMessageHandler(new object(), trme);
             this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            Assert.AreEqual(this.testableTrxLogger.GetRunLevelErrorsAndWarnings().Count, 2);
+            Assert.AreEqual(2, this.testableTrxLogger.GetRunLevelErrorsAndWarnings().Count);
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
             this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            Assert.AreEqual(this.testableTrxLogger.GetRunLevelErrorsAndWarnings().Count, 1);
+            Assert.AreEqual(1, this.testableTrxLogger.GetRunLevelErrorsAndWarnings().Count);
         }
 
         [TestMethod]
@@ -185,8 +185,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.PassedTestCount, 2, "Passed Tests");
-            Assert.AreEqual(this.testableTrxLogger.FailedTestCount, 1, "Failed Tests");
+            Assert.AreEqual(2, this.testableTrxLogger.PassedTestCount, "Passed Tests");
+            Assert.AreEqual(1, this.testableTrxLogger.FailedTestCount, "Failed Tests");
         }
 
         [TestMethod]
@@ -219,7 +219,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 4, "Passed Tests");
+            Assert.AreEqual(4, this.testableTrxLogger.TotalTestCount, "Passed Tests");
         }
 
         [TestMethod]
@@ -257,7 +257,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(2, this.testableTrxLogger.TestResultCount, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -278,7 +278,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestEntryCount, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(2, this.testableTrxLogger.TestEntryCount, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -298,7 +298,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.UnitTestElementCount, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(2, this.testableTrxLogger.UnitTestElementCount, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -323,7 +323,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 2, "TestResultHandler is not creating flat results when parent result is not present.");
+            Assert.AreEqual(2, this.testableTrxLogger.TestResultCount, "TestResultHandler is not creating flat results when parent result is not present.");
         }
 
         [TestMethod]
@@ -365,8 +365,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 1, "TestResultHandler is not creating hierarchical results when parent result is present.");
-            Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 3, "TestResultHandler is not adding all inner results in parent test result.");
+            Assert.AreEqual(1, this.testableTrxLogger.TestResultCount, "TestResultHandler is not creating hierarchical results when parent result is present.");
+            Assert.AreEqual(3, this.testableTrxLogger.TotalTestCount, "TestResultHandler is not adding all inner results in parent test result.");
         }
 
         [TestMethod]
@@ -396,7 +396,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.UnitTestElementCount, 1, "TestResultHandler is adding multiple test elements for data driven tests.");
+            Assert.AreEqual(1, this.testableTrxLogger.UnitTestElementCount, "TestResultHandler is adding multiple test elements for data driven tests.");
         }
 
         [TestMethod]
@@ -426,7 +426,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestEntryCount, 1, "TestResultHandler is adding multiple test entries for data driven tests.");
+            Assert.AreEqual(1, this.testableTrxLogger.TestEntryCount, "TestResultHandler is adding multiple test entries for data driven tests.");
         }
 
         [TestMethod]
@@ -459,8 +459,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 1, "TestResultHandler is not creating hierarchical results for ordered test.");
-            Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 3, "TestResultHandler is not adding all inner results in ordered test.");
+            Assert.AreEqual(1, this.testableTrxLogger.TestResultCount, "TestResultHandler is not creating hierarchical results for ordered test.");
+            Assert.AreEqual(3, this.testableTrxLogger.TotalTestCount, "TestResultHandler is not adding all inner results in ordered test.");
         }
 
         [TestMethod]
@@ -493,7 +493,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.UnitTestElementCount, 3, "TestResultHandler is not adding multiple test elements for ordered test.");
+            Assert.AreEqual(3, this.testableTrxLogger.UnitTestElementCount, "TestResultHandler is not adding multiple test elements for ordered test.");
         }
 
         [TestMethod]
@@ -526,7 +526,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.testableTrxLogger.TestEntryCount, 1, "TestResultHandler is adding multiple test entries for ordered test.");
+            Assert.AreEqual(1, this.testableTrxLogger.TestEntryCount, "TestResultHandler is adding multiple test entries for ordered test.");
         }
 
         [TestMethod]

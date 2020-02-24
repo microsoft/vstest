@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             string data = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, "--hello");
 
             Assert.IsTrue(argsDictionary.Count == 2);
-            Assert.AreEqual(null, data);
+            Assert.IsNull(data);
         }
 
         [TestMethod]
@@ -91,8 +91,53 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
 
             Assert.IsTrue(argsDictionary.Count == 2);
-            Assert.AreEqual(null, argsDictionary["--hello"]);
-            Assert.AreEqual(null, argsDictionary["--world"]);
+            Assert.IsNull(argsDictionary["--hello"]);
+            Assert.IsNull(argsDictionary["--world"]);
+        }
+
+        [TestMethod]
+        public void GetIntArgFromDictShouldReturnZeroIfKeyIsNotPresent()
+        {
+            var args = new List<string>() { "--hello", "--world" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            int data = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
+
+            Assert.AreEqual(0, data);
+        }
+
+        [TestMethod]
+        public void GetIntArgFromDictShouldReturnTheValueIfKeyIsPresent()
+        {
+            var args = new List<string>() { "--port", "1000" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            int data = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
+
+            Assert.AreEqual(1000, data);
+        }
+
+        [TestMethod]
+        public void TryGetIntArgFromDictShouldReturnTrueIfKeyIsPresentAndTheValue()
+        {
+            var args = new List<string>() { "--port", "59870" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            bool found = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, "--port", out var data);
+
+            Assert.IsTrue(found);
+            Assert.AreEqual(59870, data);
+        }
+
+        [TestMethod]
+        public void TryGetIntArgFromDictShouldReturnFalseIfKeyIsNotPresent()
+        {
+            var args = new List<string>() { "--hello", "--world" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            bool found = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, "--port", out var data);
+
+            Assert.IsFalse(found);
         }
     }
 }

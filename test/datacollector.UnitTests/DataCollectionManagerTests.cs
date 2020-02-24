@@ -298,11 +298,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             var sessionStartEventArgs = new SessionStartEventArgs();
 
-            Assert.AreEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));
+            Assert.AreEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
 
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
-            Assert.AreNotEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));
+            Assert.AreNotEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
         }
 
         [TestMethod]
