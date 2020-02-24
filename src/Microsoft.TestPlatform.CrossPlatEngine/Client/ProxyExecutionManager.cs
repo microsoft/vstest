@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
     /// </summary>
-    internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager, ITestRunEventsHandler
+    internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager, ITestRunEventsHandler2
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
@@ -203,7 +203,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         ///  <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid)
         {
-            return this.baseTestRunEventsHandler.AttachDebuggerToProcess(pid);
+            if (!(this.baseTestRunEventsHandler is ITestRunEventsHandler2))
+            {
+                throw new NotSupportedException("Operation not supported by the current run events handler.");
+            }
+
+            return (this.baseTestRunEventsHandler as ITestRunEventsHandler2).AttachDebuggerToProcess(pid);
         }
 
         /// <summary>

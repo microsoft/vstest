@@ -243,7 +243,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
         }
     }
 
-    public class RunEventHandler : ITestRunEventsHandler
+    public class RunEventHandler : ITestRunEventsHandler2
     {
         private AutoResetEvent waitHandle;
 

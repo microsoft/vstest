@@ -116,8 +116,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             {
                 throw new ArgumentOutOfRangeException("PID cannot be negative.");
             }
+            if (!(this.testRunEventsHandler is ITestRunEventsHandler2))
+            {
+                throw new NotSupportedException("Operation not supported by the current run events handler.");
+            }
 
-            return this.testRunEventsHandler.AttachDebuggerToProcess(pid);
+            return (this.testRunEventsHandler as ITestRunEventsHandler2).AttachDebuggerToProcess(pid);
         }
 
         public void Dispose()

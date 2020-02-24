@@ -33,13 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testProcessStartInfo">Process start info</param>
         /// <returns>ProcessId of the launched process</returns>
         int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo);
-
-        /// <summary>
-        /// Attach debugger to an already running process.
-        /// </summary>
-        /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
-        /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
-        bool AttachDebuggerToProcess(int pid);
     }
 
     /// <summary>
