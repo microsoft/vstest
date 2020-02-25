@@ -980,13 +980,13 @@ Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
-Publish-Tests
 Create-VsixPackage
 Create-NugetPackages
 Generate-Manifest
 Publish-PatchedDotnet
 Copy-PackageIntoStaticDirectory
 Invoke-TestAssetsBuild
+Publish-Tests
  
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
