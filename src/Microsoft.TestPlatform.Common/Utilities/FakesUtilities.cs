@@ -7,9 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-#if NET451
     using System.Reflection;
-#endif
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -195,7 +193,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, bool, DataCollectorSettings> configurator)
         {
-#if NET451
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
@@ -218,7 +215,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
                 }
             }
-#endif
             configurator = null;
             return false;
         }
