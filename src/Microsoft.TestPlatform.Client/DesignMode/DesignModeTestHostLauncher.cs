@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <inheritdoc/>
         public virtual bool IsDebug => false;
 
+        /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid)
         {
             return this.designModeClient.AttachDebuggerToProcess(pid, CancellationToken.None);

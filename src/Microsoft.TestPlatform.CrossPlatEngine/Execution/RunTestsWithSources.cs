@@ -118,6 +118,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
         /// <summary>
+        /// Asks the adapter about attaching to the default test host.
+        /// </summary>
+        /// <param name="executor">The executor used to run the tests.</param>
+        /// <returns>True if must attach to the default test host, false otherwise.</returns>
+        protected override bool ShouldAttachToTestHost(ITestExecutor executor)
+        {
+            // Get the sources.
+            IEnumerable<string> sources = new List<string>();
+            this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
+
+            return (executor is ITestExecutor2)
+                ? (executor as ITestExecutor2).ShouldAttachToTestHost(sources, this.RunContext)
+                : true;
+        }
+
+        /// <summary>
         /// Returns executor Vs sources list
         /// </summary>
         private Dictionary<Tuple<Uri, string>, IEnumerable<string>> GetExecutorVsSourcesList(IMessageLogger logger)

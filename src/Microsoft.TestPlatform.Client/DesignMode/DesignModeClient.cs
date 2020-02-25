@@ -309,6 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             }
         }
 
+        /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
         {
             lock (this.responseLockObject)

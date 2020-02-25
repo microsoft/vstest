@@ -58,6 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.onAckMessageReceived = onAckMessageReceived;
+            this.onResultMessageReceived = (message) => { throw new NotImplementedException(); };
             this.jobQueue = jobQueue;
         }
 
@@ -209,6 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
         }
 
+        /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
             Message resultMessage = null;

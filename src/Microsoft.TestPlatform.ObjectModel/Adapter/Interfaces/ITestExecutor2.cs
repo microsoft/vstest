@@ -31,6 +31,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         /// <param param name="frameworkHandle">Handle to the framework to record results and to do framework operations.</param>
         void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle2 frameworkHandle);
 
+        /// <summary>
+        /// Asks the adapter about attaching to the default test host.
+        /// </summary>
+        /// <param name="sources">Path to test container files to look for tests in.</param>
+        /// <param name="runContext">Context to use when executing the tests.</param>
+        /// <returns>True if must attach to the default test host, false otherwise.</returns>
         bool ShouldAttachToTestHost(IEnumerable<string> sources, IRunContext runContext);
+
+        /// <summary>
+        /// Asks the adapter about attaching to the default test host.
+        /// </summary>
+        /// <param name="tests">Tests to be run.</param>
+        /// <param name="runContext">Context to use when executing the tests.</param>
+        /// <returns>True if must attach to the default test host, false otherwise.</returns>
+        bool ShouldAttachToTestHost(IEnumerable<TestCase> tests, IRunContext runContext);
     }
 }

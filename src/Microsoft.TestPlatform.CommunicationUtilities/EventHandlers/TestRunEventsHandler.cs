@@ -94,15 +94,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// <returns>ProcessId of the launched process</returns>
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-            else
-            {
-                System.Diagnostics.Debugger.Break();
-            }
-
             EqtTrace.Info("Sending LaunchProcessWithDebuggerAttached on additional test process: {0}", testProcessStartInfo?.FileName);
             return this.requestHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }

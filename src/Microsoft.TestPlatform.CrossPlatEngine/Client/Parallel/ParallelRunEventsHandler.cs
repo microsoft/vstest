@@ -175,6 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             return this.actualRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
+        /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
             if (!(this.actualRunEventsHandler is ITestRunEventsHandler2))

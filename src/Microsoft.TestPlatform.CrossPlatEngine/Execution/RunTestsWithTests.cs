@@ -12,11 +12,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-    using ObjectModel;
     using ObjectModel.Client;
 
     internal class RunTestsWithTests : BaseRunTests
@@ -94,6 +94,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             properties.Add("TestSources", TestSourcesUtility.GetSources(this.testCases));
 
             this.testCaseEventsHandler.SendSessionStart(properties);
+        }
+
+        /// <summary>
+        /// Asks the adapter about attaching to the default test host.
+        /// </summary>
+        /// <param name="executor">The executor used to run the tests.</param>
+        /// <returns>True if must attach to the default test host, false otherwise.</returns>
+        protected override bool ShouldAttachToTestHost(ITestExecutor executor)
+        {
+            return (executor is ITestExecutor2)
+                ? (executor as ITestExecutor2).ShouldAttachToTestHost(this.testCases, this.RunContext)
+                : true;
         }
 
         /// <summary>

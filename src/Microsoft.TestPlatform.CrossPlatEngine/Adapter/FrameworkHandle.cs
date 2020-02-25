@@ -110,6 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
         }
 
+        /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
             if (pid < 0)

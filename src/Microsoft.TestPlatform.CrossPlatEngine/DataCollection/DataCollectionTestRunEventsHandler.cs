@@ -157,6 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
+        /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
             if (!(this.testRunEventsHandler is ITestRunEventsHandler2))

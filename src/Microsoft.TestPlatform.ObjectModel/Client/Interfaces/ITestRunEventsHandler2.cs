@@ -3,6 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
+    /// <summary>
+    /// Interface contract for handling test run events during run operation.
+    /// </summary>
     public interface ITestRunEventsHandler2 : ITestRunEventsHandler
     {
         /// <summary>
