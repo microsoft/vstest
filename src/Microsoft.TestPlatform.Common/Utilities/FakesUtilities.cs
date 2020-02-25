@@ -52,7 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 doc.Load(xmlReader);
             }
 
-            // The new datacollector is only used if the test does not target net framework
             var isNetFramework = !IsNetCoreFramework(runSettingsXml);
 
             return !TryAddFakesDataCollectorSettings(doc, sources, isNetFramework) ? runSettingsXml : doc.OuterXml;
@@ -83,70 +82,50 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
-            // The new Fakes implementation makes the decision to add the right datacollector uri to the configuration
-            // The old API exists for fallback measures. 
-            DataCollectorSettings fakesSettings;
-            if (!GetNewFakesSettings(runSettings, sources, isNetFramework, out fakesSettings) &&
-                !GetFallbackFakesSettings(runSettings, sources, isNetFramework, out fakesSettings))
+            // A new Fakes Congigurator API makes the decision to add the right datacollector uri to the configuration
+            // There now exist two data collector URIs to support two different scenarios. The new scanrio involves 
+            // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
+            // .NET Core scenarios). The old API still exists for fallback measures. 
+
+            Func<IEnumerable<string>, bool, DataCollectorSettings> newConfigurator;
+            if (TryGetFakesDataCollectorConfigurator(out newConfigurator))
             {
-                return false;
+                var fakesSettings = newConfigurator(sources, isNetFramework);
+                XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+                return true;
             }
 
-            XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
-            return true;
+            return AddFallbackFakesSettings(runSettings, sources, isNetFramework);
         }
 
-        private static bool GetNewFakesSettings(
+        private static bool AddFallbackFakesSettings(
             XmlDocument runSettings,
             IEnumerable<string> sources,
-            bool isNetFramework,
-            out DataCollectorSettings dataCollectorSettings)
-        {
-            Func<IEnumerable<string>, bool, DataCollectorSettings> configurator;
-            // fakes supported?
-            if (!TryGetFakesDataCollectorConfigurator(out configurator))
-            {
-                dataCollectorSettings = null;
-                return false;
-            }
-
-            dataCollectorSettings = configurator(sources, isNetFramework);
-            return true;
-        }
-
-        private static bool GetFallbackFakesSettings(
-            XmlDocument runSettings,
-            IEnumerable<string> sources,
-            bool isNetFramework,
-            out DataCollectorSettings dataCollectorSettings)
+            bool isNetFramework)
         {
 
-            //Do not generate Fakes if not Net Framework
+            // The fallback settings is for the old implementation of fakes 
+            // that only supports .Net Framework versions
             if (!isNetFramework)
             {
-                dataCollectorSettings = null;
                 return false;
             }
 
-            Func<IEnumerable<string>, string> configurator;
-
-            // fakes supported?
-            if (!TryGetFakesDataCollectorConfigurator(out configurator))
+            Func<IEnumerable<string>, string> oldConfigurator;
+            if (!TryGetFakesDataCollectorConfigurator(out oldConfigurator))
             {
-                dataCollectorSettings = null;
                 return false;
             }
 
             // if no fakes, return settings unchanged
-            var fakesConfiguration = configurator(sources);
+            var fakesConfiguration = oldConfigurator(sources);
             if (fakesConfiguration == null)
             {
-                dataCollectorSettings = null;
                 return false;
             }
 
             // integrate fakes settings in configuration
-            // if the settings don't have any data collector settings, populate with empty settings
+            // if the settings doesn't have any data collector settings, populate with empty settings
             EnsureSettingsNode(runSettings, new DataCollectionRunSettings());
 
             // embed fakes settings
@@ -160,8 +139,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             fakesSettings.Configuration = doc.DocumentElement;
+            XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
 
-            dataCollectorSettings = fakesSettings;
             return true;
         }
 
