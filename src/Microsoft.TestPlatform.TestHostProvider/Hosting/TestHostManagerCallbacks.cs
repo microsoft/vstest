@@ -28,6 +28,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
             StringBuilder testHostProcessStdError,
             Action<HostProviderEventArgs> onHostExited)
         {
+            EqtTrace.Verbose("TestHostProvider.ExitCallBack: Host exited starting callback.");
             var exitCode = 0;
             var testHostProcessStdErrorStr = testHostProcessStdError.ToString();
 
@@ -38,8 +39,9 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
             {
                 procId = (process as Process).Id;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
+                EqtTrace.Error("TestHostProvider.ExitCallBack: could not get proccess id from process, error: {0}.", ex);
             }
 
             if (exitCode != 0)

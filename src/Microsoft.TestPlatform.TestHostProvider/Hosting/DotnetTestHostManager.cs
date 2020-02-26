@@ -376,7 +376,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (!this.hostExitedEventRaised)
             {
                 this.hostExitedEventRaised = true;
+                EqtTrace.Verbose("DotnetTestHostManager.OnHostExited: invoking OnHostExited callback");
                 this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            }
+            else
+            {
+                EqtTrace.Verbose("DotnetTestHostManager.OnHostExited: exit event was already raised, skipping");
             }
         }
 

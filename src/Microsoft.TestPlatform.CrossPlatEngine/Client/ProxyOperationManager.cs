@@ -167,6 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (!this.testHostLaunched ||
                     !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
+                    EqtTrace.Verbose($"Test host failed to start Test host launched:{testHostLaunched} test host exited: {testHostExited.IsSet}");
                     // Throw a test platform exception with the appropriate message if user requested cancellation
                     this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
@@ -209,7 +210,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     // We want to give test host a chance to safely close.
                     // The upper bound for wait should be 100ms.
-                    this.testHostExited.Wait(100);
+                    var timeout = 100;
+                    EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
+                    this.testHostExited.Wait(timeout);
                 }
             }
             catch (Exception ex)
@@ -315,16 +318,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
+            EqtTrace.Verbose("CrossPlatEngine.TestHostManagerHostExited: calling on client process exit callback.");
             this.testHostProcessStdError = e.Data;
-            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
+            // this needs to be set before we call the OnClientProcess exit
+            // because the OnClientProcess will short-circuit WaitForRequestHandlerConnection in SetupChannel
+            // that then continues to throw an exception and checks if the testhost process exited
+            // if not it reports timeout, if we don't set this before OnClientProcessExit we will report timeout
+            // even though we exited the test host before even attempting the connect
             this.testHostExited.Set();
+            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
         }
 
         private void ThrowOnTestHostExited(bool testHostExited)
-        {
+        {            
             if (testHostExited)
             {
+                // we might consider passing standard output here in case standard error is not available because some 
+                // errors don't end up in the standard error output
                 throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError));
             }
         }
