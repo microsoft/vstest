@@ -122,7 +122,7 @@ Import-Module "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
 $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
 $dependencies = Get-Content -Raw -Encoding UTF8 $dependenciesPath
 $updatedDependencies = $dependencies -replace "<NETTestSdkVersion>.*?</NETTestSdkVersion>", "<NETTestSdkVersion>$TPB_Version</NETTestSdkVersion>"
-$updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath
+$updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath -NoNewline
 
 function Write-Log ([string] $message)
 {
