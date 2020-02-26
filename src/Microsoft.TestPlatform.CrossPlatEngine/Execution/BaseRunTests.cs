@@ -402,7 +402,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     EqtTrace.Verbose("Attaching to default test host.");
 
                     attachedToTestHost = true;
-                    this.frameworkHandle.AttachDebuggerToProcess(Process.GetCurrentProcess().Id);
+                    if (!this.frameworkHandle.AttachDebuggerToProcess(Process.GetCurrentProcess().Id))
+                    {
+                        throw new TestPlatformException("Cannot attach the debugger to the default test host.");
+                    }
                 }
             }
 
