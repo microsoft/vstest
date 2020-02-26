@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     // Tests for TestSourceArgumentProcessor
     // </summary>
     [TestClass]
+    [DoNotParallelize]
     public class TestSourceArgumentProcessorTests
     {
         /// <summary>

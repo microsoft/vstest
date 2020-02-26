@@ -9,6 +9,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Reflection;
     [TestClass]
+    [DoNotParallelize]
     public class TestExecutorExtensionManagerTests
     {
         [TestCleanup]

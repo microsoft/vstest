@@ -33,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     // Tests for ListFullyQualifiedTestsArgumentProcessor
     // </summary>
     [TestClass]
+    [DoNotParallelize]
     public class ListFullyQualifiedTestsArgumentProcessorTests
     {
         private readonly Mock<IFileHelper> mockFileHelper;

@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
+    [DoNotParallelize]
     public class ExecutorUnitTests
     {
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;

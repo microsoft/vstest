@@ -20,6 +20,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Moq;
 
     [TestClass]
+    [DoNotParallelize]
     public class TestPluginCacheTests
     {
         private readonly Mock<IFileHelper> mockFileHelper;

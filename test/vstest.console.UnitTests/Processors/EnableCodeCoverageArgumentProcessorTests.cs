@@ -12,6 +12,7 @@ namespace vstest.console.UnitTests.Processors
     using Moq;
 
     [TestClass]
+    [DoNotParallelize]
     public class EnableCodeCoverageArgumentProcessorTests
     {
         private TestableRunSettingsProvider settingsProvider;

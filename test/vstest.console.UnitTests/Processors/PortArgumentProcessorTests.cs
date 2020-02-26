@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Diagnostics;
 
     [TestClass]
+    [DoNotParallelize]
     public class PortArgumentProcessorTests
     {
         private Mock<IProcessHelper> mockProcessHelper;

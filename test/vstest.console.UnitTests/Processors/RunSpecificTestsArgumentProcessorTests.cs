@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using vstest.console.UnitTests.Processors;
 
     [TestClass]
+    [DoNotParallelize]
     public class RunSpecificTestsArgumentProcessorTests
     {
         private const string NoDiscoveredTestsWarning = @"No test is available in DummyTest.dll. Make sure that installed test discoverers & executors, platform & framework version settings are appropriate and try again.";

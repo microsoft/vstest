@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
 
     [TestClass]
+    [DoNotParallelize]
     public class RunSettingsArgumentProcessorTests
     {
         private TestableRunSettingsProvider settingsProvider;
