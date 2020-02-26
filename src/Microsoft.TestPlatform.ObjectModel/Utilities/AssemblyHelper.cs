@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
     /// <summary>
-    /// Implementation of finding assembly referencies using "managed route", i.e. Assembly.Load.
+    /// Implementation of finding assembly references using "managed route", i.e. Assembly.Load.
     /// </summary>
     public static class AssemblyHelper
     {
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Checks whether the source assembly directly references given assembly or not.
-        /// Only assembly name and publickey token are match. Version is ignored for matching.
+        /// Only assembly name and public key token are match. Version is ignored for matching.
         /// Returns null if not able to check if source references assembly.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -43,9 +43,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                 // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
                 // Set LoaderOptimization to MultiDomainHost which means:
-                //   Indicates that the application will probably host unique code in multiple domains, 
-                //   and the loader must share resources across application domains only for globally available (strong-named) 
-                //   assemblies that have been added to the global assembly cache. 
+                //   Indicates that the application will probably host unique code in multiple domains,
+                //   and the loader must share resources across application domains only for globally available (strong-named)
+                //   assemblies that have been added to the global assembly cache.
                 setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
                 AppDomain ad = null;
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Finds platform and .Net framework version for a given test container.
-        /// If there is an error while infering this information, defaults (AnyCPU, None) are returned
+        /// If there is an error while inferring this information, defaults (AnyCPU, None) are returned
         /// for faulting container.
         /// </summary>
         /// <param name="testSource"></param>
@@ -163,8 +163,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Returns the full name (AssemblyName.FullName) of the referenced assemblies by the assembly on the specified path.
-        /// 
-        /// Returns null on failure and an empty array if there is no reference in the project. 
+        ///
+        /// Returns null on failure and an empty array if there is no reference in the project.
         /// </summary>
         /// <param name="source">Full path to the assembly to get dependencies for.</param>
         public static string[] GetReferencedAssemblies(string source)
@@ -176,9 +176,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
             // Set LoaderOptimization to MultiDomainHost which means:
-            //   Indicates that the application will probably host unique code in multiple domains, 
-            //   and the loader must share resources across application domains only for globally available (strong-named) 
-            //   assemblies that have been added to the global assembly cache. 
+            //   Indicates that the application will probably host unique code in multiple domains,
+            //   and the loader must share resources across application domains only for globally available (strong-named)
+            //   assemblies that have been added to the global assembly cache.
             setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             AppDomain ad = null;
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Get the target dot net framework string for the assembly
         /// </summary>
         /// <param name="path">Path of the assembly file</param>
-        /// <returns>String representation of the the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+        /// <returns>String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
         internal static string GetTargetFrameworkVersionString(string path)
         {
             Debug.Assert(!string.IsNullOrEmpty(path));
@@ -250,9 +250,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
             // Set LoaderOptimization to MultiDomainHost which means:
-            //   Indicates that the application will probably host unique code in multiple domains, 
-            //   and the loader must share resources across application domains only for globally available (strong-named) 
-            //   assemblies that have been added to the global assembly cache. 
+            //   Indicates that the application will probably host unique code in multiple domains,
+            //   and the loader must share resources across application domains only for globally available (strong-named)
+            //   assemblies that have been added to the global assembly cache.
             setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             if (File.Exists(path))
@@ -314,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// When test run is targeted for .Net4.0, set target framework of test appdomain to be v4.0.
-        /// With this done tests would be executed in 4.0 compatiblity mode even when  .Net4.5 is installed.
+        /// With this done tests would be executed in 4.0 compatibility mode even when  .Net4.5 is installed.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Failure to set this property should be ignored.")]
         internal static void SetNETFrameworkCompatiblityMode(AppDomainSetup setup, IRunContext runContext)
@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
-                        EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatiblity mode.");
+                        EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatibility mode.");
                     }
                     setup.TargetFrameworkName = Constants.DotNetFramework40;
                 }

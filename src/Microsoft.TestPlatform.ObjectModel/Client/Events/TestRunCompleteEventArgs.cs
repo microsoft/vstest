@@ -42,13 +42,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public ITestRunStatistics TestRunStatistics { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether the test run is canceled or not. 
+        /// Gets a value indicating whether the test run is canceled or not.
         /// </summary>
         [DataMember]
         public bool IsCanceled { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether the test run is aborted. 
+        /// Gets a value indicating whether the test run is aborted.
         /// </summary>
         [DataMember]
         public bool IsAborted { get; private set; }
@@ -58,16 +58,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public Exception Error { get; private set; }
-        
+
         /// <summary>
-        /// Gets the attachment sets associated with the test run. 
+        /// Gets the attachment sets associated with the test run.
         /// </summary>
         [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
         /// <summary>
         /// Gets the time elapsed in just running the tests.
-        /// Value is set to TimeSpan.Zero incase of any error.
+        /// Value is set to TimeSpan.Zero in case of any error.
         /// </summary>
         [DataMember]
         public TimeSpan ElapsedTimeInRunningTests { get; private set; }
@@ -77,5 +77,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public IDictionary<string, object> Metrics { get; set; }
-    }    
+    }
 }

@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             return new TestLoggerManager(
                 requestData,
-                TestSessionMessageLogger.Instance, 
+                TestSessionMessageLogger.Instance,
                 new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
         }
 
@@ -231,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("TestEngine: Error occured while initializing ParallelExecution: {0}", ex);
+                EqtTrace.Error("TestEngine: Error occurred while initializing ParallelExecution: {0}", ex);
                 EqtTrace.Warning("TestEngine: Defaulting to Sequential Execution");
 
                 parallelLevelToUse = 1;
@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
-            // If running with the dotnet executable, then dont run in InProcess
+            // If running with the dotnet executable, then don't run in InProcess
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {

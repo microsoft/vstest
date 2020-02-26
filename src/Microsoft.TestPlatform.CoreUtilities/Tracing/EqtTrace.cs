@@ -341,7 +341,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(exceptionToTrace != null, "exceptionToTrace != null");
 
             // Write only if tracing for error is enabled.
-            // Done upfront to avoid perf hit.
+            // Done upfront to avoid performance hit.
             if (traceImpl.ShouldTrace(PlatformTraceLevel.Error))
             {
                 // Write at error level

@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Instance of the Test Discovery Extension Manager
         /// </returns>
         /// <remarks>
-        /// This would provide a discovery extension manager where extensions in 
+        /// This would provide a discovery extension manager where extensions in
         /// all the extension assemblies are discovered. This is cached.
         /// </remarks>
         public static TestDiscoveryExtensionManager Create()
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occured while loading extensions {0}", ex);
+                    EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
                 }
 
                 if (throwOnError)

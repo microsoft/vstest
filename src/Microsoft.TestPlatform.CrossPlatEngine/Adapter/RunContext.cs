@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public bool KeepAlive { get; internal set; }
 
         /// <summary>
-        /// Gets a value indicating whether the discovery or execution is happening in In-process or out-of-process.
+        /// Gets a value indicating whether the discovery or execution is happening in-process or out-of-process.
         /// </summary>
         public bool InIsolation { get; internal set; }
 

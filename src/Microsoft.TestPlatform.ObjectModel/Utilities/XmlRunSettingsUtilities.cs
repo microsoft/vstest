@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         }
 
         /// <summary>
-        /// Returns RunConfiguration from settingsXml. 
+        /// Returns RunConfiguration from settingsXml.
         /// </summary>
         /// <param name="settingsXml">The run settings.</param>
         /// <returns> The RunConfiguration node as defined in the settings xml.</returns>
@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         }
 
         /// <summary>
-        /// Returns whether in proc data collection is enabled in the parameter settings xml or not
+        /// Returns whether in-proc data collection is enabled in the parameter settings xml or not
         /// </summary>
         /// <param name="runSettingsXml"> The run Settings Xml. </param>
         /// <returns> True if data collection is enabled. </returns>
@@ -283,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                         return null;
                     }
 
-                    // Reached here => DC element present. 
+                    // Reached here => DC element present.
                     return DataCollectionRunSettings.FromXml(reader);
                 }
             }

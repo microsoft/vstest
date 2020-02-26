@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="context">Context to update with.</param>
         /// <remarks>
         /// Generally the data collection context is known in advance, however there
-        /// are cases around custom notifications where it is not necessiarly known
+        /// are cases around custom notifications where it is not necessarily known
         /// until the event is being sent.  This is used for updating the context when
         /// sending the event.
         /// </remarks>

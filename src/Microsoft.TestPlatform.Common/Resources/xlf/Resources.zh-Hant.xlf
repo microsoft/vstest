@@ -260,7 +260,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FastFilterException">
-        <source>An error occured while creating Fast filter.</source>
+        <source>An error occurred while creating Fast filter.</source>
         <target state="translated">建立快速篩選時發生錯誤。</target>
         <note />
       </trans-unit>

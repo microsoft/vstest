@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);            
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var trxFileNamePattern = "TestResults";
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
@@ -90,9 +90,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var trxFilePaths = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "TestResults"), trxFileNamePattern + "_net*.trx");
             Assert.IsTrue(trxFilePaths.Count() > 1);
-            
+
         }
-        
+
         [TestMethod]
         [NetCoreTargetFrameworkDataSource]
         public void HtmlLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)

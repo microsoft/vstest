@@ -588,7 +588,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
         }
 
-        #region implementation
+        #region Implementation
 
         /// <summary>
         /// Placing this before others so that at runtime this would be the first to be discovered as a discoverer.

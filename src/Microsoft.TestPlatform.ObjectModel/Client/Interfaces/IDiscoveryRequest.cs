@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// IDiscoverTestsRequest returned after calling GetDiscoveredTestsAsync 
+    /// IDiscoverTestsRequest returned after calling GetDiscoveredTestsAsync
     /// </summary>
     public interface IDiscoveryRequest : IRequest
     {
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         event EventHandler<DiscoveredTestsEventArgs> OnDiscoveredTests;
 
         /// <summary>
-        /// Handler for receiving error during fetching/execution. This is used for when abnormal error 
+        /// Handler for receiving error during fetching/execution. This is used for when abnormal error
         /// occurs; equivalent of IRunMessageLogger in the current RockSteady core
         /// </summary>
         event EventHandler<TestRunMessageEventArgs> OnDiscoveryMessage;

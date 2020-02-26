@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             Framework targetFramework = null;
             if (runConfiguration != null)
             {
-                // It will get target framework from runsettings 
+                // It will get target framework from runsettings
                 targetFramework = runConfiguration.TargetFramework;
             }
 

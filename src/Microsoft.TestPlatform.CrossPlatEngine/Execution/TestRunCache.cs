@@ -12,16 +12,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using ObjectModel.Client;
-    
+
     /// <summary>
     /// Maintains a cache of last 'n' test results and maintains stats for the complete run.
     /// </summary>
     internal class TestRunCache : ITestRunCache
     {
-        #region Private members 
+        #region Private Members
 
         /// <summary>
-        /// Specifies whether the object is disposed or not. 
+        /// Specifies whether the object is disposed or not.
         /// </summary>
         private bool isDisposed;
 
@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private long totalExecutedTests;
 
         /// <summary>
-        /// Callback used when cache is ready to report some test results/case. 
+        /// Callback used when cache is ready to report some test results/case.
         /// </summary>
         private OnCacheHit onCacheHit;
 
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ICollection<TestResult> testResults;
 
         /// <summary>
-        /// Sync object 
+        /// Sync object
         /// </summary>
         private object syncObject;
 
@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
         /// <summary>
-        /// Notifies the cache that a test is starting. 
+        /// Notifies the cache that a test is starting.
         /// This notification comes from the adapter to the engine which then calls into the cache.
         /// </summary>
         /// <param name="testCase"> The test Case. </param>
@@ -244,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Notifies the cache of a test completion.
         /// </summary>
         /// <param name="completedTest">
-        /// The completed Test. 
+        /// The completed Test.
         /// </param>
         /// <returns> True if this test has been removed from the list of in progress tests. </returns>
         public bool OnTestCompletion(TestCase completedTest)
@@ -306,7 +306,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </remarks>
         protected virtual void Dispose(bool disposing)
         {
-            // If you need thread safety, use a lock around these 
+            // If you need thread safety, use a lock around these
             // operations, as well as in your methods that use the resource.
             if (disposing && !this.isDisposed)
             {
@@ -332,7 +332,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             lock (this.syncObject)
             {
-                // Send results when the specified cache size has been reached or 
+                // Send results when the specified cache size has been reached or
                 // after the specified cache timeout has been hit.
                 var timeDelta = DateTime.Now - this.lastUpdate;
 
@@ -383,7 +383,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occured while checking for cache hit. {0}", ex);
+                        EqtTrace.Error("TestRunCache: OnCacheTimeHit: Exception occurred while checking for cache hit. {0}", ex);
                     }
                 }
             }

@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
 
-            // Default start and end time values for a test result are initialized to current timestamp
+            // Default start and end time values for a test result are initialized to current time stamp
             // to maintain compatibility.
             this.StartTime = DateTimeOffset.UtcNow;
             this.EndTime = DateTimeOffset.UtcNow;

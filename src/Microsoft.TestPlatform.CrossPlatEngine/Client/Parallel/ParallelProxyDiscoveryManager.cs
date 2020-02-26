@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private DiscoveryCriteria actualDiscoveryCriteria;
 
         private IEnumerator<string> sourceEnumerator;
-        
+
         private ITestDiscoveryEventsHandler2 currentDiscoveryEventsHandler;
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
@@ -108,8 +108,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             var allDiscoverersCompleted = false;
             lock (this.discoveryStatusLockObject)
             {
-                // Each concurrent Executor calls this method 
-                // So, we need to keep track of total discoverycomplete calls
+                // Each concurrent Executor calls this method
+                // So, we need to keep track of total discovery complete calls
                 this.discoveryCompletedClients++;
 
                 // If there are no more sources/testcases, a parallel executor is truly done with discovery
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             this.currentDiscoveryEventsHandler = discoveryEventsHandler;
 
-            // Reset the discoverycomplete data
+            // Reset the discovery complete data
             this.discoveryCompletedClients = 0;
 
             // One data aggregator per parallel discovery

@@ -100,7 +100,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// GetDumpFile will wait for procdump process to exit before getting file
+        /// GetDumpFile will wait for proc dump process to exit before getting file
         /// </summary>
         [TestMethod]
         public void GetDumpFileWillWaitForProcessToExitAndGetDumpFile()
@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// StartProcessDump should start procdump binary with correct arguments, while GetDumpFile returns full path
+        /// StartProcessDump should start proc dump binary with correct arguments, while GetDumpFile returns full path
         /// </summary>
         [TestMethod]
         public void StartProcessDumpWillStartProcDumpExeWithCorrectParamsAndGetDumpFileReturnsFullPath()
@@ -163,7 +163,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// StartProcessDump should start procdump binary with correct full dump arguments, while GetDumpFile returns full path
+        /// StartProcessDump should start proc dump binary with correct full dump arguments, while GetDumpFile returns full path
         /// </summary>
         [TestMethod]
         public void StartProcessDumpWillStartProcDumpExeWithCorrectParamsForFullDump()
@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// StartProcessDump should start procdump binary with correct arguments for hang based dump, while GetDumpFile returns full path
+        /// StartProcessDump should start proc dump binary with correct arguments for hang based dump, while GetDumpFile returns full path
         /// </summary>
         [TestMethod]
         public void StartProcessDumpForHangWillStartProcDumpExeWithCorrectParams()

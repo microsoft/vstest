@@ -35,9 +35,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #endregion
 
         #region Constructor
-        
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestHostLaunchedEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestHostLaunchedEventArgs"/> class.
         /// </summary>
         /// <param name="context">
         /// Data collection context

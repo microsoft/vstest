@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void Stop(Exception error)
         {
-            EqtTrace.Info("SocketServer.PrivateStop: Stopp server endPoint: {0} error: {1}", this.endPoint, error);
+            EqtTrace.Info("SocketServer.PrivateStop: Stop server endPoint: {0} error: {1}", this.endPoint, error);
 
             if (!this.stopped)
             {

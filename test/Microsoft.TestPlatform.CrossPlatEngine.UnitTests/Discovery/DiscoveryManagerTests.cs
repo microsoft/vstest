@@ -238,7 +238,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             //Act
             this.discoveryManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);
 
-            //when handler instance returns warning              
+            //when handler instance returns warning
             sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once");
 
             // Verify.

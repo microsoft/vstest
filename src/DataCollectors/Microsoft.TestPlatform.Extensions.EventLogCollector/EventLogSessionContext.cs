@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     using System.Collections.Generic;
 
     /// <summary>
-    /// Stores the start and end index for EventLogEntries correspoinding to a data collection session.
+    /// Stores the start and end index for EventLogEntries corresponding to a data collection session.
     /// </summary>
     internal class EventLogSessionContext
     {

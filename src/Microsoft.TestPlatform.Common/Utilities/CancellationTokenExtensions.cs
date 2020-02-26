@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     public static class CancellationTokenExtensions
     {
         /// <summary>
-        /// Extension method used to throw TestPlatformException in case operation is cancelled.
+        /// Extension method used to throw TestPlatformException in case operation is canceled.
         /// </summary>
         /// <param name="token">CancellationToken on which cancel is requested</param>
         public static void ThrowTestPlatformExceptionIfCancellationRequested(this CancellationToken token)

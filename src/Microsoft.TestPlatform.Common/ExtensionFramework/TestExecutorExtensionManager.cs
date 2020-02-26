@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// Manages the the Test Executor extensions.
+    /// Manages the Test Executor extensions.
     /// </summary>
     internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
     {
@@ -132,8 +132,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 foreach (var executor in executorExtensionManager.TestExtensions)
                 {
-                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to 
-                    // call executor.Value even if logging is not enabled. 
+                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to
+                    // call executor.Value even if logging is not enabled.
                     EqtTrace.Verbose("TestExecutorExtensionManager: Loading executor {0}", executor.Value);
                 }
             }
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 if (EqtTrace.IsErrorEnabled)
                 {
                     EqtTrace.Error(
-                        "TestExecutorExtensionManager: LoadAndInitialize: Exception occured while loading extensions {0}",
+                        "TestExecutorExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}",
                         ex);
                 }
 

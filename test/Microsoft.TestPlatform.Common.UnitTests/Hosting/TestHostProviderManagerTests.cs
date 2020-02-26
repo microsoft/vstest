@@ -148,7 +148,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
         }
 
-        #region implementations
+        #region Implementations
 
         [ExtensionUri("executor://DesktopTestHost")]
         [FriendlyName("DesktopTestHost")]

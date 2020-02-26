@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// Argument Executor which handles adding the source provided to the TestManager.
     /// </summary>
     internal class TestSourceArgumentExecutor : IArgumentExecutor
-    {        
+    {
         #region Fields
 
         /// <summary>

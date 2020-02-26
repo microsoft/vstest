@@ -33,13 +33,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                                                                                           </RunConfiguration>";
 
         /// <summary>
-        /// This will update the RunSetting with MaxCpuCount 0 if RunSetting doesnt configured with this setting.
+        /// This will update the RunSetting with MaxCpuCount 0 if RunSetting doesn't configured with this setting.
         /// </summary>
         /// <param name="runSettingsDocument">RunSetting file.</param>
         public static void UpdateRunSettingsWithParallelSettingIfNotConfigured(XPathNavigator navigator)
         {
             var node = navigator.SelectSingleNode(XpathOfMaxCpuCount);
-            // run settings given by user takes precendence over parallel switch
+            // run settings given by user takes precedence over parallel switch
             if (node == null)
             {
                 var runConfigurationNavigator = navigator.SelectSingleNode(XpathOfRunConfiguration);

@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             this.KeepAlive = keepAlive;
             this.IsDataCollectionEnabled = isDataCollectionEnabled;
             this.AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
-            
+
             this.IsDebug = isDebug;
 
             this.HasTestRun = hasTestRun;
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
         }
 
         /// <summary>
-        /// Gets or sets a configuration associated with this run. 
+        /// Gets or sets a configuration associated with this run.
         /// </summary>
         /// <remarks>It is not serialized over <c>wcf </c> as the information is available in the run settings</remarks>
         [IgnoreDataMember]

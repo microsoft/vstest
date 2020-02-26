@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri dataCollectorUri, string friendlyName);
 
         /// <summary>
-        /// Stops processing further transfer requests as test run is cancelled.
+        /// Stops processing further transfer requests as test run is canceled.
         /// </summary>
         void Cancel();
     }

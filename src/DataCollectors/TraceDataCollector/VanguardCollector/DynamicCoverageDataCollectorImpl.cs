@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.Coverage
         private const string ConfigCodeCoverageElementName = "CodeCoverage";
 
         /// <summary>
-        /// File name which conatins config for vanguard process.
+        /// File name which contains config for vanguard process.
         /// </summary>
         private const string VanguardConfigFileName = "CodeCoverage.config";
 

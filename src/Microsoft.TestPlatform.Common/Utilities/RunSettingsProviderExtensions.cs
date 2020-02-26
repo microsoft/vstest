@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Text.RegularExpressions;
 
     /// <summary>
-    /// Utilities to get the run settings from the provider and the commandline options specified.
+    /// Utilities to get the run settings from the provider and the command line options specified.
     /// </summary>
     internal static class RunSettingsProviderExtensions
     {

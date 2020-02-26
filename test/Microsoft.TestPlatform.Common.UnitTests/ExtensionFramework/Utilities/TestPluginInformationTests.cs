@@ -7,7 +7,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
+
 
     [TestClass]
     public class TestPluginInformationTests

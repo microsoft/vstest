@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Calculates a hash of the string and copies the first 128 bits of the hash
         /// to a new Guid.
         /// </summary>
-        [SuppressMessage("Microsoft.Cryptographic.Standard", "CA5354:SHA1CannotBeUsed", Justification = "Hash Algorithm is used only to gererate unique testcase id.")]
+        [SuppressMessage("Microsoft.Cryptographic.Standard", "CA5354:SHA1CannotBeUsed", Justification = "Hash Algorithm is used only to generate unique testcase id.")]
         public static Guid GuidFromString(string data)
         {
             Debug.Assert(data != null);

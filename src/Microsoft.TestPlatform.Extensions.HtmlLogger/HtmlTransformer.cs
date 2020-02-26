@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     using System.Xml.Xsl;
 
     /// <summary>
-    /// Html transformer transforms the xml file to html file using xslt file.  
+    /// Html transformer transforms the xml file to html file using xslt file.
     /// </summary>
     internal class HtmlTransformer : IHtmlTransformer
     {

@@ -327,7 +327,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is ArgumentException);
-                Assert.AreEqual("An error occured while creating Fast filter.", ex.Message);
+                Assert.AreEqual("An error occurred while creating Fast filter.", ex.Message);
             }
         }
 

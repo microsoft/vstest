@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         {
                             EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
 
-                            // Rethrow FileLoadException, because this exception means that the assembly
+                            // Re-throw FileLoadException, because this exception means that the assembly
                             // was found, but could not be loaded. This will allow us to report a more
                             // specific error message to the user for things like access denied.
                             throw;

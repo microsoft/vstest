@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Reflection;
 
     /// <summary>
-    /// Does the real work of finding references using Assembly.ReflectionOnlyLoadFrom. 
+    /// Does the real work of finding references using Assembly.ReflectionOnlyLoadFrom.
     /// The caller is supposed to create AppDomain and create instance of given class in there.
     /// </summary>
     internal class AssemblyLoadWorker : MarshalByRefObject
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Get the target dot net framework string for the assembly
         /// </summary>
         /// <param name="path">Path of the assembly file</param>
-        /// <returns> String representation of the the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+        /// <returns> String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
         public string GetTargetFrameworkVersionStringFromPath(string path)
         {
             if (!File.Exists(path))
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Get the target dot net framework string for the assembly
         /// </summary>
         /// <param name="assembly">Assembly</param>
-        /// <returns>String representation of the the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
+        /// <returns>String representation of the target dot net framework e.g. .NETFramework,Version=v4.0 </returns>
         internal static string GetTargetFrameworkStringFromAssembly(Assembly assembly)
         {
             var dotNetVersion = string.Empty;
@@ -77,8 +77,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
         /// <summary>
         /// Returns the full name of the referenced assemblies by the assembly on the specified path.
-        /// 
-        /// Returns null on failure and an empty array if there is no reference in the project. 
+        ///
+        /// Returns null on failure and an empty array if there is no reference in the project.
         /// </summary>
         /// <param name="path">Path to the assembly file to load from.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Being created in a separate app-domain"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -89,9 +89,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             Assembly a = null;
             try
             {
-                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the 
-                // specified path only and does not let code to be executed by the assembly 
-                // in the loaded context. 
+                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
+                // specified path only and does not let code to be executed by the assembly
+                // in the loaded context.
                 a = Assembly.ReflectionOnlyLoadFrom(path);
             }
             catch
@@ -119,19 +119,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             Assembly a = null;
             try
             {
-                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the 
-                // specified path only and does not let code to be executed by the assembly 
-                // in the loaded context. 
+                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
+                // specified path only and does not let code to be executed by the assembly
+                // in the loaded context.
                 //
                 a = Assembly.ReflectionOnlyLoadFrom(path);
-                
+
                 Debug.Assert(a != null);
 
                 AssemblyName[] assemblies = a.GetReferencedAssemblies();
 
                 foreach (AssemblyName referencedAssembly in assemblies)
                 {
-                    // Check without version. Only name and publikey token.
+                    // Check without version. Only name and public key token.
                     if (string.Compare(referencedAssembly.Name, referenceAssemblyName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         byte[] publicKeyToken1 = referencedAssembly.GetPublicKeyToken();
@@ -179,19 +179,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             procArchType = Architecture.Default.ToString();
             frameworkVersion = String.Empty;
-            
+
             try
             {
-                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the 
-                // specified path only and does not let code to be executed by the assembly 
-                // in the loaded context. 
+                // ReflectionOnlyLoadFrom does not use the probing paths and loads from the
+                // specified path only and does not let code to be executed by the assembly
+                // in the loaded context.
 
                 var a = Assembly.ReflectionOnlyLoadFrom(path);
                 Debug.Assert(a != null);
                 PortableExecutableKinds peKind;
                 ImageFileMachine machine;
                 a.ManifestModule.GetPEKind(out peKind, out machine);
-                
+
                 // conversion to string type is needed for below reason
                 // -- PortableExecutableKinds.Preferred32Bit and ImageFileMachine.ARM is available only
                 //    in .Net4.0 and above. Below code is compiled with .Net3.5 but runs in .Net4.0
@@ -237,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 frameworkVersion = a.ImageRuntimeVersion.Substring(0, 4).ToUpperInvariant();
 
                 // ImageRuntimeVersion for v4.0 & v4.5 are same and it return v4.0
-                // Since there is behaviourial differnece in both its important to differentiate them
+                // Since there is behavioral difference in both its important to differentiate them
                 // Using TargetFrameworkAttribute for the purpose.
                 if (string.Equals(frameworkVersion, "v4.0", StringComparison.OrdinalIgnoreCase))
                 {
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             const int IMAGE_FILE_MACHINE_ARM = 0x01c0;  // ARM Little-Endian
             const int IMAGE_FILE_MACHINE_THUMB = 0x01c2;  // ARM Thumb/Thumb-2 Little-Endian
             const int IMAGE_FILE_MACHINE_ARMNT = 0x01c4; // ARM Thumb-2 Little-Endian
-            
+
             try
             {
                 //get the input stream
@@ -316,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                         fs.Position = peHeader;
 
                         UInt32 signature = reader.ReadUInt32(); //peHeaderSignature
-                        // 0x00004550 is the letters "PE" followed by two terminating zeroes.
+                        // 0x00004550 is the letters "PE" followed by two terminating zeros.
                         if (signature != 0x00004550)
                         {
                             validImage = false;
@@ -324,7 +324,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                         if (validImage)
                         {
-                            //Read the image file header header.
+                            //Read the image file header.
                             machine = reader.ReadUInt16();
                             reader.ReadUInt16(); //NumberOfSections
                             reader.ReadUInt32(); //TimeDateStamp

@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// The test engine.
         /// </param>
         /// <param name="filehelper">
-        /// The filehelper.
+        /// The file helper.
         /// </param>
         /// <param name="testHostProviderManager">
         /// The data.

@@ -24,19 +24,19 @@ namespace Microsoft.TestPlatform.Protocol
         public dynamic TestCases { get; set; }
 
         /// <summary>
-        /// Gets or sets the settings used for the test run request. 
+        /// Gets or sets the settings used for the test run request.
         /// </summary>
         [DataMember]
         public string RunSettings { get; set; }
 
         /// <summary>
-        /// Settings used for the Run request. 
+        /// Settings used for the Run request.
         /// </summary>
         [DataMember]
         public bool KeepAlive { get; set; }
 
         /// <summary>
-        /// Is Debugging enabled 
+        /// Is Debugging enabled
         /// </summary>
         [DataMember]
         public bool DebuggingEnabled { get; set; }

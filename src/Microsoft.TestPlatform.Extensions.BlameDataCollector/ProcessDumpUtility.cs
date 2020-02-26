@@ -81,7 +81,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Error("ProcessDumpUtility.GetDumpFile: No dump file generated.");
                 if (this.processHelper.TryGetExitCode(this.procDumpProcess, out exitCode))
                 {
-                    EqtTrace.Error("ProcessDumpUtility.GetDumpFile: Procdump exited with code: {0}", exitCode);
+                    EqtTrace.Error("ProcessDumpUtility.GetDumpFile: Proc dump exited with code: {0}", exitCode);
                 }
             }
 
@@ -102,7 +102,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info($"ProcessDumpUtility : The procdump argument is {procDumpArgs}");
+                EqtTrace.Info($"ProcessDumpUtility : The proc dump argument is {procDumpArgs}");
             }
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -128,7 +128,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info($"ProcessDumpUtility : The hang based procdump invocation argument is {procDumpArgs}");
+                EqtTrace.Info($"ProcessDumpUtility : The hang based proc dump invocation argument is {procDumpArgs}");
             }
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -162,12 +162,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
-        /// Get procdump executable path
+        /// Get proc dump executable path
         /// </summary>
         /// <param name="processId">
         /// Process Id
         /// </param>
-        /// <returns>procdump executable path</returns>
+        /// <returns>proc dump executable path</returns>
         private string GetProcDumpExecutable(int processId)
         {
             var procdumpPath = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
@@ -176,7 +176,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 string filename = string.Empty;
 
-                // Launch procdump according to process architecture
+                // Launch proc dump according to process architecture
                 if (this.environment.Architecture == PlatformArchitecture.X86)
                 {
                     filename = Constants.ProcdumpProcess;
@@ -191,7 +191,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("Using procdump at: {0}", procDumpExe);
+                    EqtTrace.Verbose("Using proc dump at: {0}", procDumpExe);
                 }
 
                 return procDumpExe;

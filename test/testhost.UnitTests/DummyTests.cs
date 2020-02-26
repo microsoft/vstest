@@ -9,7 +9,7 @@ namespace testhost.UnitTests
     public class DummyTests
     {
         /// <summary>
-        /// This test is added as atleast one test is required for dotnet core tfm for test scripts to succeed.
+        /// This test is added as at least one test is required for dotnet core tfm for test scripts to succeed.
         /// </summary>
         [TestMethod]
         public void DummyUnitTest()

@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Gets the singleton instance of DataCollectionTestCaseEventSender.
         /// </summary>
-        // todo : Refactor to pass the instance as singleton.
+        // TODO : Re-factor to pass the instance as singleton.
         public static DataCollectionTestCaseEventSender Instance { get; private set; }
 
         /// <summary>

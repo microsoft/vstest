@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
+        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
         /// </summary>
         /// <param name="requestData"></param>
         /// <param name="requestSender">Request Sender instance.</param>
@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="cancellationToken">
         /// </param>
         /// <returns>
-        /// Returns true if Communation is established b/w runner and host
+        /// Returns true if Communication is established b/w runner and host
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
         {
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
                 if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
-                    new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) && 
+                    new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
                     !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
 
-                // please clean up test host. 
+                // please clean up test host.
                 this.testHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
 
                 this.testHostManager.HostExited -= this.TestHostManagerHostExited;
@@ -238,11 +238,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         /// <summary>
-        /// This method is exposed to enable drived classes to modify TestProcessStartInfo. E.g. DataCollection need additional environment variables to be passed, etc.  
+        /// This method is exposed to enable derived classes to modify TestProcessStartInfo. E.g. DataCollection need additional environment variables to be passed, etc.
         /// </summary>
         /// <param name="testProcessStartInfo">
         /// The sources.
-        /// </param>        
+        /// </param>
         /// <returns>
         /// The <see cref="TestProcessStartInfo"/>.
         /// </returns>
@@ -274,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// This function will remove the unknown runsettings node from runsettings for old testhost who throws exception for unknown node.
         /// </summary>
         /// <param name="runsettingsXml">runsettings string</param>
-        /// <returns>runsetting after removing unrequired nodes</returns>
+        /// <returns>runsetting after removing un-required nodes</returns>
         protected string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
         {
             var updatedRunSettingsXml = runsettingsXml;
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Failed to launch testhost process.
             var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
-            // Testhost launched but Timeout occured due to machine slowness.
+            // Testhost launched but Timeout occurred due to machine slowness.
             if (this.testHostLaunched)
             {
                 errorMsg = string.Format(

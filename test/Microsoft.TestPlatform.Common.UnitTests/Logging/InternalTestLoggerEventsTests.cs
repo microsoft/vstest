@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
         [TestMethod]
         public void RaiseTestRunMessageShouldNotThrowExceptionIfNoEventHandlersAreRegistered()
         {
-            // Send the test mesage event.
+            // Send the test message event.
             loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational,"This is a string."));
         }
 
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
             };
 
             loggerEvents.EnableEvents();
-            // Send the test mesage event.
+            // Send the test message event.
             loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, message));
 
             var waitSuccess = waitHandle.WaitOne(500);
@@ -266,7 +266,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
             });
         }
 
-        /// <summary> 
+        /// <summary>
         /// Exception should be thrown if discovered tests event args is null.
         /// </summary>
         [TestMethod]

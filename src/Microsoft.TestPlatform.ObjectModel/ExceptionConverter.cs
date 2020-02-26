@@ -36,11 +36,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// This method converts WCF fault exception to a strongly-typed exception
         /// </summary>
         /// <param name="faultEx">FaultException</param>
-        /// <returns>strongly typed excetption that is wrapped in Fault Exception</returns>
+        /// <returns>strongly typed exception that is wrapped in Fault Exception</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         public static Exception ConvertException(FaultException faultEx)
         {
-            ValidateArg.NotNull(faultEx, "faultEx");            
+            ValidateArg.NotNull(faultEx, "faultEx");
             if (faultEx.Code == null || faultEx.Code.Name == null)
             {
                 return new TestPlatformException(faultEx.Message, faultEx);
@@ -49,10 +49,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Creates a strontly-typed exception that is represented by the exception name 
+        /// Creates a strongly-typed exception that is represented by the exception name
         /// passed as parameter
         /// </summary>
-        /// <param name="exceptionType">Exception type classname</param>
+        /// <param name="exceptionType">Exception type class name</param>
         /// <param name="message">message of exception</param>
         /// <param name="innerException">actual exception that is to be wrapped</param>
         /// <returns>actual exception that is represented by the exception name</returns>

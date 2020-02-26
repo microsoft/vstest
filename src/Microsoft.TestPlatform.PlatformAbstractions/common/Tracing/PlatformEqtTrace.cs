@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             TraceLevel = this.MapPlatformTraceToTrace(platformTraceLevel);
             Source.Switch.Level = TraceSourceLevelsMap[TraceLevel];
 
-            // Ensure trace is initlized
+            // Ensure trace is initialized
             return EnsureTraceIsInitialized();
         }
 
@@ -382,7 +382,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 if (args != null && args.Length != 0)
                 {
                     // Leave the extension if specified, otherwise don't add it (e.g. case a.exe.exe).
-                    // It seems that if .exe suffix is not specified Framework adds .EXE to agrs[0].
+                    // It seems that if .exe suffix is not specified Framework adds .EXE to args[0].
                     processName = Path.GetFileName(args[0]);
                 }
 

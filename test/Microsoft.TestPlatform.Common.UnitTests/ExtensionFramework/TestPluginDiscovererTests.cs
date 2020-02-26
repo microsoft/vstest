@@ -144,7 +144,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.That.DoesNotThrow(() =>this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions));
         }
 
-        #region implementations
+        #region Implementations
 
         #region Discoverers
 

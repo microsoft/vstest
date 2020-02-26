@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Initializes the tracing with custom log file and trace level.
         /// Overrides if any trace is set before.
         /// </summary>
-        /// <param name="customLogFile">Customr log file for trace messages.</param>
+        /// <param name="customLogFile">Custom log file for trace messages.</param>
         /// <param name="traceLevel">Trace level.</param>
         /// <returns>Trace initialized flag.</returns>
         bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel);
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         string GetLogFile();
 
         /// <summary>
-        /// Sets platfrom specific trace value for tracing verbosity.
+        /// Sets platform specific trace value for tracing verbosity.
         /// </summary>
         /// <param name="value">
         /// The value.
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         void SetTraceLevel(PlatformTraceLevel value);
 
         /// <summary>
-        /// Gets platfrom specific trace value for tracing verbosity.
+        /// Gets platform specific trace value for tracing verbosity.
         /// </summary>
         /// <returns>
         /// The <see cref="PlatformTraceLevel"/>.

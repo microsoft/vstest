@@ -16,9 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     internal class DiscoveryResultCache
     {
         #region private members
-        
+
         /// <summary>
-        /// Callback used when cache is full. 
+        /// Callback used when cache is full.
         /// </summary>
         private OnReportTestCases onReportTestCases;
 
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private List<TestCase> tests;
 
         /// <summary>
-        /// Sync object 
+        /// Sync object
         /// </summary>
         private object syncObject = new object();
 
@@ -74,12 +74,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.tests = new List<TestCase>();
             this.totalDiscoveredTests = 0;
         }
-        
+
         /// <summary>
         /// Called when the cache is ready to report some discovered test cases.
         /// </summary>
         public delegate void OnReportTestCases(ICollection<TestCase> tests);
-        
+
         /// <summary>
         /// Gets the tests present in the cache currently
         /// </summary>
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 this.tests.Add(test);
                 this.totalDiscoveredTests++;
 
-                // Send test cases when the specified cache size has been reached or 
+                // Send test cases when the specified cache size has been reached or
                 // after the specified cache timeout has been hit.
                 var timeDelta = DateTime.Now - this.lastUpdate;
                 if (this.tests.Count >= this.cacheSize || (timeDelta > this.cacheTimeout && this.tests.Count > 0))

@@ -163,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task SetupClientAsync(IPEndPoint endpoint)
         {
-            // ToDo: pass cancellationtoken, if user cancels the operation, so we don't wait 50 secs to connect
+            // TODO: pass cancellation token, if user cancels the operation, so we don't wait 50 secs to connect
             // for now added a check for validation of this.tcpclient
             this.clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
