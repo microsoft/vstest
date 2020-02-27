@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
 
@@ -160,12 +161,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (!(this.testRunEventsHandler is ITestRunEventsHandler2))
+            var handler = this.testRunEventsHandler as ITestRunEventsHandler2;
+            if (handler == null)
             {
-                throw new NotSupportedException("Operation not supported by the current run events handler.");
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    "AttachDebuggerToProcess is only supported in ITestRunEventsHandler2, but it was called with {0}.",
+                    this.testRunEventsHandler.GetType()));
             }
 
-            return (this.testRunEventsHandler as ITestRunEventsHandler2).AttachDebuggerToProcess(pid);
+            return handler.AttachDebuggerToProcess(pid);
         }
 
         /// <summary>

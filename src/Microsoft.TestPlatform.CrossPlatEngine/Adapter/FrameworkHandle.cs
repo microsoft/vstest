@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Globalization;
     using Execution;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -117,12 +117,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             {
                 throw new ArgumentOutOfRangeException("PID cannot be negative.");
             }
-            if (!(this.testRunEventsHandler is ITestRunEventsHandler2))
+            if (pid == 0)
             {
-                throw new NotSupportedException("Operation not supported by the current run events handler.");
+                EqtTrace.Warning("Should not attach to process with id 0.");
+                return false;
             }
 
-            return (this.testRunEventsHandler as ITestRunEventsHandler2).AttachDebuggerToProcess(pid);
+            var handler = this.testRunEventsHandler as ITestRunEventsHandler2;
+            if (handler == null)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    "AttachDebuggerToProcess is only supported in ITestRunEventsHandler2, but it was called with {0}.",
+                    this.testRunEventsHandler.GetType()));
+            }
+
+            return handler.AttachDebuggerToProcess(pid);
         }
 
         public void Dispose()

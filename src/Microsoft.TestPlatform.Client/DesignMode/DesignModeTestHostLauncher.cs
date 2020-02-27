@@ -33,6 +33,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         }
 
         /// <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            return this.designModeClient.AttachDebuggerToProcess(pid, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
         {
             return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, CancellationToken.None);

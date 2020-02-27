@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-
+    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -178,12 +178,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (!(this.actualRunEventsHandler is ITestRunEventsHandler2))
+            var handler = this.actualRunEventsHandler as ITestRunEventsHandler2;
+            if (handler == null)
             {
-                throw new NotSupportedException("Operation not supported by the current run events handler.");
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    "AttachDebuggerToProcess is only supported in ITestRunEventsHandler2, but it was called with {0}.",
+                    this.actualRunEventsHandler.GetType()));
             }
 
-            return (this.actualRunEventsHandler as ITestRunEventsHandler2).AttachDebuggerToProcess(pid);
+            return handler.AttachDebuggerToProcess(pid);
         }
 
         private void ConvertToRawMessageAndSend(string messageType, object payload)
