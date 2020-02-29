@@ -130,7 +130,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsTrue(testExtensions.Count() > 0);
         }
 
-        #region implementations
+        #region Implementations
 
         private abstract class AbstractDummyLogger : ITestLogger
         {

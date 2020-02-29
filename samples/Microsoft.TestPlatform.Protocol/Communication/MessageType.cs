@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.Protocol
         /// The discovery started.
         /// </summary>
         public const string StartDiscovery = "TestDiscovery.Start";
-       
+
         /// <summary>
         /// The test cases found.
         /// </summary>
@@ -104,12 +104,12 @@ namespace Microsoft.TestPlatform.Protocol
         public const string GetTestRunnerProcessStartInfoForRunSelected = "TestExecution.GetTestRunnerProcessStartInfoForRunSelected";
 
         /// <summary>
-        /// CustomTestHostLaunch 
+        /// CustomTestHostLaunch
         /// </summary>
         public const string CustomTestHostLaunch = "TestExecution.CustomTestHostLaunch";
 
         /// <summary>
-        /// Custom Test Host launch callback 
+        /// Custom Test Host launch callback
         /// </summary>
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.Protocol
         public const string ExtensionsInitialize = "Extensions.Initialize";
 
         /// <summary>
-        /// Start Test Run All Sources 
+        /// Start Test Run All Sources
         /// </summary>
         public const string TestRunAllSourcesWithDefaultHost = "TestExecution.RunAllWithDefaultHost";
 

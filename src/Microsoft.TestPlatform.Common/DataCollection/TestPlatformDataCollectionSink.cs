@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     internal class TestPlatformDataCollectionSink : DataCollectionSink
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionSink"/> class. 
+        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionSink"/> class.
         /// Creates a data collector sink for data transfer.
         /// </summary>
         /// <param name="attachmentManager">

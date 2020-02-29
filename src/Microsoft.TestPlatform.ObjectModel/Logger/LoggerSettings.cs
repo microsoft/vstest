@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
             }
 
-            // Check for required atttributes.
+            // Check for required attributes.
             if (string.IsNullOrWhiteSpace(settings.FriendlyName) &&
                 string.IsNullOrWhiteSpace(settings.Uri?.ToString()) &&
                 string.IsNullOrWhiteSpace(settings.AssemblyQualifiedName))

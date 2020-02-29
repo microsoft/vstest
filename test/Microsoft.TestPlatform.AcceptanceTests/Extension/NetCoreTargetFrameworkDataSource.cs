@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     /// <summary>
     /// The attribute defining runner framework, target framework and target runtime for netcoreapp1.*
-    /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests. 
+    /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests.
     /// If runner framework is net46 then vstest.console.exe will run the tests.
     /// Second argument (target framework) = The framework for which test will run
     /// </summary>
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 this.dataRows.Add(new object[]
                 {
-                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
+                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
                 });
             }
 
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 this.dataRows.Add(new object[]
                 {
-                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
+                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
                 });
             }
         }

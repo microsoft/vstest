@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class.
         /// </summary>
         /// <param name="context">
         /// Context information for the test case
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class.
         /// </summary>
         /// <param name="context">
         /// Context information for the test case
@@ -66,11 +66,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             // NOTE: ONLY USE FOR UNIT TESTING!
             //  This overload is only here for 3rd parties to use for unit testing
             //  their data collectors.  Internally we should not be passing the test element
-            //  around in the events as this is extra information that needs to be seralized
+            //  around in the events as this is extra information that needs to be serialized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
 
-            // todo
+            // TODO
             // EqtAssert.ParameterNotNull(testElement, "testElement");
 
             this.TestElement = testElement;
@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     [DataContract]
     public sealed class TestCaseStartEventArgs : TestCaseEventArgs
     {
-        #region Constructor       
+        #region Constructor
 
         /// <summary>
         /// Default constructor for serialization/deserialization
@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class.
         /// Initializes the instance by storing the given information.
         /// </summary>
         /// <param name="context">
@@ -170,13 +170,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             // NOTE: ONLY USE FOR UNIT TESTING!
             //  This overload is only here for 3rd parties to use for unit testing
             //  their data collectors.  Internally we should not be passing the test element
-            //  around in the events as this is extra information that needs to be seralized
+            //  around in the events as this is extra information that needs to be serialized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class.
         /// Initializes the instance by storing the given information
         /// </summary>
         /// <param name="context">
@@ -229,14 +229,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         /// <remarks>
         /// Default constructor with default DataCollectionContext.
-        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
         /// </remarks>
         public TestCaseEndEventArgs(TestCase testElement, TestOutcome testOutcome) : this(new DataCollectionContext(new SessionId(Guid.Empty)), testElement, testOutcome)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class.
         /// Initializes the instance by storing the given information.
         /// </summary>
         /// <param name="context">
@@ -257,14 +257,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             // NOTE: ONLY USE FOR UNIT TESTING!
             //  This overload is only here for 3rd parties to use for unit testing
             //  their data collectors.  Internally we should not be passing the test element
-            //  around in the events as this is extra information that needs to be seralized
+            //  around in the events as this is extra information that needs to be serialized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
             this.TestOutcome = testOutcome;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class.
         /// </summary>
         /// <param name="context">
         /// Context information for the test case
@@ -288,7 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class.
         /// Initializes the instance by storing the given information
         /// </summary>
         /// <param name="context">
@@ -357,7 +357,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         /// <remarks>
         /// Default constructor with default DataCollectionContext.
-        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
         /// </remarks>
         public TestResultEventArgs(TestResult testResult)
             : this(new DataCollectionContext(new SessionId(Guid.Empty)), testResult)
@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class.
         /// Initializes the instance by storing the given information.
         /// </summary>
         /// <param name="context">
@@ -382,14 +382,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             // NOTE: ONLY USE FOR UNIT TESTING!
             //  This overload is only here for 3rd parties to use for unit testing
             //  their data collectors.  Internally we should not be passing the test element
-            //  around in the events as this is extra information that needs to be seralized
+            //  around in the events as this is extra information that needs to be serialized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
             this.TestResult = testResult;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class.
         /// Initializes the instance by storing the given information
         /// </summary>
         /// <param name="context">

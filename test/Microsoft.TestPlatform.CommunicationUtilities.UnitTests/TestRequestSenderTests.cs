@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var port = this.SetupFakeCommunicationChannel();
 
-            Assert.AreEqual(port, "123", "Correct port must be returned.");
+            Assert.AreEqual("123", port, "Correct port must be returned.");
         }
 
         [TestMethod]

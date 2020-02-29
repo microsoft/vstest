@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestFrameworkVersion)" />
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestAdapterVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkPreviousVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System.Runtime" />

@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occured while creating Fast filter..
+        ///   Looks up a localized string similar to An error occurred while creating Fast filter..
         /// </summary>
         internal static string FastFilterException {
             get {

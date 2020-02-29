@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         public ConcurrentDictionary<Guid, ObjectModel.TestResult> Results { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ConcurrentDictionary<string, TestResultCollection> ResultCollectionDictionary { get; private set; }
 

@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
-            // Microsoft.VisualStudio.Coverage.Analysis assembly not avaialble for .NET Core.
+            // Microsoft.VisualStudio.Coverage.Analysis assembly not available for .NET Core.
 #if NET451
             this.ValidateCoverageData(actualCoverageFile);
 #endif
@@ -160,7 +160,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
                 var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
                 Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
-                    "runDeploymentRoot attatribute not found in trx file:{0}", trxFilePath);
+                    "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
                 var collectors = doc.GetElementsByTagName("Collector");
 
                 string fileName = string.Empty;
@@ -183,7 +183,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private bool SkipIfRuningInCI(string message)
         {
             // Setting Console.ForegroundColor to newColor which will be used to determine whether
-            // test command output is redirecting to file or writting to console.
+            // test command output is redirecting to file or writing to console.
             // If command output is redirecting to file, then Console.ForegroundColor can't be modified.
             // So that tests which assert Console.ForegroundColor should not run.
             var previousColor = Console.ForegroundColor;

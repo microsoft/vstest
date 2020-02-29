@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BasicTransferInformation"/> class. 
+        /// Initializes a new instance of the <see cref="BasicTransferInformation"/> class.
         /// </summary>
         /// <param name="context">
         /// The data collection context for the transfer.
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         public RequestId RequestId { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether cleanup should be performed after transferring the resource.  This 
+        /// Gets a value indicating whether cleanup should be performed after transferring the resource. This
         /// can be known by different names in the derived classes so it is protected internal
         /// so that we can refer to it in a consistent way.
         /// </summary>
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Gets the name of the file to use on the client machine.  This 
+        /// Gets the name of the file to use on the client machine. This
         /// can be known by different names in the derived classes so it is protected internal
         /// so that we can refer to it in a consistent way.
         /// </summary>

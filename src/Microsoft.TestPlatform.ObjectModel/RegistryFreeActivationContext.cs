@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private string manifestFilePath = string.Empty;
 
         /// <summary>
-        /// Initializes a new instance of RegistryFreeActivationContext class. 
+        /// Initializes a new instance of RegistryFreeActivationContext class.
         /// </summary>
         ///<param name="manifest">Manifest file path.</param>
         public RegistryFreeActivationContext(string manifest)
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Finalize an instance of RegistryFreeActivationContext class. 
+        /// Finalize an instance of RegistryFreeActivationContext class.
         /// </summary>
         ~RegistryFreeActivationContext()
         {
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (disposing)
                 {
-                    // No managed resources to release 
+                    // No managed resources to release
                 }
 
                 this.DeactivateContext();
@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch (Exception ex)
             {
-                // Log any exceptions during deactivation. 
+                // Log any exceptions during deactivation.
                 if (EqtTrace.IsErrorEnabled)
                 {
                     EqtTrace.Error(ex);

@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <remarks>
         /// The settings providers are imported as non-shared because we need different settings provider
         /// instances to be used for each run settings.
-        /// </remarks>        
+        /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         protected SettingsProviderExtensionManager(
             IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders,
@@ -151,8 +151,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
             {
                 foreach (var settingsProvider in extensionManager.SettingsProvidersMap)
                 {
-                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to 
-                    // call executor.Value even if logging is not enabled. 
+                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to
+                    // call executor.Value even if logging is not enabled.
                     EqtTrace.Verbose("SettingsProviderExtensionManager: Loading settings provider {0}", settingsProvider.Value.Value);
                 }
             }
@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occured while loading extensions {0}", ex);
+                    EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
                 }
 
                 if (shouldThrowOnError)

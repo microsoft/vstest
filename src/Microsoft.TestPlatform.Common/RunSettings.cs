@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                 // Read to the root element.
                 XmlReaderUtilities.ReadToRootNode(reader);
 
-                // Read to the the first section.
+                // Read to the first section.
                 reader.ReadToNextElement();
 
                 // Lookup the settings provider for each of the elements.

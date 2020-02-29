@@ -51,7 +51,7 @@ namespace testhost.UnitTests
 
             Assert.IsNotNull(appDomainInvoker.NewAppDomain, "New AppDomain must be created.");
             Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
-            Assert.AreNotEqual(AppDomain.CurrentDomain.FriendlyName, appDomainInvoker.NewAppDomain.FriendlyName, 
+            Assert.AreNotEqual(AppDomain.CurrentDomain.FriendlyName, appDomainInvoker.NewAppDomain.FriendlyName,
                 "New AppDomain must be different from default one.");
         }
 
@@ -65,7 +65,7 @@ namespace testhost.UnitTests
 
             Assert.IsNotNull(newAppDomain, "New AppDomain must be created.");
             Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
-            Assert.AreNotEqual(AppDomain.CurrentDomain.FriendlyName, 
+            Assert.AreNotEqual(AppDomain.CurrentDomain.FriendlyName,
                 (appDomainInvoker.ActualInvoker as MockEngineInvoker).DomainFriendlyName,
                 "Engine must be invoked in new domain.");
 
@@ -78,7 +78,7 @@ namespace testhost.UnitTests
         {
             string appConfig = @"<?xml version=""1.0"" encoding=""utf-8""?>
                                 <configuration>
-                                    <startup> 
+                                    <startup>
                                         <supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.5.2"" />
                                     </startup>
                                 </configuration>";
@@ -90,7 +90,7 @@ namespace testhost.UnitTests
             Assert.AreEqual(1, startupElements.Count(), "Merged config must have only one 'startup' element");
 
             var supportedRuntimeXml = startupElements.First().Descendants("supportedRuntime").FirstOrDefault()?.ToString();
-            Assert.AreEqual(supportedRuntimeXml, @"<supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.0"" />",
+            Assert.AreEqual(@"<supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.0"" />", supportedRuntimeXml,
                 "TestHost Supported Runtime must be used on merging");
 
             var runtimeEle = doc.Descendants("runtime").FirstOrDefault();
@@ -189,7 +189,7 @@ namespace testhost.UnitTests
 
             var diagAddNodes = diagEle.Descendants("add");
             Assert.AreEqual(1, diagAddNodes.Count(), "Only switches from user config should be present.");
-            Assert.AreEqual(@"<add name=""SampleSwitch"" value=""1"" />", diagAddNodes.First().ToString(), 
+            Assert.AreEqual(@"<add name=""SampleSwitch"" value=""1"" />", diagAddNodes.First().ToString(),
                 "Correct Switch must be merged.");
 
             var appSettingsAddNodes = appSettingsEle.Descendants("add");
@@ -207,7 +207,7 @@ namespace testhost.UnitTests
             public static XDocument MergeConfigXmls(string userConfigText, string testHostConfigText)
             {
                 return MergeApplicationConfigFiles(
-                    XDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(userConfigText))), 
+                    XDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(userConfigText))),
                     XDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(testHostConfigText))));
             }
 

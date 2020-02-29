@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// Constructor for TestRuntimeMetadata
         /// </summary>
         /// <param name="extension">
-        /// Uri identifying the testhost. 
+        /// Uri identifying the testhost.
         /// </param>
         /// <param name="friendlyName">
         /// The friendly Name.

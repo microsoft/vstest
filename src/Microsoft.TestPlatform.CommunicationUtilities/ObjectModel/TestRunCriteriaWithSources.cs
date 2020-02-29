@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Initializes a new instance of the <see cref="TestRunCriteriaWithSources"/> class.
         /// </summary>
         /// <param name="adapterSourceMap"> The adapter source map.  </param>
-        /// <param name="package"> The package which actually contain sources. A testhost can at max execute for one pakage at time
+        /// <param name="package"> The package which actually contain sources. A testhost can at max execute for one package at time
         /// Package can be null if test source, and package are same
         /// </param>
         /// <param name="runSettings"> The run settings.  </param>

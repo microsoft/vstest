@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
-    /// Specifies the user specified RunSettings and framework provided context of the discovery. 
+    /// Specifies the user specified RunSettings and framework provided context of the discovery.
     /// </summary>
     public class DiscoveryContext : IDiscoveryContext
     {

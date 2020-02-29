@@ -157,7 +157,7 @@
     <value>Failed to load extensions from file '{0}'. Please use /diag for more information.</value>
   </data>
   <data name="FastFilterException" xml:space="preserve">
-    <value>An error occured while creating Fast filter.</value>
+    <value>An error occurred while creating Fast filter.</value>
   </data>
   <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
     <value>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</value>

@@ -83,7 +83,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 new TestRunCriteria(
                     new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
                     frequencyOfRunStatsChangeEvent: 10);
-            
+
             Assert.IsNull(testRunCriteria.Sources);
         }
 

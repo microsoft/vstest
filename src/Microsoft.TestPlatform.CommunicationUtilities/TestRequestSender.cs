@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             // Wait until either connection is successful, handled by connected.WaitHandle
-            // or operation is cancelled, handled by cancellationToken.WaitHandle
+            // or operation is canceled, handled by cancellationToken.WaitHandle
             // or testhost exits unexpectedly, handled by clientExited.WaitHandle
             var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle }, connectionTimeout);
 
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.clientExitErrorMessage = stdError;
             this.clientExited.Set();
 
-            // Break communication loop. In somecases(E.g: When tests creates child processes to testhost) communication channel won't break if testhost exits.
+            // Break communication loop. In some cases (E.g: When tests creates child processes to testhost) communication channel won't break if testhost exits.
             this.communicationEndpoint.Stop();
         }
 

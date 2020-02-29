@@ -46,9 +46,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var attachmentSets = this.requestSender.SendAfterTestRunEndAndGetResult(null, false);
 
             Assert.IsNotNull(attachmentSets);
-            Assert.AreEqual(attachmentSets.Count, 1);
+            Assert.AreEqual(1, attachmentSets.Count);
             Assert.IsNotNull(attachmentSets[0]);
-            Assert.AreEqual(attachmentSets[0].DisplayName, displayName);
+            Assert.AreEqual(displayName, attachmentSets[0].DisplayName);
             Assert.AreEqual(datacollectorUri, attachmentSets[0].Uri);
             Assert.AreEqual(attachmentUri, attachmentSets[0].Attachments[0].Uri);
         }

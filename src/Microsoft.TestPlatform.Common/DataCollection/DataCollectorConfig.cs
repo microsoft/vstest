@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             return friendlyName;
         }
-        
+
         /// <summary>
         /// Gets the attributes of the specified type from the data collector type.
         /// </summary>

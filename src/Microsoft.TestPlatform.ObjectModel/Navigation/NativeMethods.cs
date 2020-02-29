@@ -573,7 +573,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return (comObject as IDiaDataSource);
         }
 
-        #region private
+        #region Private
 
         [ComImport, ComVisible(false), Guid("00000001-0000-0000-C000-000000000046"),
          InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

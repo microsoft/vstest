@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         }
 
         /// <summary>
-        /// Wait for discovery completion completion
+        /// Wait for discovery completion
         /// </summary>
         /// <param name="timeout"> The timeout. </param>
         bool IRequest.WaitForCompletion(int timeout)
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 throw new ObjectDisposedException("DiscoveryRequest");
             }
 
-            // This method is not synchronized as it can lead to dead-lock 
+            // This method is not synchronized as it can lead to dead-lock
             // (the discoveryCompletionEvent cannot be raised unless that lock is released)
             if (this.discoveryCompleted != null)
             {
@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         public event EventHandler<TestRunMessageEventArgs> OnDiscoveryMessage;
 
         /// <summary>
-        /// Raised when new tests are discovered in this discovery request.  
+        /// Raised when new tests are discovered in this discovery request.
         /// </summary>
         public event EventHandler<DiscoveredTestsEventArgs> OnDiscoveredTests;
 
@@ -264,8 +264,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                 try
                 {
-                    // Raise onDiscoveredTests event if there are some tests in the last chunk. 
-                    // (We dont want to send the tests in the discovery complete event so that programming on top of 
+                    // Raise onDiscoveredTests event if there are some tests in the last chunk.
+                    // (We don't want to send the tests in the discovery complete event so that programming on top of
                     // RS client is easier i.e. user does not have to listen on discovery complete event.)
                     if (lastChunk != null && lastChunk.Count() > 0)
                     {

@@ -467,7 +467,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
                     {
                         if (matchFound)
-                            Assert.Fail("Concurrreny issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
+                            Assert.Fail("Concurrency issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
                         matchFound = true;
                     }
                 }
@@ -494,7 +494,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             Task.Delay(100).Wait();
 
                             // Duplicated testRunCriteria should match the actual one.
-                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismatch in testRunCriteria");
                             handler.HandleTestRunComplete(CreateTestRunCompleteArgs(), null, null, null);
                         });
             }

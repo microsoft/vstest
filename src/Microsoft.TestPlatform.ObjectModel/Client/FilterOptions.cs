@@ -7,22 +7,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
     using System.Text;
 
-    /// <summary> 
-    /// Filter options to be passed into the Test Platform during Discovery/Execution. 
-    /// </summary> 
+    /// <summary>
+    /// Filter options to be passed into the Test Platform during Discovery/Execution.
+    /// </summary>
     [DataContract]
     public class FilterOptions
     {
-        /// <summary> 
-        /// Gets or sets the regular expression that will be applied on the property before matching. 
-        /// </summary> 
+        /// <summary>
+        /// Gets or sets the regular expression that will be applied on the property before matching.
+        /// </summary>
         [DataMember]
         public string FilterRegEx { get; set; }
 
-        /// <summary> 
-        /// Gets or sets the optional regular expression replacement string. When this property is set, <see cref="System.Text.RegularExpressions.Regex.Replace"/> 
-        /// will be called upon property value instead of <see cref="System.Text.RegularExpressions.Regex.Match"/> before matching. 
-        /// </summary> 
+        /// <summary>
+        /// Gets or sets the optional regular expression replacement string. When this property is set, <see cref="System.Text.RegularExpressions.Regex.Replace"/>
+        /// will be called upon property value instead of <see cref="System.Text.RegularExpressions.Regex.Match"/> before matching.
+        /// </summary>
         [DataMember]
         public string FilterRegExReplacement { get; set; }
 
@@ -32,15 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "FilterOptions:"));
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture,
-                "   FilterRegEx={0}   FilterRegExReplacement={1}", 
+                "   FilterRegEx={0}   FilterRegExReplacement={1}",
                 this.FilterRegEx ?? string.Empty,
                 this.FilterRegExReplacement ?? string.Empty));
             return sb.ToString();
         }
 
-        protected bool Equals(FilterOptions other) => 
-            other != null && 
-            string.Equals(this.FilterRegEx, other.FilterRegEx) && 
+        protected bool Equals(FilterOptions other) =>
+            other != null &&
+            string.Equals(this.FilterRegEx, other.FilterRegEx) &&
             string.Equals(this.FilterRegExReplacement, other.FilterRegExReplacement);
 
         /// <inheritdoc/>

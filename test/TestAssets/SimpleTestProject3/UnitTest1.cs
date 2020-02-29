@@ -32,7 +32,8 @@ namespace SampleUnitTestProject3
         [TestMethod]
         public void ExitWithStackoverFlow()
         {
-            ExitWithStackoverFlow();
+            // a fast way to cause stack overflow, takes one method call instead of 9k that you need when calling a method recursively
+            Span<byte> s = stackalloc byte[int.MaxValue];
         }
 
 #if NET451

@@ -39,7 +39,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var dict = ((InProcDataCollectionSink)this.dataCollectionSink).GetDataCollectionDataSetForTestCase(this.testCase.Id);
 
-            Assert.AreEqual<string>(dict["DummyKey"].ToString(), "DummyValue");
+            Assert.AreEqual<string>("DummyValue", dict["DummyKey"].ToString());
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         //[TestMethod]
-        // TODO : Currently this code hits when test case id is null for core projects. For that we don't have algorithm to generate the guid. It's not implemented exception now (Source Code : EqtHash.cs).        
+        // TODO : Currently this code hits when test case id is null for core projects. For that we don't have algorithm to generate the guid. It's not implemented exception now (Source Code : EqtHash.cs).
         public void SendDataShouldThrowArgumentExceptionIfTestCaseIdIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(

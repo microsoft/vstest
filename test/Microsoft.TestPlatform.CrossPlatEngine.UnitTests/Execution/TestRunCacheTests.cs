@@ -325,7 +325,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var tester = new TestCacheTester { ExpectedCacheSize = cacheSize };
 
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
-            
+
             for (var i = 0; i < 2; i++)
             {
                 var tr = this.GetTestResult(i);

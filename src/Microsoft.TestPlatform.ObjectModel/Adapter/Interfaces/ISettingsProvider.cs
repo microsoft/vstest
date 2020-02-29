@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     using System.Xml;
 
     /// <summary>
-    /// Interface implemented to provide a section in the run settings.  A class that
+    /// Interface implemented to provide a section in the run settings. A class that
     /// implements this interface will be available for use if it exports its type via
     /// MEF, and if its containing assembly is placed in the Extensions folder.
     /// </summary>

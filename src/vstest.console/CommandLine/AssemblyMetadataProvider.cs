@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
             catch (Exception ex)
             {
-                // AssemblyName will thorw Exception if assembly contains native code or no manifest.
+                // AssemblyName will throw Exception if assembly contains native code or no manifest.
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                         var fxEndIndex = result.IndexOf("\u0001", fxStartIndex, StringComparison.Ordinal);
                         if (fxStartIndex > -1 && fxEndIndex > fxStartIndex)
                         {
-                            // Using -3 because custom attribute values seperated by unicode characters.
+                            // Using -3 because custom attribute values separated by unicode characters.
                             result = result.Substring(fxStartIndex, fxEndIndex - 3);
                             frameworkName = new FrameworkName(result);
                             break;
@@ -192,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                         fs.Position = peHeader;
 
                         var signature = reader.ReadUInt32(); //peHeaderSignature
-                        // 0x00004550 is the letters "PE" followed by two terminating zeroes.
+                        // 0x00004550 is the letters "PE" followed by two terminating zeros.
                         if (signature != 0x00004550)
                         {
                             validImage = false;
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
                         if (validImage)
                         {
-                            //Read the image file header header.
+                            //Read the image file header.
                             machine = reader.ReadUInt16();
                             reader.ReadUInt16(); //NumberOfSections
                             reader.ReadUInt32(); //TimeDateStamp

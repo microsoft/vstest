@@ -63,14 +63,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // we get discovery complete events from each host process
             // so we cannot "complete" the actual operation until all sources are consumed
-            // We should not block last chunk results while we aggregate overall discovery data 
+            // We should not block last chunk results while we aggregate overall discovery data
             if (lastChunk != null)
             {
                 ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
                 this.HandleDiscoveredTests(lastChunk);
             }
 
-            // Aggregate for final discoverycomplete 
+            // Aggregate for final discovery complete
             discoveryDataAggregator.Aggregate(totalTests, isAborted);
 
             // Aggregate Discovery Data Metrics
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (parallelDiscoveryComplete)
             {
                 // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
-                // To send a raw message - we need to create raw message from an aggregated payload object 
+                // To send a raw message - we need to create raw message from an aggregated payload object
                 var testDiscoveryCompletePayload = new DiscoveryCompletePayload()
                 {
                     TotalTests = discoveryDataAggregator.TotalTests,
@@ -102,14 +102,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
                 testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
-                // we have to send raw messages as we block the discoverycomplete actual raw messages
+                // we have to send raw messages as we block the discovery complete actual raw messages
                 this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
                     this.discoveryDataAggregator.IsAborted);
                 finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
-                // send actual test discoverycomplete to clients
+                // send actual test discovery complete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
             }
         }

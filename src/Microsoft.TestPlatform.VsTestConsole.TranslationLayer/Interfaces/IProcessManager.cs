@@ -6,12 +6,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     using System;
 
     /// <summary>
-    /// Defines the interface that can manage a process 
+    /// Defines the interface that can manage a process
     /// </summary>
     internal interface IProcessManager
     {
         /// <summary>
-        /// Starts the Process 
+        /// Starts the Process
         /// </summary>
         void StartProcess(ConsoleParameters consoleParameters);
 

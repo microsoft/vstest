@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <summary>
-        /// Aggregate Run Data 
+        /// Aggregate Run Data
         /// Must be thread-safe as this is expected to be called by parallel managers
         /// </summary>
         public void Aggregate(

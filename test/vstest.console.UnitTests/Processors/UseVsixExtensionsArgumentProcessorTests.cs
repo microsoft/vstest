@@ -52,14 +52,14 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new UseVsixExtensionsArgumentProcessorCapabilities();
 
             Assert.AreEqual("/UseVsixExtensions", capabilities.CommandName);
-            Assert.AreEqual(null, capabilities.HelpContentResourceName);
+            Assert.IsNull(capabilities.HelpContentResourceName);
             Assert.AreEqual(HelpContentPriority.None, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion

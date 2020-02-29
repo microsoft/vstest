@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// Registers the discovery and test run events for designmode flow
+    /// Registers the discovery and test run events for design mode flow
     /// </summary>
     public class DesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar
     {
@@ -54,10 +54,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="rawMessage">RawMessage from the testhost</param>
         private void OnRawMessageReceived(object sender, string rawMessage)
         {
-            // Directly send the data to translation layer instead of deserializing it here
+            // Directly send the data to translation layer instead of de-serializing it here
             this.designModeClient.SendRawMessage(rawMessage);
         }
-        
+
         public void LogWarning(string message)
         {
             this.designModeClient.SendTestMessage(TestMessageLevel.Warning, message);

@@ -17,7 +17,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
     public class TestDiscovererPluginInformationTests
     {
         private TestDiscovererPluginInformation testPluginInformation;
-        
+
         [TestMethod]
         public void AssemblyQualifiedNameShouldReturnTestExtensionTypesName()
         {
@@ -133,7 +133,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
     }
 
     #region Implementation
-    
+
     public class DummyTestDiscovererWithNoFileExtensions
     {
     }

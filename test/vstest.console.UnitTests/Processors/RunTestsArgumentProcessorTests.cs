@@ -90,12 +90,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("[TestFileNames]" + Environment.NewLine + "      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern" + Environment.NewLine + "      by spaces. Set console logger verbosity to detailed to view matched test files." + Environment.NewLine + "      Examples: mytestproject.dll" + Environment.NewLine + "                mytestproject.dll myothertestproject.exe" + Environment.NewLine + @"                testproject*.dll my*project.dll", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.RunTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(true, capabilities.IsAction);
+            Assert.IsTrue(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(true, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsTrue(capabilities.IsSpecialCommand);
         }
         #endregion
 

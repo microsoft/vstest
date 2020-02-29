@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Test message event handler for handling messages.
         /// </param>
         /// <param name="isCancelled">
-        /// The value to specify whether the test run is cancelled or not.
+        /// The value to specify whether the test run is canceled or not.
         /// </param>
         /// <returns>
         /// DataCollector attachments

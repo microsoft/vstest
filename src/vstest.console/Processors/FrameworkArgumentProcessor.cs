@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 throw new CommandLineException(CommandLineResources.FrameworkVersionRequired);
             }
-            
+
             var validFramework = Framework.FromString(argument);
             if (validFramework == null)
             {

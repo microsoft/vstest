@@ -21,7 +21,6 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private static Dictionary<string, string> dependencyVersions;
 
-        private readonly bool runningInCli;
         private string targetRuntime;
 
         public IntegrationTestEnvironment()
@@ -40,15 +39,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (string.IsNullOrEmpty(TestPlatformRootDirectory))
             {
                 // Running in VS/IDE. Use artifacts directory as root.
-                this.runningInCli = false;
-
                 // Get root directory from test assembly output directory
                 TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
-            }
-            else
-            {
-                // Running in command line/CI
-                this.runningInCli = true;
             }
 
             this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
@@ -105,27 +97,23 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-                string value = string.Empty;
-                if (this.runningInCli)
-                {
-                    value = Path.Combine(
-                        TestPlatformRootDirectory,
-                        "artifacts",
-                        BuildConfiguration,
-                        this.RunnerFramework,
-                        this.TargetRuntime);
-                }
-                else
-                {
-                    value = Path.Combine(
+               
+                // this used to switch to src\package\package\bin\based on whether 
+                // this is running in cli, but that's a bad idea, the console there does not have 
+                // a runtime config and will fail to start with error testhostpolicy.dll not found
+                var publishDirectory = Path.Combine(
                     TestPlatformRootDirectory,
-                    @"src\package\package\bin",
+                    "artifacts",
                     BuildConfiguration,
                     this.RunnerFramework,
                     this.TargetRuntime);
+
+                if (!Directory.Exists(publishDirectory))
+                {
+                    throw new InvalidOperationException($"Path '{publishDirectory}' does not exist, did you build the solution via build.cmd?");
                 }
 
-                return value;
+                return publishDirectory;
             }
         }
 
@@ -294,7 +282,14 @@ namespace Microsoft.TestPlatform.TestUtilities
                     {
                         if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
                         {
-                            dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                            if (!dependencyProps.ContainsKey(props.Name))
+                            {
+                                dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                            }
+                            else
+                            {
+                                dependencyProps[props.Name] = string.Join(", ", dependencyProps[props.Name], props.ReadElementContentAsString());
+                            }
                         }
                         props.Read();
                     }

@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         internal sealed class StreamWriterRollingHelper : IDisposable
         {
             /// <summary>
-            /// Synchronisation lock.
+            /// Synchronization lock.
             /// </summary>
             private object synclock = new object();
 
@@ -229,7 +229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             /// <summary>
-            /// Updates bookeeping information necessary for rolling, as required by the specified
+            /// Updates book keeping information necessary for rolling, as required by the specified
             /// rolling configuration.
             /// </summary>
             /// <returns>true if update was successful, false if an error occurred.</returns>

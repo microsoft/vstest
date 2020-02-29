@@ -61,7 +61,7 @@ using System.Security.Permissions;
 
 #if NET451
         /// <summary>
-        /// Seralization constructor.
+        /// Serialization constructor.
         /// </summary>
         protected TestPlatformFormatException(SerializationInfo info, StreamingContext context)
             : base(info, context)

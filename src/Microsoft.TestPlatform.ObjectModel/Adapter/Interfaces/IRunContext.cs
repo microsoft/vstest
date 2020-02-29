@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     using System.Collections.Generic;
 
     /// <summary>
-    /// It provides user specified runSettings and framework provided context of the run. 
+    /// It provides user specified runSettings and framework provided context of the run.
     /// </summary>
     public interface IRunContext : IDiscoveryContext
     {
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         bool IsDataCollectionEnabled { get; }
 
         /// <summary>
-        /// Whether the test is being debugged or not. 
+        /// Whether the test is being debugged or not.
         /// </summary>
         bool IsBeingDebugged { get; }
 

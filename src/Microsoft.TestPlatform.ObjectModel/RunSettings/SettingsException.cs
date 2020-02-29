@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 #if NET451
         /// <summary>
-        /// Seralization constructor.
+        /// Serialization constructor.
         /// </summary>
         protected SettingsException(SerializationInfo info, StreamingContext context)
             : base(info, context)

@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsDefaultDisableAutoFakesIsFalse()
         {
-            Assert.AreEqual(false, CommandLineOptions.Instance.DisableAutoFakes);
+            Assert.IsFalse(CommandLineOptions.Instance.DisableAutoFakes);
         }
 
         [TestMethod]

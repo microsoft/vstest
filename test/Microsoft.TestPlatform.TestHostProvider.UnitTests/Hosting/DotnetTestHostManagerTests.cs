@@ -216,7 +216,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
-            Assert.AreEqual(ex.Message, "Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".");
+            Assert.AreEqual("Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".", ex.Message);
         }
 
         [TestMethod]
@@ -236,7 +236,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
-            Assert.AreEqual(ex.Message, "Unable to find testhost.dll. Please publish your test project and retry.");
+            Assert.AreEqual("Unable to find testhost.dll. Please publish your test project and retry.", ex.Message);
         }
 
         [TestMethod]
@@ -871,7 +871,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var errorData = string.Empty;
             this.ExitCallBackTestHelper(exitCode);
 
-            // override event listner
+            // override event listener
             this.dotnetHostManager.HostExited += this.DotnetHostManagerExitCodeTesterHostExited;
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);

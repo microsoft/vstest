@@ -52,7 +52,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateDiscoveryDataMetrics(null);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
-            Assert.AreEqual(runMetrics.Count, 0);
+            Assert.AreEqual(0, runMetrics.Count);
         }
 
         [TestMethod]
@@ -69,8 +69,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsDiscovered, out value), true);
-            Assert.AreEqual(Convert.ToInt32(value), 4);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsDiscovered, out value));
+            Assert.AreEqual(4, Convert.ToInt32(value));
         }
 
         [TestMethod]
@@ -87,8 +87,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, out value), true);
-            Assert.AreEqual(value, .04182);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, out value));
+            Assert.AreEqual(.04182, value);
         }
 
         [TestMethod]
@@ -105,8 +105,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenInSecByAllAdapters, out value), true);
-            Assert.AreEqual(value, .04182);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenInSecByAllAdapters, out value));
+            Assert.AreEqual(.04182, value);
         }
 
         [TestMethod]
@@ -123,8 +123,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, out value), true);
-            Assert.AreEqual(value, .04182);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, out value));
+            Assert.AreEqual(.04182, value);
         }
 
         [TestMethod]
@@ -141,7 +141,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.DiscoveryState, out value), false);
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.DiscoveryState, out value));
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateDiscoveryDataMetrics(dict);
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            Assert.AreEqual(runMetrics.Count, 0);
+            Assert.AreEqual(0, runMetrics.Count);
         }
 
         [TestMethod]
@@ -167,7 +167,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             aggregator.AggregateDiscoveryDataMetrics(null);
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            Assert.AreEqual(runMetrics.Count, 0);
+            Assert.AreEqual(0, runMetrics.Count);
         }
 
         [TestMethod]
@@ -184,8 +184,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value), true);
-            Assert.AreEqual(value, 1);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value));
+            Assert.AreEqual(1, value);
         }
 
         [TestMethod]
@@ -202,8 +202,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out value), true);
-            Assert.AreEqual(value, 2);
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out value));
+            Assert.AreEqual(2, value);
         }
 
         [TestMethod]
@@ -217,7 +217,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value), false);
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value));
         }
 
         [TestMethod]
@@ -231,7 +231,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
             object value;
-            Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out value), false);
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out value));
         }
     }
 }

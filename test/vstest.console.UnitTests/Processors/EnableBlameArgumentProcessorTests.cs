@@ -57,14 +57,14 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new EnableBlameArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Blame", capabilities.CommandName);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Logging, capabilities.Priority);
             Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(CommandLineResources.EnableBlameUsage, capabilities.HelpContentResourceName);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         [TestMethod]

@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         private IFileHelper fileHelper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Converter"/> class. 
+        /// Initializes a new instance of the <see cref="Converter"/> class.
         /// </summary>
         public Converter(IFileHelper fileHelper)
         {
@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             if (rockSteadyTestResult.Duration != null)
                 testResult.Duration = rockSteadyTestResult.Duration;
 
-            // Clear exsting messages and store rocksteady result messages.
+            // Clear existing messages and store rocksteady result messages.
             testResult.TextMessages = null;
             UpdateResultMessages(testResult, rockSteadyTestResult);
 
@@ -395,7 +395,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             {
                 try
                 {
-                    // If the attachement is from data collector
+                    // If the attachment is from data collector
                     if (attachmentSet.Uri.AbsoluteUri.StartsWith(Constants.DataCollectorUriPrefix, StringComparison.OrdinalIgnoreCase))
                     {
                         CollectorDataEntry collectorEntry = ToCollectorEntry(attachmentSet, testResult.Id.ExecutionId, testRun, trxFileDirectory);
@@ -636,11 +636,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             {
                 className = nameToCheck.Substring(0, nameToCheck.LastIndexOf("::"));
 
-                // rename for a consistent behaviour for all tests.
+                // rename for a consistent behavior for all tests.
                 return className.Replace("::", ".");
             }
 
-            // Ordered test, web test scenario (Setting class name as source name if FQDn doesnt have . or ::)
+            // Ordered test, web test scenario (Setting class name as source name if FQDn doesn't have . or ::)
             try
             {
                 string testCaseSource = Path.GetFileNameWithoutExtension(source);

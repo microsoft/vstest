@@ -9,7 +9,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
+
     [TestClass]
     public class TestExtensionPluginInformationTests
     {
@@ -50,7 +50,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         public void MetadataShouldReturnExtensionUri()
         {
             this.testPluginInformation = new TestableTestExtensionPluginInformation(typeof(DummyTestExtensionWithExtensionUri));
-            
+
             CollectionAssert.AreEqual(new object[] { DefaultExtensionURI }, this.testPluginInformation.Metadata.ToArray());
         }
 

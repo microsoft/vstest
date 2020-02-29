@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Constructor for DataCollectorMetadata
         /// </summary>
         /// <param name="extension">
-        /// Uri identifying the data collector. 
+        /// Uri identifying the data collector.
         /// </param>
         /// <param name="friendlyName">
         /// The friendly Name.
