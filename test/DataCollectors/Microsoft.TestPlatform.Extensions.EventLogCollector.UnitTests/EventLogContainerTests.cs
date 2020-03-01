@@ -38,10 +38,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public EventLogContainerTests()
         {
-            this.eventSources = new HashSet<string>();
-            this.eventSources.Add("Application");
-            this.entryTypes = new HashSet<EventLogEntryType>();
-            this.entryTypes.Add(EventLogEntryType.Error);
+            this.eventSources = new HashSet<string>
+            {
+                "Application"
+            };
+            this.entryTypes = new HashSet<EventLogEntryType>
+            {
+                EventLogEntryType.Error
+            };
 
             this.logger = new Mock<DataCollectionLogger>();
             this.eventLog = new EventLog("Application");

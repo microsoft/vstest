@@ -72,8 +72,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 () => { });
             var sources = new List<string> { typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
 
@@ -94,8 +96,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 () => { });
             var sources = new List<string> { "temp.jpeg" };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
 
@@ -117,8 +121,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   "native.dll"
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             string testCaseFilter = "TestFilter";
 
@@ -145,8 +151,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   "managed.dll"
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             string testCaseFilter = "TestFilter";
 
@@ -207,8 +215,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
             string testCaseFilter = "TestFilter";
 
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
@@ -244,8 +254,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var sources = new List<string>(dllsources);
             sources.AddRange(jsonsources);
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             var runSettings = this.runSettingsMock.Object;
 
@@ -283,8 +295,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             var runSettings = this.runSettingsMock.Object;
 
@@ -316,8 +330,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             var runSettings = this.runSettingsMock.Object;
 
@@ -349,8 +365,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void LoadTestsShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, object>();
-            dict.Add("DummyMessage", "DummyValue");
+            var dict = new Dictionary<string, object>
+            {
+                { "DummyMessage", "DummyValue" }
+            };
 
             TestPluginCacheTests.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
@@ -362,8 +380,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
@@ -484,9 +504,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                   "test2.json"
                               };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add(typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location, jsonsources);
-            extensionSourceMap.Add("_none_", dllsources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location, jsonsources },
+                { "_none_", dllsources }
+            };
 
             var runSettings = this.runSettingsMock.Object;
 
@@ -566,8 +588,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var objectModelAseeAssemblyLocation = typeof(TestCase).GetTypeInfo().Assembly.Location;
             var sources = new string[] { crossPlatEngineAssemblyLocation, objectModelAseeAssemblyLocation };
 
-            extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
             sourcesString = string.Join(" ", crossPlatEngineAssemblyLocation, objectModelAseeAssemblyLocation);
         }
 
@@ -582,8 +606,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                       typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
                                   };
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
 
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
         }

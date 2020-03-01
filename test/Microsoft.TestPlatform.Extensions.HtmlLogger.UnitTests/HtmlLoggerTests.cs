@@ -403,9 +403,11 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestCompleteHandlerShouldCreateCustumHtmlFileNamewithLogFileNameKey()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters[HtmlLoggerConstants.LogFileNameKey] = null;
-            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            var parameters = new Dictionary<string, string>
+            {
+                [HtmlLoggerConstants.LogFileNameKey] = null,
+                [DefaultLoggerParameterNames.TestRunDirectory] = "dsa"
+            };
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -420,10 +422,12 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefix()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
-            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
-            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            var parameters = new Dictionary<string, string>
+            {
+                [HtmlLoggerConstants.LogFilePrefixKey] = "sample",
+                [DefaultLoggerParameterNames.TestRunDirectory] = "dsa",
+                [DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1"
+            };
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -438,10 +442,12 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixIfTargetFrameworkIsNull()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
-            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
-            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            var parameters = new Dictionary<string, string>
+            {
+                [HtmlLoggerConstants.LogFilePrefixKey] = "sample",
+                [DefaultLoggerParameterNames.TestRunDirectory] = "dsa",
+                [DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1"
+            };
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -456,10 +462,12 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixNull()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters[HtmlLoggerConstants.LogFilePrefixKey] = null;
-            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
-            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            var parameters = new Dictionary<string, string>
+            {
+                [HtmlLoggerConstants.LogFilePrefixKey] = null,
+                [DefaultLoggerParameterNames.TestRunDirectory] = "dsa",
+                [DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1"
+            };
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -478,9 +486,11 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestCompleteHandlerShouldThrowExceptionWithLogPrefixIfTargetFrameworkKeyIsNotPresent()
         {
-            var parameters = new Dictionary<string, string>();
-            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample.html";
-            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            var parameters = new Dictionary<string, string>
+            {
+                [HtmlLoggerConstants.LogFilePrefixKey] = "sample.html",
+                [DefaultLoggerParameterNames.TestRunDirectory] = "dsa"
+            };
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
             var resultEventArg1 = new Mock<TestResultEventArgs>(result1);

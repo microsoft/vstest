@@ -71,8 +71,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void TestRunCompletionHandlerForTestRunStatsWithOneOrMoreFailingTestsSetsOutcomeToFailed()
         {
-            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>();
-            testOutcomeDict.Add(TestOutcome.Failed, 1);
+            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>
+            {
+                { TestOutcome.Failed, 1 }
+            };
             var stats = new TestableTestRunStats(testOutcomeDict);
 
             var messageArgs = new TestRunCompleteEventArgs(stats, false, false, null, null, new TimeSpan());
@@ -83,8 +85,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void TestRunCompletionHandlerForCanceledRunShouldSetsOutcomeToFailed()
         {
-            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>();
-            testOutcomeDict.Add(TestOutcome.Passed, 1);
+            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>
+            {
+                { TestOutcome.Passed, 1 }
+            };
             var stats = new TestableTestRunStats(testOutcomeDict);
 
             var messageArgs = new TestRunCompleteEventArgs(stats, true, false, null, null, new TimeSpan());
@@ -95,8 +99,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void TestRunCompletionHandlerForAbortedRunShouldSetsOutcomeToFailed()
         {
-            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>();
-            testOutcomeDict.Add(TestOutcome.Passed, 1);
+            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>
+            {
+                { TestOutcome.Passed, 1 }
+            };
             var stats = new TestableTestRunStats(testOutcomeDict);
 
             var messageArgs = new TestRunCompleteEventArgs(stats, false, true, null, null, new TimeSpan());

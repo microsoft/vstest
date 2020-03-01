@@ -40,9 +40,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.events = new Mock<TestLoggerEvents>();
 
             this.testableTrxLogger = new TestableTrxLogger();
-            this.parameters = new Dictionary<string, string>(2);
-            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
-            this.parameters[TrxLoggerConstants.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue;
+            this.parameters = new Dictionary<string, string>(2)
+            {
+                [DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory,
+                [TrxLoggerConstants.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue
+            };
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
@@ -712,9 +714,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var converter = new Converter(new Mock<IFileHelper>().Object);
             List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
-            List<String> listCategoriesExpected = new List<string>();
-            listCategoriesExpected.Add("ClassLevel");
-            listCategoriesExpected.Add("AsmLevel");
+            List<String> listCategoriesExpected = new List<string>
+            {
+                "ClassLevel",
+                "AsmLevel"
+            };
 
             CollectionAssert.AreEqual(listCategoriesExpected, listCategoriesActual);
         }

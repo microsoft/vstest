@@ -14,9 +14,11 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
         public SessionEventsTests()
         {
-            var properties = new Dictionary<string, object>();
-            properties.Add("property1", 1);
-            properties.Add("property2", 2);
+            var properties = new Dictionary<string, object>
+            {
+                { "property1", 1 },
+                { "property2", 2 }
+            };
 
             this.sessionStartEventArgs = new SessionStartEventArgs(properties);
         }

@@ -168,8 +168,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             var testSources = sources as IList<string> ?? sources.ToList();
             ValidateArg.NotNullOrEmpty(testSources, "sources");
 
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
+            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { Constants.UnspecifiedAdapterPath, testSources }
+            };
 
             this.TestCaseFilter = testCaseFilter;
             this.FilterOptions = filterOptions;
@@ -191,8 +193,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             var testSources = sources as IList<string> ?? sources.ToArray();
             ValidateArg.NotNullOrEmpty(testSources, "sources");
 
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
+            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { Constants.UnspecifiedAdapterPath, testSources }
+            };
 
             this.TestCaseFilter = testRunCriteria.testCaseFilter;
             this.FilterOptions = testRunCriteria.filterOptions;

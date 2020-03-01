@@ -350,9 +350,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             helper.SaveIEnumerable(this.entries.Values, rootElement, "TestEntries", ".", "TestEntry", parameters);
 
             // Save default categories
-            List<TestListCategory> categories = new List<TestListCategory>();
-            categories.Add(TestListCategory.UncategorizedResults);
-            categories.Add(TestListCategory.AllResults);
+            List<TestListCategory> categories = new List<TestListCategory>
+            {
+                TestListCategory.UncategorizedResults,
+                TestListCategory.AllResults
+            };
             helper.SaveList<TestListCategory>(categories, rootElement, "TestLists", ".", "TestList", parameters);
 
             // Save summary

@@ -240,9 +240,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockConsoleOutput = new Mock<IOutput>();
 
-            List<TestCase> list = new List<TestCase>();
-            list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
-            list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
+            List<TestCase> list = new List<TestCase>
+            {
+                new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"),
+                new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2")
+            };
             var mockTestRunStats = new Mock<ITestRunStatistics>();
 
             var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan());

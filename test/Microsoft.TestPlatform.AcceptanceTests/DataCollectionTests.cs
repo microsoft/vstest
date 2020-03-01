@@ -184,10 +184,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var runsettingsPath = Path.Combine(
                 Path.GetTempPath(),
                 "test_" + Guid.NewGuid() + ".runsettings");
-            var dataCollectionAttributes = new Dictionary<string, string>();
-
-            dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
-            dataCollectionAttributes.Add("uri", "my://sample/datacollector");
+            var dataCollectionAttributes = new Dictionary<string, string>
+            {
+                { "friendlyName", "SampleDataCollector" },
+                { "uri", "my://sample/datacollector" }
+            };
 
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;

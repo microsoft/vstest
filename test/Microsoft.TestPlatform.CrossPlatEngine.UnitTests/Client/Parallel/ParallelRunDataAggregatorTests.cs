@@ -43,16 +43,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var attachmentSet1 = new Collection<AttachmentSet>();
-            attachmentSet1.Add(new AttachmentSet(new Uri("x://hello1"), "hello1"));
+            var attachmentSet1 = new Collection<AttachmentSet>
+            {
+                new AttachmentSet(new Uri("x://hello1"), "hello1")
+            };
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet1);
 
 
             Assert.AreEqual(1, aggregator.RunCompleteArgsAttachments.Count, "RunCompleteArgsAttachments List must have data.");
 
-            var attachmentSet2 = new Collection<AttachmentSet>();
-            attachmentSet2.Add(new AttachmentSet(new Uri("x://hello2"), "hello2"));
+            var attachmentSet2 = new Collection<AttachmentSet>
+            {
+                new AttachmentSet(new Uri("x://hello2"), "hello2")
+            };
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, attachmentSet2);
 
@@ -64,15 +68,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var attachmentSet1 = new Collection<AttachmentSet>();
-            attachmentSet1.Add(new AttachmentSet(new Uri("x://hello1"), "hello1"));
+            var attachmentSet1 = new Collection<AttachmentSet>
+            {
+                new AttachmentSet(new Uri("x://hello1"), "hello1")
+            };
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet1, null);
 
             Assert.AreEqual(1, aggregator.RunContextAttachments.Count, "RunContextAttachments List must have data.");
 
-            var attachmentSet2 = new Collection<AttachmentSet>();
-            attachmentSet2.Add(new AttachmentSet(new Uri("x://hello2"), "hello2"));
+            var attachmentSet2 = new Collection<AttachmentSet>
+            {
+                new AttachmentSet(new Uri("x://hello2"), "hello2")
+            };
 
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, attachmentSet2, null);
 
@@ -204,12 +212,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             var runStats = aggregator.GetAggregatedRunStats();
             Assert.AreEqual(0, runStats.ExecutedTests, "RunStats must not have data.");
 
-            var stats1 = new Dictionary<TestOutcome, long>();
-            stats1.Add(TestOutcome.Passed, 2);
-            stats1.Add(TestOutcome.Failed, 3);
-            stats1.Add(TestOutcome.Skipped, 1);
-            stats1.Add(TestOutcome.NotFound, 4);
-            stats1.Add(TestOutcome.None, 2);
+            var stats1 = new Dictionary<TestOutcome, long>
+            {
+                { TestOutcome.Passed, 2 },
+                { TestOutcome.Failed, 3 },
+                { TestOutcome.Skipped, 1 },
+                { TestOutcome.NotFound, 4 },
+                { TestOutcome.None, 2 }
+            };
 
             aggregator.Aggregate(new TestRunStatistics(12, stats1), null, null, TimeSpan.Zero, false, false, null, null);
 
@@ -222,12 +232,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             Assert.AreEqual(2, runStats.Stats[TestOutcome.None], "RunStats must have aggregated data.");
 
 
-            var stats2 = new Dictionary<TestOutcome, long>();
-            stats2.Add(TestOutcome.Passed, 3);
-            stats2.Add(TestOutcome.Failed, 2);
-            stats2.Add(TestOutcome.Skipped, 2);
-            stats2.Add(TestOutcome.NotFound, 1);
-            stats2.Add(TestOutcome.None, 3);
+            var stats2 = new Dictionary<TestOutcome, long>
+            {
+                { TestOutcome.Passed, 3 },
+                { TestOutcome.Failed, 2 },
+                { TestOutcome.Skipped, 2 },
+                { TestOutcome.NotFound, 1 },
+                { TestOutcome.None, 3 }
+            };
 
             aggregator.Aggregate(new TestRunStatistics(11, stats2), null, null, TimeSpan.Zero, false, false, null, null);
 
@@ -256,8 +268,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TotalTestsRanByAdapter, 2);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TotalTestsRanByAdapter, 2 }
+            };
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
@@ -274,8 +288,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, .02091 }
+            };
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
@@ -292,8 +308,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenByAllAdaptersInSec, .02091 }
+            };
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
@@ -310,8 +328,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.RunState, "Completed");
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.RunState, "Completed" }
+            };
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
@@ -353,8 +373,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TotalTestsRanByAdapter, 2);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TotalTestsRanByAdapter, 2 }
+            };
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
@@ -371,9 +393,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV1", .02091);
-            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV2", .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV1", .02091 },
+                { TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV2", .02091 }
+            };
 
             aggregator.AggregateRunDataMetrics(dict);
 

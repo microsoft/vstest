@@ -22,8 +22,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public EventLogSessionContextTests()
         {
             this.mockEventLogContainer = new DummyEventLogContainer(true);
-            this.eventLogContainersMap = new Dictionary<string, IEventLogContainer>();
-            this.eventLogContainersMap.Add("LogName", this.mockEventLogContainer);
+            this.eventLogContainersMap = new Dictionary<string, IEventLogContainer>
+            {
+                { "LogName", this.mockEventLogContainer }
+            };
         }
 
         [TestMethod]

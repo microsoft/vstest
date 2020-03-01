@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
-            // Validate the sources 
+            // Validate the sources
             foreach (var kvp in this.adapterSourceMap)
             {
                 var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger);
@@ -227,8 +227,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 return;
             }
 
-            var properties = new Dictionary<string, object>();
-            properties.Add("TestSources", TestSourcesUtility.GetSources(this.adapterSourceMap));
+            var properties = new Dictionary<string, object>
+            {
+                { "TestSources", TestSourcesUtility.GetSources(this.adapterSourceMap) }
+            };
 
             this.testCaseEventsHandler.SendSessionStart(properties);
         }

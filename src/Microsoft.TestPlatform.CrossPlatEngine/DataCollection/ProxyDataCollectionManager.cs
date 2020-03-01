@@ -310,13 +310,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IList<string> GetCommandLineArguments(int portNumber)
         {
-            var commandlineArguments = new List<string>();
+            var commandlineArguments = new List<string>
+            {
+                PortOption,
+                portNumber.ToString(),
 
-            commandlineArguments.Add(PortOption);
-            commandlineArguments.Add(portNumber.ToString());
-
-            commandlineArguments.Add(ParentProcessIdOption);
-            commandlineArguments.Add(this.processHelper.GetCurrentProcessId().ToString());
+                ParentProcessIdOption,
+                this.processHelper.GetCurrentProcessId().ToString()
+            };
 
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
