@@ -486,15 +486,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             if (testRunChangedArgs != null)
             {
                 EqtTrace.Verbose("TestRunRequest:SendTestRunStatsChange: Starting.");
-                if (testRunChangedArgs.ActiveTests != null)
+                if (testRunChangedArgs.ActiveTests != null && EqtTrace.IsVerboseEnabled)
                 {
-                    // Do verbose check to save performance in iterating test cases
-                    if (EqtTrace.IsVerboseEnabled)
+                    foreach (TestCase testCase in testRunChangedArgs.ActiveTests)
                     {
-                        foreach (TestCase testCase in testRunChangedArgs.ActiveTests)
-                        {
-                            EqtTrace.Verbose("InProgress is {0}", testCase.DisplayName);
-                        }
+                        EqtTrace.Verbose("InProgress is {0}", testCase.DisplayName);
                     }
                 }
 

@@ -20,12 +20,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             bool isWow64 = false;
 
             // If the function succeeds, the return value is a nonzero value.
-            if (!IsWow64Process(processHandle, out isWow64))
+            if (!IsWow64Process(processHandle, out isWow64) && EqtTrace.IsVerboseEnabled)
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("NativeMethodsHelper: The call to IsWow64Process failed.");
-                }
+                EqtTrace.Verbose("NativeMethodsHelper: The call to IsWow64Process failed.");
             }
 
             return !isWow64;

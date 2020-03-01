@@ -130,12 +130,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
             var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
             var telemetryOptedIn = false;
-            if (!string.IsNullOrWhiteSpace(telemetryStatus))
+            if (!string.IsNullOrWhiteSpace(telemetryStatus) && telemetryStatus.Equals("true", StringComparison.Ordinal))
             {
-                if (telemetryStatus.Equals("true", StringComparison.Ordinal))
-                {
-                    telemetryOptedIn = true;
-                }
+                telemetryOptedIn = true;
             }
 
             var requestData = new RequestData

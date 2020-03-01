@@ -510,12 +510,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             {
                 if (!this.disposed)
                 {
-                    if (disposing)
+                    if (disposing && this.discoveryCompleted != null)
                     {
-                        if (this.discoveryCompleted != null)
-                        {
-                            this.discoveryCompleted.Dispose();
-                        }
+                        this.discoveryCompleted.Dispose();
                     }
 
                     // Indicate that object has been disposed

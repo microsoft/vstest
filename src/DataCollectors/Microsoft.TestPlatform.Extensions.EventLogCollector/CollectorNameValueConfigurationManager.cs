@@ -84,14 +84,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                 // Save the name/value pair in the dictionary. Note that duplicate settings are
                 // overwritten with the last occurrence's value.
-                if (this.nameValuePairs.ContainsKey(settingName))
+                if (this.nameValuePairs.ContainsKey(settingName) && EqtTrace.IsVerboseEnabled)
                 {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose(
-                            "Duplicate configuration setting found for '{0}'. Using the last setting.",
-                            settingName);
-                    }
+                    EqtTrace.Verbose(
+                        "Duplicate configuration setting found for '{0}'. Using the last setting.",
+                        settingName);
                 }
 
                 this.nameValuePairs[settingName] = settingValue;

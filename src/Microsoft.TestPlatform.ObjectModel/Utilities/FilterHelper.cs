@@ -67,13 +67,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             for (int i = 0; i < str.Length; ++i)
             {
                 var currentChar = str[i];
-                if (currentChar == EscapeCharacter)
+                if (currentChar == EscapeCharacter && (++i == str.Length || !SpecialCharactersSet.Contains(currentChar = str[i])))
                 {
-                    if (++i == str.Length || !SpecialCharactersSet.Contains(currentChar = str[i]))
-                    {
-                        // "\" should be followed by a special character.
-                        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.TestCaseFilterEscapeException, str));
-                    }
+                    // "\" should be followed by a special character.
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.TestCaseFilterEscapeException, str));
                 }
 
                 // Strictly speaking, string to be un-escaped shouldn't contain any of the special characters,

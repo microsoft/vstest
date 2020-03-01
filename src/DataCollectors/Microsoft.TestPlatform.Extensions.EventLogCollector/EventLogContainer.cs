@@ -189,12 +189,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                             EventLogEntry nextEntry = this.eventLog.Entries[nextEntryIndexInCurrentLog];
 
                             // If an explicit list of event sources was provided, only report log entries from those sources
-                            if (this.eventSources != null && this.eventSources.Count > 0)
+                            if (this.eventSources != null && this.eventSources.Count > 0 && !this.eventSources.Contains(nextEntry.Source))
                             {
-                                if (!this.eventSources.Contains(nextEntry.Source))
-                                {
-                                    continue;
-                                }
+                                continue;
                             }
 
                             if (!this.entryTypes.Contains(nextEntry.EntryType))

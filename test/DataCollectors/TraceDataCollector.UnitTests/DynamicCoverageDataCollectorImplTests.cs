@@ -56,12 +56,9 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         [TestCleanup]
         public void Cleanup()
         {
-            if (this.tempSessionDir != null)
+            if (this.tempSessionDir != null && Directory.Exists(this.tempSessionDir))
             {
-                if (Directory.Exists(this.tempSessionDir))
-                {
-                    Directory.Delete(this.tempSessionDir, true);
-                }
+                Directory.Delete(this.tempSessionDir, true);
             }
         }
 

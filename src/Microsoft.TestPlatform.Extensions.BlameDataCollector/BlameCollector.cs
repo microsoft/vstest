@@ -371,30 +371,26 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.dataCollectionSink.SendFileAsync(fileTranferInformation);
                 }
 
-                if (this.collectProcessDumpOnTrigger)
+                if (this.collectProcessDumpOnTrigger && (this.testStartCount > this.testEndCount || this.collectDumpAlways))
                 {
-                    // If there was a test case crash or if we need to collect dump on process exit.
-                    if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
+                    try
                     {
-                        try
+                        var dumpFile = this.processDumpUtility.GetDumpFile();
+                        if (!string.IsNullOrEmpty(dumpFile))
                         {
-                            var dumpFile = this.processDumpUtility.GetDumpFile();
-                            if (!string.IsNullOrEmpty(dumpFile))
-                            {
-                                var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                                this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-                            }
-                            else
-                            {
-                                EqtTrace.Warning("BlameCollector.SessionEndedHandler: blame:CollectDump was enabled but dump file was not generated.");
-                                this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
-                            }
+                            var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                            this.dataCollectionSink.SendFileAsync(fileTranferInformation);
                         }
-                        catch (FileNotFoundException ex)
+                        else
                         {
-                            EqtTrace.Warning(ex.ToString());
-                            this.logger.LogWarning(args.Context, ex.ToString());
+                            EqtTrace.Warning("BlameCollector.SessionEndedHandler: blame:CollectDump was enabled but dump file was not generated.");
+                            this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
                         }
+                    }
+                    catch (FileNotFoundException ex)
+                    {
+                        EqtTrace.Warning(ex.ToString());
+                        this.logger.LogWarning(args.Context, ex.ToString());
                     }
                 }
             }

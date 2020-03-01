@@ -152,13 +152,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             foreach (var eventIds in eventIdsDics)
             {
-                if (eventIds.Value == false)
+                if (!eventIds.Value && VerifyOrder(content, eventIds.Key))
                 {
-                    if (VerifyOrder(content, eventIds.Key))
-                    {
-                        eventIdsDics[eventIds.Key] = true;
-                        return true;
-                    }
+                    eventIdsDics[eventIds.Key] = true;
+                    return true;
                 }
             }
             return false;
