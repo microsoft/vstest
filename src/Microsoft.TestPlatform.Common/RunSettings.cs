@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         {
             if (StringUtilities.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
             // Try and lookup the settings provider.

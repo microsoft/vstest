@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             if (args == null)
             {
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
             }
 
             this.CheckDisposed();

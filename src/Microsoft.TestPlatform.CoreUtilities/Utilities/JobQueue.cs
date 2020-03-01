@@ -105,17 +105,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             if (string.IsNullOrWhiteSpace(displayName))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, "displayName");
+                throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(displayName));
             }
 
             if (maxQueueLength < 1)
             {
-                throw new ArgumentOutOfRangeException("maxQueueLength");
+                throw new ArgumentOutOfRangeException(nameof(maxQueueLength));
             }
 
             if (maxQueueSize < 1)
             {
-                throw new ArgumentOutOfRangeException("maxQueueSize");
+                throw new ArgumentOutOfRangeException(nameof(maxQueueSize));
             }
 
             this.maxNumberOfJobsInQueue = maxQueueLength;

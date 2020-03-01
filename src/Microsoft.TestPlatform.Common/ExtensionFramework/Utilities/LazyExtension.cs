@@ -36,12 +36,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance"); ;
+                throw new ArgumentNullException(nameof(instance));
             }
 
             if (metadata == null)
             {
-                throw new ArgumentNullException("instance"); ;
+                throw new ArgumentNullException(nameof(instance));
             }
 
             this.extension = instance;
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (metadata == null)
             {
-                throw new ArgumentNullException("metadata"); ;
+                throw new ArgumentNullException(nameof(metadata));
             }
 
             this.testPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (metadata == null)
             {
-                throw new ArgumentNullException("metadata"); ;
+                throw new ArgumentNullException(nameof(metadata));
             }
 
             this.extensionCreator = creator ?? throw new ArgumentNullException(nameof(creator));

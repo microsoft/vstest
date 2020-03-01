@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (String.IsNullOrWhiteSpace(argument))
             {
-                throw new ArgumentException("Cannot be null or empty", "argument");
+                throw new ArgumentException("Cannot be null or empty", nameof(argument));
             }
             Contract.EndContractBlock();
 

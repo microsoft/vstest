@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             if (events == null)
             {
-                throw new ArgumentNullException("events");
+                throw new ArgumentNullException(nameof(events));
             }
 
             if (ConsoleLogger.Output == null)
