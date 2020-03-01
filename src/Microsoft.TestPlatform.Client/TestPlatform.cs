@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             // Update extension assemblies from source when design mode is false.
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            if (runConfiguration.DesignMode == false)
+            if (!runConfiguration.DesignMode)
             {
                 this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
             }
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
             // Update extension assemblies from source when design mode is false.
-            if (runConfiguration.DesignMode == false)
+            if (!runConfiguration.DesignMode)
             {
                 this.AddExtensionAssembliesFromSource(testRunCriteria);
             }

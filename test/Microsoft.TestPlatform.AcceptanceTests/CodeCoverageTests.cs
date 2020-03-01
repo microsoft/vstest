@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(deploymentElements.Count == 1,
                     "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
                 var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
-                Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
+                Assert.IsTrue(!string.IsNullOrEmpty(deploymentDir),
                     "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
                 var collectors = doc.GetElementsByTagName("Collector");
 
@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     }
                 }
 
-                Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}",
+                Assert.IsTrue(!string.IsNullOrEmpty(fileName), "Coverage file name not found in trx file: {0}",
                     trxFilePath);
                 return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
             }

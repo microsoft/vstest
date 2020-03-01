@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.Coverage
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
-            if (this.isWindowsOS == false)
+            if (!this.isWindowsOS)
             {
                 EqtTrace.Warning($"DynamicCoverageDataCollector.OnInitialize: Code coverage not supported for operating system: {this.environment.OperatingSystem}");
 
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>Returns EnvironmentVariables required for code coverage profiler. </returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
-            if (this.isWindowsOS == false)
+            if (!this.isWindowsOS)
             {
                 return Enumerable.Empty<KeyValuePair<string, string>>();
             }

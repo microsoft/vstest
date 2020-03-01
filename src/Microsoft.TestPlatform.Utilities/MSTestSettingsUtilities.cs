@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             ValidateArg.NotNull(settingsFile, "settingsFile");
             ValidateArg.NotNull(defaultRunSettings, "defaultRunSettings");
 
-            if (IsLegacyTestSettingsFile(settingsFile) == false)
+            if (!IsLegacyTestSettingsFile(settingsFile))
             {
                 throw new XmlException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.UnExpectedSettingsFile));
             }

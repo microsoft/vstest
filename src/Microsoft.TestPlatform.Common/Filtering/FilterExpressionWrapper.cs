@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     var regexString = options?.FilterRegEx;
                     if (!string.IsNullOrEmpty(regexString))
                     {
-                        Debug.Assert(options.FilterRegExReplacement != null ? options.FilterRegEx != null : true);
+                        Debug.Assert((options.FilterRegExReplacement == null) || options.FilterRegEx != null);
                         this.fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
                         this.fastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
                     }
@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 return this.fastFilter.Evaluate(propertyValueProvider);
             }
 
-            return this.filterExpression == null ? false : this.filterExpression.Evaluate(propertyValueProvider);
+            return (filterExpression != null) && this.filterExpression.Evaluate(propertyValueProvider);
         }
     }
 }

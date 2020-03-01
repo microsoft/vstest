@@ -456,7 +456,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             var logFileName = Path.GetFileName(Path.GetTempFileName());
             var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
 
-            if (Directory.Exists(logFileDir) == false)
+            if (!Directory.Exists(logFileDir))
             {
                 Directory.CreateDirectory(logFileDir);
             }

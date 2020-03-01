@@ -344,7 +344,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 It.Is<List<Guid>>(y => y.Count == 2 && y.First() == blameTestObject1.Id && y.Last() == blameTestObject2.Id),
                 It.Is<Dictionary<Guid, BlameTestObject>>(
                     y => y.Count == 2 &&
-                    y[blameTestObject1.Id].IsCompleted == true && y[blameTestObject2.Id].IsCompleted == false &&
+                    y[blameTestObject1.Id].IsCompleted && !y[blameTestObject2.Id].IsCompleted &&
                     y[blameTestObject1.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod1" && y[blameTestObject2.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod2" &&
                     y[blameTestObject1.Id].Source == "abc.dll" && y[blameTestObject2.Id].Source == "abc.dll" &&
                     y[blameTestObject1.Id].DisplayName == "TestMethod1" && y[blameTestObject2.Id].DisplayName == "TestMethod2"),

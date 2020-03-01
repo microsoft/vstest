@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.Coverage
                     null);
                 this.StartVanguardProcess(shutdownCommand, true);
 
-                if (this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit) == false)
+                if (!this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit))
                 {
                     EqtTrace.Warning("Vanguard.Stop: Vanguard process not exited in {0} ms", ProcessExitWaitLimit);
                 }
@@ -347,7 +347,7 @@ namespace Microsoft.VisualStudio.Coverage
             EqtTrace.Info("Vanguard.LoggerProcessExited: Vanguard process exit callback started.");
             if (this.vanguardProcess != null)
             {
-                if (this.vanguardProcess.HasExited == true && this.vanguardProcess.ExitCode != 0)
+                if (this.vanguardProcess.HasExited && this.vanguardProcess.ExitCode != 0)
                 {
                     EqtTrace.Warning("Vanguard.LoggerProcessExited: An error occurred in Code Coverage process. Error code = {0}", this.vanguardProcess.ExitCode);
                 }

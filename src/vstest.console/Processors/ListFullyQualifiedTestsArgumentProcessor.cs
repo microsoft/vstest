@@ -361,7 +361,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     traitDictionary = GetTraitsInTraitDictionary(traitDictionary, testCase.Traits);
 
                     // Skip test if not fitting filter criteria.
-                    if (filterExpression.MatchTestCase(testCase, p => PropertyValueProvider(p, traitDictionary)) == false)
+                    if (!filterExpression.MatchTestCase(testCase, p => PropertyValueProvider(p, traitDictionary)))
                     {
                         continue;
                     }

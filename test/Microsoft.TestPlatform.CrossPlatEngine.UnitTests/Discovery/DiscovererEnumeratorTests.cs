@@ -714,7 +714,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             public virtual void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
-                if (DllTestDiscoverer.ShouldTestDiscovered(sources) == false)
+                if (!DllTestDiscoverer.ShouldTestDiscovered(sources))
                 {
                     return;
                 }

@@ -410,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             try
             {
                 var trxFileDirPath = Path.GetDirectoryName(trxFilePath);
-                if (Directory.Exists(trxFileDirPath) == false)
+                if (!Directory.Exists(trxFileDirPath))
                 {
                     Directory.CreateDirectory(trxFileDirPath);
                 }

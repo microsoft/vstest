@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             EqtTrace.Info("ProxyDataCollectionManager.Initialize: waiting for connection with timeout: {0} seconds", connectionTimeout);
 
             var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout * 1000);
-            if (connected == false)
+            if (!connected)
             {
                 EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
                 throw new TestPlatformException(

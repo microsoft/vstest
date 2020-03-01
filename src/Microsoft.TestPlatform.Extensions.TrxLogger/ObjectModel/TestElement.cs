@@ -199,9 +199,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public override bool Equals(object other)
         {
             TestElement otherTest = other as TestElement;
-            return (otherTest == null) ?
-                false :
-                this.id.Equals(otherTest.id);
+            return (otherTest != null) && this.id.Equals(otherTest.id);
         }
 
         /// <summary>
