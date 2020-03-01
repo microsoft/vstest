@@ -96,8 +96,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override bool Equals(object obj)
         {
-            TestResultId tmpId = obj as TestResultId;
-            if (tmpId == null)
+            if (!(obj is TestResultId tmpId))
             {
                 return false;
             }
@@ -484,8 +483,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         #region Overrides
         public override bool Equals(object obj)
         {
-            TestResult trm = obj as TestResult;
-            if (trm == null)
+            if (!(obj is TestResult trm))
             {
                 return false;
             }

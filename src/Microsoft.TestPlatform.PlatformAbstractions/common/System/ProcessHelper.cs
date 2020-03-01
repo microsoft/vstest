@@ -124,10 +124,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public bool TryGetExitCode(object process, out int exitCode)
         {
-            var proc = process as Process;
             try
             {
-                if (proc != null && proc.HasExited)
+                if (process is Process proc && proc.HasExited)
                 {
                     exitCode = proc.ExitCode;
                     return true;
@@ -161,10 +160,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public void TerminateProcess(object process)
         {
-            var proc = process as Process;
             try
             {
-                if (proc != null && !proc.HasExited)
+                if (process is Process proc && !proc.HasExited)
                 {
                     proc.Kill();
                 }

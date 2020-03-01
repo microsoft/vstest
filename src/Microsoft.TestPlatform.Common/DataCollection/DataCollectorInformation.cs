@@ -177,8 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         public void SetTestExecutionEnvironmentVariables()
         {
-            var testExecutionEnvironmentSpecifier = this.DataCollector as ITestExecutionEnvironmentSpecifier;
-            if (testExecutionEnvironmentSpecifier != null)
+            if (this.DataCollector is ITestExecutionEnvironmentSpecifier testExecutionEnvironmentSpecifier)
             {
                 // Get the environment variables the data collector wants set in the test execution environment
                 this.TestExecutionEnvironmentVariables = testExecutionEnvironmentSpecifier.GetTestExecutionEnvironmentVariables();

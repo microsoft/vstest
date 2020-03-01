@@ -390,15 +390,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                     var testPropertyValue = testCase.GetPropertyValue(testProperty);
 
-                    if (testPropertyKey.Equals(TestCategory))
+                    if (testPropertyKey.Equals(TestCategory) && testPropertyValue is string[] testPropertyValueArray)
                     {
-                        var testPropertyValueArray = testPropertyValue as string[];
-                        if (testPropertyValueArray != null)
-                        {
-                            var testPropertyValueList = new List<string>(testPropertyValueArray);
-                            traitDictionary.Add(testPropertyKey, testPropertyValueList);
-                            continue;
-                        }
+                        var testPropertyValueList = new List<string>(testPropertyValueArray);
+                        traitDictionary.Add(testPropertyKey, testPropertyValueList);
+                        continue;
                     }
 
                     //always return value as a list of string

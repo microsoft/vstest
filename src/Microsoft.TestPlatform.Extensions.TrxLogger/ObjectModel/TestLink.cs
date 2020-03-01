@@ -62,10 +62,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public override bool Equals(object other)
         {
-            TestLink link = other as TestLink;
-            return (link == null) ? 
-                false :
-                this.id.Equals(link.id);
+            return other is TestLink link && this.id.Equals(link.id);
         }
 
         /// <summary>
