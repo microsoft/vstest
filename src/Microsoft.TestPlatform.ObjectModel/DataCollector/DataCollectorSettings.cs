@@ -149,8 +149,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         internal static DataCollectorSettings FromXml(XmlReader reader)
         {
-            DataCollectorSettings settings = new DataCollectorSettings();
-            settings.IsEnabled = true;
+            DataCollectorSettings settings = new DataCollectorSettings
+            {
+                IsEnabled = true
+            };
             bool empty = reader.IsEmptyElement;
             if (reader.HasAttributes)
             {

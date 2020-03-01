@@ -106,8 +106,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
-                    this.discoveryDataAggregator.IsAborted);
-                finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
+                    this.discoveryDataAggregator.IsAborted)
+                {
+                    Metrics = aggregatedDiscoveryDataMetrics
+                };
 
                 // send actual test discovery complete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);

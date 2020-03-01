@@ -794,8 +794,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -849,8 +851,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -949,8 +953,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -1013,8 +1019,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -1077,8 +1085,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -1126,8 +1136,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
@@ -1274,8 +1286,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1328,8 +1342,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1384,8 +1400,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
 
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1440,8 +1458,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
 
-            var testResult = new TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1496,8 +1516,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
 
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1553,8 +1575,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
 
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1608,8 +1632,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1670,8 +1696,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var testCaseList = new List<TestCase>() { testCase };
 
@@ -1944,8 +1972,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.InitializeCommunication();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            testResult.Outcome = TestOutcome.Passed;
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)
+            {
+                Outcome = TestOutcome.Passed
+            };
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);

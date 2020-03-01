@@ -20,9 +20,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var moqFileHelper = new Mock<IFileHelper>();
             moqFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
 
-            var sut = new ConsoleParameters(moqFileHelper.Object);
-
-            sut.LogFilePath = "c:\\users\\file location\\o.txt";
+            var sut = new ConsoleParameters(moqFileHelper.Object)
+            {
+                LogFilePath = "c:\\users\\file location\\o.txt"
+            };
 
             string result = sut.LogFilePath;
 

@@ -261,8 +261,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void CreateEventLog(string eventLogName)
         {
-            this.eventLog = new EventLog(eventLogName);
-            this.eventLog.EnableRaisingEvents = true;
+            this.eventLog = new EventLog(eventLogName)
+            {
+                EnableRaisingEvents = true
+            };
             this.eventLog.EntryWritten += this.OnEventLogEntryWritten;
             int currentCount = this.eventLog.Entries.Count;
             this.nextEntryIndexToCollect =

@@ -501,8 +501,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 false,
                 null,
                 null,
-                TimeSpan.FromSeconds(0));
-            testRunCompeleteEventsArgs.Metrics = dict;
+                TimeSpan.FromSeconds(0))
+            {
+                Metrics = dict
+            };
 
             // Act
             this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);

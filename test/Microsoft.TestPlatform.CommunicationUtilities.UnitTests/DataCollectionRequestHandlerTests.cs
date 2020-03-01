@@ -187,8 +187,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldProcessRequests()
         {
-            var testHostLaunchedPayload = new TestHostLaunchedPayload();
-            testHostLaunchedPayload.ProcessId = 1234;
+            var testHostLaunchedPayload = new TestHostLaunchedPayload
+            {
+                ProcessId = 1234
+            };
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart)
                                                                                 .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
@@ -233,8 +235,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldAddSourceDirectoryToTestPluginCache()
         {
-            var testHostLaunchedPayload = new TestHostLaunchedPayload();
-            testHostLaunchedPayload.ProcessId = 1234;
+            var testHostLaunchedPayload = new TestHostLaunchedPayload
+            {
+                ProcessId = 1234
+            };
 
             string runSettings = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
 

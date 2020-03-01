@@ -277,8 +277,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             string message = "Dummy message";
             TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
 
-            var testresult = new ObjectModel.TestResult(testcase);
-            testresult.Outcome = TestOutcome.Passed;
+            var testresult = new ObjectModel.TestResult(testcase)
+            {
+                Outcome = TestOutcome.Passed
+            };
             testresult.Messages.Add(testResultMessage);
 
             // Raise an event on mock object

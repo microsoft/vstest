@@ -134,32 +134,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <returns> The test extensions defined the extension assembly if it is already discovered. null if not.</returns>
         internal TestExtensions GetExtensionsDiscoveredFromAssembly(string extensionAssembly)
         {
-            var testExtensions = new TestExtensions();
-
-            testExtensions.TestDiscoverers =
+            var testExtensions = new TestExtensions
+            {
+                TestDiscoverers =
                 this.GetExtensionsDiscoveredFromAssembly<TestDiscovererPluginInformation>(
                     this.TestDiscoverers,
-                    extensionAssembly);
-            testExtensions.TestExecutors =
+                    extensionAssembly),
+                TestExecutors =
                 this.GetExtensionsDiscoveredFromAssembly<TestExecutorPluginInformation>(
                     this.TestExecutors,
-                    extensionAssembly);
-            testExtensions.TestSettingsProviders =
+                    extensionAssembly),
+                TestSettingsProviders =
                 this.GetExtensionsDiscoveredFromAssembly<TestSettingsProviderPluginInformation>(
                     this.TestSettingsProviders,
-                    extensionAssembly);
-            testExtensions.TestLoggers =
+                    extensionAssembly),
+                TestLoggers =
                 this.GetExtensionsDiscoveredFromAssembly<TestLoggerPluginInformation>(
                     this.TestLoggers,
-                    extensionAssembly);
-            testExtensions.TestHosts =
+                    extensionAssembly),
+                TestHosts =
                 this.GetExtensionsDiscoveredFromAssembly<TestRuntimePluginInformation>(
                     this.TestHosts,
-                    extensionAssembly);
-            testExtensions.DataCollectors =
+                    extensionAssembly),
+                DataCollectors =
                 this.GetExtensionsDiscoveredFromAssembly<DataCollectorConfig>(
                     this.DataCollectors,
-                    extensionAssembly);
+                    extensionAssembly)
+            };
 
             if (testExtensions.TestDiscoverers.Any() || testExtensions.TestExecutors.Any() || testExtensions.TestSettingsProviders.Any() ||
                 testExtensions.TestLoggers.Any() || testExtensions.TestHosts.Any() || testExtensions.DataCollectors.Any())

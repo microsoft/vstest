@@ -30,9 +30,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void EnableShutdownAfterTestRunShoudBeSetAppropriately()
         {
             var tec = GetTestExecutionContext();
-            var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null);
-
-            frameworkHandle.EnableShutdownAfterTestRun = true;
+            var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null)
+            {
+                EnableShutdownAfterTestRun = true
+            };
 
             Assert.IsTrue(frameworkHandle.EnableShutdownAfterTestRun);
         }

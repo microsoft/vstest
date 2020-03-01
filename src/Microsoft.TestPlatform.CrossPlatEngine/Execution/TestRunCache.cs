@@ -172,8 +172,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 lock (this.syncObject)
                 {
-                    var stats = new TestRunStatistics(new Dictionary<TestOutcome, long>(this.runStats));
-                    stats.ExecutedTests = this.TotalExecutedTests;
+                    var stats = new TestRunStatistics(new Dictionary<TestOutcome, long>(this.runStats))
+                    {
+                        ExecutedTests = this.TotalExecutedTests
+                    };
 
                     return stats;
                 }

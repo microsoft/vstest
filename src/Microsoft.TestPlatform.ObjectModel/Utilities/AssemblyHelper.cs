@@ -38,15 +38,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 var referenceAssemblyName = referenceAssembly.Name;
                 var referenceAssemblyPublicKeyToken = referenceAssembly.GetPublicKeyToken();
 
-                var setupInfo = new AppDomainSetup();
-                setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(source));
+                var setupInfo = new AppDomainSetup
+                {
+                    ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(source)),
 
-                // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
-                // Set LoaderOptimization to MultiDomainHost which means:
-                //   Indicates that the application will probably host unique code in multiple domains,
-                //   and the loader must share resources across application domains only for globally available (strong-named)
-                //   assemblies that have been added to the global assembly cache.
-                setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+                    // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
+                    // Set LoaderOptimization to MultiDomainHost which means:
+                    //   Indicates that the application will probably host unique code in multiple domains,
+                    //   and the loader must share resources across application domains only for globally available (strong-named)
+                    //   assemblies that have been added to the global assembly cache.
+                    LoaderOptimization = LoaderOptimization.MultiDomainHost
+                };
 
                 AppDomain ad = null;
                 try
@@ -101,9 +103,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             ValidateArg.NotNullOrEmpty(testSource, "testSource");
 
             var sourceDirectory = Path.GetDirectoryName(testSource);
-            var setupInfo = new AppDomainSetup();
-            setupInfo.ApplicationBase = sourceDirectory;
-            setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+            var setupInfo = new AppDomainSetup
+            {
+                ApplicationBase = sourceDirectory,
+                LoaderOptimization = LoaderOptimization.MultiDomainHost
+            };
             AppDomain ad = null;
             try
             {
@@ -171,15 +175,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             Debug.Assert(!string.IsNullOrEmpty(source));
 
-            var setupInfo = new AppDomainSetup();
-            setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(source));
+            var setupInfo = new AppDomainSetup
+            {
+                ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(source)),
 
-            // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
-            // Set LoaderOptimization to MultiDomainHost which means:
-            //   Indicates that the application will probably host unique code in multiple domains,
-            //   and the loader must share resources across application domains only for globally available (strong-named)
-            //   assemblies that have been added to the global assembly cache.
-            setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+                // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
+                // Set LoaderOptimization to MultiDomainHost which means:
+                //   Indicates that the application will probably host unique code in multiple domains,
+                //   and the loader must share resources across application domains only for globally available (strong-named)
+                //   assemblies that have been added to the global assembly cache.
+                LoaderOptimization = LoaderOptimization.MultiDomainHost
+            };
 
             AppDomain ad = null;
             try
@@ -245,15 +251,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             Debug.Assert(!string.IsNullOrEmpty(path));
 
-            var setupInfo = new AppDomainSetup();
-            setupInfo.ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(path));
+            var setupInfo = new AppDomainSetup
+            {
+                ApplicationBase = Path.GetDirectoryName(Path.GetFullPath(path)),
 
-            // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
-            // Set LoaderOptimization to MultiDomainHost which means:
-            //   Indicates that the application will probably host unique code in multiple domains,
-            //   and the loader must share resources across application domains only for globally available (strong-named)
-            //   assemblies that have been added to the global assembly cache.
-            setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+                // In Dev10 by devenv uses its own app domain host which has default optimization to share everything.
+                // Set LoaderOptimization to MultiDomainHost which means:
+                //   Indicates that the application will probably host unique code in multiple domains,
+                //   and the loader must share resources across application domains only for globally available (strong-named)
+                //   assemblies that have been added to the global assembly cache.
+                LoaderOptimization = LoaderOptimization.MultiDomainHost
+            };
 
             if (File.Exists(path))
             {

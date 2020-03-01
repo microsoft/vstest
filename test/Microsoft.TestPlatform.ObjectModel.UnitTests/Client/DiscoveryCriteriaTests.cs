@@ -25,8 +25,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client
             this.discoveryCriteria = new DiscoveryCriteria(
                                          new[] { "sampleTest.dll" },
                                          100,
-                                         "<RunConfiguration></RunConfiguration>");
-            this.discoveryCriteria.TestCaseFilter = "TestFilter";
+                                         "<RunConfiguration></RunConfiguration>")
+            {
+                TestCaseFilter = "TestFilter"
+            };
         }
 
         [TestMethod]

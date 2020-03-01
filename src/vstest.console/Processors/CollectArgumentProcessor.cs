@@ -155,9 +155,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
             {
-                dataCollectorSettings = new DataCollectorSettings();
-                dataCollectorSettings.FriendlyName = argument;
-                dataCollectorSettings.IsEnabled = true;
+                dataCollectorSettings = new DataCollectorSettings
+                {
+                    FriendlyName = argument,
+                    IsEnabled = true
+                };
                 dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
             }
             else
@@ -176,11 +178,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
             {
                 // Create a new setting with default values
-                dataCollectorSettings = new DataCollectorSettings();
-                dataCollectorSettings.FriendlyName = argument;
-                dataCollectorSettings.AssemblyQualifiedName = CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
-                dataCollectorSettings.CodeBase = GetCoverletCodeBasePath(runSettingProvider, fileHelper) ?? CoverletConstants.CoverletDataCollectorCodebase;
-                dataCollectorSettings.IsEnabled = true;
+                dataCollectorSettings = new DataCollectorSettings
+                {
+                    FriendlyName = argument,
+                    AssemblyQualifiedName = CoverletConstants.CoverletDataCollectorAssemblyQualifiedName,
+                    CodeBase = GetCoverletCodeBasePath(runSettingProvider, fileHelper) ?? CoverletConstants.CoverletDataCollectorCodebase,
+                    IsEnabled = true
+                };
                 dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
             }
             else

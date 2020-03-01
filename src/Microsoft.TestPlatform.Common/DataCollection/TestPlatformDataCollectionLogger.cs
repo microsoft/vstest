@@ -143,9 +143,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 throw new InvalidOperationException(Resources.Resources.WrongDataCollectionContextType);
             }
 
-            var args = new DataCollectionMessageEventArgs(level, text);
-            args.Uri = this.dataCollectorConfig.TypeUri;
-            args.FriendlyName = this.dataCollectorConfig.FriendlyName;
+            var args = new DataCollectionMessageEventArgs(level, text)
+            {
+                Uri = this.dataCollectorConfig.TypeUri,
+                FriendlyName = this.dataCollectorConfig.FriendlyName
+            };
             if (context.HasTestCase)
             {
                 args.TestCaseId = context.TestExecId.Id;

@@ -56,8 +56,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <returns>An environment context for a local (hosted) agent and controller</returns>
         public static DataCollectionEnvironmentContext CreateForLocalEnvironment(DataCollectionContext sessionDataCollectionContext)
         {
-            var dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext();
-            dataCollectionEnvironmentContext.SessionDataCollectionContext = sessionDataCollectionContext;
+            var dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext
+            {
+                SessionDataCollectionContext = sessionDataCollectionContext
+            };
 
             return dataCollectionEnvironmentContext;
         }

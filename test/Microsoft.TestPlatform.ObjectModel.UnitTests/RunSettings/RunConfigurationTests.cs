@@ -116,8 +116,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
 #pragma warning disable 612, 618
 
-            var runConfiguration = new RunConfiguration();
-            runConfiguration.TargetFrameworkVersion = FrameworkVersion.Framework35;
+            var runConfiguration = new RunConfiguration
+            {
+                TargetFrameworkVersion = FrameworkVersion.Framework35
+            };
             StringAssert.Equals(Framework.FromString("Framework35").Name, runConfiguration.TargetFramework.Name);
             Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
@@ -143,11 +145,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void SetTargetFrameworkShouldSetTargetFrameworkVersion()
         {
-            var runConfiguration = new RunConfiguration();
+            var runConfiguration = new RunConfiguration
+            {
 
 #pragma warning disable 612, 618
 
-            runConfiguration.TargetFramework = Framework.FromString("Framework35");
+                TargetFramework = Framework.FromString("Framework35")
+            };
             Assert.AreEqual(FrameworkVersion.Framework35, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFramework = Framework.FromString("Framework40");

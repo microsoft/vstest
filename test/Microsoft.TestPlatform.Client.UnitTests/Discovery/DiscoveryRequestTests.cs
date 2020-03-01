@@ -175,8 +175,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            discoveryCompleteEventArgs.Metrics = dict;
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false)
+            {
+                Metrics = dict
+            };
 
             // Act
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());

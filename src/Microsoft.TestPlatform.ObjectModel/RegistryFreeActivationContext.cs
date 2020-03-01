@@ -49,10 +49,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return;
             }
 
-            ActivationContextNativeMethods.ACTCTX context = new ActivationContextNativeMethods.ACTCTX();
-            context.cbSize = Marshal.SizeOf(typeof(ActivationContextNativeMethods.ACTCTX));
+            ActivationContextNativeMethods.ACTCTX context = new ActivationContextNativeMethods.ACTCTX
+            {
+                cbSize = Marshal.SizeOf(typeof(ActivationContextNativeMethods.ACTCTX)),
 
-            context.lpSource = this.manifestFilePath;
+                lpSource = this.manifestFilePath
+            };
 
             hActCtx = ActivationContextNativeMethods.CreateActCtx(ref context);
             if (hActCtx == (IntPtr)(-1))

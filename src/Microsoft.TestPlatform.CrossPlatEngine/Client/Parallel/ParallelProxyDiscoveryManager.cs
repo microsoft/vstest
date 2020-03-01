@@ -206,8 +206,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
 
                 // Kick off another discovery task for the next source
-                var discoveryCriteria = new DiscoveryCriteria(new[] { nextSource }, this.actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, this.actualDiscoveryCriteria.DiscoveredTestEventTimeout, this.actualDiscoveryCriteria.RunSettings);
-                discoveryCriteria.TestCaseFilter = this.actualDiscoveryCriteria.TestCaseFilter;
+                var discoveryCriteria = new DiscoveryCriteria(new[] { nextSource }, this.actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, this.actualDiscoveryCriteria.DiscoveredTestEventTimeout, this.actualDiscoveryCriteria.RunSettings)
+                {
+                    TestCaseFilter = this.actualDiscoveryCriteria.TestCaseFilter
+                };
                 Task.Run(() =>
                     {
                         if (EqtTrace.IsVerboseEnabled)

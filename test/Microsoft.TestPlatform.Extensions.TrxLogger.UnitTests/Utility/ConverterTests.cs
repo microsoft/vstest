@@ -153,8 +153,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
                 new AttachmentSet(new Uri("xyz://microsoft/random/2.0"), "XPlat test run")
             };
 
-            var testRun = new TestRun(Guid.NewGuid());
-            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1");
+            var testRun = new TestRun(Guid.NewGuid())
+            {
+                RunConfiguration = new TestRunConfiguration("Testrun 1")
+            };
             attachmentSets[0].Attachments.Add(uriDataAttachment1);
 
             var resultFiles = this.converter.ToResultFiles(attachmentSets, testRun, @"c:\temp", null);
@@ -192,8 +194,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
                 new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), "Code Coverage")
             };
 
-            testRun = new TestRun(Guid.NewGuid());
-            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1");
+            testRun = new TestRun(Guid.NewGuid())
+            {
+                RunConfiguration = new TestRunConfiguration("Testrun 1")
+            };
             attachmentSets[0].Attachments.Add(uriDataAttachment1);
             attachmentSets[0].Attachments.Add(uriDataAttachment2);
             testResultsDirectory = Path.Combine(tempDir, "TestResults");

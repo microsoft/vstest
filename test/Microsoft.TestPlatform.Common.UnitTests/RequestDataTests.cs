@@ -26,8 +26,10 @@ namespace Microsoft.TestPlatform.Common.UnitTests
         [TestMethod]
         public void RequestDataShouldReturnValidProtocolConfig()
         {
-            var requestData = new RequestData();
-            requestData.ProtocolConfig = new ProtocolConfig { Version = 2 };
+            var requestData = new RequestData
+            {
+                ProtocolConfig = new ProtocolConfig { Version = 2 }
+            };
 
             Assert.AreEqual(2, requestData.ProtocolConfig.Version);
         }
@@ -36,23 +38,29 @@ namespace Microsoft.TestPlatform.Common.UnitTests
         [ExpectedException(typeof(ArgumentNullException))]
         public void RequestDataShouldThrowArgumentNullExpectionOnNullMetricsCollection()
         {
-            var requestData = new RequestData();
-            requestData.MetricsCollection = null;
+            var requestData = new RequestData
+            {
+                MetricsCollection = null
+            };
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RequestDataShouldThrowArgumentNullExpectionOnNullProtocolConfig()
         {
-            var requestData = new RequestData();
-            requestData.ProtocolConfig = null;
+            var requestData = new RequestData
+            {
+                ProtocolConfig = null
+            };
         }
 
         [TestMethod]
         public void RequestDataShouldReturnIsTelemetryOptedInTrueIfTelemetryOptedIn()
         {
-            var requestData = new RequestData();
-            requestData.IsTelemetryOptedIn = true;
+            var requestData = new RequestData
+            {
+                IsTelemetryOptedIn = true
+            };
 
             Assert.IsTrue(requestData.IsTelemetryOptedIn);
         }
@@ -60,8 +68,10 @@ namespace Microsoft.TestPlatform.Common.UnitTests
         [TestMethod]
         public void RequestDataShouldReturnIsTelemetryOptedInFalseIfTelemetryOptedOut()
         {
-            var requestData = new RequestData();
-            requestData.IsTelemetryOptedIn = false;
+            var requestData = new RequestData
+            {
+                IsTelemetryOptedIn = false
+            };
 
             Assert.IsFalse(requestData.IsTelemetryOptedIn);
         }

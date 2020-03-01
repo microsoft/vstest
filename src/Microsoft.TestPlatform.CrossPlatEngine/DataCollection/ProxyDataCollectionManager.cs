@@ -205,8 +205,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <inheritdoc />
         public void TestHostLaunched(int processId)
         {
-            var payload = new TestHostLaunchedPayload();
-            payload.ProcessId = processId;
+            var payload = new TestHostLaunchedPayload
+            {
+                ProcessId = processId
+            };
 
             this.dataCollectionRequestSender.SendTestHostLaunched(payload);
         }

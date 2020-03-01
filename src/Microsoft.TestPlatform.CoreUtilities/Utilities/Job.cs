@@ -52,8 +52,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             get
             {
-                var shutdownJob = new Job<TPayload>();
-                shutdownJob.Shutdown = true;
+                var shutdownJob = new Job<TPayload>
+                {
+                    Shutdown = true
+                };
 
                 return shutdownJob;
             }
@@ -91,8 +93,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent)
         {
             ValidateArg.NotNull<ManualResetEvent>(waitEvent, "waitEvent");
-            var waitJob = new Job<TPayload>();
-            waitJob.WaitManualResetEvent = waitEvent;
+            var waitJob = new Job<TPayload>
+            {
+                WaitManualResetEvent = waitEvent
+            };
 
             return waitJob;
         }

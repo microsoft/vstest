@@ -416,8 +416,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true; });
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            var args = new TestCaseEndEventArgs();
-            args.TestElement = new TestCase();
+            var args = new TestCaseEndEventArgs
+            {
+                TestElement = new TestCase()
+            };
             this.dataCollectionManager.TestCaseEnded(args);
 
             Assert.IsTrue(isEndInvoked);

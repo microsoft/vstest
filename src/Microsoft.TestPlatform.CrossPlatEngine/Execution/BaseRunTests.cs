@@ -313,12 +313,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, this.testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
 
-            this.runContext = new RunContext();
-            this.runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings);
-            this.runContext.KeepAlive = this.testExecutionContext.KeepAlive;
-            this.runContext.InIsolation = this.testExecutionContext.InIsolation;
-            this.runContext.IsDataCollectionEnabled = this.testExecutionContext.IsDataCollectionEnabled;
-            this.runContext.IsBeingDebugged = this.testExecutionContext.IsDebug;
+            this.runContext = new RunContext
+            {
+                RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings),
+                KeepAlive = this.testExecutionContext.KeepAlive,
+                InIsolation = this.testExecutionContext.InIsolation,
+                IsDataCollectionEnabled = this.testExecutionContext.IsDataCollectionEnabled,
+                IsBeingDebugged = this.testExecutionContext.IsDebug
+            };
 
             var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettings);
             this.runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
@@ -574,8 +576,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     aborted,
                     exception,
                     attachments,
-                    elapsedTime);
-                testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
+                    elapsedTime)
+                {
+                    Metrics = this.requestData.MetricsCollection.Metrics
+                };
 
                 this.testRunEventsHandler.HandleTestRunComplete(
                     testRunCompleteEventArgs,

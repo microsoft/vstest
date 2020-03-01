@@ -39,14 +39,18 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 dataTable.Locale = CultureInfo.InvariantCulture;
 
                 // The MaxLength of the Type and Source columns must be set to allow indices to be created on them
-                DataColumn typeColumn = new DataColumn("Type", typeof(string));
-                typeColumn.MaxLength = EventLogConstants.TypeColumnMaxLength;
+                DataColumn typeColumn = new DataColumn("Type", typeof(string))
+                {
+                    MaxLength = EventLogConstants.TypeColumnMaxLength
+                };
                 dataTable.Columns.Add(typeColumn);
 
                 dataTable.Columns.Add(new DataColumn("DateTime", typeof(DateTime)));
 
-                DataColumn sourceColumn = new DataColumn("Source", typeof(string));
-                sourceColumn.MaxLength = EventLogConstants.SourceColumnMaxLength;
+                DataColumn sourceColumn = new DataColumn("Source", typeof(string))
+                {
+                    MaxLength = EventLogConstants.SourceColumnMaxLength
+                };
                 dataTable.Columns.Add(sourceColumn);
 
                 dataTable.Columns.Add(new DataColumn("Category", typeof(string)));
@@ -71,8 +75,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     dataTable.Rows.Add(row);
                 }
 
-                DataSet dataSet = new DataSet();
-                dataSet.Locale = CultureInfo.InvariantCulture;
+                DataSet dataSet = new DataSet
+                {
+                    Locale = CultureInfo.InvariantCulture
+                };
                 dataSet.Tables.Add(dataTable);
 
                 // Use UTF-16 encoding

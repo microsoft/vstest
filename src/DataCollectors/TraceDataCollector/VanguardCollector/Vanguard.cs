@@ -246,15 +246,19 @@ namespace Microsoft.VisualStudio.Coverage
                 commandLine,
                 wait,
                 standardErrorAsynchronousCall);
-            ProcessStartInfo info = new ProcessStartInfo(vanguardPath, commandLine);
-            info.WorkingDirectory = Directory.GetCurrentDirectory();
-            info.UseShellExecute = false;
-            info.CreateNoWindow = true;
-            info.RedirectStandardError = true;
+            ProcessStartInfo info = new ProcessStartInfo(vanguardPath, commandLine)
+            {
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardError = true
+            };
 
-            Process process = new Process();
-            process.StartInfo = info;
-            process.EnableRaisingEvents = true;
+            Process process = new Process
+            {
+                StartInfo = info,
+                EnableRaisingEvents = true
+            };
 
             if (standardErrorAsynchronousCall)
             {

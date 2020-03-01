@@ -117,8 +117,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
-            var testProcessStartInfo = new TestProcessStartInfo();
-            testProcessStartInfo.Arguments = string.Empty;
+            var testProcessStartInfo = new TestProcessStartInfo
+            {
+                Arguments = string.Empty
+            };
 
             var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
             proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
@@ -134,8 +136,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
-            var testProcessStartInfo = new TestProcessStartInfo();
-            testProcessStartInfo.Arguments = string.Empty;
+            var testProcessStartInfo = new TestProcessStartInfo
+            {
+                Arguments = string.Empty
+            };
 
             var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
 
@@ -154,8 +158,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
-            var testProcessStartInfo = new TestProcessStartInfo();
-            testProcessStartInfo.Arguments = string.Empty;
+            var testProcessStartInfo = new TestProcessStartInfo
+            {
+                Arguments = string.Empty
+            };
 
             var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
 

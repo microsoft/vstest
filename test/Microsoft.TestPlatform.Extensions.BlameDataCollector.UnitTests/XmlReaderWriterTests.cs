@@ -150,8 +150,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void WriteTestSequenceShouldWriteCorrectFileContentsIfTestCompletedIsFalse()
         {
             var xmlReaderWriter = new XmlReaderWriter();
-            var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"));
-            testObject.DisplayName = "UnitTest1";
+            var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"))
+            {
+                DisplayName = "UnitTest1"
+            };
             var testSequence = new List<Guid>
             {
                 testObject.Id
@@ -178,8 +180,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void WriteTestSequenceShouldWriteCorrectFileContentsIfTestCompletedIsTrue()
         {
             var xmlReaderWriter = new XmlReaderWriter();
-            var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"));
-            testObject.DisplayName = "UnitTest1";
+            var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"))
+            {
+                DisplayName = "UnitTest1"
+            };
             var testSequence = new List<Guid>
             {
                 testObject.Id

@@ -268,8 +268,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 var clone = new TestCase(
                     tr.TestCase.FullyQualifiedName,
                     tr.TestCase.ExecutorUri,
-                    tr.TestCase.Source);
-                clone.Id = tr.TestCase.Id;
+                    tr.TestCase.Source)
+                {
+                    Id = tr.TestCase.Id
+                };
 
                 Assert.IsTrue(cache.OnTestCompletion(clone));
 

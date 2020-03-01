@@ -76,8 +76,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             // Replace bad chars by this.
             char replacementChar = '_';
-            StringBuilder result = new StringBuilder(fileName.Length);
-            result.Length = fileName.Length;
+            StringBuilder result = new StringBuilder(fileName.Length)
+            {
+                Length = fileName.Length
+            };
 
             // Replace each invalid char with replacement char.
             for (int i = 0; i < fileName.Length; ++i)

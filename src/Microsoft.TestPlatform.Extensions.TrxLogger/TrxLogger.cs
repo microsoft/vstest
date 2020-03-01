@@ -487,7 +487,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             if (isLogFilePrefixParameterExists)
             {
-                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))              
+                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))
                 {
                     var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
                     if (framework != null)
@@ -533,18 +533,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 return;
 
             Guid runId = Guid.NewGuid();
-            this.testRun = new TestRun(runId);
+            this.testRun = new TestRun(runId)
+            {
 
-            // We cannot rely on the StartTime for the first test result
-            // In case of parallel, first test result is the fastest test and not the one which started first.
-            // Setting Started to DateTime.Now in Initialize will make sure we include the startup cost, which was being ignored earlier.
-            // This is in parity with the way we set this.testRun.Finished
-            this.testRun.Started = this.testRunStartTime;
+                // We cannot rely on the StartTime for the first test result
+                // In case of parallel, first test result is the fastest test and not the one which started first.
+                // Setting Started to DateTime.Now in Initialize will make sure we include the startup cost, which was being ignored earlier.
+                // This is in parity with the way we set this.testRun.Finished
+                Started = this.testRunStartTime
+            };
 
             // Save default test settings
             string runDeploymentRoot = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
-            TestRunConfiguration testrunConfig = new TestRunConfiguration("default");
-            testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
+            TestRunConfiguration testrunConfig = new TestRunConfiguration("default")
+            {
+                RunDeploymentRootDirectory = runDeploymentRoot
+            };
             this.testRun.RunConfiguration = testrunConfig;
         }
 
@@ -699,8 +703,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="parentTestElement"></param>
         private void UpdateTestEntries(Guid executionId, Guid parentExecutionId, ITestElement testElement, ITestElement parentTestElement)
         {
-            TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id);
-            te.ExecutionId = executionId;
+            TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id)
+            {
+                ExecutionId = executionId
+            };
 
             if (parentTestElement == null)
             {

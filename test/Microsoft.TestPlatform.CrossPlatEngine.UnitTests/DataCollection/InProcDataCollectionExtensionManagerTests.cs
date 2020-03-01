@@ -238,9 +238,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerTestCaseStartShouldCallInProcDataCollector()
         {
-            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-            // random guid
-            testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
+            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll")
+            {
+                // random guid
+                Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD")
+            };
             this.mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
 
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
@@ -252,9 +254,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerTestCaseEndShouldtBeCalledMultipleTimesInDataDrivenScenario()
         {
-            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-            // random guid
-            testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
+            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll")
+            {
+                // random guid
+                Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD")
+            };
             this.mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
             this.mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
             this.mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
@@ -267,7 +271,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper) 
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper)
                 : base(runSettings, mockTestEventsPublisher, defaultCodebase, testPluginCache, fileHelper)
             {
             }

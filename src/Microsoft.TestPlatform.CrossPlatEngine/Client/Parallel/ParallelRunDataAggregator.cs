@@ -85,8 +85,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
             }
 
-            var overallRunStats = new TestRunStatistics(testOutcomeMap);
-            overallRunStats.ExecutedTests = totalTests;
+            var overallRunStats = new TestRunStatistics(testOutcomeMap)
+            {
+                ExecutedTests = totalTests
+            };
             return overallRunStats;
         }
 

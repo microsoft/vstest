@@ -35,8 +35,10 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.attachmentSets = new Collection<AttachmentSet>();
             this.attachmentSets.Add(attachmentSet);
 
-            this.testcase = new TestCase();
-            this.testcase.Id = Guid.NewGuid();
+            this.testcase = new TestCase
+            {
+                Id = Guid.NewGuid()
+            };
             this.mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseEnd(It.IsAny<TestCaseEndEventArgs>())).Returns(this.attachmentSets);
             this.mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(this.testcase, TestOutcome.Passed));
             this.testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testcase);

@@ -410,8 +410,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
 
-            var testableTestPluginCache = new TestableTestPluginCache(extensions.ToList());
-            testableTestPluginCache.Action = callback;
+            var testableTestPluginCache = new TestableTestPluginCache(extensions.ToList())
+            {
+                Action = callback
+            };
 
             // Setup the testable instance.
             TestPluginCache.Instance = testableTestPluginCache;

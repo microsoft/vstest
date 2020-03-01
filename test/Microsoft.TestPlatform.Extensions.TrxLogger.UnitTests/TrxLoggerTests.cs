@@ -163,17 +163,25 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
             ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
-            passResult1.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2);
-            passResult2.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1);
-            failResult1.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
 
-            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
             Mock<TestResultEventArgs> pass1 = new Mock<TestResultEventArgs>(passResult1);
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);
@@ -197,17 +205,25 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
             ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
-            passResult1.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2);
-            passResult2.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1);
-            failResult1.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
 
-            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
             Mock<TestResultEventArgs> pass1 = new Mock<TestResultEventArgs>(passResult1);
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);
@@ -227,8 +243,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
@@ -245,11 +263,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var testCase1 = CreateTestCase("testCase1");
             ObjectModel.TestCase testCase2 = CreateTestCase("testCase2");
 
-            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
-            result1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
-            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
-            result2.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
 
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
@@ -266,11 +288,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
             ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
 
-            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
-            result1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
-            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
-            result2.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
@@ -289,8 +315,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
 
-            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
-            result2.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
 
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
@@ -312,8 +340,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result1.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase1);
-            result2.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -352,8 +382,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -383,8 +415,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -413,8 +447,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -446,8 +482,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -480,8 +518,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -513,8 +553,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
@@ -549,17 +591,25 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
             ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
-            passResult1.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2);
-            passResult2.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1);
-            failResult1.Outcome = ObjectModel.TestOutcome.Failed;
+            ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Failed
+            };
 
-            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
             Mock<TestResultEventArgs> pass1 = new Mock<TestResultEventArgs>(passResult1);
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);
@@ -585,14 +635,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
             ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
-            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
-            passResult1.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2);
-            passResult2.Outcome = ObjectModel.TestOutcome.Passed;
+            ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2)
+            {
+                Outcome = ObjectModel.TestOutcome.Passed
+            };
 
-            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1)
+            {
+                Outcome = ObjectModel.TestOutcome.Skipped
+            };
 
             Mock<TestResultEventArgs> pass1 = new Mock<TestResultEventArgs>(passResult1);
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);

@@ -110,9 +110,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldProcessBeforeTestCaseStartEvent()
         {
-            var message = new Message();
-            message.MessageType = MessageType.DataCollectionTestStart;
-            message.Payload = JToken.FromObject(new TestCaseEndEventArgs());
+            var message = new Message
+            {
+                MessageType = MessageType.DataCollectionTestStart,
+                Payload = JToken.FromObject(new TestCaseEndEventArgs())
+            };
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
@@ -126,8 +128,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldProcessAfterTestCaseCompleteEvent()
         {
-            var message = new Message();
-            message.MessageType = MessageType.DataCollectionTestEnd;
+            var message = new Message
+            {
+                MessageType = MessageType.DataCollectionTestEnd
+            };
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             message.Payload = JToken.FromObject(new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase)));
 

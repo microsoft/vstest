@@ -490,10 +490,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         var discoveryCompletePayload =
                             this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted)
+                        {
 
-                        // Adding Metrics From VsTestConsole
-                        discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                            // Adding Metrics From VsTestConsole
+                            Metrics = discoveryCompletePayload.Metrics
+                        };
 
                         eventHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
@@ -556,10 +558,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         var discoveryCompletePayload =
                             this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted)
+                        {
 
-                        // Adding Metrics from VsTestConsole
-                        discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                            // Adding Metrics from VsTestConsole
+                            Metrics = discoveryCompletePayload.Metrics
+                        };
 
                         eventHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,

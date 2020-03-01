@@ -424,8 +424,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 // Send discovery complete to logger manager.
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
-                discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted)
+                {
+                    Metrics = discoveryCompletePayload.Metrics
+                };
                 this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
             }
         }
