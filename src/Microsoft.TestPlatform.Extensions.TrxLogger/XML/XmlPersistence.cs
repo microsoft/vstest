@@ -761,7 +761,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         private string GetNamespaceUriOrDefault(string nameSpaceUri)
         {
-            return nameSpaceUri != null ? nameSpaceUri : this.namespaceUri;
+            return nameSpaceUri ?? this.namespaceUri;
         }
 
 

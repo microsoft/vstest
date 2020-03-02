@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                     {
                         if (this.metadata == null && this.testPluginInfo != null)
                         {
-                            var parameters = this.testPluginInfo.Metadata == null ? null : this.testPluginInfo.Metadata.ToArray();
+                            var parameters = this.testPluginInfo.Metadata?.ToArray();
                             var dataObject = Activator.CreateInstance(this.metadataType, parameters);
                             this.metadata = (TMetadata)dataObject;
                         }
