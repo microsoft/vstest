@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(null);
             Assert.IsTrue(argsDictionary.Count == 0);
 
-            argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(new string[] { });
+            argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(System.Array.Empty<string>());
             Assert.IsTrue(argsDictionary.Count == 0);
         }
 
