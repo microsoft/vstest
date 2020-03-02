@@ -15,7 +15,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         public void FakesSettingsShouldBeNotGeneratedIfTargetFrameWorkIsNetCore()
         {
             string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.netstandard,Version=5.0</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
-            var generatedRunSettings = FakesUtilities.GenerateFakesSettingsForRunConfiguration(Array.Empty<string>(), runSettingsXml);
+            var generatedRunSettings = FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { }, runSettingsXml);
             Assert.AreEqual(generatedRunSettings, runSettingsXml);
         }
 
@@ -29,7 +29,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void FakesSettingsShouldThrowExceptionIfRunSettingsIsPassedAsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(Array.Empty<string>(), null));
+            Assert.ThrowsException<ArgumentNullException>(() => FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] { }, null));
         }
 
         [TestMethod]

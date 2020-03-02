@@ -552,7 +552,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Create logger instance
                 var constructorInfo = loggerType?.GetConstructor(Type.EmptyTypes);
-                var logger = constructorInfo?.Invoke(Array.Empty<object>());
+                var logger = constructorInfo?.Invoke(new object[] { });
 
                 // Handle logger null scenario.
                 if (logger == null)

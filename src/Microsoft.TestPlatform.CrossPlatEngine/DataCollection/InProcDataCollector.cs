@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             object obj = null;
 
             var constructorInfo = type.GetConstructor(Type.EmptyTypes);
-            obj = constructorInfo?.Invoke(Array.Empty<object>());
+            obj = constructorInfo?.Invoke(new object[] { });
 
             return obj;
         }
