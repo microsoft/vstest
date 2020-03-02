@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Initializes a new instance of <see cref="CommunicationException" /> class with provided
         /// message.
         /// </summary>
-        /// <param Name="message">Message describing the error.</param>
+        /// <param name="message">Message describing the error.</param>
         public CommunicationException(string message)
             : base(message)
         {
@@ -31,8 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Initializes a new instance of <see cref="CommunicationException" /> class with provided
         /// message and inner exception.
         /// </summary>
-        /// <param Name="message">Message describing the error.</param>
-        /// <param Name="inner">Inner exception.</param>
+        /// <param name="message">Message describing the error.</param>
+        /// <param name="inner">Inner exception.</param>
         public CommunicationException(string message, Exception inner)
             : base(message, inner)
         {
