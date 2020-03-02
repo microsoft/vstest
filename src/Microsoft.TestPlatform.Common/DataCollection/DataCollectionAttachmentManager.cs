@@ -322,10 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                             }
                         }
 
-                        if (sendFileCompletedCallback != null)
-                        {
-                            sendFileCompletedCallback(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
-                        }
+                        sendFileCompletedCallback?.Invoke(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
                     }
                     catch (Exception e)
                     {
