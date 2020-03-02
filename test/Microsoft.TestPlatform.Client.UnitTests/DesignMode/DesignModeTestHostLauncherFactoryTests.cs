@@ -30,12 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var testRunRequestPayload = new TestRunRequestPayload { DebuggingEnabled = true };
             var launcher = DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(mockDesignModeClient.Object, testRunRequestPayload);
 
-            // Accepted behavior.
-            // No more debug launchers are returned, not even in debugging context.
-            // Workflow changed and debugging is no longer a matter of correctly getting the
-            // launcher. The test platform must explicitly make a request to attach to the debugger
-            // based on info it gets from the adapters.
-            Assert.IsFalse(launcher.IsDebug, "Factory must return non-debug launcher if debugging is enabled.");
+            Assert.IsTrue(launcher.IsDebug, "Factory must return non-debug launcher if debugging is enabled.");
         }
     }
 }

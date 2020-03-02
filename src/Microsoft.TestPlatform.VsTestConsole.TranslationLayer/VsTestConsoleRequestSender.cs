@@ -636,6 +636,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
+                    else if (string.Equals(MessageType.AttachDebuggerToProcess, message.MessageType))
+                    {
+                        AttachDebuggerToProcess(customHostLauncher, message);
+                    }
                 }
             }
             catch (Exception exception)
@@ -698,6 +702,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
+                    }
+                    else if (string.Equals(MessageType.AttachDebuggerToProcess, message.MessageType))
+                    {
+                        AttachDebuggerToProcess(customHostLauncher, message);
                     }
                 }
             }
@@ -768,6 +776,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 // Always unblock the Vstest.console thread which is indefintitely waiting on this ACK
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload, this.protocolVersion);
+            }
+        }
+
+        private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+        {
+            if (customHostLauncher == null)
+            {
+                throw new ArgumentNullException("VsTestConsoleRequestSender.AttachDebuggerToProcess: test host launcher cannot be null.");
+            }
+            if (!(customHostLauncher is ITestHostLauncher2 launcher))
+            {
+                throw new NotSupportedException("VsTestConsoleRequestSender.AttachDebuggerToProcess: test host launcher is not ITestHostLauncher2.");
+            }
+
+            bool response = false;
+            try
+            {
+                var pid = this.dataSerializer.DeserializePayload<int>(message);
+                response = launcher.AttachDebuggerToProcess(pid);
+
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}", ex);
+            }
+            finally
+            {
+                this.communicationManager.SendMessage(MessageType.AttachDebuggerToProcessCallback, response, this.protocolVersion);
             }
         }
     }

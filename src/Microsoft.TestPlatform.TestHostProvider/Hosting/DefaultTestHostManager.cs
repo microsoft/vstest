@@ -365,19 +365,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
             EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-            if (this.customTestHostLauncher == null)
-            {
-                EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-
-                cancellationToken.ThrowIfCancellationRequested();
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) as Process;
-            }
-            else
-            {
-                int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo, cancellationToken);
-                this.testHostProcess = Process.GetProcessById(processId);
-                this.processHelper.SetExitCallback(processId, this.ExitCallBack);
-            }
+            EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+            cancellationToken.ThrowIfCancellationRequested();
+            this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) as Process;
 
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
             return this.testHostProcess != null;

@@ -409,16 +409,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
 
-            int index = -1;
+            int index = 0;
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
                 // Get the executor from cache.
-                var executor = executorCache[++index];
+                var executor = executorCache[index++];
                 if (executor == null)
                 {
-                    // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
-                    // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",
-                    // PlatformServices.Default.Runtime.RuntimeVersion);
                     var runtimeVersion = " ";
                     this.TestRunEventsHandler?.HandleLogMessage(
                         TestMessageLevel.Warning,
