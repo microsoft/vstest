@@ -455,8 +455,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
 
                     case MessageType.AttachDebuggerToProcess:
-                        var handler = testRunEventsHandler as ITestRunEventsHandler2;
-                        if (handler == null)
+                        if (!(testRunEventsHandler is ITestRunEventsHandler2 handler))
                         {
                             throw new NotSupportedException(string.Format(
                                 CultureInfo.CurrentUICulture,

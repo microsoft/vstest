@@ -161,8 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            var handler = this.testRunEventsHandler as ITestRunEventsHandler2;
-            if (handler == null)
+            if (!(this.testRunEventsHandler is ITestRunEventsHandler2 handler))
             {
                 throw new NotSupportedException(string.Format(
                     CultureInfo.CurrentUICulture,

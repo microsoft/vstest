@@ -103,10 +103,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <returns>True if must attach to the default test host, false otherwise.</returns>
         protected override bool ShouldAttachToTestHost(ITestExecutor executor)
         {
-            var convertedExecutor = executor as ITestExecutor2;
-            return (convertedExecutor != null)
-                ? convertedExecutor.ShouldAttachToTestHost(this.testCases, this.RunContext)
-                : true;
+           if (!(executor is ITestExecutor2 convertedExecutor))
+                return true;
+
+            return convertedExecutor.ShouldAttachToTestHost(this.testCases, this.RunContext);
         }
 
         /// <summary>

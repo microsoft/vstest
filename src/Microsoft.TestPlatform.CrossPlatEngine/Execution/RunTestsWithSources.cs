@@ -128,10 +128,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             IEnumerable<string> sources = new List<string>();
             this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
 
-            var convertedExecutor = executor as ITestExecutor2;
-            return (convertedExecutor != null)
-                ? convertedExecutor.ShouldAttachToTestHost(sources, this.RunContext)
-                : true;
+            if (!(executor is ITestExecutor2 convertedExecutor))
+                return true;
+
+            return convertedExecutor.ShouldAttachToTestHost(sources, this.RunContext);
         }
 
         /// <summary>
