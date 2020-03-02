@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             string resultsDirectory = null;
             if (runConfiguration != null)
             {
-                // It will try to get path from runsettings, if not found then it will return default path. 
+                // It will try to get path from runsettings, if not found then it will return default path.
                 resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
             }
 
@@ -72,13 +72,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         public static string GetSolutionDirectory(RunConfiguration runConfiguration)
         {
             string solutionDirectory = null;
-            if (runConfiguration != null)
+            if (runConfiguration != null && !string.IsNullOrEmpty(runConfiguration.SolutionDirectory))
             {
-                if (!string.IsNullOrEmpty(runConfiguration.SolutionDirectory))
-                {
-                    // Env var is expanded in run configuration
-                    solutionDirectory = runConfiguration.SolutionDirectory;
-                }
+                // Env var is expanded in run configuration
+                solutionDirectory = runConfiguration.SolutionDirectory;
             }
 
             return solutionDirectory;
@@ -142,12 +139,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
 
             IEnumerable<string> testAdaptersPaths = Enumerable.Empty<string>();
-            if (runConfiguration != null)
+            if (runConfiguration != null && runConfiguration.TestAdaptersPathsSet)
             {
-                if (runConfiguration.TestAdaptersPathsSet)
-                {
-                    testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                }
+                testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             return testAdaptersPaths;

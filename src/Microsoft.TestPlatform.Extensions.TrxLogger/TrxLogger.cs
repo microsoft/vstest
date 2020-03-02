@@ -504,13 +504,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 }
             }
 
-            else if (isLogFileNameParameterExists)
+            else if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
             {
-                if (!string.IsNullOrWhiteSpace(logFileNameValue))
-                {
-                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
-                    return;
-                }
+                this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                return;
             }
 
             this.SetDefaultTrxFilePath();

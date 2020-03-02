@@ -92,12 +92,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.DataCollectionTestStart, e);
 
             var message = this.communicationManager.ReceiveMessage();
-            if (message != null && message.MessageType != MessageType.DataCollectionTestStartAck)
+            if (message != null && message.MessageType != MessageType.DataCollectionTestStartAck && EqtTrace.IsErrorEnabled)
             {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("DataCollectionTestCaseEventSender.SendTestCaseStart : MessageType.DataCollectionTestStartAck not received.");
-                }
+                EqtTrace.Error("DataCollectionTestCaseEventSender.SendTestCaseStart : MessageType.DataCollectionTestStartAck not received.");
             }
         }
 
