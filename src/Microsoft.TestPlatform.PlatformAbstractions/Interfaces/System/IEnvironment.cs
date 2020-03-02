@@ -9,17 +9,17 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     public interface IEnvironment
     {
         /// <summary>
-        /// Operating System architecture.
+        /// Gets Operating System architecture.
         /// </summary>
         PlatformArchitecture Architecture { get; }
 
         /// <summary>
-        /// Operating System name.
+        /// Gets Operating System name.
         /// </summary>
         PlatformOperatingSystem OperatingSystem { get; }
 
         /// <summary>
-        /// Operating System Version
+        /// Gets Operating System Version
         /// </summary>
         string OperatingSystemVersion { get; }
 
