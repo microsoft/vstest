@@ -279,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 catch (IOException)
                 {
                     // catch errors and attempt move to a new file with a GUID
-                    archiveFileName = archiveFileName + Guid.NewGuid().ToString();
+                    archiveFileName += Guid.NewGuid().ToString();
 
                     try
                     {

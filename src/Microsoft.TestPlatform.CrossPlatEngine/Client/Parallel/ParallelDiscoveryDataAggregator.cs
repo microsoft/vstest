@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     return;
                 }
 
-                this.TotalTests = this.TotalTests + totalTests;
+                this.TotalTests += totalTests;
             }
         }
 

@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             ValidateArg.NotNull(testObjectDictionary, nameof(testObjectDictionary));
             ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
 
-            filePath = filePath + ".xml";
+            filePath += ".xml";
 
             // Writing test sequence
             var xmlDocument = new XmlDocument();
