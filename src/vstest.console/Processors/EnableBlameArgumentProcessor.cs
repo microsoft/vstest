@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Add default run settings if required.
             if (this.runSettingsManager.ActiveRunSettings?.SettingsXml == null)
             {
-                this.runSettingsManager.AddDefaultRunSettings(); ;
+                this.runSettingsManager.AddDefaultRunSettings();
             }
             var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
 
