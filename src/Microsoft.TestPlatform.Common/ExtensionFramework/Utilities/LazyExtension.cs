@@ -56,18 +56,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <param name="metadataType">Metadata type to instantiate on demand</param>
         public LazyExtension(TestPluginInformation pluginInfo, Type metadataType)
         {
-            if (pluginInfo == null)
-            {
-                throw new ArgumentNullException("pluginInfo"); ;
-            }
-
-            if (metadataType == null)
-            {
-                throw new ArgumentNullException("metadataType"); ;
-            }
-
-            this.testPluginInfo = pluginInfo;
-            this.metadataType = metadataType;
+            this.testPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
+            this.metadataType = metadataType ?? throw new ArgumentNullException(nameof(metadataType));
             this.isExtensionCreated = false;
         }
 
@@ -78,17 +68,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <param name="metadata">Test extension metadata</param>
         public LazyExtension(TestPluginInformation pluginInfo, TMetadata metadata)
         {
-            if (pluginInfo == null)
-            {
-                throw new ArgumentNullException("pluginInfo"); ;
-            }
-
             if (metadata == null)
             {
                 throw new ArgumentNullException("metadata"); ;
             }
 
-            this.testPluginInfo = pluginInfo;
+            this.testPluginInfo = pluginInfo ?? throw new ArgumentNullException(nameof(pluginInfo));
             this.metadata = metadata;
             this.isExtensionCreated = false;
         }
@@ -100,17 +85,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <param name="metadata">test extension metadata</param>
         public LazyExtension(Func<TExtension> creator, TMetadata metadata)
         {
-            if (creator == null)
-            {
-                throw new ArgumentNullException("creator"); ;
-            }
-
             if (metadata == null)
             {
                 throw new ArgumentNullException("metadata"); ;
             }
 
-            this.extensionCreator = creator;
+            this.extensionCreator = creator ?? throw new ArgumentNullException(nameof(creator));
             this.metadata = metadata;
             this.isExtensionCreated = false;
         }

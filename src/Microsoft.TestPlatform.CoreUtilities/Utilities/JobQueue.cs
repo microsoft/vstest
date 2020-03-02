@@ -103,11 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="exceptionLogger">The exception Logger.</param>
         public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
         {
-            if (processJob == null)
-            {
-                throw new ArgumentNullException("processJob");
-            }
-
             if (string.IsNullOrWhiteSpace(displayName))
             {
                 throw new ArgumentException(Resources.CannotBeNullOrEmpty, "displayName");
@@ -135,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             this.isDisposed = false;
 
             // Save off the arguments.
-            this.processJob = processJob;
+            this.processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
             this.displayName = displayName;
             this.exceptionLogger = exceptionLogger;
 
