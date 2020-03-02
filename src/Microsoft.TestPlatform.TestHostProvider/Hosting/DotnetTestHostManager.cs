@@ -423,7 +423,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open, FileAccess.Read))
                     {
                         var context = new DependencyContextJsonReader().Read(stream);
-                        var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                        var testhostPackage = context.RuntimeLibraries.FirstOrDefault(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase));
 
                         if (testhostPackage != null)
                         {

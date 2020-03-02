@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleRawMessage(string rawMessage)
         {
-            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete 
+            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
             if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             foreach (var attachmentSet in newAttachments)
             {
-                var attSet = originalAttachmentSets.Where(item => Uri.Equals(item.Uri, attachmentSet.Uri)).FirstOrDefault();
+                var attSet = originalAttachmentSets.FirstOrDefault(item => Uri.Equals(item.Uri, attachmentSet.Uri));
                 if (null == attSet)
                 {
                     originalAttachmentSets.Add(attachmentSet);

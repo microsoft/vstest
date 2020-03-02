@@ -272,7 +272,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
 
                 // Try finding/removing a matching test corresponding to the completed test
-                var inProgressTest = this.inProgressTests.Where(inProgress => inProgress.Id == completedTest.Id).FirstOrDefault();
+                var inProgressTest = this.inProgressTests.FirstOrDefault(inProgress => inProgress.Id == completedTest.Id);
                 if (inProgressTest != null)
                 {
                     removed = this.inProgressTests.Remove(inProgressTest);
