@@ -455,7 +455,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
 
                     case MessageType.AttachDebuggerToProcess:
+#pragma warning disable SA1119 // Statement must not use unnecessary parenthesis
                         if (!(testRunEventsHandler is ITestRunEventsHandler2 handler))
+#pragma warning restore SA1119 // Statement must not use unnecessary parenthesis
                         {
                             throw new NotSupportedException(string.Format(
                                 CultureInfo.CurrentUICulture,
