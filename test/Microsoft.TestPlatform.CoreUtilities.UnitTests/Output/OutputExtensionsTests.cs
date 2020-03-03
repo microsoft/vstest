@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         public OutputExtensionsTests()
         {
             // Setting Console.ForegroundColor to newColor which will be used to determine whether
-            // test command output is redirecting to file or writting to console.
+            // test command output is redirecting to file or writing to console.
             // If command output is redirecting to file, then Console.ForegroundColor can't be modified.
             // So that tests which assert Console.ForegroundColor should not run.
             this.previousColor = Console.ForegroundColor;
