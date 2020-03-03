@@ -85,8 +85,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
             // .NET Core scenarios). The old API still exists for fallback measures. 
 
-            Func<IEnumerable<string>, bool, DataCollectorSettings> newConfigurator;
-            if (TryGetFakesDataCollectorConfigurator(out newConfigurator))
+            var newConfigurator = TryGetFakesNewDataCollectorConfigurator();
+            if (newConfigurator != null)
             {
                 var fakesSettings = newConfigurator(sources, isNetFramework);
                 XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
@@ -109,8 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
-            Func<IEnumerable<string>, string> oldConfigurator;
-            if (!TryGetFakesDataCollectorConfigurator(out oldConfigurator))
+            Func<IEnumerable<string>, string> oldConfigurator = TryGetFakesDataCollectorConfigurator();
+            if (oldConfigurator == null)
             {
                 return false;
             }
@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
         }
 
-        private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, string> configurator)
+        private static Func<IEnumerable<string>, string> TryGetFakesDataCollectorConfigurator()
         {
 #if NET451
             try
@@ -169,14 +169,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
 
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                if (type != null)
+
+                var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
+
+                if (method != null)
                 {
-                    var method = type.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
-                    if (method != null)
-                    {
-                        configurator = (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
-                        return true;
-                    }
+                    return (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
                 }
             }
             catch (Exception ex)
@@ -187,25 +185,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 }
             }
 #endif
-            configurator = null;
-            return false;
+            return null;
         }
 
-        private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, bool, DataCollectorSettings> configurator)
+        private static Func<IEnumerable<string>, bool, DataCollectorSettings> TryGetFakesNewDataCollectorConfigurator()
         {
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
 
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                if (type != null)
+
+                var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
+
+                if (method != null)
                 {
-                    var method = type.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
-                    if (method != null)
-                    {
-                        configurator = (Func<IEnumerable<string>, bool, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IEnumerable<string>, bool, DataCollectorSettings>));
-                        return true;
-                    }
+                    return (Func<IEnumerable<string>, bool, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IEnumerable<string>, bool, DataCollectorSettings>));
                 }
             }
             catch (Exception ex)
@@ -215,8 +210,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
                 }
             }
-            configurator = null;
-            return false;
+
+            return null;
         }
 
         /// <summary>
