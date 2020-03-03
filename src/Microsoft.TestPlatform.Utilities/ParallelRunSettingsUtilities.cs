@@ -23,12 +23,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// The MaxCpuCount setting template.
         /// </summary>
-        private static readonly string MaxCpuCountSettingTemplate = @"<MaxCpuCount>0</MaxCpuCount>";
+        private const string MaxCpuCountSettingTemplate = @"<MaxCpuCount>0</MaxCpuCount>";
 
         /// <summary>
         /// The RunConfiguration with MaxCpuCount setting template.
         /// </summary>
-        private static readonly string RunConfigurationWithMaxCpuCountSettingTemplate = @"<RunConfiguration>
+        private const string RunConfigurationWithMaxCpuCountSettingTemplate = @"<RunConfiguration>
                                                                                             <MaxCpuCount>0</MaxCpuCount>
                                                                                           </RunConfiguration>";
 

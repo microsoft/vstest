@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         private HtmlLogger.HtmlLogger htmlLogger;
         private Dictionary<string, string> parameters;
         private static readonly string DefaultTestRunDirectory = Path.GetTempPath();
-        private static readonly string DefaultLogFileNameParameterValue = "logfilevalue.html";
+        private const string DefaultLogFileNameParameterValue = "logfilevalue.html";
         private Mock<IFileHelper> mockFileHelper;
         private Mock<XmlObjectSerializer> mockXmlSerializer;
         private Mock<IHtmlTransformer> mockHtmlTransformer;

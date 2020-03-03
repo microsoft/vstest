@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Key in <see cref="XmlTestStoreParameters"/> for specifying the location where the test ID is stored, under an XML element
         /// </summary>
-        internal static readonly string IdLocationKey = "IdLocation";
+        internal const string IdLocationKey = "IdLocation";
 
         /// <summary>
         /// Location where the test ID is stored, under an XML element

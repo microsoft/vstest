@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private const int DUMMYPROTOCOLVERSION = 42;
         private const int DEFAULTPROTOCOLVERSION = 1;
         private const int DUMMYNEGOTIATEDPROTOCOLVERSION = 41;
-        private static readonly string TimoutErrorMessage = "Failed to negotiate protocol, waiting for response timed out after 0 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
+        private const string TimoutErrorMessage = "Failed to negotiate protocol, waiting for response timed out after 0 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         private readonly Mock<ICommunicationEndPoint> mockServer;
         private readonly Mock<IDataSerializer> mockDataSerializer;

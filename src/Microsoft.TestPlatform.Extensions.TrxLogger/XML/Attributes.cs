@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <summary>
         /// Default value
         /// </summary>
-        internal static readonly bool CreateDefaultInstanceDefault = true;
+        internal const bool CreateDefaultInstanceDefault = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreXmlFieldAttribute"/> class.

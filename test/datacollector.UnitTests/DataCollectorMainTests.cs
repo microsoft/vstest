@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private readonly string[] argsWithEmptyDiagArg = { "--port", "1025", "--parentprocessid", "100", "--diag", "", "--tracelevel", "3" };
         private readonly string[] argsWithInvalidTraceLevel = { "--port", "1025", "--parentprocessid", "100", "--diag", "abc.txt", "--tracelevel", "5" };
 
-        private static readonly string TimoutErrorMessage =
+        private const string TimoutErrorMessage =
             "datacollector process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<IEnvironment> mockEnvironment;

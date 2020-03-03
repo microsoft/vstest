@@ -28,7 +28,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ParallelProxyExecutionManagerTests
     {
-        private static readonly int taskTimeout = 15 * 1000; // In milliseconds
+        private const int taskTimeout = 15 * 1000; // In milliseconds
 
         private List<Mock<IProxyExecutionManager>> createdMockManagers;
         private Func<IProxyExecutionManager> proxyManagerFunc;

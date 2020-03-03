@@ -51,7 +51,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private string defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
 
-        private static readonly string TimoutErrorMessage =
+        private const string TimoutErrorMessage =
             "vstest.console process failed to connect to testhost process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         public ProxyOperationManagerTests()

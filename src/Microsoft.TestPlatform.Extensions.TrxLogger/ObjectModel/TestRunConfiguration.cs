@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal class TestRunConfiguration : IXmlTestStore, IXmlTestStoreCustom
     {
-        internal static readonly string DeploymentInDirectorySuffix = "In";
+        internal const string DeploymentInDirectorySuffix = "In";
 
         #region  Fields
         private TestRunConfigurationId id;

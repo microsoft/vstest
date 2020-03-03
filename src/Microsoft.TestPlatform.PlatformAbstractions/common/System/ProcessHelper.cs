@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// </summary>
     public partial class ProcessHelper : IProcessHelper
     {
-        private static readonly string ARM = "arm";
+        private const string ARM = "arm";
 
         /// <inheritdoc/>
         public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallBack)

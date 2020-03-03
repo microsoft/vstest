@@ -39,7 +39,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
-        private static readonly string TimoutErrorMessage =
+        private const string TimoutErrorMessage =
             "vstest.console process failed to connect to datacollector process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         [TestInitialize]

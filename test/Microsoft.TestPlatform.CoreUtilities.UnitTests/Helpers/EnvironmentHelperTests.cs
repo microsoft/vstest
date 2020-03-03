@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
     [TestClass]
     public class EnvironmentHelperTests
     {
-        private static readonly int DefaultTimeout = 90;
+        private const int DefaultTimeout = 90;
         [TestCleanup]
         public void Cleanup()
         {
