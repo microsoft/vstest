@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public LazyPropertyValue(Func<T> getValue)
         {
             this.isValueCreated = false;
-            this.value = default(T);
+            this.value = default;
             this.getValue = getValue;
         }
 

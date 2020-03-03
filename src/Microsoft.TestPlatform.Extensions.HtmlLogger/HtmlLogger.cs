@@ -399,7 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <returns></returns>
         internal string GetFormattedDurationString(TimeSpan duration)
         {
-            if (duration == default(TimeSpan))
+            if (duration == default)
             {
                 return null;
             }

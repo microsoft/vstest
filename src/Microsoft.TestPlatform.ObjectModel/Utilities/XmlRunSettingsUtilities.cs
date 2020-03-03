@@ -423,7 +423,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 }
             }
 
-            return default(T);
+            return default;
         }
 
         /// <summary>

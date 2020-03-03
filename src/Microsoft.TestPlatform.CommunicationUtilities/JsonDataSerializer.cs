@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             if (obj == null)
             {
-                return default(T);
+                return default;
             }
 
             var stringObj = this.Serialize<T>(obj, 2);

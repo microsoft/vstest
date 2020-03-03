@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.htmlLogger.TestMessageHandler(new object(), default(TestRunMessageEventArgs));
+                this.htmlLogger.TestMessageHandler(new object(), default);
             });
         }
 

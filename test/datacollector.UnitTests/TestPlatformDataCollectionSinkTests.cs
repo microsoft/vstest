@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.dataCollectionSink.SendFileAsync(default(FileTransferInformation));
+                this.dataCollectionSink.SendFileAsync(default);
             });
         }
 

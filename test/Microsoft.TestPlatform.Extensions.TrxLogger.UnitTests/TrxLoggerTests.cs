@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.testableTrxLogger.TestMessageHandler(new object(), default(TestRunMessageEventArgs));
+                this.testableTrxLogger.TestMessageHandler(new object(), default);
             });
         }
 

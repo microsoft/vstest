@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Singleton Instance of this class
         /// </summary>
-        protected static T instance = default(T);
+        protected static T instance = default;
 
         /// <summary>
         /// Default number of Processes
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.concurrentManagerHandlerMap = new ConcurrentDictionary<T, U>();
                 for (int i = 0; i < newParallelLevel; i++)
                 {
-                    this.AddManager(this.CreateNewConcurrentManager(), default(U));
+                    this.AddManager(this.CreateNewConcurrentManager(), default);
                 }
             }
             else if (this.currentParallelLevel != newParallelLevel)
@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     for (int i = 0; i < newParallelLevel - this.currentParallelLevel; i++)
                     {
-                        this.AddManager(this.CreateNewConcurrentManager(), default(U));
+                        this.AddManager(this.CreateNewConcurrentManager(), default);
                     }
                 }
                 else
@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
             }
 
-            instance = default(T);
+            instance = default;
         }
 
         protected void DoActionOnAllManagers(Action<T> action, bool doActionsInParallel = false)
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>True, if data exists. False otherwise</returns>
         protected bool TryFetchNextSource<Y>(IEnumerator enumerator, out Y source)
         {
-            source = default(Y);
+            source = default;
             var hasNext = false;
             lock (this.sourceEnumeratorLockObject)
             {

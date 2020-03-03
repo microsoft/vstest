@@ -283,13 +283,13 @@ namespace Microsoft.VisualStudio.TraceCollector
 
             if (ProcessJobObject.Is32Bit)
             {
-                BasicLimits32 basicInfo = default(BasicLimits32);
+                BasicLimits32 basicInfo = default;
                 basicInfo.LimitFlags = LimitFlags.LimitKillOnJobClose;
 
-                ExtendedLimits32 extendedInfo = default(ExtendedLimits32);
+                ExtendedLimits32 extendedInfo = default;
                 extendedInfo.BasicLimits = basicInfo;
 
-                JobObjectInfo info = default(JobObjectInfo);
+                JobObjectInfo info = default;
                 info.basicLimits32 = basicInfo;
                 info.extendedLimits32 = extendedInfo;
 
@@ -304,13 +304,13 @@ namespace Microsoft.VisualStudio.TraceCollector
             }
             else
             {
-                BasicLimits64 basicInfo = default(BasicLimits64);
+                BasicLimits64 basicInfo = default;
                 basicInfo.LimitFlags = LimitFlags.LimitKillOnJobClose;
 
-                ExtendedLimits64 extendedInfo = default(ExtendedLimits64);
+                ExtendedLimits64 extendedInfo = default;
                 extendedInfo.BasicLimits = basicInfo;
 
-                JobObjectInfo info = default(JobObjectInfo);
+                JobObjectInfo info = default;
                 info.basicLimits64 = basicInfo;
                 info.extendedLimits64 = extendedInfo;
 

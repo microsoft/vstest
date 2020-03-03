@@ -56,7 +56,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
 
             this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
-            this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
+            this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         {
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
 
-            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
+            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
 
             StringAssert.EndsWith(info.FileName, "testhost.x86.exe");
         }
@@ -80,7 +80,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         {
             string subFoler = "TestHost";
 
-            var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
+            var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
 
             Assert.IsTrue(startInfo.FileName.EndsWith(Path.Combine(subFoler, "testhost.exe")));
         }
@@ -123,7 +123,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         {
             var environmentVariables = new Dictionary<string, string> { { "k1", "v1" } };
 
-            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), environmentVariables, default(TestRunnerConnectionInfo));
+            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), environmentVariables, default);
 
             Assert.AreEqual(environmentVariables, info.EnvironmentVariables);
         }
@@ -160,7 +160,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 new List<string>() { source },
                 null,
-                default(TestRunnerConnectionInfo));
+                default);
 
             Assert.AreEqual("/usr/bin/mono", info.FileName);
             StringAssert.Contains(info.Arguments, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe\"");
@@ -177,7 +177,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 new List<string>() { source },
                 null,
-                default(TestRunnerConnectionInfo));
+                default);
 
             StringAssert.Contains(info.FileName, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
             Assert.IsFalse(info.Arguments.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
@@ -324,7 +324,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
                          It.IsAny<Action<object, string>>())).Returns(Process.GetCurrentProcess());
 
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
-            var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
+            var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default);
 
             this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
 

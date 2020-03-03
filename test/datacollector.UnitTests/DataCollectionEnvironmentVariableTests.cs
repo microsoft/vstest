@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.ThrowsException<ArgumentNullException>(
                 () =>
                     {
-                        var envvariable = new DataCollectionEnvironmentVariable(default(KeyValuePair<string, string>), null);
+                        var envvariable = new DataCollectionEnvironmentVariable(default, null);
                     });
         }
 

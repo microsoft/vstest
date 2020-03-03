@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </summary>
         /// <param name="fileExtensions"> The file Extensions. </param>
         /// <param name="defaultExecutorUri"> The default Executor Uri. </param>
-        public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri, AssemblyType assemblyType = default(AssemblyType))
+        public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri, AssemblyType assemblyType = default)
         {
             if (fileExtensions != null && fileExtensions.Count > 0)
             {

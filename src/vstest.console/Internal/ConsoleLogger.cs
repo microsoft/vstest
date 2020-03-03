@@ -625,7 +625,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         private string GetFormattedDurationString(TimeSpan duration)
         {
-            if (duration == default(TimeSpan))
+            if (duration == default)
             {
                 return null;
             }

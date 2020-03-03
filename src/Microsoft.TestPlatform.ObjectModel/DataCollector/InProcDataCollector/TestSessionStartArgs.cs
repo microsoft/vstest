@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         {
             ValidateArg.NotNullOrEmpty(property, "property");
 
-            return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
+            return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default;
         }
 
         /// <summary>

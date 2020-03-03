@@ -334,7 +334,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             if (value == null)
             {
-                return default(T);
+                return default;
             }
             else if (value is T)
             {
