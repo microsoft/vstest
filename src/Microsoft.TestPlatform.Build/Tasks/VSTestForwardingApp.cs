@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using Trace;
 
     public class VSTestForwardingApp

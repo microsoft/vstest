@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
     /// <summary>
     /// Defines the test run stats header
     /// </summary>

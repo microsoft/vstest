@@ -1,23 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.Utilities.UnitTests
-{
+namespace Microsoft.TestPlatform.Utilities.UnitTests {
 	using System;
 	using System.Xml;
-	using System.Xml.XPath;
 
-	using Microsoft.TestPlatform.Utilities.Tests;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 	using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 	using Microsoft.VisualStudio.TestPlatform.Utilities;
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using MSTest.TestFramework.AssertExtensions;
-	using System.IO;
 	using System.Collections.Generic;
 	using System.Linq;
-	using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 	using System.Globalization;
 	using System.Text;
 

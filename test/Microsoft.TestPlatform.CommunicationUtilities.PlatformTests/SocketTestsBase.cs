@@ -3,13 +3,9 @@
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 {
-    using System;
     using System.IO;
-    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

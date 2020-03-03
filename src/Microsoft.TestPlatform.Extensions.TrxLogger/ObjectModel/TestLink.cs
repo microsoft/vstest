@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
     using System;
-    using System.Diagnostics;
     using System.Globalization;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
@@ -63,7 +62,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public override bool Equals(object other)
         {
             TestLink link = other as TestLink;
-            return (link == null) ? 
+            return (link == null) ?
                 false :
                 this.id.Equals(link.id);
         }

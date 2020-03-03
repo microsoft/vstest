@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    using System;
-
     /// <summary>
     /// Represents the outcomes of a test case.
     /// </summary>

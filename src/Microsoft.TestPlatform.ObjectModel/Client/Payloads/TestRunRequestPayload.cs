@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Class used to define the TestRunRequestPayload sent by the Vstest.console translation layers into design mode

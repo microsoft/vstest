@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
     using System;
-    using System.Xml;
     using TestPlatform.ObjectModel.DataCollection;
     using TraceCollector;
 

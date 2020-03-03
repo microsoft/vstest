@@ -4,11 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 {
     using System;
-    using System.Runtime.Serialization;
 #if NET451
-using System.Security.Permissions;
+    using System.Runtime.Serialization;
 #endif
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Exception thrown on parsing error in user provided filter expression.

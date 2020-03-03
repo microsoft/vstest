@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
 {
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
