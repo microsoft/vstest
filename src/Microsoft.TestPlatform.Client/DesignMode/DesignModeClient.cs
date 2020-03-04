@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.AttachDebuggerToProcessCallback:
+                        case MessageType.VSAttachDebuggerToProcessCallback:
                             this.onResponseMessageReceived?.Invoke(message);
                             break;
 
@@ -322,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     waitHandle.Set();
                 };
 
-                this.communicationManager.SendMessage(MessageType.AttachDebuggerToProcess, pid);
+                this.communicationManager.SendMessage(MessageType.VSAttachDebuggerToProcess, pid);
 
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 

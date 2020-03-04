@@ -636,7 +636,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
-                    else if (string.Equals(MessageType.AttachDebuggerToProcess, message.MessageType))
+                    else if (string.Equals(MessageType.VSAttachDebuggerToProcess, message.MessageType))
                     {
                         AttachDebuggerToProcess(customHostLauncher, message);
                     }
@@ -703,7 +703,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
-                    else if (string.Equals(MessageType.AttachDebuggerToProcess, message.MessageType))
+                    else if (string.Equals(MessageType.VSAttachDebuggerToProcess, message.MessageType))
                     {
                         AttachDebuggerToProcess(customHostLauncher, message);
                     }
@@ -803,7 +803,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.communicationManager.SendMessage(MessageType.AttachDebuggerToProcessCallback, response, this.protocolVersion);
+                this.communicationManager.SendMessage(MessageType.VSAttachDebuggerToProcessCallback, response, this.protocolVersion);
             }
         }
     }
