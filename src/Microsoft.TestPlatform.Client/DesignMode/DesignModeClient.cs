@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
-                this.onAckMessageReceived = null;
+                this.onResponseMessageReceived = null;
 
                 var response = this.dataSerializer.DeserializePayload<bool>(responseMessage);
                 return response;
