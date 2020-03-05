@@ -144,6 +144,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     this.commandLineOptions.InIsolation = true;
                     this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
                 }
+
+                var testCaseFilter = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestCaseFilter");
+                if (testCaseFilter != null)
+                {
+                    this.commandLineOptions.TestCaseFilterValue = testCaseFilter;
+                }
             }
             catch (XmlException exception)
             {

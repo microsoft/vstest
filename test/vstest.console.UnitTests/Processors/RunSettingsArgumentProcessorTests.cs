@@ -363,6 +363,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsNull(this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
+        [TestMethod]
+        public void InitializeShouldUpdateTestCaseFilterIfProvided()
+        {
+            // Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
+            var filter = "TestCategory=Included";
+            var settingsXml = $"<RunSettings><RunConfiguration><TestCaseFilter>{filter}</TestCaseFilter></RunConfiguration></RunSettings>";
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                this.settingsProvider,
+                settingsXml);
+
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
+            Assert.AreEqual(filter, CommandLineOptions.Instance.TestCaseFilterValue);
+        }
         #endregion
 
         #region Testable Implementations

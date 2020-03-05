@@ -64,6 +64,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void ExecutorInitializeWithNullOrEmptyTestCaseFilterShouldNotThrowWhenTestFilterWasSpecifiedByPreviousStep()
+        {            
+            var options = CommandLineOptions.Instance;
+            options.TestCaseFilterValue = "Test=FilterFromPreviousStep";
+            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
+
+            executor.Initialize(null);
+        }
+
+        [TestMethod]
+        public void ExecutorInitializeWithTestCaseFilterShouldOverwriteTheValueProvidedByPreviousStep()
+        {
+            var options = CommandLineOptions.Instance;
+            var defaultValue = "Test=FilterFromPreviousStep";
+            options.TestCaseFilterValue = defaultValue;
+            Assert.AreEqual(defaultValue, options.TestCaseFilterValue);
+            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
+
+            var value = "Test=NewFilter";
+            executor.Initialize(value);
+            
+            Assert.AreEqual(value, options.TestCaseFilterValue);
+        }
+
+        [TestMethod]
         public void ExecutorInitializeWithValidTestCaseFilterShouldAddTestCaseFilterToCommandLineOptions()
         {
             var options = CommandLineOptions.Instance;

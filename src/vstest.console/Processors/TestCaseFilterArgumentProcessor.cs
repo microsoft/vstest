@@ -116,10 +116,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
-        {
+        {            
             if (string.IsNullOrWhiteSpace(argument))
             {
+                if (!string.IsNullOrWhiteSpace(this.commandLineOptions.TestCaseFilterValue))
+                {
+                    // if user did not specify the argument, and we have a previously set value (for example from settings)
+                    // we keep the value and return, otherwise we throw because there was no default value, and the user did not provide any either
+                    return;
+                }
+
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
+                
             }
 
             this.commandLineOptions.TestCaseFilterValue = argument;
