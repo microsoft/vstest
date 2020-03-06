@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         public bool AttachDebuggerToProcess(int pid)
         {
             // No op
-            return false;
+            return true;
         }
     }
 }
