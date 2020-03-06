@@ -106,22 +106,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize("DummyLoggerExtension");
 
             string expectedSettingsXml =
-@"<?xml version=""1.0"" encoding=""utf-16""?>
-<RunSettings>
-  <RunConfiguration>
-  </RunConfiguration>
-  <DataCollectionRunSettings>
-    <DataCollectors>
-      <DataCollector friendlyName=""Code Coverage"">
-      </DataCollector>
-    </DataCollectors>
-  </DataCollectionRunSettings>
-  <LoggerRunSettings>
-    <Loggers>
-      <Logger friendlyName=""DummyLoggerExtension"" enabled=""True"" />
-    </Loggers>
-  </LoggerRunSettings>
-</RunSettings>";
+                @"<?xml version=""1.0"" encoding=""utf-16""?>
+                <RunSettings>
+                  <RunConfiguration>
+                  </RunConfiguration>
+                  <DataCollectionRunSettings>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""Code Coverage"">
+                      </DataCollector>
+                    </DataCollectors>
+                  </DataCollectionRunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""DummyLoggerExtension"" enabled=""True"" />
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
 
             Assert.AreEqual(expectedSettingsXml, RunSettingsManager.Instance.ActiveRunSettings?.SettingsXml);
         }
