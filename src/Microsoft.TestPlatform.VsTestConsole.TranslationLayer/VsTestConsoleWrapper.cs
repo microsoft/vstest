@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
     /// via the <c>vstest.console</c> test runner.
     /// </summary>
-    public class VsTestConsoleWrapper : IVsTestConsoleWrapper2
+    public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     {
         #region Private Members
 
@@ -245,30 +245,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             this.EnsureInitialized();
             this.requestSender.StartTestRunWithCustomHost(testCaseList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
-        {
-            this.RunTestsWithCustomTestHost(sources, runSettings, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
-        {
-            this.RunTestsWithCustomTestHost(sources, runSettings, options, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
-        {
-            this.RunTestsWithCustomTestHost(testCases, runSettings, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
-        }
-
-        /// <inheritdoc/>
-        public void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
-        {
-            this.RunTestsWithCustomTestHost(testCases, runSettings, options, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
         }
 
         /// <inheritdoc/>
