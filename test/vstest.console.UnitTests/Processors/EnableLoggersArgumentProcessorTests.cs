@@ -86,17 +86,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorInitializeShouldAddLoggerWithFriendlyNameInRunSettingsIfNamePresentInArg()
         {
             string settingsXml =
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
-                <RunSettings>
-                  <RunConfiguration>
-                  </RunConfiguration>
-                  <DataCollectionRunSettings>
-                    <DataCollectors>
-                      <DataCollector friendlyName=""Code Coverage"">
-                      </DataCollector>
-                    </DataCollectors>
-                  </DataCollectionRunSettings>
-                </RunSettings>";
+@"<?xml version=""1.0"" encoding=""utf-8""?>
+<RunSettings>
+    <RunConfiguration>
+    </RunConfiguration>
+    <DataCollectionRunSettings>
+    <DataCollectors>
+        <DataCollector friendlyName=""Code Coverage"">
+        </DataCollector>
+    </DataCollectors>
+    </DataCollectionRunSettings>
+</RunSettings>";
 
             var runSettings = new RunSettings();
             runSettings.LoadSettingsXml(settingsXml);
