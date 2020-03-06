@@ -86,27 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorInitializeShouldAddLoggerWithFriendlyNameInRunSettingsIfNamePresentInArg()
         {
             string settingsXml =
-@"<?xml version=""1.0"" encoding=""utf-8""?>
-<RunSettings>
-    <RunConfiguration>
-    </RunConfiguration>
-    <DataCollectionRunSettings>
-    <DataCollectors>
-        <DataCollector friendlyName=""Code Coverage"">
-        </DataCollector>
-    </DataCollectors>
-    </DataCollectionRunSettings>
-</RunSettings>";
-
-            var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(settingsXml);
-            RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
-
-            var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-            executor.Initialize("DummyLoggerExtension");
-
-            string expectedSettingsXml =
-                @"<?xml version=""1.0"" encoding=""utf-16""?>
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                   <RunConfiguration>
                   </RunConfiguration>
@@ -116,12 +96,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                       </DataCollector>
                     </DataCollectors>
                   </DataCollectionRunSettings>
-                  <LoggerRunSettings>
-                    <Loggers>
-                      <Logger friendlyName=""DummyLoggerExtension"" enabled=""True"" />
-                    </Loggers>
-                  </LoggerRunSettings>
                 </RunSettings>";
+
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(settingsXml);
+            RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+
+            var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
+            executor.Initialize("DummyLoggerExtension");
+
+            string expectedSettingsXml =
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<RunSettings>
+  <RunConfiguration>
+  </RunConfiguration>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName=""Code Coverage"">
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+  <LoggerRunSettings>
+    <Loggers>
+      <Logger friendlyName=""DummyLoggerExtension"" enabled=""True"" />
+    </Loggers>
+  </LoggerRunSettings>
+</RunSettings>";
 
             Assert.AreEqual(expectedSettingsXml, RunSettingsManager.Instance.ActiveRunSettings?.SettingsXml);
         }
