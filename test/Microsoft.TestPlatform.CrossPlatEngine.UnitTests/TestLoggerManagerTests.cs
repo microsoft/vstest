@@ -28,6 +28,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     /// Tests the behaviors of the TestLoggerManager class.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class TestLoggerManagerTests
     {
         private static int counter = 0;
@@ -76,14 +77,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetResultsDirectoryShouldReadResultsDirectoryFromSettingsIfSpecified()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
         <MaxCpuCount>0</MaxCpuCount>
-        <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>             
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-      </RunConfiguration>     
+        <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>
     </RunSettings> ";
 
             var testLoggerManager = new DummyTestLoggerManager();
@@ -94,13 +95,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetResultsDirectoryShouldReturnDefaultPathIfResultsDirectoryIsNotProvidedInRunSettings()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-      </RunConfiguration>     
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>
     </RunSettings> ";
 
             var testLoggerManager = new DummyTestLoggerManager();
@@ -112,13 +113,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetTargetFrameworkShouldReturnFrameworkProvidedInRunSettings()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                        <RunSettings>     
-                                          <RunConfiguration> 
-                                            <MaxCpuCount>0</MaxCpuCount>       
-                                            <TargetPlatform> x64 </TargetPlatform>     
-                                            <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-                                          </RunConfiguration>     
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                                        <RunSettings>
+                                          <RunConfiguration>
+                                            <MaxCpuCount>0</MaxCpuCount>
+                                            <TargetPlatform> x64 </TargetPlatform>
+                                            <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+                                          </RunConfiguration>
                                         </RunSettings> ";
 
             var testLoggerManager = new DummyTestLoggerManager();
@@ -135,7 +136,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var testLoggerManager = new DummyTestLoggerManager();
             testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
             testLoggerManager.EnableLogging();
-            
+
             testLoggerManager.HandleTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, "TestRunMessage"));
 
             waitHandle.WaitOne();
@@ -1086,7 +1087,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
-            
+
             mockMetricsCollection.Verify(
                 rd => rd.Add(TelemetryDataConstants.LoggerUsed, "TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger2,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLoggerWithParameters"));
         }
