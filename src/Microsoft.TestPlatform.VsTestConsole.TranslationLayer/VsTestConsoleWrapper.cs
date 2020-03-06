@@ -250,37 +250,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
         {
-            this.RunTestsWithCustomTestHost(sources, runSettings, options: null, testRunEventsHandler: testRunEventsHandler, customTestHostLauncher: customTestHostLauncher);
+            this.RunTestsWithCustomTestHost(sources, runSettings, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
         }
 
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
         {
-            var sourceList = sources.ToList();
-            this.testPlatformEventSource.TranslationLayerExecutionStart(1, sourceList.Count, 0, runSettings ?? string.Empty);
-
-            this.EnsureInitialized();
-            this.requestSender.StartTestRunWithCustomHost(sourceList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
+            this.RunTestsWithCustomTestHost(sources, runSettings, options, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
         }
 
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
         {
-            var testCaseList = testCases.ToList();
-            this.testPlatformEventSource.TranslationLayerExecutionStart(1, 0, testCaseList.Count, runSettings ?? string.Empty);
-
-            this.EnsureInitialized();
-            this.requestSender.StartTestRunWithCustomHost(testCaseList, runSettings, options: null, runEventsHandler: testRunEventsHandler, customTestHostLauncher: customTestHostLauncher);
+            this.RunTestsWithCustomTestHost(testCases, runSettings, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
         }
 
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher2 customTestHostLauncher)
         {
-            var testCaseList = testCases.ToList();
-            this.testPlatformEventSource.TranslationLayerExecutionStart(1, 0, testCaseList.Count, runSettings ?? string.Empty);
-
-            this.EnsureInitialized();
-            this.requestSender.StartTestRunWithCustomHost(testCaseList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
+            this.RunTestsWithCustomTestHost(testCases, runSettings, options, testRunEventsHandler, customTestHostLauncher as ITestHostLauncher);
         }
 
         /// <inheritdoc/>
