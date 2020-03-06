@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
     <PackageReference Include="xunit" Version="$(XUnitFrameworkVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XUnitAdapterVersion)" />
-    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <PackageReference Include="coverlet.collector" Version="$(CoverletCoverageVersion)" />
   </ItemGroup>
 
 </Project>
