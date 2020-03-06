@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     [TestClass]
+    [DoNotParallelize]
     public class ResultsDirectoryArgumentProcessorTests
     {
         private ResultsDirectoryArgumentExecutor executor;
