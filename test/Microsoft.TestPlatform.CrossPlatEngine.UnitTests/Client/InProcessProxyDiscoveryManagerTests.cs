@@ -19,6 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Moq;
 
     [TestClass]
+    [DoNotParallelize]
     public class InProcessProxyDiscoveryManagerTests
     {
         private Mock<ITestHostManagerFactory> mockTestHostManagerFactory;
