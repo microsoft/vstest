@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [DoNotParallelize]
     public class RunsettingsTests : AcceptanceTestBase
     {
         private string runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
@@ -214,7 +215,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var expectedProcessCreated = 2;
             if (!this.IsDesktopRunner())
             {
-                // this creates dotnet hosted vstest console and 2 testhosts one of which is hosted 
+                // this creates dotnet hosted vstest console and 2 testhosts one of which is hosted
                 // in dotnet, so we have two dotnet + 1 testhost.exe
                 expectedProcessCreated = 3;
             }
@@ -481,9 +482,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         #region RunSettings defined in project file
         /// <summary>
-        /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test 
+        /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test
         /// checks that the settings were honored by translating an inconlusive test to failed "result", instead of the default "skipped".
-        /// This test depends on Microsoft.TestPlatform.Build\Microsoft.TestPlatform.targets being previously copied into the 
+        /// This test depends on Microsoft.TestPlatform.Build\Microsoft.TestPlatform.targets being previously copied into the
         /// artifacts/testArtifacts/dotnet folder. This will allow the local copy of dotnet to pickup the VSTest msbuild task.
         /// </summary>
         /// <param name="runnerInfo"></param>
@@ -499,9 +500,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeDotnetTest(projectPath);
             this.ValidateSummaryStatus(0, 1, 0);
 
-            // make sure that we can revert the project settings back by providing a config from commandline 
-            // keeping this in the same test, because it is easier to see that we are reverting settings that 
-            // are honored by dotnet test, instead of just using the default, which would produce the same 
+            // make sure that we can revert the project settings back by providing a config from commandline
+            // keeping this in the same test, because it is easier to see that we are reverting settings that
+            // are honored by dotnet test, instead of just using the default, which would produce the same
             // result
             var settingsPath = this.GetProjectAssetFullPath(projectName, "inconclusive.runsettings");
             this.InvokeDotnetTest($"{projectPath} --settings {settingsPath}");
@@ -574,7 +575,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 // we create just testhost.exe
                 return 1;
             }
-          
+
             if (this.IsDesktopRunner() && !this.IsDesktopTargetFramework())
             {
                 // we create dotnet testhost and testhost.exe
@@ -595,7 +596,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (!this.IsDesktopRunner() && !this.IsDesktopTargetFramework())
             {
-                // we create dotnet vsconsole, and 2 dotnet test hosts 
+                // we create dotnet vsconsole, and 2 dotnet test hosts
                 return 3;
             }
 
