@@ -139,6 +139,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             Assert.AreEqual(expectedErrorMessage, exception.Message);
         }
 
+        [Ignore("This test appears to be flaky")]
         [TestMethod]
         public void StartShouldThrowOnTimeout()
         {
