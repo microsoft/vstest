@@ -6,12 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     using System.IO;
 
     /// <summary>
-    /// Helper class to return plaform specific stream.
+    /// Helper class to return platform specific stream.
     /// </summary>
     public interface IStream
     {
         /// <summary>
-        /// Returns platrform specific Buffered Stream with desired buffer size.
+        /// Returns platform specific Buffered Stream with desired buffer size.
         /// </summary>
         /// <param name="stream">Input Stream</param>
         /// <param name="bufferSize">Buffer Size</param>

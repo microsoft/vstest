@@ -10,7 +10,7 @@
 // Allow command processors to validate against other command processors which are present.
 //   If throws during validation, output error and exit.
 // Process each command processor.
-//   If throws during validaton, output error and exit.
+//   If throws during validation, output error and exit.
 //   If the default (RunTests) command processor has no test containers output an error and exit
 //   If the default (RunTests) command processor has no tests to run output an error and exit
 
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;  
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -85,13 +85,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Arguments provided to perform execution with.
         /// </param>
         /// <returns>
-        /// Exit Codes - Zero (for sucessful command execution), One (for bad command) 
+        /// Exit Codes - Zero (for successful command execution), One (for bad command) 
         /// </returns>
         internal int Execute(params string[] args)
         {
             this.testPlatformEventSource.VsTestConsoleStart();
 
-            // If User specifies --nologo via dotnet, donot print splat screen
+            // If User specifies --nologo via dotnet, do not print splat screen
             if (args != null && args.Length !=0 && args.Contains("--nologo"))
             {
                 // Sanitizing this list, as I don't think we should write Argument processor for this.
@@ -244,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     else
                     {
                         // Let it throw - User must see crash and report it with stack trace!
-                        // No need for recoverability as user will start a new vstest.console anwyay
+                        // No need for recoverability as user will start a new vstest.console anyway
                         throw;
                     }
                 }
@@ -307,7 +307,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             Contract.Requires(argumentProcessors != null);
             Contract.Requires(processorFactory != null);
 
-            // Determine if any of the argument processors are actions. 
+            // Determine if any of the argument processors are actions.
             var isActionIncluded = argumentProcessors.Any((processor) => processor.Metadata.Value.IsAction);
 
             // If no action arguments have been provided, then add the default action argument.
@@ -350,7 +350,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 else
                 {
                     // Let it throw - User must see crash and report it with stack trace!
-                    // No need for recoverability as user will start a new vstest.console anwyay
+                    // No need for recoverability as user will start a new vstest.console anyway
                     throw;
                 }
             }

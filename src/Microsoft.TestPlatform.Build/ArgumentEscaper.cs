@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.Build.Utils
         /// <summary>
         /// Undo the processing which took place to create string[] args in Main,
         /// so that the next process will receive the same string[] args
-        /// 
+        ///
         /// See here for more info:
         /// http://blogs.msdn.com/b/twistylittlepassagesallalike/archive/2011/04/23/everyone-quotes-arguments-the-wrong-way.aspx
         /// </summary>

@@ -29,7 +29,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void DiscoveryResultCacheConstructorShouldInitializeTotalDiscoveredTests()
         {
             var cache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
-            
+
             Assert.AreEqual(0, cache.TotalDiscoveredTests);
         }
 

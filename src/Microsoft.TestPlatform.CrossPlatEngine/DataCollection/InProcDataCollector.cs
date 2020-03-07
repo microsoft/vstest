@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private Type dataCollectorType;
 
         /// <summary>
-        /// Instance of the 
+        /// Instance of the
         /// </summary>
         private object dataCollectorObject;
 
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             if (Path.GetFileName(codeBase) == Constants.CoverletDataCollectorCodebase)
             {
                 // If we're loading coverlet collector we skip to check the version of assembly
-                // to allow upgrade throught nuget package
+                // to allow upgrade through nuget package
                 filterPredicate = (x) => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
 
                 // Coverlet collector is consumed as nuget package we need to add assemblies directory to resolver to correctly load references.
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public string AssemblyQualifiedName { get; private set; }
 
         /// <summary>
-        /// Loads the DataCollector type 
+        /// Loads the DataCollector type
         /// </summary>
         /// <param name="inProcDataCollectionSink">Sink object to send data</param>
         public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Loads the assembly into the default context based on the codebase path
+        /// Loads the assembly into the default context based on the code base path
         /// </summary>
         /// <param name="codeBase"></param>
         /// <returns></returns>
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "InProcDataCollectionExtensionManager: Error occured while loading the InProcDataCollector : {0} , Exception Details : {1}", codeBase, ex);
+                    "InProcDataCollectionExtensionManager: Error occurred while loading the InProcDataCollector : {0} , Exception Details : {1}", codeBase, ex);
             }
 
             return assembly;

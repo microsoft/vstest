@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Program.Main: Error occured during initialization of Datacollector : {0}", ex);
+                EqtTrace.Error("Program.Main: Error occurred during initialization of Datacollector : {0}", ex);
                 throw;
             }
             finally

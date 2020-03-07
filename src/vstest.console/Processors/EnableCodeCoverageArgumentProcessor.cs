@@ -270,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                 }
 
-                // If any nodes are missing to add code coverage deafult settings, add the missing xml nodes.
+                // If any nodes are missing to add code coverage default settings, add the missing xml nodes.
                 XPathNavigator dataCollectorsNavigator;
                 if (existingPath.Equals(xpaths[2]) == false)
                 {

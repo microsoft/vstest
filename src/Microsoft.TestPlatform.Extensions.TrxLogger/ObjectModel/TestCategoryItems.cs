@@ -85,7 +85,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Convert the category name to a hashcode
         /// </summary>
-        /// <returns>Hashcode of the cagegory.</returns>
+        /// <returns>Hashcode of the category.</returns>
         public override int GetHashCode()
         {
             Debug.Assert(this.category != null, "category is null");
@@ -198,7 +198,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Convert the TestCategoryItemCollection to an array of strings.
         /// </summary>
-        /// <returns>Array of strings containing the test cagegories.</returns>
+        /// <returns>Array of strings containing the test categories.</returns>
         public string[] ToArray()
         {
             string[] result = new string[this.Count];

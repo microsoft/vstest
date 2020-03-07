@@ -1141,9 +1141,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             return testresultList;
         }
 
-        
-
-
         private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
         {
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");

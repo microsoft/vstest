@@ -871,7 +871,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var errorData = string.Empty;
             this.ExitCallBackTestHelper(exitCode);
 
-            // override event listner
+            // override event listener
             this.dotnetHostManager.HostExited += this.DotnetHostManagerExitCodeTesterHostExited;
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);

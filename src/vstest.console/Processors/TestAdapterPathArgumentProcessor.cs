@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // Remove leading and trailing ' " ' chars...
                 argument = argument.Trim().Trim(new char[] { '\"' });
 
-                // Get testadapter paths from RunSettings.
+                // Get test adapter paths from RunSettings.
                 var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
 
                 if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))

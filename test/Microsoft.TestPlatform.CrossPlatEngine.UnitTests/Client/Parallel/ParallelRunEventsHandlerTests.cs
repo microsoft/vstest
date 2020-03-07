@@ -55,7 +55,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             string payload = "RunStats";
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.TestRunStatsChange, Payload = payload });
-           
+
             this.parallelRunEventsHandler.HandleRawMessage(payload);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
@@ -91,7 +91,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             string log = "Hello";
             this.parallelRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, log);
 
-            this.mockTestRunEventsHandler.Verify(mt => 
+            this.mockTestRunEventsHandler.Verify(mt =>
                 mt.HandleLogMessage(TestMessageLevel.Error, log), Times.Once);
         }
 
@@ -123,7 +123,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-            // Raw message must be sent 
+            // Raw message must be sent
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
@@ -147,7 +147,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, lastChunk, null, null);
 
-            // Raw message must be sent 
+            // Raw message must be sent
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(lastChunk), Times.Once);
@@ -178,7 +178,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), 
+                It.IsAny<TestRunChangedEventArgs>(),
                 It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>()), Times.Once);
         }

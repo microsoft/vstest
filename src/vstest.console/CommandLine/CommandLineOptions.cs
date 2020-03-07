@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     /// </summary>
     internal class CommandLineOptions
     {
-        #region Constants/Readonly 
+        #region Constants/Readonly
 
         /// <summary>
         /// The default batch size.
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public bool InIsolation { get; set; }
 
         /// <summary>
-        /// Readonly collection of all available test sources
+        /// Read only collection of all available test sources
         /// </summary>
         public IEnumerable<string> Sources
         {
@@ -127,12 +127,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public bool DisableAutoFakes { get; set; } = false;
 
         /// <summary>
-        /// Specifies whether vsixExtensions is enabled or not. 
+        /// Specifies whether vsixExtensions is enabled or not.
         /// </summary>
         public bool UseVsixExtensions { get; set; }
 
         /// <summary>
-        /// Path to the custom test adapters. 
+        /// Path to the custom test adapters.
         /// </summary>
         public string TestAdapterPath { get; set; }
 
@@ -224,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         }
 
         /// <summary>
-        /// If not already set from IDE in the runSettings, ShouldCollectSourceInformation defaults to IsDesignMode value        
+        /// If not already set from IDE in the runSettings, ShouldCollectSourceInformation defaults to IsDesignMode value
         /// </summary>
         public bool ShouldCollectSourceInformation
         {

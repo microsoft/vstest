@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRuntimeProviderManager"/> class. 
+        /// Initializes a new instance of the <see cref="TestRuntimeProviderManager"/> class.
         /// Default constructor.
         /// </summary>
         /// <param name="sessionLogger">

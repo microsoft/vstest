@@ -4,12 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
 
-
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
-    
+
     /// <summary>
-    /// A struct that stores the infomation needed by the navigation: file name, line number, column number.
+    /// A struct that stores the information needed by the navigation: file name, line number, column number.
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Dia is a specific name.")]
     public class DiaNavigationData : INavigationData
@@ -27,5 +26,4 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.MaxLineNumber = maxLineNumber;
         }
     }
-
 }

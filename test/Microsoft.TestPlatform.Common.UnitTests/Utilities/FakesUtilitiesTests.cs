@@ -10,7 +10,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
     [TestClass]
     public class FakesUtilitiesTests
     {
-        
+
         [TestMethod]
         public void FakesSettingsShouldBeNotGeneratedIfTargetFrameWorkIsNetCore()
         {

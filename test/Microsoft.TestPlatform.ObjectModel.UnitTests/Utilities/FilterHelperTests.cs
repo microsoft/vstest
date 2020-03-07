@@ -1,5 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.       
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;  
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class FilterHelpersTests

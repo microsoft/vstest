@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         }
 
         /// <summary>
-        /// Override function of GetHashCode 
+        /// Override function of GetHashCode
         /// </summary>
         /// <returns>
         /// The <see cref="int"/>.

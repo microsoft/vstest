@@ -4,13 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     /// <summary>
-    /// Details of EndPoint address for connection b/w test runtime, test runnner
+    /// Details of EndPoint address for connection b/w test runtime, test runner
     /// </summary>
     public struct TestHostConnectionInfo
     {
         /// <summary>
         /// Endpoint where the service is hosted, This endpoint is specific to Transport
-        /// e.g. 127.0.0.0:8080 for socktes
+        /// e.g. 127.0.0.0:8080 for sockets
         /// </summary>
         public string Endpoint
         {
@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets or sets the trasport protocol supported by test runtime
+        /// Gets or sets the transport protocol supported by test runtime
         /// </summary>
         public Transport Transport
         {

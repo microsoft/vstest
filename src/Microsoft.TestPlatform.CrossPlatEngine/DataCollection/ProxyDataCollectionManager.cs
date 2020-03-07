@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
             () =>
             {
-                EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+                EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
                 var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.SettingsXml, this.Sources, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public void Dispose()
         {
-            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dospose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dispose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
             this.dataCollectionRequestSender.Close();
         }
 
@@ -340,7 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Update Extensions path folder in testadapterspaths in runsettings.
+        /// Update Extensions path folder in test adapters paths in runsettings.
         /// </summary>
         /// <param name="settingsXml"></param>
         private static string UpdateExtensionsFolderInRunSettings(string settingsXml)

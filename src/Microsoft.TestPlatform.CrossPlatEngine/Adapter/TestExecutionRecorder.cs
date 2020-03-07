@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// Start has been recorded but End has not yet been recorded.
         /// </summary>
         private HashSet<Guid> testCaseInProgressMap;
-        
+
         private object testCaseInProgressSyncObject = new object();
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         }
 
         /// <summary>
-        /// Notify the framework about starting of the test case. 
-        /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored. 
+        /// Notify the framework about starting of the test case.
+        /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored.
         /// </summary>
         /// <param name="testCase">test case which will be started.</param>
         public void RecordStart(TestCase testCase)
@@ -89,8 +89,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// Notify the framework about the test result.
         /// </summary>
         /// <param name="testResult">Test Result to be sent to the framework.</param>
-        /// <exception cref="TestCanceledException">Exception thrown by the framework when an executor attempts to send 
-        /// test result to the framework when the test(s) is canceled. </exception>  
+        /// <exception cref="TestCanceledException">Exception thrown by the framework when an executor attempts to send
+        /// test result to the framework when the test(s) is canceled. </exception>
         public void RecordResult(TestResult testResult)
         {
             EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult?.TestCase?.FullyQualifiedName);
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         }
 
         /// <summary>
-        /// Notify the framework about completion of the test case. 
+        /// Notify the framework about completion of the test case.
         /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored. 
         /// </summary>
         /// <param name="testCase">test case which has completed.</param>

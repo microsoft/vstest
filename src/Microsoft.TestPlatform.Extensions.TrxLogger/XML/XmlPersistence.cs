@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
 
         /// <summary>
-        /// Optimization: avoid reparsing same query multiple times
+        /// Optimization: avoid re-parsing same query multiple times
         /// </summary>
         private static Dictionary<string, string> queryCache = new Dictionary<string, string>();
 
@@ -582,7 +582,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             else
             {
                 // Ensure that the datetime value is in local time..
-                // This is needed as the persistenceformat we use needs the datetime to be in local time..
+                // This is needed as the persistence format we use needs the datetime to be in local time..
                 DateTime localDateTime = dateTime.ToLocalTime();
                 return localDateTime.ToString(DateTimePersistenceFormat, CultureInfo.InvariantCulture.DateTimeFormat);
             }
@@ -837,7 +837,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             }
             catch (System.Xml.XPath.XPathException e)
             {
-                throw new Exception("The persistance location is invalid. Element: '" + element.Name + "', location: '" + location + "'", e);
+                throw new Exception("The persistence location is invalid. Element: '" + element.Name + "', location: '" + location + "'", e);
             }
         }
 

@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         private bool UseFastFilter => this.fastFilter != null;
 
         /// <summary>
-        /// Initializes FilterExpressionWrapper with given filterString and options.  
+        /// Initializes FilterExpressionWrapper with given filterString and options.
         /// </summary>
         public FilterExpressionWrapper(string filterString, FilterOptions options)
         {
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     this.filterExpression = null;
 
-                    // Property value regex is only supported for fast filter, 
+                    // Property value regex is only supported for fast filter,
                     // so we ignore it if no fast filter is constructed.
 
                     // TODO: surface an error message to suer.
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         }
 
         /// <summary>
-        /// Initializes FilterExpressionWrapper with given filterString.  
+        /// Initializes FilterExpressionWrapper with given filterString.
         /// </summary>
         public FilterExpressionWrapper(string filterString)
             : this(filterString, null)
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
-            
+
             if (UseFastFilter)
             {
                 return this.fastFilter.Evaluate(propertyValueProvider);

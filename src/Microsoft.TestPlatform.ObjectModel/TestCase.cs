@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public sealed class TestCase : TestObject
     {
         /// <summary>
-        /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
+        /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
         private Object localExtensionData;
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #region Properties
 
         /// <summary>
-        /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
+        /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
         public Object LocalExtensionData

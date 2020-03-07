@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
             // Verify that messages exist
-            Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print atleast copyright info");
+            Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print at least copyright info");
             Assert.IsNotNull(mockOutput.Messages.First().Message, "First Printed Message cannot be null or empty");
 
             // Just check first 20 characters - don't need to check whole thing as assembly version is variable

@@ -121,7 +121,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             {
                 new TestCase("A.C.M1", new Uri("e://d"), "s.dll")
             };
-            
+
             var executorUriVsTestList = new Dictionary<Tuple<Uri, string>, List<TestCase>>();
             var executorUriExtensionTuple = new Tuple<Uri, string>(new Uri("e://d/"), "A.dll");
             executorUriVsTestList.Add(executorUriExtensionTuple, tests);
@@ -134,7 +134,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockTestRunEventsHandler.Object,
                 executorUriVsTestList,
                 this.mockRequestData.Object);
-            
+
             var testExecutor = new RunTestsWithSourcesTests.RunTestWithSourcesExecutor();
             var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));
             IEnumerable<TestCase> receivedTests = null;
@@ -193,7 +193,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
         }
 
-        #region Testable Implemetations
+        #region Testable Implementations
 
         private class TestableRunTestsWithTests : RunTestsWithTests
         {

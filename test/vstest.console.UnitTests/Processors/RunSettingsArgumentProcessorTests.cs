@@ -314,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         [TestMethod]
         public void InitializeShouldSetInIsolataionToTrueIfEnvironmentVariablesSpecified()
-        {            
+        {
             var settingsXml = @"<RunSettings><RunConfiguration><EnvironmentVariables><RANDOM_PATH>C:\temp</RANDOM_PATH></EnvironmentVariables></RunConfiguration></RunSettings>";
 
             // Arrange.
@@ -342,7 +342,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldNotSetInIsolataionToTrueIfEnvironmentVariablesNotSpecified()
         {
             var settingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            
+
             /// Arrange.
             var fileName = "C:\\temp\\r.runsettings";
 

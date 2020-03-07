@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     /// </summary>
     public class SuspendCodeCoverage : IDisposable
     {
-        #region private variables
+        #region Private Variables
 
         private const string SuspendCodeCoverageEnvVarName = "__VANGUARD_SUSPEND_INSTRUMENT__";
         private const string SuspendCodeCoverageEnvVarTrueValue = "TRUE";
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Whether the object is disposed or not.
         /// </summary>
         private bool isDisposed = false;
-        
+
         #endregion
 
         /// <summary>

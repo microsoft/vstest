@@ -106,7 +106,7 @@ namespace vstest.console.UnitTests.Internal
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
             this.mockFileHelper.Setup(x => x.Exists(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")).Returns(false);
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-      
+
             Assert.ThrowsException<TestSourceException>(() => this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
         }
     }

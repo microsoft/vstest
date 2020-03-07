@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         string AssemblyQualifiedName { get; }
 
         /// <summary>
-        /// Loads the DataCollector type 
+        /// Loads the DataCollector type
         /// </summary>
         /// <param name="inProcDataCollectionSink">Sink object to send data</param>
         void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink);

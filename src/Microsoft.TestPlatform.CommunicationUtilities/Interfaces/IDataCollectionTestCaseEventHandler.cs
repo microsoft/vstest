@@ -4,11 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     /// <summary>
-    /// Interface for interacting with execution process for getting test case events in datacollection process.
+    /// Interface for interacting with execution process for getting test case events in data collection process.
     /// </summary>
     internal interface IDataCollectionTestCaseEventHandler
     {
-        // todo : Similar interfaces exist, need redesign.
+        // TODO : Similar interfaces exist, need redesign.
 
         /// <summary>
         /// Initializes the communication for sending requests

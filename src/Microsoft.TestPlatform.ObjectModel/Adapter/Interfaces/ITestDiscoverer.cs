@@ -8,8 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 
     /// <summary>
     /// Interface implemented to provide tests to the test platform.  A class that
-    //  implements this interface will be available for use if its containing 
-    //  assembly is either placed in the Extensions folder or is marked as a 'UnitTestExtension' type 
+    //  implements this interface will be available for use if its containing
+    //  assembly is either placed in the Extensions folder or is marked as a 'UnitTestExtension' type
     //  in the vsix package.
     /// </summary>
     public interface ITestDiscoverer

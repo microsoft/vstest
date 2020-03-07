@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         private const string TelemetryInstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
         private TelemetryClient client;
         private DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
-        
+
         public TelemetryPerfTestbase()
         {
             client = new TelemetryClient();
@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         /// <summary>
-        /// Used for posting the telemtery to AppInsights
+        /// Used for posting the telemetry to AppInsights
         /// </summary>
         /// <param name="perfScenario"></param>
         /// <param name="handlerMetrics"></param>

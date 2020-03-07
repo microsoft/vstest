@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     /// <summary>
-    /// Type of test case failure which occured.
+    /// Type of test case failure which occurred.
     /// </summary>
     public enum TestCaseFailureType
     {

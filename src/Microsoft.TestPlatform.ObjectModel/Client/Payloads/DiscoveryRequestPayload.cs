@@ -12,13 +12,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public class DiscoveryRequestPayload
     {
         /// <summary>
-        /// Settings used for the discovery request. 
+        /// Settings used for the discovery request.
         /// </summary>
         [DataMember]
         public IEnumerable<string> Sources { get; set; }
 
         /// <summary>
-        /// Settings used for the discovery request. 
+        /// Settings used for the discovery request.
         /// </summary>
         [DataMember]
         public string RunSettings { get; set; }

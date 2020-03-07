@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets the valueType. 
+        /// Gets the valueType.
         /// </summary>
         /// <remarks>Only works for the valueType that is in the currently executing assembly or in Mscorlib.dll. The default valueType is of string valueType.</remarks>
         /// <returns>The valueType of the test property</returns>

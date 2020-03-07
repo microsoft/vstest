@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
-    /// Defines the contract that commandline 
+    /// Defines the contract that command line
     /// </summary>
     public interface ITestRequestManager : IDisposable
     {

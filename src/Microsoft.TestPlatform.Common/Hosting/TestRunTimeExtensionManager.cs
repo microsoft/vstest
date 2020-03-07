@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     internal class TestRuntimeExtensionManager : TestExtensionManager<ITestRuntimeProvider, ITestRuntimeCapabilities>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRuntimeExtensionManager"/> class. 
+        /// Initializes a new instance of the <see cref="TestRuntimeExtensionManager"/> class.
         /// Default constructor.
         /// </summary>
         /// <param name="unfilteredTestExtensions">

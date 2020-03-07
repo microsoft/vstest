@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         /// <summary>
-        /// Command line switches should have high precedence if runsetting file and commandline switch specified
+        /// Command line switches should have high precedence if runsetting file and command line switch specified
         /// </summary>
         /// <param name="runnerFramework"></param>
         /// <param name="targetFramework"></param>
@@ -483,7 +483,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #region RunSettings defined in project file
         /// <summary>
         /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test
-        /// checks that the settings were honored by translating an inconlusive test to failed "result", instead of the default "skipped".
+        /// checks that the settings were honored by translating an inconclusive test to failed "result", instead of the default "skipped".
         /// This test depends on Microsoft.TestPlatform.Build\Microsoft.TestPlatform.targets being previously copied into the
         /// artifacts/testArtifacts/dotnet folder. This will allow the local copy of dotnet to pickup the VSTest msbuild task.
         /// </summary>
@@ -500,7 +500,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeDotnetTest(projectPath);
             this.ValidateSummaryStatus(0, 1, 0);
 
-            // make sure that we can revert the project settings back by providing a config from commandline
+            // make sure that we can revert the project settings back by providing a config from command line
             // keeping this in the same test, because it is easier to see that we are reverting settings that
             // are honored by dotnet test, instead of just using the default, which would produce the same
             // result

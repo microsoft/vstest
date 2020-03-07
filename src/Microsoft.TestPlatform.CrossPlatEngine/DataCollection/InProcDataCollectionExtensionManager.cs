@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The data collection test case event manager.
         /// </param>
         /// <param name="defaultCodeBase">
-        /// The default codebase to be used by inproc data collector
+        /// The default code base to be used by in-proc data collector
         /// </param>
         public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache)
             : this(runSettings, testEventsPublisher, defaultCodeBase, testPluginCache, new FileHelper())
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.fileHelper = fileHelper;
             this.codeBasePaths = new List<string> { this.defaultCodeBase };
 
-            // Get Datacollector codebase paths from test plugin cache
+            // Get Datacollector code base paths from test plugin cache
             var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
             foreach (var extensionPath in extensionPaths)
             {
@@ -86,12 +86,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Gets a value indicating whether is in proc data collection enabled.
+        /// Gets a value indicating whether is in-proc data collection enabled.
         /// </summary>
         public bool IsInProcDataCollectionEnabled { get; private set; }
 
         /// <summary>
-        /// Creates data collector instance based on datacollector settings provided. 
+        /// Creates data collector instance based on datacollector settings provided.
         /// </summary>
         /// <param name="dataCollectorSettings">
         /// Settings to be used for creating DataCollector.
@@ -192,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Loads all the inproc data collector dlls
+        /// Loads all the in-proc data collector dlls
         /// </summary>
         /// <param name="runSettings">
         /// The run Settings.
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void InitializeInProcDataCollectors(string runSettings)
         {
             try
-            { 
+            {
                 // Check if runsettings contains in-proc datacollector element
                 var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(runSettings);
                 var inProcDataCollectionSettingsPresentInRunSettings = inProcDataCollectionRunSettings?.IsCollectionEnabled ?? false;
@@ -209,7 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 inProcDataCollectionSettingsPresentInRunSettings = inProcDataCollectionSettingsPresentInRunSettings &&
                     inProcDataCollectionRunSettings.DataCollectorSettingsList.Any();
 
-                // Initialize if we have atleast one
+                // Initialize if we have at least one
                 if (inProcDataCollectionSettingsPresentInRunSettings)
                 {
                     this.inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings.DataCollectorSettingsList;
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("InProcDataCollectionExtensionManager: Error occured while Initializing the datacollectors : {0}", ex);
+                EqtTrace.Error("InProcDataCollectionExtensionManager: Error occurred while Initializing the datacollectors : {0}", ex);
             }
             finally
             {
@@ -236,11 +236,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Gets codebase for inproc datacollector
+        /// Gets code base for in-proc datacollector
         /// Uses all codebasePaths to check where the datacollector exists
         /// </summary>
-        /// <param name="codeBase">The codebase.</param>
-        /// <returns> Codebase </returns>
+        /// <param name="codeBase">The code base.</param>
+        /// <returns> Code base </returns>
         private string GetCodebase(string codeBase)
         {
             if (!Path.IsPathRooted(codeBase))
@@ -276,7 +276,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("InProcDataCollectionExtensionManager: Error occured while Triggering the {0} method : {1}", methodName, ex);
+                EqtTrace.Error("InProcDataCollectionExtensionManager: Error occurred while Triggering the {0} method : {1}", methodName, ex);
             }
         }
 
@@ -331,12 +331,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public const string TestSourcesPropertyName = "TestSources";
 
         /// <summary>
-        /// Coverlet inproc data collector codebase
+        /// Coverlet in-proc data collector code base
         /// </summary>
         public const string CoverletDataCollectorCodebase = "coverlet.collector.dll";
 
         /// <summary>
-        /// Coverlet inproc data collector type name
+        /// Coverlet in-proc data collector type name
         /// </summary>
         public const string CoverletDataCollectorTypeName = "Coverlet.Collector.DataCollection.CoverletInProcDataCollector";
     }

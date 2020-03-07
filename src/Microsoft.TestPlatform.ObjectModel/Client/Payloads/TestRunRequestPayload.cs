@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets or sets the sources for the test run request.
         /// </summary>
-        /// <remarks> 
+        /// <remarks>
         /// Making this a list instead of an IEnumerable because the json serializer fails to deserialize
         /// if a linq query outputs the IEnumerable.
         /// </remarks>
@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets or sets the test cases for the test run request.
         /// </summary>
-        /// <remarks> 
+        /// <remarks>
         /// Making this a list instead of an IEnumerable because the json serializer fails to deserialize
         /// if a linq query outputs the IEnumerable.
         /// </remarks>
@@ -33,19 +33,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public List<TestCase> TestCases { get; set; }
 
         /// <summary>
-        /// Gets or sets the settings used for the test run request. 
+        /// Gets or sets the settings used for the test run request.
         /// </summary>
         [DataMember]
         public string RunSettings { get; set; }
 
         /// <summary>
-        /// Settings used for the Run request. 
+        /// Settings used for the Run request.
         /// </summary>
         [DataMember]
         public bool KeepAlive { get; set; }
 
         /// <summary>
-        /// Is Debugging enabled 
+        /// Is Debugging enabled
         /// </summary>
         [DataMember]
         public bool DebuggingEnabled { get; set; }

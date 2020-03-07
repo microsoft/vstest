@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// The name of the command line argument that the TestCaseFilterArgumentExecutor handles.
         /// </summary>
         public const string CommandName = "/TestCaseFilter";
-        
+
         #endregion
 
         private Lazy<IArgumentProcessorCapabilities> metadata;
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class TestCaseFilterArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override string CommandName => TestCaseFilterArgumentProcessor.CommandName;
-        
+
         public override bool AllowMultiple => false;
 
         public override bool IsAction => false;
