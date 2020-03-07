@@ -27,6 +27,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
+    [DoNotParallelize]
     public class DiscovererEnumeratorTests
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();

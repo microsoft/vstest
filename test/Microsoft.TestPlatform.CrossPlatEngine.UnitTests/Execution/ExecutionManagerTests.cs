@@ -29,6 +29,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using static RunTestsWithSourcesTests;
 
     [TestClass]
+    [DoNotParallelize]
     public class ExecutionManagerTests
     {
         private ExecutionManager executionManager;

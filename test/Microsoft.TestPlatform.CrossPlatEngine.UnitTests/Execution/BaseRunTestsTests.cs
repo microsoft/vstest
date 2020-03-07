@@ -36,6 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Moq;
 
     [TestClass]
+    [DoNotParallelize]
     public class BaseRunTestsTests
     {
         private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
