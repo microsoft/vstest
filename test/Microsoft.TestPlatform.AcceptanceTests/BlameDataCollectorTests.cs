@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Xml;
 
     [TestClass]
+    [DoNotParallelize]
     public class BlameDataCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
