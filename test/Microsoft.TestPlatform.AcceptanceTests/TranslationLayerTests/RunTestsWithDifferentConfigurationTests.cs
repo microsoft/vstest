@@ -18,6 +18,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// The Run Tests using VsTestConsoleWrapper API's
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
         private const string Netcoreapp = "netcoreapp";

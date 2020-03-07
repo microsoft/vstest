@@ -19,6 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// The Run Tests using VsTestConsoleWrapper API's
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class RunTests : AcceptanceTestBase
     {
         private IVsTestConsoleWrapper vstestConsoleWrapper;

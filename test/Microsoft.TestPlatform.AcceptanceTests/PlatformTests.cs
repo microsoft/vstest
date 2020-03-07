@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [DoNotParallelize]
     public class PlatformTests : AcceptanceTestBase
     {
         /// <summary>
