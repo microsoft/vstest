@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 #endif
 
     [TestClass]
+    [DoNotParallelize]
     public class CodeCoverageTests : AcceptanceTestBase
     {
         private readonly string resultsDirectory;
