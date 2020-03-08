@@ -18,6 +18,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
+// The following GUID is for the ID of the typelib if this project is exposed to COM.
 [assembly: Guid("83eaf11c-3fd7-49da-8673-9e81cc2bac66")]
 [assembly: Parallelize(Workers = 0, Scope = ExecutionScope.ClassLevel)]
