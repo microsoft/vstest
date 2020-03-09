@@ -294,11 +294,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     EqtTrace.Warning("ProxyDataCollectionManager.InvokeDataCollectionServiceAction: TestPlatformException = {0}.", ex);
                 }
 
-                this.HandleExceptionMessage(runEventsHandler, ex);
+                HandleExceptionMessage(runEventsHandler, ex);
             }
         }
 
-        private void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
+        private static void HandleExceptionMessage(ITestMessageEventHandler runEventsHandler, Exception exception)
         {
             if (EqtTrace.IsErrorEnabled)
             {
@@ -322,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
                 commandlineArguments.Add(DiagOption);
-                commandlineArguments.Add(this.GetTimestampedLogFile(EqtTrace.LogFile));
+                commandlineArguments.Add(GetTimestampedLogFile(EqtTrace.LogFile));
 
                 commandlineArguments.Add(TraceLevelOption);
                 commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());
@@ -331,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             return commandlineArguments;
         }
 
-        private string GetTimestampedLogFile(string logFile)
+        private static string GetTimestampedLogFile(string logFile)
         {
             return Path.ChangeExtension(
                 logFile,

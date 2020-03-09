@@ -325,7 +325,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 }
                 else
                 {
-                    this.SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
+                    SaveSimpleData(objectToSave, nodeToSaveAt, defaultValue);
                 }
             }
         }
@@ -353,7 +353,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             }
 
             XmlNode saveTarget = this.EnsureLocationExists(xml, location);
-            this.SaveSimpleData(value, saveTarget, defaultValue);
+            SaveSimpleData(value, saveTarget, defaultValue);
         }
 
         /// <summary>
@@ -501,7 +501,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             helper.SaveSingleFields(element, instance, requestedType, parameters);
         }
 
-        #endregion PublicSaveDataInTrx 
+        #endregion PublicSaveDataInTrx
 
         #region Utilities
 
@@ -637,7 +637,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Reviewed. Suppression is OK here.")]
-        private void SaveSimpleData(object value, XmlNode nodeToSaveAt, object defaultValue)
+        private static void SaveSimpleData(object value, XmlNode nodeToSaveAt, object defaultValue)
         {
             if (value == null || value.Equals(defaultValue))
             {
@@ -698,8 +698,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (str != null)
             {
-                // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
-                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
+                // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
+                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
 
                 // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
                 // because C# support unicode character in range \u0000 to \uFFFF

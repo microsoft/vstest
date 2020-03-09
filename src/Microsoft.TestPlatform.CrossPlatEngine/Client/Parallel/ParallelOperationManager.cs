@@ -204,18 +204,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
                     else
                     {
-                        this.DoManagerAction(() => action(client));
+                        DoManagerAction(() => action(client));
                     }
                 }
 
                 if (doActionsInParallel)
                 {
-                    this.DoManagerAction(() => Task.WaitAll(actionTasks));
+                    DoManagerAction(() => Task.WaitAll(actionTasks));
                 }
             }
         }
 
-        private void DoManagerAction(Action action)
+        private static void DoManagerAction(Action action)
         {
             try
             {

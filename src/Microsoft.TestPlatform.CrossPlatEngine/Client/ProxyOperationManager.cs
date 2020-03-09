@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 var processId = this.processHelper.GetCurrentProcessId();
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), TraceLevel = (int)EqtTrace.TraceLevel };
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = GetTimestampedLogFile(EqtTrace.LogFile), TraceLevel = (int)EqtTrace.TraceLevel };
 
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
@@ -254,7 +254,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return testProcessStartInfo;
         }
 
-        protected string GetTimestampedLogFile(string logFile)
+        protected static string GetTimestampedLogFile(string logFile)
         {
             if (string.IsNullOrWhiteSpace(logFile))
             {

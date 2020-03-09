@@ -602,7 +602,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             TestCase testCase = rockSteadyTestResult.TestCase;
-            Guid testId = this.converter.GetTestId(testCase);
+            Guid testId = converter.GetTestId(testCase);
 
             // Scenario for inner test case when parent test element is not present.
             var testName = testCase.DisplayName;

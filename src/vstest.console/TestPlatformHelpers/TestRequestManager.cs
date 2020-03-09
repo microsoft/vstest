@@ -396,10 +396,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
-                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
+                    CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
                     settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
                     settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
-                    settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
+                    settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
                     settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
@@ -412,20 +412,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private bool AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, LoggerRunSettings loggerRunSettings)
         {
             // Update console logger settings
-            bool consoleLoggerUpdated = this.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+            bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
             // In case of CLI, add console logger if not already present.
             bool designMode = runConfiguration.DesignModeSet ? runConfiguration.DesignMode : this.commandLineOptions.IsDesignMode;
             if (!designMode && !consoleLoggerUpdated)
             {
-                this.AddConsoleLogger(document, loggerRunSettings);
+                AddConsoleLogger(document, loggerRunSettings);
             }
 
             // Update is required 1) in case of CLI 2) in case of design mode if console logger is present in runsettings.
             return !designMode || consoleLoggerUpdated;
         }
 
-        private bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
+        private static bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
         {
             bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
             if (updateRequired)
@@ -456,7 +456,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
+        private static void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
         {
             // Find compatible sources
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
@@ -524,7 +524,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         /// <param name="document">Runsettings document.</param>
         /// <param name="loggerRunSettings">Logger run settings.</param>
-        private void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
+        private static void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
         {
             var consoleLogger = new LoggerSettings
             {
@@ -545,7 +545,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="document">Runsettings document.</param>
         /// <param name="loggerRunSettings">Logger run settings.</param>
         /// <returns>True if updated console logger in runsettings successfully.</returns>
-        private bool UpdateConsoleLoggerIfExists(XmlDocument document, LoggerRunSettings loggerRunSettings)
+        private static bool UpdateConsoleLoggerIfExists(XmlDocument document, LoggerRunSettings loggerRunSettings)
         {
             var defaultConsoleLogger = new LoggerSettings
             {

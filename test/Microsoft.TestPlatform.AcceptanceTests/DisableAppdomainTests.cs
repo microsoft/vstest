@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(passedTestCount, 0, 0);
         }
 
-        private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
+        private static string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
             var runsettingsPath = Path.Combine(
                 Path.GetTempPath(),

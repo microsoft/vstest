@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             var platformPath = platform.Equals("x64") ? platform : string.Empty;
             var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\"
                 + $@"contentFiles\any\any\{platformPath}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         {
             var expectedElapsedTime = 5;
             var assemblyPath = this.testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var actualFx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         {
             var expectedElapsedTime = 5;
             var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var fx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
@@ -150,11 +150,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
+        private static void LoadAssemblyIntoMemory(string assemblyPath)
+        {
+            // Load the file into RAM in ahead to avoid performance number(expectedElapsedTime) dependence on disk read time.
+            File.ReadAllBytes(assemblyPath);
+        }
+
         private void TestDotnetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
         {
             this.isManagedAssemblyArchitectureTest = true;
             var assemblyPath = this.testEnvironment.GetTestAsset(projectName + ".dll", framework);
-            this.LoadAssemblyIntoMemory(assemblyPath);
+            LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
@@ -164,12 +170,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
             // We should not assert on time elapsed, it will vary depending on machine, & their state.
             // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
-        }
-
-        private void LoadAssemblyIntoMemory(string assemblyPath)
-        {
-            // Load the file into RAM in ahead to avoid performance number(expectedElapsedTime) dependence on disk read time.
-            File.ReadAllBytes(assemblyPath);
         }
     }
 }

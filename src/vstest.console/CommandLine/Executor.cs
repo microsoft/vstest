@@ -213,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             RunSettingsManager.Instance.AddDefaultRunSettings();
 
             // Ensure we have an action argument.
-            this.EnsureActionArgumentIsPresent(processors, processorFactory);
+            EnsureActionArgumentIsPresent(processors, processorFactory);
 
             // Instantiate and initialize the processors in priority order.
             processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
@@ -302,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         /// <param name="argumentProcessors">The arguments that are being processed.</param>
         /// <param name="processorFactory">A factory for creating argument processors.</param>
-        private void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
+        private static void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
         {
             Contract.Requires(argumentProcessors != null);
             Contract.Requires(processorFactory != null);

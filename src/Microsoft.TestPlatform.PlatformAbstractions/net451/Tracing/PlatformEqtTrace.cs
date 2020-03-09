@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 if (!Enum.Equals(TraceLevel, TraceLevel.Off))
                 {
-                    remoteEqtTrace.TraceLevel = TraceLevel;
+                    RemoteEqtTrace.TraceLevel = TraceLevel;
 
                     TraceListener tptListner = null;
                     foreach (TraceListener listener in Trace.Listeners)

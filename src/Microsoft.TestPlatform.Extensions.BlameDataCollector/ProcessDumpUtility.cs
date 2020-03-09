@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.nativeMethodsHelper = nativeMethodsHelper;
         }
 
-        protected Action<object, string> OutputReceivedCallback => (process, data) =>
+        protected static Action<object, string> OutputReceivedCallback => (process, data) =>
         {
             // Log all standard output message of procdump in diag files.
             // Otherwise they end up coming on console in pipleine.
@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             null,
                                             null,
                                             null,
-                                            this.OutputReceivedCallback) as Process;
+                                            OutputReceivedCallback) as Process;
         }
 
         /// <inheritdoc/>
@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             null,
                                             null,
                                             null,
-                                            this.OutputReceivedCallback) as Process;
+                                            OutputReceivedCallback) as Process;
         }
 
         /// <inheritdoc/>

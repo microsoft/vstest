@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
-        private bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
+        private static bool UpdateTestRunParameterNode(IRunSettingsProvider runSettingsProvider, string node)
         {
             if (!node.Contains(Constants.TestRunParametersName))
             {

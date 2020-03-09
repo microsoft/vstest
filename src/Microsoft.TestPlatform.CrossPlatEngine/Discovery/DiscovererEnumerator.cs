@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
 
                 // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-                this.SetAdapterLoggingSettings(logger, settings);
+                SetAdapterLoggingSettings(logger, settings);
 
                 var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
                 foreach (var discoverer in discovererToSourcesMap.Keys)
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
         }
 
-        private void LogTestsDiscoveryCancellation(IMessageLogger logger)
+        private static void LogTestsDiscoveryCancellation(IMessageLogger logger)
         {
             logger.SendMessage(TestMessageLevel.Warning, CrossPlatEngineResources.TestDiscoveryCancelled);
         }
@@ -326,7 +326,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         }
 
 
-        private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
+        private static void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
         {
             var discoveryMessageLogger = messageLogger as TestSessionMessageLogger;
             if (discoveryMessageLogger != null && runSettings != null)

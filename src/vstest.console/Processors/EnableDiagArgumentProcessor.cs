@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="diagParameters">Diag parameters.</param>
         /// <returns>Diag trace level.</returns>
-        private PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
+        private static PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
         {
             // If diag parameters is null, set value of trace level as verbose.
             if (diagParameters == null)

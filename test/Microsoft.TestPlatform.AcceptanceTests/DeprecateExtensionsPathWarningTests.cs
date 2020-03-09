@@ -12,7 +12,7 @@
         private IList<string> adapterDependencies;
         private IList<string> copiedFiles;
 
-        private string BuildConfiguration
+        private static string BuildConfiguration
         {
             get
             {

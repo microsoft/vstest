@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void GetVisualStudioPathShouldReturnPathToDevenvExecutable()
         {
-            var devenvPath = this.installationContext.GetVisualStudioPath(@"C:\temp");
+            var devenvPath = installationContext.GetVisualStudioPath(@"C:\temp");
 
             Assert.AreEqual(@"C:\temp\devenv.exe", devenvPath);
         }

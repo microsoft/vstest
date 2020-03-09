@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             StartProcessing();
         }
 
-        private void WaitForDebuggerIfEnabled()
+        private static void WaitForDebuggerIfEnabled()
         {
             var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
             if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))

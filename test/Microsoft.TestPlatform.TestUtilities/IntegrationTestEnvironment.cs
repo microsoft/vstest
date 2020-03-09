@@ -97,9 +97,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-               
-                // this used to switch to src\package\package\bin\based on whether 
-                // this is running in cli, but that's a bad idea, the console there does not have 
+
+                // this used to switch to src\package\package\bin\based on whether
+                // this is running in cli, but that's a bad idea, the console there does not have
                 // a runtime config and will fail to start with error testhostpolicy.dll not found
                 var publishDirectory = Path.Combine(
                     TestPlatformRootDirectory,

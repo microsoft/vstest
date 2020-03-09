@@ -274,9 +274,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 return;
             }
 
-            if (this.NotRequiredSTAThread() || !this.TryToRunInSTAThread(() => this.CancelTestRunInternal(this.activeExecutor), false))
+            if (this.NotRequiredSTAThread() || !this.TryToRunInSTAThread(() => CancelTestRunInternal(this.activeExecutor), false))
             {
-                Task.Run(() => this.CancelTestRunInternal(this.activeExecutor));
+                Task.Run(() => CancelTestRunInternal(this.activeExecutor));
             }
         }
 
@@ -294,7 +294,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         #endregion
 
-        private void CancelTestRunInternal(ITestExecutor executor)
+        private static void CancelTestRunInternal(ITestExecutor executor)
         {
             try
             {
@@ -349,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var executorUriExtensionMap = this.GetExecutorUriExtensionMap(this.frameworkHandle, this.runContext);
 
             // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-            this.SetAdapterLoggingSettings();
+            SetAdapterLoggingSettings();
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
                 // Get the executor
-                var extensionManager = this.GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
+                var extensionManager = GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
 
                 // Look up the executor.
                 var executor = extensionManager.TryGetTestExtension(executorUriExtensionTuple.Item1);
@@ -502,7 +502,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return this.runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
         }
 
-        private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
+        private static TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
         {
             try
             {
@@ -527,7 +527,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-        private void SetAdapterLoggingSettings()
+        private static void SetAdapterLoggingSettings()
         {
             // TODO: enable the below once runsettings is in.
             // var sessionMessageLogger = testExecutorFrameworkHandle as TestSessionMessageLogger;

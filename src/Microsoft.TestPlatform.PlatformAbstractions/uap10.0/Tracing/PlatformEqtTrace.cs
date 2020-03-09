@@ -116,6 +116,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return TraceLevel;
         }
 
+        private static void UnInitializeTrace()
+        {
+            isInitialized = false;
+            LogFile = null;
+            TraceLevel = PlatformTraceLevel.Off;
+        }
+
         /// <summary>
         /// Initializes Tracing based on Trace Level
         /// </summary>
@@ -160,20 +167,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 catch (Exception ex)
                 {
-                    this.UnInitializeTrace();
+                    UnInitializeTrace();
                     ErrorOnInitialization = ex.Message;
                     return false;
                 }
 
                 return isInitialized;
             }
-        }
-
-        private void UnInitializeTrace()
-        {
-            isInitialized = false;
-            LogFile = null;
-            TraceLevel = PlatformTraceLevel.Off;
         }
     }
 }

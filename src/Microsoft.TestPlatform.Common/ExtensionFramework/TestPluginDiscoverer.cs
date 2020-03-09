@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
             if (!extensionPaths.Any())
             {
-                this.AddKnownExtensions(ref extensionPaths);
+                AddKnownExtensions(ref extensionPaths);
             }
 
             this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         #region Private Methods
 
-        private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
+        private static void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
         {
             // For C++ UWP adapter, & OLD C# UWP(MSTest V1) adapter
             // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.

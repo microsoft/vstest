@@ -156,7 +156,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runnerFramework">Runner Framework</param>
         /// <param name="framework">Framework for which Tests are not supported</param>
         /// <param name="message">Message to be shown</param>
-        public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+        public static void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
         {
             if (runnerFramework.StartsWith(framework))
             {
@@ -509,7 +509,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             this.arguments = args;
 
-            this.ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
+            ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
         }
 
         /// <summary>
@@ -528,10 +528,10 @@ namespace Microsoft.TestPlatform.TestUtilities
             };
 
             var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe");
-            this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+            ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
-        private void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
+        private static void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {

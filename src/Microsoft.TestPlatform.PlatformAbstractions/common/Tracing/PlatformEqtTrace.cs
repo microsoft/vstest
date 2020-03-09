@@ -159,6 +159,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        public static TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
+        {
+            switch (traceLevel)
+            {
+                case PlatformTraceLevel.Off:
+                    return TraceLevel.Off;
+                case PlatformTraceLevel.Error:
+                    return TraceLevel.Error;
+                case PlatformTraceLevel.Warning:
+                    return TraceLevel.Warning;
+                case PlatformTraceLevel.Info:
+                    return TraceLevel.Info;
+                case PlatformTraceLevel.Verbose:
+                    return TraceLevel.Verbose;
+                default:
+                    Debug.Fail("Should never get here!");
+                    return TraceLevel.Verbose;
+            }
+        }
+
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
@@ -171,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             isInitialized = false;
 
             LogFile = customLogFile;
-            TraceLevel = this.MapPlatformTraceToTrace(platformTraceLevel);
+            TraceLevel = MapPlatformTraceToTrace(platformTraceLevel);
             Source.Switch.Level = TraceSourceLevelsMap[TraceLevel];
 
             // Ensure trace is initialized
@@ -232,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 try
                 {
-                    Source.TraceEvent(TraceLevelEventTypeMap[this.MapPlatformTraceToTrace(level)], 0, log);
+                    Source.TraceEvent(TraceLevelEventTypeMap[MapPlatformTraceToTrace(level)], 0, log);
                     Source.Flush();
                 }
                 catch (Exception e)
@@ -247,32 +267,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public void SetTraceLevel(PlatformTraceLevel value)
         {
-            Source.Switch.Level = TraceSourceLevelsMap[this.MapPlatformTraceToTrace(value)];
+            Source.Switch.Level = TraceSourceLevelsMap[MapPlatformTraceToTrace(value)];
         }
 
         public PlatformTraceLevel GetTraceLevel()
         {
             return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
-        }
-
-        public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
-        {
-            switch (traceLevel)
-            {
-                case PlatformTraceLevel.Off:
-                    return TraceLevel.Off;
-                case PlatformTraceLevel.Error:
-                    return TraceLevel.Error;
-                case PlatformTraceLevel.Warning:
-                    return TraceLevel.Warning;
-                case PlatformTraceLevel.Info:
-                    return TraceLevel.Info;
-                case PlatformTraceLevel.Verbose:
-                    return TraceLevel.Verbose;
-                default:
-                    Debug.Fail("Should never get here!");
-                    return TraceLevel.Verbose;
-            }
         }
 
         /// <summary>

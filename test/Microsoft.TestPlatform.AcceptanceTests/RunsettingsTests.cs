@@ -240,7 +240,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                  {
                                                          { "TargetPlatform", "123" }
                                                  };
-            var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary);
+            var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary);
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 string.Empty,
@@ -261,7 +261,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                  {
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary);
+            var runsettingsFilePath = GetRunsettingsFilePath(runConfigurationDictionary);
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 string.Empty,
@@ -510,7 +510,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         #endregion
 
-        private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
+        private static string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
             var runsettingsPath = Path.Combine(
                 Path.GetTempPath(),
@@ -529,7 +529,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (runConfigurationDictionary != null)
             {
-                runsettingsPath = this.GetRunsettingsFilePath(runConfigurationDictionary);
+                runsettingsPath = GetRunsettingsFilePath(runConfigurationDictionary);
             }
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);

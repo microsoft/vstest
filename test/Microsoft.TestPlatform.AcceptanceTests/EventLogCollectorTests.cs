@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(this.VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
             Assert.IsTrue(this.VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
 
-            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
+            Assert.IsTrue(VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
         }
 
         private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)
@@ -161,7 +161,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return false;
         }
 
-        private bool VerifyOrder(string content, string[] eventIds)
+        private static bool VerifyOrder(string content, string[] eventIds)
         {
             for (int i = 0; i < eventIds.Length; i++)
             {

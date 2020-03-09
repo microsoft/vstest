@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         }
 
 
-        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory, 
+        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
             List<string> errorMessages)
         {
             List<String> resultFiles = new List<string>();
@@ -209,8 +209,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                         string errorMsg = string.Format(
                             CultureInfo.CurrentCulture,
                             TrxLoggerResources.FailureToAttach,
-                            attachmentSet.DisplayName, 
-                            e.GetType().ToString(), 
+                            attachmentSet.DisplayName,
+                            e.GetType().ToString(),
                             e);
 
                         if (ObjectModel.EqtTrace.IsErrorEnabled)
@@ -230,7 +230,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="unitTestResult">TRX TestResult</param>
         /// <param name="testResult"> rock steady test result</param>
-        private void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
+        private static void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
         {
             StringBuilder debugTrace = new StringBuilder();
             StringBuilder stdErr = new StringBuilder();
@@ -412,8 +412,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     string errorMsg = string.Format(
                         CultureInfo.CurrentCulture,
                         TrxLoggerResources.FailureToAttach,
-                        attachmentSet.DisplayName, 
-                        e.GetType().ToString(), 
+                        attachmentSet.DisplayName,
+                        e.GetType().ToString(),
                         e);
 
                     if (ObjectModel.EqtTrace.IsErrorEnabled)
@@ -581,7 +581,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Priority</returns>
-        private int GetPriority(ObjectModel.TestCase rockSteadyTestCase)
+        private static int GetPriority(ObjectModel.TestCase rockSteadyTestCase)
         {
             int priority = int.MaxValue;
 
@@ -597,7 +597,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Owner</returns>
-        private string GetOwner(ObjectModel.TestCase rockSteadyTestCase)
+        private static string GetOwner(ObjectModel.TestCase rockSteadyTestCase)
         {
             string owner = null;
 
@@ -708,7 +708,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testType"></param>
         /// <param name="testCategoryId"></param>
         /// <returns>Trx test result</returns>
-        private TrxObjectModel.TestResult CreateTestResult(
+        private static TrxObjectModel.TestResult CreateTestResult(
             Guid runId,
             Guid testId,
             Guid executionId,

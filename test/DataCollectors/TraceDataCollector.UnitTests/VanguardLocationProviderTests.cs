@@ -31,22 +31,22 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         public void GetVanguardDirectoryShouldReturnRightDirectory()
         {
             var actualDir = this.vanguardLocationProvider.GetVanguardDirectory();
-            var expectedDir = this.GetVanguardDirectory();
+            var expectedDir = GetVanguardDirectory();
 
             Assert.AreEqual(expectedDir, actualDir);
         }
 
-        private string GetVanguardPath()
-        {
-            var vanguardDir = this.GetVanguardDirectory();
-            return Path.Combine(vanguardDir, "CodeCoverage.exe");
-        }
-
-        private string GetVanguardDirectory()
+        private static string GetVanguardDirectory()
         {
             var currentAssemblyLocation =
                 Path.GetDirectoryName(typeof(VanguardLocationProviderTests).GetTypeInfo().Assembly.Location);
             return Path.Combine(currentAssemblyLocation, "CodeCoverage");
+        }
+
+        private string GetVanguardPath()
+        {
+            var vanguardDir = GetVanguardDirectory();
+            return Path.Combine(vanguardDir, "CodeCoverage.exe");
         }
     }
 }

@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             return (HasEventListener(this.TestCaseStart, valueOnFailure) || HasEventListener(this.TestCaseEnd, valueOnFailure));
         }
 
-        private bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
+        private static bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
         {
             try
             {

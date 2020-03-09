@@ -441,7 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// Get the appsetting value for the parameter appSettingKey. Use the parameter defaultValue if
         /// value is not there or is invalid.
         /// </summary>
-        private int GetSetting(string appSettingKey, int defaultValue)
+        private static int GetSetting(string appSettingKey, int defaultValue)
         {
             int value;
 #if NET451

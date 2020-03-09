@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public T DeserializePayload<T>(Message message)
         {
             var versionedMessage = message as VersionedMessage;
-            var payloadSerializer = this.GetPayloadSerializer(versionedMessage?.Version);
+            var payloadSerializer = GetPayloadSerializer(versionedMessage?.Version);
             return this.Deserialize<T>(payloadSerializer, message.Payload);
         }
 
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>An instance of <see cref="T"/>.</returns>
         public T Deserialize<T>(string json, int version = 1)
         {
-            var payloadSerializer = this.GetPayloadSerializer(version);
+            var payloadSerializer = GetPayloadSerializer(version);
             return this.Deserialize<T>(payloadSerializer, json);
         }
 
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload, int version)
         {
-            var payloadSerializer = this.GetPayloadSerializer(version);
+            var payloadSerializer = GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return version > 1 ?
@@ -148,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>JSON string.</returns>
         public string Serialize<T>(T data, int version = 1)
         {
-            var payloadSerializer = this.GetPayloadSerializer(version);
+            var payloadSerializer = GetPayloadSerializer(version);
             return this.Serialize(payloadSerializer, data);
         }
 
@@ -162,6 +162,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             var stringObj = this.Serialize<T>(obj, 2);
             return this.Deserialize<T>(stringObj, 2);
+        }
+
+        private static JsonSerializer GetPayloadSerializer(int? version)
+        {
+            return version == 2 ? payloadSerializer2 : payloadSerializer;
         }
 
         /// <summary>
@@ -207,11 +212,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private T Deserialize<T>(JsonSerializer serializer, JToken jToken)
         {
             return jToken.ToObject<T>(serializer);
-        }
-
-        private JsonSerializer GetPayloadSerializer(int? version)
-        {
-            return version == 2 ? payloadSerializer2 : payloadSerializer;
         }
     }
 }

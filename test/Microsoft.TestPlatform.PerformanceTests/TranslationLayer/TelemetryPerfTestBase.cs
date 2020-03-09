@@ -75,7 +75,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
             return vstestConsoleWrapper;
         }
 
-        private string BuildConfiguration
+        private static string BuildConfiguration
         {
             get
             {
@@ -99,7 +99,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         /// Returns the default runsettings xml
         /// </summary>
         /// <returns></returns>
-        public string GetDefaultRunSettings()
+        public static string GetDefaultRunSettings()
         {
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>

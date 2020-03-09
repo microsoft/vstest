@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
             return finalFx;
         }
 
-        private bool IsDotNETAssembly(string filePath)
+        private static bool IsDotNETAssembly(string filePath)
         {
             var extType = Path.GetExtension(filePath);
             return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||

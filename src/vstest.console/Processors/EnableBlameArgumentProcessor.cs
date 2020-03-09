@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="settings">Settings xml.</param>
         /// <returns>Results directory.</returns>
-        private string GetResultsDirectory(string settings)
+        private static string GetResultsDirectory(string settings)
         {
             string resultsDirectory = null;
             if (settings != null)
@@ -303,7 +303,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="parameters">Parameters.</param>
         /// <param name="XmlDocument">Xml document.</param>
         /// <param name="outernode">Outer node.</param>
-        private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
+        private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
         {
             var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
             if (parameters != null && parameters.Count > 0)
