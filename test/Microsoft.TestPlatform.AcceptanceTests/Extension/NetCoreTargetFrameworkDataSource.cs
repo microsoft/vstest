@@ -23,24 +23,54 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         /// <param name="useDesktopRunner">To run tests with desktop runner(vstest.console.exe)</param>
         /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
-        public NetCoreTargetFrameworkDataSource(bool useDesktopRunner = true, bool useCoreRunner = true)
+        public NetCoreTargetFrameworkDataSource(
+            bool useDesktopRunner = true, 
+            // adding another runner is not necessary until we need to start building against another 
+            // sdk, because the netcoreapp2.1 executable is forward compatible
+            bool useCoreRunner = true,
+            bool useNetCore21Target = true, 
+            // laying the ground work here for tests to be able to run against 3.1 but not enabling it for
+            // all tests to avoid changing all acceptance tests right now
+            bool useNetCore31Target = false)
         {
             this.dataRows = new List<object[]>(6);
 
             if (useDesktopRunner)
             {
-                this.dataRows.Add(new object[]
+                if (useNetCore21Target)
                 {
+                    this.dataRows.Add(new object[]
+                    {
                     new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
-                });
+                    });
+                }
+
+                if (useNetCore31Target)
+                {
+                    this.dataRows.Add(new object[]
+                    {
+                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core31TargetFramework)
+                    });
+                }
             }
 
             if (useCoreRunner)
             {
-                this.dataRows.Add(new object[]
+                if (useNetCore21Target)
                 {
+                    this.dataRows.Add(new object[]
+                    {
                     new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
-                });
+                    });
+                }
+
+                if (useNetCore31Target)
+                {
+                    this.dataRows.Add(new object[]
+                    {
+                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core31TargetFramework)
+                    });
+                }
             }
         }
 

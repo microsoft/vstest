@@ -406,7 +406,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected bool IsNetCoreRunner()
         {
-            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
+            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;               
         }
 
         /// <summary>
