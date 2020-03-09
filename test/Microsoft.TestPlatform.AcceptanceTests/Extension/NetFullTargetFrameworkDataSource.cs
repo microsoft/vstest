@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     /// If runner framework is net46 then vstest.console.exe will run the tests.
     /// Second argument (target framework) = The framework for which test will run
     /// </summary>
-    public class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
+    public sealed class NetFullTargetFrameworkDataSource : Attribute, ITestDataSource
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NetFullTargetFrameworkDataSource"/> class.

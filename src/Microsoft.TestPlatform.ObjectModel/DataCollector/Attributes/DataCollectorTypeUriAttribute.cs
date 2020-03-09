@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// Provides unique identification of a data collector in the form of a URI.
     /// Recommended format: 'datacollector://Company/Product/Version'
     /// </summary>
-    public class DataCollectorTypeUriAttribute : Attribute
+    public sealed class DataCollectorTypeUriAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectorTypeUriAttribute"/> class.
