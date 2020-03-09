@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    public class SocketConstants
+    public static class SocketConstants
     {
         // Buffer size for the buffered stream we are using.
         public const int BufferSize = 16384;

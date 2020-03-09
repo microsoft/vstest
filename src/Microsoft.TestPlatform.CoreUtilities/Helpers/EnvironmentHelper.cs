@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
     using System;
     using ObjectModel;
 
-    public class EnvironmentHelper
+    public static class EnvironmentHelper
     {
         public const string VstestConnectionTimeout = "VSTEST_CONNECTION_TIMEOUT";
         public const int DefaultConnectionTimeout = 90; // seconds

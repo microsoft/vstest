@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
     /// <summary>
     /// The set of constants required for across various(Communication, CrossPlatform, etc.) modules.
     /// </summary>
-    public class Constants
+    public static class Constants
     {
         /// <summary>
         ///  Vstest.console process name, without file extension(.exe/.dll)

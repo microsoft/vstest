@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// <summary>
     /// Assembly utility to perform assembly related functions.
     /// </summary>
-    public class AssemblyUtility
+    public static class AssemblyUtility
     {
         /// <summary>
         /// Gets the assembly name at a given location.

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     /// <summary>
     /// Exception utilities.
     /// </summary>
-    public class ExceptionUtilities
+    public static class ExceptionUtilities
     {
         /// <summary>
         /// Returns an exception message with all inner exceptions messages.

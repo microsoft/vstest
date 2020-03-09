@@ -14,7 +14,7 @@ namespace TestPlatform.TestUtilities
     /// <summary>
     /// The number of process launched utility.
     /// </summary>
-    public class NumberOfProcessLaunchedUtility
+    public static class NumberOfProcessLaunchedUtility
     {
         /// <summary>
         /// Counts processes that are created until cancellation is requested.

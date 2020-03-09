@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
     /// <summary>
     /// The constants.
     /// </summary>
-    public class Constants
+    public static class Constants
     {
         /// <summary>
         /// The discovery task.

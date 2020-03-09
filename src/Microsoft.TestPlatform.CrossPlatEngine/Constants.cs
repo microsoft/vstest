@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     /// <summary>
     /// The set of constants used throughout this project.
     /// </summary>
-    public class Constants
+    public static class Constants
     {
         // Replace this collection with list of adapters we want to white list from "Extensions" folder in Next Major VS Release
         internal static readonly IList<string> DefaultAdapters = new ReadOnlyCollection<string>(new List<string>

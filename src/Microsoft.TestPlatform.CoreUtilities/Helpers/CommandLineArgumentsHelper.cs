@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
     /// <summary>
     /// Helper class for processing arguments passed to a process.
     /// </summary>
-    public class CommandLineArgumentsHelper
+    public static class CommandLineArgumentsHelper
     {
         /// <summary>
         /// Parse command line arguments to a dictionary.
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
             if (!found)
             {
                 value = default;
-                return false; 
+                return false;
             }
 
             value = int.Parse(optionValue);

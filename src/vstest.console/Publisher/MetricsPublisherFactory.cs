@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
     /// <summary>
     /// Returns the Instance of <see cref="IMetricsPublisher"/> on basis of given parameters.
     /// </summary>
-    public class MetricsPublisherFactory
+    public static class MetricsPublisherFactory
     {
         /// <summary>
         /// Gets the Metrics Publisher

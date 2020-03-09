@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// <summary>
     /// Utility class for Inferring the runsettings from the current environment and the user specified command line switches.
     /// </summary>
-    public class InferRunSettingsHelper
+    public static class InferRunSettingsHelper
     {
         private const string DesignModeNodeName = "DesignMode";
         private const string CollectSourceInformationNodeName = "CollectSourceInformation";
