@@ -9,6 +9,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     /// Exception thrown by argument processors when they encounter an error with
     /// the command line arguments.
     /// </summary>
+
+    [Serializable]
     public class CommandLineException : Exception
     {
         #region Constructors

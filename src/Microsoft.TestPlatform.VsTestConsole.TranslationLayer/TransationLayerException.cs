@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// <summary>
     /// Specialized exception for TranslationLayer
     /// </summary>
+    [Serializable]
     public class TransationLayerException : Exception
     {
         /// <summary>

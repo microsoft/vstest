@@ -33,6 +33,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// The exception type that is thrown when a duplicate key is added to a hashtable or
         /// dictionary
         /// </summary>
+        [Serializable]
         public class DuplicateKeyLoadException : Exception
         {
             #region Constructors

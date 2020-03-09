@@ -4,10 +4,14 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Thread apartment state not supported exception.
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public class ThreadApartmentStateNotSupportedException : Exception
     {
         #region Constructors
