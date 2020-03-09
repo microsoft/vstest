@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// <summary>
     /// Thread apartment state not supported exception.
     /// </summary>
-    [Serializable]
     public class ThreadApartmentStateNotSupportedException : Exception
     {
         #region Constructors
