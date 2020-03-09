@@ -684,7 +684,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             {
                 var codeBase = source;
                 var className = GetTestClassName(name, fullyQualifiedName, source);
-                var testMethodName = fullyQualifiedName.StartsWith(className) ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
+                var testMethodName = fullyQualifiedName.StartsWith($"{className}.") ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
                 var testMethod = new TestMethod(testMethodName, className);
 
                 testElement = new UnitTestElement(testId, name, adapter, testMethod);
