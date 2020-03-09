@@ -487,6 +487,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public bool CollectSourceInformationSet { get; private set; } = false;
 
+        /// <summary>
+        /// Default filter to use to filter tests
+        /// </summary>
+        public string TestCaseFilter { get; private set; }
+
         #endregion
 
         /// <inheritdoc/>
@@ -569,6 +574,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement targetDevice = doc.CreateElement("TargetDevice");
                 targetDevice.InnerXml = this.TargetDevice;
                 root.AppendChild(targetDevice);
+            }
+
+            if (!string.IsNullOrEmpty(this.TestCaseFilter))
+            {
+                XmlElement testCaseFilter = doc.CreateElement(nameof(TestCaseFilter));
+                testCaseFilter.InnerXml = this.TestCaseFilter;
+                root.AppendChild(testCaseFilter);
             }
 
             return root;
@@ -865,6 +877,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "TargetDevice":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TargetDevice = reader.ReadElementContentAsString();
+                            break;
+
+                        case "TestCaseFilter":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.TestCaseFilter = reader.ReadElementContentAsString();
                             break;
 
                         default:
