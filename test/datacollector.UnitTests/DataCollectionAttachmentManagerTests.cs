@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.IO;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;

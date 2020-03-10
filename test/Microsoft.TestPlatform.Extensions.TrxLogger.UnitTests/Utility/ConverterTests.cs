@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Xml;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

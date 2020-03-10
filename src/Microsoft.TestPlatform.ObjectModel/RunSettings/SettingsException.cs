@@ -4,7 +4,10 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+#if NET451
     using System.Runtime.Serialization;
+#endif
+
 
     /// <summary>
     /// Exception thrown by Run Settings when an error with a settings provider

@@ -3,11 +3,8 @@
 
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
-    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

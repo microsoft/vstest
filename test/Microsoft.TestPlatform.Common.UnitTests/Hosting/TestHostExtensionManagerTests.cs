@@ -5,8 +5,6 @@ namespace TestPlatform.Common.UnitTests.Logging
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using TestPlatform.Common.UnitTests.ExtensionFramework;

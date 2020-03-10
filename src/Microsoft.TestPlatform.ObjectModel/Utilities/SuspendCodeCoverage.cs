@@ -5,9 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
 #if NET451
     using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Threading;
 
     /// <summary>
     /// Suspends the instrumentation (for code coverage) of the modules which are loaded

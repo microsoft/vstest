@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;

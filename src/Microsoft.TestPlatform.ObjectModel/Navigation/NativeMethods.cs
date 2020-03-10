@@ -6,9 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
     using System;
     using System.IO;
-    using System.Reflection;
     using System.Runtime.InteropServices;
     using PlatformAbstractions;
+
     internal static class HResult
     {
         public static bool Failed(int hr)

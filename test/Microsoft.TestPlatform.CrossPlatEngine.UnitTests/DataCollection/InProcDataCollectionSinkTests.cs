@@ -5,14 +5,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 {
     using System;
 
-    using Castle.DynamicProxy.Generators.Emitters;
-
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using TestPlatform.CrossPlatEngine.UnitTests.Discovery;
 
     [TestClass]
     public class InProcDataCollectionSinkTests

@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
     using System;
     using System.Globalization;
     using System.IO;
-    using System.Xml;
-    using Microsoft.VisualStudio.TestPlatform.SettingsMigrator;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

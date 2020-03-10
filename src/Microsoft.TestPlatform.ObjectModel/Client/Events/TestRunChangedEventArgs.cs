@@ -6,9 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using System.Linq;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The test run changed event args that provides the test results available.
