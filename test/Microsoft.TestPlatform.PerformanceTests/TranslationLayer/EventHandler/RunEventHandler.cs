@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler
+    public class RunEventHandler : ITestRunEventsHandler2
     {
         /// <summary>
         /// Gets the test results.
