@@ -33,22 +33,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)
         {
-            if (string.Equals(testEnvironment.TargetFramework, Core21TargetFramework, StringComparison.Ordinal))
+            switch (testEnvironment.TargetFramework)
             {
-                return Core21FrameworkArgValue;
+                case Core21TargetFramework:
+                    return Core21FrameworkArgValue;
+                case Core31TargetFramework:
+                    return Core31FrameworkArgValue;
+                case DesktopTargetFramework:
+                    return DesktopFrameworkArgValue;
+                default:
+                    throw new NotSupportedException($"{testEnvironment.TargetFramework} is not supported TargetFramework value.");
             }
-            
-            if (string.Equals(testEnvironment.TargetFramework, Core31TargetFramework, StringComparison.Ordinal))
-            {
-                return Core31FrameworkArgValue;
-            }
-            
-            if (string.Equals(testEnvironment.TargetFramework, DesktopTargetFramework, StringComparison.Ordinal))
-            {
-                return DesktopFrameworkArgValue;
-            }
-
-            throw new NotSupportedException($"{testEnvironment.TargetFramework} is not supported TargetFramework value.");
         }
 
         protected bool IsDesktopTargetFramework()

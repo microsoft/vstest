@@ -18,6 +18,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     /// </summary>
     public class NetCoreTargetFrameworkDataSource : Attribute, ITestDataSource
     {
+        private List<object[]> dataRows = new List<object[]>();
         /// <summary>
         /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
         /// </summary>
@@ -33,48 +34,40 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // all tests to avoid changing all acceptance tests right now
             bool useNetCore31Target = false)
         {
-            this.dataRows = new List<object[]>(6);
-
             if (useDesktopRunner)
             {
+                var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
                 if (useNetCore21Target)
                 {
-                    this.dataRows.Add(new object[]
-                    {
-                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
-                    });
+                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
                 }
 
                 if (useNetCore31Target)
                 {
-                    this.dataRows.Add(new object[]
-                    {
-                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core31TargetFramework)
-                    });
+                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
                 }
             }
 
             if (useCoreRunner)
             {
+                var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
                 if (useNetCore21Target)
                 {
-                    this.dataRows.Add(new object[]
-                    {
-                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core21TargetFramework)
-                    });
+                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
                 }
 
                 if (useNetCore31Target)
                 {
-                    this.dataRows.Add(new object[]
-                    {
-                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core31TargetFramework)
-                    });
+                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
                 }
             }
         }
 
-        private List<object[]> dataRows;
+        private void AddRunnerDataRow(string runnerFramework, string targetFramework)
+        {
+            var runnerInfo = new RunnerInfo(runnerFramework, targetFramework);
+            this.dataRows.Add(new object[] { runnerInfo });
+        }
 
         public IEnumerable<object[]> GetData(MethodInfo methodInfo)
         {
