@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
@@ -116,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
-        {            
+        {
             if (string.IsNullOrWhiteSpace(argument))
             {
                 if (!string.IsNullOrWhiteSpace(this.commandLineOptions.TestCaseFilterValue))
