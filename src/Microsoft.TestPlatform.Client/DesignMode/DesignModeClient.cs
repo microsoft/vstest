@@ -314,9 +314,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message responseMessage = null;
-                this.onAttachDebuggerAckRecieved = (responseRawMessage) =>
+                this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
                 {
-                    responseMessage = responseRawMessage;
+                    responseMessage = ackRawMessage;
                     waitHandle.Set();
                 };
 
