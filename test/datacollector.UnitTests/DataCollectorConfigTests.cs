@@ -4,10 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
-    using System.Globalization;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class DataCollectorConfigTests

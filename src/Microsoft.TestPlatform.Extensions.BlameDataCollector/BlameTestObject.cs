@@ -4,9 +4,7 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
-    using System.IO;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     public class BlameTestObject
     {

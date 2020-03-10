@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -8,8 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using Moq;
-
     [TestClass]
     public class EventLogSessionContextTests
     {

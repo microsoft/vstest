@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// JsonDataSerializes serializes and deserializes data using Json format

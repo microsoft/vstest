@@ -4,9 +4,7 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;

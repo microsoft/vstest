@@ -5,7 +5,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;

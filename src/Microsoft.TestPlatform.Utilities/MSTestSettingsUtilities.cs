@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Globalization;
     using System.IO;
     using System.Xml;
-    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 

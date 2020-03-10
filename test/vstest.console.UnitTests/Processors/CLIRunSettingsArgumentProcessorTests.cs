@@ -5,8 +5,6 @@ namespace vstest.console.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
-    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;

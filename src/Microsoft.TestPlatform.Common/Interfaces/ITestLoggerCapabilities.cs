@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// Metadata that is available from Test Loggers.
     /// </summary>

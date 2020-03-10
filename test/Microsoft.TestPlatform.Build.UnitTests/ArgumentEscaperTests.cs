@@ -2,7 +2,6 @@
 
 namespace Microsoft.TestPlatform.Build.Utils.UnitTests
 {
-    using Microsoft.TestPlatform.Build.Utils;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

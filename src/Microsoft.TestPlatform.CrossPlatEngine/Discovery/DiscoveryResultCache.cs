@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The discovery result cache.

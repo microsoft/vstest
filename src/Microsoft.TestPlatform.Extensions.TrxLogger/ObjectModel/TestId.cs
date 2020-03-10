@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System.Globalization;
     using System.Xml;
 
-    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
     #region TestId

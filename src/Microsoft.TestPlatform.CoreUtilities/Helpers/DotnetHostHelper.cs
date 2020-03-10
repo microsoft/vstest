@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
     using System;
     using System.IO;
-    using System.Runtime.InteropServices;
 
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;

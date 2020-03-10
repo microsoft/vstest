@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;

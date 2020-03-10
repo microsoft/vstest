@@ -11,7 +11,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.Threading;
     using System.Xml;
 
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;

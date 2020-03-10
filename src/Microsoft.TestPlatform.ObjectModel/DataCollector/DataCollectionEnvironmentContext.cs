@@ -3,7 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+#if NET451
     using System;
+#endif
 
     /// <summary>
     /// Encapsulates the context of the environment a data collector is being hosted in.

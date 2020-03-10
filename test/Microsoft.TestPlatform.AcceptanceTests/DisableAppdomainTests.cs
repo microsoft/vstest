@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Text;
 
     [TestClass]
     public class DisableAppdomainTests : AcceptanceTestBase

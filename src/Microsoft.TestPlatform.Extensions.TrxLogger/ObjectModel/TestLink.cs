@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
     using System;
-    using System.Diagnostics;
     using System.Globalization;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;

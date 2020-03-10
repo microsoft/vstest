@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

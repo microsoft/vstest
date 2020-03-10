@@ -7,10 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    using Client.Execution;
-
-    using CrossPlatEngine.Execution;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;

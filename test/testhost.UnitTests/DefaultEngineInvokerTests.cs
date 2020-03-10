@@ -6,7 +6,6 @@ namespace testhost.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;

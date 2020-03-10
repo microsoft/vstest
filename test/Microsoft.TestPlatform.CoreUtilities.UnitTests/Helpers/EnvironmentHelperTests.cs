@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
 {
     using System;
-    using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

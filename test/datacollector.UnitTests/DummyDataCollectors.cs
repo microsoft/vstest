@@ -3,13 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
-    using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
 
     [DataCollectorFriendlyName("CustomDataCollector")]
     [DataCollectorTypeUri("my://custom/datacollector")]

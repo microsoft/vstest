@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System;
-
     /// <summary>
     /// Available architectures for test platform.
     /// </summary>
