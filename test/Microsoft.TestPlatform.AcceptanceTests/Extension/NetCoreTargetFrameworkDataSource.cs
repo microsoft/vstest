@@ -53,7 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 var runnerFramework = IntegrationTestBase.CoreRunnerFramework;
                 if (useNetCore21Target)
                 {
-                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core31TargetFramework);
+                    this.AddRunnerDataRow(runnerFramework, AcceptanceTestBase.Core21TargetFramework);
                 }
 
                 if (useNetCore31Target)
