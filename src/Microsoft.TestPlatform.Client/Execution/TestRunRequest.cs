@@ -663,7 +663,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (!(this.testRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher))
+            if (!(this.testRunCriteria.TestHostLauncher is IDebugTestHostLauncher launcher))
                 return false;
 
             return launcher.AttachDebuggerToProcess(pid);

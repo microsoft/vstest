@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     /// <summary>
     /// DesignMode TestHost Launcher for hosting of test process
     /// </summary>
-    internal class DesignModeTestHostLauncher : ITestHostLauncher2
+    internal class DesignModeTestHostLauncher : IDebugTestHostLauncher
     {
         private readonly IDesignModeClient designModeClient;
 

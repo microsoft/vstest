@@ -636,7 +636,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
-                    else if (string.Equals(MessageType.VSAttachDebuggerToProcess, message.MessageType))
+                    else if (string.Equals(MessageType.ProxyAttachDebuggerToProcess, message.MessageType))
                     {
                         AttachDebuggerToProcess(customHostLauncher, message);
                     }
@@ -703,7 +703,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
-                    else if (string.Equals(MessageType.VSAttachDebuggerToProcess, message.MessageType))
+                    else if (string.Equals(MessageType.ProxyAttachDebuggerToProcess, message.MessageType))
                     {
                         AttachDebuggerToProcess(customHostLauncher, message);
                     }
@@ -785,7 +785,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 throw new ArgumentNullException("VsTestConsoleRequestSender.AttachDebuggerToProcess: test host launcher cannot be null.");
             }
-            if (!(customHostLauncher is ITestHostLauncher2 launcher))
+            if (!(customHostLauncher is IDebugTestHostLauncher launcher))
             {
                 throw new NotSupportedException("VsTestConsoleRequestSender.AttachDebuggerToProcess: test host launcher is not ITestHostLauncher2.");
             }
@@ -803,7 +803,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             finally
             {
-                this.communicationManager.SendMessage(MessageType.VSAttachDebuggerToProcessCallback, response, this.protocolVersion);
+                this.communicationManager.SendMessage(MessageType.ProxyAttachDebuggerToProcessCallback, response, this.protocolVersion);
             }
         }
     }

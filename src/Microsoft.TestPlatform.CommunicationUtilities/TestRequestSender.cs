@@ -455,9 +455,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
 
                     case MessageType.AttachDebuggerToProcess:
-#pragma warning disable SA1119 // Statement must not use unnecessary parenthesis
-                        if (!(testRunEventsHandler is ITestRunEventsHandler2 handler))
-#pragma warning restore SA1119 // Statement must not use unnecessary parenthesis
+                        if (testRunEventsHandler is ITestRunEventsHandler2 handler)
+                        {
+                            var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                            bool result = handler.AttachDebuggerToProcess(testProcessPid.ProcessID);
+
+                            var resultMessage = this.dataSerializer.SerializePayload(
+                                MessageType.AttachDebuggerToProcessCallback,
+                                result,
+                                this.protocolVersion);
+
+                            this.channel.Send(resultMessage);
+                        }
+                        else
                         {
                             throw new NotSupportedException(string.Format(
                                 CultureInfo.CurrentUICulture,
@@ -465,15 +475,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 testRunEventsHandler.GetType()));
                         }
 
-                        var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
-                        bool result = handler.AttachDebuggerToProcess(testProcessPid.ProcessID);
-
-                        var resultMessage = this.dataSerializer.SerializePayload(
-                            MessageType.AttachDebuggerToProcessCallback,
-                            result,
-                            this.protocolVersion);
-
-                        this.channel.Send(resultMessage);
                         break;
                 }
             }

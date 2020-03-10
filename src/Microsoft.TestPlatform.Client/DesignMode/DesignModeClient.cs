@@ -35,17 +35,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         private readonly IDataSerializer dataSerializer;
 
-        private object ackLockObject = new object();
-
-        private object responseLockObject = new object();
+        private object lockObject = new object();
 
         private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
 
         private IEnvironment platformEnvironment;
 
-        protected Action<Message> onAckMessageReceived;
+        protected Action<Message> onCustomTestHostLaunchAckReceived;
 
-        protected Action<Message> onResponseMessageReceived;
+        protected Action<Message> onAttachDebuggerAckRecieved;
 
         private TestSessionMessageLogger testSessionMessageLogger;
 
@@ -226,12 +224,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.CustomTestHostLaunchCallback:
                             {
-                                this.onAckMessageReceived?.Invoke(message);
+                                this.onCustomTestHostLaunchAckReceived?.Invoke(message);
                                 break;
                             }
 
-                        case MessageType.VSAttachDebuggerToProcessCallback:
-                            this.onResponseMessageReceived?.Invoke(message);
+                        case MessageType.ProxyAttachDebuggerToProcessCallback:
+                            this.onAttachDebuggerAckRecieved?.Invoke(message);
                             break;
 
                         case MessageType.SessionEnd:
@@ -273,11 +271,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// </returns>
         public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
-            lock (ackLockObject)
+            lock (this.lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message ackMessage = null;
-                this.onAckMessageReceived = (ackRawMessage) =>
+                this.onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
                 {
                     ackMessage = ackRawMessage;
                     waitHandle.Set();
@@ -294,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-                this.onAckMessageReceived = null;
+                this.onCustomTestHostLaunchAckReceived = null;
 
                 var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
 
@@ -312,25 +310,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
         {
-            lock (this.responseLockObject)
+            lock (this.lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message responseMessage = null;
-                this.onResponseMessageReceived = (responseRawMessage) =>
+                this.onAttachDebuggerAckRecieved = (responseRawMessage) =>
                 {
                     responseMessage = responseRawMessage;
                     waitHandle.Set();
                 };
 
-                this.communicationManager.SendMessage(MessageType.VSAttachDebuggerToProcess, pid);
+                this.communicationManager.SendMessage(MessageType.ProxyAttachDebuggerToProcess, pid);
 
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
-                this.onResponseMessageReceived = null;
+                this.onAttachDebuggerAckRecieved = null;
 
-                var response = this.dataSerializer.DeserializePayload<bool>(responseMessage);
-                return response;
+                return this.dataSerializer.DeserializePayload<bool>(responseMessage);
             }
         }
 
