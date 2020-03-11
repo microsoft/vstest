@@ -213,12 +213,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            Message resultMessage = null;
+            Message ackMessage = null;
             var waitHandle = new ManualResetEventSlim(false);
 
-            this.onAttachDebuggerAckRecieved = (resultRawMessage) =>
+            this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
             {
-                resultMessage = resultRawMessage;
+                ackMessage = ackRawMessage;
                 waitHandle.Set();
             };
 
@@ -228,11 +228,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 protocolVersion);
             this.SendData(data);
 
-            EqtTrace.Verbose("Waiting for AttachDebuggerToProcess result ...");
+            EqtTrace.Verbose("Waiting for AttachDebuggerToProcess ack ...");
             waitHandle.Wait();
 
             this.onAttachDebuggerAckRecieved = null;
-            return this.dataSerializer.DeserializePayload<bool>(resultMessage);
+            return this.dataSerializer.DeserializePayload<bool>(ackMessage);
         }
 
         public void OnMessageReceived(object sender, MessageReceivedEventArgs messageReceivedArgs)

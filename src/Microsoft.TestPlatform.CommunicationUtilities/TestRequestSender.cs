@@ -455,25 +455,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
 
                     case MessageType.AttachDebuggerToProcess:
-                        if (testRunEventsHandler is ITestRunEventsHandler2 handler)
-                        {
-                            var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
-                            bool result = handler.AttachDebuggerToProcess(testProcessPid.ProcessID);
+                        var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                        bool result = ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
 
-                            var resultMessage = this.dataSerializer.SerializePayload(
-                                MessageType.AttachDebuggerToProcessCallback,
-                                result,
-                                this.protocolVersion);
+                        var resultMessage = this.dataSerializer.SerializePayload(
+                            MessageType.AttachDebuggerToProcessCallback,
+                            result,
+                            this.protocolVersion);
 
-                            this.channel.Send(resultMessage);
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(string.Format(
-                                CultureInfo.CurrentUICulture,
-                                "AttachDebuggerToProcess is only supported in ITestRunEventsHandler2, but it was called with {0}.",
-                                testRunEventsHandler.GetType()));
-                        }
+                        this.channel.Send(resultMessage);
 
                         break;
                 }

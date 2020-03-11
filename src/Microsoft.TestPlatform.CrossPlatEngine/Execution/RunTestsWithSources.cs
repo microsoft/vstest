@@ -128,8 +128,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             IEnumerable<string> sources = new List<string>();
             this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
 
+            // If the adapter doesn't implement the new test executor interface we should attach to
+            // the default test host by default to preserve old behavior.
             if (!(executor is ITestExecutor2 convertedExecutor))
+            {
                 return true;
+            }
 
             return convertedExecutor.ShouldAttachToTestHost(sources, this.RunContext);
         }

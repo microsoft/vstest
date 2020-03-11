@@ -178,15 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (!(this.actualRunEventsHandler is ITestRunEventsHandler2 handler))
-            {
-                throw new NotSupportedException(string.Format(
-                    CultureInfo.CurrentUICulture,
-                    "AttachDebuggerToProcess is only supported in ITestRunEventsHandler2, but it was called with {0}.",
-                    this.actualRunEventsHandler.GetType()));
-            }
-
-            return handler.AttachDebuggerToProcess(pid);
+            return ((ITestRunEventsHandler2)this.actualRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         private void ConvertToRawMessageAndSend(string messageType, object payload)

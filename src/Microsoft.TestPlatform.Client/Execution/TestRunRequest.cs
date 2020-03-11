@@ -13,8 +13,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -22,8 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
     using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler2
     {
@@ -663,12 +663,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (!(this.testRunCriteria.TestHostLauncher is IDebugTestHostLauncher launcher))
-            {
-                return false;
-            }
-
-            return launcher.AttachDebuggerToProcess(pid);
+            return ((IDebugTestHostLauncher)this.testRunCriteria.TestHostLauncher).AttachDebuggerToProcess(pid);
         }
 
         /// <summary>

@@ -101,13 +101,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (this.requestHandler is ITestRequestHandler2 handler)
-            {
-                EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
-                return handler.AttachDebuggerToProcess(pid);
-            }
-
-            return false;
+            EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
+            return ((ITestRequestHandler2)this.requestHandler).AttachDebuggerToProcess(pid);
         }
     }
 }

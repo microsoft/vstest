@@ -795,7 +795,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 var pid = this.dataSerializer.DeserializePayload<int>(message);
                 response = launcher.AttachDebuggerToProcess(pid);
-
             }
             catch (Exception ex)
             {

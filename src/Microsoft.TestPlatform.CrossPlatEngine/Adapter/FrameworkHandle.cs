@@ -113,25 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
-            if (pid < 0)
-            {
-                throw new ArgumentOutOfRangeException("FrameworkHandle.AttachDebuggerToProcess: PID cannot be negative.");
-            }
-            if (pid == 0)
-            {
-                EqtTrace.Warning("FrameworkHandle.AttachDebuggerToProcess: Attaching to a process with process id 0, is this intended ?");
-            }
-
-            var handler = this.testRunEventsHandler as ITestRunEventsHandler2;
-            if (handler == null)
-            {
-                throw new NotSupportedException(string.Format(
-                    CultureInfo.CurrentUICulture,
-                    "FrameworkHandle.AttachDebuggerToProcess is only supported in ITestRunEventsHandler2, but it was called with {0}.",
-                    this.testRunEventsHandler.GetType()));
-            }
-
-            return handler.AttachDebuggerToProcess(pid);
+            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         public void Dispose()

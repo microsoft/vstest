@@ -377,7 +377,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Collecting Total Number of Adapters Discovered in Machine.
             this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMap.Count());
 
-            bool attachedToTestHost = false;
+            var attachedToTestHost = false;
             var executorCache = new List<LazyExtension<ITestExecutor, ITestExecutorCapabilities>>();
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
@@ -397,7 +397,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     continue;
                 }
 
-                if (!(executor.Value is ITestExecutor2) || this.ShouldAttachToTestHost(executor.Value))
+                // If there's at least one adapter in the filtered adapters list that doesn't
+                // implement the new test executor interface, we should attach to the default test
+                // host by default.
+                // Same goes if all adapters implement the new test executor interface but at
+                // least one of them needs the test platform to attach to the default test host.
+                if (!(executor.Value is ITestExecutor2 executor2) || this.ShouldAttachToTestHost(executor2))
                 {
                     EqtTrace.Verbose("Attaching to default test host.");
 
@@ -409,7 +414,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
 
-            int index = 0;
+            var index = 0;
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
                 // Get the executor from cache.

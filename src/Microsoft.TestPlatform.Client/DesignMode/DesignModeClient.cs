@@ -229,8 +229,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             }
 
                         case MessageType.ProxyAttachDebuggerToProcessCallback:
-                            this.onAttachDebuggerAckRecieved?.Invoke(message);
-                            break;
+                            {
+                                this.onAttachDebuggerAckRecieved?.Invoke(message);
+                                break;
+                            }
 
                         case MessageType.SessionEnd:
                             {
@@ -313,10 +315,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             lock (this.lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
-                Message responseMessage = null;
+                Message ackMessage = null;
                 this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
                 {
-                    responseMessage = ackRawMessage;
+                    ackMessage = ackRawMessage;
                     waitHandle.Set();
                 };
 
@@ -327,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
                 this.onAttachDebuggerAckRecieved = null;
 
-                return this.dataSerializer.DeserializePayload<bool>(responseMessage);
+                return this.dataSerializer.DeserializePayload<bool>(ackMessage);
             }
         }
 
