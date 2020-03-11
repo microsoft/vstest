@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
-    using System;
-    using System.Diagnostics;
     using System.Runtime.Serialization;
 
     /// <summary>

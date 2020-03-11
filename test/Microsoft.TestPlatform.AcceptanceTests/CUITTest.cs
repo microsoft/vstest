@@ -4,10 +4,6 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
 
     [TestClass]
     public class CUITTest : AcceptanceTestBase

@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.TestExecutor;
 
     [TestClass]
     public class UnitTestClientTests

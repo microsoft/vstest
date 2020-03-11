@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>

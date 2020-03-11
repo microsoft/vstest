@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System.ComponentModel;
-    using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;

@@ -4,9 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System;
-    using System.Diagnostics;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
     /// <summary>
     /// Event arguments used when test run starts
