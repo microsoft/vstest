@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [DoNotParallelize]
     public class RunSelectedTests : AcceptanceTestBase
     {
         private IVsTestConsoleWrapper vstestConsoleWrapper;
