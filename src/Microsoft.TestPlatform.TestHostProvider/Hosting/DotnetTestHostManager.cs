@@ -68,6 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool isVersionCheckRequired = true;
 
+        private string dotnetHostPath;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
@@ -156,6 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             this.architecture = runConfiguration.TargetPlatform;
+            this.dotnetHostPath = runConfiguration.DotnetHostPath;
         }
 
         /// <inheritdoc/>
@@ -218,10 +221,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
             string testHostPath = string.Empty;
+            bool useCustomDotnetHostpath = !string.IsNullOrEmpty(this.dotnetHostPath);
 
-            // If testhost.exe is available use it
+            if (useCustomDotnetHostpath)
+            {
+                EqtTrace.Verbose("DotnetTestHostmanager: User specified custom path to dotnet host: '{0}'.", this.dotnetHostPath);
+            }
+
+            // If testhost.exe is available use it, unless user specified path to dotnet.exe, then we will use the testhost.dll
             bool testHostExeFound = false;
-            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            if (!useCustomDotnetHostpath && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
                 var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
                 var fullExePath = Path.Combine(sourceDirectory, exeName);
@@ -257,17 +266,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!testHostExeFound)
             {
-                var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
-
                 if (string.IsNullOrEmpty(testHostPath))
                 {
                     testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
                 }
 
+                var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+                if (useCustomDotnetHostpath)
+                {
+                    startInfo.FileName = this.dotnetHostPath;
+                }
+
                 // This host manager can create process start info for dotnet core targets only.
                 // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
                 // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
-                if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                else if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                    || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     startInfo.FileName = currentProcessPath;

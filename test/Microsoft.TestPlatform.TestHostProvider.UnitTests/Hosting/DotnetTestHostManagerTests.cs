@@ -280,6 +280,18 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseDotnetHostPathFromRunsettings()
+        {
+            var dotnetHostPath = @"C:\dotnet.exe";
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotNetHostPath>{dotnetHostPath}</DotNetHostPath></RunConfiguration></RunSettings>");
+            var startInfo = this.GetDefaultStartInfo();
+
+            StringAssert.Contains(startInfo.FileName, dotnetHostPath);
+        }
+
+        [TestMethod]
         public void GetTestHostProcessStartInfoShouldUseTestHostExeFromNugetIfNotFoundInSourceLocation()
         {
             var testhostExePath = "testhost.exe";
