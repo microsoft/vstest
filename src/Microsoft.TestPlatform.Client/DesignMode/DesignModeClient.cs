@@ -329,7 +329,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
                 this.onAttachDebuggerAckRecieved = null;
 
-                return this.dataSerializer.DeserializePayload<bool>(ackMessage);
+                var ackPayload = this.dataSerializer.DeserializePayload<ProxyAttachDebuggerToProcessAckPayload>(ackMessage);
+                if (!ackPayload.Attached)
+                {
+                    EqtTrace.Warning(ackPayload.ErrorMessage);
+                }
+
+                return ackPayload.Attached;
             }
         }
 

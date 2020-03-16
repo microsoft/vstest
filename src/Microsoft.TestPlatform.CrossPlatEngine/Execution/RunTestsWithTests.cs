@@ -96,12 +96,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testCaseEventsHandler.SendSessionStart(properties);
         }
 
-        /// <summary>
-        /// Asks the adapter about attaching to the default test host.
-        /// </summary>
-        /// <param name="executor">The executor used to run the tests.</param>
-        /// <returns>True if must attach to the default test host, false otherwise.</returns>
-        protected override bool ShouldAttachToTestHost(ITestExecutor executor)
+        /// <inheritdoc />
+        protected override bool ShouldAttachDebuggerToTestHost(ITestExecutor executor)
         {
             // If the adapter doesn't implement the new test executor interface we should attach to
             // the default test host by default to preserve old behavior.

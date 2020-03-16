@@ -292,7 +292,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected abstract void SendSessionEnd();
 
-        protected abstract bool ShouldAttachToTestHost(ITestExecutor executor);
+        /// <summary>
+        /// Asks the adapter about attaching the debugger to the default test host.
+        /// </summary>
+        /// <param name="executor">The executor used to run the tests.</param>
+        /// <returns>
+        /// <see cref="true"/> if must attach the debugger to the default test host,
+        /// <see cref="false"/> otherwise.
+        /// </returns>
+        protected abstract bool ShouldAttachDebuggerToTestHost(ITestExecutor executor);
 
         #endregion
 
@@ -421,6 +429,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 var executor = executorCache[index++];
                 if (executor == null)
                 {
+                    // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
+                    // this.activeExecutor = null;
+                    // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",	
+                    // PlatformServices.Default.Runtime.RuntimeVersion);
                     var runtimeVersion = " ";
                     this.TestRunEventsHandler?.HandleLogMessage(
                         TestMessageLevel.Warning,

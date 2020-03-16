@@ -49,7 +49,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived)
+        protected TestRequestHandler(
+            TestHostConnectionInfo connectionInfo,
+            ICommunicationEndpointFactory communicationEndpointFactory,
+            IDataSerializer dataSerializer,
+            JobQueue<Action> jobQueue,
+            Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived,
+            Action<Message> onAttachDebuggerAckRecieved)
         {
             this.communicationEndpointFactory = communicationEndpointFactory;
             this.ConnectionInfo = connectionInfo;
@@ -58,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived = onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
-            this.onAttachDebuggerAckRecieved = (message) => { throw new NotImplementedException(); };
+            this.onAttachDebuggerAckRecieved = onAttachDebuggerAckRecieved;
             this.jobQueue = jobQueue;
         }
 
