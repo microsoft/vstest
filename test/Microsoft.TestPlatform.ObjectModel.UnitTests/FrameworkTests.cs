@@ -3,8 +3,6 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
-    using System.Runtime.Versioning;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

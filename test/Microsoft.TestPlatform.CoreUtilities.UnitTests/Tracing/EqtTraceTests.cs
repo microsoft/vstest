@@ -3,12 +3,13 @@
 
 namespace TestPlatform.CoreUtilities.UnitTests
 {
+#if NET451
     using System.Diagnostics;
+#endif
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
-    using System.Text;
 
     [TestClass]
     public class EqtTraceTests

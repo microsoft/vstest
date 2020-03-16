@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
-    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;

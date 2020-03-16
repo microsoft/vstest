@@ -213,6 +213,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     "DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Loading tests for {0}",
                         discoverer.Value.GetType().FullName);
 
+                if (discoverer.Metadata.DefaultExecutorUri == null)
+                {
+                    throw new Exception($@"DefaultExecutorUri is null, did you decorate the discoverer class with [DefaultExecutorUri()] attribute? For example [DefaultExecutorUri(""executor://example.testadapter"")].");
+                }
+
                 var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
                 var newTimeStart = DateTime.UtcNow;
 

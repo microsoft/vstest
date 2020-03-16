@@ -10,9 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
     /// <summary>

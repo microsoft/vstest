@@ -3,10 +3,7 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
-    using System;
-    using System.Collections.Generic;
     using System.Globalization;
-    using System.Runtime.Serialization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

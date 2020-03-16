@@ -3,11 +3,9 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
 
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;

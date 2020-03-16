@@ -8,8 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Collections.ObjectModel;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
     /// <summary>
     /// Event arguments used when a test run has completed.
     /// </summary>

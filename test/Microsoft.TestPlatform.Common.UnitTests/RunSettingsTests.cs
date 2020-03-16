@@ -4,12 +4,10 @@
 namespace TestPlatform.Common.UnitTests
 {
     using System;
-    using System.Runtime.InteropServices;
     using System.Xml;
 
     using ExtensionFramework;
 
-    using Microsoft.VisualBasic;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;

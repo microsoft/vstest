@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Text;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -684,7 +683,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             {
                 var codeBase = source;
                 var className = GetTestClassName(name, fullyQualifiedName, source);
-                var testMethodName = fullyQualifiedName.StartsWith(className) ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
+                var testMethodName = fullyQualifiedName.StartsWith($"{className}.") ? fullyQualifiedName.Remove(0, $"{className}.".Length) : fullyQualifiedName;
                 var testMethod = new TestMethod(testMethodName, className);
 
                 testElement = new UnitTestElement(testId, name, adapter, testMethod);

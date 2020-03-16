@@ -5,12 +5,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;

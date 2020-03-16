@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;

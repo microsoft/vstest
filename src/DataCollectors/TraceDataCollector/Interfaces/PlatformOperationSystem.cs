@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TraceCollector.Interfaces
 {
-    using System;
-
     /// <summary>
     /// Available operating systems.
     /// </summary>
