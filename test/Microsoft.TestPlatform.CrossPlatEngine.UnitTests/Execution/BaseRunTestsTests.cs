@@ -1046,7 +1046,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.testCaseEventsHandler?.SendSessionStart(new Dictionary<string, object> { { "TestSources", new List<string>() { "1.dll" } } });
             }
 
-            protected override bool ShouldAttachToTestHost(ITestExecutor executor)
+            protected override bool ShouldAttachDebuggerToTestHost(ITestExecutor executor)
             {
                 return false;
             }
