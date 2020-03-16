@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
     /// <summary>
     /// Defines the contract for handling test platform requests
     /// </summary>
-    public interface ITestRequestHandler : IDisposable
+    internal interface ITestRequestHandler : IDisposable
     {
         /// <summary>
         /// Gets or sets connection info for to start server/client.
@@ -86,5 +86,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="testProcessStartInfo">Process start info</param>
         /// <returns>ProcessId of the launched process</returns>
         int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo);
+
+        /// <summary>
+        /// Attach debugger to an already running process.
+        /// </summary>
+        /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
+        /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
+        bool AttachDebuggerToProcess(int pid);
     }
 }

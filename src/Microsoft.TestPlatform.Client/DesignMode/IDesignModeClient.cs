@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     /// <summary>
     /// The interface for design mode client.
     /// </summary>
-    public interface IDesignModeClient : IDisposable
+    internal interface IDesignModeClient : IDisposable
     {
         /// <summary>
         /// Setups client based on port
