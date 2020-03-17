@@ -50,7 +50,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>$(TestPlatformExternalsVersion)-patched3</Version>
+      <Version>$(TestPlatformExternalsVersion)-patched4</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
