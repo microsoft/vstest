@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
 
-                var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
+                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
 
                 if (method != null)
                 {
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
 
-                var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
+                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>), typeof(bool) });
 
                 if (method != null)
                 {
