@@ -112,26 +112,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return executorUris;
         }
 
-        protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
+        protected override void InvokeExecutor(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUriExtensionTuple,
+            RunContext runContext,
+            IFrameworkHandle frameworkHandle)
         {
             executor?.Value.RunTests(this.executorUriVsSourceList[executorUriExtensionTuple], runContext, frameworkHandle);
         }
 
         /// <inheritdoc />
-        protected override bool ShouldAttachDebuggerToTestHost(ITestExecutor executor)
+        protected override bool ShouldAttachDebuggerToTestHost(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUriExtensionTuple,
+            RunContext runContext)
         {
-            // Get the sources.
-            IEnumerable<string> sources = new List<string>();
-            this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
-
             // If the adapter doesn't implement the new test executor interface we should attach to
             // the default test host by default to preserve old behavior.
-            if (!(executor is ITestExecutor2 convertedExecutor))
+            if (!(executor?.Value is ITestExecutor2 convertedExecutor))
             {
                 return true;
             }
 
-            return convertedExecutor.ShouldAttachToTestHost(sources, this.RunContext);
+            return convertedExecutor.ShouldAttachToTestHost(
+                this.executorUriVsSourceList[executorUriExtensionTuple],
+                runContext);
         }
 
         /// <summary>

@@ -66,9 +66,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return this.executorUriVsTestList.Keys;
         }
 
-        protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUri, RunContext runContext, IFrameworkHandle frameworkHandle)
+        protected override void InvokeExecutor(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUri,
+            RunContext runContext,
+            IFrameworkHandle frameworkHandle)
         {
             executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldAttachDebuggerToTestHost(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUri,
+            RunContext runContext)
+        {
+            // If the adapter doesn't implement the new test executor interface we should attach to
+            // the default test host by default to preserve old behavior.
+            if (!(executor?.Value is ITestExecutor2 convertedExecutor))
+            {
+                return true;
+            }
+
+            return convertedExecutor.ShouldAttachToTestHost(this.executorUriVsTestList[executorUri], runContext);
         }
 
         /// <summary>
@@ -94,19 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             properties.Add("TestSources", TestSourcesUtility.GetSources(this.testCases));
 
             this.testCaseEventsHandler.SendSessionStart(properties);
-        }
-
-        /// <inheritdoc />
-        protected override bool ShouldAttachDebuggerToTestHost(ITestExecutor executor)
-        {
-            // If the adapter doesn't implement the new test executor interface we should attach to
-            // the default test host by default to preserve old behavior.
-            if (!(executor is ITestExecutor2 convertedExecutor))
-            {
-                return true;
-            }
-
-            return convertedExecutor.ShouldAttachToTestHost(this.testCases, this.RunContext);
         }
 
         /// <summary>

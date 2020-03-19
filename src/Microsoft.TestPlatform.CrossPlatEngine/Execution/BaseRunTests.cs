@@ -284,23 +284,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
-        protected abstract IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext);
+        protected abstract IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(
+            IFrameworkHandle testExecutorFrameworkHandle,
+            RunContext runContext);
 
-        protected abstract void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle);
-
-        protected abstract void SendSessionStart();
-
-        protected abstract void SendSessionEnd();
+        protected abstract void InvokeExecutor(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUriExtensionTuple,
+            RunContext runContext,
+            IFrameworkHandle frameworkHandle);
 
         /// <summary>
         /// Asks the adapter about attaching the debugger to the default test host.
         /// </summary>
         /// <param name="executor">The executor used to run the tests.</param>
+        /// <param name="executorUriExtensionTuple">The executor URI.</param>
+        /// <param name="runContext">The run context.</param>
         /// <returns>
         /// <see cref="true"/> if must attach the debugger to the default test host,
         /// <see cref="false"/> otherwise.
         /// </returns>
-        protected abstract bool ShouldAttachDebuggerToTestHost(ITestExecutor executor);
+        protected abstract bool ShouldAttachDebuggerToTestHost(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUriExtensionTuple,
+            RunContext runContext);
+
+        protected abstract void SendSessionStart();
+
+        protected abstract void SendSessionEnd();
 
         #endregion
 
@@ -375,28 +386,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must call all possible executors and not fail on crash in any executor.")]
         private bool RunTestInternalWithExecutors(IEnumerable<Tuple<Uri, string>> executorUriExtensionMap, long totalTests)
         {
-            double totalTimeTakenByAdapters = 0;
-
-            var executorsFromDeprecatedLocations = false;
-
-            // Call the executor for each group of tests.
-            var exceptionsHitDuringRunTests = false;
-
             // Collecting Total Number of Adapters Discovered in Machine.
             this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, executorUriExtensionMap.Count());
 
             var attachedToTestHost = false;
-            var executorCache = new List<LazyExtension<ITestExecutor, ITestExecutorCapabilities>>();
+            var executorCache = new Dictionary<string, LazyExtension<ITestExecutor, ITestExecutorCapabilities>>();
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
-                // Get the executor.
+                // Avoid processing the same executor twice.
+                if (executorCache.ContainsKey(executorUriExtensionTuple.Item1.AbsoluteUri))
+                {
+                    continue;
+                }
+
+                // Get the extension manager.
                 var extensionManager = this.GetExecutorExtensionManager(executorUriExtensionTuple.Item2);
 
                 // Look up the executor.
                 var executor = extensionManager.TryGetTestExtension(executorUriExtensionTuple.Item1);
+                if (executor == null)
+                {
+                    // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
+                    // this.activeExecutor = null;
+                    // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",	
+                    // PlatformServices.Default.Runtime.RuntimeVersion);
+                    var runtimeVersion = " ";
+                    this.TestRunEventsHandler?.HandleLogMessage(
+                        TestMessageLevel.Warning,
+                        string.Format(
+                            CultureInfo.CurrentUICulture,
+                            CrossPlatEngineResources.NoMatchingExecutor,
+                            executorUriExtensionTuple.Item1.AbsoluteUri,
+                            runtimeVersion));
+
+                    continue;
+                }
 
                 // Cache the executor.
-                executorCache.Add(executor);
+                executorCache.Add(executorUriExtensionTuple.Item1.AbsoluteUri, executor);
 
                 // Check if we actually have to attach to the default test host.
                 if (!this.runContext.IsBeingDebugged || attachedToTestHost)
@@ -410,7 +437,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // host by default.
                 // Same goes if all adapters implement the new test executor interface but at
                 // least one of them needs the test platform to attach to the default test host.
-                if (!(executor.Value is ITestExecutor2 executor2) || this.ShouldAttachDebuggerToTestHost(executor2))
+                if (!(executor.Value is ITestExecutor2)
+                    || this.ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, this.runContext))
                 {
                     EqtTrace.Verbose("Attaching to default test host.");
 
@@ -422,22 +450,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
 
-            var index = 0;
+
+            // Call the executor for each group of tests.
+            var exceptionsHitDuringRunTests = false;
+            var executorsFromDeprecatedLocations = false;
+            double totalTimeTakenByAdapters = 0;
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
-                // Get the executor from cache.
-                var executor = executorCache[index++];
-                if (executor == null)
+                // Get the executor from the cache.
+                if (!executorCache.TryGetValue(executorUriExtensionTuple.Item1.AbsoluteUri, out var executor))
                 {
-                    // Commenting this out because of a compatibility issue with Microsoft.Dotnet.ProjectModel released on nuGet.org.
-                    // this.activeExecutor = null;
-                    // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",	
-                    // PlatformServices.Default.Runtime.RuntimeVersion);
-                    var runtimeVersion = " ";
-                    this.TestRunEventsHandler?.HandleLogMessage(
-                        TestMessageLevel.Warning,
-                        string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.NoMatchingExecutor, executorUriExtensionTuple.Item1, runtimeVersion));
-
                     continue;
                 }
 
