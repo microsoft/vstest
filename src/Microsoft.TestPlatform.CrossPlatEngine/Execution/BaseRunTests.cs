@@ -443,9 +443,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     EqtTrace.Verbose("Attaching to default test host.");
 
                     attachedToTestHost = true;
-                    if (!this.frameworkHandle.AttachDebuggerToProcess(Process.GetCurrentProcess().Id))
+                    var pid = Process.GetCurrentProcess().Id;
+                    if (!this.frameworkHandle.AttachDebuggerToProcess(pid))
                     {
-                        throw new TestPlatformException("Cannot attach the debugger to the default test host.");
+                        throw new TestPlatformException(
+                            string.Format(
+                                CultureInfo.CurrentUICulture,
+                                CrossPlatEngineResources.AttachDebuggerToDefaultTestHostFailure,
+                                pid));
                     }
                 }
             }
