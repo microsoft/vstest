@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Xml;
 
@@ -50,17 +51,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 doc.Load(xmlReader);
             }
 
-            var isNetFramework = !IsNetCoreFramework(runSettingsXml);
-
-            return !TryAddFakesDataCollectorSettings(doc, sources, isNetFramework) ? runSettingsXml : doc.OuterXml;
+            return !TryAddFakesDataCollectorSettings(doc, sources, GetFramework(runSettingsXml)) 
+                ? runSettingsXml 
+                : doc.OuterXml;
         }
 
-        private static bool IsNetCoreFramework(string runSettingsXml)
+        private static FrameworkVersion GetFramework(string runSettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
-
-            return config.TargetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                   || config.TargetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
+            return config.TargetFrameworkVersion;
         }
 
         /// <summary>
@@ -72,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         private static bool TryAddFakesDataCollectorSettings(
             XmlDocument runSettings,
             IEnumerable<string> sources,
-            bool isNetFramework)
+            FrameworkVersion framework)
         {
             // If user provided fakes settings don't do anything
             if (XmlRunSettingsUtilities.ContainsDataCollector(runSettings.CreateNavigator(), FakesMetadata.DataCollectorUri))
@@ -88,23 +87,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var newConfigurator = TryGetFakesNewDataCollectorConfigurator();
             if (newConfigurator != null)
             {
-                var fakesSettings = newConfigurator(sources, isNetFramework);
+                var sourceTFMMap = sources.ToDictionary(s => s, _ => framework);
+                var fakesSettings = newConfigurator(sourceTFMMap);
                 XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
                 return true;
             }
 
-            return AddFallbackFakesSettings(runSettings, sources, isNetFramework);
+            return AddFallbackFakesSettings(runSettings, sources, framework);
         }
 
         private static bool AddFallbackFakesSettings(
             XmlDocument runSettings,
             IEnumerable<string> sources,
-            bool isNetFramework)
+            FrameworkVersion framework)
         {
 
             // The fallback settings is for the old implementation of fakes 
             // that only supports .Net Framework versions
-            if (!isNetFramework)
+            if (framework != FrameworkVersion.Framework35 &&
+                framework != FrameworkVersion.Framework40 &&
+                framework != FrameworkVersion.Framework45)
             {
                 return false;
             }
@@ -188,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return null;
         }
 
-        private static Func<IEnumerable<string>, bool, DataCollectorSettings> TryGetFakesNewDataCollectorConfigurator()
+        private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesNewDataCollectorConfigurator()
         {
             try
             {
@@ -200,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
                 if (method != null)
                 {
-                    return (Func<IEnumerable<string>, bool, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IEnumerable<string>, bool, DataCollectorSettings>));
+                    return (Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>));
                 }
             }
             catch (Exception ex)
