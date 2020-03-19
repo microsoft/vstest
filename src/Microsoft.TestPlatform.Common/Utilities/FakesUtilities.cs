@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <param name="sources">test sources</param>
         /// <param name="runSettingsXml">runsettings</param>
         /// <returns>updated runsettings for fakes</returns>
+        [Obsolete]
         public static string GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml)
         {
             if (sources == null)
@@ -56,6 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 : doc.OuterXml;
         }
 
+        [Obsolete]
         private static FrameworkVersion GetFramework(string runSettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
@@ -80,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             // A new Fakes Congigurator API makes the decision to add the right datacollector uri to the configuration
-            // There now exist two data collector URIs to support two different scenarios. The new scanrio involves 
+            // There now exist two data collector URIs to support two different scenarios. The new scenario involves 
             // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
             // .NET Core scenarios). The old API still exists for fallback measures. 
 
@@ -125,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             // integrate fakes settings in configuration
-            // if the settings doesn't have any data collector settings, populate with empty settings
+            // if the settings don't have any data collector settings, populate with empty settings
             EnsureSettingsNode(runSettings, new DataCollectionRunSettings());
 
             // embed fakes settings
@@ -169,11 +171,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
-
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-
                 var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
-
                 if (method != null)
                 {
                     return (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
@@ -195,11 +194,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
-
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-
                 var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
-
                 if (method != null)
                 {
                     return (Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>));
