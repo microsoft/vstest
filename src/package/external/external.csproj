@@ -50,7 +50,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>$(TestPlatformExternalsVersion)-patched3</Version>
+      <Version>$(TestPlatformExternalsVersion)-patched5</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
@@ -79,6 +79,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
       <Version>15.6.815-master284DF69C</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.TestPlatform.Fakes">
+      <Version>$(MicrosoftFakesVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.
