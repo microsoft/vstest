@@ -31,7 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <param name="sources">test sources</param>
         /// <param name="runSettingsXml">runsettings</param>
         /// <returns>updated runsettings for fakes</returns>
-        [Obsolete]
         public static string GenerateFakesSettingsForRunConfiguration(string[] sources, string runSettingsXml)
         {
             if (sources == null)
@@ -57,11 +56,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 : doc.OuterXml;
         }
 
-        [Obsolete]
         private static FrameworkVersion GetFramework(string runSettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
+#pragma warning disable CS0618 // Type or member is obsolete
             return config.TargetFrameworkVersion;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>
