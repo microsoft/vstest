@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
-    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -21,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Ensure that names of constructor parameters match the public property names of the same for JSON serialization
         /// </summary>
         /// <param name="tests"> The tests. </param>
-        /// <param name="package"> The package which actually contain sources. A testhost can at max execute for one pakage at time
+        /// <param name="package"> The package which actually contain sources. A testhost can at max execute for one package at time
         /// Package can be null if test source, and package are same
         /// </param>
         /// <param name="runSettings"> The test run settings. </param>

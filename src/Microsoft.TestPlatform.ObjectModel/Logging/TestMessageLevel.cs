@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
 {
-    using System;
-
     /// <summary>
     /// Levels for test messages.
     /// </summary>
@@ -14,12 +12,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         /// Informational message.
         /// </summary>
         Informational = 0,
-        
+
         /// <summary>
         /// Warning message.
         /// </summary>
         Warning = 1,
-        
+
         /// <summary>
         /// Error message.
         /// </summary>

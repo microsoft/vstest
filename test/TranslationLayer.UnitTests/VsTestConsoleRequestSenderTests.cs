@@ -468,8 +468,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -506,8 +506,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -542,8 +542,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -578,8 +578,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedTestCases.ToArray()[0].Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -931,7 +931,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.SetupMockCommunicationForRunRequest(mockHandler);
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
                 Callback((string msg, object requestpayload, int protocol) => { receivedRequest = (TestRunRequestPayload)requestpayload; });
-            
+
             // Act.
             this.requestSender.StartTestRun(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, mockHandler.Object);
 
@@ -1426,8 +1426,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1482,8 +1482,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1539,8 +1539,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1596,8 +1596,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
             Assert.IsNotNull(traits);
-            Assert.AreEqual(traits.ToArray()[0].Name, "a");
-            Assert.AreEqual(traits.ToArray()[0].Value, "b");
+            Assert.AreEqual("a", traits.ToArray()[0].Name);
+            Assert.AreEqual("b", traits.ToArray()[0].Value);
         }
 
         [TestMethod]
@@ -1899,7 +1899,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         #endregion
 
-        #region private methods
+        #region Private Methods
 
         /// <summary>
         /// Serialize and Deserialize message as it would happen for real.
@@ -1938,7 +1938,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsTrue(connectionSuccess, "Connection must succeed.");
         }
-        
+
         private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
         {
             this.InitializeCommunication();

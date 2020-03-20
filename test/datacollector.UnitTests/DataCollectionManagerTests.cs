@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.Reflection;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -298,11 +297,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             var sessionStartEventArgs = new SessionStartEventArgs();
 
-            Assert.AreEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));
+            Assert.AreEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
 
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
-            Assert.AreNotEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));
+            Assert.AreNotEqual(new SessionId(Guid.Empty), sessionStartEventArgs.Context.SessionId);
         }
 
         [TestMethod]

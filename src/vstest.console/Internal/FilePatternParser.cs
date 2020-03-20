@@ -51,7 +51,7 @@ namespace vstest.console.Internal
                 filePattern = Path.Combine(this.fileHelper.GetCurrentDirectory(), filePattern);
             }
 
-            // If there is no wildcard simply add the file to the list of matching files.
+            // If there is no wild card simply add the file to the list of matching files.
             if (filePattern.IndexOfAny(wildCardCharacters) == -1)
             {
                 EqtTrace.Info($"FilePatternParser: The given file {filePattern} is a full path.");
@@ -68,7 +68,7 @@ namespace vstest.console.Internal
                 return matchingFiles;
             }
 
-            // Split the given wildcard into search directory and pattern to be searched.
+            // Split the given wild card into search directory and pattern to be searched.
             var splitPattern = SplitFilePatternOnWildCard(filePattern);
             EqtTrace.Info($"FilePatternParser: Matching file pattern '{splitPattern.Item2}' within directory '{splitPattern.Item1}'");
 
@@ -91,7 +91,7 @@ namespace vstest.console.Internal
         /// </summary>
         private Tuple<string, string> SplitFilePatternOnWildCard(string filePattern)
         {
-            // Split the pattern based on first wildcard character found.
+            // Split the pattern based on first wild card character found.
             var splitOnWildCardIndex = filePattern.IndexOfAny(wildCardCharacters);
             var directorySeparatorIndex = filePattern.Substring(0, splitOnWildCardIndex).LastIndexOf(Path.DirectorySeparatorChar);
 

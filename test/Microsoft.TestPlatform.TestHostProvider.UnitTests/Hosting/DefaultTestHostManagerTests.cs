@@ -432,7 +432,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
 
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
-            Assert.AreEqual(null, this.errorMessage);
+            Assert.IsNull(this.errorMessage);
         }
 
         [TestMethod]

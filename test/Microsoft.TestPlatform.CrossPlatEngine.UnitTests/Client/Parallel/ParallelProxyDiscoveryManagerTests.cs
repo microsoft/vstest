@@ -247,7 +247,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     {
                         if (matchFound)
                         {
-                            Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                            Assert.Fail("Concurrency issue detected: Source['{0}'] got processed twice", processedSrc);
                         }
 
                         matchFound = true;

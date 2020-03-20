@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.Coverage
         private const uint WaitObject0 = 0x00000000;
 
         /// <summary>
-        /// Time limit for vangaurd process exit event
+        /// Time limit for vanguard process exit event
         /// </summary>
         private const int ProcessExitWaitLimit = 60000;
 
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.Coverage
         private const string GlobalEventNamePrefix = "Global\\";
 
         /// <summary>
-        /// Stop() will use this event to check wheather the stop vanguard commnad
+        /// Stop() will use this event to check whether the stop vanguard command
         /// successful stop the collect command codecoverage.exe.
         /// </summary>
         private ManualResetEvent vanguardProcessExitEvent;
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Gets a value indicating whether whether vanguard is running
+        /// Gets a value indicating whether vanguard is running
         /// </summary>
         private bool IsRunning
         {
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <inheritdoc />
         public virtual void Stop()
         {
-            EqtTrace.Info("Vanguard.Stop: Stoping Vanguard.");
+            EqtTrace.Info("Vanguard.Stop: Stopping Vanguard.");
             if (this.IsRunning)
             {
                 var shutdownCommand = this.vanguardCommandBuilder.GenerateCommandLine(
@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.Coverage
 
                 if (this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit) == false)
                 {
-                    EqtTrace.Warning("Vanguard.Stop: Vangurad process not exited in {0} ms", ProcessExitWaitLimit);
+                    EqtTrace.Warning("Vanguard.Stop: Vanguard process not exited in {0} ms", ProcessExitWaitLimit);
                 }
 
                 if (this.processJobObject != null)
@@ -275,12 +275,12 @@ namespace Microsoft.VisualStudio.Coverage
             }
             else if (this.processJobObject != null)
             {
-                EqtTrace.Info("Vanguard.StartVanguardProcess: Add Vangaurd process to the project object");
+                EqtTrace.Info("Vanguard.StartVanguardProcess: Add Vanguard process to the project object");
                 this.processJobObject.AddProcess(process.SafeHandle.DangerousGetHandle());
             }
 
             EqtTrace.Info(
-                "Vanguard.StartVanguardProcess: Started Vangaurd process id :{0}",
+                "Vanguard.StartVanguardProcess: Started Vanguard process id :{0}",
                 Vanguard.GetProcessId(process));
 
             return process;
@@ -340,7 +340,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event args. </param>
         private void LoggerProcessExited(object sender, EventArgs e)
         {
-            EqtTrace.Info("Vanguard.LoggerProcessExited: Vangaurd process exit callback started.");
+            EqtTrace.Info("Vanguard.LoggerProcessExited: Vanguard process exit callback started.");
             if (this.vanguardProcess != null)
             {
                 if (this.vanguardProcess.HasExited == true && this.vanguardProcess.ExitCode != 0)

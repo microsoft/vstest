@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -327,7 +326,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     // Reset the manual reset event so we get notified of new jobs that are added.
                     this.jobAdded.Reset();
 
-                    // Releases a thread waiting on the queue to get empty, to continue with the enquing process.
+                    // Releases a thread waiting on the queue to get empty, to continue with the enqueuing process.
                     if (this.enableBoundsOnQueue)
                     {
                         Monitor.PulseAll(this.jobsQueue);

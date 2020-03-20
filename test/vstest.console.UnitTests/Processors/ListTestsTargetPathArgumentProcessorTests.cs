@@ -33,13 +33,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ListTestsTargetPathArgumentProcessorCapabilities capabilities = new ListTestsTargetPathArgumentProcessorCapabilities();
             Assert.AreEqual("/ListTestsTargetPath", capabilities.CommandName);
-            
-            Assert.AreEqual(false, capabilities.IsAction);
+
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion

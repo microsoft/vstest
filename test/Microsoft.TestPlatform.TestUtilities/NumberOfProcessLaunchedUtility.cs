@@ -5,6 +5,7 @@ namespace TestPlatform.TestUtilities
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -14,30 +15,28 @@ namespace TestPlatform.TestUtilities
     public class NumberOfProcessLaunchedUtility
     {
         /// <summary>
-        /// To Find the process created by name during this task run
+        /// Counts processes that are created until cancellation is requested.
         /// </summary>
         /// <param name="cts">
-        /// To cancel task
+        /// To cancel the task and finish counting
         /// </param>
-        /// <param name="processName">
-        /// Name of the process
+        /// <param name="runnerName">
+        /// Name of the process, or a library that is launched by dotnet.exe
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public static async Task<int> NumberOfProcessCreated(CancellationTokenSource cts, string processName)
+        public static async Task<ICollection<string>> NumberOfProcessCreated(CancellationTokenSource cts, string processName)
         {
-            var testhostProcessIDsBeforeRun = new List<int>();
-            var testhostProcessesBeforeRun = Process.GetProcessesByName(processName);
+            return await NumberOfProcessCreated(cts, new[] { processName });
+        }
+            
+        public static async Task<ICollection<string>> NumberOfProcessCreated(CancellationTokenSource cts, IEnumerable<string> processNames)
+        {
+            var processesBeforeRun = GetProcesses(processNames);
 
-            foreach (var process in testhostProcessesBeforeRun)
-            {
-                testhostProcessIDsBeforeRun.Add(process.Id);
-            }
-
-            var numOfProcessTask =
-                Task.Run(() => NumberOfProcessLaunchedDuringRun(cts.Token, testhostProcessIDsBeforeRun, processName));
-            return await numOfProcessTask;
+            var processesCreated = Task.Run(() => NumberOfProcessLaunchedDuringRun(cts.Token, processesBeforeRun, processNames));
+            return await processesCreated;
         }
 
         /// <summary>
@@ -46,40 +45,52 @@ namespace TestPlatform.TestUtilities
         /// <param name="token">
         /// The token.
         /// </param>
-        /// <param name="executorProcessesBeforeRun">
-        /// The executor processes before run.
+        /// <param name="processesBeforeRun">
+        /// The processes that were already running.
         /// </param>
-        /// <param name="processName">
+        /// <param name="runnerName">
         /// The process name.
         /// </param>
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public static int NumberOfProcessLaunchedDuringRun(
+        public static ICollection<string> NumberOfProcessLaunchedDuringRun(
             CancellationToken token,
-            List<int> executorProcessesBeforeRun,
-            string processName)
+            IEnumerable<Process> processesBeforeRun,
+            IEnumerable<string> processNames)
         {
-            var preCreatedProcessIDs = new List<int>(executorProcessesBeforeRun);
-            var desireCount = 0;
+            var existingProcessIDs = processesBeforeRun.Select(p => p.Id).ToList();
+            var startedNames = new List<string>();
 
             while (!token.IsCancellationRequested)
             {
-                var executorProcessDuringRun = Process.GetProcessesByName(processName);
+                var startedDuringRun = GetProcesses(processNames);
 
-                foreach (var process in executorProcessDuringRun)
+                foreach (var process in startedDuringRun)
                 {
-                    if (preCreatedProcessIDs.Contains(process.Id))
+                    if (existingProcessIDs.Contains(process.Id))
                     {
                         continue;
                     }
 
-                    desireCount++;
-                    preCreatedProcessIDs.Add(process.Id);
+                    startedNames.Add(process.ProcessName);
+                    existingProcessIDs.Add(process.Id);
                 }
             }
 
-            return desireCount;
+            return startedNames;
+        }
+
+        private static IEnumerable<Process> GetProcesses(IEnumerable<string> processNames)
+        {
+
+            var processes = new List<Process>();
+            foreach (var processName in processNames)
+            {
+                processes.AddRange(Process.GetProcessesByName(processName));
+            }
+
+            return processes;
         }
     }
 }

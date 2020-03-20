@@ -80,7 +80,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
                 new LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>(
                     testDiscovererPluginInfo,
                     mockMetadata.Object);
-            
+
             Assert.AreEqual(mockMetadata.Object, extension.Metadata);
         }
 

@@ -23,13 +23,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         private IDiaSession session;
 
         /// <summary>
-        /// Holds type symbols avaiable in the source.
+        /// Holds type symbols available in the source.
         /// </summary>
         private Dictionary<string, IDiaSymbol> typeSymbols = new Dictionary<string, IDiaSymbol>();
 
         /// <summary>
         /// Holds method symbols for all types in the source.
-        /// Methods in different types can have same name, hence seprated dicitionary is created for each type.
+        /// Methods in different types can have same name, hence separated dictionary is created for each type.
         /// Bug: Method overrides in same type are not handled (not a regression)
         /// ToDo(Solution): Use method token along with as identifier, this will always give unique method.The adapters would need to send this token to us to correct the behavior.
         /// </summary>
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// </param>
         /// <returns>
         /// <see cref="INavigationData"/>.
-        /// Returns INavigationData which contains filename and linenumber.
+        /// Returns INavigationData which contains filename and line number.
         /// </returns>
         public INavigationData GetNavigationData(string declaringTypeName, string methodName)
         {
@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
                         // Get endline
                         lineNumber.GetLineNumberEnd(out uint endLine);
-                        
+
                         // The magic hex constant below works around weird data reported from GetSequencePoints.
                         // The constant comes from ILDASM's source code, which performs essentially the same test.
                         const uint Magic = 0xFEEFEE;
@@ -450,7 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         }
 
         /// <summary>
-        /// Update the method symbol cache. 
+        /// Update the method symbol cache.
         /// </summary>
         private static void UpdateMethodSymbolCache(string methodName, IDiaSymbol methodSymbol, Dictionary<string, IDiaSymbol> methodSymbolCache)
         {
@@ -458,8 +458,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             Debug.Assert(methodSymbol != null, "Method symbol cannot be null.");
             Debug.Assert(methodSymbolCache != null, "Method symbol cache cannot be null.");
 
-            // #827589, In case a type has overloaded methods, then there could be a method already in the 
-            // cache which should be disposed. 
+            // #827589, In case a type has overloaded methods, then there could be a method already in the
+            // cache which should be disposed.
             if (methodSymbolCache.TryGetValue(methodName, out IDiaSymbol oldSymbol))
             {
                 ReleaseComObject(ref oldSymbol);

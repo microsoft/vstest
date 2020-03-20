@@ -151,7 +151,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         /// <summary>
         /// Disposes of the timer when called to prevent further calls.
-        /// Kills the other instance of procdump if launched for collecting trigger based dumps.
+        /// Kills the other instance of proc dump if launched for collecting trigger based dumps.
         /// Starts and waits for a new proc dump process to collect a single dump and then
         /// kills the testhost process.
         /// </summary>
@@ -472,7 +472,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
-        /// Method to deregister handlers and cleanup
+        /// Method to de-register handlers and cleanup
         /// </summary>
         private void DeregisterEvents()
         {

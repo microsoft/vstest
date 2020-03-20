@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
         /// </summary>
         /// <param name="sources">
         /// Sources from which the tests should be discovered

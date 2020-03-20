@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Collections.Generic;
     using System.Xml;
     using System.IO;
-    
+
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;

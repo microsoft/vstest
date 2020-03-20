@@ -3,10 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Interface contract for invoking the engine

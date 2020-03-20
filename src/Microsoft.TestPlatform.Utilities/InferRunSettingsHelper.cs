@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System;
     using System.Collections.Generic;
-    using System.Dynamic;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -96,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                             "DisableAppDomain"
                         };
 
-                        // Find all invalid RunConfiguration Settings 
+                        // Find all invalid RunConfiguration Settings
                         runSettingsNavigator.MoveToFirstChild();
                         do
                         {
@@ -227,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Validates the collectors in runsettings when an inlined testsettings is specified
+        /// Validates the collectors in runsettings when an in-lined testsettings is specified
         /// </summary>
         /// <param name="runsettings">RunSettings used for the run</param>
         /// <returns>True if an incompatible collector is found</returns>
@@ -239,10 +238,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return false;
             }
 
-            // Explicitly blocking usage of data collectors through modes runsettings and testsettings except 
+            // Explicitly blocking usage of data collectors through modes runsettings and testsettings except
             // for couple of scenarios where the IDE generates the collector settings in the runsettings file even when
             // it has an embedded testsettings file. Longterm runsettings will be the single run configuration source
-            // Inproc collectos are incompatible with testsettings
+            // In-proc collectors are incompatible with testsettings
             var inprocDataCollectionSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(runsettings);
             if (inprocDataCollectionSettings != null && inprocDataCollectionSettings.IsCollectionEnabled && inprocDataCollectionSettings.DataCollectorSettingsList != null)
             {
@@ -256,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
             }
 
-            // TestSettings and collection is enabled in runsetttings.. the only allowed collectors are codecoverage and fakes
+            // TestSettings and collection is enabled in runsetttings.. the only allowed collectors are code coverage and fakes
             var datacollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runsettings);
             if (datacollectionSettings != null && datacollectionSettings.IsCollectionEnabled && datacollectionSettings.DataCollectorSettingsList != null)
             {
@@ -337,7 +336,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     {
                         legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
                     }
-                    
+
                     var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
                     var deploymentAttributes = GetNodeAttributes(deploymentNode);
                     if (deploymentAttributes != null)
@@ -487,7 +486,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Adds node under RunConfiguration setting. Noop if node is already present.
+        /// Adds node under RunConfiguration setting. No op if node is already present.
         /// </summary>
         private static void AddNodeIfNotPresent<T>(XmlDocument xmlDocument, string nodePath, string nodeName, T nodeValue, bool overwrite = false)
         {
@@ -695,7 +694,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Returns true if source settings are incomaptible with target settings.
+        /// Returns true if source settings are incompatible with target settings.
         /// </summary>
         private static bool IsSettingIncompatible(Architecture sourcePlatform,
             Architecture targetPlatform,

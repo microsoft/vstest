@@ -3,8 +3,9 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
+    using System;
     using System.Collections.Generic;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -27,6 +28,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public string LogMessage { get; private set; }
 
+        public List<string> Errors { get; set; }
+
         /// <summary>
         /// Gets the test message level.
         /// </summary>
@@ -35,12 +38,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public RunEventHandler()
         {
             this.TestResults = new List<TestResult>();
+            this.Errors = new List<string>();
+        }
+
+        public void EnsureSuccess()
+        {
+            if (this.Errors.Any())
+            {
+                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, this.Errors)}");
+            }
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.LogMessage = message;
             this.TestMessageLevel = level;
+            if (level == TestMessageLevel.Error) {
+                this.Errors.Add(message);
+            }
         }
 
         public void HandleTestRunComplete(

@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.E2ETest
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using System.Diagnostics;
     using System.IO;
-    
+
     public class Program
     {
         public static void Main(string[] args)

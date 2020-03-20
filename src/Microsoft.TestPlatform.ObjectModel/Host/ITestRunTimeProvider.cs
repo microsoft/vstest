@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -20,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         #region events
         /// <summary>
         /// Raised when host is launched successfully
-        /// Consumed by TestPlatform to initialize connection b/w test host and testplatform
+        /// Consumed by TestPlatform to initialize connection b/w test host and test platform
         /// </summary>
         event EventHandler<HostProviderEventArgs> HostLaunched;
 
@@ -63,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         void SetCustomLauncher(ITestHostLauncher customLauncher);
 
         /// <summary>
-        /// Gets the end point address and behaviour of TestRuntime
+        /// Gets the end point address and behavior of TestRuntime
         /// E.g. for phone device EndPoint:127.0.0.1:8080, ConnectionRole Host, TransportProtocol: Sockets
         /// </summary>
         /// <returns> Socket where the service is hosted by TestRuntime</returns>
@@ -74,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>Returns whether the test host lauched successfully or not.</returns>
+        /// <returns>Returns whether the test host launched successfully or not.</returns>
         Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>
@@ -99,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <summary>
         /// Gets path of test sources, based on RuntimeProvider, and where the test is actually deployed(Remote Scenario).
         /// A test host manager may choose to accept input source as XML file, and provide appropriate source(dll/exe) which the adapters can actually consume
-        /// E.g. for UWP, input source could be "appxrecipe" file, which gives information about actual source exe.
+        /// E.g. for UWP, input source could be "appx recipe" file, which gives information about actual source exe.
         /// </summary>
         /// <param name="sources">List of test sources.</param>
         /// <returns>Updated List of test sources based on remote/local scenario.</returns>

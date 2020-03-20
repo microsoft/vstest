@@ -52,12 +52,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
         /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
         public static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
         {
-            string optionValue;
-            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
+            var found = TryGetIntArgFromDict(argsDictionary, fullname, out var value);
+            return found ? value : 0;
         }
 
         /// <summary>
-        /// Parse the value of an argument as an integer.
+        /// Try get the argument and parse the value of an argument as an integer.
+        /// </summary>
+        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
+        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
+        /// <returns>Value of the argument.</returns>
+        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
+        public static bool TryGetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname, out int value)
+        {
+            var found = argsDictionary.TryGetValue(fullname, out var optionValue);
+            if (!found)
+            {
+                value = default;
+                return false; 
+            }
+
+            value = int.Parse(optionValue);
+            return true;
+        }
+
+
+        /// <summary>
+        /// Parse the value of an argument as a string.
         /// </summary>
         /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
         /// <param name="fullname">The full name for required argument. Ex: "--port"</param>

@@ -84,6 +84,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
             }
 
+#if NETCOREAPP
+            TestHostTraceListener.Setup();
+#endif
+
             this.SetParentProcessExitCallback(argsDictionary);
 
             this.requestHandler.ConnectionInfo =
@@ -92,7 +96,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // Initialize Communication with vstest.console
             this.requestHandler.InitializeCommunication();
 
-            // Initialize DataCollection Communication if data collection port is provided.
+            // skipping because 0 is the default value, and also the value the the callers use when they
+            // call with the parameter specified, but without providing an actual port
             var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
             if (dcPort > 0)
             {
@@ -176,22 +181,35 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private void SetParentProcessExitCallback(IDictionary<string, string> argsDictionary)
         {
             // Attach to exit of parent process
-            var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
-            EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: Monitoring parent process with id: '{0}'",
-                parentProcessId);
+            var hasParentProcessArgument = CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, ParentProcessIdArgument, out var parentProcessId);
 
-            // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
-            if (parentProcessId != -1)
+            if (!hasParentProcessArgument)
             {
-                this.processHelper.SetExitCallback(
-                    parentProcessId,
-                    (obj) =>
-                    {
-                        EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: ParentProcess '{0}' Exited.",
-                            parentProcessId);
-                        new PlatformEnvironment().Exit(1);
-                    });
+                throw new ArgumentException($"Argument {ParentProcessIdArgument} was not specified.");
             }
+
+            EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: Monitoring parent process with id: '{0}'", parentProcessId);
+
+            if (parentProcessId == -1)
+            {
+                // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
+                return;
+            }
+
+            if (parentProcessId == 0)
+            {
+                //TODO: should there be a warning / error in this case, on windows and linux we are most likely not started by this PID 0, because it's Idle process on Windows, and Swapper on Linux, and similarly in docker
+                // Trying to attach to 0 will cause access denied error on Windows
+            }
+
+            this.processHelper.SetExitCallback(
+                parentProcessId,
+                (obj) =>
+                {
+                    EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: ParentProcess '{0}' Exited.",
+                        parentProcessId);
+                    new PlatformEnvironment().Exit(1);
+                });
         }
 
         private static TestHostConnectionInfo GetConnectionInfo(IDictionary<string, string> argsDictionary)
@@ -256,8 +274,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     // The reason to wait infinitely, was remote debugging scenarios of UWP app,
                     // in such cases after the app gets launched, VS debugger takes control of it, & causes a lot of delay, which frequently causes timeout with vstest.console.
                     // One fix would be just double this timeout, but there is no telling how much time it can actually take.
-                    // Hence we are waiting here indefinelty, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
-                    // In other cases if vstest.console's timeout exceeds it will definitelty such down the app.
+                    // Hence we are waiting here indefinitely, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
+                    // In other cases if vstest.console's timeout exceeds it will definitely such down the app.
                     if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                     {
                         EqtTrace.Info("DefaultEngineInvoker.StartProcessingAsync: Connected to vstest.console, Starting process requests.");

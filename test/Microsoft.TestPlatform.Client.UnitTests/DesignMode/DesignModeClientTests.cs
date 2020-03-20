@@ -4,7 +4,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 {
     using System;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -71,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         public void TestRunMessageHandlerShouldCallCommmunicationManagerIfMessageisError()
         {
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
-        
+
             this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Error, "message"));
 
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(),It.IsAny<TestMessagePayload>()), Times.Once());
@@ -138,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
-            
+
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once());
         }
 
@@ -200,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)
                 .Returns(sessionEnd);
-            
+
             // Act.
             this.designModeClient.ConnectToClientAndProcessRequests(0, this.mockTestRequestManager.Object);
 
@@ -458,7 +457,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         public void DesignModeClientSendTestMessageShouldSendTestMessage()
         {
             var testPayload = new TestMessagePayload { MessageLevel = ObjectModel.Logging.TestMessageLevel.Error, Message = "DummyMessage" };
-            
+
             this.designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message);
 
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());

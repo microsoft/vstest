@@ -23,8 +23,8 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
             object value;
-            Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value), true);
-            Assert.AreEqual(value, "DummyValue");
+            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value));
+            Assert.AreEqual("DummyValue", value);
         }
 
         [TestMethod]
@@ -33,14 +33,14 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
             object value;
-            Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value), true);
-            Assert.AreEqual(value, "DummyValue");
+            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value));
+            Assert.AreEqual("DummyValue", value);
 
             this.metricsCollection.Add("DummyMessage", "newValue");
 
             object newValue;
-            Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out newValue), true);
-            Assert.AreEqual(newValue, "newValue");
+            Assert.IsTrue(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out newValue));
+            Assert.AreEqual("newValue", newValue);
         }
 
         [TestMethod]
@@ -49,15 +49,15 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection.Add("DummyMessage", "DummyValue");
             this.metricsCollection.Add("DummyMessage2", "DummyValue");
 
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 2);
-            Assert.AreEqual(this.metricsCollection.Metrics.ContainsKey("DummyMessage"), true);
-            Assert.AreEqual(this.metricsCollection.Metrics.ContainsKey("DummyMessage2"), true);
+            Assert.AreEqual(2, this.metricsCollection.Metrics.Count);
+            Assert.IsTrue(this.metricsCollection.Metrics.ContainsKey("DummyMessage"));
+            Assert.IsTrue(this.metricsCollection.Metrics.ContainsKey("DummyMessage2"));
         }
 
         [TestMethod]
         public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
         {
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
+            Assert.AreEqual(0, this.metricsCollection.Metrics.Count);
         }
     }
 }

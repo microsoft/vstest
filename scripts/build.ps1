@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "", # Will set this later by reading TestPlatform.Settings.targets file.
+    [System.String] $Version, # Will set this later by reading TestPlatform.Settings.targets file.
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -62,11 +62,15 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_TESTARTIFACTS = Join-Path $env:TP_OUT_DIR "testArtifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
-# Set Version from scripts/build/TestPlatform.Settings.targets
+# Set Version from scripts/build/TestPlatform.Settings.targets, when we are running locally and not providing the version as the parameter 
+# or when the build is done directly in VS
 if([string]::IsNullOrWhiteSpace($Version))
 {
-$Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix
-$Version = ($Version).Trim()
+    $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup[0].TPVersionPrefix | 
+        ForEach-Object { $_.Trim() } |
+        Select-Object -First 1 
+
+    Write-Verbose "Version was not provided using version '$Version' from TestPlatform.Settings.targets"    
 }
 
 #
@@ -98,7 +102,7 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_X64_Runtime = "win7-x64"
 $TPB_X86_Runtime = "win7-x86"
 
-# Version suffix is empty for RTM releases
+# Version suffix is empty for RTM release
 $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } else { $Version }
 $TPB_CIBuild = $CIBuild
 $TPB_PublishTests = $PublishTestArtifacts
@@ -111,6 +115,14 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 $Script:ScriptFailed = $false
 
 Import-Module "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
+
+# Update the version in the dependencies props to be the TPB_version version, this is not ideal but because changing how this is resolved would 
+# mean that we need to change the whole build process this is a solution with the least amount of impact, that does not require us to keep track of 
+# the version in multiple places
+$dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
+$dependencies = Get-Content -Raw -Encoding UTF8 $dependenciesPath
+$updatedDependencies = $dependencies -replace "<NETTestSdkVersion>.*?</NETTestSdkVersion>", "<NETTestSdkVersion>$TPB_Version</NETTestSdkVersion>"
+$updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath -NoNewline
 
 function Write-Log ([string] $message)
 {
@@ -159,20 +171,40 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
-    & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
 
     # Pull in additional shared frameworks.
     # Get netcoreapp2.1 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.1.0")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.1.0' -Channel 'release/2.1.0'
-    }
+    
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64 -NoPath
+    $env:DOTNET_ROOT= $dotnetInstallPath
 
-    # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
-    #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
-        #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
-    #}
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86 -NoPath
+    ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
+    
+    $env:DOTNET_MULTILEVEL_LOOKUP=0
+
+    "---- dotnet environment variables"
+    Get-ChildItem "Env:\dotnet_*"
+    
+    "`n`n---- x64 dotnet"
+    & "$env:DOTNET_ROOT\dotnet.exe" --info
+
+    "`n`n---- x86 dotnet"
+    & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info
+
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Clear-Package {
+    # find all microsoft packages that have the same version as we specified
+    # this is cache-busting the nuget packages, so we don't reuse them from cache 
+    # after we built new ones
+    if (Test-Path $env:TP_PACKAGES_DIR) {
+        $devPackages = Get-ChildItem $env:TP_PACKAGES_DIR/microsoft.*/$TPB_Version | Select-Object -ExpandProperty FullName 
+        $devPackages | Remove-Item -Force -Recurse -Confirm:$false
+    }
 }
 
 function Restore-Package
@@ -198,14 +230,7 @@ function Invoke-Build
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
-    Write-Log ".. .. Build: Complete."
-
-    Set-ScriptFailedOnError
-
-    Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
-    Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError
@@ -213,11 +238,43 @@ function Invoke-Build
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Invoke-TestAssetsBuild
+{
+    $timer = Start-Timer
+    Write-Log "Invoke-TestAssetsBuild: Start test assets build."
+    $dotnetExe = Get-DotNetPath
+
+    
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
+    Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
+    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
+    Write-Log ".. .. Build: Complete."
+
+    Set-ScriptFailedOnError
+
+    Write-Log "Invoke-TestAssetsBuild: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Copy-PackageIntoStaticDirectory { 
+    # packages are published into folder based on configuration, but 
+    # nuget does not understand that, and does not support wildcards in paths 
+    # in order to be able to use the produced packages for acceptance tests we
+    # need to put them in folder that is not changing it's name based on config
+    $tpPackagesPath = "$env:TP_OUT_DIR\$TPB_Configuration\packages\"
+    $tpPackagesDestination = "$env:TP_TESTARTIFACTS"
+    Copy-Item $tpPackagesPath $tpPackagesDestination -Force -Filter *.nupkg -Verbose -Recurse
+}
+
 function Publish-PatchedDotnet { 
     Write-Log "Publish-PatchedDotnet: Copy local dotnet installation to testArtifacts"
     $dotnetPath = "$env:TP_TOOLS_DIR\dotnet\"
-    
+
     $dotnetTestArtifactsPath = "$env:TP_TESTARTIFACTS\dotnet\" 
+    
+    if (Test-Path $dotnetTestArtifactsPath) { 
+        Remove-Item -Force -Recurse $dotnetTestArtifactsPath
+    }
+
     $dotnetTestArtifactsSdkPath = "$env:TP_TESTARTIFACTS\dotnet\sdk\$env:DOTNET_CLI_VERSION\"
     Copy-Item $dotnetPath $dotnetTestArtifactsPath -Force -Recurse
 
@@ -513,7 +570,7 @@ function Create-VsixPackage
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion-patched\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion-patched4\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Microsoft.VisualStudio.ArchitectureTools.PEReader to Extensions
@@ -564,12 +621,12 @@ function Create-VsixPackage
         Update-VsixVersion $vsixProjectDir
 
         # Build vsix project to get TestPlatform.vsix
-        Write-Verbose "$msbuildPath\msbuild.exe $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
-        & $msbuildPath\msbuild.exe "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
+        Write-Verbose "$msbuildPath $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
+        & $msbuildPath "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
     }
     else
-    {
-        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
+    { 
+        throw ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
@@ -769,17 +826,16 @@ function PrintAndExit-OnError([System.String] $output)
 function Locate-MSBuildPath 
 {
     $vsInstallPath = Locate-VsInstallPath
+    $msbuildPath = Get-ChildItem (Join-Path -path $vsInstallPath -childPath "MSBuild\*\Bin\MSBuild.exe")
 
-    if([string]::IsNullOrEmpty($vsInstallPath))
-    {
-        return $null
+    Write-Verbose "found msbuild : '$($msbuildPath -join "','")'"
+    $msBuild = $msBuildPath | Select-Object -First 1
+    Write-Verbose "msbuildPath is : '$($msbuildPath -join "','")'"
+    if ($null -eq $msBuild -or 0 -eq $msBuild.Count) { 
+        throw "MSBuild not found."
     }
 
-    $vsInstallPath = Resolve-Path -path $vsInstallPath
-    $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
-
-    Write-Verbose "msbuildPath is : $msbuildPath"
-    return $msbuildPath
+    return $msBuild.FullName
 }
 
 function Locate-VsInstallPath
@@ -796,22 +852,31 @@ function Locate-VsInstallPath
 
    Try
    {
-       Write-Verbose "VSWhere command line: $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath"
        if ($TPB_CIBuild) {
-           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -products * -requires $requiredPackageIds -property installationPath
+           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath"
+           $vsInstallPath = & $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath
        }
        else {
            # Allow using pre release versions of VS for dev builds
-           $vsInstallPath = & $vswhere -version '(15.0,16.0]' -prerelease -products * -requires $requiredPackageIds -property installationPath
+           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath"
+           $vsInstallPath = & $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath
        }
    }
    Catch [System.Management.Automation.MethodInvocationException]
    {
-       Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
+       throw "Failed to find VS installation with requirements: $requiredPackageIds"
    }
 
-   Write-Verbose "VSInstallPath is : $vsInstallPath"
-   return $vsInstallPath
+   if ($null -eq $vsInstallPath -or 0 -eq @($vsInstallPath).Count) {
+        throw "Failed to find VS installation with requirements: $requiredPackageIds"
+   }
+   else { 
+        Write-Verbose "Found VS installation with requirements '$($requiredPackageIds -join "','")'  : '$($vsInstallPath -join "','")'."
+   }
+
+   $vsPath = $vsInstallPath | Select-Object -First 1
+   Write-Verbose "VSInstallPath is : $vsPath"
+   return $vsPath
 }
 
 function Update-VsixVersion($vsixProjectDir)
@@ -910,15 +975,19 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 Install-DotNetCli
+Clear-Package
 Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
-Publish-PatchedDotnet
-Publish-Tests
 Create-VsixPackage
 Create-NugetPackages
 Generate-Manifest
+Publish-PatchedDotnet
+Copy-PackageIntoStaticDirectory
+Invoke-TestAssetsBuild
+Publish-Tests
+ 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
  

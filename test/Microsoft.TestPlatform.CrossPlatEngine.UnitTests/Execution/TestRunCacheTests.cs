@@ -5,9 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
-    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -325,7 +323,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var tester = new TestCacheTester { ExpectedCacheSize = cacheSize };
 
             var cache = new TestRunCache(cacheSize, TimeSpan.MaxValue, tester.CacheHitOnSize);
-            
+
             for (var i = 0; i < 2; i++)
             {
                 var tr = this.GetTestResult(i);

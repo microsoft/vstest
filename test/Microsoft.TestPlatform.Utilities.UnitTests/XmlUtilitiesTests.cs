@@ -206,7 +206,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
         #endregion
 
-        #region private methods
+        #region Private Methods
 
         private XmlDocument GetXmlDocument(string settingsXml)
         {

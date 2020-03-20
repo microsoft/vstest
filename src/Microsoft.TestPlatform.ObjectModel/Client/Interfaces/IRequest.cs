@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         ///  Handler for receiving raw messages directly from host without any deserialization or morphing
         ///  This is required if one wants to re-direct the message over the process boundary without any processing overhead
-        ///  All events should come as raw messages as well as actual serialized events 
+        ///  All events should come as raw messages as well as actual serialized events
         /// </summary>
         event EventHandler<string> OnRawMessageReceived;
 

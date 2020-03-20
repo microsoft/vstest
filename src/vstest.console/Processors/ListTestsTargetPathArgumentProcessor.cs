@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -71,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;      
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
     }
 
     internal class ListTestsTargetPathArgumentExecutor : IArgumentExecutor

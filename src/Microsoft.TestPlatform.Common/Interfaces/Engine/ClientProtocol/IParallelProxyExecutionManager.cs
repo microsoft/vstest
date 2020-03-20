@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface IParallelProxyExecutionManager : IParallelOperationManager, IProxyExecutionManager
     {
         /// <summary>
-        /// Handles Partial Run Complete event coming from a specific concurrent proxy exceution manager
+        /// Handles Partial Run Complete event coming from a specific concurrent proxy execution manager
         /// Each concurrent proxy execution manager will signal the parallel execution manager when its complete
         /// </summary>
         /// <param name="proxyExecutionManager">Concurrent Execution manager that completed the run</param>

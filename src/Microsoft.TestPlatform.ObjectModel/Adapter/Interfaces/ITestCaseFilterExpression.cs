@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     using System;
 
     /// <summary>
-    /// It represents expression for filtering test cases. 
+    /// It represents expression for filtering test cases.
     /// </summary>
     public interface ITestCaseFilterExpression
     {

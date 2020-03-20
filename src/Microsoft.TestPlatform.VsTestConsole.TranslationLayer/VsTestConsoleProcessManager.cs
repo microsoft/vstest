@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Creates an instance of VsTestConsoleProcessManager class.
         /// </summary>
-        /// <param name="vstestConsolePath">The fullpath to vstest.console</param>
+        /// <param name="vstestConsolePath">The full path to vstest.console</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
             this.FileHelper = new FileHelper();
@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 SafelyTerminateProcess();
                 this.process.Dispose();
                 this.process = null;
-            }            
+            }
         }
 
         private void SafelyTerminateProcess()

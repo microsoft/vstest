@@ -312,7 +312,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         {
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test", new FilterOptions() { FilterRegEx = @"^[^\s\(]+\1" });
 
-            Assert.AreEqual(null, filterExpressionWrapper.fastFilter);
+            Assert.IsNull(filterExpressionWrapper.fastFilter);
             Assert.IsFalse(string.IsNullOrEmpty(filterExpressionWrapper.ParseError));
         }
 
@@ -327,7 +327,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is ArgumentException);
-                Assert.AreEqual("An error occured while creating Fast filter.", ex.Message);
+                Assert.AreEqual("An error occurred while creating Fast filter.", ex.Message);
             }
         }
 

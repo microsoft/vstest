@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
             where TPluginInfo : TestPluginInformation
         {
-            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies endswith: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
+            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies ends with: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
             // Return the cached value if cache is valid.
             if (this.TestExtensions != null && this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
             {
@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (skipExtensionFilters)
                 {
-                    // Add the extensions to unfilter list. These extensions will never be filtered
+                    // Add the extensions to un-filter list. These extensions will never be filtered
                     // based on file name (e.g. *.testadapter.dll etc.).
                     if (TryMergeExtensionPaths(this.unfilterableExtensionPaths, extensions,
                         out this.unfilterableExtensionPaths))
@@ -293,6 +293,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             this.filterableExtensionPaths?.Clear();
             this.unfilterableExtensionPaths?.Clear();
             this.TestExtensions?.InvalidateCache();
+        }
+
+        /// <summary>
+        /// Add search directories to assembly resolver
+        /// </summary>
+        /// <param name="directories"></param>
+        public void AddResolverSearchDirectories(string[] directories)
+        {
+            assemblyResolver.AddSearchDirectories(directories);
         }
 
         #endregion
@@ -486,7 +495,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
         }
 
-        private void SetupAssemblyResolver(string extensionAssembly)
+        protected void SetupAssemblyResolver(string extensionAssembly)
         {
             IList<string> resolutionPaths;
 
@@ -527,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     }
 
                     // Put it in the resolved assembly so that if below Assembly.Load call
-                    // triggers another assembly resolution, then we dont end up in stack overflow
+                    // triggers another assembly resolution, then we don't end up in stack overflow
                     this.resolvedAssemblies[args.Name] = null;
 
                     assembly = Assembly.Load(assemblyName);

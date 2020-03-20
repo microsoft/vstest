@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// Basic metadata for extensions which are identified by a URI.
     /// </summary>

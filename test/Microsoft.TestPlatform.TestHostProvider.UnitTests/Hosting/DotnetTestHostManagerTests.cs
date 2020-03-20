@@ -216,7 +216,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
-            Assert.AreEqual(ex.Message, "Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".");
+            Assert.AreEqual("Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".", ex.Message);
         }
 
         [TestMethod]
@@ -236,7 +236,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
-            Assert.AreEqual(ex.Message, "Unable to find testhost.dll. Please publish your test project and retry.");
+            Assert.AreEqual("Unable to find testhost.dll. Please publish your test project and retry.", ex.Message);
         }
 
         [TestMethod]
@@ -277,6 +277,18 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var startInfo = this.GetDefaultStartInfo();
 
             StringAssert.Contains(startInfo.FileName, testhostExePath);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseDotnetHostPathFromRunsettings()
+        {
+            var dotnetHostPath = @"C:\dotnet.exe";
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotNetHostPath>{dotnetHostPath}</DotNetHostPath></RunConfiguration></RunSettings>");
+            var startInfo = this.GetDefaultStartInfo();
+
+            StringAssert.Contains(startInfo.FileName, dotnetHostPath);
         }
 
         [TestMethod]
@@ -567,16 +579,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, Enumerable.Empty<string>());
 
             Assert.AreEqual(0, extensions.Count());
-        }
-
-        [TestMethod]
-        public void GetTestPlatformExtensionsShouldOnlyAddCoverletDataCollectorsExtensionsIfPresent()
-        {
-            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string> { "coverlet.collector.dll" });
-
-            Assert.AreEqual(1, extensions.Count());
         }
 
         [TestMethod]
@@ -881,7 +883,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var errorData = string.Empty;
             this.ExitCallBackTestHelper(exitCode);
 
-            // override event listner
+            // override event listener
             this.dotnetHostManager.HostExited += this.DotnetHostManagerExitCodeTesterHostExited;
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);

@@ -11,7 +11,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.Threading;
     using System.Xml;
 
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -634,7 +633,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The trigger test host launcehd handler should not break if start process dump throws TestPlatFormExceptions and log error message
+        /// The trigger test host launched handler should not break if start process dump throws TestPlatFormExceptions and log error message
         /// </summary>
         [TestMethod]
         public void TriggerTestHostLaunchedHandlerShouldCatchTestPlatFormExceptionsAndReportMessage()

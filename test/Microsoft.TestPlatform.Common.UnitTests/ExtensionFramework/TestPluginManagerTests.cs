@@ -5,7 +5,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
 
@@ -17,10 +16,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
 
     [TestClass]
     public class TestPluginManagerTests
@@ -130,7 +126,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsTrue(testExtensions.Count() > 0);
         }
 
-        #region implementations
+        #region Implementations
 
         private abstract class AbstractDummyLogger : ITestLogger
         {

@@ -73,7 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class PlatformArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override string CommandName => PlatformArgumentProcessor.CommandName;
-        
         public override bool AllowMultiple => false;
 
         public override bool IsAction => false;

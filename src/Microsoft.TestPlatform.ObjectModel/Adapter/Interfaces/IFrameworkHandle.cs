@@ -12,9 +12,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     public interface IFrameworkHandle : ITestExecutionRecorder, IMessageLogger
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the execution framework enables the shutdown of execution process after the test run is complete. This should be used only in out of process test runs when IRunContext.KeepAlive is true 
-        /// and should be used only when absolutely required as using it degrades the performance of the subsequent run. 
-        /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false. 
+        /// Gets or sets a value indicating whether the execution framework enables the shutdown of execution process after the test run is complete. This should be used only in out of process test runs when IRunContext.KeepAlive is true
+        /// and should be used only when absolutely required as using it degrades the performance of the subsequent run.
+        /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false.
         /// </summary>
         bool EnableShutdownAfterTestRun { get; set; }
 

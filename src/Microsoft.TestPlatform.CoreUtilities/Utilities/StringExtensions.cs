@@ -3,9 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions
 {
-    using System;
-    using System.Text;
-
     public static class StringExtensions
     {
         /// <summary>

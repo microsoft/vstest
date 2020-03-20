@@ -76,7 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
             this.testPlatformEventSource.AdapterSearchStop();
-            
         }
 
         /// <summary>
@@ -98,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 this.testDiscoveryEventsHandler = eventHandler;
                 var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
-                // Validate the sources 
+                // Validate the sources
                 foreach (var kvp in discoveryCriteria.AdapterSourceMap)
                 {
                     var verifiedSources = GetValidSources(kvp.Value, this.sessionMessageLogger);
@@ -108,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
                 }
 
-                
+
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
@@ -216,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
             }
 
-            // No valid source is found => we cannot discover. 
+            // No valid source is found => we cannot discover.
             if (!verifiedSources.Any())
             {
                 var sourcesString = string.Join(",", sources.ToArray());

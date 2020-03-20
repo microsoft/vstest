@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.TestExecutor;
 
     [TestClass]
     public class UnitTestClientTests
@@ -16,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests
             var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag \"abc txt\"";
             string[] argsArr = UnitTestClient.SplitArguments(argument);
 
-            Assert.AreEqual(argsArr.Length, 6);
+            Assert.AreEqual(6, argsArr.Length);
             CollectionAssert.AreEqual(argsArr, expected);
         }
 
@@ -27,8 +26,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests
             var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag \'abc txt\'";
             string[] argsArr = UnitTestClient.SplitArguments(argument);
 
-            Assert.AreEqual(argsArr.Length, 6);
-            CollectionAssert.AreEqual(argsArr, expected);
+            Assert.AreEqual(6, argsArr.Length);
+            CollectionAssert.AreEqual(expected, argsArr);
         }
 
         [TestMethod]
@@ -38,8 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestExecutor.Tests
             var argument = "--port 8080 --endpoint 127.0.0.1:8020 --diag abc txt";
             string[] argsArr = UnitTestClient.SplitArguments(argument);
 
-            Assert.AreEqual(argsArr.Length, 7);
-            CollectionAssert.AreEqual(argsArr, expected);
+            Assert.AreEqual(7, argsArr.Length);
+            CollectionAssert.AreEqual(expected, argsArr);
         }
     }
 }

@@ -7,7 +7,9 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
 
     [TestClass]
     public class EnableCodeCoverageArgumentProcessorTests
@@ -19,7 +21,7 @@ namespace vstest.console.UnitTests.Processors
         public EnableCodeCoverageArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, this.settingsProvider);
+            this.executor = new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, this.settingsProvider, new Mock<IFileHelper>().Object);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
@@ -45,12 +47,12 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new EnableCodeCoverageArgumentProcessorCapabilities();
 
             Assert.AreEqual("/EnableCodeCoverage", capabilities.CommandName);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion
@@ -84,7 +86,7 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(this.settingsProvider.ActiveRunSettings.SettingsXml);
-            Assert.IsTrue(dataCollectorsFriendlyNames.Contains("Code Coverage"), "Code coverage setting in not avilabe in runsettings");
+            Assert.IsTrue(dataCollectorsFriendlyNames.Contains("Code Coverage"), "Code coverage setting in not available in runsettings");
         }
 
         [TestMethod]

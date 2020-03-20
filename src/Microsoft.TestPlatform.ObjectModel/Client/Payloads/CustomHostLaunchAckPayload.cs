@@ -11,13 +11,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public class CustomHostLaunchAckPayload
     {
         /// <summary>
-        /// ProcessId of the TestHost launched by Clients like IDE, LUT etc. 
+        /// ProcessId of the TestHost launched by Clients like IDE, LUT etc.
         /// </summary>
         [DataMember]
         public int HostProcessId { get; set; }
 
         /// <summary>
-        /// ErrorMessage, in cases where custom launch fails 
+        /// ErrorMessage, in cases where custom launch fails
         /// </summary>
         [DataMember]
         public string ErrorMessage { get; set; }

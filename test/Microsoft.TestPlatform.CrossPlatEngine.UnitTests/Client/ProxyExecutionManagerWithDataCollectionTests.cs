@@ -191,7 +191,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             proxyExecutionManager.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
             // Verify.
-            Assert.IsTrue(launchedStartInfo != null, "Failed to get the startinfo");
+            Assert.IsTrue(launchedStartInfo != null, "Failed to get the start info");
             foreach (var envVaribale in testProcessStartInfo.EnvironmentVariables)
             {
                 Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");

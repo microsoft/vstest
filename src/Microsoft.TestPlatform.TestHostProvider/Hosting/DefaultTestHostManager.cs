@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
             // We are doing this specifically for UWP, should we extract it out to some other utility?
-            // Why? Lets say if we have to do same for someother source extension, would we just add another if check?
+            // Why? Lets say if we have to do same for some other source extension, would we just add another if check?
             var uwpSources = sources.Where(source => source.EndsWith(".appxrecipe", StringComparison.OrdinalIgnoreCase));
 
             if (uwpSources.Any())
@@ -341,7 +341,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Raises HostLaunched event
         /// </summary>
-        /// <param name="e">hostprovider event args</param>
+        /// <param name="e">host provider event args</param>
         private void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
@@ -350,7 +350,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Raises HostExited event
         /// </summary>
-        /// <param name="e">hostprovider event args</param>
+        /// <param name="e">host provider event args</param>
         private void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)

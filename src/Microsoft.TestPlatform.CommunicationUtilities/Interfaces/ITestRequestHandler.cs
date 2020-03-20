@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// The discovery complete handler
         /// </summary>
-        /// <param name="discoveryCompleteEventArgs">Discovery Compelete Event Args</param>
+        /// <param name="discoveryCompleteEventArgs">Discovery Complete Event Args</param>
         /// <param name="lastChunk"> The last Chunk. </param>
         void DiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk);
 

@@ -17,7 +17,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
             this.TestCompletedList = new List<TestCase>();
             this.TestResultList = new List<TestResult>();
         }
-        
+
         // use the below three to fill in data to the testable cache.
         public List<TestCase> TestStartedList { get; private set; }
 

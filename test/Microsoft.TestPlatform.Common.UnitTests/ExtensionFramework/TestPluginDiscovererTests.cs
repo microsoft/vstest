@@ -20,8 +20,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using MSTest.TestFramework.AssertExtensions;
-    using Moq;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     [TestClass]
     public class TestPluginDiscovererTests
@@ -144,7 +142,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.That.DoesNotThrow(() =>this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions));
         }
 
-        #region implementations
+        #region Implementations
 
         #region Discoverers
 

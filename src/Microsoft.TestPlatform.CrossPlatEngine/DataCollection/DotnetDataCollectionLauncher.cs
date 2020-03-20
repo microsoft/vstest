@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IFileHelper fileHelper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class. 
+        /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class.
         /// </summary>
         public DotnetDataCollectionLauncher()
             : this(new ProcessHelper(), new FileHelper(), TestSessionMessageLogger.Instance)
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class.
         /// </summary>
         /// <param name="processHelper">
-        /// The process helper. 
+        /// The process helper.
         /// </param>
         /// <param name="fileHelper">
         /// The file Helper.
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var args = "exec";
 
-            // Probe for runtimeconfig and deps file for the test source
+            // Probe for runtime config and deps file for the test source
             var runtimeConfigPath = Path.Combine(dataCollectorDirectory, string.Concat(dataCollectorFileName, ".runtimeconfig.json"));
 
             if (this.fileHelper.Exists(runtimeConfigPath))
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, doesnot exist", runtimeConfigPath);
+                    EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", runtimeConfigPath);
                 }
             }
 
@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, doesnot exist", depsFilePath);
+                    EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, does not exist", depsFilePath);
                 }
             }
 

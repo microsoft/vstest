@@ -224,19 +224,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception ex)
             {
                 // Exception can occur if we are trying to cancel a test run on an executor where test run is not even fired
-                // we can safely ignore that as user is just cancelling the test run and we don't care about additional parallel executors
-                // as we will be disposing them off soon ansyway
+                // we can safely ignore that as user is just canceling the test run and we don't care about additional parallel executors
+                // as we will be disposing them off soon anyway
                 if (EqtTrace.IsWarningEnabled)
                 {
                     EqtTrace.Warning("AbstractParallelOperationManager: Exception while invoking an action on Proxy Manager instance: {0}", ex);
                 }
             }
         }
-        
+
         /// <summary>
         /// Fetches the next data object for the concurrent executor to work on
         /// </summary>
-        /// <param name="source">sourcedata to work on - sourcefile or testCaseList</param>
+        /// <param name="source">source data to work on - source file or testCaseList</param>
         /// <returns>True, if data exists. False otherwise</returns>
         protected bool TryFetchNextSource<Y>(IEnumerator enumerator, out Y source)
         {

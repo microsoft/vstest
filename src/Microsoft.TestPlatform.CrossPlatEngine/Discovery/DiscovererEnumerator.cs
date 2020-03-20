@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         }
 
         /// <summary>
-        /// Loads test cases from individual source. 
+        /// Loads test cases from individual source.
         /// Discovery extensions update progress through ITestCaseDiscoverySink.
         /// Discovery extensions sends discovery messages through TestRunMessageLoggerProxy
         /// </summary>
@@ -212,6 +212,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 EqtTrace.Verbose(
                     "DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Loading tests for {0}",
                         discoverer.Value.GetType().FullName);
+
+                if (discoverer.Metadata.DefaultExecutorUri == null)
+                {
+                    throw new Exception($@"DefaultExecutorUri is null, did you decorate the discoverer class with [DefaultExecutorUri()] attribute? For example [DefaultExecutorUri(""executor://example.testadapter"")].");
+                }
 
                 var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
                 var newTimeStart = DateTime.UtcNow;
@@ -332,7 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             if (discoveryMessageLogger != null && runSettings != null)
             {
 #if Todo
-                // Todo: Enable this when RunSettings is enabled.
+                // TODO : Enable this when RunSettings is enabled.
                 IRunConfigurationSettingsProvider runConfigurationSettingsProvider =
                         (IRunConfigurationSettingsProvider)runSettings.GetSettings(ObjectModel.Constants.RunConfigurationSettingsName);
                 if (runConfigurationSettingsProvider != null
@@ -386,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
                 }
 
-                // Find the sources which this discoverer can look at. 
+                // Find the sources which this discoverer can look at.
                 // Based on whether it is registered for a matching file extension or no file extensions at all.
                 var matchingSources = (from source in sourcesToCheck
                                        where
@@ -394,7 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                                             || discoverer.Metadata.FileExtension.Contains(
                                                 Path.GetExtension(source),
                                                 StringComparer.OrdinalIgnoreCase))
-                                       select source).ToList(); // ToList is required to actually execute the query 
+                                       select source).ToList(); // ToList is required to actually execute the query
 
 
                 // Update the source list for which no matching source is available.
@@ -411,7 +416,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             {
                 foreach (var source in sourcesForWhichNoDiscovererIsAvailable)
                 {
-                    // Log a warning to logfile, not to the "default logger for discovery time messages".
+                    // Log a warning to log file, not to the "default logger for discovery time messages".
                     EqtTrace.Warning(
                         "No test discoverer is registered to perform discovery for the type of test source '{0}'. Register a test discoverer for this source type and try again.",
                         source);
@@ -426,7 +431,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="sources">Sources.</param>
         /// <param name="assemblyType">Assembly type.</param>
-        /// <returns>Sources with mathcing assembly type.</returns>
+        /// <returns>Sources with matching assembly type.</returns>
         private static IDictionary<AssemblyType, IList<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources, IAssemblyProperties assemblyProperties)
         {
             var assemblyTypeToSoucesMap = new Dictionary<AssemblyType, IList<string>>()
@@ -485,7 +490,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
             catch (Exception ex)
             {
-                EqtTrace.Error($"TestDiscoveryManager: LoadExtensions: Exception occured while loading extensions {ex}");
+                EqtTrace.Error($"TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {ex}");
                 if (throwOnError)
                 {
                     throw;

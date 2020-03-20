@@ -98,8 +98,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                                    <RunSettings>
                                         <RunConfiguration>
                                         <BatchSize>3</BatchSize>
                                         </RunConfiguration>
@@ -126,8 +126,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                                    <RunSettings>
                                         <RunConfiguration>
                                         <BatchSize>3</BatchSize>
                                         </RunConfiguration>

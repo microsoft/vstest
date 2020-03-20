@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.IO;
-    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
@@ -107,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void Stop(Exception error)
         {
-            EqtTrace.Info("SocketServer.PrivateStop: Stopp server endPoint: {0} error: {1}", this.endPoint, error);
+            EqtTrace.Info("SocketServer.PrivateStop: Stop server endPoint: {0} error: {1}", this.endPoint, error);
 
             if (!this.stopped)
             {

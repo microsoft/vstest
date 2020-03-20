@@ -23,8 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
     /// <summary>
     /// Operator in order of precedence.
-    /// Predence(And) > Predence(Or)
-    /// Precdence of OpenBrace and CloseBrace operators is not used, instead parsing code takes care of same.
+    /// Precedence(And) > Precedence(Or)
+    /// Precedence of OpenBrace and CloseBrace operators is not used, instead parsing code takes care of same.
     /// </summary>
     internal enum Operator
     {
@@ -118,8 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
                 case Operation.NotEqual:
                     // all values in multi-valued property should not match 'this.Value' for NotEqual to evaluate true.
-                    result = true; 
-                    
+                    result = true;
+
                     // if value is null.
                     if (null != multiValue)
                     {
@@ -135,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     break;
 
                 case Operation.Contains:
-                    // if any value in mulit-valued property contains 'this.Value' for 'Contains' to be true.
+                    // if any value in multi-valued property contains 'this.Value' for 'Contains' to be true.
                     if (null != multiValue)
                     {
                         foreach (string propertyValue in multiValue)
@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     break;
             }
             return result;
-        } 
+        }
 
         /// <summary>
         /// Returns a condition object after parsing input string of format '<propertyName>Operation<propertyValue>'
@@ -212,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException,
                 string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
-        }          
+        }
 
         /// <summary>
         /// Check if condition validates any property in properties.
@@ -233,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             return valid;
         }
-        
+
         private bool ValidForContainsOperation(Func<string, TestProperty> propertyProvider)
         {
             bool valid = true;
@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             // It is OK for propertyProvider to be null, no syntax check will happen.
 
             // Check validity of operator only if related TestProperty is non-null.
-            // if null, it might be custom validation ignore it.             
+            // if null, it might be custom validation ignore it.
             if (null != propertyProvider)
             {
                 TestProperty testProperty = propertyProvider(Name);
@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
 
             return null;
-        }    
+        }
 
         internal static IEnumerable<string> TokenizeFilterConditionString(string str)
         {
@@ -318,14 +318,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     if (last == FilterHelper.EscapeCharacter)
                     {
                         // Don't check if `current` is one of the special characters here.
-                        // Instead, we blindly let any character follows '\' pass though and 
+                        // Instead, we blindly let any character follows '\' pass though and
                         // relies on `FilterHelpers.Unescape` to report such errors.
                         tokenBuilder.Append(current);
 
                         if (current == FilterHelper.EscapeCharacter)
                         {
-                            // We just encountered double backslash (i.e. escaped '\'), therefore set `last` to '\0' 
-                            // so the second '\' (i.e. current) will not be treated as the prefix of escape sequence 
+                            // We just encountered double backslash (i.e. escaped '\'), therefore set `last` to '\0'
+                            // so the second '\' (i.e. current) will not be treated as the prefix of escape sequence
                             // in next iteration.
                             current = '\0';
                         }

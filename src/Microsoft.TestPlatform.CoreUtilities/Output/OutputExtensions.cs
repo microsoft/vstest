@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
     using System.Globalization;
 
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
     /// <summary>

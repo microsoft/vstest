@@ -7,10 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    using Client.Execution;
-
-    using CrossPlatEngine.Execution;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -74,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>();
             testOutcomeDict.Add(TestOutcome.Failed, 1);
             var stats = new TestableTestRunStats(testOutcomeDict);
-            
+
             var messageArgs = new TestRunCompleteEventArgs(stats, false, false, null, null, new TimeSpan());
             this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
@@ -104,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
         }
 
-        #region implementation
+        #region Implementation
 
         private class TestableTestRunStats : ITestRunStatistics
         {

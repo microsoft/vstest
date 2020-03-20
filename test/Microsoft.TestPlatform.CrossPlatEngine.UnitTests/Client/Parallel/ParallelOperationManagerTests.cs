@@ -100,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AddManagerShouldAddAManagerWithHandlerInConcurrentManagerList()
         {
-            // At the begining it should be equal to parallel level
+            // At the beginning it should be equal to parallel level
             Assert.AreEqual(2, this.proxyParallelManager.GetConcurrentManagersCount());
 
             this.proxyParallelManager.AddManager(new SampleConcurrentClass(true), new SampleHandlerClass());
@@ -154,7 +154,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private class MockParallelOperationManager : ParallelOperationManager<SampleConcurrentClass, SampleHandlerClass>
         {
-            public MockParallelOperationManager(Func<SampleConcurrentClass> createNewClient, int parallelLevel, bool sharedHosts) : 
+            public MockParallelOperationManager(Func<SampleConcurrentClass> createNewClient, int parallelLevel, bool sharedHosts) :
                 base(createNewClient, parallelLevel, sharedHosts)
             {
             }

@@ -113,10 +113,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             var runContext = this.runTestsInstance.GetRunContext;
             Assert.IsNotNull(runContext);
-            Assert.AreEqual(false, runContext.KeepAlive);
-            Assert.AreEqual(false, runContext.InIsolation);
-            Assert.AreEqual(false, runContext.IsDataCollectionEnabled);
-            Assert.AreEqual(false, runContext.IsBeingDebugged);
+            Assert.IsFalse(runContext.KeepAlive);
+            Assert.IsFalse(runContext.InIsolation);
+            Assert.IsFalse(runContext.IsDataCollectionEnabled);
+            Assert.IsFalse(runContext.IsBeingDebugged);
         }
 
         [TestMethod]

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
@@ -12,13 +10,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class AcceptanceTestBase : IntegrationTestBase
     {
         public const string DesktopTargetFramework = "net451";
-        public const string CoreTargetFramework = "netcoreapp1.0";
-        public const string Core11TargetFramework = "netcoreapp1.1";
-        public const string Core20TargetFramework = "netcoreapp2.1";
+        public const string Core21TargetFramework = "netcoreapp2.1";
+        public const string Core31TargetFramework = "netcoreapp3.1";
 
-        public const string CoreFrameworkArgValue = ".NETCoreApp,Version=v1.0";
-        public const string Core11FrameworkArgValue = ".NETCoreApp,Version=v1.1";
-        public const string Core20FrameworkArgValue = ".NETCoreApp,Version=v2.0";
+        public const string Core21FrameworkArgValue = ".NETCoreApp,Version=v2.1";
+        public const string Core31FrameworkArgValue = ".NETCoreApp,Version=v3.1";
         public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
         public const string DesktopRunnerTargetRuntime = "win7-x64";
         public const string CoreRunnerTargetRuntime = "";
@@ -35,25 +31,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)
         {
-            string framworkArgValue = string.Empty;
-            if (string.Equals(testEnvironment.TargetFramework, CoreTargetFramework, StringComparison.Ordinal))
+            switch (testEnvironment.TargetFramework)
             {
-                framworkArgValue = CoreFrameworkArgValue;
+                case Core21TargetFramework:
+                    return Core21FrameworkArgValue;
+                case Core31TargetFramework:
+                    return Core31FrameworkArgValue;
+                case DesktopTargetFramework:
+                    return DesktopFrameworkArgValue;
+                default:
+                    throw new NotSupportedException($"{testEnvironment.TargetFramework} is not supported TargetFramework value.");
             }
-            else if (string.Equals(testEnvironment.TargetFramework, Core11TargetFramework, StringComparison.Ordinal))
-            {
-                framworkArgValue = Core11FrameworkArgValue;
-            }
-            else if (string.Equals(testEnvironment.TargetFramework, Core20TargetFramework, StringComparison.Ordinal))
-            {
-                framworkArgValue = Core20FrameworkArgValue;
-            }
-            else if (string.Equals(testEnvironment.TargetFramework, DesktopTargetFramework, StringComparison.Ordinal))
-            {
-                framworkArgValue = DesktopFrameworkArgValue;
-            }
-
-            return framworkArgValue;
         }
 
         protected bool IsDesktopTargetFramework()
@@ -74,28 +62,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             return targetFramework;
-        }
-
-        protected string GetTestHostProcessName(string targetPlatform)
-        {
-            var testHostProcessName = string.Empty;
-            if (this.IsDesktopTargetFramework())
-            {
-                if (string.Equals(targetPlatform, "x86", StringComparison.OrdinalIgnoreCase))
-                {
-                    testHostProcessName = "testhost.x86";
-                }
-                else
-                {
-                    testHostProcessName = "testhost";
-                }
-            }
-            else
-            {
-                testHostProcessName = "dotnet";
-            }
-
-            return testHostProcessName;
         }
 
         /// <summary>

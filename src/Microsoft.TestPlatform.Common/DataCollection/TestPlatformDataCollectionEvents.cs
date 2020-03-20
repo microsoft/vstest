@@ -16,12 +16,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     internal sealed class TestPlatformDataCollectionEvents : DataCollectionEvents
     {
         /// <summary>
-        /// Maps the type of event args to the multicast delegate for that event
+        /// Maps the type of event args to the multi cast delegate for that event
         /// </summary>
         private Dictionary<Type, EventInvoker> eventArgsToEventInvokerMap;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionEvents"/> class by mapping the types of expected event args to the multicast
+        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionEvents"/> class by mapping the types of expected event args to the multi cast
         /// delegate that invokes the event on registered targets
         /// </summary>
         internal TestPlatformDataCollectionEvents()
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occured while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
+                    EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occurred while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
                 }
 
                 return valueOnFailure;

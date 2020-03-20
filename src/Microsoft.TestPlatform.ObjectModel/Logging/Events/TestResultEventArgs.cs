@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class.
         /// </summary>
         /// <param name="result">
         /// Test Result for the event.
