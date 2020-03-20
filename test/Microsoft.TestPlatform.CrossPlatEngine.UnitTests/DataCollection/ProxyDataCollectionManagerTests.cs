@@ -7,7 +7,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Reflection;
 
@@ -28,7 +27,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     using Moq;
-    using System.Collections;
 
     [TestClass]
     public class ProxyDataCollectionManagerTests

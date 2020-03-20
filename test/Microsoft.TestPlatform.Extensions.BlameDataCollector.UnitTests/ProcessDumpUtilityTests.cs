@@ -4,11 +4,9 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
 
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;

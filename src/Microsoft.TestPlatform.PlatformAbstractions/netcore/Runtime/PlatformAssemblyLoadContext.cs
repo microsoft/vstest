@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System;
-    using System.IO;
     using System.Reflection;
     using System.Runtime.Loader;
 

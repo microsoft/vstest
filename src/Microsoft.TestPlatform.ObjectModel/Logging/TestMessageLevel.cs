@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
 {
-    using System;
-
     /// <summary>
     /// Levels for test messages.
     /// </summary>

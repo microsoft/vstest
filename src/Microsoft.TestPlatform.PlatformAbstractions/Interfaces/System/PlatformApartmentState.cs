@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System;
-
     /// <summary>
     /// Available apartment states for test platform.
     /// </summary>

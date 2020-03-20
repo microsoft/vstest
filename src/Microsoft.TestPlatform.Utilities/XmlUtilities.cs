@@ -5,7 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+#if NET451
     using System.Security;
+#endif
     using System.Xml;
     using System.Xml.XPath;
 

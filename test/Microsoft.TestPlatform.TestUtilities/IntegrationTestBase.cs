@@ -406,7 +406,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected bool IsNetCoreRunner()
         {
-            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
+            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;               
         }
 
         /// <summary>
@@ -527,7 +527,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
 
-            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe"); ;
+            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe");
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 

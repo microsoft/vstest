@@ -7,7 +7,6 @@ using System.Xml;
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;

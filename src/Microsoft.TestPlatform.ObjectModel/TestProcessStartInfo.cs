@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    using System;
-    using System.Diagnostics;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 

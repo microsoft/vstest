@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class DataCollectorExtensionManagerTests

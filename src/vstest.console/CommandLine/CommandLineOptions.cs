@@ -13,10 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using System.IO;
     using vstest.console.Internal;
     using System.Globalization;
-    using System.Collections;
 
     /// <summary>
     /// Provides access to the command-line options.

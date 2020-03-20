@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Text;
 
     public static class CommandLineUtilities

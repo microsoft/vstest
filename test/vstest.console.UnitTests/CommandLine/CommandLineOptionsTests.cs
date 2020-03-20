@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System.IO;
-    using MSTest.TestFramework.AssertExtensions;
     using vstest.console.Internal;
     using Microsoft.Extensions.FileSystemGlobbing;
 

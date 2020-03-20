@@ -6,13 +6,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System;
     using System.IO;
     using System.Runtime.Serialization;
-
-    using System.Globalization;
     using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test case.

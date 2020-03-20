@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Globalization;
     using System.Net;
     using System.Threading;
@@ -324,10 +323,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="e"></param>
         public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            if (e.Level == TestMessageLevel.Error || e.Level == TestMessageLevel.Warning)
+            // save into trace log and send the message to the IDE
+            //
+            // there is a mismatch between log levels that VS uses and that TP
+            // uses. In VS you can choose Trace level which will enable Test platform
+            // logs on Verbose level. Below we report Errors and warnings always to the 
+            // IDE no matter what the level of VS logging is, but Info only when the Eqt trace 
+            // info level is enabled (so only when VS enables Trace logging)
+            switch (e.Level)
             {
-                var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
-                this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+                case TestMessageLevel.Error:
+                    EqtTrace.Error(e.Message);
+                    SendTestMessage(e.Level, e.Message);
+                    break;
+                case TestMessageLevel.Warning:
+                    EqtTrace.Warning(e.Message);
+                    SendTestMessage(e.Level, e.Message);
+                    break;
+
+                case TestMessageLevel.Informational:
+                    EqtTrace.Info(e.Message);
+
+                    if (EqtTrace.IsInfoEnabled)
+                        SendTestMessage(e.Level, e.Message);
+                    break;
+
+               
+                default:
+                    throw new NotSupportedException($"Test message level '{e.Level}' is not supported.");
             }
         }
 
