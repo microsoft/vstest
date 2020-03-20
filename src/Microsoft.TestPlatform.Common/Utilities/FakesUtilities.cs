@@ -185,7 +185,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                var method = type?.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
 
                 var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
 
@@ -212,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
 
-                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>), typeof(bool) });
+                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>), typeof(FrameworkVersion) });
 
                 if (method != null)
                 {
