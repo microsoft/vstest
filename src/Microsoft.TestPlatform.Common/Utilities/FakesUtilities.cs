@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using System.Xml;
 
@@ -89,13 +88,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var newConfigurator = TryGetFakesNewDataCollectorConfigurator();
             if (newConfigurator != null)
             {
-                var sourceTFMMap = sources.ToDictionary(s => s, _ => framework);
+                var sourceTFMMap = CreateDictionary(sources, framework);
                 var fakesSettings = newConfigurator(sourceTFMMap);
                 XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
                 return true;
             }
 
             return AddFallbackFakesSettings(runSettings, sources, framework);
+        }
+
+        private static IDictionary<string, FrameworkVersion> CreateDictionary(IEnumerable<string> sources, FrameworkVersion framework)
+        {
+            var dict = new Dictionary<string, FrameworkVersion>();
+            foreach(var source in sources)
+            {
+                if (!dict.ContainsKey(source))
+                {
+                    dict.Add(source, framework);
+                }
+            }
+
+            return dict;
         }
 
         private static bool AddFallbackFakesSettings(
