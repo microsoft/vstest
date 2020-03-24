@@ -164,17 +164,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         [StoreXmlSimpleField("StackTrace", "")]
         private string stackTrace;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestResultErrorInfo"/> class.
-        /// </summary>
-        /// <param name="message">
-        /// The message.
-        /// </param>
-        public TestResultErrorInfo(string message)
-        {
-            Debug.Assert(message != null, "message is null");
-            this.message = message;
-        }
 
         /// <summary>
         /// Gets or sets the message.
@@ -370,8 +359,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string ErrorMessage
         {
-            get { return (this.errorInfo == null) ? string.Empty : this.errorInfo.Message; }
-            set { this.errorInfo = new TestResultErrorInfo(value); }
+            get { return this.errorInfo?.Message ?? string.Empty; }
+            set
+            {
+                if (this.errorInfo == null)
+                    this.errorInfo = new TestResultErrorInfo();
+
+                this.errorInfo.Message = value;
+            }
         }
 
         /// <summary>
@@ -379,11 +374,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string ErrorStackTrace
         {
-            get { return (this.errorInfo == null) ? string.Empty : this.errorInfo.StackTrace; }
+            get { return this.errorInfo?.StackTrace ?? string.Empty; }
 
             set
             {
-                Debug.Assert(this.errorInfo != null, "errorInfo is null");
+                if (this.errorInfo == null)
+                    this.errorInfo = new TestResultErrorInfo();
+
                 this.errorInfo.StackTrace = value;
             }
         }
