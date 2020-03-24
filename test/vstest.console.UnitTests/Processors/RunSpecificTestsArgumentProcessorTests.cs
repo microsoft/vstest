@@ -172,16 +172,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteForValidSourceWithTestCaseFilterShouldThrowCommandLineException()
-        {
-            this.ResetAndAddSourceToCommandLineOptions();
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask, this.mockProcessHelper.Object);
-            var executor = GetExecutor(testRequestManager);
-            CommandLineOptions.Instance.TestCaseFilterValue = "Filter";
-            Assert.ThrowsException<CommandLineException>(() => executor.Execute());
-        }
-
-        [TestMethod]
         public void ExecutorExecuteShouldThrowTestPlatformExceptionThrownDuringDiscovery()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
