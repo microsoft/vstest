@@ -187,15 +187,15 @@ function Install-DotNetCli
     "---- dotnet environment variables"
     Get-ChildItem "Env:\dotnet_*"
     
-    # "`n`n---- x64 dotnet"
-    # & "$env:DOTNET_ROOT\dotnet.exe" --info
+    "`n`n---- x64 dotnet"
+    & "$env:DOTNET_ROOT\dotnet.exe" --info
 
-    # "`n`n---- x86 dotnet"
-    # # avoid erroring out because we don't have the sdk for x86 that global.json requires
-    # try {
-    #     & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
-    # } catch {}
-    # Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
+    "`n`n---- x86 dotnet"
+    # avoid erroring out because we don't have the sdk for x86 that global.json requires
+    try {
+        & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
+    } catch {}
+    Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 function Clear-Package {
