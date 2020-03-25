@@ -86,8 +86,7 @@ Get-ChildItem "Env:\dotnet_*"
 try {
     & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
 } catch {}
-Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
-    
+
 
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
