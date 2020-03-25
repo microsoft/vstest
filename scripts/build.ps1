@@ -193,7 +193,7 @@ function Install-DotNetCli
     "`n`n---- x86 dotnet"
     # avoid erroring out because we don't have the sdk for x86 that global.json requires
     try {
-    & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
+        & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
     } catch {}
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
