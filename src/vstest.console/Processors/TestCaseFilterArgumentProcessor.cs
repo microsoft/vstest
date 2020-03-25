@@ -117,12 +117,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
+            var defaultFilter = this.commandLineOptions.TestCaseFilterValue;
+            var hasDefaultFilter = !string.IsNullOrWhiteSpace(defaultFilter);
+            
+            if (!hasDefaultFilter && string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
             }
 
-            this.commandLineOptions.TestCaseFilterValue = argument;
+            if (!hasDefaultFilter)
+            {
+                this.commandLineOptions.TestCaseFilterValue = argument;
+            }
+            else
+            {
+                // Merge default filter an provided filter by AND operator to have both the default filter and custom filter applied.
+                this.commandLineOptions.TestCaseFilterValue = $"({defaultFilter})&({argument})";
+            }
         }
 
         /// <summary>
