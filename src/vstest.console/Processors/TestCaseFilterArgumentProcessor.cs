@@ -117,20 +117,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
+            var defaultFilter = this.commandLineOptions.TestCaseFilterValue;
+            var hasDefaultFilter = !string.IsNullOrWhiteSpace(defaultFilter);
+            
+            if (!hasDefaultFilter && string.IsNullOrWhiteSpace(argument))
             {
-                if (!string.IsNullOrWhiteSpace(this.commandLineOptions.TestCaseFilterValue))
-                {
-                    // if user did not specify the argument, and we have a previously set value (for example from settings)
-                    // we keep the value and return, otherwise we throw because there was no default value, and the user did not provide any either
-                    return;
-                }
-
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
-                
             }
 
-            this.commandLineOptions.TestCaseFilterValue = argument;
+            if (!hasDefaultFilter)
+            {
+                this.commandLineOptions.TestCaseFilterValue = argument;
+            }
+            else
+            {
+                // Merge default filter an provided filter by AND operator to have both the default filter and custom filter applied.
+                this.commandLineOptions.TestCaseFilterValue = $"({defaultFilter})&({argument})";
+            }
         }
 
         /// <summary>

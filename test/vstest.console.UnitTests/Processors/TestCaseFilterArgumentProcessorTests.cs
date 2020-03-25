@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorInitializeWithTestCaseFilterShouldOverwriteTheValueProvidedByPreviousStep()
+        public void ExecutorInitializeWithTestCaseFilterShouldMergeWithTheValueProvidedByPreviousStep()
         {
             var options = CommandLineOptions.Instance;
             var defaultValue = "Test=FilterFromPreviousStep";
@@ -84,8 +84,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var value = "Test=NewFilter";
             executor.Initialize(value);
-            
-            Assert.AreEqual(value, options.TestCaseFilterValue);
+
+            var expectedValue = $"({defaultValue})&({value})";
+            Assert.AreEqual(expectedValue, options.TestCaseFilterValue);
         }
 
         [TestMethod]
