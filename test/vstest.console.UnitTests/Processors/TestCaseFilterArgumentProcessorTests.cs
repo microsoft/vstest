@@ -90,16 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorInitializeWithValidTestCaseFilterShouldAddTestCaseFilterToCommandLineOptions()
-        {
-            var options = CommandLineOptions.Instance;
-            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
-
-            executor.Initialize("Debug");
-            Assert.AreEqual("Debug", options.TestCaseFilterValue);
-        }
-
-        [TestMethod]
         public void ExecutorExecutoreturnArgumentProcessorResultSuccess()
         {
             var executor = new TestCaseFilterArgumentExecutor(CommandLineOptions.Instance);
