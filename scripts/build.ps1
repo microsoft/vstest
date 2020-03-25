@@ -176,10 +176,10 @@ function Install-DotNetCli
     # Pull in additional shared frameworks.
     # Get netcoreapp2.1 shared components.
     
-    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x64 -NoPath
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
-    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel 'release/2.1.0' -Architecture x86 -NoPath
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
     
     $env:DOTNET_MULTILEVEL_LOOKUP=0
@@ -191,9 +191,10 @@ function Install-DotNetCli
     & "$env:DOTNET_ROOT\dotnet.exe" --info
 
     "`n`n---- x86 dotnet"
-    & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info
-
-    
+    # avoid erroring out because we don't have the sdk for x86 that global.json requires
+    try {
+        & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
+    } catch {}
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
