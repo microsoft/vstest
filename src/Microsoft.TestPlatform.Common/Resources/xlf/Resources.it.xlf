@@ -271,7 +271,7 @@
       </trans-unit>
       <trans-unit id="UnableToFetchUriString">
         <source>Unable to find a datacollector with friendly name '{0}'.</source>
-        <target state="translated">Non è possibile trovare un agente di raccolta dati con nome descrittivo '{0}'.</target>
+        <target state="translated">Non è possibile trovare un oggetto datacollector con nome descrittivo '{0}'.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">

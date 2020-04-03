@@ -588,7 +588,7 @@
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="translated">Çalıştırma ayarlarında tanılama veri bağdaştırıcıları etkinleştirildiğinden testleri çalıştırmak üzere Yalıtım modu kullanılıyor. Bu uyarıyı kapatmak için /inIsolation parametresini kullanın.</target>
+        <target state="translated">runsettings içinde tanılama veri bağdaştırıcıları etkinleştirildiğinden testleri çalıştırmak üzere Yalıtım modu kullanılıyor. Bu uyarıyı kapatmak için /inIsolation parametresini kullanın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
@@ -1659,8 +1659,8 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">'{0}' test çalıştırması parametre bağımsız değişkeni geçersiz. Lütfen aşağıdaki biçimi kullanın.
+     Biçim: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>
