@@ -305,7 +305,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // those changes (older testhosts won't know to request VS to attach to themselves
             // thinking instead VS launched and attached to them already), we request VS to attach
             // to the testhost here before starting the test run.
-            if (runCriteria.TestExecutionContext.IsDebug
+            if (runCriteria.TestExecutionContext != null
+                && runCriteria.TestExecutionContext.IsDebug
                 && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
                 && this.protocolVersion < MinimumProtocolVersionWithDebugSupport)
             {
@@ -353,7 +354,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // those changes (older testhosts won't know to request VS to attach to themselves
             // thinking instead VS launched and attached to them already), we request VS to attach
             // to the testhost here before starting the test run.
-            if (runCriteria.TestExecutionContext.IsDebug
+            if (runCriteria.TestExecutionContext != null
+                && runCriteria.TestExecutionContext.IsDebug
                 && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
                 && this.protocolVersion < MinimumProtocolVersionWithDebugSupport)
             {
