@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// </remarks>
     [ExtensionUri(DotnetTestHostUri)]
     [FriendlyName(DotnetTestHostFriendlyName)]
-    public class DotnetTestHostManager : ITestRuntimeProvider
+    public class DotnetTestHostManager : ITestRuntimeProvider2
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendlyName = "DotnetTestHost";
@@ -369,6 +369,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToTestHost()
+        {
+            return ((ITestHostLauncher2)this.customTestHostLauncher).AttachDebuggerToProcess(this.testHostProcess.Id);
         }
 
         /// <summary>

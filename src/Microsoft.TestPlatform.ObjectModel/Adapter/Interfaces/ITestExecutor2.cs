@@ -16,19 +16,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     public interface ITestExecutor2 : ITestExecutor
     {
         /// <summary>
-        /// Asks the adapter about attaching to the default test host.
+        /// Indicates whether or not the default test host process should be attached to.
         /// </summary>
         /// <param name="sources">Path to test container files to look for tests in.</param>
         /// <param name="runContext">Context to use when executing the tests.</param>
-        /// <returns>True if must attach to the default test host, false otherwise.</returns>
+        /// <returns>
+        /// <see cref="true"/> if the default test host process should be attached to,
+        /// <see cref="false"/> otherwise.
+        /// </returns>
         bool ShouldAttachToTestHost(IEnumerable<string> sources, IRunContext runContext);
 
         /// <summary>
-        /// Asks the adapter about attaching to the default test host.
+        /// Indicates whether or not the default test host process should be attached to.
         /// </summary>
         /// <param name="tests">Tests to be run.</param>
         /// <param name="runContext">Context to use when executing the tests.</param>
-        /// <returns>True if must attach to the default test host, false otherwise.</returns>
+        /// <returns>
+        /// <see cref="true"/> if the default test host process should be attached to,
+        /// <see cref="false"/> otherwise.
+        /// </returns>
         bool ShouldAttachToTestHost(IEnumerable<TestCase> tests, IRunContext runContext);
     }
 }

@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public TestHostConnectionInfo ConnectionInfo { get; set; }
 
-        private int highestSupportedVersion = 2;
+        private int highestSupportedVersion = 3;
         private JobQueue<Action> jobQueue;
         private ICommunicationChannel channel;
 

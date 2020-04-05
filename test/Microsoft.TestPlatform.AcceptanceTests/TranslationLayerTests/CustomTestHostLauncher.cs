@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// <summary>
     /// The custom test host launcher.
     /// </summary>
-    public class CustomTestHostLauncher : IDebugTestHostLauncher
+    public class CustomTestHostLauncher : ITestHostLauncher2
     {
         public int ProcessId
         {

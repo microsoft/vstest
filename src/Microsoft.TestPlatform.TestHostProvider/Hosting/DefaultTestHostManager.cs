@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// </summary>
     [ExtensionUri(DefaultTestHostUri)]
     [FriendlyName(DefaultTestHostFriendlyName)]
-    public class DefaultTestHostManager : ITestRuntimeProvider
+    public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
@@ -260,6 +260,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToTestHost()
+        {
+            return ((ITestHostLauncher2)this.customTestHostLauncher).AttachDebuggerToProcess(this.testHostProcess.Id);
         }
 
         /// <summary>

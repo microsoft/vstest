@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces
     /// <summary>
     /// Interface defining contract for custom test host implementations
     /// </summary>
-    public interface IDebugTestHostLauncher : ITestHostLauncher
+    public interface ITestHostLauncher2 : ITestHostLauncher
     {
         /// <summary>
         /// Attach debugger to already running custom test host process.
