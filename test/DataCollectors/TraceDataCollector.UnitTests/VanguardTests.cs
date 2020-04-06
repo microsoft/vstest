@@ -139,6 +139,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
+        [Ignore("This test is flaky")]
         public void StartShouldThrowOnTimeout()
         {
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "0");
