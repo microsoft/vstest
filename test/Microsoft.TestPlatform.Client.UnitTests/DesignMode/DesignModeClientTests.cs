@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         private readonly DesignModeClient designModeClient;
 
-        private readonly int protocolVersion = 1;
+        private readonly int protocolVersion = 3;
 
         private readonly AutoResetEvent complateEvent;
 
