@@ -90,6 +90,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 var sourceTFMMap = CreateDictionary(sources, framework);
                 var fakesSettings = newConfigurator(sourceTFMMap);
+                // if no fakes, return settings unchanged
+                if (fakesSettings == null)
+                {
+                    return false;
+                }
+
                 XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
                 return true;
             }
