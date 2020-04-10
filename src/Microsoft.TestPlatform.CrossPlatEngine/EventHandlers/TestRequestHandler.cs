@@ -22,25 +22,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class TestRequestHandler : ITestRequestHandler
     {
+        private const int MinimumProtocolVersionWithDebugSupport = 3;
+
+        private int protocolVersion = 1;
+        private int highestSupportedVersion = 3;
+
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
         private ICommunicationEndPoint communicationEndPoint;
         private ICommunicationEndpointFactory communicationEndpointFactory;
-        private int protocolVersion = 1;
-
-        public TestHostConnectionInfo ConnectionInfo { get; set; }
-
-        private int highestSupportedVersion = 3;
-        private JobQueue<Action> jobQueue;
         private ICommunicationChannel channel;
 
+        private JobQueue<Action> jobQueue;
         private ManualResetEventSlim requestSenderConnected;
         private ManualResetEventSlim testHostManagerFactoryReady;
-
         private ManualResetEventSlim sessionCompleted;
-
         private Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
         private Action<Message> onAttachDebuggerAckRecieved;
+
+        public TestHostConnectionInfo ConnectionInfo { get; set; } 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestHandler" />.
@@ -219,6 +219,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public bool AttachDebuggerToProcess(int pid)
         {
+            // If an attach request is issued but there is no support for attaching on the other
+            // side of the communication channel, we simply return and let the caller know the
+            // request failed.
+            if (this.protocolVersion < MinimumProtocolVersionWithDebugSupport)
+            {
+                return false;
+            }
+
             Message ackMessage = null;
             var waitHandle = new ManualResetEventSlim(false);
 

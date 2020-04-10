@@ -313,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var handler = (ITestRunEventsHandler2)eventHandler;
                 if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
                 {
-                    throw new TestPlatformException(
+                    EqtTrace.Warning(
                         string.Format(
                             CultureInfo.CurrentUICulture,
                             CommonResources.AttachDebuggerToDefaultTestHostFailure));
@@ -362,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var handler = (ITestRunEventsHandler2)eventHandler;
                 if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
                 {
-                    throw new TestPlatformException(
+                    EqtTrace.Warning(
                         string.Format(
                             CultureInfo.CurrentUICulture,
                             CommonResources.AttachDebuggerToDefaultTestHostFailure));

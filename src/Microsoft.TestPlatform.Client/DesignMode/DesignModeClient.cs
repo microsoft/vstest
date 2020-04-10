@@ -30,21 +30,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     /// </summary>
     public class DesignModeClient : IDesignModeClient
     {
-        private readonly ICommunicationManager communicationManager;
+        private const int MinimumProtocolVersionWithDebugSupport = 3;
 
+        private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
+        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
+        private IEnvironment platformEnvironment;
+        private TestSessionMessageLogger testSessionMessageLogger;
         private object lockObject = new object();
 
-        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
-
-        private IEnvironment platformEnvironment;
-
         protected Action<Message> onCustomTestHostLaunchAckReceived;
-
         protected Action<Message> onAttachDebuggerAckRecieved;
-
-        private TestSessionMessageLogger testSessionMessageLogger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -311,6 +308,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
         {
+            // If an attach request is issued but there is no support for attaching on the other
+            // side of the communication channel, we simply return and let the caller know the
+            // request failed.
+            if (this.protocolConfig.Version < MinimumProtocolVersionWithDebugSupport)
+            {
+                return false;
+            }
+
             lock (this.lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);

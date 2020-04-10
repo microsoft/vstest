@@ -444,7 +444,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     var pid = Process.GetCurrentProcess().Id;
                     if (!this.frameworkHandle.AttachDebuggerToProcess(pid))
                     {
-                        throw new TestPlatformException(
+                        EqtTrace.Warning(
                             string.Format(
                                 CultureInfo.CurrentUICulture,
                                 CrossPlatEngineResources.AttachDebuggerToDefaultTestHostFailure,
