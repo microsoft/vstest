@@ -20,7 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     {
         private const string ConfiguratorAssemblyQualifiedName = "Microsoft.VisualStudio.TestPlatform.Fakes.FakesDataCollectorConfiguration";
 
-        private const string ConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
+        private const string NetFrameworkConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
+
+        private const string CrossPlatformConfiguratorMethodName = "GetCrossPlatformDataCollectorSettings";
 
         private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
 
@@ -85,11 +87,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
             // .NET Core scenarios). The old API still exists for fallback measures. 
 
-            var newConfigurator = TryGetFakesNewDataCollectorConfigurator();
-            if (newConfigurator != null)
+            var crossPlatformConfigurator = TryGetFakesCrossPlatformDataCollectorConfigurator();
+            if (crossPlatformConfigurator != null)
             {
                 var sourceTFMMap = CreateDictionary(sources, framework);
-                var fakesSettings = newConfigurator(sourceTFMMap);
+                var fakesSettings = crossPlatformConfigurator(sourceTFMMap);
                 // if no fakes, return settings unchanged
                 if (fakesSettings == null)
                 {
@@ -132,14 +134,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
-            Func<IEnumerable<string>, string> oldConfigurator = TryGetFakesDataCollectorConfigurator();
-            if (oldConfigurator == null)
+            Func<IEnumerable<string>, string> netFrameworkConfigurator = TryGetNetFrameworkFakesDataCollectorConfigurator();
+            if (netFrameworkConfigurator == null)
             {
                 return false;
             }
 
             // if no fakes, return settings unchanged
-            var fakesConfiguration = oldConfigurator(sources);
+            var fakesConfiguration = netFrameworkConfigurator(sources);
             if (fakesConfiguration == null)
             {
                 return false;
@@ -184,14 +186,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
         }
 
-        private static Func<IEnumerable<string>, string> TryGetFakesDataCollectorConfigurator()
+        private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
 #if NET451
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
+                var method = type?.GetMethod(NetFrameworkConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
                 if (method != null)
                 {
                     return (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
@@ -208,13 +210,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return null;
         }
 
-        private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesNewDataCollectorConfigurator()
+        private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesCrossPlatformDataCollectorConfigurator()
         {
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
+                var method = type?.GetMethod(CrossPlatformConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
                 if (method != null)
                 {
                     return (Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>));
