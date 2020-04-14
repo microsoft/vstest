@@ -51,7 +51,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Using XmlReaderWriter by default
         /// </summary>
         public BlameCollector()
-            : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper())
+            : this(new XmlReaderWriter(),
+#if NETSTANDARD
+            new DotnetProcessDumpUtility()
+#else
+            new DesktopProcessDumpUtility()
+#endif
+                  , null, new FileHelper())
         {
         }
 
@@ -62,7 +68,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// BlameReaderWriter instance.
         /// </param>
         /// <param name="processDumpUtility">
-        /// ProcessDumpUtility instance.
+        /// IProcessDumpUtility instance.
         /// </param>
         /// <param name="inactivityTimer">
         /// InactivityTimer instance.
@@ -157,8 +163,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         private void CollectDumpAndAbortTesthost()
         {
-            EqtTrace.Info(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes));
             this.inactivityTimerAlreadyFired = true;
+            EqtTrace.Info(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes));
 
             try
             {

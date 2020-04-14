@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-    public class ProcessDumpUtility : IProcessDumpUtility
+    public class DesktopProcessDumpUtility : IProcessDumpUtility
     {
         private static readonly IEnumerable<string> ProcDumpExceptionsList = new List<string>()
         {
@@ -29,12 +29,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private string dumpFileName;
         private INativeMethodsHelper nativeMethodsHelper;
 
-        public ProcessDumpUtility()
+        public DesktopProcessDumpUtility()
             : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
         {
         }
 
-        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper nativeMethodsHelper)
+        public DesktopProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper nativeMethodsHelper)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // Otherwise they end up coming on console in pipleine.
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
+                EqtTrace.Info("DesktopProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
             }
         };
 
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // Log to diagnostics if multiple files just in case
                 if (dumpFiles.Length != 1)
                 {
-                    EqtTrace.Warning("ProcessDumpUtility.GetDumpFile: Multiple dump files found.");
+                    EqtTrace.Warning("DesktopProcessDumpUtility.GetDumpFile: Multiple dump files found.");
                 }
 
                 return dumpFiles[0];
@@ -78,10 +78,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             if (EqtTrace.IsErrorEnabled)
             {
                 int exitCode;
-                EqtTrace.Error("ProcessDumpUtility.GetDumpFile: No dump file generated.");
+                EqtTrace.Error("DesktopProcessDumpUtility.GetDumpFile: No dump file generated.");
                 if (this.processHelper.TryGetExitCode(this.procDumpProcess, out exitCode))
                 {
-                    EqtTrace.Error("ProcessDumpUtility.GetDumpFile: Proc dump exited with code: {0}", exitCode);
+                    EqtTrace.Error("DesktopProcessDumpUtility.GetDumpFile: Proc dump exited with code: {0}", exitCode);
                 }
             }
 
@@ -102,7 +102,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info($"ProcessDumpUtility : The proc dump argument is {procDumpArgs}");
+                EqtTrace.Info($"DesktopProcessDumpUtility : The proc dump argument is {procDumpArgs}");
             }
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -128,7 +128,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info($"ProcessDumpUtility : The hang based proc dump invocation argument is {procDumpArgs}");
+                EqtTrace.Info($"DesktopProcessDumpUtility : The hang based proc dump invocation argument is {procDumpArgs}");
             }
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -152,12 +152,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             try
             {
-                EqtTrace.Info("ProcessDumpUtility : Attempting to kill proc dump process.");
+                EqtTrace.Info("DesktopProcessDumpUtility : Attempting to kill proc dump process.");
                 this.processHelper.TerminateProcess(this.procDumpProcess);
             }
             catch (Exception e)
             {
-                EqtTrace.Warning($"ProcessDumpUtility : Failed to kill proc dump process with exception {e}");
+                EqtTrace.Warning($"DesktopProcessDumpUtility : Failed to kill proc dump process with exception {e}");
             }
         }
 

@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -87,7 +87,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                  this.mockProcessHelper.Object,
                  this.mockFileHelper.Object,
                  this.mockPlatformEnvironment.Object,
@@ -115,7 +115,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -148,7 +148,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
                 .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -180,7 +180,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
                 .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -212,7 +212,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
                 .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -232,7 +232,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -258,7 +258,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.GetProcessHandle(processId))
                                 .Returns(new IntPtr(0));
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockPlatformEnvironment.Object,
@@ -284,7 +284,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(x64ProcessHandle))
                                 .Returns(true);
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
             this.mockProcessHelper.Object,
             this.mockFileHelper.Object,
             this.mockPlatformEnvironment.Object,
@@ -310,7 +310,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(x86ProcessHandle))
                                 .Returns(false);
 
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
             this.mockProcessHelper.Object,
             this.mockFileHelper.Object,
             this.mockPlatformEnvironment.Object,
@@ -327,7 +327,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void TerminateProcessDumpShouldCallTerminateOnProcDumpProcess()
         {
-            var processDumpUtility = new ProcessDumpUtility(
+            var processDumpUtility = new DesktopProcessDumpUtility(
             this.mockProcessHelper.Object,
             this.mockFileHelper.Object,
             this.mockPlatformEnvironment.Object,

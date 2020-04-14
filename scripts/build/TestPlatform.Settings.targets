@@ -42,13 +42,6 @@
   <!-- Package dependency versions -->
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" />
 
-  <!-- Common dependencies for all projects -->
-  <ItemGroup>
-    <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
-      <Link>stylecop.json</Link>
-    </AdditionalFiles>
-  </ItemGroup>
-
   <!-- Test project settings -->
   <Choose>
     <When Condition="$(TestProject) == 'true'"> 
