@@ -52,17 +52,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 doc.Load(xmlReader);
             }
 
-            return !TryAddFakesDataCollectorSettings(doc, sources, GetFramework(runSettingsXml)) 
-                ? runSettingsXml 
-                : doc.OuterXml;
+            var frameworkVersion = GetFramework(runSettingsXml);
+            if (frameworkVersion == null)
+            {
+                return runSettingsXml;
+            }
+
+            return TryAddFakesDataCollectorSettings(doc, sources, (FrameworkVersion)frameworkVersion) 
+                ? doc.OuterXml
+                : runSettingsXml;
         }
 
-        private static FrameworkVersion GetFramework(string runSettingsXml)
+        /// <summary>
+        /// returns FrameworkVersion contained in the runsettingsXML
+        /// </summary>
+        /// <param name="runSettingsXml"></param>
+        /// <returns></returns>
+        private static FrameworkVersion? GetFramework(string runSettingsXml)
         {
-            var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
-#pragma warning disable CS0618 // Type or member is obsolete
-            return config.TargetFrameworkVersion;
-#pragma warning restore CS0618 // Type or member is obsolete
+            // We assume that only .NET Core, .NET Standard, or .NET Framework projects can have fakes.
+            var targetFramework = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml)?.TargetFramework;
+
+            if (targetFramework == null)
+            {
+                return null;
+            }
+
+            // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
+            // and default to FrameworkCore10 for .Net Core 
+            if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return FrameworkVersion.FrameworkCore10;
+            }
+
+            // Since the Datacollector is separated on the NetFramework/NetCore line, any value of NETFramework 
+            // can be passed along to the fakes data collector configuration creator. 
+            // We default to Framework40 to preserve back compat
+            return FrameworkVersion.Framework40;
         }
 
         /// <summary>
