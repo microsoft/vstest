@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             // Since the Datacollector is separated on the NetFramework/NetCore line, any value of NETFramework 
             // can be passed along to the fakes data collector configuration creator. 
-            // We default to Framework40to preserve back compat
+            // We default to Framework40 to preserve back compat
             return FrameworkVersion.Framework40;
         }
 
