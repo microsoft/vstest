@@ -55,7 +55,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 #if NETSTANDARD
             new DotnetProcessDumpUtility()
 #else
-            new DesktopProcessDumpUtility()
+             new DotnetProcessDumpUtility()
+            // new DesktopProcessDumpUtility()
 #endif
                   , null, new FileHelper())
         {

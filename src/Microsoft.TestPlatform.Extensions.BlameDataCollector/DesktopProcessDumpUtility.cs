@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private INativeMethodsHelper nativeMethodsHelper;
 
         public DesktopProcessDumpUtility()
-            : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
+            : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), null)
         {
         }
 
