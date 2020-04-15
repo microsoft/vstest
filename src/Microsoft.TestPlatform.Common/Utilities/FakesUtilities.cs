@@ -20,7 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     {
         private const string ConfiguratorAssemblyQualifiedName = "Microsoft.VisualStudio.TestPlatform.Fakes.FakesDataCollectorConfiguration";
 
-        private const string ConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
+        private const string NetFrameworkConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
+
+        private const string CrossPlatformConfiguratorMethodName = "GetCrossPlatformDataCollectorSettings";
 
         private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
 
@@ -50,17 +52,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 doc.Load(xmlReader);
             }
 
-            return !TryAddFakesDataCollectorSettings(doc, sources, GetFramework(runSettingsXml)) 
-                ? runSettingsXml 
-                : doc.OuterXml;
+            var frameworkVersion = GetFramework(runSettingsXml);
+            if (frameworkVersion == null)
+            {
+                return runSettingsXml;
+            }
+
+            return TryAddFakesDataCollectorSettings(doc, sources, (FrameworkVersion)frameworkVersion) 
+                ? doc.OuterXml
+                : runSettingsXml;
         }
 
-        private static FrameworkVersion GetFramework(string runSettingsXml)
+        /// <summary>
+        /// returns FrameworkVersion contained in the runsettingsXML
+        /// </summary>
+        /// <param name="runSettingsXml"></param>
+        /// <returns></returns>
+        private static FrameworkVersion? GetFramework(string runSettingsXml)
         {
-            var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
-#pragma warning disable CS0618 // Type or member is obsolete
-            return config.TargetFrameworkVersion;
-#pragma warning restore CS0618 // Type or member is obsolete
+            // We assume that only .NET Core, .NET Standard, or .NET Framework projects can have fakes.
+            var targetFramework = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml)?.TargetFramework;
+
+            if (targetFramework == null)
+            {
+                return null;
+            }
+
+            // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
+            // and default to FrameworkCore10 for .Net Core 
+            if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return FrameworkVersion.FrameworkCore10;
+            }
+
+            // Since the Datacollector is separated on the NetFramework/NetCore line, any value of NETFramework 
+            // can be passed along to the fakes data collector configuration creator. 
+            // We default to Framework40 to preserve back compat
+            return FrameworkVersion.Framework40;
         }
 
         /// <summary>
@@ -85,11 +114,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
             // .NET Core scenarios). The old API still exists for fallback measures. 
 
-            var newConfigurator = TryGetFakesNewDataCollectorConfigurator();
-            if (newConfigurator != null)
+            var crossPlatformConfigurator = TryGetFakesCrossPlatformDataCollectorConfigurator();
+            if (crossPlatformConfigurator != null)
             {
                 var sourceTFMMap = CreateDictionary(sources, framework);
-                var fakesSettings = newConfigurator(sourceTFMMap);
+                var fakesSettings = crossPlatformConfigurator(sourceTFMMap);
                 // if no fakes, return settings unchanged
                 if (fakesSettings == null)
                 {
@@ -132,14 +161,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
-            Func<IEnumerable<string>, string> oldConfigurator = TryGetFakesDataCollectorConfigurator();
-            if (oldConfigurator == null)
+            Func<IEnumerable<string>, string> netFrameworkConfigurator = TryGetNetFrameworkFakesDataCollectorConfigurator();
+            if (netFrameworkConfigurator == null)
             {
                 return false;
             }
 
             // if no fakes, return settings unchanged
-            var fakesConfiguration = oldConfigurator(sources);
+            var fakesConfiguration = netFrameworkConfigurator(sources);
             if (fakesConfiguration == null)
             {
                 return false;
@@ -184,14 +213,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
         }
 
-        private static Func<IEnumerable<string>, string> TryGetFakesDataCollectorConfigurator()
+        private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
 #if NET451
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
+                var method = type?.GetMethod(NetFrameworkConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
                 if (method != null)
                 {
                     return (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
@@ -208,13 +237,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return null;
         }
 
-        private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesNewDataCollectorConfigurator()
+        private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesCrossPlatformDataCollectorConfigurator()
         {
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                var method = type?.GetMethod(ConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
+                var method = type?.GetMethod(CrossPlatformConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
                 if (method != null)
                 {
                     return (Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>));
