@@ -82,8 +82,11 @@ Get-ChildItem "Env:\dotnet_*"
 & "$env:DOTNET_ROOT\dotnet.exe" --info
 
 "`n`n---- x86 dotnet"
-& "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info
-    
+# avoid erroring out because we don't have the sdk for x86 that global.json requires
+try {
+    & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
+} catch {}
+
 
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR

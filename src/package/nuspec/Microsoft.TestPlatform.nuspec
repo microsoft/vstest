@@ -142,7 +142,6 @@
     <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" />
@@ -456,5 +455,8 @@
     <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
     <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
     <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+
+    <!-- External dependencies-->
+    <file src="$FakesPackageDir$\net451\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
   </files>
 </package>

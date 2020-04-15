@@ -588,7 +588,7 @@
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="translated">Używanie trybu izolacji do uruchomienia testów jako adapterów danych diagnostycznych zostało włączone w parametrach uruchomieniowych. Użyj parametru /inIsolation, aby pominąć to ostrzeżenie.</target>
+        <target state="translated">Używanie trybu izolacji do uruchomienia testów jako adapterów danych diagnostycznych zostało włączone w pliku runsettings. Użyj parametru /inIsolation, aby pominąć to ostrzeżenie.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
@@ -1659,8 +1659,8 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">Argument parametru przebiegu testu „{0}” jest nieprawidłowy. Użyj poniższego formatu.
+     Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>

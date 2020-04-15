@@ -28,3 +28,7 @@ Write-Host "##vso[task.setvariable variable=PackageVersion;]$packageVersion"
 
 $JsonNetVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
 Write-Host "##vso[task.setvariable variable=JsonNetVersion;]$JsonNetVersion"
+
+$microsoftFakesVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
+$FakesPackageDir = Join-Path $TP_ROOT_DIR "packages\Microsoft.VisualStudio.TestPlatform.Fakes\$microsoftFakesVersion\lib"
+Write-Host "##vso[task.setvariable variable=FakesPackageDir;]$FakesPackageDir"
