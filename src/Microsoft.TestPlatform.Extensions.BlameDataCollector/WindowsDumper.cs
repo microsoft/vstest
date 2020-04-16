@@ -6,19 +6,34 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+#if NETSTANDARD || NETCOREAPP
+using Microsoft.Diagnostics.NETCore.Client;
+#endif
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    enum DumpTypeOption
+    public interface IDumper
+    {
+        void Dump(int processId, string outputFile, DumpTypeOption dumpType);
+    }
+
+    public enum DumpTypeOption
     {
         Full,
         WithHeap,
         Mini,
     }
 
-    static class DumperWindows
+    class WindowsDumper : IDumper
     {
-        internal static void CollectDumpAsync(Process process, string outputFile, DumpTypeOption type)
+        public void Dump(int processId, string outputFile, DumpTypeOption type)
+        {
+            var process = Process.GetProcessById(processId);
+            CollectDump(process, outputFile, type);
+        }
+
+        internal static void CollectDump(Process process, string outputFile, DumpTypeOption type)
         {
             // Open the file for writing
             using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
@@ -116,5 +131,69 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 MiniDumpValidTypeFlags = (-1) ^ ((~1) << 22)
             }
         }
+    }
+
+#if NETSTANDARD || NETCOREAPP
+    class SigtrapDumper : IDumper
+    {
+        public void Dump(int processId, string outputFile, DumpTypeOption type)
+        {
+            Process.Start($"kill -s SIGTRAP { processId }");
+        }
+    }
+
+    class NetClientDumper : IDumper
+    {
+        public void Dump(int processId, string outputFile, DumpTypeOption type)
+        {
+
+            var client = new DiagnosticsClient(processId);
+            client.WriteDump(type == DumpTypeOption.Full ? DumpType.Full : DumpType.Normal, outputFile);
+        }
+    }
+
+#endif
+    class DumperFactory : IDumperFactory
+    {
+        public IDumper Create(Version frameworkVersion)
+        {
+#if !NETSTANDARD && !NETCOREAPP
+            return new WindowsDumper();
+#else
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return new WindowsDumper();
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                if (frameworkVersion != default && frameworkVersion <= new Version("2.1"))
+                {
+                    return new SigtrapDumper();
+                }
+
+
+                return new NetClientDumper();
+            }
+
+            // this is not supported yet
+            //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            //{
+            //    if (frameworkVersion != default && frameworkVersion <= new Version("5.0"))
+            //    {
+            //        return new SigtrapDumper();
+            //    }
+
+            //    return new NetClientDumper();
+            //}
+
+            throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");
+#endif
+        }
+    }
+
+    public interface IDumperFactory 
+    {
+        IDumper Create(Version frameworkVersion);
     }
 }

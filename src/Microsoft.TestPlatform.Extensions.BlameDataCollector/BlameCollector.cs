@@ -50,15 +50,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
         /// Using XmlReaderWriter by default
         /// </summary>
-        public BlameCollector()
-            : this(new XmlReaderWriter(),
-#if NETSTANDARD
-            new DotnetProcessDumpUtility()
-#else
-             new DotnetProcessDumpUtility()
-            // new DesktopProcessDumpUtility()
-#endif
-                  , null, new FileHelper())
+        public BlameCollector() : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper())
         {
         }
 
