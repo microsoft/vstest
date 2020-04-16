@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>16.7.0-preview-3645374</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
