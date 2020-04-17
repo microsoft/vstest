@@ -43,13 +43,20 @@ function Verify-Nuget-Packages($packageDirectory)
     Write-VerboseLog "Verify NuGet packages files."
     foreach($unzipNugetPackageDir in $unzipNugetPackageDirs)
     {
-        $actualNumOfFiles = (Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir).Count
+        $children = Get-ChildItem -Recurse -File -Path $unzipNugetPackageDir
+        $relativePaths = $children.FullName -replace ([regex]::escape($packageDirectory))
+
+        
+        $actualNumOfFiles = ($children).Count
         $versionLen = $TPB_Version.Length + 1  # +1 for dot
         $packageKey = (Get-Item $unzipNugetPackageDir).BaseName -replace ".{$versionLen}$"
 
+        $relativePaths | Sort-Object -Property FullName |
+            Set-Content "$PSScriptRoot\$packageKey.lock.txt" -Encoding utf8
+
         Write-VerboseLog "verifying package $packageKey."
 
-        if( $expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
+        if($expectedNumOfFiles[$packageKey] -ne $actualNumOfFiles)
         {
             Write-Error "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
         }
