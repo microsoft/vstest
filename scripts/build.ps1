@@ -461,7 +461,8 @@ function Publish-Package
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     # Copy IntelliTrace components.
-    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\16.0.0-preview-20181010-02\tools"
+    $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
+    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\$testPlatformExternalsVersion\tools"
     $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
 
     if (-not (Test-Path $intellitraceTargetDirectory)) {
