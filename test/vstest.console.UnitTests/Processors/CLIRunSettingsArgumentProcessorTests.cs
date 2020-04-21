@@ -347,5 +347,46 @@ namespace vstest.console.UnitTests.Processors
             },
         };
         #endregion
+
+        [TestMethod]
+        public void InitializeShouldMergeTestRunParametersWithSpaces()
+        {
+            // in powershell call: ConsoleApp1.exe --% --TestRunParameters.Parameter(name =\"myParam\", value=\"myValue\")
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in cmd: ConsoleApp1.exe -- TestRunParameters.Parameter(name=\"myParam\", value=\"myValue\")
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in ubuntu wsl without escaping the space: ConsoleApp1.exe-- TestRunParameters.Parameter\(name =\"myParam\", value=\"myValue\"\)
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in ubuntu wsl with escaping the space: ConsoleApp1.exe-- TestRunParameters.Parameter\(name =\"myParam\",\ value=\"myValue\"\)
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam", value = "myValue")
+
+            var args = new string[] {
+                "--",
+                "TestRunParameters.Parameter(name=\"myParam\",",
+                "value=\"myValue\")",
+                "TestRunParameters.Parameter(name=\"myParam2\",",
+                "value=\"myValue 2\")",
+            };
+
+            var runsettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"myParam\" value=\"myValue\" />\r\n    <Parameter name=\"myParam2\" value=\"myValue 2\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            this.executor.Initialize(args);
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(runsettings, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
     }
 }

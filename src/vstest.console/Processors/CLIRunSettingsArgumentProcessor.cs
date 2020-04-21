@@ -14,6 +14,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using System.Text.RegularExpressions;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection.Metadata;
+    using System.Runtime.ExceptionServices;
 
     /// <summary>
     /// The argument processor for runsettings passed as argument through cli
@@ -136,11 +140,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private void CreateOrOverwriteRunSettings(IRunSettingsProvider runSettingsProvider, string[] args)
         {
-            var length = args.Length;
+            var mergedArgs = new List<string>();
+            var mergedArg = string.Empty;
+            var merge = false;
+           
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("TestRunParameters", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (arg.EndsWith("\")")) {
+                        // this parameter is complete
+                        mergedArgs.Add(arg);
+                    }
+                    else
+                    {
+                        // this parameter needs merging
+                        merge = true;
+                    }
+                }
+
+                if (merge)
+                {
+                    mergedArg += string.IsNullOrWhiteSpace(mergedArg) ? arg : $" {arg}";
+                }
+                else
+                {
+                    mergedArgs.Add(arg);
+                }
+
+                if (merge && arg.EndsWith("\")")) {
+                    mergedArgs.Add(mergedArg);
+                    mergedArg = string.Empty;
+                    merge = false;
+                }
+            }
+
+            if (merge == true)
+            {
+                // we tried to merge but never finished, add what we merged up until now
+                mergedArgs.Add(mergedArg);
+            }
+
+            
+            var length = mergedArgs.Count;
 
             for (int index = 0; index < length; index++)
             {
-                var arg = args[index];
+                var arg = mergedArgs[index];
 
                 if (UpdateTestRunParameterNode(runSettingsProvider, arg))
                 {
