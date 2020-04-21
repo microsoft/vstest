@@ -1,3 +1,6 @@
+> 🔥 VSTest release 16.6.0 has a major bug in Fakes in vstest.console. The 16.6.0 packages are unlisted from nuget.org, with the exception of Microsoft.NET.Test.SDK and it's dependencies which are not impacted by this problem. 
+> Please see: https://github.com/microsoft/vstest/issues/2408 We are working on fixing this and releasing 16.6.1. 
+
 ### VSTest
 The Visual Studio Test Platform is an open and extensible test platform that enables running tests, collect diagnostics data and report results. The Test Platform supports running tests written in various test frameworks, and using a pluggable adapter model. Based on user-choice, the desired test framework and its corresponding adapter can be acquired as a vsix or as NuGet package as the case may be. Adapters can be written in terms of a public API exposed by the Test Platform.
 
