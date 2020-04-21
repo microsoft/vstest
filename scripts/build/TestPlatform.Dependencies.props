@@ -32,8 +32,8 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.0.0-preview-2148743</TestPlatformExternalsVersion>
-    <MicrosoftFakesVersion>16.6.2-beta.20208.2</MicrosoftFakesVersion>
-
+    <MicrosoftFakesVersion>16.6.3-beta.20221.2</MicrosoftFakesVersion>
+    
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
