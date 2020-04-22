@@ -6,18 +6,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Xml.XPath;
+    using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using System.Text.RegularExpressions;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection.Metadata;
-    using System.Runtime.ExceptionServices;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;    
 
     /// <summary>
     /// The argument processor for runsettings passed as argument through cli
@@ -146,6 +142,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
            
             foreach (var arg in args)
             {
+                // when we see that the parameter begins with TestRunParameters 
+                // but does not end with ") we start merging the params
                 if (arg.StartsWith("TestRunParameters", StringComparison.OrdinalIgnoreCase))
                 {
                     if (arg.EndsWith("\")")) {
@@ -159,15 +157,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                 }
 
+                // we merge as long as the flag is set
+                // hoping that we find the end of the parameter
                 if (merge)
                 {
                     mergedArg += string.IsNullOrWhiteSpace(mergedArg) ? arg : $" {arg}";
                 }
                 else
                 {
+                    // if we are not merging just pass the param as is
                     mergedArgs.Add(arg);
                 }
 
+                // once we detect the end we add the whole parameter to the args
                 if (merge && arg.EndsWith("\")")) {
                     mergedArgs.Add(mergedArg);
                     mergedArg = string.Empty;
@@ -175,9 +177,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
             }
 
-            if (merge == true)
+            if (merge)
             {
-                // we tried to merge but never finished, add what we merged up until now
+                // we tried to merge but never found the end of that 
+                // test paramter, add what we merged up until now
                 mergedArgs.Add(mergedArg);
             }
 

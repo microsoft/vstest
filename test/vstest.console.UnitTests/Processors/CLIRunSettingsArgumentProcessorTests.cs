@@ -382,7 +382,18 @@ namespace vstest.console.UnitTests.Processors
                 "value=\"myValue 2\")",
             };
 
-            var runsettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"myParam\" value=\"myValue\" />\r\n    <Parameter name=\"myParam2\" value=\"myValue 2\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var runsettings = string.Join(Environment.NewLine, new[]{
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors />",
+                "  </DataCollectionRunSettings>",
+                "  <TestRunParameters>",
+                "    <Parameter name=\"myParam\" value=\"myValue\" />",
+                "    <Parameter name=\"myParam2\" value=\"myValue 2\" />",
+                "  </TestRunParameters>",
+                "</RunSettings>"});
+
             this.executor.Initialize(args);
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
