@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 bool isCollectDumpKeyValid = ValidateCollectDumpKey(collectDumpKey);
 
                 // Check if dump should be enabled or not.
-                enableDump = isCollectDumpKeyValid && IsDumpCollectionSupported();
+                enableDump = isCollectDumpKeyValid;
 
                 // Get collect dump parameters.
                 var collectDumpParameterArgs = blameArgumentList.Skip(1);
@@ -219,7 +219,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Add collect dump node in configuration element.
             if (enableDump)
             {
-                AddCollectDumpNode(collectDumpParameters, XmlDocument, outernode);
+                
+                var dumpParameters = collectDumpParameters.Where(p => new[] { "CollectAlways", "CollectDump", "DumpType" }.Contains(p.Key) ).ToDictionary(p => p.Key, p => p.Value);
+                if (dumpParameters.Keys.Any())
+                {
+                    AddCollectDumpNode(dumpParameters, XmlDocument, outernode);
+                }
+
+                var hangDumpParameters = collectDumpParameters.Where(p => new[] { "TestTimeout", "DumpType" }.Contains(p.Key) ).ToDictionary(p => p.Key, p => p.Value);
+                if (hangDumpParameters.Keys.Any())
+                {
+                    AddCollectHangDumpNode(hangDumpParameters, XmlDocument, outernode);
+                }
             }
 
             // Add blame configuration element to blame collector.
@@ -263,24 +274,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Checks if dump collection is supported.
-        /// </summary>
-        /// <returns>Dump collection supported flag.</returns>
-        private bool IsDumpCollectionSupported()
-        {
-            var dumpCollectionSupported = this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
-                    this.environment.Architecture != PlatformArchitecture.ARM64 &&
-                    this.environment.Architecture != PlatformArchitecture.ARM;
-
-            if (!dumpCollectionSupported)
-            {
-                Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
-            }
-
-            return dumpCollectionSupported;
-        }
-
-        /// <summary>
         /// Check if collect dump key is valid.
         /// </summary>
         /// <param name="collectDumpKey">Collect dump key.</param>
@@ -306,6 +299,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
         {
             var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
+            if (parameters != null && parameters.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> entry in parameters)
+                {
+                    var attribute = XmlDocument.CreateAttribute(entry.Key);
+                    attribute.Value = entry.Value;
+                    dumpNode.Attributes.Append(attribute);
+                }
+            }
+            outernode.AppendChild(dumpNode);
+        }
+
+        /// <summary>
+        /// Adds collect dump node in outer node.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="XmlDocument">Xml document.</param>
+        /// <param name="outernode">Outer node.</param>
+        private void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
+        {
+            var dumpNode = XmlDocument.CreateElement(Constants.CollectDumpOnTestSessionHang);
             if (parameters != null && parameters.Count > 0)
             {
                 foreach (KeyValuePair<string, string> entry in parameters)

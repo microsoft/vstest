@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -41,7 +42,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         /// <inheritdoc/>
         public string GetDumpFile()
-        {
+        {  
             if (string.IsNullOrWhiteSpace(this.dumpPath))
             {
                 return string.Empty;
@@ -110,6 +111,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.dumpPath = dumpPath;
 
             var dumper = this.dumperFactory.Create(Version.TryParse(frameworkVersion, out var v) ? v : default);
+            ConsoleOutput.Instance.Warning(true, $"Creating { dumpType.ToString().ToLowerInvariant()} dump of process { processName} (id { processId}).");
             dumper.Dump(processId, dumpPath, dumpType);
 
             EqtTrace.Info($"DotnetProcessDumpUtility.{caller}: Process {processName} ({processId}) was dumped into '{dumpPath}'.");

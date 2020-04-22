@@ -54,16 +54,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string DumpModeKey = "CollectDump";
 
         /// <summary>
-        /// Proc dump 32 bit version
-        /// </summary>
-        public const string ProcdumpProcess = "procdump.exe";
-
-        /// <summary>
-        /// Proc dump 64 bit version
-        /// </summary>
-        public const string Procdump64Process = "procdump64.exe";
-
-        /// <summary>
         /// Configuration key name for collect dump always
         /// </summary>
         public const string CollectDumpAlwaysKey = "CollectAlways";

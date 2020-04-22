@@ -45,6 +45,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private IInactivityTimer inactivityTimer;
         private TimeSpan inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
         private int testHostProcessId;
+        private bool dumpWasCollectedByHangDumper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -157,7 +158,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private void CollectDumpAndAbortTesthost()
         {
             this.inactivityTimerAlreadyFired = true;
-            EqtTrace.Info(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes));
+            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes);
+            EqtTrace.Warning(message);
+            this.logger.LogWarning(this.context.SessionDataCollectionContext, message);
 
             try
             {
@@ -178,7 +181,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
+                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled);
             }
             catch (Exception ex)
             {
@@ -190,6 +193,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 var dumpFile = this.processDumpUtility.GetDumpFile();
                 if (!string.IsNullOrEmpty(dumpFile))
                 {
+                    this.dumpWasCollectedByHangDumper = true;
                     var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
                     this.dataCollectionSink.SendFileAsync(fileTransferInformation);
                 }
@@ -364,7 +368,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // And send the attachment
                 if (this.testStartCount > this.testEndCount)
                 {
-                    var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
+                    var filepath = Path.Combine(this.GetTempDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
+                    
                     filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
                     var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
                     this.dataCollectionSink.SendFileAsync(fileTranferInformation);
@@ -373,7 +378,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (this.collectProcessDumpOnTrigger)
                 {
                     // If there was a test case crash or if we need to collect dump on process exit.
-                    if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
+                    //
+                    // Do not try to collect dump when we already collected one from the hang dump
+                    // we won't dump the killed process again and that would just show a warning on the command line
+                    if ((this.testStartCount > this.testEndCount || this.collectDumpAlways) && !this.dumpWasCollectedByHangDumper)
                     {
                         try
                         {
@@ -427,7 +435,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
+                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled);
             }
             catch (TestPlatformException e)
             {
@@ -480,24 +488,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.events.TestCaseEnd -= this.EventsTestCaseEnd;
         }
 
-        private string GetResultsDirectory()
+        private string GetTempDirectory()
         {
-            try
+            var tmp = Path.GetTempPath();
+            if (!Directory.Exists(tmp))
             {
-                XmlElement resultsDirectoryElement = this.configurationElement["ResultsDirectory"];
-                string resultsDirectory = resultsDirectoryElement != null ? resultsDirectoryElement.InnerText : string.Empty;
-
-                return Environment.ExpandEnvironmentVariables(resultsDirectory);
+                Directory.CreateDirectory(tmp);
             }
-            catch (NullReferenceException exception)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("Blame Collector : " + exception);
-                }
 
-                return string.Empty;
-            }
+            return tmp;
+            // might want to reuse this if using temp is not practical
+            // the results directory is temporary, and we need to make sure we 
+            // create it! The actual results will end up in the testresults dir
+            // of the actual test run, so this really is just a temp
+            //try
+            //{
+            //    XmlElement resultsDirectoryElement = this.configurationElement["ResultsDirectory"];
+            //    string resultsDirectory = resultsDirectoryElement != null ? resultsDirectoryElement.InnerText : string.Empty;
+
+            //    return Environment.ExpandEnvironmentVariables(resultsDirectory);
+            //}
+            //catch (NullReferenceException exception)
+            //{
+            //    if (EqtTrace.IsErrorEnabled)
+            //    {
+            //        EqtTrace.Error("Blame Collector : " + exception);
+            //    }
+
+            //    return string.Empty;
+            //}
         }
     }
 }
