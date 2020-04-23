@@ -588,7 +588,7 @@
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="translated">Используется режим изоляции для запуска тестов, так как в параметрах запуска включены адаптеры диагностических данных. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
+        <target state="translated">Используется режим изоляции для запуска тестов, так как в файле параметров запуска RUNSETTINGS включены адаптеры диагностических данных. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
@@ -1419,7 +1419,7 @@
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
-        <target state="translated">Один параметр запуска (или несколько) включает в себя недопустимый токен.</target>
+        <target state="translated">Один или несколько файлов RUNSETTINGS включают в себя недопустимый токен</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryArgumentHelp">
@@ -1659,8 +1659,8 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">Недопустимый аргумент "{0}" для параметра тестового запуска. Используйте указанный ниже формат.
+     Формат: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>

@@ -150,6 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
+            var testCaseFilterFromRunsettings = runConfiguration.TestCaseFilter;
 
             if (requestData.IsTelemetryOptedIn)
             {
@@ -160,10 +161,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 this.LogCommandsTelemetryPoints(requestData);
             }
 
+            
+
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
             {
-                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
+                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue ?? testCaseFilterFromRunsettings
             };
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe
