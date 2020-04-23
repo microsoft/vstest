@@ -384,7 +384,6 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
-        [Ignore]
         public void LaunchTestHostShouldSetExitCallbackInCaseCustomHost()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
