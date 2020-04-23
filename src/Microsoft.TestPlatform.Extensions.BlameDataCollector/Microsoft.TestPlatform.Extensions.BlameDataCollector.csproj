@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Diagnostics.NETCore.Client">
-      <Version>0.2.0-preview.20210.4</Version>
+      <Version>0.2.0-preview.20220.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
