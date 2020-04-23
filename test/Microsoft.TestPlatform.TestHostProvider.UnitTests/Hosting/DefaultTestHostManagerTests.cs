@@ -365,7 +365,6 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
-        [Ignore]
         public void LaunchTestHostShouldUseCustomHostIfSet()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
