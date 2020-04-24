@@ -66,12 +66,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
         {
+            Console.WriteLine("crash dump:");
             Dump(processId, dumpFileGuid, testResultsDirectory, isFullDump, isHangDump: false, nameof(StartTriggerBasedProcessDump), frameworkVersion);
         }
 
         /// <inheritdoc/>
         public void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
         {
+            Console.WriteLine("hang dump:");
             Dump(processId, dumpFileGuid, testResultsDirectory, isFullDump, isHangDump: true, nameof(StartHangBasedProcessDump), frameworkVersion);
         }
 
@@ -111,7 +113,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.dumpPath = dumpPath;
 
             var dumper = this.dumperFactory.Create(Version.TryParse(frameworkVersion, out var v) ? v : default);
-            ConsoleOutput.Instance.Warning(true, $"Creating { dumpType.ToString().ToLowerInvariant()} dump of process { processName} (id { processId}).");
+            ConsoleOutput.Instance.Information(true, $"Blame: Dumping process { processName} (id { processId}).");
             dumper.Dump(processId, dumpPath, dumpType);
 
             EqtTrace.Info($"DotnetProcessDumpUtility.{caller}: Process {processName} ({processId}) was dumped into '{dumpPath}'.");

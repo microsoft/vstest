@@ -208,9 +208,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Error(ex);
             }
 
+
             try
             {
-                Process.GetProcessById(this.testHostProcessId).Kill();
+                var p = Process.GetProcessById(this.testHostProcessId);
+                try
+                {
+                    if (!p.HasExited)
+                    {
+                        p.Kill();
+                    }
+                }
+                catch (InvalidOperationException) { }
             }
             catch (Exception ex)
             {
@@ -454,6 +463,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
 
                 this.logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
+            }
+
+            try
+            {
+                var p = Process.GetProcessById(this.testHostProcessId);
+                try
+                {
+                    if (!p.HasExited)
+                    {
+                        p.Kill();
+                    }
+                } catch(InvalidOperationException) { }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
             }
         }
 
