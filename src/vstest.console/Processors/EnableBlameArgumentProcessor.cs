@@ -144,6 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             var enableDump = false;
+            var enableHangDump = false;
             var exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, argument);
             Dictionary<string, string> collectDumpParameters = null;
 
@@ -157,7 +158,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 bool isCollectDumpKeyValid = ValidateCollectDumpKey(collectDumpKey);
 
                 // Check if dump should be enabled or not.
-                enableDump = isCollectDumpKeyValid;
+                enableDump = isCollectDumpKeyValid && IsDumpCollectionSupported();
+
+                // Check if dump should be enabled or not.
+                enableHangDump = isCollectDumpKeyValid && IsHangDumpCollectionSupported();
 
                 // Get collect dump parameters.
                 var collectDumpParameterArgs = blameArgumentList.Skip(1);
@@ -165,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Initialize blame.
-            InitializeBlame(enableDump, collectDumpParameters);
+            InitializeBlame(enableDump, enableHangDump, collectDumpParameters);
         }
 
         /// <summary>
@@ -181,9 +185,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initialize blame.
         /// </summary>
-        /// <param name="enableDump">Enable dump.</param>
+        /// <param name="enableCrashDump">Enable dump.</param>
         /// <param name="blameParameters">Blame parameters.</param>
-        private void InitializeBlame(bool enableDump, Dictionary<string, string> collectDumpParameters)
+        private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string> collectDumpParameters)
         {
             // Add Blame Logger
             LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, this.runSettingsManager);
@@ -217,15 +221,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             node.InnerText = resultsDirectory;
 
             // Add collect dump node in configuration element.
-            if (enableDump)
+            if (enableCrashDump)
             {
-                
-                var dumpParameters = collectDumpParameters.Where(p => new[] { "CollectAlways", "CollectDump", "DumpType" }.Contains(p.Key) ).ToDictionary(p => p.Key, p => p.Value);
+                var dumpParameters = collectDumpParameters.Where(p => new[] { "CollectAlways", "CollectDump", "DumpType" }.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value);
                 if (dumpParameters.Keys.Any())
                 {
                     AddCollectDumpNode(dumpParameters, XmlDocument, outernode);
                 }
+            } 
 
+            if (enableHangDump) { 
                 var hangDumpParameters = collectDumpParameters.Where(p => new[] { "TestTimeout", "DumpType" }.Contains(p.Key) ).ToDictionary(p => p.Key, p => p.Value);
                 if (hangDumpParameters.Keys.Any())
                 {
@@ -271,6 +276,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             return resultsDirectory;
+        }
+
+        /// <summary>
+        /// Checks if crash dump collection is supported.
+        /// </summary>
+        /// <returns>Dump collection supported flag.</returns>
+        private bool IsDumpCollectionSupported()
+        {
+            var dumpCollectionSupported = true; // this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
+            //        this.environment.Architecture != PlatformArchitecture.ARM64 &&
+            //        this.environment.Architecture != PlatformArchitecture.ARM;
+
+            if (!dumpCollectionSupported)
+            {
+                Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
+            }
+
+            return dumpCollectionSupported;
+        }
+
+        /// <summary>
+        /// Checks if hang dump collection is supported.
+        /// </summary>
+        /// <returns>Dump collection supported flag.</returns>
+        private bool IsHangDumpCollectionSupported()
+        {
+            var dumpCollectionSupported = true; // this.environment.OperatingSystem != PlatformOperatingSystem.OSX;
+
+            if (!dumpCollectionSupported)
+            {
+                Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
+            }
+
+            return dumpCollectionSupported;
         }
 
         /// <summary>

@@ -6,7 +6,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 #if NETSTANDARD || NETCOREAPP
 using Microsoft.Diagnostics.NETCore.Client;
 #endif

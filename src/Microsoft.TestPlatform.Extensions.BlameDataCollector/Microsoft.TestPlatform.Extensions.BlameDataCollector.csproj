@@ -47,5 +47,16 @@
       <Version>0.2.0-preview.20220.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="procdump">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="procdump.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="procdump64.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

@@ -549,7 +549,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
                 process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
                 if (environmentVariables != null) {

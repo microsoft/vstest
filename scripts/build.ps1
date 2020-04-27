@@ -414,6 +414,14 @@ function Publish-Package
     # we use this to dump processes on netcore
     Copy-Item $blameDataCollectorNetStandard\Microsoft.Diagnostics.NETCore.Client.dll $coreCLRExtensionsDir -Force
 
+    $null = New-Item -Force "$fullCLRExtensionsDir\procdump" -ItemType Directory
+    $null = New-Item -Force "$coreCLRExtensionsDir\procdump" -ItemType Directory
+    Copy-Item $blameDataCollectorNetFull\procdump.exe $fullCLRExtensionsDir\procdump -Force
+    Copy-Item $blameDataCollectorNetFull\procdump64.exe $fullCLRExtensionsDir\procdump -Force
+    Copy-Item $blameDataCollectorNetStandard\procdump.exe $coreCLRExtensionsDir\procdump -Force
+    Copy-Item $blameDataCollectorNetStandard\procdump64.exe $coreCLRExtensionsDir\procdump -Force
+    Copy-Item $blameDataCollectorNetStandard\procdump $coreCLRExtensionsDir\procdump -Force
+
     # Copy blame data collector resource dlls
     if($TPB_LocalizedBuild) {
         Copy-Loc-Files $blameDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
@@ -981,10 +989,10 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
+#  Install-DotNetCli
 Clear-Package
 Restore-Package
-Update-LocalizedResources
+#  Update-LocalizedResources
 Invoke-Build
 Publish-Package
 Create-VsixPackage

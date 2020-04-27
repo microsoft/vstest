@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
             {
                 UseShellExecute = false,
-                CreateNoWindow = true,
+                CreateNoWindow = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };

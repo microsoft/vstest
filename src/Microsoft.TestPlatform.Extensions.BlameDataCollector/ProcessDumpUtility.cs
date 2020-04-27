@@ -17,7 +17,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private readonly IProcessHelper processHelper;
         private readonly IFileHelper fileHelper;
         private readonly IDumperFactory dumperFactory;
+        private readonly ProcDumpProcessDumpUtility internalProcDump;
         private string dumpPath;
+        private bool wasHangDumped;
 
         public ProcessDumpUtility() : this(new ProcessHelper(), new FileHelper(), new DumperFactory())
         {
@@ -28,21 +30,27 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dumperFactory = dumperFactory;
+            this.internalProcDump = new ProcDumpProcessDumpUtility();
         }
 
         protected Action<object, string> OutputReceivedCallback => (process, data) =>
         {
-            // Log all standard output message of procdump in diag files.
-            // Otherwise they end up coming on console in pipleine.
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("DotnetProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
-            }
+            //// Log all standard output message of procdump in diag files.
+            //// Otherwise they end up coming on console in pipleine.
+            //if (EqtTrace.IsInfoEnabled)
+            //{
+            //    EqtTrace.Info("DotnetProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
+            //}
         };
 
         /// <inheritdoc/>
         public string GetDumpFile()
-        {  
+        {
+            if (!wasHangDumped)
+                return this.internalProcDump.GetDumpFile();
+
+             
+
             if (string.IsNullOrWhiteSpace(this.dumpPath))
             {
                 return string.Empty;
@@ -63,31 +71,34 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             throw new FileNotFoundException(Resources.Resources.DumpFileNotGeneratedErrorMessage);
         }
 
-        /// <inheritdoc/>
-        public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
-        {
-            Console.WriteLine("crash dump:");
-            Dump(processId, dumpFileGuid, testResultsDirectory, isFullDump, isHangDump: false, nameof(StartTriggerBasedProcessDump), frameworkVersion);
-        }
 
         /// <inheritdoc/>
         public void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
         {
             Console.WriteLine("hang dump:");
+            this.wasHangDumped = true;
             Dump(processId, dumpFileGuid, testResultsDirectory, isFullDump, isHangDump: true, nameof(StartHangBasedProcessDump), frameworkVersion);
         }
 
 
+
+        /// <inheritdoc/>
+        public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
+        {
+            Console.WriteLine("crash dump:");
+            internalProcDump.StartTriggerBasedProcessDump(processId, dumpFileGuid, testResultsDirectory, isFullDump, frameworkVersion);
+        }
+
         /// <inheritdoc/>
         public void DetachFromTargetProcess(int targetProcessId)
         {
-            // noop, it does not use procdump.exe anymore
+            internalProcDump.DetachFromTargetProcess(targetProcessId);
         }
 
         /// <inheritdoc/>
         public void TerminateProcess()
         {
-            // noop, it does not use procdump.exe anymore
+            internalProcDump.TerminateProcess();
         }
 
         private void Dump(int processId, string dumpFileGuid, string tempDirectory, bool isFullDump , bool isHangDump, string caller, string frameworkVersion = "4.6")

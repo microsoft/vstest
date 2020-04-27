@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             try
             {
                 process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.WorkingDirectory = workingDirectory;
 
                 process.StartInfo.FileName = processPath;
