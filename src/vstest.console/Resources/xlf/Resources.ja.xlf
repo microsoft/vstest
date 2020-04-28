@@ -1674,8 +1674,8 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">テストの実行パラメーターの引数 '{0}' が無効です。以下の形式を使用してください。
+     形式: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>

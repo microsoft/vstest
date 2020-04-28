@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
@@ -61,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
         {
             // If run was with sources and no test was executed and cancellation was not requested,
-            // then raise a warning saying that no test was present in the sources.  
+            // then raise a warning saying that no test was present in the sources.
             // The warning is raised only if total no of tests that have been run is zero.
             if (!exceptionsHitDuringRunTests && this.executorUriVsSourceList?.Count > 0 && !this.IsCancellationRequested
                 && this.TestRunCache?.TotalExecutedTests <= 0)

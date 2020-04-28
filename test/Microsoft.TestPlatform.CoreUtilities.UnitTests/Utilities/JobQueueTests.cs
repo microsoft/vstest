@@ -166,7 +166,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 processedJobs.Add(job);
             };
 
-            // Queue the jobs after paused and verify they are not procesed until resumed.
+            // Queue the jobs after paused and verify they are not processed until resumed.
             using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
             {
                 queue.Pause();
@@ -262,20 +262,20 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     queue.QueueJob("job10", 0);
                     queue.QueueJob("job11", 0);
 
-                    // By this point surely the queue would have blocked atleast once, hence setting queue.enteredBlockingMethod true.
+                    // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
                     Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
 
-                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state. 
+                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
                     jobProcessed.WaitOne();
 
-                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also 
+                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
                     // allowJobProcessingHandlerToProceed is reset to block the handler again in next iteration.
                     queue.IsEnqueueBlocked = false;
                     allowJobProcessingHandlerToProceed.Reset();
 
                     // if we reach here it means that the queue was successfully blocked at some point in between job6 and job11
-                    // and subsequently unblocked. 
+                    // and subsequently unblocked.
                 }
             }
         }
@@ -308,7 +308,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     queue.QueueJob("job4", 8);
                     queue.QueueJob("job5", 8);
 
-                    // At this point exactly 80 bytes have been queued. Even if all are still in queue, still the need to block shouldn't 
+                    // At this point exactly 80 bytes have been queued. Even if all are still in queue, still the need to block shouldn't
                     // have risen. So queue.enteredBlockingMethod would be false.
                     Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
 
@@ -319,19 +319,19 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     queue.QueueJob("job10", 10);
                     queue.QueueJob("job11", 10);
 
-                    // By this point surely the queue would have blocked atleast once, hence setting queue.enteredBlockingMethod true.
+                    // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
                     Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
                     // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
                     jobProcessed.WaitOne();
 
-                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also 
+                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
                     // allowJobProcessingHandlerToProceed is reset to block the handler again in next iteration.
                     queue.IsEnqueueBlocked = false;
                     allowJobProcessingHandlerToProceed.Reset();
 
                     // if we reach here it means that the queue was successfully blocked at some point in between job6 and job11
-                    // and subsequently unblocked. 
+                    // and subsequently unblocked.
                 }
             }
         }
@@ -375,10 +375,10 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     // allow handlers to proceed.
                     allowJobProcessingHandlerToProceed.Set();
 
-                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state. 
+                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
                     jobProcessed.WaitOne();
 
-                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also 
+                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
                     // allowJobProcessingHandlerToProceed is reset to allow blocking the handler again in next iteration.
                     queue.IsEnqueueBlocked = false;
                     allowJobProcessingHandlerToProceed.Reset();
@@ -389,7 +389,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
         }
 
         [TestMethod]
-        
         public void TestLargeTestResultCanBeLoadedWithBlockingEnabled()
         {
             var jobProcessed = new AutoResetEvent(false);
@@ -409,7 +408,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     // we check whether or not the queue size has exceeded the limit before actually queuing.
                     queue.QueueJob("job1", 8);
 
-                    // if queue.EnteredBlockingMethod is true, the enquing entered the over-ridden blocking method. This was not
+                    // if queue.EnteredBlockingMethod is true, the enqueuing entered the overridden blocking method. This was not
                     // intended.
                     Assert.IsFalse(queue.EnteredBlockingMethod, "Entered the over-ridden blocking method.");
                     jobProcessed.WaitOne();
@@ -419,7 +418,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
 
 
         [TestMethod]
-        
         [Timeout(60000)]
         public void TestDisposeUnblocksBlockedThreads()
         {
@@ -461,7 +459,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         #region Implementation
 
         /// <summary>
-        /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to allow for checking that blocking and 
+        /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to allow for checking that blocking and
         /// unblocking work as expected.
         /// </summary>
         internal class JobQueueWrapper : JobQueue<String>
@@ -485,7 +483,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             }
 
             /// <summary>
-            /// Specifies whether enQueue was blocked or not. 
+            /// Specifies whether enQueue was blocked or not.
             /// </summary>
             public bool IsEnqueueBlocked
             {

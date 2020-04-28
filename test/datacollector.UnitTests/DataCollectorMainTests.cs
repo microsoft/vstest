@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             this.mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
             var message = Assert.ThrowsException<TestPlatformException>(() => this.dataCollectorMain.Run(args)).Message;
-            Assert.AreEqual(message, DataCollectorMainTests.TimoutErrorMessage);
+            Assert.AreEqual(DataCollectorMainTests.TimoutErrorMessage, message);
         }
 
     }

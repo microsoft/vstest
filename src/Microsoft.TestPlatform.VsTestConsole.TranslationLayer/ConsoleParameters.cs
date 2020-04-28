@@ -4,7 +4,9 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
+#if NET451
     using System.Collections.Generic;
+#endif
     using System.Diagnostics;
     using System.IO;
 

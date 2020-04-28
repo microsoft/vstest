@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-    using System.Linq;
 #if !NET451
     using System.Runtime.Loader;
 #else

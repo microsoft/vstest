@@ -37,7 +37,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
             TestPluginCacheTests.SetupMockExtensions();
             string runsettings = @"<RunSettings><RunConfiguration><ResultsDirectory>.\TestResults</ResultsDirectory></RunConfiguration ><DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest></RunSettings>";
             var result= RunSettingsUtilities.CreateAndInitializeRunSettings(runsettings);
-            Assert.AreEqual(DummyMsTestSetingsProvider.StringToVerify, "<DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest>");
+            Assert.AreEqual("<DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest>", DummyMsTestSetingsProvider.StringToVerify);
             TestPluginCacheTests.ResetExtensionsCache();
         }
 

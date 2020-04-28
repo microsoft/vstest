@@ -149,7 +149,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             expectedExtensions.Add("default.dll");
             TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll" }, false);
             TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
-            TestPluginCache.Instance.DefaultExtensionPaths = new[] {"default.dll"};
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] { "default.dll" };
 
             var extensions = TestPluginCache.Instance.GetExtensionPaths("filter.dll");
 
@@ -163,7 +163,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             expectedExtensions.Add("default.dll");
             TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);
             TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
-            TestPluginCache.Instance.DefaultExtensionPaths = new[] {"default.dll"};
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] { "default.dll" };
 
             var extensions = TestPluginCache.Instance.GetExtensionPaths("filter.dll");
 
@@ -177,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             expectedExtensions.Add("default.dll");
             TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);
             TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
-            TestPluginCache.Instance.DefaultExtensionPaths = new[] {"default.dll"};
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] { "default.dll" };
 
             var extensions = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
@@ -331,7 +331,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldShouldThrowIfDiscovererThrows()
         {
-            //todo : make ITestDiscoverer interface and then mock it in order to make this test case pass.
+            //TODO : make ITestDiscoverer interface and then mock it in order to make this test case pass.
 
             var extensionAssembly = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
             Assert.ThrowsException<Exception>(() => this.testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly));
@@ -458,6 +458,11 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             this.Action?.Invoke();
             return extensions;
+        }
+
+        new public void SetupAssemblyResolver(string extensionAssembly)
+        {
+            base.SetupAssemblyResolver(extensionAssembly);
         }
     }
 

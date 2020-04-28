@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         public static DataCollectionRunSettings CreateDataCollectionRunSettings(
-            XmlReader reader, string dataCollectionName,            
+            XmlReader reader, string dataCollectionName,
             string dataCollectorsName, string dataCollectorName)
         {
             ValidateArg.NotNull<XmlReader>(reader, "reader");

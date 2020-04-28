@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -23,7 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -80,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private RunConfiguration runConfiguration;
 
         /// <summary>
-        /// The Serializer to clone testcase object incase of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
+        /// The Serializer to clone testcase object in case of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
         /// </summary>
         private IDataSerializer dataSerializer;
 
@@ -244,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             EqtTrace.Error("BaseRunTests.RunTests: Failed to raise runCompletion error. Reason: {0}.", ex2);
                         }
 
-                        // TODO: this does not crash the process currently because of the job queue.
+                        // TODO : this does not crash the process currently because of the job queue.
                         // Let the process crash
                         throw;
                     }
@@ -266,7 +264,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         internal void Cancel()
         {
             // Note: Test host delegates the cancellation to active executor and doesn't call HandleTestRunComplete in cancel request.
-            // Its expected from active executor to respect the cancel request and thus return from RunTests quickly (cancelling the tests).
+            // Its expected from active executor to respect the cancel request and thus return from RunTests quickly (canceling the tests).
             this.isCancellationRequested = true;
 
             if (this.activeExecutor == null)
@@ -518,7 +516,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "BaseRunTests: GetExecutorExtensionManager: Exception occured while loading extensions {0}",
+                    "BaseRunTests: GetExecutorExtensionManager: Exception occurred while loading extensions {0}",
                     ex);
 
                 return null;

@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Globalization;
     using System.IO;
     using System.Xml;
-    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -20,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     public static class MSTestSettingsUtilities
     {
         /// <summary>
-        /// Imports the parameter settings file in the default runsettings. 
+        /// Imports the parameter settings file in the default runsettings.
         /// </summary>
         /// <param name="settingsFile">
         /// Settings file which need to be imported. The file extension of the settings file will be specified by <paramref name="SettingsFileExtension"/> property.
@@ -49,10 +48,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             var settingsNode = GenerateMSTestXml(settingsFile);
-            
+
             defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(settingsNode, true));
 
-            // Adding RunConfig 
+            // Adding RunConfig
             if (!navigator.MoveToChild(Constants.RunConfigurationSettingsName, string.Empty))
             {
                 var doc = new XmlDocument();

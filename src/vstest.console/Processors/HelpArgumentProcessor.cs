@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public ArgumentProcessorResult Execute()
         {
-            // Output the stock ouput text
+            // Output the stock output text
             OutputSection(CommandLineResources.HelpUsageText);
             OutputSection(CommandLineResources.HelpDescriptionText);
             OutputSection(CommandLineResources.HelpArgumentsText);
@@ -164,10 +164,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #region Private Methods
 
         /// <summary>
-        /// Lookup the help description for the argument procesor.
+        /// Lookup the help description for the argument processor.
         /// </summary>
         /// <param name="argumentProcessor">The argument processor for which to discover any help content</param>
-        /// <returns>The formatted string containing the help description if foundl null otherwise</returns>
+        /// <returns>The formatted string containing the help description if found null otherwise</returns>
         private string LookupHelpDescription(IArgumentProcessor argumentProcessor)
         {
             string result = null;

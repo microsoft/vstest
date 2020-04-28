@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// The argument processor for enabling data collectors.
@@ -57,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, new FileHelper()));
                 }
 
                 return this.executor;
@@ -95,6 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private IRunSettingsProvider runSettingsManager;
         private CommandLineOptions commandLineOptions;
+        private IFileHelper fileHelper;
 
         private const string FriendlyName = "Code Coverage";
 
@@ -185,10 +188,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #endregion
 
-        internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
+        internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
             this.commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
+            this.fileHelper = fileHelper;
         }
 
         /// <inheritdoc />
@@ -242,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (ContainsDataCollectorWithFriendlyName(runSettingsNavigator, FriendlyName))
             {
                 // runsettings already has Code coverage data collector, just enable it.
-                CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
+                CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager, this.fileHelper);
             }
             else
             {
@@ -266,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                 }
 
-                // If any nodes are missing to add code coverage deafult settings, add the missing xml nodes.
+                // If any nodes are missing to add code coverage default settings, add the missing xml nodes.
                 XPathNavigator dataCollectorsNavigator;
                 if (existingPath.Equals(xpaths[2]) == false)
                 {

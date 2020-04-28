@@ -7,9 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-#if NET451
     using System.Reflection;
-#endif
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -22,7 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     {
         private const string ConfiguratorAssemblyQualifiedName = "Microsoft.VisualStudio.TestPlatform.Fakes.FakesDataCollectorConfiguration";
 
-        private const string ConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
+        private const string NetFrameworkConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
+
+        private const string CrossPlatformConfiguratorMethodName = "GetCrossPlatformDataCollectorSettings";
 
         private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
 
@@ -43,12 +43,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 throw new ArgumentNullException(nameof(runSettingsXml));
             }
-            
-            // donot generate fakes for netcore
-            if (IsNetCoreFramework(runSettingsXml))
-            {
-                return runSettingsXml;
-            }
 
             var doc = new XmlDocument();
             using (var xmlReader = XmlReader.Create(
@@ -58,15 +52,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 doc.Load(xmlReader);
             }
 
-            return !TryAddFakesDataCollectorSettings(doc, sources) ? runSettingsXml : doc.OuterXml;
+            var frameworkVersion = GetFramework(runSettingsXml);
+            if (frameworkVersion == null)
+            {
+                return runSettingsXml;
+            }
+
+            return TryAddFakesDataCollectorSettings(doc, sources, (FrameworkVersion)frameworkVersion) 
+                ? doc.OuterXml
+                : runSettingsXml;
         }
 
-        private static bool IsNetCoreFramework(string runSettingsXml)
+        /// <summary>
+        /// returns FrameworkVersion contained in the runsettingsXML
+        /// </summary>
+        /// <param name="runSettingsXml"></param>
+        /// <returns></returns>
+        private static FrameworkVersion? GetFramework(string runSettingsXml)
         {
-            var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
+            // We assume that only .NET Core, .NET Standard, or .NET Framework projects can have fakes.
+            var targetFramework = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml)?.TargetFramework;
 
-            return config.TargetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                   || config.TargetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
+            if (targetFramework == null)
+            {
+                return null;
+            }
+
+            // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
+            // and default to FrameworkCore10 for .Net Core 
+            if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return FrameworkVersion.FrameworkCore10;
+            }
+
+            // Since the Datacollector is separated on the NetFramework/NetCore line, any value of NETFramework 
+            // can be passed along to the fakes data collector configuration creator. 
+            // We default to Framework40 to preserve back compat
+            return FrameworkVersion.Framework40;
         }
 
         /// <summary>
@@ -77,7 +100,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns>true if runSettings was modified; false otherwise.</returns>
         private static bool TryAddFakesDataCollectorSettings(
             XmlDocument runSettings,
-            IEnumerable<string> sources)
+            IEnumerable<string> sources,
+            FrameworkVersion framework)
         {
             // If user provided fakes settings don't do anything
             if (XmlRunSettingsUtilities.ContainsDataCollector(runSettings.CreateNavigator(), FakesMetadata.DataCollectorUri))
@@ -85,16 +109,66 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return false;
             }
 
-            Func<IEnumerable<string>, string> configurator;
+            // A new Fakes Congigurator API makes the decision to add the right datacollector uri to the configuration
+            // There now exist two data collector URIs to support two different scenarios. The new scenario involves 
+            // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
+            // .NET Core scenarios). The old API still exists for fallback measures. 
 
-            // fakes supported?
-            if (!TryGetFakesDataCollectorConfigurator(out configurator))
+            var crossPlatformConfigurator = TryGetFakesCrossPlatformDataCollectorConfigurator();
+            if (crossPlatformConfigurator != null)
+            {
+                var sourceTFMMap = CreateDictionary(sources, framework);
+                var fakesSettings = crossPlatformConfigurator(sourceTFMMap);
+                // if no fakes, return settings unchanged
+                if (fakesSettings == null)
+                {
+                    return false;
+                }
+
+                XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+                return true;
+            }
+
+            return AddFallbackFakesSettings(runSettings, sources, framework);
+        }
+
+        private static IDictionary<string, FrameworkVersion> CreateDictionary(IEnumerable<string> sources, FrameworkVersion framework)
+        {
+            var dict = new Dictionary<string, FrameworkVersion>();
+            foreach(var source in sources)
+            {
+                if (!dict.ContainsKey(source))
+                {
+                    dict.Add(source, framework);
+                }
+            }
+
+            return dict;
+        }
+
+        private static bool AddFallbackFakesSettings(
+            XmlDocument runSettings,
+            IEnumerable<string> sources,
+            FrameworkVersion framework)
+        {
+
+            // The fallback settings is for the old implementation of fakes 
+            // that only supports .Net Framework versions
+            if (framework != FrameworkVersion.Framework35 &&
+                framework != FrameworkVersion.Framework40 &&
+                framework != FrameworkVersion.Framework45)
+            {
+                return false;
+            }
+
+            Func<IEnumerable<string>, string> netFrameworkConfigurator = TryGetNetFrameworkFakesDataCollectorConfigurator();
+            if (netFrameworkConfigurator == null)
             {
                 return false;
             }
 
             // if no fakes, return settings unchanged
-            var fakesConfiguration = configurator(sources);
+            var fakesConfiguration = netFrameworkConfigurator(sources);
             if (fakesConfiguration == null)
             {
                 return false;
@@ -116,6 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             fakesSettings.Configuration = doc.DocumentElement;
             XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+
             return true;
         }
 
@@ -138,22 +213,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
         }
 
-        private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, string> configurator)
+        private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
 #if NET451
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
-
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
-                if (type != null)
+                var method = type?.GetMethod(NetFrameworkConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
+                if (method != null)
                 {
-                    var method = type.GetMethod(ConfiguratorMethodName, BindingFlags.Public | BindingFlags.Static);
-                    if (method != null)
-                    {
-                        configurator = (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
-                        return true;
-                    }
+                    return (Func<IEnumerable<string>, string>)method.CreateDelegate(typeof(Func<IEnumerable<string>, string>));
                 }
             }
             catch (Exception ex)
@@ -164,8 +234,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 }
             }
 #endif
-            configurator = null;
-            return false;
+            return null;
+        }
+
+        private static Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings> TryGetFakesCrossPlatformDataCollectorConfigurator()
+        {
+            try
+            {
+                Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
+                var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
+                var method = type?.GetMethod(CrossPlatformConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
+                if (method != null)
+                {
+                    return (Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>)method.CreateDelegate(typeof(Func<IDictionary<string, FrameworkVersion>, DataCollectorSettings>));
+                }
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("Failed to create newly implemented Fakes Configurator. Reason:{0} ", ex);
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

@@ -262,7 +262,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void EndSession()
         {
-            EqtTrace.Info("VsTestConsoleWrapper.EndSession: Endinhg VsTestConsoleWrapper session");
+            EqtTrace.Info("VsTestConsoleWrapper.EndSession: Ending VsTestConsoleWrapper session");
 
             this.requestSender.EndSession();
             this.requestSender.Close();

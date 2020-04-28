@@ -57,7 +57,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var dataCollector = inProcDataCollectionManager.InProcDataCollectors.First().Value as MockDataCollector;
 
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
-            Assert.AreEqual(inProcDataCollectionManager.InProcDataCollectors.Count, 1, "One Datacollector must be registered");
+            Assert.AreEqual(1, inProcDataCollectionManager.InProcDataCollectors.Count, "One Datacollector must be registered");
 
             Assert.IsTrue(string.Equals(dataCollector.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
             Assert.IsTrue(string.Equals(dataCollector.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll", StringComparison.OrdinalIgnoreCase));
@@ -83,7 +83,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
-            Assert.AreEqual(codebase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll");
+            Assert.AreEqual(@"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll", codebase);
         }
 
         [TestMethod]
@@ -107,7 +107,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
-            Assert.AreEqual(codebase, @"E:\source\.nuget\TestImpactListenerDataCollector.dll");
+            Assert.AreEqual(@"E:\source\.nuget\TestImpactListenerDataCollector.dll", codebase);
         }
 
         [TestMethod]
@@ -127,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
-            Assert.AreEqual(codebase, "\\\\DummyPath\\TestImpactListener.Tests.dll");
+            Assert.AreEqual("\\\\DummyPath\\TestImpactListener.Tests.dll", codebase);
         }
 
         [TestMethod]
@@ -200,7 +200,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var properties = new Dictionary<string, object>();
             properties.Add("TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" });
-            
+
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
 
             this.mockTestEventsPublisher.Raise(x => x.SessionStart += null, new SessionStartEventArgs(properties));

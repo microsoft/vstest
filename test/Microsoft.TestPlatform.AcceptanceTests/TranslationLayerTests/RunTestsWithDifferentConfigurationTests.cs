@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
         private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
+        private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
@@ -77,21 +77,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            string testhostProcessName = string.Empty;
+            var testHostNames = new[] { "testhost", "testhost.x86", "dotnet" };
             int expectedNumOfProcessCreated = 2;
-            if (this.IsDesktopTargetFramework())
-            {
-                testhostProcessName = "testhost.x86";
-            }
-            else
-            {
-                testhostProcessName = "dotnet";
-            }
 
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testhostProcessName);
+                testHostNames);
 
             this.vstestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
@@ -101,14 +93,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             cts.Cancel();
 
             // Assert
+            this.runEventHandler.EnsureSuccess();
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
+                numOfProcessCreatedTask.Result.Count,
+                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
         }
 
         [TestMethod]
@@ -156,21 +149,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                   this.GetAssetFullPath("SimpleTestProject3.dll")
                               };
 
-            string testhostProcessName = string.Empty;
+
             int expectedNumOfProcessCreated = 1;
-            if (this.IsDesktopTargetFramework())
-            {
-                testhostProcessName = "testhost";
-            }
-            else
-            {
-                testhostProcessName = "dotnet";
-            }
+            var testhostProcessNames = new[] { "testhost", "dotnet" };
 
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testhostProcessName);
+                cts, testhostProcessNames);
 
             this.vstestConsoleWrapper.RunTests(
                 sources,
@@ -183,10 +168,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Assert
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            var numberOfProcessCreated = numOfProcessCreatedTask.Result;
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
+                numberOfProcessCreated.Count,
+                $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated.Count} ({ string.Join(", ", numberOfProcessCreated) })");
         }
 
         private IList<string> GetTestAssemblies()

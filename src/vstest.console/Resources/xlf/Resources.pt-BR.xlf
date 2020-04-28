@@ -1674,8 +1674,8 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">O argumento do parâmetro de execução de teste '{0}' é inválido. Use o formato abaixo.
+     Formato: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>

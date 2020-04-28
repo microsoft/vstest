@@ -4,12 +4,10 @@
 namespace TestPlatform.Common.UnitTests
 {
     using System;
-    using System.Runtime.InteropServices;
     using System.Xml;
 
     using ExtensionFramework;
 
-    using Microsoft.VisualBasic;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -51,7 +49,7 @@ namespace TestPlatform.Common.UnitTests
 
             runSettings.LoadSettingsXml(emptyRunSettings);
 
-            // Not doing this because when we load the xmla nd write to string it converts it to a utf-16 format.
+            // Not doing this because when we load the xml and write to string it converts it to a utf-16 format.
             // So they do not exactly match.
             // Assert.AreEqual(emptyRunSettings, runSettings.SettingsXml);
 

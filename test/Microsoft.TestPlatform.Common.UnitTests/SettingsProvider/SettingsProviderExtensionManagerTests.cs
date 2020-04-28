@@ -99,7 +99,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
             Assert.IsNotNull(extensionManager.SettingsProvidersMap);
             Assert.IsTrue(extensionManager.SettingsProvidersMap.Count > 0);
         }
-        
+
         #endregion
 
         #region LoadAndInitialize tests

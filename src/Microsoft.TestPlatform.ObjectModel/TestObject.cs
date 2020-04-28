@@ -190,9 +190,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.store.Remove(property);
             }
         }
- 
+
         /// <summary>
-        /// Returns TestProperty's value 
+        /// Returns TestProperty's value
         /// </summary>
         /// <returns>property's value. default value is returned if the property is not present</returns>
         public T GetPropertyValue<T>(TestProperty property, T defaultValue, CultureInfo culture)
@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             // Do not try conversion if the object is already of the type we're trying to convert.
             // Note that typeof(T) may be object in case the value is getting deserialized via the StoreKvpList, however
-            // the deserializer could have converted it already, hence the runtime type check.
+            // the de-serializer could have converted it already, hence the runtime type check.
             if (valueType != null && (valueType.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || valueType.GetTypeInfo().IsAssignableFrom(value?.GetType().GetTypeInfo())))
             {
                 return value;
@@ -316,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch (Exception e)
             {
-                // some type converters throw strange exceptions (eg: System.Exception by Int32Converter)
+                // some type converters throw strange exceptions (e.g.: System.Exception by Int32Converter)
                 throw new FormatException(e.Message, e);
             }
         }
@@ -364,7 +364,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch (Exception e)
             {
-                // some type converters throw strange exceptions (eg: System.Exception by Int32Converter)
+                // some type converters throw strange exceptions (e.g.: System.Exception by Int32Converter)
                 throw new FormatException(e.Message, e);
             }
         }

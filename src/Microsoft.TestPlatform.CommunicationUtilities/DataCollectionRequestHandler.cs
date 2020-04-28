@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -51,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private IFileHelper fileHelper;
 
         /// <summary>
-        /// Use to cancel data collection test case events monitoring if test run is cancelled.
+        /// Use to cancel data collection test case events monitoring if test run is canceled.
         /// </summary>
         private CancellationTokenSource cancellationTokenSource;
 
@@ -284,17 +283,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             }
             catch (Exception e)
             {
-                // If any exception is throuwn while updating additional assemblies, log the exception in eqt trace.
+                // If any exception is thrown while updating additional assemblies, log the exception in eqt trace.
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occured: {0}", e);
+                    EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occurred: {0}", e);
                 }
             }
         }
 
         private void HandleBeforeTestRunStart(Message message)
         {
-            // Initialize datacollectors and get enviornment variables.
+            // Initialize datacollectors and get environment variables.
             var payload = this.dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
             this.AddExtensionAssemblies(payload);
 
@@ -340,7 +339,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         }
                         catch (Exception e)
                         {
-                            EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occured during initialization of TestHost : {0}", e);
+                            EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occurred during initialization of TestHost : {0}", e);
                         }
                     },
                     this.cancellationTokenSource.Token);
@@ -374,7 +373,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
 
-            // Dispose all datacollectors before sending attachements to vstest.console process.
+            // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.
             this.dataCollectionManager?.Dispose();
 

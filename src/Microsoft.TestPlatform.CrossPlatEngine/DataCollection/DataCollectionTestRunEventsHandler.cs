@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete. 
-    /// Existing functionality of ITestRunEventsHandler is decorated with aditional call to Data Collection Process.
+    /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete.
+    /// Existing functionality of ITestRunEventsHandler is decorated with additional call to Data Collection Process.
     /// </summary>
     internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler
     {
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The run attachments.
         /// </param>
         /// <param name="newAttachments">
-        /// The runcontext attachments.
+        /// The run context attachments.
         /// </param>
         /// <returns>
         /// The <see cref="Collection"/>.

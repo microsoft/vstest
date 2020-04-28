@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // Set Current Opt in Status
             Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, CurrentOptInStatus);
 
-            // Unset the environment varaible
+            // Unset the environment variable
             Environment.SetEnvironmentVariable(LOG_TELEMETRY, "0");
 
             if (Directory.Exists(this.resultPath))

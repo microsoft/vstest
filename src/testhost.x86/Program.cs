@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -37,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("TestHost: Error occured during initialization of TestHost : {0}", ex);
+                EqtTrace.Error("TestHost: Error occurred during initialization of TestHost : {0}", ex);
 
                 // Throw exception so that vstest.console get the exception message.
                 throw;
@@ -55,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             WaitForDebuggerIfEnabled();
             SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
-            
+
             // Invoke the engine with arguments
             GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
         }
@@ -64,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             IEngineInvoker invoker = null;
 #if NET451
-            // If Args contains test source argument, invoker Engine in new appdomain 
+            // If Args contains test source argument, invoker Engine in new appdomain
             string testSourcePath;
             if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
             {
@@ -84,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         }
 
         private static void WaitForDebuggerIfEnabled()
-        {   
+        {
             // Check if native debugging is enabled and OS is windows.
             var nativeDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 

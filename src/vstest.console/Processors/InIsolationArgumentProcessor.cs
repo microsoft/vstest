@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="options">Commandline options</param>
+        /// <param name="options">Command line options</param>
         /// <param name="runSettingsManager">the runsettings manager</param>
         public InIsolationArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {

@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         string CommandName { get; }
 
         /// <summary>
-        /// Indicates if multiple of of the command are allowed.
+        /// Indicates if multiple of the command are allowed.
         /// </summary>
         bool AllowMultiple { get; }
 

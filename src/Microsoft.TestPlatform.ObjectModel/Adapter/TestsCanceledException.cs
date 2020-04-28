@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 #endif
 
     /// <summary>
-    /// Exception thrown by the framework when an executor attempts to send 
-    /// test result to the framework when the test is canceled.  
+    /// Exception thrown by the framework when an executor attempts to send
+    /// test result to the framework when the test is canceled.
     /// </summary>
 #if NET451
     [Serializable]
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 
 #if NET451
         /// <summary>
-        /// Seralization constructor.
+        /// Serialization constructor.
         /// </summary>
         protected TestCanceledException(SerializationInfo info, StreamingContext context)
             : base(info, context)

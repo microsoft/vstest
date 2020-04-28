@@ -120,11 +120,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             {
                 // Reason is unknown for why full framework it is taking more time. Need to investigate.
                 expectedElapsedTime = 100;
-                Assert.AreEqual(actualFx.FullName, Constants.DotNetFramework451);
+                Assert.AreEqual(Constants.DotNetFramework451, actualFx.FullName);
             }
             else
             {
-                Assert.AreEqual(actualFx.FullName, ".NETCoreApp,Version=v2.1");
+                Assert.AreEqual(".NETCoreApp,Version=v2.1", actualFx.FullName);
             }
 
             Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         private void LoadAssemblyIntoMemory(string assemblyPath)
         {
-            // Load the file into RAM in ahead to avoid perf number(expectedElapsedTime) dependence on disk read time.
+            // Load the file into RAM in ahead to avoid performance number(expectedElapsedTime) dependence on disk read time.
             File.ReadAllBytes(assemblyPath);
         }
     }

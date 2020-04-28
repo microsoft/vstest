@@ -22,7 +22,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             adapterSourceMap.Add("adapter3", new List<string>() { "source1.dll"});
 
             var sources = TestSourcesUtility.GetSources(adapterSourceMap);
-            Assert.AreEqual(sources.Count(), 5);
+            Assert.AreEqual(5, sources.Count());
             Assert.IsTrue(sources.Contains("source1.dll"));
             Assert.IsTrue(sources.Contains("source2.dll"));
             Assert.IsTrue(sources.Contains("source3.dll"));
@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
                                                new TestCase("test3", new Uri("e://d"), "source1.dll")};
 
             var sources = TestSourcesUtility.GetSources(tests);
-            Assert.AreEqual(sources.Count(), 2);
+            Assert.AreEqual(2, sources.Count());
             Assert.IsTrue(sources.Contains("source1.dll"));
             Assert.IsTrue(sources.Contains("source2.dll"));
         }
@@ -66,7 +66,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             adapterSourceMap.Add("adapter1", new List<string>() { "c:\\folder1\\source1.dll", "c:\\folder2\\source2.dll" });
 
             var defaultCodeBase = TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap);
-            Assert.AreEqual(defaultCodeBase, "c:\\folder1");
+            Assert.AreEqual("c:\\folder1", defaultCodeBase);
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             var tests = new List<TestCase>() { new TestCase("test1", new Uri("e://d"), "c:\\folder1\\source1.dll") };
 
             var defaultCodeBase = TestSourcesUtility.GetDefaultCodebasePath(tests);
-            Assert.AreEqual(defaultCodeBase, "c:\\folder1");
+            Assert.AreEqual("c:\\folder1", defaultCodeBase);
         }
     }
 }

@@ -260,8 +260,8 @@
         <note />
       </trans-unit>
       <trans-unit id="FastFilterException">
-        <source>An error occured while creating Fast filter.</source>
-        <target state="translated">Une erreur s'est produite lors de la création du filtre rapide.</target>
+        <source>An error occurred while creating Fast filter.</source>
+        <target state="translated">Une erreur s'est produite durant la création du filtre rapide.</target>
         <note />
       </trans-unit>
       <trans-unit id="CancellationRequested">
@@ -271,7 +271,7 @@
       </trans-unit>
       <trans-unit id="UnableToFetchUriString">
         <source>Unable to find a datacollector with friendly name '{0}'.</source>
-        <target state="translated">Impossible de trouver un collecteur de données avec le nom convivial « {0} ».</target>
+        <target state="translated">Le datacollector ayant le nom convivial '{0}' est introuvable.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">

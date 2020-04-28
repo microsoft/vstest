@@ -108,12 +108,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var capabilities = new ListFullyQualifiedTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/ListFullyQualifiedTests", capabilities.CommandName);
 
-            Assert.AreEqual(true, capabilities.IsAction);
+            Assert.IsTrue(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
         #endregion
 

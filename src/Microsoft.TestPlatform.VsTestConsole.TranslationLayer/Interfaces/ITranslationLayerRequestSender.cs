@@ -22,19 +22,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         int InitializeCommunication();
 
         /// <summary>
-        /// Waits for Request Handler to be connected 
+        /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>
         bool WaitForRequestHandlerConnection(int connectionTimeout);
 
         /// <summary>
-        /// Close the Sender 
+        /// Close the Sender
         /// </summary>
         void Close();
 
         /// <summary>
-        /// Initializes the Extensions while probing additional extension paths 
+        /// Initializes the Extensions while probing additional extension paths
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
         void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions);

@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         string GetDumpFile();
 
         /// <summary>
-        /// Launch procdump process
+        /// Launch proc dump process
         /// </summary>
         /// <param name="processId">
         /// Process ID of test host
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
 
         /// <summary>
-        /// Launch procdump process to capture dump in case of a testhost hang and wait for it to exit
+        /// Launch proc dump process to capture dump in case of a testhost hang and wait for it to exit
         /// </summary>
         /// <param name="processId">
         /// Process ID of test host

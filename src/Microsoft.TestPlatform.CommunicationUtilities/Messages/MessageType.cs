@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string AfterTestRunEnd = "DataCollection.AfterTestRunEnd";
 
         /// <summary>
-        /// Event message type used by dastacollector to send result on receiving test run end event.
+        /// Event message type used by datacollector to send result on receiving test run end event.
         /// </summary>
         public const string AfterTestRunEndResult = "DataCollection.AfterTestRunEndResult";
 

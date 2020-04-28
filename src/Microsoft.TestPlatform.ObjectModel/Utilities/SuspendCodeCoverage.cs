@@ -5,9 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
 #if NET451
     using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Threading;
 
     /// <summary>
     /// Suspends the instrumentation (for code coverage) of the modules which are loaded
@@ -16,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     /// </summary>
     public class SuspendCodeCoverage : IDisposable
     {
-        #region private variables
+        #region Private Variables
 
         private const string SuspendCodeCoverageEnvVarName = "__VANGUARD_SUSPEND_INSTRUMENT__";
         private const string SuspendCodeCoverageEnvVarTrueValue = "TRUE";
@@ -27,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Whether the object is disposed or not.
         /// </summary>
         private bool isDisposed = false;
-        
+
         #endregion
 
         /// <summary>

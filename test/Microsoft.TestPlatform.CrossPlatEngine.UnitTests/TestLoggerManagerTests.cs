@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Reflection.PortableExecutable;
 using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
@@ -11,7 +10,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using System.Reflection;
     using System.Threading;
     using global::TestPlatform.Common.UnitTests.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -70,61 +68,61 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             var testLoggerManager = new DummyTestLoggerManager();
             string result = testLoggerManager.GetResultsDirectory(null);
-            Assert.AreEqual(null, result);
+            Assert.IsNull(result);
         }
 
         [TestMethod]
         public void GetResultsDirectoryShouldReadResultsDirectoryFromSettingsIfSpecified()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
         <MaxCpuCount>0</MaxCpuCount>
-        <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>             
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-      </RunConfiguration>     
+        <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>
     </RunSettings> ";
 
             var testLoggerManager = new DummyTestLoggerManager();
             string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
-            Assert.AreEqual(string.Compare("DummyTestResultsFolder", result), 0);
+            Assert.AreEqual(0, string.Compare("DummyTestResultsFolder", result));
         }
 
         [TestMethod]
         public void GetResultsDirectoryShouldReturnDefaultPathIfResultsDirectoryIsNotProvidedInRunSettings()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-      </RunConfiguration>     
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>
     </RunSettings> ";
 
             var testLoggerManager = new DummyTestLoggerManager();
             string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
 
-            Assert.AreEqual(string.Compare(Constants.DefaultResultsDirectory, result), 0);
+            Assert.AreEqual(0, string.Compare(Constants.DefaultResultsDirectory, result));
         }
 
         [TestMethod]
         public void GetTargetFrameworkShouldReturnFrameworkProvidedInRunSettings()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                        <RunSettings>     
-                                          <RunConfiguration> 
-                                            <MaxCpuCount>0</MaxCpuCount>       
-                                            <TargetPlatform> x64 </TargetPlatform>     
-                                            <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-                                          </RunConfiguration>     
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                                        <RunSettings>
+                                          <RunConfiguration>
+                                            <MaxCpuCount>0</MaxCpuCount>
+                                            <TargetPlatform> x64 </TargetPlatform>
+                                            <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+                                          </RunConfiguration>
                                         </RunSettings> ";
 
             var testLoggerManager = new DummyTestLoggerManager();
             var framework = testLoggerManager.GetTargetFramework(runSettingsXml);
 
-            Assert.AreEqual(framework.Name, ".NETFramework,Version=v4.5");
+            Assert.AreEqual(".NETFramework,Version=v4.5", framework.Name);
         }
 
         [TestMethod]
@@ -135,11 +133,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var testLoggerManager = new DummyTestLoggerManager();
             testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
             testLoggerManager.EnableLogging();
-            
+
             testLoggerManager.HandleTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, "TestRunMessage"));
 
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         [TestMethod]
@@ -154,7 +152,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Dispose();
             testLoggerManager.HandleTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, "TestRunMessage"));
 
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         [TestMethod]
@@ -170,7 +168,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
 
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         [TestMethod]
@@ -186,7 +184,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Dispose();
             testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
 
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         [TestMethod]
@@ -202,7 +200,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
             testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan())); // count should not increase because of second call.
 
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         [TestMethod]
@@ -229,7 +227,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                     null));
 
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         [TestMethod]
@@ -256,7 +254,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                     },
                     null));
 
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         [TestMethod]
@@ -390,7 +388,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             // Assertions when discovery events registered
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         /// <summary>
@@ -414,7 +412,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleDiscoveryStart(discoveryStartEventArgs);
 
             // Assertions when discovery events registered
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         /// <summary>
@@ -438,7 +436,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             // Assertions when discovery events registered
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         [TestMethod]
@@ -459,7 +457,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleDiscoveredTests(discoveredTestsEventArgs);
 
             // Assertions when discovery events registered
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         /// <summary>
@@ -483,7 +481,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             // Assertions when test run events registered
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         /// <summary>
@@ -507,7 +505,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleTestRunStart(testRunStartEventArgs);
 
             // Assertions when test run events registered
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         /// <summary>
@@ -530,7 +528,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             // Assertions when discovery events registered
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         /// <summary>
@@ -553,7 +551,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
 
             // Assertions when discovery events registered
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         [TestMethod]
@@ -570,7 +568,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
             testLoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs); // count should not increase because of second call.
 
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         /// <summary>
@@ -594,7 +592,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             // Assertions when discovery events registered
             waitHandle.WaitOne();
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
         }
 
         /// <summary>
@@ -617,7 +615,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Dispose();
             testLoggerManager.HandleDiscoveryMessage(testRunMessageEventArgs);
 
-            Assert.AreEqual(counter, 0);
+            Assert.AreEqual(0, counter);
         }
 
         [TestMethod]
@@ -1086,7 +1084,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
-            
+
             mockMetricsCollection.Verify(
                 rd => rd.Add(TelemetryDataConstants.LoggerUsed, "TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger2,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLoggerWithParameters"));
         }

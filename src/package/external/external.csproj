@@ -66,7 +66,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
-      <Version>16.0.0-preview-20181010-02</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">
@@ -78,7 +78,19 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
-      <Version>15.6.815-master284DF69C</Version>
+      <Version>16.3.58</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.RemoteControl">
+      <Version>16.3.23</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Utilities.Internal">
+      <Version>16.3.23</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.TestPlatform.Fakes">
+      <Version>$(MicrosoftFakesVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.

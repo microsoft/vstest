@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Text; 
+    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
 
     public static class FilterHelper
@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         private static readonly HashSet<char> SpecialCharactersSet = new HashSet<char>(SpecialCharacters);
 
         /// <summary>
-        /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences. 
+        /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences.
         /// </summary>
         /// <param name="str">The input string that contains the text to convert.</param>
         /// <returns>A string of characters with special characters converted to their escaped form.</returns>
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Converts any escaped characters in the input filter string.
         /// </summary>
         /// <param name="str">The input string that contains the text to convert.</param>
-        /// <returns>A filter string of characters with any escaped characters converted to their unescaped form.</returns>
+        /// <returns>A filter string of characters with any escaped characters converted to their un-escaped form.</returns>
         public static string Unescape(string str)
         {
             if (str == null)
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     }
                 }
 
-                // Strictly speaking, string to be unescaped shouldn't contain any of the special characters, 
+                // Strictly speaking, string to be un-escaped shouldn't contain any of the special characters,
                 // other than being part of escape sequence, but we will ignore that to avoid additional overhead.
 
                 builder.Append(currentChar);

@@ -137,8 +137,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FastFilterException">
-        <source>An error occured while creating Fast filter.</source>
-        <target state="new">An error occured while creating Fast filter.</target>
+        <source>An error occurred while creating Fast filter.</source>
+        <target state="new">An error occurred while creating Fast filter.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CancellationRequested">

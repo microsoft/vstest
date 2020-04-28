@@ -25,6 +25,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             bool result = testCaseFilterExpression.MatchTestCase(dummyTestCase, (s) => { return "unused"; });
 
             Assert.IsTrue(result);
-        }   
+        }
     }
 }

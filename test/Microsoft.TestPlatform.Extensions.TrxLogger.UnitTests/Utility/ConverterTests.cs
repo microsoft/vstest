@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Xml;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -116,30 +115,33 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnIsSameAsTestName()
         {
             var expectedClassName = "TestProject1.Class1";
-            var fullyQualifiedName = expectedClassName + "." + "TestMethod1";
+            var expectedTestName = "TestMethod1";
+            var fullyQualifiedName = expectedClassName + "." + expectedTestName;
             var testName = "TestProject1.Class1.TestMethod1";
 
-            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName, expectedTestName);
         }
 
         [TestMethod]
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnEndsWithTestName()
         {
             var expectedClassName = "TestProject1.Class1";
-            var fullyQualifiedName = expectedClassName + "." + "TestMethod1(2, 3, 4.0d)";
+            var expectedTestName = "TestMethod1(2, 3, 4.0d)";
+            var fullyQualifiedName = expectedClassName + "." + expectedTestName;
             var testName = "TestMethod1(2, 3, 4.0d)";
 
-            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName, expectedTestName);
         }
 
         [TestMethod]
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnDoesNotEndsWithTestName()
         {
             var expectedClassName = "TestProject1.Class1.TestMethod1(2, 3, 4";
-            var fullyQualifiedName = "TestProject1.Class1.TestMethod1(2, 3, 4.0d)";
+            var expectedTestName = "0d)";
+            var fullyQualifiedName = "TestProject1.Class1.TestMethod1(2, 3, 4." + expectedTestName;
             var testName = "TestMethod1";
 
-            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName, expectedTestName);
         }
 
         [TestMethod]
@@ -161,13 +163,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             Assert.IsTrue(resultFiles[0].Contains("abc.txt"));
         }
 
-        private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName)
+        [TestMethod]
+        public void ToTestElementShouldNotFailWhenClassNameIsTheSameAsFullyQualifiedName()
+        {
+            // the converter assumed to find 'classname' in the fqn and split it on 'classname.'
+            // but that threw an exception because 'classname.' is not contained in 'classname' 
+            // (notice the . at the end)
+            // we should not be assuming that the fqn will have '.' in them
+            // seen it for example with qtest
+
+            string expectedClassName, expectedTestName, fullyQualifiedName, source, testName;
+            expectedClassName = expectedTestName = fullyQualifiedName = source = testName = "test1";
+            
+            TestPlatformObjectModel.TestCase testCase = new TestPlatformObjectModel.TestCase(fullyQualifiedName, new Uri("some://uri"), source);
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
+            var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+
+            Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
+            Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);
+        }
+
+        private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName, string expectedTestName)
         {
             TestPlatformObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
             TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
 
             var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
-            var expectedTestName = fullyQualifiedName.StartsWith(expectedClassName) ? fullyQualifiedName.Remove(0, $"{expectedClassName}.".Length) : fullyQualifiedName;
 
             Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
             Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);

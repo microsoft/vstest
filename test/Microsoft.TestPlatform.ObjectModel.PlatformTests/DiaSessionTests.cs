@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
     public class DiaSessionTests : IntegrationTestBase
     {
         private const string NET451 = "net451";
-        private const string NETCOREAPP10 = "netcoreapp1.0";
+        private const string NETCOREAPP21 = "netcoreapp2.1";
 
         public static string GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
         {
@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 #if NET451
             testEnvironment.TargetFramework = NET451;
 #else
-            testEnvironment.TargetFramework = NETCOREAPP10;
+            testEnvironment.TargetFramework = NETCOREAPP21;
 #endif
             return currentTargetFrameWork;
         }
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
             // Weird why DiaSession is now returning the first overloaded method
-            // as compared to before when it used to  retun second method
+            // as compared to before when it used to return second method
             this.ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;

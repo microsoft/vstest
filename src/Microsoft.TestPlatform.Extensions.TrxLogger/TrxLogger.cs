@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// </summary>
         public TrxLogger():
             this (new Utilities.Helpers.FileHelper())
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="fileHelper">The file helper interface.</param>
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private Dictionary<string, string> parametersDictionary;
 
         /// <summary>
-        /// Gets the directory under which default trx file and test results attachements should be saved.
+        /// Gets the directory under which default trx file and test results attachments should be saved.
         /// </summary>
         private string testResultsDirPath;
 
@@ -267,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (this.testRun == null)
                 CreateTestRun();
 
-            // Convert skipped test to a log entry as that is the behaviour of mstest.
+            // Convert skipped test to a log entry as that is the behavior of mstest.
             if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
                 this.HandleSkippedTest(e.Result);
 
@@ -299,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             // Update test entries
             UpdateTestEntries(executionId, parentExecutionId, testElement, parentTestElement);
 
-            // Set various counts (passtests, failed tests, total tests)
+            // Set various counts (passed tests, failed tests, total tests)
             this.totalTests++;
             if (testResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
             {
@@ -395,7 +395,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         }
 
         /// <summary>
-        /// populate trx file from the xmlelement
+        /// populate trx file from the xml element
         /// </summary>
         /// <param name="trxFileName">
         /// Trx full path
@@ -537,7 +537,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             // We cannot rely on the StartTime for the first test result
             // In case of parallel, first test result is the fastest test and not the one which started first.
-            // Setting Started to DateTime.Now in Intialize will make sure we include the startup cost, which was being ignored earlier.
+            // Setting Started to DateTime.Now in Initialize will make sure we include the startup cost, which was being ignored earlier.
             // This is in parity with the way we set this.testRun.Finished
             this.testRun.Started = this.testRunStartTime;
 

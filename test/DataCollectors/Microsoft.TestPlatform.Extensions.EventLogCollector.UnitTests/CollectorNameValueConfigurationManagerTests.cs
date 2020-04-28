@@ -42,14 +42,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             }
 
             var configManager = new CollectorNameValueConfigurationManager(xmlDocument.DocumentElement);
-            Assert.AreEqual(configManager.NameValuePairs.Count, 0);
+            Assert.AreEqual(0, configManager.NameValuePairs.Count);
         }
 
         [TestMethod]
         public void ConstructorShouldNotInitializeNameValuePairNullIsPassed()
         {
             var configManager = new CollectorNameValueConfigurationManager(null);
-            Assert.AreEqual(configManager.NameValuePairs.Count, 0);
+            Assert.AreEqual(0, configManager.NameValuePairs.Count);
         }
     }
 }

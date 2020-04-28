@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
 
         /// <summary>
-        /// Invokes <c>vstest.console</c> with specified arguments.
+        /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
         /// </summary>
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeDotnetTest(string arguments)
@@ -232,12 +232,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         public void StdOutputContains(string substring)
         {
-            Assert.IsTrue(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
+            Assert.IsTrue(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Actual string: {this.standardTestOutput}");
         }
 
         public void StdOutputDoesNotContains(string substring)
         {
-            Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
+            Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Actual string: {this.standardTestOutput}");
         }
 
         public void ExitCodeEquals(int exitCode)
@@ -256,7 +256,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
             foreach (var test in passedTests)
             {
-                // Check for tick or ? both, in some cases as unicode charater for tick is not available
+                // Check for tick or ? both, in some cases as unicode character for tick is not available
                 // in std out and gets replaced by ?
                 var flag = this.standardTestOutput.Contains("\\u221a " + test)
                            || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test))
@@ -373,7 +373,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var projectPath = this.testEnvironment.GetTestProject(projectName);
             return Path.Combine(Path.GetDirectoryName(projectPath), assetName);
-        } 
+        }
 
         protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
         {
@@ -406,7 +406,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected bool IsNetCoreRunner()
         {
-            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
+            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;               
         }
 
         /// <summary>
@@ -513,7 +513,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to 
+        /// Executes a local copy of dotnet that has VSTest task installed and possibly other modifications. Do not use this to
         /// do your builds or to run general tests, unless you want your changes to be reflected.
         /// </summary>
         /// <param name="command"></param>
@@ -524,10 +524,10 @@ namespace Microsoft.TestPlatform.TestUtilities
         private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
         {
             var environmentVariables = new Dictionary<string, string> {
-                ["DOTNET_MULTILEVEL_LOOKUP"] = "0" 
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
-            
-            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe"); ;
+
+            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe");
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
@@ -556,7 +556,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                     foreach (var variable in environmentVariables) {
                         if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key)) {
                             process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
-                        } 
+                        }
                         else
                         {
                             process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
@@ -620,7 +620,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Destination runsettings path where resulted file saves
         /// </param>
         /// <param name="runConfigurationDictionary">
-        /// Contains run configuratin settings
+        /// Contains run configuration settings
         /// </param>
         public static void CreateRunSettingsFile(string destinationRunsettingsPath, IDictionary<string, string> runConfigurationDictionary)
         {

@@ -45,7 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendlyName = "DotnetTestHost";
         private const string TestAdapterRegexPattern = @"TestAdapter.dll";
-        private const string CoverletDataCollectorRegexPattern = @"coverlet.collector.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
         private IEnvironment platformEnvironment;
@@ -68,6 +67,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Architecture architecture;
 
         private bool isVersionCheckRequired = true;
+
+        private string dotnetHostPath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -157,6 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             this.architecture = runConfiguration.TargetPlatform;
+            this.dotnetHostPath = runConfiguration.DotnetHostPath;
         }
 
         /// <inheritdoc/>
@@ -191,7 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
             var sourceDirectory = Path.GetDirectoryName(sourcePath);
 
-            // Probe for runtimeconfig and deps file for the test source
+            // Probe for runtime config and deps file for the test source
             var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
@@ -201,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", runtimeConfigPath);
+                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, does not exist", runtimeConfigPath);
             }
 
             // Use the deps.json for test source
@@ -214,15 +216,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", depsFilePath);
+                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, does not exist", depsFilePath);
             }
 
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
             string testHostPath = string.Empty;
+            bool useCustomDotnetHostpath = !string.IsNullOrEmpty(this.dotnetHostPath);
 
-            // If testhost.exe is available use it
+            if (useCustomDotnetHostpath)
+            {
+                EqtTrace.Verbose("DotnetTestHostmanager: User specified custom path to dotnet host: '{0}'.", this.dotnetHostPath);
+            }
+
+            // If testhost.exe is available use it, unless user specified path to dotnet.exe, then we will use the testhost.dll
             bool testHostExeFound = false;
-            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            if (!useCustomDotnetHostpath && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
                 var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
                 var fullExePath = Path.Combine(sourceDirectory, exeName);
@@ -258,17 +266,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!testHostExeFound)
             {
-                var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
-
                 if (string.IsNullOrEmpty(testHostPath))
                 {
                     testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
                 }
 
+                var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+                if (useCustomDotnetHostpath)
+                {
+                    startInfo.FileName = this.dotnetHostPath;
+                }
+
                 // This host manager can create process start info for dotnet core targets only.
                 // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
                 // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
-                if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                else if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                    || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     startInfo.FileName = currentProcessPath;
@@ -316,18 +328,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 extensionPaths.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestAdapterRegexPattern));
             }
 
-            if (extensions != null && extensions.Any())
-            {
-                extensionPaths.AddRange(extensions.Where(x => x.EndsWith(CoverletDataCollectorRegexPattern, StringComparison.OrdinalIgnoreCase)));
-            }
-
             return extensionPaths;
         }
 
         /// <inheritdoc/>
         public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
-            // We do not have scenario where netcore tests are deployed to remote machine, so no need to udpate sources
+            // We do not have scenario where netcore tests are deployed to remote machine, so no need to update sources
             return sources;
         }
 
@@ -367,7 +374,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Raises HostLaunched event
         /// </summary>
-        /// <param name="e">hostprovider event args</param>
+        /// <param name="e">host provider event args</param>
         private void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
@@ -376,13 +383,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Raises HostExited event
         /// </summary>
-        /// <param name="e">hostprovider event args</param>
+        /// <param name="e">host provider event args</param>
         private void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)
             {
                 this.hostExitedEventRaised = true;
+                EqtTrace.Verbose("DotnetTestHostManager.OnHostExited: invoking OnHostExited callback");
                 this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            }
+            else
+            {
+                EqtTrace.Verbose("DotnetTestHostManager.OnHostExited: exit event was already raised, skipping");
             }
         }
 
@@ -482,7 +494,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.UnableToFindDepsFile, depsFilePath);
             }
 
-            // If we are here it means it couldnt resolve testhost.dll from nuget cache.
+            // If we are here it means it couldn't resolve testhost.dll from nuget cache.
             // Try resolving testhost from output directory of test project. This is required if user has published the test project
             // and is running tests in an isolated machine. A second scenario is self test: test platform unit tests take a project
             // dependency on testhost (instead of nuget dependency), this drops testhost to output path.
@@ -491,7 +503,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!this.fileHelper.Exists(testHostPath))
             {
-                // If deps file is not found, suggest adding Microsoft.Net.Test.Sdk reference to the project
+                // If dependency file is not found, suggest adding Microsoft.Net.Test.Sdk reference to the project
                 // Otherwise, suggest publishing the test project so that test host gets dropped next to the test source.
                 errorMessage = errorMessage ?? string.Format(CultureInfo.CurrentCulture, Resources.SuggestPublishTestProject, testHostPath);
                 throw new TestPlatformException(errorMessage);

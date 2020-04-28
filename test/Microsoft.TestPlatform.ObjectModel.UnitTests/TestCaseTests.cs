@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             Assert.AreEqual(testDisplayName, this.testCase.GetPropertyValue(TestCaseProperties.DisplayName));
         }
-        
+
         [TestMethod]
         public void TestCaseGetPropertyValueForExecutorUriShouldReturnCorrectValue()
         {
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             Assert.AreEqual(testExecutorUri, this.testCase.GetPropertyValue(TestCaseProperties.ExecutorUri));
         }
-        
+
         [TestMethod]
         public void TestCaseGetPropertyValueForFullyQualifiedNameShouldReturnCorrectValue()
         {
@@ -98,7 +98,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             Assert.AreEqual(testFullyQualifiedName, this.testCase.GetPropertyValue(TestCaseProperties.FullyQualifiedName));
         }
-        
+
         [TestMethod]
         public void TestCaseGetPropertyValueForIdShouldReturnCorrectValue()
         {

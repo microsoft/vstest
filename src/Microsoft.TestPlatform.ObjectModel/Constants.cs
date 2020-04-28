@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #endif
 
         /// <summary>
-        ///  Contants for detecting .net framework.
+        ///  Constants for detecting .net framework.
         /// </summary>
         public const string TargetFrameworkAttributeFullName = "System.Runtime.Versioning.TargetFrameworkAttribute";
 
@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public static class DefaultLoggerParameterNames
     {
-        // Denotes target location for test run resutls
+        // Denotes target location for test run results
         // For ex. TrxLogger saves test run results at this target
         public const string TestRunDirectory = "TestRunDirectory";
 

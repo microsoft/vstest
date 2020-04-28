@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider
     using System.IO;
     using System.Xml.Linq;
 
-    /// <summary> Wrapper for an appxmanifest file. </summary>
+    /// <summary> Wrapper for an appx manifest file. </summary>
     internal static class AppxManifestFile
     {
         /// <summary> Gets the app's exe name. </summary>

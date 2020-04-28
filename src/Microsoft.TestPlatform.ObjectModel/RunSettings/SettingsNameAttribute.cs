@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "settingsName");
             }
-            
+
             SettingsName = settingsName;
         }
 
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The name of the settings.
         /// </summary>
         public string SettingsName { get; private set; }
-        
+
         #endregion
     }
 }

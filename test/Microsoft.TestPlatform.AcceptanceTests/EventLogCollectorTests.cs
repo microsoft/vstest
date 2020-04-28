@@ -70,15 +70,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Path.GetTempPath(),
                 "test_" + Guid.NewGuid() + ".runsettings");
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
       </RunConfiguration>
-      <DataCollectionRunSettings>  
-        <DataCollectors>  
+      <DataCollectionRunSettings>
+        <DataCollectors>
             <DataCollector friendlyName=""Event Log"" >
                 <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /></Configuration>
             </DataCollector>
@@ -96,15 +96,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Path.GetTempPath(),
                 "test_" + Guid.NewGuid() + ".runsettings");
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
       </RunConfiguration>
-      <DataCollectionRunSettings>  
-        <DataCollectors>  
+      <DataCollectionRunSettings>
+        <DataCollectors>
             <DataCollector friendlyName=""Event Log"" >
                 <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /><Setting name=""EventSources"" value=""CustomEventSource"" /></Configuration>
             </DataCollector>

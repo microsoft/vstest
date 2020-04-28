@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IRequestData requestData;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
+        /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class.
         /// </summary>
         /// <param name="requestSender">
         /// Test request sender instance.
@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionRunEventsHandler"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionRunEventsHandler"/> class.
         /// </summary>
         public DataCollectionRunEventsHandler()
         {

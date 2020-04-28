@@ -667,7 +667,7 @@ namespace Microsoft.VisualStudio.TraceCollector
             public BasicLimits32 BasicLimits;
 
             /// <summary>
-            /// Resereved.
+            /// Reserved.
             /// </summary>
             [FieldOffset(48)]
             public IoCounters32 IoInfo;
@@ -718,7 +718,7 @@ namespace Microsoft.VisualStudio.TraceCollector
             public BasicLimits64 BasicLimits;
 
             /// <summary>
-            /// Resereved.
+            /// Reserved.
             /// </summary>
             [FieldOffset(64)]
             public IoCounters64 IoInfo;

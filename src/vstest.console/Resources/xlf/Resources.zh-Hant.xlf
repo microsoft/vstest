@@ -264,7 +264,7 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="translated">用法: vstest.console.exe [引數] [選項] [[--] &lt;執行設定引數&gt;...]]</target>
+        <target state="translated">用法: vstest.console.exe [引數] [選項] [[--] &lt;RunSettings 引數&gt;...]]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Syntax: vstest.console.exe [Optionen] [Argumente]</target>
@@ -1675,8 +1675,8 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">測試回合參數的引數 '{0}' 無效。請使用下面的格式。
+     格式: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
     </body>

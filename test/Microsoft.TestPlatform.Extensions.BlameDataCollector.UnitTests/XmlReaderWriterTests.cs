@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -165,10 +164,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testCaseList = xmlReaderWriter.ReadTestSequence(filePath);
             File.Delete(filePath);
 
-            Assert.AreEqual(testCaseList.First().FullyQualifiedName, "Abc.UnitTest1");
-            Assert.AreEqual(testCaseList.First().DisplayName, "UnitTest1");
-            Assert.AreEqual(testCaseList.First().Source, "Abc.dll");
-            Assert.AreEqual(testCaseList.First().IsCompleted, false);
+            Assert.AreEqual("Abc.UnitTest1", testCaseList.First().FullyQualifiedName);
+            Assert.AreEqual("UnitTest1", testCaseList.First().DisplayName);
+            Assert.AreEqual("Abc.dll", testCaseList.First().Source);
+            Assert.IsFalse(testCaseList.First().IsCompleted);
         }
 
         /// <summary>
@@ -194,10 +193,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testCaseList = xmlReaderWriter.ReadTestSequence(filePath);
             File.Delete(filePath);
 
-            Assert.AreEqual(testCaseList.First().FullyQualifiedName, "Abc.UnitTest1");
-            Assert.AreEqual(testCaseList.First().DisplayName, "UnitTest1");
-            Assert.AreEqual(testCaseList.First().Source, "Abc.dll");
-            Assert.AreEqual(testCaseList.First().IsCompleted, true);
+            Assert.AreEqual("Abc.UnitTest1", testCaseList.First().FullyQualifiedName);
+            Assert.AreEqual("UnitTest1", testCaseList.First().DisplayName);
+            Assert.AreEqual("Abc.dll", testCaseList.First().Source);
+            Assert.IsTrue(testCaseList.First().IsCompleted);
         }
 
         /// <summary>

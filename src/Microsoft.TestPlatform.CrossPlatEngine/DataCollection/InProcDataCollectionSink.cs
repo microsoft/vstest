@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
-                        EqtTrace.Warning("The data for inprocdata collector with key {0} has already been set. Will be reset with new value", key);
+                        EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
                     }
                     this.CollectionData[key] = value;
                 }

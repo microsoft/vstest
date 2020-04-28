@@ -223,9 +223,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         //       new string[] { assemblyLocation },
         //       () => { });
         //    //Act
-        //    this.executionManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);           
+        //    this.executionManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);
 
-        //    //when handler instance returns warning       
+        //    //when handler instance returns warning
         //    sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning");
 
         //    // Verify.

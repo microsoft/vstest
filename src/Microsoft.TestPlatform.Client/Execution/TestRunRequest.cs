@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private object cancelSyncObject = new Object();
 
         /// <summary>
-        /// The run completion event which will be signalled on completion of test run.
+        /// The run completion event which will be signaled on completion of test run.
         /// </summary>
         private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
 
@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancelation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
+                EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
             }
 
             string message = String.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
@@ -218,11 +218,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         || this.State == TestRunState.Canceled
                         || this.State == TestRunState.Aborted))
             {
-                // If run is already terminated, then we should not throw an exception. 
+                // If run is already terminated, then we should not throw an exception.
                 throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
             }
 
-            // This method is not synchronized as it can lead to dead-lock 
+            // This method is not synchronized as it can lead to dead-lock
             // (the runCompletionEvent cannot be raised unless that lock is released)
 
             // Wait for run completion (In case m_runCompletionEvent is closed, then waitOne will throw nice error)
@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
             }
 
-            EqtTrace.Info("TestRunRequest.CancelAsync: Cancelled.");
+            EqtTrace.Info("TestRunRequest.CancelAsync: Canceled.");
         }
 
         /// <summary>
@@ -337,7 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         ///  Raised when a test run event raw message is received from host
         ///  This is required if one wants to re-direct the message over the process boundary without any processing overhead
-        ///  All the run events should come as raw messages as well as proper serialized events like OnRunStatsChange 
+        ///  All the run events should come as raw messages as well as proper serialized events like OnRunStatsChange
         /// </summary>
         public event EventHandler<string> OnRawMessageReceived;
 
@@ -395,7 +395,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             lock (this.syncObject)
             {
-                // If this object is disposed, dont do anything
+                // If this object is disposed, don't do anything
                 if (this.disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
@@ -428,11 +428,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            // This is required as TMI adapter is sending attachments as List which cannot be typecasted to Collection.
+                            // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                             runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                             this.runRequestTimeTracker.Elapsed);
 
-                    // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
+                    // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests)
                     // by either engines - as both calculate at different points
                     // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
                     this.LoggerManager.HandleTestRunComplete(runCompletedEvent);
@@ -488,7 +488,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 EqtTrace.Verbose("TestRunRequest:SendTestRunStatsChange: Starting.");
                 if (testRunChangedArgs.ActiveTests != null)
                 {
-                    // Do verbose check to save perf in iterating test cases
+                    // Do verbose check to save performance in iterating test cases
                     if (EqtTrace.IsVerboseEnabled)
                     {
                         foreach (TestCase testCase in testRunChangedArgs.ActiveTests)
@@ -500,14 +500,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 lock (this.syncObject)
                 {
-                    // If this object is disposed, dont do anything
+                    // If this object is disposed, don't do anything
                     if (this.disposed)
                     {
                         EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
                         return;
                     }
 
-                    // TODO: Invoke this event in a separate thread. 
+                    // TODO: Invoke this event in a separate thread.
                     // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
                     this.LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
                     this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
@@ -526,7 +526,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             lock (this.syncObject)
             {
-                // If this object is disposed, dont do anything
+                // If this object is disposed, don't do anything
                 if (this.disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");

@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
@@ -295,6 +294,22 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             clientThread.Join();
 
             Assert.IsTrue(true);
+        }
+
+        [TestMethod]
+        public async Task ReceiveRawMessageNotConnectedSocketShouldReturnNull()
+        {
+            var peer = new SocketCommunicationManager();
+            Assert.IsNull(peer.ReceiveRawMessage());
+            Assert.IsNull(await peer.ReceiveRawMessageAsync(CancellationToken.None));
+        }
+
+        [TestMethod]
+        public async Task ReceiveMessageNotConnectedSocketShouldReturnNull()
+        {
+            var peer = new SocketCommunicationManager();
+            Assert.IsNull(peer.ReceiveMessage());
+            Assert.IsNull(await peer.ReceiveMessageAsync(CancellationToken.None));
         }
 
         private static void SendData(ICommunicationManager communicationManager)

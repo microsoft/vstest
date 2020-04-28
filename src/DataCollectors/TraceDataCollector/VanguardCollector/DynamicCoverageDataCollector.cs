@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.Coverage
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("DynamicCoverageDataCollector.OnInitialize: Failed to initialize code coverage datacolector with exception: {0}", ex);
+                EqtTrace.Error("DynamicCoverageDataCollector.OnInitialize: Failed to initialize code coverage datacollector with exception: {0}", ex);
                 this.Logger.LogError(
                     this.AgentContext.SessionDataCollectionContext,
                     string.Format(CultureInfo.CurrentUICulture, Resources.FailedToInitializeCodeCoverageDataCollector, ex));

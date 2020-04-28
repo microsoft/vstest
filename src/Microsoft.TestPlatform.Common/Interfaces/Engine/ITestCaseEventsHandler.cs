@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The Test Case level events.
@@ -23,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="testCase">Details of the test case.</param>
         /// <param name="outcome">Result of the test case executed.</param>
         void SendTestCaseEnd(TestCase testCase, TestOutcome outcome);
-        
+
         /// <summary>
         /// Sends the test result
         /// </summary>

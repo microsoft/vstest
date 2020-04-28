@@ -6,9 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
     using System;
     using System.IO;
-    using System.Reflection;
     using System.Runtime.InteropServices;
     using PlatformAbstractions;
+
     internal static class HResult
     {
         public static bool Failed(int hr)
@@ -573,7 +573,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return (comObject as IDiaDataSource);
         }
 
-        #region private
+        #region Private
 
         [ComImport, ComVisible(false), Guid("00000001-0000-0000-C000-000000000046"),
          InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

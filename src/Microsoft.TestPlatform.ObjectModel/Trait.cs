@@ -3,12 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+#if NET451
     using System;
+#endif
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Class that holds Trait. 
+    /// Class that holds Trait.
     /// A traits is Name, Value pair.
     /// </summary>
 #if NET451

@@ -6,13 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Runtime.Versioning;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     internal class InferHelper
@@ -104,14 +99,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                     {
                         // TODO Log to console and client.
                         EqtTrace.Info(
-                            "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
+                            "conflicts in Framework identifier of provided sources(test assemblies), using default framework:{0}",
                             framework);
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Failed to determine framework:{0}, using defaulf: {1}", ex, framework);
+                EqtTrace.Error("Failed to determine framework:{0}, using default: {1}", ex, framework);
             }
 
             if (EqtTrace.IsInfoEnabled)

@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var testhostProcessName = new[] { "testhost.x86", "dotnet" };
             var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
 
             // passing parallel
@@ -75,7 +75,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var testhostProcessName = new[] { "testhost.x86", "dotnet" };
             var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
 
             // Pass parallel
@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         /// <summary>
-        /// Command line switches should have high precedence if runsetting file and commandline switch specified
+        /// Command line switches should have high precedence if runsetting file and command line switch specified
         /// </summary>
         /// <param name="runnerFramework"></param>
         /// <param name="targetFramework"></param>
@@ -108,8 +108,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var targetPlatform = "x86";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var testhostProcessName = new[] { "testhost.x86", "dotnet" };
             var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
 
             // passing different platform
@@ -135,8 +134,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
-            var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+            var testhostProcessNames = new[] { "testhost.x86" };
+            var expectedNumOfProcessCreated = 1;
 
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
@@ -145,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessNames, expectedNumOfProcessCreated);
         }
 
         [TestMethod]
@@ -156,8 +155,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
-            var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+            var testhostProcessName = new[] { "testhost.x86" };
+            var expectedNumOfProcessCreated = 1;
 
             var runSettingsArgs = String.Join(
                 " ",
@@ -180,8 +179,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
-            var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+            var testhostProcessName = new[] { "testhost.x86" };
+            var expectedNumOfProcessCreated = 1;
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
                                                          { "MaxCpuCount", "2" },
@@ -211,10 +210,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x64";
-            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var testhostProcessName = new[] { "testhost", "dotnet" };
             var expectedProcessCreated = 2;
-            if (!this.IsDesktopTargetFramework() && !this.IsDesktopRunner())
+            if (!this.IsDesktopRunner())
             {
+                // this creates dotnet hosted vstest console and 2 testhosts one of which is hosted 
+                // in dotnet, so we have two dotnet + 1 testhost.exe
                 expectedProcessCreated = 3;
             }
 
@@ -480,9 +481,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         #region RunSettings defined in project file
         /// <summary>
-        /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test 
-        /// checks that the settings were honored by translating an inconlusive test to failed "result", instead of the default "skipped".
-        /// This test depends on Microsoft.TestPlatform.Build\Microsoft.TestPlatform.targets being previously copied into the 
+        /// RunSettingsFilePath can be specified in .csproj and should be honored by `dotnet test`, this test
+        /// checks that the settings were honored by translating an inconclusive test to failed "result", instead of the default "skipped".
+        /// This test depends on Microsoft.TestPlatform.Build\Microsoft.TestPlatform.targets being previously copied into the
         /// artifacts/testArtifacts/dotnet folder. This will allow the local copy of dotnet to pickup the VSTest msbuild task.
         /// </summary>
         /// <param name="runnerInfo"></param>
@@ -498,9 +499,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeDotnetTest(projectPath);
             this.ValidateSummaryStatus(0, 1, 0);
 
-            // make sure that we can revert the project settings back by providing a config from commandline 
-            // keeping this in the same test, because it is easier to see that we are reverting settings that 
-            // are honored by dotnet test, instead of just using the default, which would produce the same 
+            // make sure that we can revert the project settings back by providing a config from command line
+            // keeping this in the same test, because it is easier to see that we are reverting settings that
+            // are honored by dotnet test, instead of just using the default, which would produce the same
             // result
             var settingsPath = this.GetProjectAssetFullPath(projectName, "inconclusive.runsettings");
             this.InvokeDotnetTest($"{projectPath} --settings {settingsPath}");
@@ -519,7 +520,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         private void RunTestWithRunSettings(Dictionary<string, string> runConfigurationDictionary,
-            string runSettingsArgs, string additionalArgs, string testhostProcessName, int expectedNumOfProcessCreated)
+            string runSettingsArgs, string additionalArgs, IEnumerable<string> testhostProcessNames, int expectedNumOfProcessCreated)
         {
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
@@ -546,16 +547,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testhostProcessName);
+                testhostProcessNames);
 
             this.InvokeVsTest(arguments);
             cts.Cancel();
 
+            var processesCreated = numOfProcessCreatedTask.Result;
             // assert
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result} args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
+                processesCreated.Count,
+                $"Number of { string.Join(", ", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {processesCreated.Count} ({ string.Join(", ", processesCreated) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(2, 2, 2);
 
             //cleanup
@@ -567,16 +569,37 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private int GetExpectedNumOfProcessCreatedForWithoutParallel()
         {
-            int expectedNumOfProcessCreated;
-            if (this.IsDesktopTargetFramework())
+            if (this.IsDesktopRunner() && this.IsDesktopTargetFramework())
             {
-                expectedNumOfProcessCreated = 1;
+                // we create just testhost.exe
+                return 1;
             }
-            else
+          
+            if (this.IsDesktopRunner() && !this.IsDesktopTargetFramework())
             {
-                expectedNumOfProcessCreated = this.IsDesktopRunner() ? 2 : 3;
+                // we create dotnet testhost and testhost.exe
+                return 2;
             }
-            return expectedNumOfProcessCreated;
+
+            if (!this.IsDesktopRunner() && this.IsDesktopTargetFramework())
+            {
+                // we create testhost and testhost
+                return 2;
+            }
+
+            if (!this.IsDesktopRunner() && this.IsDesktopTargetFramework() && this.testEnvironment.InIsolationValue == "InProcess")
+            {
+                // we create just testhost
+                return 1;
+            }
+
+            if (!this.IsDesktopRunner() && !this.IsDesktopTargetFramework())
+            {
+                // we create dotnet vsconsole, and 2 dotnet test hosts 
+                return 3;
+            }
+
+            return -10;
         }
     }
 }

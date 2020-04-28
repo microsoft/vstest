@@ -13,6 +13,7 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
@@ -56,14 +57,14 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new EnableBlameArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Blame", capabilities.CommandName);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Logging, capabilities.Priority);
             Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(CommandLineResources.EnableBlameUsage, capabilities.HelpContentResourceName);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         [TestMethod]
@@ -206,7 +207,7 @@ namespace vstest.console.UnitTests.Processors
         internal class TestableEnableBlameArgumentExecutor : EnableBlameArgumentExecutor
         {
             internal TestableEnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IOutput output)
-                : base(runSettingsManager, environment)
+                : base(runSettingsManager, environment, new Mock<IFileHelper>().Object)
             {
                 this.Output = output;
             }

@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
-    using System.Diagnostics;
 
     /// <summary>
     /// Wrapper class for tracing.

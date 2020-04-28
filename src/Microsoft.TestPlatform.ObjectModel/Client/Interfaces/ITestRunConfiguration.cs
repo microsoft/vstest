@@ -11,24 +11,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public interface ITestRunConfiguration
     {
         /// <summary>
-        /// Defines the frequency of run stats test event. 
+        /// Defines the frequency of run stats test event.
         /// </summary>
         /// <remarks>
-        /// Run stats change event will be raised after completion of these number of tests. 
-        /// 
-        /// Note that this event is raised asynchronously and the underlying execution process is not 
-        /// paused during the listener invocation. So if the event handler, you try to query the 
+        /// Run stats change event will be raised after completion of these number of tests.
+        ///
+        /// Note that this event is raised asynchronously and the underlying execution process is not
+        /// paused during the listener invocation. So if the event handler, you try to query the
         /// next set of results, you may get more than 'FrequencyOfRunStatsChangeEvent'.
-        /// </remarks>        
+        /// </remarks>
         long FrequencyOfRunStatsChangeEvent { get; }
 
         /// <summary>
-        /// Returns whether the run is configured to run specific tests 
+        /// Returns whether the run is configured to run specific tests
         /// </summary>
         bool HasSpecificTests { get; }
 
         /// <summary>
-        /// Returns whether the run is configured to run specific sources 
+        /// Returns whether the run is configured to run specific sources
         /// </summary>
         bool HasSpecificSources { get; }
 

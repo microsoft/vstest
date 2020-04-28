@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class RunConfiguration : TestRunSettings
     {
-        #region private fields
+        #region Private Fields
 
         /// <summary>
         /// Platform architecture which rocksteady should use for discovery/execution
@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Maximum number of cores that the engine can use to run tests in parallel
         /// </summary>
         private int maxCpuCount;
-        
+
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private long testSessionTimeout;
 
         /// <summary>
-        /// Directory in which rocksteady/adapter should keep their run specific data. 
+        /// Directory in which rocksteady/adapter should keep their run specific data.
         /// </summary>
         private string resultsDirectory;
 
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool disableParallelization;
 
         /// <summary>
-        /// True if test run is triggered 
+        /// True if test run is triggered
         /// </summary>
         private bool designMode;
 
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RunConfiguration"/> class. 
+        /// Initializes a new instance of the <see cref="RunConfiguration"/> class.
         /// </summary>
         public RunConfiguration() : base(Constants.RunConfigurationSettingsName)
         {
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// Gets or sets the design mode value.
         /// </summary>
         public bool DesignMode
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// Gets or sets a value indicating whether to run tests in isolation or not.
         /// </summary>
         public bool InIsolation
@@ -487,6 +487,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public bool CollectSourceInformationSet { get; private set; } = false;
 
+        /// <summary>
+        /// Default filter to use to filter tests
+        /// </summary>
+        public string TestCaseFilter { get; private set; }
+
+        /// Path to dotnet executable to be used to invoke testhost.dll. Specifying this will skip looking up testhost.exe and will force usage of the testhost.dll. 
+        /// </summary>
+        public string DotnetHostPath { get; private set; }
+
         #endregion
 
         /// <inheritdoc/>
@@ -569,6 +578,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement targetDevice = doc.CreateElement("TargetDevice");
                 targetDevice.InnerXml = this.TargetDevice;
                 root.AppendChild(targetDevice);
+            }
+
+            if (!string.IsNullOrEmpty(this.TestCaseFilter))
+            {
+                XmlElement testCaseFilter = doc.CreateElement(nameof(TestCaseFilter));
+                testCaseFilter.InnerXml = this.TestCaseFilter;
+                root.AppendChild(testCaseFilter);
+            }
+            
+            if (!string.IsNullOrEmpty(this.DotnetHostPath))
+            {
+                XmlElement dotnetHostPath = doc.CreateElement(nameof(DotnetHostPath));
+                dotnetHostPath.InnerXml = this.DotnetHostPath;
+                root.AppendChild(dotnetHostPath);
             }
 
             return root;
@@ -865,6 +888,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "TargetDevice":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TargetDevice = reader.ReadElementContentAsString();
+                            break;
+
+                        case "TestCaseFilter":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.TestCaseFilter = reader.ReadElementContentAsString();
+                            break;
+                            
+                        case "DotNetHostPath":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
                             break;
 
                         default:

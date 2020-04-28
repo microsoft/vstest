@@ -159,7 +159,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.DiscoverTests should get called");
 
-            // AdapterSourceMap should contail updated testSources.
+            // AdapterSourceMap should contain updated testSources.
             Assert.AreEqual(actualSources.FirstOrDefault(), discoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
             Assert.AreEqual(inputSource.FirstOrDefault(), discoveryCriteria.Package);
         }

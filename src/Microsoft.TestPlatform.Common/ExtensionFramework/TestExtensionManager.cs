@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
-    /// Generic base class for managing extensions and looking them up by their URI. 
+    /// Generic base class for managing extensions and looking them up by their URI.
     /// </summary>
     /// <typeparam name="TExtension">The type of the extension.</typeparam>
     /// <typeparam name="TMetadata">The type of the metadata.</typeparam>
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         }
 
         #endregion
-        
+
         /// <summary>
         /// Populate the extension map.
         /// </summary>

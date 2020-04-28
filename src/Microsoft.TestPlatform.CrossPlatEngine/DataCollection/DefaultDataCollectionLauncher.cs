@@ -30,10 +30,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultDataCollectionLauncher"/> class. 
+        /// Initializes a new instance of the <see cref="DefaultDataCollectionLauncher"/> class.
         /// </summary>
         /// <param name="processHelper">
-        /// The process helper. 
+        /// The process helper.
         /// </param>
         /// <param name="messageLogger">
         /// The message Logger.

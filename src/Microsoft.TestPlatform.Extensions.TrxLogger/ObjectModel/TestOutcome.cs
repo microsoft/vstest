@@ -7,10 +7,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
     /// <summary>
     /// Outcome of a test or a run.
-    /// If a new successful state needs to be added you will need to modify 
+    /// If a new successful state needs to be added you will need to modify
     /// RunResultAndStatistics in TestRun.cs and TestOutcomeHelper below.
     /// ----------------------------------------------------------------
-    /// NOTE: the order is important and is used for computing outcome for aggregations. 
+    /// NOTE: the order is important and is used for computing outcome for aggregations.
     ///       More important outcomes come first. See TestOutcomeHelper.GetAggregationOutcome.
     /// </summary>
     internal enum TestOutcome
@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         Timeout,
 
         /// <summary>
-        /// Test was aborted. 
+        /// Test was aborted.
         /// This was not caused by a user gesture, but rather by a framework decision.
         /// </summary>
         Aborted,
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         NotRunnable,
 
         /// <summary>
-        /// Test was not executed. 
+        /// Test was not executed.
         /// This was caused by a user gesture - e.g. user hit stop button.
         /// </summary>
         NotExecuted,

@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
@@ -247,11 +246,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 var quietTestLogging = new List<string>() {"q", "quiet"};
 
                 string vsTestVerbosity = "minimal";
-                if (normalTestLogging.Contains(this.VSTestVerbosity))
+                if (normalTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
                 {
                     vsTestVerbosity = "normal";
                 }
-                else if (quietTestLogging.Contains(this.VSTestVerbosity))
+                else if (quietTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
                 {
                     vsTestVerbosity = "quiet";
                 }

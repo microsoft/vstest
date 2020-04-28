@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Gets the singleton instance of DataCollectionTestCaseEventSender.
         /// </summary>
-        // todo : Refactor to pass the instance as singleton.
+        // TODO : Re-factor to pass the instance as singleton.
         public static DataCollectionTestCaseEventSender Instance { get; private set; }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.DataCollectionTestStart, e);
 
             var message = this.communicationManager.ReceiveMessage();
-            if (message.MessageType != MessageType.DataCollectionTestStartAck)
+            if (message != null && message.MessageType != MessageType.DataCollectionTestStartAck)
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
@@ -108,8 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.DataCollectionTestEnd, e);
 
             var message = this.communicationManager.ReceiveMessage();
-
-            if (message.MessageType == MessageType.DataCollectionTestEndResult)
+            if (message != null && message.MessageType == MessageType.DataCollectionTestEndResult)
             {
                 attachmentSets = this.dataSerializer.DeserializePayload<Collection<AttachmentSet>>(message);
             }

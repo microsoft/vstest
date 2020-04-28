@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.Protocol
         {
             this.process = new Process();
             process.StartInfo.FileName = GetDotnetHostFullPath();
-            
+
             if (args != null)
             {
                 process.StartInfo.Arguments = args.Length < 2 ? args[0] : string.Join(" ", args);
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.Protocol
 
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-       
+
             process.Start();
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;

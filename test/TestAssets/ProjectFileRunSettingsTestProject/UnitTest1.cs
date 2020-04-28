@@ -9,10 +9,10 @@ namespace ProjectFileRunSettingsTestProject
         public void TestMethod1()
         {
             // this project specifies runsettings in it's proj file
-            // that runsettings say that inconclusive should translate to 
-            // failed. 
-            // we can then easily figure out if the settings were applied 
-            // correctly if we set the test as failed, or did not apply if the 
+            // that runsettings say that inconclusive should translate to
+            // failed.
+            // we can then easily figure out if the settings were applied
+            // correctly if we set the test as failed, or did not apply if the
             // test is shown as skipped
             Assert.Inconclusive();
         }

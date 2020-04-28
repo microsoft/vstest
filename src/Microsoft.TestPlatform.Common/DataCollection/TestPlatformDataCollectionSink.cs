@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System.ComponentModel;
-    using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -16,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     internal class TestPlatformDataCollectionSink : DataCollectionSink
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionSink"/> class. 
+        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionSink"/> class.
         /// Creates a data collector sink for data transfer.
         /// </summary>
         /// <param name="attachmentManager">

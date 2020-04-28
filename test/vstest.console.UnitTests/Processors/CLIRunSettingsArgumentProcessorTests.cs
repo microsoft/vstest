@@ -5,8 +5,6 @@ namespace vstest.console.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
-    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -65,12 +63,12 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual("RunSettings arguments:" + Environment.NewLine + "      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after \"-- \". Note the space after --. " + Environment.NewLine + "      Use a space to separate multiple [name]=[value]." + Environment.NewLine + "      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.CLIRunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.CLIRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion
@@ -349,5 +347,57 @@ namespace vstest.console.UnitTests.Processors
             },
         };
         #endregion
+
+        [TestMethod]
+        public void InitializeShouldMergeTestRunParametersWithSpaces()
+        {
+            // in powershell call: ConsoleApp1.exe --% --TestRunParameters.Parameter(name =\"myParam\", value=\"myValue\")
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in cmd: ConsoleApp1.exe -- TestRunParameters.Parameter(name=\"myParam\", value=\"myValue\")
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in ubuntu wsl without escaping the space: ConsoleApp1.exe-- TestRunParameters.Parameter\(name =\"myParam\", value=\"myValue\"\)
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in ubuntu wsl with escaping the space: ConsoleApp1.exe-- TestRunParameters.Parameter\(name =\"myParam\",\ value=\"myValue\"\)
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam", value = "myValue")
+
+            var args = new string[] {
+                "--",
+                "TestRunParameters.Parameter(name=\"myParam\",",
+                "value=\"myValue\")",
+                "TestRunParameters.Parameter(name=\"myParam2\",",
+                "value=\"myValue 2\")",
+            };
+
+            var runsettings = string.Join(Environment.NewLine, new[]{
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors />",
+                "  </DataCollectionRunSettings>",
+                "  <TestRunParameters>",
+                "    <Parameter name=\"myParam\" value=\"myValue\" />",
+                "    <Parameter name=\"myParam2\" value=\"myValue 2\" />",
+                "  </TestRunParameters>",
+                "</RunSettings>"});
+
+            this.executor.Initialize(args);
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(runsettings, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
     }
 }

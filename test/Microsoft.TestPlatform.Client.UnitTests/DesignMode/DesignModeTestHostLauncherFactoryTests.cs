@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -19,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var mockDesignModeClient = new Mock<IDesignModeClient>();
             var testRunRequestPayload = new TestRunRequestPayload { DebuggingEnabled = false };
             var launcher = DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(mockDesignModeClient.Object, testRunRequestPayload);
-            
+
             Assert.IsFalse(launcher.IsDebug, "Factory must not return debug launcher if debugging is disabled.");
         }
 

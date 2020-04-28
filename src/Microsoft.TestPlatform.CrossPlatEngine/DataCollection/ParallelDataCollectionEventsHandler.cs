@@ -21,10 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private readonly ParallelRunDataAggregator runDataAggregator;
 
         public ParallelDataCollectionEventsHandler(IRequestData requestData,
-            IProxyExecutionManager proxyExecutionManager, 
-            ITestRunEventsHandler actualRunEventsHandler, 
-            IParallelProxyExecutionManager parallelProxyExecutionManager, 
-            ParallelRunDataAggregator runDataAggregator) : 
+            IProxyExecutionManager proxyExecutionManager,
+            ITestRunEventsHandler actualRunEventsHandler,
+            IParallelProxyExecutionManager parallelProxyExecutionManager,
+            ParallelRunDataAggregator runDataAggregator) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
-            IDataSerializer dataSerializer) : 
+            IDataSerializer dataSerializer) :
             base(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, dataSerializer)
         {
             this.runDataAggregator = runDataAggregator;
@@ -50,10 +50,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ICollection<string> executorUris)
         {
             var parallelRunComplete = HandleSingleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
-            
+
             if (parallelRunComplete)
             {
-                // todo: use TestPluginCache to iterate over all IDataCollectorAttachments
+                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
                 {
                     var coverageHandler = new CodeCoverageDataAttachmentsHandler();
                     Uri attachementUri = coverageHandler.GetExtensionUri();

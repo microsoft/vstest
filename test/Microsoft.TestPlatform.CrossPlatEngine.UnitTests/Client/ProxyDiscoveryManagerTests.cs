@@ -250,8 +250,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldPassAdapterToTestHostManagerFromTestPluginCacheExtensions()
         {
-            // We are updating extension with testadapter only to make it easy to test.
-            // In product code it filter out testadapter from extension
+            // We are updating extension with test adapter only to make it easy to test.
+            // In product code it filter out test adapter from extension
             TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
             try
             {

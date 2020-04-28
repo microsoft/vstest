@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -251,7 +250,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 ConsoleLogger.RaiseTestRunWarning(message);
             }
-            
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
                 discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;
@@ -269,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     throw new TestPlatformException("DiscoveredTestsEventArgs cannot be null.");
                 }
 
-                // Initialising the test case filter here because the filter value is read late.
+                // Initializing the test case filter here because the filter value is read late.
                 this.testCasefilter.Initialize(this.options.TestCaseFilterValue);
                 var discoveredTests = args.DiscoveredTestCases.ToList();
                 var filteredTests = this.testCasefilter.FilterTests(discoveredTests).ToList();
@@ -374,7 +372,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             /// <summary>
-            /// fetch the testproperties on this test method as traits and populate a trait dictionary
+            /// fetch the test properties on this test method as traits and populate a trait dictionary
             /// </summary>
             private static Dictionary<string, List<string>> GetTestPropertiesInTraitDictionary(TestCase testCase)
             {
@@ -443,7 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                 }
 
-                //This is hack for NUnit,Xunit to understand test category -> This method is called only for NUnit/Xunit
+                //This is hack for NUnit, XUnit to understand test category -> This method is called only for NUnit/XUnit
                 if (!traitDictionary.ContainsKey(TestCategory) && traitDictionary.ContainsKey(Category))
                 {
                     traitDictionary.TryGetValue(Category, out var categoryValue);

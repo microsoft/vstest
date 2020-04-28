@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionEvents"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionEvents"/> class.
         /// </summary>
         protected DataCollectionEvents()
         {

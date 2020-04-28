@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         private static List<string> GetFileExtensions(Type testDicovererType)
         {
             var fileExtensions = new List<string>();
-            
+
             var attributes = testDicovererType.GetTypeInfo().GetCustomAttributes(typeof(FileExtensionAttribute), false).ToArray();
             if (attributes != null && attributes.Length > 0)
             {
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         private static string GetDefaultExecutorUri(Type testDiscovererType)
         {
             string result = string.Empty;
-            
+
             object[] attributes = testDiscovererType.GetTypeInfo().GetCustomAttributes(typeof(DefaultExecutorUriAttribute), false).ToArray();
             if (attributes != null && attributes.Length > 0)
             {

@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -83,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
                     if (EqtTrace.IsVerboseEnabled)
                     {
-                        EqtTrace.Verbose("Unable to connect to server, Exception occured : {0}", connectAsyncTask.Exception);
+                        EqtTrace.Verbose("Unable to connect to server, Exception occurred : {0}", connectAsyncTask.Exception);
                     }
                 }
                 else

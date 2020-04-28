@@ -63,12 +63,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("--Settings|/Settings:<Settings File>" + Environment.NewLine + "      Settings to use when running tests.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.RunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.RunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion
@@ -313,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         [TestMethod]
         public void InitializeShouldSetInIsolataionToTrueIfEnvironmentVariablesSpecified()
-        {            
+        {
             var settingsXml = @"<RunSettings><RunConfiguration><EnvironmentVariables><RANDOM_PATH>C:\temp</RANDOM_PATH></EnvironmentVariables></RunConfiguration></RunSettings>";
 
             // Arrange.
@@ -341,7 +341,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldNotSetInIsolataionToTrueIfEnvironmentVariablesNotSpecified()
         {
             var settingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            
+
             /// Arrange.
             var fileName = "C:\\temp\\r.runsettings";
 
@@ -363,6 +363,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsNull(this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
+        [TestMethod]
+        public void InitializeShouldUpdateTestCaseFilterIfProvided()
+        {
+            // Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
+            var filter = "TestCategory=Included";
+            var settingsXml = $"<RunSettings><RunConfiguration><TestCaseFilter>{filter}</TestCaseFilter></RunConfiguration></RunSettings>";
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                this.settingsProvider,
+                settingsXml);
+
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
+            Assert.AreEqual(filter, CommandLineOptions.Instance.TestCaseFilterValue);
+        }
         #endregion
 
         #region Testable Implementations
