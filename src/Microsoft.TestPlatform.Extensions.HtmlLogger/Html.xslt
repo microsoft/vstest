@@ -28,6 +28,9 @@
         margin-top: 15px;
         margin-bottom:10px;
         }
+        pre {
+        white-space: pre-wrap;
+        }
         .summary {font-family:monospace;
         display: -webkit-flex; /* Safari */
         -webkit-flex-wrap: wrap; /* Safari 6.1+ */
