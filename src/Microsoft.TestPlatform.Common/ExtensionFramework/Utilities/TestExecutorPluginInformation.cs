@@ -19,4 +19,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
         }
     }
+
+    /// <summary>
+    /// The test executor 2 plugin information.
+    /// </summary>
+    internal class TestExecutorPluginInformation2 : TestExtensionPluginInformation
+    {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="testExecutorType"> The test Executor Type. </param>
+        public TestExecutorPluginInformation2(Type testExecutorType)
+            : base(testExecutorType)
+        {
+        }
+    }
 }

@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                         // Get all extensions for ITestExecutor2.
                         TestPluginManager.Instance
-                            .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                            .GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
                                 out unfilteredTestExtensions2,
                                 out testExtensions2);
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             // Get all extensions for ITestExecutor2.
             TestPluginManager.Instance
-                .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                .GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                     extensionAssembly,
                     out unfilteredTestExtensions2,
                     out testExtensions2);
