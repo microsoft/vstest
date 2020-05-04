@@ -183,6 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     processors.Add(cliRunSettingsProcessor);
                     break;
                 }
+
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
