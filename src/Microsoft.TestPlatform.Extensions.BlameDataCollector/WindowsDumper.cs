@@ -156,28 +156,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     {
         public IDumper Create(Version frameworkVersion)
         {
-            Console.WriteLine(">>>>>  heeeey");
 #if !NETSTANDARD && !NETCOREAPP
-            Console.WriteLine(">>>>>  windows fmw");
             return new WindowsDumper();
 #else
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Console.WriteLine(">>>>>  windows on core");
                 return new WindowsDumper();
             }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                Console.WriteLine(">>>>>  linux");
                 if (frameworkVersion != default && frameworkVersion <= new Version("2.1"))
                 {
-                    Console.WriteLine(">>>>>  linux old");
                     return new SigtrapDumper();
                 }
-
-
-                Console.WriteLine(">>>>>  linux new");
                 return new NetClientDumper();
             }
 
@@ -188,8 +180,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 //{
                 //    return new SigtrapDumper();
                 //}
-
-                Console.WriteLine(">>>>>  macos new");
                 return new NetClientDumper();
             }
 
@@ -198,7 +188,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
     }
 
-    public interface IDumperFactory 
+    public interface IDumperFactory
     {
         IDumper Create(Version frameworkVersion);
     }

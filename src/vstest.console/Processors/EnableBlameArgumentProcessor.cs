@@ -226,14 +226,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 var dumpParameters = collectDumpParameters.Where(p => new[] { "CollectAlways", "CollectDump", "DumpType" }.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value);
                 if (dumpParameters.Keys.Any())
                 {
+                    if (!dumpParameters.ContainsKey("DumpType"))
+                    {
+                        dumpParameters.Add("DumpType", "Full");
+                    }
                     AddCollectDumpNode(dumpParameters, XmlDocument, outernode);
                 }
-            } 
+            }
 
-            if (enableHangDump) { 
-                var hangDumpParameters = collectDumpParameters.Where(p => new[] { "TestTimeout", "DumpType" }.Contains(p.Key) ).ToDictionary(p => p.Key, p => p.Value);
+            if (enableHangDump)
+            {
+                var hangDumpParameters = collectDumpParameters.Where(p => new[] { "TestTimeout", "DumpType" }.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value);
                 if (hangDumpParameters.Keys.Any())
                 {
+                    if (!hangDumpParameters.ContainsKey("DumpType"))
+                    {
+                        hangDumpParameters.Add("DumpType", "Full");
+                    }
                     AddCollectHangDumpNode(hangDumpParameters, XmlDocument, outernode);
                 }
             }
@@ -284,9 +293,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>Dump collection supported flag.</returns>
         private bool IsDumpCollectionSupported()
         {
-            var dumpCollectionSupported = true; // this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
-            //        this.environment.Architecture != PlatformArchitecture.ARM64 &&
-            //        this.environment.Architecture != PlatformArchitecture.ARM;
+            var dumpCollectionSupported =
+                this.environment.OperatingSystem == PlatformOperatingSystem.Windows
+                && this.environment.Architecture != PlatformArchitecture.ARM64
+                && this.environment.Architecture != PlatformArchitecture.ARM;
 
             if (!dumpCollectionSupported)
             {
@@ -302,11 +312,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>Dump collection supported flag.</returns>
         private bool IsHangDumpCollectionSupported()
         {
-            var dumpCollectionSupported = true; // this.environment.OperatingSystem != PlatformOperatingSystem.OSX;
+            var dumpCollectionSupported =
+                this.environment.OperatingSystem != PlatformOperatingSystem.OSX
+                && this.environment.Architecture != PlatformArchitecture.ARM64
+                && this.environment.Architecture != PlatformArchitecture.ARM;
 
             if (!dumpCollectionSupported)
             {
-                Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
+                Output.Warning(false, CommandLineResources.BlameCollectDumpTestTimeoutNotSupportedForPlatform);
             }
 
             return dumpCollectionSupported;

@@ -75,7 +75,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
         {
-            Console.WriteLine("hang dump:");
             this.wasHangDumped = true;
             Dump(processId, dumpFileGuid, testResultsDirectory, isFullDump, isHangDump: true, nameof(StartHangBasedProcessDump), frameworkVersion);
         }
@@ -85,7 +84,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
         {
-            Console.WriteLine("crash dump:");
             internalProcDump.StartTriggerBasedProcessDump(processId, dumpFileGuid, testResultsDirectory, isFullDump, frameworkVersion);
         }
 
