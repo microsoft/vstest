@@ -110,5 +110,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Cancels the discovery of tests
         /// </summary>
         void CancelDiscovery();
+
+        /// <summary>
+        /// Provides back all attachements to TestPlatform for additional processing (for example merging)
+        /// </summary>
+        /// <param name="attachments">List of attachements</param>
+        /// <param name="testSessionEventsHandler"></param>
+        void OnTestSessionEnd(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler testSessionEventsHandler);
     }
 }

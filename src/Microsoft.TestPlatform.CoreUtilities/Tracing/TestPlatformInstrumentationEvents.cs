@@ -157,5 +157,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// Event fired on Metrics Dispose completes.
         /// </summary>
         public const int MetricsDisposeStopEventId = 0x39;
+
+        /// <summary>
+        /// The session finalization start event id.
+        /// </summary>
+        public const int SessionFinalizationStartEventId = 0x40;
+
+        /// <summary>
+        /// The session finalization stop event id.
+        /// </summary>
+        public const int SessionFinalizationStopEventId = 0x41;
+
+        /// <summary>
+        /// The session finalization request start event id.
+        /// </summary>
+        public const int SessionFinalizationRequestStartEventId = 0x42;
+
+        /// <summary>
+        /// The session finalization request stop event id.
+        /// </summary>
+        public const int SessionFinalizationRequestStopEventId = 0x43;
+
+        /// <summary>
+        /// The adapter session finalization start event id.
+        /// </summary>
+        public const int AdapterSessionFinalizationStartEventId = 0x44;
+
+        /// <summary>
+        /// The adapter session finalization stop event id.
+        /// </summary>
+        public const int AdapterSessionFinalizationStopEventId = 0x45;
+
+        /// <summary>
+        /// Events fired on session finalization start of translation layer.
+        /// </summary>
+        public const int TranslationLayerSessionFinalizationStartEventId = 0x46;
+
+        /// <summary>
+        /// Events fired on session finalization complete in translation layer.
+        /// </summary>
+        public const int TranslationLayerSessionFinalizationStopEventId = 0x47;
     }
 }

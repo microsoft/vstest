@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
     /// via the <c>vstest.console</c> test runner.
     /// </summary>
-    public class VsTestConsoleWrapper : IVsTestConsoleWrapper
+    public class VsTestConsoleWrapper : IVsTestConsoleWrapper2
     {
         #region Private Members
 
@@ -271,6 +271,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.vstestConsoleProcessManager.ShutdownProcess();
 
             this.sessionStarted = false;
+        }
+
+        /// <inheritdoc/>
+        public void OnTestSessionEnd(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler testSessionEventsHandler)
+        {
+            this.EnsureInitialized();
+
+            this.requestSender.OnTestSessionEnd(attachments, testSessionEventsHandler);
         }
 
         #endregion

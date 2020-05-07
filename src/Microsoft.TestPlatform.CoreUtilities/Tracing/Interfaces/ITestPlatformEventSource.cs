@@ -182,5 +182,54 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// Mark the completion of Metrics Dispose.
         /// </summary>
         void MetricsDisposeStop();
+
+        /// <summary>
+        /// The session finalization request start.
+        /// </summary>
+        void SessionFinalizationRequestStart();
+
+        /// <summary>
+        /// The session finalization request stop.
+        /// </summary>
+        void SessionFinalizationRequestStop();
+
+        /// <summary>
+        /// The adapter session finalization start.
+        /// </summary>
+        /// <param name="numberOfAttachements">
+        /// The number of attachements.
+        /// </param>
+        void AdapterSessionFinalizationStart(long numberOfAttachements);
+
+        /// <summary>
+        /// The adapter session finalization stop.
+        /// </summary>
+        /// <param name="numberOfAttachements">
+        /// The number of attachements.
+        /// </param>
+        void AdapterSessionFinalizationStop(long numberOfAttachements);
+
+        /// <summary>
+        /// The session finalization start.
+        /// </summary>
+        void SessionFinalizationStart();
+
+        /// <summary>
+        /// The session finalization stop.
+        /// </summary>
+        /// <param name="numberOfAttachements">
+        /// The number of attachements.
+        /// </param>
+        void SessionFinalizationStop(long numberOfAttachements);
+
+        /// <summary>
+        /// Mark the start of translation layer session finalization request.
+        /// </summary>
+        void TranslationLayerSessionFinalizationStart();
+
+        /// <summary>
+        /// Mark the completion of translation layer session finalization request.
+        /// </summary>
+        void TranslationLayerSessionFinalizationStop();
     }
 }

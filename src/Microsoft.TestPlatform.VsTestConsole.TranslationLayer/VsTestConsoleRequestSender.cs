@@ -19,6 +19,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
@@ -383,6 +384,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
+        /// <inheritdoc/>
+        public void OnTestSessionEnd(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler testSessionEventsHandler)
+        {
+            this.SendMessageAndListenAndReportAttachements(attachments, testSessionEventsHandler);
+        }
+
         /// <summary>
         /// Closes the communication channel
         /// </summary>
@@ -715,6 +722,59 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
+        }
+
+        private void SendMessageAndListenAndReportAttachements(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler eventHandler)
+        {
+            try
+            {
+                var payload = new OnTestSessionEndPayload
+                {
+                    Attachments = attachments
+                };
+                this.communicationManager.SendMessage(MessageType.OnTestSessionEnd, payload);
+                var isSessionComplete = false;
+
+                // Cycle through the messages that the vstest.console sends.
+                // Currently each of the operations are not separate tasks since they should not each take much time.
+                // This is just a notification.
+                while (!isSessionComplete)
+                {
+                    var message = this.TryReceiveMessage();
+
+                    if (string.Equals(MessageType.OnTestSessionEndCallback, message.MessageType))
+                    {
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachements: Process complete.");
+                        }
+
+                        var testSessionCompletePayload = this.dataSerializer.DeserializePayload<TestSessionCompletePayload>(message);
+
+                        eventHandler.HandleTestSessionComplete(testSessionCompletePayload.Attachments);
+                        isSessionComplete = true;
+                    }
+                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                    {
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedSessionFinalization);               
+                eventHandler.HandleTestSessionComplete(null);
+
+                // Earlier we were closing the connection with vstest.console in case of exceptions
+                // Removing that code because vstest.console might be in a healthy state and letting the client
+                // know of the error, so that the TL can wait for the next instruction from the client itself.
+                // Also, connection termination might not kill the process which could result in files being locked by testhost.
+            }
+            
+            // TODO: do we need events?
+            this.testPlatformEventSource.TranslationLayerSessionFinalizationStop(); 
         }
 
         private Message TryReceiveMessage()

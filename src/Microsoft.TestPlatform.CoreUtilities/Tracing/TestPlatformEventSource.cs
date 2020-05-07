@@ -237,5 +237,61 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.MetricsDisposeStopEventId);
         }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.SessionFinalizationRequestStartEventId)]
+        public void SessionFinalizationRequestStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationRequestStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.SessionFinalizationRequestStopEventId)]
+        public void SessionFinalizationRequestStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationRequestStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStartEventId)]
+        public void AdapterSessionFinalizationStart(long numberOfAttachements)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStartEventId, numberOfAttachements);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStopEventId)]
+        public void AdapterSessionFinalizationStop(long numberOfAttachements)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStopEventId, numberOfAttachements);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.SessionFinalizationStartEventId)]
+        public void SessionFinalizationStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.SessionFinalizationStopEventId)]
+        public void SessionFinalizationStop(long numberOfAttachements)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationStopEventId, numberOfAttachements);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStartEventId)]
+        public void TranslationLayerSessionFinalizationStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStopEventId)]
+        public void TranslationLayerSessionFinalizationStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStopEventId);
+        }
     }
 }

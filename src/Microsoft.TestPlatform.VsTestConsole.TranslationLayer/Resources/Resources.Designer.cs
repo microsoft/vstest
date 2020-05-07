@@ -10,7 +10,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -20,10 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -37,10 +36,11 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Reso" +
+                            "urces", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -60,47 +60,56 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 resourceCulture = value;
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The active Session Finalization was aborted..
+        /// </summary>
+        internal static string AbortedSessionFinalization {
+            get {
+                return ResourceManager.GetString("AbortedSessionFinalization", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Discovery was aborted..
         /// </summary>
-        public static string AbortedTestsDiscovery {
+        internal static string AbortedTestsDiscovery {
             get {
                 return ResourceManager.GetString("AbortedTestsDiscovery", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Run was aborted..
         /// </summary>
-        public static string AbortedTestsRun {
+        internal static string AbortedTestsRun {
             get {
                 return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Failed to receive message from vstest.console process.
         /// </summary>
-        public static string FailedToReceiveMessage {
+        internal static string FailedToReceiveMessage {
             get {
                 return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to File {0} does not exists.
         /// </summary>
-        public static string InvalidFilePath {
+        internal static string InvalidFilePath {
             get {
                 return ResourceManager.GetString("InvalidFilePath", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to vstest.console process exited abnormally.
         /// </summary>
-        public static string VsTestProcessExitedAbnormally {
+        internal static string VsTestProcessExitedAbnormally {
             get {
                 return ResourceManager.GetString("VsTestProcessExitedAbnormally", resourceCulture);
             }
