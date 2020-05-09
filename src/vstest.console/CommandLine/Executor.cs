@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Quick exit for syntax error
             if (exitCode == 1
                 && argumentProcessors.All(
-                    processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName))
+                    processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName && !processor.Metadata.Value.IsSpecialCommand))
             {
                 this.testPlatformEventSource.VsTestConsoleStop();
                 return exitCode;
@@ -204,11 +204,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
             }
 
-            // Add the internal argument processors that should always be executed.
+            // Add the argument processors that should always be executed.
             // Examples: processors to enable loggers that are statically configured, and to start logging,
             // should always be executed.
             var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
-            processors.AddRange(processorsToAlwaysExecute);
+            foreach (var processorToAlwaysExecute in processorsToAlwaysExecute)
+            {
+                if (processorToAlwaysExecute.Metadata.Value.AllowMultiple ||
+                    !processors.Any(p => p.GetType() == processorToAlwaysExecute.GetType()))
+                {
+                    processors.Add(processorToAlwaysExecute);
+                }
+            }
 
             // Initialize Runsettings with defaults
             RunSettingsManager.Instance.AddDefaultRunSettings();
