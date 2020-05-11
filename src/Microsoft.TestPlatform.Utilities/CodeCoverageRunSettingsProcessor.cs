@@ -7,56 +7,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
     using System.Collections.Generic;
     using System.Xml;
+    using System.Xml.XPath;
 
-    internal class ExclusionType
+    public class CodeCoverageRunSettingsProcessor
     {
-        private string path;
-
-        private IDictionary<string, XmlNode> exclusionRules;
-  
-        public ExclusionType(string path)
-        {
-            this.path = path;
-
-            this.exclusionRules = new Dictionary<string, XmlNode>();
-        }
-
-        public void AddExclusionNodes(XmlDocument doc)
-        {
-            var masterNode = doc.SelectSingleNode(this.path);
-
-            foreach (XmlNode child in masterNode.ChildNodes)
-            {
-                var key = child.OuterXml;
-                if (this.exclusionRules.ContainsKey(key))
-                {
-                    continue;
-                }
-
-                this.exclusionRules.Add(key, child);
-            }
-        }
-
-        public void ReplaceExclusionNodes(XmlDocument doc)
-        {
-            var masterNode = doc.SelectSingleNode(this.path);
-
-            masterNode.RemoveAll();
-            foreach (var child in this.exclusionRules.Values)
-            {
-                masterNode.AppendChild(child);
-            }
-        }
-    }
-
-    internal class CodeCoverageRunSettingsProcessor
-    {
+        #region Members
         private static readonly string CodeCoverageCollectorDefaultSettings =
             @"<DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
             @"  <Configuration>" + Environment.NewLine +
             @"    <CodeCoverage>" + Environment.NewLine +
             @"      <ModulePaths>" + Environment.NewLine +
-            @"        <Exclude>" + Environment.NewLine +
+            @"        <Exclude mergeDefaults='true'>" + Environment.NewLine +
             @"           <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
             @"           <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
             @"           <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
@@ -133,8 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private XmlDocument runSettingsDocument;
 
-        private IEnumerable<ExclusionType> exclusions;
+        private IEnumerable<Tuple<string, IDictionary<string, XmlNode>>> exclusionClasses;
+        #endregion
 
+        #region Constructors & Helpers
         public CodeCoverageRunSettingsProcessor(string runSettings)
         {
             ValidateArg.NotNullOrEmpty(runSettings, nameof(runSettings));
@@ -159,38 +122,150 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             defaultRunSettingsDocument = new XmlDocument();
             defaultRunSettingsDocument.LoadXml(CodeCoverageRunSettingsProcessor.CodeCoverageCollectorDefaultSettings);
 
-            this.exclusions = new List<ExclusionType>()
+            this.exclusionClasses = new List<Tuple<string, IDictionary<string, XmlNode>>>()
             {
-                new ExclusionType(@"/DataCollector/Configuration/CodeCoverage/ModulePaths/Exclude"),
-                new ExclusionType(@"/DataCollector/Configuration/CodeCoverage/Functions/Exclude"),
-                new ExclusionType(@"/DataCollector/Configuration/CodeCoverage/Attributes/Exclude"),
-                new ExclusionType(@"/DataCollector/Configuration/CodeCoverage/Sources/Exclude")
+                new Tuple<string, IDictionary<string, XmlNode>>(
+                    @"./Configuration/CodeCoverage/ModulePaths/Exclude",
+                    new Dictionary<string, XmlNode>()),
+
+                new Tuple<string, IDictionary<string, XmlNode>>(
+                    @"./Configuration/CodeCoverage/Attributes/Exclude",
+                    new Dictionary<string, XmlNode>()),
+
+                new Tuple<string, IDictionary<string, XmlNode>>(
+                    @"./Configuration/CodeCoverage/Sources/Exclude",
+                    new Dictionary<string, XmlNode>()),
+
+                new Tuple<string, IDictionary<string, XmlNode>>(
+                    @"./Configuration/CodeCoverage/Functions/Exclude",
+                    new Dictionary<string, XmlNode>())
             };
         }
+        #endregion
 
+        #region Public Interface
         public string Process()
         {
-            this.Merge();
-            this.Replace();
+            var codeCoverageDataCollectorNode = GetCodeCoverageDataCollectorNode();
+            if (codeCoverageDataCollectorNode == null)
+            {
+                // What do we do if we cannot extract code coverage data collectors node ?
+                return this.runSettingsDocument.OuterXml;
+            }
+
+            foreach (var exclusionClass in this.exclusionClasses)
+            {
+                var node = this.ExtractNode(codeCoverageDataCollectorNode, exclusionClass.Item1);
+                if (node == null)
+                {
+                    // What do we do if we cannot extract the specified class ?
+                    continue;
+                }
+
+                if (!this.ShouldProcessCurrentExclusionClass(node))
+                {
+                    continue;
+                }
+
+                var defaultNode = this.ExtractNode(this.defaultRunSettingsDocument.FirstChild, exclusionClass.Item1);
+
+                AddNodes(defaultNode, exclusionClass);
+                AddNodes(node, exclusionClass);
+
+                ReplaceNodes(node, exclusionClass);
+            }
 
             return this.runSettingsDocument.OuterXml;
         }
+        #endregion
 
-        private void Merge()
+        #region Private Methods
+        private XmlNode GetCodeCoverageDataCollectorNode()
         {
-            foreach (var exclusionType in this.exclusions)
+            const string prefix = @"/RunSettings/DataCollectionRunSettings/DataCollectors";
+
+            var dataCollectorsNode = this.ExtractNode(this.runSettingsDocument, prefix);
+            if (dataCollectorsNode == null)
             {
-                exclusionType.AddExclusionNodes(this.defaultRunSettingsDocument);
-                exclusionType.AddExclusionNodes(this.runSettingsDocument);
+                // Should we return default exclusions in this case ?
+                return dataCollectorsNode;
+            }
+
+            foreach (XmlNode node in dataCollectorsNode.ChildNodes)
+            {
+                foreach (XmlAttribute attribute in node.Attributes)
+                {
+                    if (attribute.Name == "uri" && attribute.Value == "datacollector://microsoft/CodeCoverage/2.0")
+                    {
+                        return node;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private bool ShouldProcessCurrentExclusionClass(XmlNode node)
+        {
+            foreach (XmlAttribute attribute in node.Attributes)
+            {
+                if (attribute.Name == "mergeDefaults" && attribute.Value == "false")
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private XmlNode ExtractNode(XmlNode doc, string path)
+        {
+            try
+            {
+                return doc.SelectSingleNode(path);
+            }
+            catch (XPathException ex)
+            {
+                EqtTrace.Error("CodeCoverageRunSettingsProcessor.ExtractNode: Cannot select single node \"{0}\".", ex.Message);
+            }
+
+            return null;
+        }
+
+        private void AddNodes(XmlNode node, Tuple<string, IDictionary<string, XmlNode>> exclusionClass)
+        {
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                var key = child.OuterXml;
+                if (exclusionClass.Item2.ContainsKey(key))
+                {
+                    continue;
+                }
+
+                exclusionClass.Item2.Add(key, child);
             }
         }
 
-        private void Replace()
+        private void ReplaceNodes(XmlNode node, Tuple<string, IDictionary<string, XmlNode>> exclusionClass)
         {
-            foreach (var exclusionType in this.exclusions)
+            foreach (XmlNode child in node.ChildNodes)
             {
-                exclusionType.ReplaceExclusionNodes(this.runSettingsDocument);
+                if (!exclusionClass.Item2.ContainsKey(child.OuterXml))
+                {
+                    continue;
+                }
+
+                exclusionClass.Item2.Remove(child.OuterXml);
             }
+
+            foreach (var child in exclusionClass.Item2.Values)
+            {
+                var imported = node.OwnerDocument.ImportNode(child, true);
+                node.AppendChild(imported);
+            }
+
+            exclusionClass.Item2.Clear();
         }
+        #endregion
     }
 }
