@@ -72,8 +72,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: Attaching to process '{processId}' to dump into '{outputFile}'.");
 
+            // Procdump will append .dmp at the end of the dump file. We generate this internally so it is rather a safety check.
+            if (!outputFile.EndsWith(".dmp", StringComparison.OrdinalIgnoreCase)) {
+                throw new InvalidOperationException("Procdump crash dump file must end with .dmp extension.");
+            }
             this.tempDirectory = Path.GetDirectoryName(outputFile);
-            this.dumpFileName = outputFile;
+            this.dumpFileName = Path.GetFileNameWithoutExtension(outputFile);
 
             string procDumpArgs = new ProcDumpArgsBuilder().BuildTriggerBasedProcDumpArgs(
                 processId,

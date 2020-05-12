@@ -179,13 +179,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Verbose("Inactivity timer is already disposed.");
             }
 
-            if (this.collectProcessDumpOnTrigger)
-            {
-                // Detach procdump from the testhost process to prevent testhost process from crashing
-                // if/when we try to kill the existing proc dump process.
-                this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
-            }
-
             try
             {
                 this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
@@ -193,6 +186,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             catch (Exception ex)
             {
                 EqtTrace.Error($"BlameCollector.CollectDumpAndAbortTesthost: Failed with error {ex}");
+            }
+
+            if (this.collectProcessDumpOnTrigger)
+            {
+                // Detach procdump from the testhost process to prevent testhost process from crashing
+                // if/when we try to kill the existing proc dump process.
+                this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
             try
