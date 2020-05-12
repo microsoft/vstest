@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             @"  <Configuration>" + Environment.NewLine +
             @"    <CodeCoverage>" + Environment.NewLine +
             @"      <ModulePaths>" + Environment.NewLine +
-            @"        <Exclude mergeDefaults='true'>" + Environment.NewLine +
+            @"        <Exclude>" + Environment.NewLine +
             @"           <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
             @"           <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
             @"           <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
