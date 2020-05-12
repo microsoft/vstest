@@ -109,5 +109,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Configuration value for mini
         /// </summary>
         public const string MiniConfigurationValue = "Mini";
+
+        /// <summary>
+        /// The target framework of test host.
+        /// </summary>
+        public const string TargetFramework = "Framework";
     }
 }

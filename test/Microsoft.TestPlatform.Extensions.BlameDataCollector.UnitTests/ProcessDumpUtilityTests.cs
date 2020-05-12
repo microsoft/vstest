@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     {
         private Mock<IFileHelper> mockFileHelper;
         private Mock<IProcessHelper> mockProcessHelper;
-        private Mock<IDumperFactory> mockDumperFactory;
+        private Mock<IHangDumperFactory> mockDumperFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessDumpUtilityTests"/> class.
@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.mockDumperFactory = new Mock<IDumperFactory>();
+            this.mockDumperFactory = new Mock<IHangDumperFactory>();
         }
 
         /// <summary>
@@ -48,15 +48,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
 
-            this.mockDumperFactory.Setup(x => x.Create(It.IsAny<Version>()))
-                .Returns(new Mock<IDumper>().Object);
+            this.mockDumperFactory.Setup(x => x.Create(It.IsAny<string>()))
+                .Returns(new Mock<IHangDumper>().Object);
 
             var processDumpUtility = new ProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
                 this.mockDumperFactory.Object);
 
-            processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory);
+            processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory, false, ".NETCoreApp,Version=v5.0");
 
             var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
             Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);

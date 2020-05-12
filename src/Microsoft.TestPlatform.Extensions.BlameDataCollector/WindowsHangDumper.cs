@@ -6,25 +6,12 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-#if NETSTANDARD || NETCOREAPP
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.Diagnostics.NETCore.Client;
-#endif
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    public interface IDumper
-    {
-        void Dump(int processId, string outputFile, DumpTypeOption dumpType);
-    }
-
-    public enum DumpTypeOption
-    {
-        Full,
-        WithHeap,
-        Mini,
-    }
-
-    class WindowsDumper : IDumper
+    class WindowsHangDumper : IHangDumper
     {
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
@@ -132,8 +119,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
     }
 
-#if NETSTANDARD || NETCOREAPP
-    class SigtrapDumper : IDumper
+    class SigtrapDumper : IHangDumper
     {
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
@@ -141,7 +127,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
     }
 
-    class NetClientDumper : IDumper
+    class NetClientDumper : IHangDumper
     {
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
@@ -151,45 +137,75 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
     }
 
-#endif
-    class DumperFactory : IDumperFactory
+    class HangDumperFactory : IHangDumperFactory
     {
-        public IDumper Create(Version frameworkVersion)
+        public IHangDumper Create(string targetFramework)
         {
-#if !NETSTANDARD && !NETCOREAPP
-            return new WindowsDumper();
-#else
+            EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return new WindowsDumper();
+                EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
+                return new WindowsHangDumper();
             }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                if (frameworkVersion != default && frameworkVersion <= new Version("2.1"))
+                if (!string.IsNullOrWhiteSpace(targetFramework) && targetFramework.Contains("v2.1"))
                 {
+                    EqtTrace.Info($"HangDumperFactory: This is Linux on netcoreapp2.1, returning SigtrapDumper.");
+
                     return new SigtrapDumper();
                 }
+
+                EqtTrace.Info($"HangDumperFactory: This is Linux netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
                 return new NetClientDumper();
             }
 
             // this is not supported yet
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
+            //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            //{
+                
                 //if (frameworkVersion != default && frameworkVersion <= new Version("5.0"))
                 //{
                 //    return new SigtrapDumper();
                 //}
-                return new NetClientDumper();
-            }
+
+                //EqtTrace.Info($"HangDumperFactory: This is OSX on netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
+                //return new NetClientDumper();
+            //}
 
             throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");
-#endif
         }
     }
 
-    public interface IDumperFactory
+    public interface IHangDumperFactory
     {
-        IDumper Create(Version frameworkVersion);
+        IHangDumper Create(string targetFramework);
+    }
+
+    public interface ICrashDumperFactory
+    {
+        ICrashDumper Create(string targetFramework);
+    }
+
+    public interface IHangDumper
+    {
+        void Dump(int processId, string outputFile, DumpTypeOption dumpType);
+    }
+
+    public interface ICrashDumper
+    {
+        void AttachToTargetProcess(int processId, string outputFile, DumpTypeOption dumpType);
+        
+        void WaitForDumpToFinish();
+
+        void DetachFromTargetProcess(int processId);
+    }
+
+    public enum DumpTypeOption
+    {
+        Full,
+        WithHeap,
+        Mini,
     }
 }

@@ -5,6 +5,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.IO;
+    using System.Runtime.InteropServices;
+    using System.Security.Cryptography.X509Certificates;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -16,94 +18,99 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     {
         private readonly IProcessHelper processHelper;
         private readonly IFileHelper fileHelper;
-        private readonly IDumperFactory dumperFactory;
-        private readonly ProcDumpProcessDumpUtility internalProcDump;
-        private string dumpPath;
+        private readonly IHangDumperFactory hangDumperFactory;
+        private ICrashDumper crashDumper;
+        private string hangDumpPath;
+        private string crashDumpPath;
         private bool wasHangDumped;
 
-        public ProcessDumpUtility() : this(new ProcessHelper(), new FileHelper(), new DumperFactory())
+        public ProcessDumpUtility() : this(new ProcessHelper(), new FileHelper(), new HangDumperFactory())
         {
         }
 
-        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IDumperFactory dumperFactory)
+        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IHangDumperFactory hangDumperFactory)//, ICrashDumperFactory crashDumperFactory)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
-            this.dumperFactory = dumperFactory;
-            this.internalProcDump = new ProcDumpProcessDumpUtility();
+            this.hangDumperFactory = hangDumperFactory;
+            
         }
 
         protected Action<object, string> OutputReceivedCallback => (process, data) =>
         {
-            //// Log all standard output message of procdump in diag files.
-            //// Otherwise they end up coming on console in pipleine.
-            //if (EqtTrace.IsInfoEnabled)
-            //{
-            //    EqtTrace.Info("DotnetProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
-            //}
+            // Log all standard output message of procdump in diag files.
+            // Otherwise they end up coming on console in pipleine.
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
+            }
         };
 
         /// <inheritdoc/>
         public string GetDumpFile()
         {
+            string dumpPath;
             if (!wasHangDumped)
-                return this.internalProcDump.GetDumpFile();
-
-             
-
-            if (string.IsNullOrWhiteSpace(this.dumpPath))
             {
-                return string.Empty;
+                this.crashDumper.WaitForDumpToFinish();
+                dumpPath = this.crashDumpPath;
+            }
+            else
+            {
+                dumpPath = this.hangDumpPath;
             }
 
-            var found = this.fileHelper.Exists(this.dumpPath);
+            EqtTrace.Info($"ProcessDumpUtility.GetDumpFile: Looking for dump file '{dumpPath}'.");
+            var found = this.fileHelper.Exists(dumpPath);
             if (found)
             {
-                EqtTrace.Info($"DotnetProcessDumpUtility.GetDumpFile: Found dump file '{this.dumpPath}'.");
-                return this.dumpPath;
+                EqtTrace.Info($"ProcessDumpUtility.GetDumpFile: Found dump file '{dumpPath}'.");
+                return dumpPath;
             }
 
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Info($"DotnetProcessDumpUtility.GetDumpFile: Dump file '{this.dumpPath}' was not found.");
-            }
-
+            EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Dump file '{dumpPath}' was not found.");
             throw new FileNotFoundException(Resources.Resources.DumpFileNotGeneratedErrorMessage);
         }
 
 
         /// <inheritdoc/>
-        public void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
+        public void StartHangBasedProcessDump(int processId, string dumpFileGuid, string tempDirectory, bool isFullDump, string targetFramework)
         {
-            this.wasHangDumped = true;
-            Dump(processId, dumpFileGuid, testResultsDirectory, isFullDump, isHangDump: true, nameof(StartHangBasedProcessDump), frameworkVersion);
+            HangDump(processId, dumpFileGuid, tempDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework);
         }
 
-
-
         /// <inheritdoc/>
-        public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false, string frameworkVersion = null)
+        public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump, string targetFramework)
         {
-            internalProcDump.StartTriggerBasedProcessDump(processId, dumpFileGuid, testResultsDirectory, isFullDump, frameworkVersion);
+            CrashDump(processId, dumpFileGuid, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework);
         }
 
         /// <inheritdoc/>
         public void DetachFromTargetProcess(int targetProcessId)
         {
-            internalProcDump.DetachFromTargetProcess(targetProcessId);
+            crashDumper?.DetachFromTargetProcess(targetProcessId);
         }
 
-        /// <inheritdoc/>
-        public void TerminateProcess()
+        private void CrashDump(int processId, string dumpFileGuid, string tempDirectory, DumpTypeOption dumpType, string targetFramework)
         {
-            internalProcDump.TerminateProcess();
+            var dumpPath = GetDumpPath(processId, dumpFileGuid, tempDirectory, isHangDump: false, out var processName);
+
+            EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{dumpPath}'.");
+            this.crashDumpPath = dumpPath;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                throw new NotSupportedException($"Operating system {RuntimeInformation.OSDescription} is not supported for crash dumps.");
+            }
+
+            this.crashDumper = new ProcDumpCrashDumper();
+            ConsoleOutput.Instance.Information(true, $"Blame: Creating crash dump of process {processName} ({processId}).");
+            this.crashDumper.AttachToTargetProcess(processId, dumpPath, dumpType);
+            EqtTrace.Info($"ProcessDumpUtility.CrashDump: Process {processName} ({processId}) was dumped into temporary path '{dumpPath}'.");
         }
 
-        private void Dump(int processId, string dumpFileGuid, string tempDirectory, bool isFullDump , bool isHangDump, string caller, string frameworkVersion = "4.6")
+        private void HangDump(int processId, string dumpFileGuid, string tempDirectory, DumpTypeOption dumpType, string targetFramework)
         {
-            var processName = this.processHelper.GetProcessName(processId);
-
-            var dumpType = isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini;
+            this.wasHangDumped = true;
             // the below format is extremely ugly maybe we can use: 
             // https://github.com/microsoft/testfx/issues/678
             // which will order the files correctly gives more info when transported out of 
@@ -112,20 +119,25 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // var dumpFileName = $"crash_{processName}_{DateTime.Now:yyyyMMddTHHmmss}_{processId}.dmp";
             //var dumpFileName = $"{prefix}_{processName}_{DateTime.Now:yyyyMMddTHHmmss}_{processId}.dmp";
 
+            var dumpPath = GetDumpPath(processId, dumpFileGuid, tempDirectory, isHangDump: true, out var processName);
+
+            EqtTrace.Info($"ProcessDumpUtility.HangDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{dumpPath}'.");
+            this.hangDumpPath = dumpPath;
+
+            var dumper = this.hangDumperFactory.Create(targetFramework);
+            ConsoleOutput.Instance.Information(true, $"Blame: Creating hang dump of process {processName} ({processId}).");
+            dumper.Dump(processId, dumpPath, dumpType);
+            EqtTrace.Info($"ProcessDumpUtility.HangDump: Process {processName} ({processId}) was dumped into temporary path '{dumpPath}'.");
+        }
+
+        private string GetDumpPath(int processId, string dumpFileGuid, string tempDirectory, bool isHangDump, out string processName)
+        {
+            processName = this.processHelper.GetProcessName(processId);
             var suffix = isHangDump ? "hang" : "crash";
             var dumpFileName = $"{processName}_{processId}_{dumpFileGuid}_{suffix}dump.dmp";
 
             var path = Path.GetFullPath(tempDirectory);
-            var dumpPath = Path.Combine(path, dumpFileName);
-
-            EqtTrace.Info($"DotnetProcessDumpUtility.{caller}: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into '{dumpPath}'.");
-            this.dumpPath = dumpPath;
-
-            var dumper = this.dumperFactory.Create(Version.TryParse(frameworkVersion, out var v) ? v : default);
-            ConsoleOutput.Instance.Information(true, $"Blame: Dumping process { processName} (id { processId}).");
-            dumper.Dump(processId, dumpPath, dumpType);
-
-            EqtTrace.Info($"DotnetProcessDumpUtility.{caller}: Process {processName} ({processId}) was dumped into '{dumpPath}'.");
+            return Path.Combine(path, dumpFileName);
         }
     }
 }

@@ -94,6 +94,7 @@ Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
 $TPB_TargetFramework = "net451"
+$TPB_TargetFramework472 = "net472"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.1"
 $TPB_TargetFrameworkUap = "uap10.0"
 $TPB_TargetFrameworkNS2_0 = "netstandard2.0"
@@ -321,7 +322,7 @@ function Publish-Package
     Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework $fullCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
-    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullCLRPackageDir
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     # Publish testhost
@@ -351,7 +352,7 @@ function Publish-Package
     Set-ScriptFailedOnError
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
-    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackageDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force -recurse
@@ -405,7 +406,7 @@ function Publish-Package
     # Copy Blame Datacollector to Extensions folder.
     $TPB_TargetFrameworkStandard = "netstandard2.0"
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
-    $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework
+    $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework472
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
