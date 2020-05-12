@@ -3,16 +3,93 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using System.Xml;
     using System.Xml.XPath;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class CodeCoverageRunSettingsProcessor
     {
+        #region Type Members
+        /// <summary>
+        /// 
+        /// </summary>
+        private class Exclusion
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            private string path;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public IEnumerable<string> PathComponents { get; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public IDictionary<string, XmlNode> ExclusionRules { get; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public string Path
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(this.path))
+                    {
+                        this.path = Exclusion.BuildPath(this.PathComponents);
+                    }
+
+                    return this.path;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// 
+            /// <param name="pathComponents"></param>
+            public Exclusion(IEnumerable<string> pathComponents)
+            {
+                this.path = string.Empty;
+                this.PathComponents = pathComponents;
+                this.ExclusionRules = new Dictionary<string, XmlNode>();
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// 
+            /// <returns></returns>
+            public static string BuildPath(IEnumerable<string> pathComponents)
+            {
+                var path = ".";
+
+                foreach (var component in pathComponents)
+                {
+                    path += "/" + component;
+                }
+
+                return path;
+            }
+        }
+        #endregion
+
         #region Members
-        private static readonly string CodeCoverageCollectorDefaultSettings =
+        #region Default Settings String
+        /// <summary>
+        /// 
+        /// </summary>
+        private static readonly string DefaultSettings =
             @"<DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
             @"  <Configuration>" + Environment.NewLine +
             @"    <CodeCoverage>" + Environment.NewLine +
@@ -89,105 +166,145 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             @"    </CodeCoverage>" + Environment.NewLine +
             @"  </Configuration>" + Environment.NewLine +
             @"</DataCollector>";
+        #endregion
 
-        private XmlDocument defaultRunSettingsDocument;
+        /// <summary>
+        /// 
+        /// </summary>
+        private XmlDocument defaultSettingsDocument;
 
-        private XmlDocument runSettingsDocument;
+        /// <summary>
+        /// 
+        /// </summary>
+        private XmlDocument currentSettingsDocument;
 
-        private IEnumerable<Tuple<string, IDictionary<string, XmlNode>>> exclusionClasses;
+        /// <summary>
+        /// 
+        /// </summary>
+        private IEnumerable<Exclusion> exclusions;
         #endregion
 
         #region Constructors & Helpers
-        public CodeCoverageRunSettingsProcessor(string runSettings)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="currentSettings"></param>
+        public CodeCoverageRunSettingsProcessor(string currentSettings)
         {
-            ValidateArg.NotNullOrEmpty(runSettings, nameof(runSettings));
+            ValidateArg.NotNullOrEmpty(currentSettings, nameof(currentSettings));
 
-            runSettingsDocument = new XmlDocument();
-            runSettingsDocument.LoadXml(runSettings);
+            this.currentSettingsDocument = new XmlDocument();
+            this.currentSettingsDocument.LoadXml(currentSettings);
 
-            this.Initialize(runSettingsDocument);
+            this.Initialize(currentSettingsDocument);
         }
 
-        public CodeCoverageRunSettingsProcessor(XmlDocument runSettingsDocument)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="currentSettingsDocument"></param>
+        public CodeCoverageRunSettingsProcessor(XmlDocument currentSettingsDocument)
         {
-            ValidateArg.NotNull(runSettingsDocument, nameof(runSettingsDocument));
+            ValidateArg.NotNull(currentSettingsDocument, nameof(currentSettingsDocument));
 
-            this.Initialize(runSettingsDocument);
+            this.Initialize(currentSettingsDocument);
         }
 
-        private void Initialize(XmlDocument runSettingsDocument)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="currentSettingsDocument"></param>
+        private void Initialize(XmlDocument currentSettingsDocument)
         {
-            this.runSettingsDocument = runSettingsDocument;
+            this.currentSettingsDocument = currentSettingsDocument;
 
-            defaultRunSettingsDocument = new XmlDocument();
-            defaultRunSettingsDocument.LoadXml(CodeCoverageRunSettingsProcessor.CodeCoverageCollectorDefaultSettings);
+            this.defaultSettingsDocument = new XmlDocument();
+            this.defaultSettingsDocument.LoadXml(CodeCoverageRunSettingsProcessor.DefaultSettings);
 
-            this.exclusionClasses = new List<Tuple<string, IDictionary<string, XmlNode>>>()
+            this.exclusions = new List<Exclusion>
             {
-                new Tuple<string, IDictionary<string, XmlNode>>(
-                    @"./Configuration/CodeCoverage/ModulePaths/Exclude",
-                    new Dictionary<string, XmlNode>()),
-
-                new Tuple<string, IDictionary<string, XmlNode>>(
-                    @"./Configuration/CodeCoverage/Attributes/Exclude",
-                    new Dictionary<string, XmlNode>()),
-
-                new Tuple<string, IDictionary<string, XmlNode>>(
-                    @"./Configuration/CodeCoverage/Sources/Exclude",
-                    new Dictionary<string, XmlNode>()),
-
-                new Tuple<string, IDictionary<string, XmlNode>>(
-                    @"./Configuration/CodeCoverage/Functions/Exclude",
-                    new Dictionary<string, XmlNode>())
+                new Exclusion(new List<string> { "ModulePaths", "Exclude" }),
+                new Exclusion(new List<string> { "Attributes", "Exclude" }),
+                new Exclusion(new List<string> { "Sources", "Exclude" }),
+                new Exclusion(new List<string> { "Functions", "Exclude" })
             };
         }
         #endregion
 
         #region Public Interface
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <returns></returns>
         public string Process()
         {
-            var codeCoverageDataCollectorNode = GetCodeCoverageDataCollectorNode();
-            if (codeCoverageDataCollectorNode == null)
+            var dataCollectorNode = this.GetDataCollectorNode();
+            if (dataCollectorNode == null)
             {
-                // What do we do if we cannot extract code coverage data collectors node ?
-                return this.runSettingsDocument.OuterXml;
+                // No data collector settings for code coverage are found.
+                // TODO: Consider adding defaults nevertheless.
+                return this.currentSettingsDocument.OuterXml;
             }
 
-            foreach (var exclusionClass in this.exclusionClasses)
+            var codeCoveragePathComponents = new List<string>() { "Configuration", "CodeCoverage" };
+            var currentCodeCoverageNode = this.SelectNodeOrAddDefaults(
+                dataCollectorNode,
+                this.defaultSettingsDocument.FirstChild,
+                codeCoveragePathComponents);
+
+            if (currentCodeCoverageNode == null)
             {
-                var node = this.ExtractNode(codeCoverageDataCollectorNode, exclusionClass.Item1);
-                if (node == null)
+                return this.currentSettingsDocument.OuterXml;
+            }
+
+            var defaultCodeCoverageNode = this.ExtractNode(
+                this.defaultSettingsDocument.FirstChild,
+                Exclusion.BuildPath(codeCoveragePathComponents));
+
+            foreach (var exclusion in this.exclusions)
+            {
+                var currentNode = this.SelectNodeOrAddDefaults(
+                    currentCodeCoverageNode,
+                    defaultCodeCoverageNode,
+                    exclusion.PathComponents);
+                if (currentNode == null || !this.ShouldProcessCurrentExclusion(currentNode))
                 {
-                    // What do we do if we cannot extract the specified class ?
                     continue;
                 }
 
-                if (!this.ShouldProcessCurrentExclusionClass(node))
-                {
-                    continue;
-                }
+                var defaultNode = this.ExtractNode(
+                    defaultCodeCoverageNode,
+                    exclusion.Path);
 
-                var defaultNode = this.ExtractNode(this.defaultRunSettingsDocument.FirstChild, exclusionClass.Item1);
+                this.AddNodes(defaultNode, exclusion);
+                this.AddNodes(currentNode, exclusion);
 
-                AddNodes(defaultNode, exclusionClass);
-                AddNodes(node, exclusionClass);
-
-                ReplaceNodes(node, exclusionClass);
+                this.ReplaceNodes(currentNode, exclusion);
             }
 
-            return this.runSettingsDocument.OuterXml;
+            return this.currentSettingsDocument.OuterXml;
         }
         #endregion
 
         #region Private Methods
-        private XmlNode GetCodeCoverageDataCollectorNode()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <returns></returns>
+        private XmlNode GetDataCollectorNode()
         {
-            const string prefix = @"/RunSettings/DataCollectionRunSettings/DataCollectors";
+            const string prefixPath = @"/RunSettings/DataCollectionRunSettings/DataCollectors";
+            const string attributeName = "uri";
+            const string attributeValue = "datacollector://microsoft/CodeCoverage/2.0";
 
-            var dataCollectorsNode = this.ExtractNode(this.runSettingsDocument, prefix);
+            var dataCollectorsNode = this.ExtractNode(this.currentSettingsDocument, prefixPath);
             if (dataCollectorsNode == null)
             {
-                // Should we return default exclusions in this case ?
                 return dataCollectorsNode;
             }
 
@@ -195,7 +312,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 foreach (XmlAttribute attribute in node.Attributes)
                 {
-                    if (attribute.Name == "uri" && attribute.Value == "datacollector://microsoft/CodeCoverage/2.0")
+                    if (attribute.Name == attributeName && attribute.Value == attributeValue)
                     {
                         return node;
                     }
@@ -205,11 +322,62 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return null;
         }
 
-        private bool ShouldProcessCurrentExclusionClass(XmlNode node)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="rootNode"></param>
+        /// <param name="pathComponents"></param>
+        /// 
+        /// <returns></returns>
+        private XmlNode SelectNodeOrAddDefaults(
+            XmlNode currentRootNode,
+            XmlNode defaultRootNode,
+            IEnumerable<string> pathComponents)
         {
+            var currentNode = currentRootNode;
+            var partialPath = ".";
+
+            foreach (var component in pathComponents)
+            {
+                var currentPathComponent = "/" + component;
+
+                partialPath += currentPathComponent;
+                var tempNode = this.ExtractNode(currentNode, "." + currentPathComponent);
+
+                if (tempNode == null)
+                {
+                    var defaultNode = this.ExtractNode(
+                        defaultRootNode,
+                        partialPath);
+
+                    var importedChild = currentNode.OwnerDocument.ImportNode(defaultNode, true);
+                    currentNode.AppendChild(importedChild);
+
+                    return null;
+                }
+
+                currentNode = tempNode;
+            }
+
+            return currentNode;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="node"></param>
+        /// 
+        /// <returns></returns>
+        private bool ShouldProcessCurrentExclusion(XmlNode node)
+        {
+            const string attributeName = "mergeDefaults";
+            const string attributeValue = "false";
+
             foreach (XmlAttribute attribute in node.Attributes)
             {
-                if (attribute.Name == "mergeDefaults" && attribute.Value == "false")
+                if (attribute.Name == attributeName && attribute.Value == attributeValue)
                 {
                     return false;
                 }
@@ -218,53 +386,75 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return true;
         }
 
-        private XmlNode ExtractNode(XmlNode doc, string path)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="node"></param>
+        /// <param name="path"></param>
+        /// 
+        /// <returns></returns>
+        private XmlNode ExtractNode(XmlNode node, string path)
         {
             try
             {
-                return doc.SelectSingleNode(path);
+                return node.SelectSingleNode(path);
             }
             catch (XPathException ex)
             {
-                EqtTrace.Error("CodeCoverageRunSettingsProcessor.ExtractNode: Cannot select single node \"{0}\".", ex.Message);
+                EqtTrace.Error(
+                    "CodeCoverageRunSettingsProcessor.ExtractNode: Cannot select single node \"{0}\".",
+                    ex.Message);
             }
 
             return null;
         }
 
-        private void AddNodes(XmlNode node, Tuple<string, IDictionary<string, XmlNode>> exclusionClass)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="node"></param>
+        /// <param name="exclusion"></param>
+        private void AddNodes(XmlNode node, Exclusion exclusion)
         {
             foreach (XmlNode child in node.ChildNodes)
             {
                 var key = child.OuterXml;
-                if (exclusionClass.Item2.ContainsKey(key))
+                if (exclusion.ExclusionRules.ContainsKey(key))
                 {
                     continue;
                 }
 
-                exclusionClass.Item2.Add(key, child);
+                exclusion.ExclusionRules.Add(key, child);
             }
         }
 
-        private void ReplaceNodes(XmlNode node, Tuple<string, IDictionary<string, XmlNode>> exclusionClass)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="node"></param>
+        /// <param name="exclusion"></param>
+        private void ReplaceNodes(XmlNode node, Exclusion exclusion)
         {
             foreach (XmlNode child in node.ChildNodes)
             {
-                if (!exclusionClass.Item2.ContainsKey(child.OuterXml))
+                if (!exclusion.ExclusionRules.ContainsKey(child.OuterXml))
                 {
                     continue;
                 }
 
-                exclusionClass.Item2.Remove(child.OuterXml);
+                exclusion.ExclusionRules.Remove(child.OuterXml);
             }
 
-            foreach (var child in exclusionClass.Item2.Values)
+            foreach (var child in exclusion.ExclusionRules.Values)
             {
-                var imported = node.OwnerDocument.ImportNode(child, true);
-                node.AppendChild(imported);
+                var importedChild = node.OwnerDocument.ImportNode(child, true);
+                node.AppendChild(importedChild);
             }
 
-            exclusionClass.Item2.Clear();
+            exclusion.ExclusionRules.Clear();
         }
         #endregion
     }
