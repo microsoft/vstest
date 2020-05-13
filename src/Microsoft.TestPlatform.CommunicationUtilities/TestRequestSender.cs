@@ -518,7 +518,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Set operation complete.");
             this.SetOperationComplete();
 
-
             var reason = this.GetAbortErrorMessage(exception, getClientError);
             EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
             this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));

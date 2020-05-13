@@ -513,26 +513,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             return tmp;
-            // might want to reuse this if using temp is not practical
-            // the results directory is temporary, and we need to make sure we 
-            // create it! The actual results will end up in the testresults dir
-            // of the actual test run, so this really is just a temp
-            //try
-            //{
-            //    XmlElement resultsDirectoryElement = this.configurationElement["ResultsDirectory"];
-            //    string resultsDirectory = resultsDirectoryElement != null ? resultsDirectoryElement.InnerText : string.Empty;
-
-            //    return Environment.ExpandEnvironmentVariables(resultsDirectory);
-            //}
-            //catch (NullReferenceException exception)
-            //{
-            //    if (EqtTrace.IsErrorEnabled)
-            //    {
-            //        EqtTrace.Error("Blame Collector : " + exception);
-            //    }
-
-            //    return string.Empty;
-            //}
         }
     }
 }
