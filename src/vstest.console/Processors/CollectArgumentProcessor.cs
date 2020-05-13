@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -83,6 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
+        public override bool AlwaysExecute => true;
+
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
         public override string HelpContentResourceName => CommandLineResources.CollectArgumentHelp;
@@ -105,6 +108,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <inheritdoc />
         public void Initialize(string argument)
         {
+            // If coverlet data collector is enabled in the runsettings file, add the corresponding
+            // inproc data collector. This code runs always, without specifying a data collector from the CLI.
+            if (argument == null)
+            {
+                EnableInProcCollectorFromRunSettings();
+                return;
+            }
+
             // 1. Disable all other data collectors. Enable only those data collectors that are explicitly specified by user.
             // 2. Check if Code Coverage Data Collector is specified in runsettings, if not add it and also set enable to true.
 
@@ -123,6 +134,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
             AddDataCollectorToRunSettings(argument, this.runSettingsManager, this.fileHelper);
+        }
+
+        private void EnableInProcCollectorFromRunSettings()
+        {
+            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            if (settings == null)
+            {
+                runSettingsManager.AddDefaultRunSettings();
+                settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            }
+
+            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings) ?? new DataCollectionRunSettings();
+            bool isCoverletEnabled = dataCollectionRunSettings.DataCollectorSettingsList.Any(dcs => dcs.IsEnabled &&
+                (string.Equals(dcs.FriendlyName, CoverletConstants.CoverletDataCollectorFriendlyName, StringComparison.InvariantCultureIgnoreCase) || dcs.Uri == CoverletConstants.CoverletDataCollectorUri));
+
+            if (isCoverletEnabled)
+            {
+                var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settings)
+                ?? new DataCollectionRunSettings(
+                    Constants.InProcDataCollectionRunSettingsName,
+                    Constants.InProcDataCollectorsSettingName,
+                    Constants.InProcDataCollectorSettingName);
+
+                EnabledDataCollectors.Add(CoverletConstants.CoverletDataCollectorFriendlyName);
+
+                // Add in-proc data collector to runsettings if coverlet code coverage is enabled
+                EnableCoverletInProcDataCollector(CoverletConstants.CoverletDataCollectorFriendlyName, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
+                runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
+            }
         }
 
         /// <summary>
@@ -251,6 +291,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             /// Coverlet in-proc data collector friendly name
             /// </summary>
             public const string CoverletDataCollectorFriendlyName = "XPlat Code Coverage";
+
+            /// <summary>
+            /// Coverlet in-prod data collector uri
+            /// </summary>
+            public static Uri CoverletDataCollectorUri = new Uri(@"datacollector://Microsoft/CoverletCodeCoverage/1.0");
 
             /// <summary>
             /// Coverlet in-proc data collector assembly qualified name
