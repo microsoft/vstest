@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -185,7 +186,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
             catch (Exception ex)
             {
-                EqtTrace.Error($"BlameCollector.CollectDumpAndAbortTesthost: Failed with error {ex}");
+                ConsoleOutput.Instance.Error(true, $"Blame: Creating hang dump failed with error {ex}.");
             }
 
             if (this.collectProcessDumpOnTrigger)
@@ -293,7 +294,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                         break;
 
-                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.HangDumpTypeKey, StringComparison.OrdinalIgnoreCase):
 
                         if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
                         {

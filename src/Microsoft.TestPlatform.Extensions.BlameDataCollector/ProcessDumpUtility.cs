@@ -103,9 +103,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             this.crashDumper = new ProcDumpCrashDumper();
-            ConsoleOutput.Instance.Information(true, $"Blame: Creating crash dump of process {processName} ({processId}).");
+            ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
             this.crashDumper.AttachToTargetProcess(processId, dumpPath, dumpType);
-            EqtTrace.Info($"ProcessDumpUtility.CrashDump: Process {processName} ({processId}) was dumped into temporary path '{dumpPath}'.");
         }
 
         private void HangDump(int processId, string dumpFileGuid, string tempDirectory, DumpTypeOption dumpType, string targetFramework)
@@ -125,9 +124,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.hangDumpPath = dumpPath;
 
             var dumper = this.hangDumperFactory.Create(targetFramework);
-            ConsoleOutput.Instance.Information(true, $"Blame: Creating hang dump of process {processName} ({processId}).");
-            dumper.Dump(processId, dumpPath, dumpType);
-            EqtTrace.Info($"ProcessDumpUtility.HangDump: Process {processName} ({processId}) was dumped into temporary path '{dumpPath}'.");
+
+            try
+            {
+                ConsoleOutput.Instance.Information(false, $"Blame: Creating hang dump of process {processName} ({processId}).");
+                dumper.Dump(processId, dumpPath, dumpType);
+                EqtTrace.Info($"ProcessDumpUtility.HangDump: Process {processName} ({processId}) was dumped into temporary path '{dumpPath}'.");
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error($"Blame: Failed with error {ex}.");
+                throw;
+            }
         }
 
         private string GetDumpPath(int processId, string dumpFileGuid, string tempDirectory, bool isHangDump, out string processName)

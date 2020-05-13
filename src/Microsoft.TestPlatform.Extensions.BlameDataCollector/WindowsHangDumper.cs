@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     {
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
-            Process.Start($"kill -s SIGTRAP { processId }");
+            Process.Start("kill", $"-s SIGTRAP { processId }");
         }
     }
 

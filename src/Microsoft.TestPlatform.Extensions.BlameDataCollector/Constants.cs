@@ -54,6 +54,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string DumpModeKey = "CollectDump";
 
         /// <summary>
+        /// Configuration key name for hang dump mode
+        /// </summary>
+        public const string HangDumpModeKey = "CollectHangDump";
+
+        /// <summary>
         /// Proc dump 32 bit version
         /// </summary>
         public const string ProcdumpProcess = "procdump.exe";
@@ -89,6 +94,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Configuration key name for dump type
         /// </summary>
         public const string DumpTypeKey = "DumpType";
+
+        /// <summary>
+        /// Configuration key name for hang dump type
+        /// </summary>
+        public const string HangDumpTypeKey = "HangDumpType";
 
         /// <summary>
         /// Configuration value for true
