@@ -5,21 +5,19 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
-    using Microsoft.TestPlatform.Build.Utils;
-    using Trace;
 
-    public class VSTestTask : Task, ICancelableTask
+    public class VSTestTask : ToolTask
     {
-        // The process which is invoking vstest.console
-        private VSTestForwardingApp vsTestForwardingApp;
 
-        private const string vsTestAppName = "vstest.console.dll";
-
-        public string TestFileFullPath
+        [Required]
+        //TODO: rename, as relative paths are allowed?
+        public ITaskItem TestFileFullPath
         {
             get;
             set;
@@ -31,7 +29,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string[] VSTestTestAdapterPath
+        public ITaskItem[] VSTestTestAdapterPath
         {
             get;
             set;
@@ -60,7 +58,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestListTests
+        public bool VSTestListTests
         {
             get;
             set;
@@ -79,13 +77,13 @@ namespace Microsoft.TestPlatform.Build.Tasks
         }
 
         [Required]
-        public string VSTestConsolePath
+        public ITaskItem VSTestConsolePath
         {
             get;
             set;
         }
 
-        public string VSTestResultsDirectory
+        public ITaskItem VSTestResultsDirectory
         {
             get;
             set;
@@ -103,13 +101,13 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestBlame
+        public bool VSTestBlame
         {
             get;
             set;
         }
 
-        public string VSTestBlameCrash
+        public bool VSTestBlameCrash
         {
             get;
             set;
@@ -121,13 +119,13 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestBlameCrashCollectAlways
+        public bool VSTestBlameCrashCollectAlways
         {
             get;
             set;
         }
 
-        public string VSTestBlameHang
+        public bool VSTestBlameHang
         {
             get;
             set;
@@ -138,110 +136,87 @@ namespace Microsoft.TestPlatform.Build.Tasks
             get;
             set;
         }
+
         public string VSTestBlameHangTimeout
         {
             get;
             set;
         }
 
-        public string VSTestTraceDataCollectorDirectoryPath
+        public ITaskItem VSTestTraceDataCollectorDirectoryPath
         {
             get;
             set;
         }
 
-        public string VSTestNoLogo
+        public bool VSTestNoLogo
         {
             get;
             set;
         }
 
-        public override bool Execute()
+        protected override string ToolName
         {
-            var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
-            Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
-
-            vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
-            if (!string.IsNullOrEmpty(this.VSTestFramework))
+            get
             {
-                Console.WriteLine(Resources.TestRunningSummary, this.TestFileFullPath, this.VSTestFramework);
-            }
-
-            return vsTestForwardingApp.Execute() == 0;
-        }
-
-        public void Cancel()
-        {
-            Tracing.Trace("VSTest: Killing the process...");
-            vsTestForwardingApp.Cancel();
-        }
-
-        internal IEnumerable<string> CreateArgument()
-        {
-            var allArgs = this.AddArgs();
-
-            // VSTestCLIRunSettings should be last argument in allArgs as vstest.console ignore options after "--"(CLIRunSettings option).
-            this.AddCLIRunSettingsArgs(allArgs);
-
-            return allArgs;
-        }
-
-        private void AddCLIRunSettingsArgs(List<string> allArgs)
-        {
-            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
-            {
-                allArgs.Add("--");
-                foreach (var arg in this.VSTestCLIRunSettings)
-                {
-                    allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
-                }
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    return "dotnet.exe";
+                else
+                    return "dotnet";
             }
         }
 
-        private List<string> AddArgs()
+        public VSTestTask()
+        {
+            this.LogStandardErrorAsError = true;
+            this.StandardOutputImportance = "Normal";
+        }
+
+        protected override string GenerateCommandLineCommands()
         {
             var isConsoleLoggerSpecifiedByUser = false;
             var isCollectCodeCoverageEnabled = false;
             var isRunSettingsEnabled = false;
-            var allArgs = new List<string>();
 
-            // TODO log arguments in task
-            if (!string.IsNullOrEmpty(this.VSTestSetting))
+            var builder = new CommandLineBuilder();
+            builder.AppendSwitch("exec");
+            builder.AppendSwitchIfNotNull("", this.VSTestConsolePath);
+
+            if (this.VSTestSetting != null)
             {
                 isRunSettingsEnabled = true;
-                allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestSetting));
+                builder.AppendSwitchIfNotNull("--settings:", this.VSTestSetting);
             }
 
-            if (this.VSTestTestAdapterPath != null && this.VSTestTestAdapterPath.Length > 0)
+            if (this.VSTestTestAdapterPath != null && this.VSTestTestAdapterPath.Any())
             {
                 foreach (var arg in this.VSTestTestAdapterPath)
                 {
-                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                    builder.AppendSwitchIfNotNull("--testAdapterPath:", arg);
                 }
             }
 
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
-                allArgs.Add("--framework:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestFramework));
+                builder.AppendSwitchIfNotNull("--framework:", this.VSTestFramework);
             }
 
             // vstest.console only support x86 and x64 for argument platform
             if (!string.IsNullOrEmpty(this.VSTestPlatform) && !this.VSTestPlatform.Contains("AnyCPU"))
             {
-                allArgs.Add("--platform:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestPlatform));
+                builder.AppendSwitchIfNotNull("--platform:", this.VSTestPlatform);
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
             {
-                allArgs.Add("--testCaseFilter:" +
-                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestCaseFilter));
+                builder.AppendSwitchIfNotNull("--testCaseFilter:", this.VSTestTestCaseFilter);
             }
 
             if (this.VSTestLogger != null && this.VSTestLogger.Length > 0)
             {
                 foreach (var arg in this.VSTestLogger)
                 {
-                    allArgs.Add("--logger:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                    builder.AppendSwitchIfNotNull("--logger:", arg);
 
                     if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
                     {
@@ -250,29 +225,24 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
+            if (this.VSTestResultsDirectory != null && !string.IsNullOrEmpty(this.VSTestResultsDirectory.ItemSpec))
             {
-                allArgs.Add("--resultsDirectory:" +
-                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestResultsDirectory));
+                builder.AppendSwitchIfNotNull("--resultsDirectory:", this.VSTestResultsDirectory);
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestListTests))
+            if (this.VSTestListTests)
             {
-                allArgs.Add("--listTests");
+                builder.AppendSwitch("--listTests");
             }
 
             if (!string.IsNullOrEmpty(this.VSTestDiag))
             {
-                allArgs.Add("--Diag:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestDiag));
+                builder.AppendSwitchIfNotNull("--Diag:", this.VSTestDiag);
             }
 
-            if (string.IsNullOrEmpty(this.TestFileFullPath))
+            if (this.TestFileFullPath != null)
             {
-                this.Log.LogError("Test file path cannot be empty or null.");
-            }
-            else
-            {
-                allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.TestFileFullPath));
+                builder.AppendFileNameIfNotNull(this.TestFileFullPath);
             }
 
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
@@ -282,31 +252,28 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 var quietTestLogging = new List<string>() { "q", "quiet" };
 
                 string vsTestVerbosity = "minimal";
-                if (normalTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
+                if (normalTestLogging.Contains(this.VSTestVerbosity, StringComparer.InvariantCultureIgnoreCase))
                 {
                     vsTestVerbosity = "normal";
                 }
-                else if (quietTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
+                else if (quietTestLogging.Contains(this.VSTestVerbosity, StringComparer.InvariantCultureIgnoreCase))
                 {
                     vsTestVerbosity = "quiet";
                 }
 
-                allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
+                builder.AppendSwitchUnquotedIfNotNull("--logger:", $"Console;Verbosity={vsTestVerbosity}");
             }
 
-            var blameCrash = !string.IsNullOrEmpty(this.VSTestBlameCrash);
-            var blameHang = !string.IsNullOrEmpty(this.VSTestBlameHang);
-            if (!string.IsNullOrEmpty(this.VSTestBlame) || blameCrash || blameHang)
+            if (this.VSTestBlame)
             {
-                var blameArgs = "--Blame";
-
                 var dumpArgs = new List<string>();
-                if (blameCrash || blameHang)
+                if (this.VSTestBlameCrash || this.VSTestBlameHang)
                 {
-                    if (blameCrash)
+                    if (this.VSTestBlameCrash)
                     {
                         dumpArgs.Add("CollectDump");
-                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashCollectAlways))
+
+                        if (this.VSTestBlameCrashCollectAlways)
                         {
                             dumpArgs.Add($"CollectAlways={this.VSTestBlameCrashCollectAlways}");
                         }
@@ -317,7 +284,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                         }
                     }
 
-                    if (blameHang)
+                    if (this.VSTestBlameHang)
                     {
                         dumpArgs.Add("CollectHangDump");
 
@@ -331,14 +298,15 @@ namespace Microsoft.TestPlatform.Build.Tasks
                             dumpArgs.Add($"TestTimeout={this.VSTestBlameHangTimeout}");
                         }
                     }
-
-                    if (dumpArgs.Any())
-                    {
-                        blameArgs += $":\"{string.Join(";", dumpArgs)}\"";
-                    }
                 }
 
-                allArgs.Add(blameArgs);
+                if (dumpArgs.Any())
+                {
+                    builder.AppendSwitchIfNotNull("--Blame:", string.Join(";", dumpArgs));
+                } else
+                {
+                    builder.AppendSwitch("--Blame");
+                }
             }
 
             if (this.VSTestCollect != null && this.VSTestCollect.Length > 0)
@@ -350,7 +318,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                         isCollectCodeCoverageEnabled = true;
                     }
 
-                    allArgs.Add("--collect:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                    builder.AppendSwitchIfNotNull("--collect:", arg);
                 }
             }
 
@@ -363,29 +331,71 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
                 // This is required due to currently trace datacollector not ships with dotnet sdk, can be remove once we have
                 // go code coverage x-plat.
-                if (!string.IsNullOrEmpty(this.VSTestTraceDataCollectorDirectoryPath))
+                if (this.VSTestTraceDataCollectorDirectoryPath != null && !string.IsNullOrEmpty(this.VSTestTraceDataCollectorDirectoryPath.ItemSpec))
                 {
-                    allArgs.Add("--testAdapterPath:" +
-                                ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this
-                                    .VSTestTraceDataCollectorDirectoryPath));
-                }
-                else
+                    builder.AppendSwitchIfNotNull("--testAdapterPath:", this.VSTestTraceDataCollectorDirectoryPath);
+                } else
                 {
                     if (isCollectCodeCoverageEnabled)
                     {
                         // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
                         // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
-                        Console.WriteLine(Resources.UpdateTestSdkForCollectingCodeCoverage);
+                        this.Log.LogWarning(Resources.UpdateTestSdkForCollectingCodeCoverage);
                     }
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
+            if (this.VSTestNoLogo)
             {
-                allArgs.Add("--nologo");
+                builder.AppendSwitch("--nologo");
             }
 
-            return allArgs;
+            // VSTestCLIRunSettings should be last argument as vstest.console ignore options after "--"(CLIRunSettings option).
+            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Any())
+            {
+                builder.AppendSwitch("--");
+
+                foreach (var arg in this.VSTestCLIRunSettings)
+                {
+                    builder.AppendSwitchIfNotNull(string.Empty, arg);
+                }
+            }
+
+            return builder.ToString();
+        }
+
+        protected override string GenerateFullPathToTool()
+        {
+            string path = null;
+
+            if (!string.IsNullOrEmpty(ToolPath))
+            {
+                path = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ToolPath)), ToolExe);
+            } else
+            {
+                //TODO: https://github.com/dotnet/sdk/issues/20 Need to get the dotnet path from MSBuild
+                if (File.Exists(ToolExe))
+                {
+                    path = Path.GetFullPath(ToolExe);
+                } else
+                {
+                    var values = Environment.GetEnvironmentVariable("PATH");
+                    foreach (var p in values.Split(Path.PathSeparator))
+                    {
+                        var fullPath = Path.Combine(p, ToolExe);
+                        if (File.Exists(fullPath))
+                            path = fullPath;
+                    }
+                }
+            }
+
+            return path;
+        }
+
+        /// To be used by unit tests only
+        internal protected string CreateCommandLineArguments()
+        {
+            return this.GenerateCommandLineCommands();
         }
     }
 }

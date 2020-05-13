@@ -2,9 +2,10 @@
 
 namespace Microsoft.TestPlatform.Build.UnitTests
 {
-    using System;
-    using System.Linq;
-
+    using System.Collections;
+    using System.Text.RegularExpressions;
+    using Microsoft.Build.Framework;
+    using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,7 +18,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask = new VSTestTask
             {
-                TestFileFullPath = @"C:\path\to\test-assembly.dll",
+                BuildEngine = new FakeBuildEngine(),
+                TestFileFullPath = new TaskItem(@"C:\path\to\test-assembly.dll"),
                 VSTestFramework = ".NETCoreapp,Version2.0"
             };
         }
@@ -32,13 +34,11 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestCLIRunSettings[0] = arg1;
             this.vsTestTask.VSTestCLIRunSettings[1] = arg2;
 
-            var result = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.AreEqual(5, result.Length);
-
-            // First, second and third args would be framework:".NETCoreapp,Version2.0", testfilepath and -- respectively.
-            Assert.AreEqual($"\"{arg1}\"", result[3]);
-            Assert.AreEqual($"{arg2}", result[4]);
+            StringAssert.Contains(commandline, " -- ");
+            StringAssert.Contains(commandline, $"\"{arg1}\"");
+            StringAssert.Contains(commandline, $"{arg2}");
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             const string codeCoverageOption = "Code Coverage";
 
             this.vsTestTask.VSTestCollect = new string[] { codeCoverageOption };
-            this.vsTestTask.VSTestBlame = "Blame";
+            this.vsTestTask.VSTestBlame = true;
 
             const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
             const string arg2 = "MSTest.DeploymentEnabled";
@@ -56,24 +56,22 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestCLIRunSettings[0] = arg1;
             this.vsTestTask.VSTestCLIRunSettings[1] = arg2;
 
-            var result = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.AreEqual(7, result.Length);
-
-            // Following are expected  --framework:".NETCoreapp,Version2.0", testfilepath, blame, collect:"Code coverage" -- respectively.
-            Assert.AreEqual($"\"{arg1}\"", result[5]);
-            Assert.AreEqual($"{arg2}", result[6]);
+            StringAssert.Contains(commandline, " -- ");
+            StringAssert.Contains(commandline, $"\"{arg1}\"");
+            StringAssert.Contains(commandline, $"{arg2}");
         }
 
         [TestMethod]
         public void CreateArgumentShouldPassResultsDirectoryCorrectly()
         {
             const string resultsDirectoryValue = @"C:\tmp\Results Directory";
-            this.vsTestTask.VSTestResultsDirectory = resultsDirectoryValue;
+            this.vsTestTask.VSTestResultsDirectory = new TaskItem(resultsDirectoryValue);
 
-            var result = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue}\"", result[1]);
+            StringAssert.Contains(commandline, $"--resultsDirectory:\"{resultsDirectoryValue}\"");
         }
 
         [TestMethod]
@@ -82,10 +80,10 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestVerbosity = "diag";
             this.vsTestTask.VSTestLogger = new string[] { "Console;Verbosity=quiet" };
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            StringAssert.DoesNotMatch(commandline, new Regex("(--logger:\"Console;Verbosity=normal\")"));
+            StringAssert.Contains(commandline, "--logger:\"Console;Verbosity=quiet\"");
         }
 
         [TestMethod]
@@ -93,9 +91,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "n";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -103,9 +101,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "normal";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -113,9 +111,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "d";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -123,9 +121,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "detailed";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -133,9 +131,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "diag";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -143,9 +141,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "diagnostic";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -153,9 +151,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "q";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=quiet");
         }
 
         [TestMethod]
@@ -163,9 +161,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "quiet";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=quiet");
         }
 
         [TestMethod]
@@ -173,9 +171,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "m";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=minimal");
         }
 
         [TestMethod]
@@ -183,9 +181,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "minimal";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=minimal");
         }
 
         [TestMethod]
@@ -193,9 +191,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "Normal";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=normal");
         }
 
         [TestMethod]
@@ -203,9 +201,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestVerbosity = "Quiet";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            StringAssert.Contains(commandline, "--logger:Console;Verbosity=quiet");
         }
 
         [TestMethod]
@@ -213,9 +211,9 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         {
             this.vsTestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx" };
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
+            StringAssert.Contains(commandline, "--logger:\"trx;LogFileName=foo bar.trx\"");
         }
 
         [TestMethod]
@@ -226,91 +224,92 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestCollect[0] = "name1";
             this.vsTestTask.VSTestCollect[1] = "name 2";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name 2\"")));
+            StringAssert.Contains(commandline, "--collect:name1");
+            StringAssert.Contains(commandline, "--collect:\"name 2\"");
         }
 
         [TestMethod]
         public void CreateArgumentShouldAddMultipleTestAdapterPaths()
         {
-            this.vsTestTask.VSTestTestAdapterPath = new string[] { "path1", "path2" };
+            this.vsTestTask.VSTestTestAdapterPath = new ITaskItem[] { new TaskItem("path1"), new TaskItem("path2") };
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path2")));
+            StringAssert.Contains(commandline, "--testAdapterPath:path1");
+            StringAssert.Contains(commandline, "--testAdapterPath:path2");
         }
 
         [TestMethod]
         public void CreateArgumentShouldAddMultipleLoggers()
         {
             this.vsTestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx", "console" };
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:console")));
+            StringAssert.Contains(commandline, "--logger:\"trx;LogFileName=foo bar.trx\"");
+            StringAssert.Contains(commandline, "--logger:console");
         }
 
         [TestMethod]
         public void CreateArgumentShouldAddTraceCollectorDirectoryPathAsTestAdapterForCodeCoverageCollect()
         {
             const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
-            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
+            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = new TaskItem(traceDataCollectorDirectoryPath);
             this.vsTestTask.VSTestCollect = new string[] { "code coverage" };
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
             const string expectedArg = "--testAdapterPath:\"c:\\path\\to\\tracedata collector\"";
-            CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
+            StringAssert.Contains(commandline, expectedArg);
         }
 
         [TestMethod]
         public void CreateArgumentShouldNotAddTraceCollectorDirectoryPathAsTestAdapterForNonCodeCoverageCollect()
         {
             const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
-            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
+            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = new TaskItem(traceDataCollectorDirectoryPath);
             this.vsTestTask.VSTestCollect = new string[] { "not code coverage" };
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
             const string notExpectedArg = "--testAdapterPath:\"c:\\path\\to\\tracedata collector\"";
-            CollectionAssert.DoesNotContain(allArguments, notExpectedArg, $"Not expected argument: '''{notExpectedArg}''' present in [{string.Join(", ", allArguments)}]");
+            StringAssert.DoesNotMatch(commandline, new Regex(Regex.Escape(notExpectedArg)));
         }
 
         [TestMethod]
         public void CreateArgumentShouldAddTraceCollectorDirectoryPathAsTestAdapterIfSettingsGiven()
         {
             const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedatacollector\";
-            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
+            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = new TaskItem(traceDataCollectorDirectoryPath);
             this.vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
             const string expectedArg = "--testAdapterPath:c:\\path\\to\\tracedatacollector\\";
-            CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
+            StringAssert.Contains(commandline, expectedArg);
         }
 
         [TestMethod]
         public void CreateArgumentShouldNotAddTestAdapterPathIfVSTestTraceDataCollectorDirectoryPathIsEmpty()
         {
-            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = string.Empty;
+            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = null;
             this.vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
             this.vsTestTask.VSTestCollect = new string[] { "code coverage" };
 
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
 
-            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:")));
+            StringAssert.DoesNotMatch(commandline, new Regex(@"(--testAdapterPath:)"));
         }
 
         [TestMethod]
         public void CreateArgumentShouldAddNoLogoOptionIfSpecifiedByUser()
         {
-            this.vsTestTask.VSTestNoLogo = "--nologo";
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+            this.vsTestTask.VSTestNoLogo = true;
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--nologo")));
+            var commandline = this.vsTestTask.CreateCommandLineArguments();
+
+            StringAssert.Contains(commandline, "--nologo");
         }
     }
 }
