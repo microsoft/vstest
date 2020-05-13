@@ -99,62 +99,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             Assert.AreEqual(typeof(CLIRunSettingsArgumentProcessor), result.GetType());
         }
 
-        [TestMethod]
-        public void BuildCommadMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
-        {
-            var specialCommands = GetArgumentProcessors(specialCommandFilter: true);
-
-            List<string> xplatspecialCommandNames = new List<string>();
-            List<string> specialCommandNames = new List<string>();
-
-            // for each command add there xplat version
-            foreach (var specialCommand in specialCommands)
-            {
-                specialCommandNames.Add(specialCommand.Metadata.Value.CommandName);
-                if (!specialCommand.Metadata.Value.AlwaysExecute)
-                {
-                    xplatspecialCommandNames.Add(string.Concat("--", specialCommand.Metadata.Value.CommandName.Remove(0, 1)));
-                }
-            }
-            var factory = ArgumentProcessorFactory.Create();
-
-            CollectionAssert.AreEquivalent(
-                specialCommandNames.Concat(xplatspecialCommandNames).ToList(),
-                factory.SpecialCommandToProcessorMap.Keys.ToList());
-        }
-
-        [TestMethod]
-        public void BuildCommadMapsForMultipleProcessorAddsProcessorToAppropriateMaps()
-        {
-            var commandProcessors = GetArgumentProcessors(specialCommandFilter: false);
-            var commands = commandProcessors.Select(a => a.Metadata.Value.CommandName);
-            List<string> xplatCommandName = new List<string>();
-
-            // for each command add there xplat version
-            foreach (string name in commands)
-            {
-                xplatCommandName.Add(string.Concat("--", name.Remove(0, 1)));
-            }
-
-            var shortCommands = commandProcessors.Where(a => !string.IsNullOrEmpty(a.Metadata.Value.ShortCommandName))
-                                    .Select(a => a.Metadata.Value.ShortCommandName);
-
-            List<string> xplatShortCommandName = new List<string>();
-
-            // for each short command add there xplat version
-            foreach (string name in shortCommands)
-            {
-                xplatShortCommandName.Add(name.Replace('/', '-'));
-            }
-
-            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
-
-            // Expect command processors to contain both long and short commands.
-            CollectionAssert.AreEquivalent(
-                commands.Concat(xplatCommandName).Concat(shortCommands).Concat(xplatShortCommandName).ToList(),
-                factory.CommandToProcessorMap.Keys.ToList());
-        }
-
         private static IEnumerable<IArgumentProcessor> GetArgumentProcessors(bool specialCommandFilter)
         {
             var allProcessors = typeof(ArgumentProcessorFactory).GetTypeInfo()
