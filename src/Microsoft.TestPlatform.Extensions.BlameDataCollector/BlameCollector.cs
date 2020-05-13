@@ -53,7 +53,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
         /// Using XmlReaderWriter by default
         /// </summary>
-        public BlameCollector() : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper())
+        public BlameCollector()
+            : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper())
         {
         }
 
@@ -216,7 +217,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Error(ex);
             }
 
-
             try
             {
                 var p = Process.GetProcessById(this.testHostProcessId);
@@ -227,7 +227,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         p.Kill();
                     }
                 }
-                catch (InvalidOperationException) { }
+                catch (InvalidOperationException)
+                {
+                }
             }
             catch (Exception ex)
             {

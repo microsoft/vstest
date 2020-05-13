@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Proc dump 64 bit version
         /// </summary>
-        public const string ProcdumpUnixProcess= "procdump";
+        public const string ProcdumpUnixProcess = "procdump";
 
         /// <summary>
         /// Configuration key name for collect dump always

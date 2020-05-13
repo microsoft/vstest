@@ -1,17 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.Win32.SafeHandles;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.Diagnostics.NETCore.Client;
-
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    class WindowsHangDumper : IHangDumper
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Runtime.InteropServices;
+    using Microsoft.Win32.SafeHandles;
+
+    internal class WindowsHangDumper : IHangDumper
     {
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
@@ -24,7 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // Open the file for writing
             using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
-                var exceptionInfo = new NativeMethods.MINIDUMP_EXCEPTION_INFORMATION();
+                NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default(NativeMethods.MINIDUMP_EXCEPTION_INFORMATION);
 
                 NativeMethods.MINIDUMP_TYPE dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpNormal;
                 switch (type)
@@ -88,7 +86,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             [Flags]
+#pragma warning disable SA1201 // Elements must appear in the correct order
             public enum MINIDUMP_TYPE : uint
+#pragma warning restore SA1201 // Elements must appear in the correct order
             {
                 MiniDumpNormal = 0,
                 MiniDumpWithDataSegs = 1 << 0,
@@ -117,95 +117,5 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 MiniDumpValidTypeFlags = (-1) ^ ((~1) << 22)
             }
         }
-    }
-
-    class SigtrapDumper : IHangDumper
-    {
-        public void Dump(int processId, string outputFile, DumpTypeOption type)
-        {
-            Process.Start("kill", $"-s SIGTRAP { processId }");
-        }
-    }
-
-    class NetClientDumper : IHangDumper
-    {
-        public void Dump(int processId, string outputFile, DumpTypeOption type)
-        {
-
-            var client = new DiagnosticsClient(processId);
-            client.WriteDump(type == DumpTypeOption.Full ? DumpType.Full : DumpType.Normal, outputFile);
-        }
-    }
-
-    class HangDumperFactory : IHangDumperFactory
-    {
-        public IHangDumper Create(string targetFramework)
-        {
-            EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
-                return new WindowsHangDumper();
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                if (!string.IsNullOrWhiteSpace(targetFramework) && targetFramework.Contains("v2.1"))
-                {
-                    EqtTrace.Info($"HangDumperFactory: This is Linux on netcoreapp2.1, returning SigtrapDumper.");
-
-                    return new SigtrapDumper();
-                }
-
-                EqtTrace.Info($"HangDumperFactory: This is Linux netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
-                return new NetClientDumper();
-            }
-
-            // this is not supported yet
-            //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            //{
-                
-                //if (frameworkVersion != default && frameworkVersion <= new Version("5.0"))
-                //{
-                //    return new SigtrapDumper();
-                //}
-
-                //EqtTrace.Info($"HangDumperFactory: This is OSX on netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
-                //return new NetClientDumper();
-            //}
-
-            throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");
-        }
-    }
-
-    public interface IHangDumperFactory
-    {
-        IHangDumper Create(string targetFramework);
-    }
-
-    public interface ICrashDumperFactory
-    {
-        ICrashDumper Create(string targetFramework);
-    }
-
-    public interface IHangDumper
-    {
-        void Dump(int processId, string outputFile, DumpTypeOption dumpType);
-    }
-
-    public interface ICrashDumper
-    {
-        void AttachToTargetProcess(int processId, string outputFile, DumpTypeOption dumpType);
-        
-        void WaitForDumpToFinish();
-
-        void DetachFromTargetProcess(int processId);
-    }
-
-    public enum DumpTypeOption
-    {
-        Full,
-        WithHeap,
-        Mini,
     }
 }

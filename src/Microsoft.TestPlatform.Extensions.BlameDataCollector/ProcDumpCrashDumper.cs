@@ -46,9 +46,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         protected Action<object, string> OutputReceivedCallback => (process, data) =>
         {
             // useful for visibility when debugging this tool
-            //Console.ForegroundColor = ConsoleColor.Cyan;
-            //Console.WriteLine(data);
-            //Console.ForegroundColor = ConsoleColor.White;
+            // Console.ForegroundColor = ConsoleColor.Cyan;
+            // Console.WriteLine(data);
+            // Console.ForegroundColor = ConsoleColor.White;
             // Log all standard output message of procdump in diag files.
             // Otherwise they end up coming on console in pipleine.
             if (EqtTrace.IsInfoEnabled)
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void WaitForDumpToFinish()
         {
-            if (processHelper == null)
+            if (this.processHelper == null)
             {
                 EqtTrace.Info($"ProcDumpCrashDumper.WaitForDumpToFinish: ProcDump was not previously attached, this might indicate error during setup, look for ProcDumpCrashDumper.AttachToTargetProcess.");
             }
@@ -96,12 +96,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 ProcDumpExceptionsList,
                 isFullDump: dumpType == DumpTypeOption.Full);
 
-
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: Running ProcDump with arguments: '{procDumpArgs}'.");
             this.procDumpProcess = this.processHelper.LaunchProcess(
                                             procDumpPath,
                                             procDumpArgs,
-                                            tempDirectory,
+                                            this.tempDirectory,
                                             null,
                                             null,
                                             null,
@@ -109,7 +108,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: ProcDump started as process with id '{this.procDumpProcess.Id}'.");
         }
-
 
         /// <inheritdoc/>
         public void DetachFromTargetProcess(int targetProcessId)
@@ -145,17 +143,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="processId">
         /// Process Id to determine the bittness
         /// </param>
+        /// <param name="path">
+        /// Path to procdump or the name of the executable we tried to resolve when we don't find it
+        /// </param>
         /// <returns>proc dump executable path</returns>
         private bool TryGetProcDumpExecutable(int processId, out string path)
         {
-            var here = Path.GetDirectoryName(typeof(ProcDumpCrashDumper).Assembly.Location);
-
             var procdumpDirectory = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
-
-            // look here if we ship procdump with test platform
-            // which we currently don't because of eula
-            // var procdumpPath = Path.Combine(here, "procdump");
-
             var searchPath = false;
             if (string.IsNullOrWhiteSpace(procdumpDirectory))
             {
@@ -191,7 +185,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new NotSupportedException($"Not supported platform {this.environment.OperatingSystem}");
             }
 
-
             if (!searchPath)
             {
                 var candidatePath = Path.Combine(procdumpDirectory, filename);
@@ -199,14 +192,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     EqtTrace.Verbose($"ProcDumpCrashDumper.GetProcDumpExecutable: Path to ProcDump '{candidatePath}' exists, using that.");
                     path = candidatePath;
-                    return true; 
+                    return true;
                 }
-                
+
                 EqtTrace.Verbose($"ProcDumpCrashDumper.GetProcDumpExecutable: Path '{candidatePath}' does not exist will try to run {filename} from PATH.");
             }
 
-
-            if (TryGetExecutablePath(filename, out var p))
+            if (this.TryGetExecutablePath(filename, out var p))
             {
                 EqtTrace.Verbose($"ProcDumpCrashDumper.GetProcDumpExecutable: Resolved {filename} to {p} from PATH.");
                 path = p;
