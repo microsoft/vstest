@@ -12,33 +12,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
-    /// 
+    /// Represents the run settings processor for code coverage data collectors.
     /// </summary>
     public class CodeCoverageRunSettingsProcessor
     {
         #region Type Members
         /// <summary>
-        /// 
+        /// Represents the exclusion type for code coverage run settings.
         /// </summary>
         private class Exclusion
         {
             /// <summary>
-            /// 
+            /// Represents the <see cref="XPathNavigator"/> style path of the exclusion type.
             /// </summary>
             private string path;
 
             /// <summary>
-            /// 
+            /// Gets the path components for the current exclusion type.
             /// </summary>
             public IEnumerable<string> PathComponents { get; }
 
             /// <summary>
-            /// 
+            /// Gets the exclusion rules for the current exclusion type.
             /// </summary>
             public IDictionary<string, XmlNode> ExclusionRules { get; }
 
             /// <summary>
-            /// 
+            /// Gets the actual exclusion type path generated from the individual path components.
             /// </summary>
             public string Path
             {
@@ -54,10 +54,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             /// <summary>
-            /// 
+            /// Constructs an <see cref="Exclusion"/> object.
             /// </summary>
             /// 
-            /// <param name="pathComponents"></param>
+            /// <param name="pathComponents">The path split as components.</param>
             public Exclusion(IEnumerable<string> pathComponents)
             {
                 this.path = string.Empty;
@@ -66,10 +66,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             /// <summary>
-            /// 
+            /// Assembles a relative path from the path given components.
             /// </summary>
             /// 
-            /// <returns></returns>
+            /// <returns>A relative path built from path components.</returns>
             public static string BuildPath(IEnumerable<string> pathComponents)
             {
                 var path = ".";
@@ -87,113 +87,117 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         #region Members
         #region Default Settings String
         /// <summary>
-        /// 
+        /// Represents the default settings for the code coverage data collector.
         /// </summary>
-        private static readonly string DefaultSettings =
-            @"<DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
-            @"  <Configuration>" + Environment.NewLine +
-            @"    <CodeCoverage>" + Environment.NewLine +
-            @"      <ModulePaths>" + Environment.NewLine +
-            @"        <Exclude>" + Environment.NewLine +
-            @"           <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*testhost.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*datacollector.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*qtagent32.*</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*msvcr.*dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*msvcp.*dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*clr.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*clr.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*clrjit.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*clrjit.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*mscoree.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*mscoreei.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*mscoreei.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*mscorlib.dll$</ModulePath>" + Environment.NewLine +
-            @"           <ModulePath>.*mscorlib.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"         </Exclude>" + Environment.NewLine +
-            @"      </ModulePaths>" + Environment.NewLine +
-            @"      <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>" + Environment.NewLine +
-            @"      <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>" + Environment.NewLine +
-            @"      <CollectFromChildProcesses>True</CollectFromChildProcesses>" + Environment.NewLine +
-            @"      <CollectAspDotNet>false</CollectAspDotNet>" + Environment.NewLine +
-            @"      <SymbolSearchPaths />" + Environment.NewLine +
-            @"      <Functions>" + Environment.NewLine +
-            @"        <Exclude>" + Environment.NewLine +
-            @"          <Function>^std::.*</Function>" + Environment.NewLine +
-            @"          <Function>^ATL::.*</Function>" + Environment.NewLine +
-            @"          <Function>.*::__GetTestMethodInfo.*</Function>" + Environment.NewLine +
-            @"          <Function>.*__CxxPureMSILEntry.*</Function>" + Environment.NewLine +
-            @"          <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>" + Environment.NewLine +
-            @"          <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>" + Environment.NewLine +
-            @"          <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>" + Environment.NewLine +
-            @"          <Function>^__.*</Function>" + Environment.NewLine +
-            @"          <Function>.*::__.*</Function>" + Environment.NewLine +
-            @"        </Exclude>" + Environment.NewLine +
-            @"      </Functions>" + Environment.NewLine +
-            @"      <Attributes>" + Environment.NewLine +
-            @"        <Exclude>" + Environment.NewLine +
-            @"          <Attribute>^System.Diagnostics.DebuggerHiddenAttribute$</Attribute>" + Environment.NewLine +
-            @"          <Attribute>^System.Diagnostics.DebuggerNonUserCodeAttribute$</Attribute>" + Environment.NewLine +
-            @"          <Attribute>^System.Runtime.CompilerServices.CompilerGeneratedAttribute$</Attribute>" + Environment.NewLine +
-            @"          <Attribute>^System.CodeDom.Compiler.GeneratedCodeAttribute$</Attribute>" + Environment.NewLine +
-            @"          <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>" + Environment.NewLine +
-            @"          <Attribute>^Microsoft.VisualStudio.TestPlatform.TestSDKAutoGeneratedCode.*</Attribute>" + Environment.NewLine +
-            @"        </Exclude>" + Environment.NewLine +
-            @"      </Attributes>" + Environment.NewLine +
-            @"      <Sources>" + Environment.NewLine +
-            @"        <Exclude>" + Environment.NewLine +
-            @"          <Source>.*\\atlmfc\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\vctools\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\public\\sdk\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\externalapis\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\microsoft sdks\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\vc\\include\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\msclr\\.*</Source>" + Environment.NewLine +
-            @"          <Source>.*\\ucrt\\.*</Source>" + Environment.NewLine +
-            @"        </Exclude>" + Environment.NewLine +
-            @"      </Sources>" + Environment.NewLine +
-            @"      <CompanyNames/>" + Environment.NewLine +
-            @"      <PublicKeyTokens/>" + Environment.NewLine +
-            @"    </CodeCoverage>" + Environment.NewLine +
-            @"  </Configuration>" + Environment.NewLine +
-            @"</DataCollector>";
+        private static readonly string DefaultSettings = string.Join(
+            Environment.NewLine,
+            @"<DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">",
+            @"  <Configuration>",
+            @"    <CodeCoverage>",
+            @"      <ModulePaths>",
+            @"        <Exclude>",
+            @"           <ModulePath>.*CPPUnitTestFramework.*</ModulePath>",
+            @"           <ModulePath>.*vstest.console.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.intellitrace.*</ModulePath>",
+            @"           <ModulePath>.*testhost.*</ModulePath>",
+            @"           <ModulePath>.*datacollector.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>",
+            @"           <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>",
+            @"           <ModulePath>.*qtagent32.*</ModulePath>",
+            @"           <ModulePath>.*msvcr.*dll$</ModulePath>",
+            @"           <ModulePath>.*msvcp.*dll$</ModulePath>",
+            @"           <ModulePath>.*clr.dll$</ModulePath>",
+            @"           <ModulePath>.*clr.ni.dll$</ModulePath>",
+            @"           <ModulePath>.*clrjit.dll$</ModulePath>",
+            @"           <ModulePath>.*clrjit.ni.dll$</ModulePath>",
+            @"           <ModulePath>.*mscoree.dll$</ModulePath>",
+            @"           <ModulePath>.*mscoreei.dll$</ModulePath>",
+            @"           <ModulePath>.*mscoreei.ni.dll$</ModulePath>",
+            @"           <ModulePath>.*mscorlib.dll$</ModulePath>",
+            @"           <ModulePath>.*mscorlib.ni.dll$</ModulePath>",
+            @"         </Exclude>",
+            @"      </ModulePaths>",
+            @"      <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>",
+            @"      <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>",
+            @"      <CollectFromChildProcesses>True</CollectFromChildProcesses>",
+            @"      <CollectAspDotNet>false</CollectAspDotNet>",
+            @"      <SymbolSearchPaths />",
+            @"      <Functions>",
+            @"        <Exclude>",
+            @"          <Function>^std::.*</Function>",
+            @"          <Function>^ATL::.*</Function>",
+            @"          <Function>.*::__GetTestMethodInfo.*</Function>",
+            @"          <Function>.*__CxxPureMSILEntry.*</Function>",
+            @"          <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>",
+            @"          <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>",
+            @"          <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>",
+            @"          <Function>^__.*</Function>",
+            @"          <Function>.*::__.*</Function>",
+            @"        </Exclude>",
+            @"      </Functions>",
+            @"      <Attributes>",
+            @"        <Exclude>",
+            @"          <Attribute>^System.Diagnostics.DebuggerHiddenAttribute$</Attribute>",
+            @"          <Attribute>^System.Diagnostics.DebuggerNonUserCodeAttribute$</Attribute>",
+            @"          <Attribute>^System.Runtime.CompilerServices.CompilerGeneratedAttribute$</Attribute>",
+            @"          <Attribute>^System.CodeDom.Compiler.GeneratedCodeAttribute$</Attribute>",
+            @"          <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>",
+            @"          <Attribute>^Microsoft.VisualStudio.TestPlatform.TestSDKAutoGeneratedCode.*</Attribute>",
+            @"        </Exclude>",
+            @"      </Attributes>",
+            @"      <Sources>",
+            @"        <Exclude>",
+            @"          <Source>.*\\atlmfc\\.*</Source>",
+            @"          <Source>.*\\vctools\\.*</Source>",
+            @"          <Source>.*\\public\\sdk\\.*</Source>",
+            @"          <Source>.*\\externalapis\\.*</Source>",
+            @"          <Source>.*\\microsoft sdks\\.*</Source>",
+            @"          <Source>.*\\vc\\include\\.*</Source>",
+            @"          <Source>.*\\msclr\\.*</Source>",
+            @"          <Source>.*\\ucrt\\.*</Source>",
+            @"        </Exclude>",
+            @"      </Sources>",
+            @"      <CompanyNames/>",
+            @"      <PublicKeyTokens/>",
+            @"    </CodeCoverage>",
+            @"  </Configuration>",
+            @"</DataCollector>");
         #endregion
 
         /// <summary>
-        /// 
+        /// Represents the default settings loaded as an <see cref="XmlDocument"/>.
         /// </summary>
         private XmlDocument defaultSettingsDocument;
 
         /// <summary>
-        /// 
+        /// Represents the current settings loaded as an <see cref="XmlDocument"/>.
         /// </summary>
         private XmlDocument currentSettingsDocument;
 
         /// <summary>
-        /// 
+        /// Represents a list of exclusion types tracked by this processor.
         /// </summary>
         private IEnumerable<Exclusion> exclusions;
         #endregion
 
         #region Constructors & Helpers
         /// <summary>
-        /// 
+        /// Constructs an <see cref="CodeCoverageRunSettingsProcessor"/> object.
         /// </summary>
         /// 
-        /// <param name="currentSettings"></param>
+        /// <param name="currentSettings">
+        /// The current settings for the code coverage data collector.
+        /// </param>
         public CodeCoverageRunSettingsProcessor(string currentSettings)
         {
             ValidateArg.NotNullOrEmpty(currentSettings, nameof(currentSettings));
 
+            // Load current settings from string.
             this.currentSettingsDocument = new XmlDocument();
             this.currentSettingsDocument.LoadXml(currentSettings);
 
@@ -201,10 +205,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Constructs an <see cref="CodeCoverageRunSettingsProcessor"/> object.
         /// </summary>
         /// 
-        /// <param name="currentSettingsDocument"></param>
+        /// <param name="currentSettingsDocument">
+        /// The current settings for the code coverage data collector loaded as an
+        /// <see cref="XmlDocument"/>.
+        /// </param>
         public CodeCoverageRunSettingsProcessor(XmlDocument currentSettingsDocument)
         {
             ValidateArg.NotNull(currentSettingsDocument, nameof(currentSettingsDocument));
@@ -213,17 +220,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Finishes initialization of the <see cref="CodeCoverageRunSettingsProcessor"/>.
         /// </summary>
         /// 
-        /// <param name="currentSettingsDocument"></param>
+        /// <param name="currentSettingsDocument">
+        /// The current settings for the code coverage data collector loaded as an
+        /// <see cref="XmlDocument"/>.
+        /// </param>
         private void Initialize(XmlDocument currentSettingsDocument)
         {
             this.currentSettingsDocument = currentSettingsDocument;
 
+            // Load default settings from string.
             this.defaultSettingsDocument = new XmlDocument();
             this.defaultSettingsDocument.LoadXml(CodeCoverageRunSettingsProcessor.DefaultSettings);
 
+            // Create the exclusion type list.
             this.exclusions = new List<Exclusion>
             {
                 new Exclusion(new List<string> { "ModulePaths", "Exclude" }),
@@ -236,12 +248,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         #region Public Interface
         /// <summary>
-        /// 
+        /// Processes the current settings for the code coverage data collector.
         /// </summary>
         /// 
-        /// <returns></returns>
+        /// <returns>An updated version of the current run settings.</returns>
         public string Process()
         {
+            // Get the code coverage data collector node.
             var dataCollectorNode = this.GetDataCollectorNode();
             if (dataCollectorNode == null)
             {
@@ -250,6 +263,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return this.currentSettingsDocument.OuterXml;
             }
 
+            // Get the code coverage node from the current settings. If unable to get any
+            // particular component down the path just add the default values for that component
+            // from the default settings document and return since there's nothing else to be done.
             var codeCoveragePathComponents = new List<string>() { "Configuration", "CodeCoverage" };
             var currentCodeCoverageNode = this.SelectNodeOrAddDefaults(
                 dataCollectorNode,
@@ -261,29 +277,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return this.currentSettingsDocument.OuterXml;
             }
 
+            // Get the code coverage node from the default settings.
             var defaultCodeCoverageNode = this.ExtractNode(
                 this.defaultSettingsDocument.FirstChild,
                 Exclusion.BuildPath(codeCoveragePathComponents));
 
             foreach (var exclusion in this.exclusions)
             {
+                // Get the <Exclude> node for the current exclusion type. If unable to get any
+                // particular component down the path just add the default values for that
+                // component from the default settings document and continue since there's nothing
+                // else to be done.
                 var currentNode = this.SelectNodeOrAddDefaults(
                     currentCodeCoverageNode,
                     defaultCodeCoverageNode,
                     exclusion.PathComponents);
+
+                // Check if the node extraction was successful and we should process the current
+                // node in order to merge the current exclusion rules with the default ones.
                 if (currentNode == null || !this.ShouldProcessCurrentExclusion(currentNode))
                 {
                     continue;
                 }
 
+                // Extract the <Exclude> node from the default settings.
                 var defaultNode = this.ExtractNode(
                     defaultCodeCoverageNode,
                     exclusion.Path);
 
+                // Add nodes from both the current and the default settings to current exclusion
+                // type's exclusion rules.
                 this.AddNodes(defaultNode, exclusion);
                 this.AddNodes(currentNode, exclusion);
 
-                this.ReplaceNodes(currentNode, exclusion);
+                // Merge both the current and the default settings for the current exclusion rule.
+                this.MergeNodes(currentNode, exclusion);
             }
 
             return this.currentSettingsDocument.OuterXml;
@@ -292,22 +320,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         #region Private Methods
         /// <summary>
-        /// 
+        /// Gets the code coverage data collector node from the current settings document.
         /// </summary>
         /// 
-        /// <returns></returns>
+        /// <returns>
+        /// The code coverage data collector node from the current settings document.
+        /// </returns>
         private XmlNode GetDataCollectorNode()
         {
             const string prefixPath = @"/RunSettings/DataCollectionRunSettings/DataCollectors";
             const string attributeName = "uri";
             const string attributeValue = "datacollector://microsoft/CodeCoverage/2.0";
 
+            // Extract all data collectors.
             var dataCollectorsNode = this.ExtractNode(this.currentSettingsDocument, prefixPath);
             if (dataCollectorsNode == null)
             {
                 return dataCollectorsNode;
             }
 
+            // Identify the correct data collector node for code coverage.
             foreach (XmlNode node in dataCollectorsNode.ChildNodes)
             {
                 foreach (XmlAttribute attribute in node.Attributes)
@@ -323,13 +355,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Selects the node from the current settings node using the given
+        /// <see cref="XPathNavigator"/> style path. If unable to select the requested node it adds
+        /// default settings along the path.
         /// </summary>
         /// 
-        /// <param name="rootNode"></param>
-        /// <param name="pathComponents"></param>
+        /// <param name="currentRootNode">
+        /// The root node from the current settings document for the extraction.
+        /// </param>
+        /// <param name="defaultRootNode">
+        /// The corresponding root node from the default settings document.
+        /// </param>
+        /// <param name="pathComponents">The path components.</param>
         /// 
-        /// <returns></returns>
+        /// <returns>The requested node if successful, <see cref="null"/> otherwise.</returns>
         private XmlNode SelectNodeOrAddDefaults(
             XmlNode currentRootNode,
             XmlNode defaultRootNode,
@@ -342,9 +381,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 var currentPathComponent = "/" + component;
 
+                // Append the current path component to the partial path.
                 partialPath += currentPathComponent;
+
+                // Extract the node corresponding to the latest path component.
                 var tempNode = this.ExtractNode(currentNode, "." + currentPathComponent);
 
+                // If the current node extraction is unsuccessful then add the corresponding
+                // default settings node and bail out.
                 if (tempNode == null)
                 {
                     var defaultNode = this.ExtractNode(
@@ -357,6 +401,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     return null;
                 }
 
+                // Node corresponding to the latest path component is the new root node for the
+                // next extraction.
                 currentNode = tempNode;
             }
 
@@ -364,12 +410,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Checks if we should process the current exclusion node.
         /// </summary>
         /// 
-        /// <param name="node"></param>
+        /// <param name="node">The current exclusion node.</param>
         /// 
-        /// <returns></returns>
+        /// <returns>
+        /// <see cref="true"/> if the node should be processed, <see cref="false"/> otherwise.
+        /// </returns>
         private bool ShouldProcessCurrentExclusion(XmlNode node)
         {
             const string attributeName = "mergeDefaults";
@@ -387,13 +435,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Extracts the node specified by the current path using the provided node as root.
         /// </summary>
         /// 
-        /// <param name="node"></param>
-        /// <param name="path"></param>
+        /// <param name="node">The root to be used for extraction.</param>
+        /// <param name="path">The path used to specify the requested node.</param>
         /// 
-        /// <returns></returns>
+        /// <returns>The extracted node if successful, <see cref="null"/> otherwise.</returns>
         private XmlNode ExtractNode(XmlNode node, string path)
         {
             try
@@ -411,33 +459,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Adds all children nodes of the current root to the current exclusion type's exclusion
+        /// rules cache.
         /// </summary>
         /// 
-        /// <param name="node"></param>
-        /// <param name="exclusion"></param>
+        /// <param name="node">The root node.</param>
+        /// <param name="exclusion">The exclusion rule.</param>
         private void AddNodes(XmlNode node, Exclusion exclusion)
         {
             foreach (XmlNode child in node.ChildNodes)
             {
                 var key = child.OuterXml;
+
+                // Ignore keys that are already present in the current exclusion type's exclusion
+                // rules cache.
                 if (exclusion.ExclusionRules.ContainsKey(key))
                 {
                     continue;
                 }
 
+                // Add the current exclusion rule to the exclusion type's cache.
                 exclusion.ExclusionRules.Add(key, child);
             }
         }
 
         /// <summary>
-        /// 
+        /// Merges the current settings rules with the default settings rules.
         /// </summary>
         /// 
-        /// <param name="node"></param>
-        /// <param name="exclusion"></param>
-        private void ReplaceNodes(XmlNode node, Exclusion exclusion)
+        /// <param name="node">The root node.</param>
+        /// <param name="exclusion">The exclusion rule.</param>
+        private void MergeNodes(XmlNode node, Exclusion exclusion)
         {
+            // Iterate through all the children nodes of the given root.
             foreach (XmlNode child in node.ChildNodes)
             {
                 if (!exclusion.ExclusionRules.ContainsKey(child.OuterXml))
@@ -445,11 +499,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     continue;
                 }
 
+                // Remove exclusion rule from the current exclusion type's cache.
                 exclusion.ExclusionRules.Remove(child.OuterXml);
             }
 
+            // Iterate through remaining items in the current exclusion type cache.
             foreach (var child in exclusion.ExclusionRules.Values)
             {
+                // Import any remaining items in the current settings document.
                 var importedChild = node.OwnerDocument.ImportNode(child, true);
                 node.AppendChild(importedChild);
             }
