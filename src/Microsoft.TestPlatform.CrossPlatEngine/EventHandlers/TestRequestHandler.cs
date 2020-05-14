@@ -19,11 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     public class TestRequestHandler : ITestRequestHandler
     {
-        private const int MinimumProtocolVersionWithDebugSupport = 3;
-
         private int protocolVersion = 1;
         private int highestSupportedVersion = 3;
 
@@ -222,7 +221,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
             // request failed.
-            if (this.protocolVersion < MinimumProtocolVersionWithDebugSupport)
+            if (this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
             {
                 return false;
             }

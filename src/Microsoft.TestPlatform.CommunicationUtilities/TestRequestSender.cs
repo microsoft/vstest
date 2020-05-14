@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// Test request sender implementation.
@@ -23,10 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     {
         // Time to wait for test host exit
         private const int ClientProcessExitWaitTimeout = 10 * 1000;
-
-        // The minimuim protocol version a testhost has to implement to be aware it should ask
-        // VS to attach the debugger to the said testhost.
-        private const int MinimumProtocolVersionWithDebugSupport = 3;
 
         private readonly IDataSerializer dataSerializer;
 
@@ -69,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public TestRequestSender(ProtocolConfig protocolConfig, ITestRuntimeProvider runtimeProvider)
             : this(
                   runtimeProvider,
-                  null,
+                  communicationEndPoint: null,
                   runtimeProvider.GetTestHostConnectionInfo(),
                   JsonDataSerializer.Instance,
                   protocolConfig,
@@ -118,7 +115,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             IDataSerializer serializer,
             ProtocolConfig protocolConfig,
             int clientExitedWaitTime)
-            : this(null, communicationEndPoint, connectionInfo, serializer, protocolConfig, clientExitedWaitTime)
+            : this(
+                  runtimeProvider: null,
+                  communicationEndPoint,
+                  connectionInfo,
+                  serializer,
+                  protocolConfig,
+                  clientExitedWaitTime)
         {
         }
 
@@ -308,7 +311,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (runCriteria.TestExecutionContext != null
                 && runCriteria.TestExecutionContext.IsDebug
                 && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
-                && this.protocolVersion < MinimumProtocolVersionWithDebugSupport)
+                && this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
             {
                 var handler = (ITestRunEventsHandler2)eventHandler;
                 if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
@@ -357,7 +360,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (runCriteria.TestExecutionContext != null
                 && runCriteria.TestExecutionContext.IsDebug
                 && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
-                && this.protocolVersion < MinimumProtocolVersionWithDebugSupport)
+                && this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
             {
                 var handler = (ITestRunEventsHandler2)eventHandler;
                 if (!convertedRuntimeProvider.AttachDebuggerToTestHost())

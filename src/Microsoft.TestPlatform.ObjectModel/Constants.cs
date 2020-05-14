@@ -161,6 +161,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 3 };
 
         /// <summary>
+        /// The minimum protocol version that has debug support
+        /// </summary>
+        public const int MinimumProtocolVersionWithDebugSupport = 3;
+
+        /// <summary>
         /// Name of the results directory
         /// </summary>
         public const string ResultsDirectoryName = "TestResults";

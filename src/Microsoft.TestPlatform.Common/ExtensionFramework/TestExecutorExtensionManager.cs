@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<TExecutor1, TValue>> testExtensions1,
             IEnumerable<LazyExtension<TExecutor2, TValue>> testExtensions2) where TExecutor1 : ITestExecutor where TExecutor2 : TExecutor1
         {
-            if (testExtensions2.Count() == 0)
+            if (!testExtensions2.Any())
             {
                 return testExtensions1;
             }

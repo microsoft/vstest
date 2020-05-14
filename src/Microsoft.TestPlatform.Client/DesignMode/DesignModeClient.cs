@@ -24,14 +24,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// The design mode client.
     /// </summary>
     public class DesignModeClient : IDesignModeClient
     {
-        private const int MinimumProtocolVersionWithDebugSupport = 3;
-
         private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
@@ -311,7 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
             // request failed.
-            if (this.protocolConfig.Version < MinimumProtocolVersionWithDebugSupport)
+            if (this.protocolConfig.Version < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
             {
                 return false;
             }
