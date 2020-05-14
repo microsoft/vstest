@@ -4,12 +4,8 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
-    using System.Diagnostics;
-    using System.IO;
     using System.Runtime.InteropServices;
-    using Microsoft.Diagnostics.NETCore.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.Win32.SafeHandles;
 
     internal class HangDumperFactory : IHangDumperFactory
     {

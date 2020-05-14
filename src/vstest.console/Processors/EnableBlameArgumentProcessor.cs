@@ -165,9 +165,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // Check if dump should be enabled or not.
                 enableHangDump = hasCollectHangDumpKey && IsHangDumpCollectionSupported();
 
-                // Get collect dump parameters.
-                var collectDumpParameterArgs = blameArgumentList.Where(a => !isDumpCollect(a) && !isHangDumpCollect(a));
-                collectDumpParameters = ArgumentProcessorUtilities.GetArgumentParameters(collectDumpParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
+                if (!enableDump && !enableHangDump)
+                {
+                    Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, argument));
+                }
+                else
+                {
+                    // Get collect dump parameters.
+                    var collectDumpParameterArgs = blameArgumentList.Where(a => !isDumpCollect(a) && !isHangDumpCollect(a));
+                    collectDumpParameters = ArgumentProcessorUtilities.GetArgumentParameters(collectDumpParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
+                }
             }
 
             // Initialize blame.
@@ -229,14 +236,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     .Where(p => new[] { "CollectAlways", "DumpType" }.Contains(p.Key))
                     .ToDictionary(p => p.Key, p => p.Value);
 
-                if (dumpParameters.Keys.Any())
+                if (!dumpParameters.ContainsKey("DumpType"))
                 {
-                    if (!dumpParameters.ContainsKey("DumpType"))
-                    {
-                        dumpParameters.Add("DumpType", "Full");
-                    }
-                    AddCollectDumpNode(dumpParameters, XmlDocument, outernode);
+                    dumpParameters.Add("DumpType", "Full");
                 }
+
+                AddCollectDumpNode(dumpParameters, XmlDocument, outernode);
             }
 
             // Add collect hang dump node in configuration element.
@@ -246,19 +251,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     .Where(p => new[] { "TestTimeout", "HangDumpType" }.Contains(p.Key))
                     .ToDictionary(p => p.Key, p => p.Value);
 
-                if (hangDumpParameters.Keys.Any())
+                if (!hangDumpParameters.ContainsKey("TestTimeout"))
                 {
-                    if (!hangDumpParameters.ContainsKey("TestTimeout"))
-                    {
-                        hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString());
-                    }
-
-                    if (!hangDumpParameters.ContainsKey("HangDumpType"))
-                    {
-                        hangDumpParameters.Add("HangDumpType", "Full");
-                    }
-                    AddCollectHangDumpNode(hangDumpParameters, XmlDocument, outernode);
+                    hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString());
                 }
+
+                if (!hangDumpParameters.ContainsKey("HangDumpType"))
+                {
+                    hangDumpParameters.Add("HangDumpType", "Full");
+                }
+                
+                AddCollectHangDumpNode(hangDumpParameters, XmlDocument, outernode);
             }
 
             // Add blame configuration element to blame collector.
@@ -337,35 +340,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             return dumpCollectionSupported;
-        }
-
-        /// <summary>
-        /// Check if collect dump key is valid.
-        /// </summary>
-        /// <param name="collectDumpKey">Collect dump key.</param>
-        /// <returns>Flag for collect dump key valid or not.</returns>
-        private bool ValidateCollectDumpKey(string collectDumpKey)
-        {
-            var isCollectDumpKeyValid = collectDumpKey != null && collectDumpKey.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase);
-
-            if (!isCollectDumpKeyValid)
-            {
-                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, collectDumpKey));
-            }
-
-            return isCollectDumpKeyValid;
-        }
-
-        private bool ValidateCollectHangDumpKey(string collectDumpKey)
-        {
-            var isCollectDumpKeyValid = collectDumpKey != null && collectDumpKey.Equals(Constants.BlameCollectHangDumpKey, StringComparison.OrdinalIgnoreCase);
-
-            if (!isCollectDumpKeyValid)
-            {
-                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, collectDumpKey));
-            }
-
-            return isCollectDumpKeyValid;
         }
 
         /// <summary>

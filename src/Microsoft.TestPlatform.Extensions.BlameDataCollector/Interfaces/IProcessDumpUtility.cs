@@ -28,6 +28,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="isFullDump">
         /// Is full dump enabled
         /// </param>
+        /// <param name="targetFramework">
+        /// The target framework of the process
+        /// </param>
         void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump, string targetFramework);
 
         /// <summary>
@@ -44,6 +47,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </param>
         /// <param name="isFullDump">
         /// Is full dump enabled
+        /// </param>
+        /// <param name="targetFramework">
+        /// The target framework of the process
         /// </param>
         void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump, string targetFramework);
 

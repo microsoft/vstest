@@ -20,7 +20,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     {
         private Mock<IFileHelper> mockFileHelper;
         private Mock<IProcessHelper> mockProcessHelper;
-        private Mock<IHangDumperFactory> mockDumperFactory;
+        private Mock<IHangDumperFactory> mockHangDumperFactory;
+        private Mock<ICrashDumperFactory> mockCrashDumperFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessDumpUtilityTests"/> class.
@@ -29,7 +30,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.mockDumperFactory = new Mock<IHangDumperFactory>();
+            this.mockHangDumperFactory = new Mock<IHangDumperFactory>();
+            this.mockCrashDumperFactory = new Mock<ICrashDumperFactory>();
         }
 
         /// <summary>
@@ -48,13 +50,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
 
-            this.mockDumperFactory.Setup(x => x.Create(It.IsAny<string>()))
+            this.mockHangDumperFactory.Setup(x => x.Create(It.IsAny<string>()))
                 .Returns(new Mock<IHangDumper>().Object);
+
+            this.mockCrashDumperFactory.Setup(x => x.Create(It.IsAny<string>()))
+                .Returns(new Mock<ICrashDumper>().Object);
 
             var processDumpUtility = new ProcessDumpUtility(
                 this.mockProcessHelper.Object,
                 this.mockFileHelper.Object,
-                this.mockDumperFactory.Object);
+                this.mockHangDumperFactory.Object,
+                this.mockCrashDumperFactory.Object);
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory, false, ".NETCoreApp,Version=v5.0");
 

@@ -6,7 +6,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
-    using System.Security.Cryptography.X509Certificates;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -19,21 +18,23 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private readonly IProcessHelper processHelper;
         private readonly IFileHelper fileHelper;
         private readonly IHangDumperFactory hangDumperFactory;
+        private readonly ICrashDumperFactory crashDumperFactory;
         private ICrashDumper crashDumper;
         private string hangDumpPath;
         private string crashDumpPath;
         private bool wasHangDumped;
 
         public ProcessDumpUtility()
-            : this(new ProcessHelper(), new FileHelper(), new HangDumperFactory())
+            : this(new ProcessHelper(), new FileHelper(), new HangDumperFactory(), new CrashDumperFactory())
         {
         }
 
-        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IHangDumperFactory hangDumperFactory)
+        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IHangDumperFactory hangDumperFactory, ICrashDumperFactory crashDumperFactory)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.hangDumperFactory = hangDumperFactory;
+            this.crashDumperFactory = crashDumperFactory;
         }
 
         protected Action<object, string> OutputReceivedCallback => (process, data) =>
@@ -102,7 +103,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new NotSupportedException($"Operating system {RuntimeInformation.OSDescription} is not supported for crash dumps.");
             }
 
-            this.crashDumper = new ProcDumpCrashDumper();
+            this.crashDumper = this.crashDumperFactory.Create(targetFramework);
             ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
             this.crashDumper.AttachToTargetProcess(processId, dumpPath, dumpType);
         }
