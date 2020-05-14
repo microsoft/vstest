@@ -21,6 +21,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCleanup]
         public void Cleanup()
         {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
+
             if (Directory.Exists(this.resultsDir))
             {
                 Directory.Delete(this.resultsDir, true);
@@ -47,6 +49,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
         {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
