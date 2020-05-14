@@ -786,7 +786,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             try
             {
                 var pid = this.dataSerializer.DeserializePayload<int>(message);
-                ackPayload.Attached = ((ITestHostLauncher2)customHostLauncher).AttachDebuggerToProcess(pid);
+
+                ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
+                    ? launcher.AttachDebuggerToProcess(pid)
+                    : false;
             }
             catch (Exception ex)
             {

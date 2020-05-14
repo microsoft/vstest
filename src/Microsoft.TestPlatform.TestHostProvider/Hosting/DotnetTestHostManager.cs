@@ -374,7 +374,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc />
         public bool AttachDebuggerToTestHost()
         {
-            return ((ITestHostLauncher2)this.customTestHostLauncher).AttachDebuggerToProcess(this.testHostProcess.Id);
+            return this.customTestHostLauncher is ITestHostLauncher2 launcher
+                ? launcher.AttachDebuggerToProcess(this.testHostProcess.Id)
+                : false;
         }
 
         /// <summary>
@@ -409,12 +411,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
 
             // We launch the test host process here if we're on the normal test running workflow.
-            // If we're debugging we launch it here as well, but we expect to attach later to the
-            // test host process by using its PID.
+            // If we're debugging and we have access to the newest version of the testhost launcher
+            // interface we launch it here as well, but we expect to attach later to the test host
+            // process by using its PID.
             // For every other workflow (e.g.: profiling) we ask the IDE to launch the custom test
             // host for us. In the profiling case this is needed because then the IDE sets some
             // additional environmental variables for us to help with probing.
-            if (this.customTestHostLauncher == null || this.customTestHostLauncher.IsDebug)
+            if ((this.customTestHostLauncher == null)
+                || (this.customTestHostLauncher.IsDebug
+                    && this.customTestHostLauncher is ITestHostLauncher2))
             {
                 EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
