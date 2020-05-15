@@ -285,9 +285,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     case XmlAttribute attribute when string.Equals(attribute.Name, Constants.TestTimeout, StringComparison.OrdinalIgnoreCase):
 
-                        if (!string.IsNullOrWhiteSpace(attribute.Value) && int.TryParse(attribute.Value, out int inactivityTimespanInMilliseconds))
+                        if (!string.IsNullOrWhiteSpace(attribute.Value) && TimeSpanParser.TryParse(attribute.Value, out var timeout))
                         {
-                            this.inactivityTimespan = TimeSpan.FromMilliseconds(inactivityTimespanInMilliseconds);
+                            this.inactivityTimespan = timeout;
                         }
                         else
                         {
