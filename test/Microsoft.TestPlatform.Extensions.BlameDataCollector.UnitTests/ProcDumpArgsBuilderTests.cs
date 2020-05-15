@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void BuildHangBasedProcDumpArgsShouldCreateCorrectArgString()
         {
             var procDumpArgsBuilder = new ProcDumpArgsBuilder();
-            var argString = procDumpArgsBuilder.BuildHangBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName);
+            var argString = procDumpArgsBuilder.BuildHangBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, false);
             Assert.AreEqual("-accepteula -n 1 1234 dump.dmp", argString);
         }
 
@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void BuildTriggerBasedProcDumpArgsShouldCreateCorrectArgString()
         {
             var procDumpArgsBuilder = new ProcDumpArgsBuilder();
-            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" });
+            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, false);
             Assert.AreEqual("-accepteula -e 1 -g -t -f a -f b 1234 dump.dmp", argString);
         }
 

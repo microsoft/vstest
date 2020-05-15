@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
     {
         /// <inheritdoc />
-        public string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump = false)
+        public string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump)
         {
             // -accepteula: Auto accept end-user license agreement
             // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc />
-        public string BuildHangBasedProcDumpArgs(int processId, string filename, bool isFullDump = false)
+        public string BuildHangBasedProcDumpArgs(int processId, string filename, bool isFullDump)
         {
             // -accepteula: Auto accept end-user license agreement
             // -ma: Full dump argument.

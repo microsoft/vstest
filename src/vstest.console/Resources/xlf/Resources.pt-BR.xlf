@@ -1587,9 +1587,9 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
-        <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="translated">A opção CollectDump para Blame não é compatível com esta plataforma.</target>
-        <note />
+        <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
+        <target state="new">A opção CollectDump para Blame não é compatível com esta plataforma.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
@@ -1661,6 +1661,11 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
         <target state="translated">O argumento do parâmetro de execução de teste '{0}' é inválido. Use o formato abaixo.
      Formato: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
+        <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
+        <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
         <note></note>
       </trans-unit>
     </body>

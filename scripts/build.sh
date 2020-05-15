@@ -93,7 +93,7 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
-TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet}"
+TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet-linux}"
 TP_PACKAGES_DIR="${NUGET_PACKAGES:-${TP_ROOT_DIR}/packages}"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
@@ -186,12 +186,12 @@ function install_cli()
         chmod u+x $install_script
 
         log "install_cli: Get the latest dotnet cli toolset..."
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_CLI_VERSION
 
         # Get netcoreapp1.1 shared components
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.1.0" --version "2.1.0" --shared-runtime
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "release/2.1.0" --version "2.1.0" --runtime dotnet
         #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-        #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
+        #$install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --runtime dotnet
     fi
 
     local dotnet_path=$(_get_dotnet_path)
