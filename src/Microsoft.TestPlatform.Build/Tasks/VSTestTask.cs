@@ -313,7 +313,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
                         if (!string.IsNullOrEmpty(this.VSTestBlameCrashDumpType))
                         {
-                            dumpArgs.Add($"DumpType={this.VSTestBlameCrashDumpType.Trim()}");
+                            dumpArgs.Add($"DumpType={this.VSTestBlameCrashDumpType}");
                         }
                     }
 
