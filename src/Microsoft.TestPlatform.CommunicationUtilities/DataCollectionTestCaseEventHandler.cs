@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case started.");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' started.", testCaseStartEventArgs.TestCaseName, testCaseStartEventArgs.TestCaseId);
                         }
 
                         break;
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case completed");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' completed", testCaseEndEventArgs.TestCaseName, testCaseEndEventArgs.TestCaseId);
                         }
 
                         break;
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     default:
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message types");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message type '{0}'", message.MessageType);
                         }
 
                         break;

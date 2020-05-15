@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public void RunShouldInitializeTraceWithTraceLevelOffIfDiagArgIsEmpty()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public void RunShouldInitializeTraceWithVerboseTraceLevelIfInvalidTraceLevelPassed()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public void RunShouldInitializeTraceWithCorrectVerboseTraceLevel()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;

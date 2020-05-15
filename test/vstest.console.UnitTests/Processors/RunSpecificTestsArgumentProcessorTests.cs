@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using CoreUtilities.Tracing.Interfaces;
     using Microsoft.Extensions.FileSystemGlobbing;
     using Microsoft.VisualStudio.TestPlatform.Client;
+    using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
@@ -172,14 +173,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteForValidSourceWithTestCaseFilterShouldThrowCommandLineException()
+        public void ExecutorExecuteForValidSourceWithTestCaseFilterShouldRunTests()
         {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+
             this.ResetAndAddSourceToCommandLineOptions();
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask, this.mockProcessHelper.Object);
+
+            List<TestCase> list = new List<TestCase>();
+            list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
+            list.Add(new TestCase("Test2", new Uri("http://FooTestUri1"), "Source1"));
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
+
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask, this.mockProcessHelper.Object);
             var executor = GetExecutor(testRequestManager);
+
             CommandLineOptions.Instance.TestCaseFilterValue = "Filter";
-            Assert.ThrowsException<CommandLineException>(() => executor.Execute());
+            executor.Initialize("Test1");
+            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
+
+            mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
+            mockTestPlatform.Verify(o => o.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(c => c.TestCaseFilter == "Filter"), It.IsAny<TestPlatformOptions>()), Times.Once());
+            Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
         }
+
 
         [TestMethod]
         public void ExecutorExecuteShouldThrowTestPlatformExceptionThrownDuringDiscovery()
