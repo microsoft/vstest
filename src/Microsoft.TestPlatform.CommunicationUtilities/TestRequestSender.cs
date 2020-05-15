@@ -522,12 +522,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         this.channel.Send(data);
                         break;
 
-                    case MessageType.AttachDebuggerToProcess:
+                    case MessageType.AttachDebugger:
                         var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
                         bool result = ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
 
                         var resultMessage = this.dataSerializer.SerializePayload(
-                            MessageType.AttachDebuggerToProcessCallback,
+                            MessageType.AttachDebuggerCallback,
                             result,
                             this.protocolVersion);
 

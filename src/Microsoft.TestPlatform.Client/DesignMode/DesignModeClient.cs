@@ -223,7 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.ProxyAttachDebuggerToProcessCallback:
+                        case MessageType.EditorAttachDebuggerCallback:
                             {
                                 this.onAttachDebuggerAckRecieved?.Invoke(message);
                                 break;
@@ -325,14 +325,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     waitHandle.Set();
                 };
 
-                this.communicationManager.SendMessage(MessageType.ProxyAttachDebuggerToProcess, pid);
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
 
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
                 this.onAttachDebuggerAckRecieved = null;
 
-                var ackPayload = this.dataSerializer.DeserializePayload<ProxyAttachDebuggerToProcessAckPayload>(ackMessage);
+                var ackPayload = this.dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
                 if (!ackPayload.Attached)
                 {
                     EqtTrace.Warning(ackPayload.ErrorMessage);

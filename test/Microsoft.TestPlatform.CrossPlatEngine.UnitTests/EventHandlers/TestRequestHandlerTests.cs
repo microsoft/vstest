@@ -536,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private static void OnAttachDebuggerAckRecieved(Message message)
         {
-            Assert.AreEqual(message.MessageType, MessageType.AttachDebuggerToProcessCallback);
+            Assert.AreEqual(message.MessageType, MessageType.AttachDebuggerCallback);
         }
     }
 }

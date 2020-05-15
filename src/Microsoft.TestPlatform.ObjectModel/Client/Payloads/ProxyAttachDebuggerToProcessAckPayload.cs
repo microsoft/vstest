@@ -6,10 +6,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Class used to define the <see cref="ProxyAttachDebuggerToProcessAckPayload"/> sent by the
+    /// Class used to define the <see cref="EditorAttachDebuggerAckPayload"/> sent by the
     /// vstest.console translation layers into design mode.
     /// </summary>
-    public class ProxyAttachDebuggerToProcessAckPayload
+    public class EditorAttachDebuggerAckPayload
     {
         /// <summary>
         /// A value indicating if the debugger has successfully attached.

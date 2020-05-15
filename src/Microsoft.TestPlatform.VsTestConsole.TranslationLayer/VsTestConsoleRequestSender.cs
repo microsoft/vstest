@@ -636,7 +636,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
-                    else if (string.Equals(MessageType.ProxyAttachDebuggerToProcess, message.MessageType))
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
                         AttachDebuggerToProcess(customHostLauncher, message);
                     }
@@ -703,7 +703,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
-                    else if (string.Equals(MessageType.ProxyAttachDebuggerToProcess, message.MessageType))
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
                         AttachDebuggerToProcess(customHostLauncher, message);
                     }
@@ -781,7 +781,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
         {
-            var ackPayload = new ProxyAttachDebuggerToProcessAckPayload() { Attached = false, ErrorMessage = null };
+            var ackPayload = new EditorAttachDebuggerAckPayload() { Attached = false, ErrorMessage = null };
 
             try
             {
@@ -803,7 +803,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             finally
             {
                 // Always unblock the vstest.console thread which is indefintitely waiting on this ACK.
-                this.communicationManager.SendMessage(MessageType.ProxyAttachDebuggerToProcessCallback, ackPayload, this.protocolVersion);
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebuggerCallback, ackPayload, this.protocolVersion);
             }
         }
     }

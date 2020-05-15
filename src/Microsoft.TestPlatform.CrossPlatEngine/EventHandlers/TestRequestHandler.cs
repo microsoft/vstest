@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             };
 
             var data = dataSerializer.SerializePayload(
-                MessageType.AttachDebuggerToProcess,
+                MessageType.AttachDebugger,
                 new TestProcessAttachDebuggerPayload(pid),
                 protocolVersion);
             this.SendData(data);
@@ -369,7 +369,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived?.Invoke(message);
                     break;
 
-                case MessageType.AttachDebuggerToProcessCallback:
+                case MessageType.AttachDebuggerCallback:
                     this.onAttachDebuggerAckRecieved?.Invoke(message);
                     break;
 
