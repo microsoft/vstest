@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-#if !NET451
+#if !NETFRAMEWORK
     using System.Runtime.Loader;
 #else
     using System.Reflection;
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var runSettings = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
             var inprocasm = this.testEnvironment.GetTestAsset("SimpleDataCollector.dll");
-#if !NET451
+#if !NETFRAMEWORK
             var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);
 #else
             var assemblyName = AssemblyName.GetAssemblyName(inprocasm);

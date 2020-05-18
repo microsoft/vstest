@@ -491,7 +491,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
-#if !NET451
+#if !NETFRAMEWORK
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';

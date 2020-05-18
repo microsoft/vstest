@@ -13,14 +13,14 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
     [TestClass]
     public class DiaSessionTests : IntegrationTestBase
     {
-        private const string NET451 = "net451";
+        private const string NETFRAMEWORK = "net451";
         private const string NETCOREAPP21 = "netcoreapp2.1";
 
         public static string GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
         {
             var currentTargetFrameWork = testEnvironment.TargetFramework;
-#if NET451
-            testEnvironment.TargetFramework = NET451;
+#if NETFRAMEWORK
+            testEnvironment.TargetFramework = NETFRAMEWORK;
 #else
             testEnvironment.TargetFramework = NETCOREAPP21;
 #endif
