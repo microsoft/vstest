@@ -3,9 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-
+    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -18,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     /// <summary>
     /// ParallelRunEventsHandler for handling the run events in case of parallel execution
     /// </summary>
-    internal class ParallelRunEventsHandler : ITestRunEventsHandler
+    internal class ParallelRunEventsHandler : ITestRunEventsHandler2
     {
         private IProxyExecutionManager proxyExecutionManager;
 
@@ -172,6 +173,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             return this.actualRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return ((ITestRunEventsHandler2)this.actualRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         private void ConvertToRawMessageAndSend(string messageType, object payload)

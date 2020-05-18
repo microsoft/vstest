@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -49,6 +49,60 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         #endregion
 
+        #region Private Methods
+        /// <summary>
+        /// Merges two test extension lists.
+        /// </summary>
+        /// 
+        /// <typeparam name="TExecutor1">Type of first test extension.</typeparam>
+        /// <typeparam name="TExecutor2">Type of second test extension.</typeparam>
+        /// <typeparam name="TValue">Type of the value used in the lazy extension expression.</typeparam>
+        /// 
+        /// <param name="testExtensions1">First test extension list.</param>
+        /// <param name="testExtensions2">Second test extension list.</param>
+        /// 
+        /// <returns>A merged list of test extensions.</returns>
+        private static IEnumerable<LazyExtension<TExecutor1, TValue>> MergeTestExtensionLists<TExecutor1, TExecutor2, TValue>(
+            IEnumerable<LazyExtension<TExecutor1, TValue>> testExtensions1,
+            IEnumerable<LazyExtension<TExecutor2, TValue>> testExtensions2) where TExecutor1 : ITestExecutor where TExecutor2 : TExecutor1
+        {
+            if (!testExtensions2.Any())
+            {
+                return testExtensions1;
+            }
+
+            var mergedTestExtensions = new List<LazyExtension<TExecutor1, TValue>>();
+            var cache = new Dictionary<string, LazyExtension<TExecutor1, TValue>>();
+
+            // Create the cache used for merging by adding all extensions from the first list.
+            foreach (var testExtension in testExtensions1)
+            {
+                cache.Add(testExtension.TestPluginInfo.IdentifierData, testExtension);
+            }
+
+            // Update the cache with extensions from the second list. Should there be any conflict
+            // we prefer the second extension to the first.
+            foreach (var testExtension in testExtensions2)
+            {
+                if (cache.ContainsKey(testExtension.TestPluginInfo.IdentifierData))
+                {
+                    cache[testExtension.TestPluginInfo.IdentifierData] =
+                        new LazyExtension<TExecutor1, TValue>(
+                            (TExecutor1)testExtension.Value, testExtension.Metadata);
+                }
+            }
+
+            // Create the merged test extensions list from the cache.
+            foreach (var kvp in cache)
+            {
+                mergedTestExtensions.Add(kvp.Value);
+            }
+
+            return mergedTestExtensions;
+        }
+
+        #endregion
+
         #region Factory Methods
 
         /// <summary>
@@ -63,17 +117,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 {
                     if (testExecutorExtensionManager == null)
                     {
-                        IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions;
-                        IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions;
+                        IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions1;
+                        IEnumerable<LazyExtension<ITestExecutor2, Dictionary<string, object>>> unfilteredTestExtensions2;
+                        IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions1;
+                        IEnumerable<LazyExtension<ITestExecutor2, ITestExecutorCapabilities>> testExtensions2;
 
+                        // Get all extensions for ITestExecutor.
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                                out unfilteredTestExtensions,
-                                out testExtensions);
+                                out unfilteredTestExtensions1,
+                                out testExtensions1);
 
+                        // Get all extensions for ITestExecutor2.
+                        TestPluginManager.Instance
+                            .GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                                TestPlatformConstants.TestAdapterEndsWithPattern,
+                                out unfilteredTestExtensions2,
+                                out testExtensions2);
+
+                        // Merge the extension lists.
+                        var mergedUnfilteredTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+                            unfilteredTestExtensions1,
+                            unfilteredTestExtensions2);
+
+                        var mergedTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+                            testExtensions1,
+                            testExtensions2);
+
+                        // Create the TestExecutorExtensionManager using the merged extension list.
                         testExecutorExtensionManager = new TestExecutorExtensionManager(
-                            unfilteredTestExtensions, testExtensions, TestSessionMessageLogger.Instance);
+                            mergedUnfilteredTestExtensions, mergedTestExtensions, TestSessionMessageLogger.Instance);
                     }
                 }
             }
@@ -92,20 +166,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </remarks>
         internal static TestExecutorExtensionManager GetExecutionExtensionManager(string extensionAssembly)
         {
-            IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions;
+            IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions1;
+            IEnumerable<LazyExtension<ITestExecutor2, Dictionary<string, object>>> unfilteredTestExtensions2;
+            IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions1;
+            IEnumerable<LazyExtension<ITestExecutor2, ITestExecutorCapabilities>> testExtensions2;
 
+            // Get all extensions for ITestExecutor.
             TestPluginManager.Instance
                 .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                     extensionAssembly,
-                    out unfilteredTestExtensions,
-                    out testExtensions);
+                    out unfilteredTestExtensions1,
+                    out testExtensions1);
+
+            // Get all extensions for ITestExecutor2.
+            TestPluginManager.Instance
+                .GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
+                    extensionAssembly,
+                    out unfilteredTestExtensions2,
+                    out testExtensions2);
+
+            // Merge the extension lists.
+            var mergedUnfilteredTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+                    unfilteredTestExtensions1,
+                    unfilteredTestExtensions2);
+
+            var mergedTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
+                testExtensions1,
+                testExtensions2);
 
             // TODO: This can be optimized - The base class's populate map would be called repeatedly for the same extension assembly.
             // Have a single instance of TestExecutorExtensionManager that keeps populating the map iteratively.
             return new TestExecutorExtensionManager(
-                unfilteredTestExtensions,
-                testExtensions,
+                mergedUnfilteredTestExtensions,
+                mergedTestExtensions,
                 TestSessionMessageLogger.Instance);
         }
 

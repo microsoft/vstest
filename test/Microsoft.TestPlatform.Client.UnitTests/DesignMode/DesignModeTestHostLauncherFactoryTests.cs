@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var testRunRequestPayload = new TestRunRequestPayload { DebuggingEnabled = true };
             var launcher = DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(mockDesignModeClient.Object, testRunRequestPayload);
 
-            Assert.IsTrue(launcher.IsDebug, "Factory must not return debug launcher if debugging is disabled.");
+            Assert.IsTrue(launcher.IsDebug, "Factory must return non-debug launcher if debugging is enabled.");
         }
     }
 }

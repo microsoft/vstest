@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler
+    public class RunEventHandler : ITestRunEventsHandler2
     {
         /// <summary>
         /// Gets the test results.
@@ -89,6 +89,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             // No op
             return -1;
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            // No op
+            return true;
         }
     }
 }

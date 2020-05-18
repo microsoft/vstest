@@ -12,8 +12,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// Test request sender implementation.
@@ -47,24 +49,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private string clientExitErrorMessage;
 
         // Set default to 1, if protocol version check does not happen
-        // that implies host is using version 1
+        // that implies host is using version 1.
         private int protocolVersion = 1;
 
-        private int highestSupportedVersion = 2;
+        private int highestSupportedVersion = 3;
+
         private TestHostConnectionInfo connectionInfo;
+
+        private ITestRuntimeProvider runtimeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
         /// </summary>
         /// <param name="protocolConfig">Protocol configuration.</param>
-        /// <param name="connectionInfo">Transport layer to set up connection</param>
-        public TestRequestSender(ProtocolConfig protocolConfig, TestHostConnectionInfo connectionInfo)
-            : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, ClientProcessExitWaitTimeout)
+        /// <param name="runtimeProvider">The runtime provider.</param>
+        public TestRequestSender(ProtocolConfig protocolConfig, ITestRuntimeProvider runtimeProvider)
+            : this(
+                  runtimeProvider,
+                  communicationEndPoint: null,
+                  runtimeProvider.GetTestHostConnectionInfo(),
+                  JsonDataSerializer.Instance,
+                  protocolConfig,
+                  ClientProcessExitWaitTimeout)
         {
             this.SetCommunicationEndPoint();
         }
 
         internal TestRequestSender(
+            ITestRuntimeProvider runtimeProvider,
+            ICommunicationEndPoint communicationEndPoint,
             TestHostConnectionInfo connectionInfo,
             IDataSerializer serializer,
             ProtocolConfig protocolConfig,
@@ -79,6 +92,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.highestSupportedVersion = protocolConfig.Version;
 
             // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
+            this.runtimeProvider = runtimeProvider;
+            this.communicationEndpoint = communicationEndPoint;
             this.connectionInfo.Endpoint = connectionInfo.Endpoint;
             this.connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
                 ? ConnectionRole.Client
@@ -100,9 +115,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             IDataSerializer serializer,
             ProtocolConfig protocolConfig,
             int clientExitedWaitTime)
-            : this(connectionInfo, serializer, protocolConfig, clientExitedWaitTime)
+            : this(
+                  runtimeProvider: null,
+                  communicationEndPoint,
+                  connectionInfo,
+                  serializer,
+                  protocolConfig,
+                  clientExitedWaitTime)
         {
-            this.communicationEndpoint = communicationEndPoint;
         }
 
         /// <inheritdoc />
@@ -279,6 +299,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
 
+            // This code section is needed because we altered the old testhost launch process for
+            // the debugging workflow. Now we don't ask VS to launch and attach to the testhost
+            // process for us as we previously did, instead we launch it as a standalone process
+            // and rely on the testhost to ask VS to attach the debugger to itself.
+            //
+            // In order to avoid breaking compatibility with previous testhost versions because of
+            // those changes (older testhosts won't know to request VS to attach to themselves
+            // thinking instead VS launched and attached to them already), we request VS to attach
+            // to the testhost here before starting the test run.
+            if (runCriteria.TestExecutionContext != null
+                && runCriteria.TestExecutionContext.IsDebug
+                && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
+                && this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+            {
+                var handler = (ITestRunEventsHandler2)eventHandler;
+                if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
+                {
+                    EqtTrace.Warning(
+                        string.Format(
+                            CultureInfo.CurrentUICulture,
+                            CommonResources.AttachDebuggerToDefaultTestHostFailure));
+                }
+            }
+
             var message = this.dataSerializer.SerializePayload(
                 MessageType.StartTestExecutionWithSources,
                 runCriteria,
@@ -304,10 +348,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
 
+            // This code section is needed because we altered the old testhost launch process for
+            // the debugging workflow. Now we don't ask VS to launch and attach to the testhost
+            // process for us as we previously did, instead we launch it as a standalone process
+            // and rely on the testhost to ask VS to attach the debugger to itself.
+            //
+            // In order to avoid breaking compatibility with previous testhost versions because of
+            // those changes (older testhosts won't know to request VS to attach to themselves
+            // thinking instead VS launched and attached to them already), we request VS to attach
+            // to the testhost here before starting the test run.
+            if (runCriteria.TestExecutionContext != null
+                && runCriteria.TestExecutionContext.IsDebug
+                && this.runtimeProvider is ITestRuntimeProvider2 convertedRuntimeProvider
+                && this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+            {
+                var handler = (ITestRunEventsHandler2)eventHandler;
+                if (!convertedRuntimeProvider.AttachDebuggerToTestHost())
+                {
+                    EqtTrace.Warning(
+                        string.Format(
+                            CultureInfo.CurrentUICulture,
+                            CommonResources.AttachDebuggerToDefaultTestHostFailure));
+                }
+            }
+
             var message = this.dataSerializer.SerializePayload(
                 MessageType.StartTestExecutionWithTests,
                 runCriteria,
                 this.protocolVersion);
+
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
@@ -451,6 +520,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         }
 
                         this.channel.Send(data);
+                        break;
+
+                    case MessageType.AttachDebugger:
+                        var testProcessPid = this.dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
+                        bool result = ((ITestRunEventsHandler2)testRunEventsHandler).AttachDebuggerToProcess(testProcessPid.ProcessID);
+
+                        var resultMessage = this.dataSerializer.SerializePayload(
+                            MessageType.AttachDebuggerCallback,
+                            result,
+                            this.protocolVersion);
+
+                        this.channel.Send(resultMessage);
+
                         break;
                 }
             }

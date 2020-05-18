@@ -207,6 +207,11 @@
         <target state="translated">已取消測試的探索。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
+        <target state="new">Cannot attach the debugger to the default test host with process ID: {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -26,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
     /// </summary>
-    internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager, ITestRunEventsHandler
+    internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager, ITestRunEventsHandler2
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
@@ -191,6 +192,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return ((ITestRunEventsHandler2)this.baseTestRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         /// <summary>
