@@ -22,15 +22,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// <inheritdoc />
         public bool IsDebug => true;
 
-        public bool AttachDebuggerToProcess(int pid)
-        {
-            return this.AttachDebuggerToProcess(pid, CancellationToken.None);
-        }
+        public bool AttachDebuggerToProcess(int pid) => this.AttachDebuggerToProcess(pid, CancellationToken.None);
 
-        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
-        {
-            return true;
-        }
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken) => true;
 
         /// <inheritdoc />
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
