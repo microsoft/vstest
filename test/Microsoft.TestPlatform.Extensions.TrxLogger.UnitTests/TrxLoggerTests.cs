@@ -724,8 +724,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
 
             Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results.trx"), this.testableTrxLogger.trxFile, "Expected framework name to appear in file name");
-            Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net451.trx"), this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
-            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net451"), actualFileNameWithoutTimestamp);
+            Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net472.trx"), this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net472"), actualFileNameWithoutTimestamp);
         }
 
         [TestMethod]
@@ -741,7 +741,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
 
-            Assert.AreEqual(trxPrefix + "_net451", actualFileNameWithoutTimestamp);
+            Assert.AreEqual(trxPrefix + "_net472", actualFileNameWithoutTimestamp);
 
             File.Delete(this.testableTrxLogger.trxFile);
         }

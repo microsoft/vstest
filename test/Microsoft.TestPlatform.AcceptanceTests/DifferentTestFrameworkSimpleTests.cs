@@ -98,7 +98,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             string testAssemblyPath = null;
 
-            // Xunit >= 2.2 won't support net472, Minimum target framework it supports is net452.
+            // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
             if (this.testEnvironment.TargetFramework.Equals("net472"))
             {
                 testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", "net46");

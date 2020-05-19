@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            // Xunit >= 2.2 won't support net472, Minimum target framework it supports is net452.
+            // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
             string testAssemblyPath = null;
             if (this.testEnvironment.TargetFramework.Equals("net472"))
             {

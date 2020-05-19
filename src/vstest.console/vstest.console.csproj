@@ -13,6 +13,8 @@
     <PlatformTarget Condition="'$(TargetFramework)' == 'net472'">AnyCPU</PlatformTarget>
     <Prefer32Bit Condition="'$(TargetFramework)' == 'net472'">true</Prefer32Bit>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+      <!-- to copy the netcore.client dependency to bin folder on build -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
@@ -24,6 +26,7 @@
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing">
       <Version>$(FileSystemGlobbingVersion)</Version>
     </PackageReference>
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />

@@ -3,7 +3,7 @@
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;net472</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>
@@ -11,10 +11,10 @@
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' and $(Configuration) == 'Release'">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' and $(Configuration) == 'Debug'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' and $(Configuration) == 'Release'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' and $(Configuration) == 'Release'">
     <DebugType>portable</DebugType>
   </PropertyGroup>
 </Project>

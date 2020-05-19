@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string DotNetFramework45 = ".NETFramework,Version=v4.5";
 
-        public const string DotNetFramework451 = ".NETFramework,Version=v4.5.1";
+        public const string DotNetFramework451 = ".NETFramework,Version=v4.7.2";
 
         public const string DotNetFramework46 = ".NETFramework,Version=v4.6";
 

@@ -2,7 +2,7 @@
   <!-- Package dependency versions -->
   <Import Project="..\..\..\..\scripts\build\TestPlatform.Dependencies.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

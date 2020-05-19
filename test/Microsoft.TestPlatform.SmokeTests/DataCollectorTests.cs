@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.SmokeTests
 
             var runSettings = this.GetInProcDataCollectionRunsettingsFile();
 
-            this.InvokeVsTestForExecution(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject), this.GetTestAdapterPath(), ".NETFramework,Version=v4.5.1", runSettings);
+            this.InvokeVsTestForExecution(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject), this.GetTestAdapterPath(), ".NETFramework,Version=v4.7.2", runSettings);
             this.ValidateSummaryStatus(1, 1, 1);
 
             ValidateInProcDataCollectionOutput();

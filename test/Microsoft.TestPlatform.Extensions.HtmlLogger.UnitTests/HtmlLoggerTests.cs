@@ -450,7 +450,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
-            Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("sample_net451"));
+            Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("sample_net472"));
         }
 
         [TestMethod]

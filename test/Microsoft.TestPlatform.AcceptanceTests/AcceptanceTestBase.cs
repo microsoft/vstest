@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public const string Core21FrameworkArgValue = ".NETCoreApp,Version=v2.1";
         public const string Core31FrameworkArgValue = ".NETCoreApp,Version=v3.1";
-        public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
+        public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.7.2";
         public const string DesktopRunnerTargetRuntime = "win7-x64";
         public const string CoreRunnerTargetRuntime = "";
         public const string InIsolation = "/InIsolation";

@@ -119,7 +119,7 @@ DOTNET_CLI_VERSION="3.1.101"
 #
 TPB_Solution="TestPlatform.sln"
 TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
-TPB_TargetFramework="net451"
+TPB_TargetFramework="net472"
 TPB_TargetFrameworkCore="netcoreapp2.1"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
@@ -299,8 +299,8 @@ function publish_package()
         # Copy TestHost for desktop targets
         local testhost=$packageDir/TestHost
         mkdir -p $testhost
-        cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-        cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
+        cp -r src/testhost/bin/$TPB_Configuration/net472/win7-x64/* $testhost
+        cp -r src/testhost.x86/bin/$TPB_Configuration/net472/win7-x86/* $testhost
 
         # Copy over the logger assemblies to the Extensions folder.
         local extensionsDir="$packageDir/Extensions"

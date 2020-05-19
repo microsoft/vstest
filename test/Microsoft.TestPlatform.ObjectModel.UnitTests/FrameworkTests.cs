@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void FrameworkFromStringShouldWorkForShortNames()
         {
             var fx = Framework.FromString("net472");
-            Assert.AreEqual(".NETFramework,Version=v4.5.1", fx.Name);
+            Assert.AreEqual(".NETFramework,Version=v4.7.2", fx.Name);
             Assert.AreEqual("4.5.1.0", fx.Version);
 
             var corefx = Framework.FromString("netcoreapp2.0");
