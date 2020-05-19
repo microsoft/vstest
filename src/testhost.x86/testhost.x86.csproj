@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>testhost.x86</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,7 +30,7 @@
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />

@@ -406,7 +406,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                     </RunConfiguration >
                     <InProcDataCollectionRunSettings>
                         <InProcDataCollectors>
-                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.6.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\Enlistments\vstest\test\TestAssets\SimpleDataCollector\bin\Debug\net451\SimpleDataCollector.dll'>
+                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.6.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\Enlistments\vstest\test\TestAssets\SimpleDataCollector\bin\Debug\net472\SimpleDataCollector.dll'>
                                 <Configuration>
                                     <Port>4312</Port>
                                 </Configuration>

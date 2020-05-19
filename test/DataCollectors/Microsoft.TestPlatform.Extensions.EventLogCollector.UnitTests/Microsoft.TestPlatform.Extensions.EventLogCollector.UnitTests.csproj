@@ -9,10 +9,10 @@
     <RootNamespace>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>    
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>

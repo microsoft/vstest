@@ -19,7 +19,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         }
 
         [TestMethod]
-        [DataRow("net451")]
+        [DataRow("net472")]
         [DataRow("netcoreapp2.1")]
         public void GetAssemblyTypeForManagedDll(string framework)
         {
@@ -41,7 +41,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void GetAssemblyTypeForManagedExe()
         {
-            var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
+            var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net472");
             var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
 
             Assert.AreEqual(AssemblyType.Managed, assemblyType);

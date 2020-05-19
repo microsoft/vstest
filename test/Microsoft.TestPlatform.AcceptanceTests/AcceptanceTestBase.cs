@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     public class AcceptanceTestBase : IntegrationTestBase
     {
-        public const string DesktopTargetFramework = "net451";
+        public const string DesktopTargetFramework = "net472";
         public const string Core21TargetFramework = "netcoreapp2.1";
         public const string Core31TargetFramework = "netcoreapp3.1";
 

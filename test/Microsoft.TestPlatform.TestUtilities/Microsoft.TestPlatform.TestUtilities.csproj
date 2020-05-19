@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.TestUtilities</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
@@ -21,7 +21,7 @@
       <Version>$(MSTestFrameworkVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent">
       <Version>1.0.41</Version>
     </PackageReference>

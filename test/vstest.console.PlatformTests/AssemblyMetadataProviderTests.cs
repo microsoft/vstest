@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         }
 
         [TestMethod]
-        [DataRow("net451")]
+        [DataRow("net472")]
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
         {
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         }
 
         [TestMethod]
-        [DataRow("net451")]
+        [DataRow("net472")]
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
         {
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         }
 
         [TestMethod]
-        [DataRow("net451")]
+        [DataRow("net472")]
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForAnyCPUAssembly(string framework)
         {
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         }
 
         [TestMethod]
-        [DataRow("net451")]
+        [DataRow("net472")]
         [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForARMAssembly(string framework)
         {
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         }
 
         [TestMethod]
-        [DataRow("net451")]
+        [DataRow("net472")]
         [DataRow("netcoreapp2.1")]
         public void GetFrameWorkForDotNetAssembly(string framework)
         {
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             var actualFx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
 
-            if (framework.Equals("net451"))
+            if (framework.Equals("net472"))
             {
                 // Reason is unknown for why full framework it is taking more time. Need to investigate.
                 expectedElapsedTime = 100;

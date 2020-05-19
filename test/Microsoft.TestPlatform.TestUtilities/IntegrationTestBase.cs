@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestBase
     {
-        public const string DesktopRunnerFramework = "net451";
+        public const string DesktopRunnerFramework = "net472";
         public const string CoreRunnerFramework = "netcoreapp2.1";
 
         private const string TotalTestsMessage = "Total tests: {0}";

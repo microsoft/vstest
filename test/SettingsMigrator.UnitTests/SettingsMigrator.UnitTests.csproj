@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
 	<WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <AssemblyName>SettingsMigrator.UnitTests</AssemblyName>

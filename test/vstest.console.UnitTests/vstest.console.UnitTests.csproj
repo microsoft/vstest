@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <OutputType Condition=" '$(TargetFramework)' != 'net451' ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <OutputType Condition=" '$(TargetFramework)' != 'net472' ">Exe</OutputType>
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <AssemblyName>vstest.console.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
@@ -19,7 +19,7 @@
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

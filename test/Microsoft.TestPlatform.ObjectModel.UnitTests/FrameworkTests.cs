@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void FrameworkFromStringShouldWorkForShortNames()
         {
-            var fx = Framework.FromString("net451");
+            var fx = Framework.FromString("net472");
             Assert.AreEqual(".NETFramework,Version=v4.5.1", fx.Name);
             Assert.AreEqual("4.5.1.0", fx.Version);
 

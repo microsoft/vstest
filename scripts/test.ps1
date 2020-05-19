@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("net451", "netcoreapp2.1")]
+    [ValidateSet("net472", "netcoreapp2.1")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -94,7 +94,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
-$TPT_TargetFrameworkFullCLR = "net451"
+$TPT_TargetFrameworkFullCLR = "net472"
 $TPT_TargetFrameworkCore20 = "netcoreapp2.1"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
@@ -290,7 +290,7 @@ function Invoke-Test
 
                     if (-not (Test-Path $testContainer))
                     {
-                        # Test project may not targetting all frameworks. Example: Microsoft.TestPlatform.Build.UnitTests won't target net451.
+                        # Test project may not targetting all frameworks. Example: Microsoft.TestPlatform.Build.UnitTests won't target net472.
                         return
                     }
 

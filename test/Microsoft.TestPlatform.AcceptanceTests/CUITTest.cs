@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
+            var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net472");
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,

@@ -80,7 +80,7 @@
         {
             DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent;
 
-            return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+            return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, "net472", "win7-x64", "vstest.console.exe");
         }
     }
 }

@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (this.IsDesktopRunner())
             {
-                consoleRunnerPath = Path.Combine(portablePackageFolder, "tools", "net451", "vstest.console.exe");
+                consoleRunnerPath = Path.Combine(portablePackageFolder, "tools", "net472", "vstest.console.exe");
             }
             else if (this.IsNetCoreRunner())
             {

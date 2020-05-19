@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
                 this.runEventHandler);
 
-            var errorMessage = runnerInfo.TargetFramework == "net451"
+            var errorMessage = runnerInfo.TargetFramework == "net472"
                 ? "The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.\r\n"
                 : "The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.\r\n";
 

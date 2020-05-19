@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-            var xunitAssemblyPath = this.testEnvironment.TargetFramework.Equals("net451")?
+            var xunitAssemblyPath = this.testEnvironment.TargetFramework.Equals("net472")?
                 testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
                 testEnvironment.GetTestAsset("XUTestProject.dll");
 

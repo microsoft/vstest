@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
-    /// The attribute defining runner framework and target framework for net451.
+    /// The attribute defining runner framework and target framework for net472.
     /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests.
     /// If runner framework is net46 then vstest.console.exe will run the tests.
     /// Second argument (target framework) = The framework for which test will run

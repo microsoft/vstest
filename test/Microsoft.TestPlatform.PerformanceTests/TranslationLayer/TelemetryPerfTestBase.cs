@@ -92,7 +92,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
             // Find the root
             var root = this.currentDirectory.Parent.Parent.Parent;
             // Path to artifacts vstest.console
-            return Path.Combine(root.FullName, BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+            return Path.Combine(root.FullName, BuildConfiguration, "net472", "win7-x64", "vstest.console.exe");
         }
 
         /// <summary>
