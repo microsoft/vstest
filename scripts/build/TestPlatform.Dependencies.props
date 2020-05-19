@@ -31,7 +31,7 @@
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
-    <TestPlatformExternalsVersion>16.7.0-preview-3657262</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>16.7.0-preview-3740203</TestPlatformExternalsVersion>
     <MicrosoftFakesVersion>16.6.3-beta.20221.2</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
