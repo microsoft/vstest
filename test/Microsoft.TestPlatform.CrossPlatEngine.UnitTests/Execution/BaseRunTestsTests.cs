@@ -1045,6 +1045,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             {
                 this.testCaseEventsHandler?.SendSessionStart(new Dictionary<string, object> { { "TestSources", new List<string>() { "1.dll" } } });
             }
+
+            protected override bool ShouldAttachDebuggerToTestHost(
+                LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+                Tuple<Uri, string> executorUri,
+                RunContext runContext)
+            {
+                return false;
+            }
         }
 
         [ExtensionUri(BaseRunTestsExecutorUri)]
