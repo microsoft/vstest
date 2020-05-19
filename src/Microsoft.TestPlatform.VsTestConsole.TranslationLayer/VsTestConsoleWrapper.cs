@@ -279,6 +279,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.EnsureInitialized();
 
             this.requestSender.OnTestSessionEnd(attachments, testSessionEventsHandler);
+            this.requestSender.FinalizeSession(attachments, testSessionEventsHandler);
         }
 
         #endregion
