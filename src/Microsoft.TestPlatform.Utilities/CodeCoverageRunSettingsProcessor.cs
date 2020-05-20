@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             /// Constructs an <see cref="Exclusion"/> object.
             /// </summary>
             /// 
-            /// <param name="pathComponents">The path split as components.</param>
+            /// <param name="pathComponents">The path split in components.</param>
             public Exclusion(IEnumerable<string> pathComponents)
             {
                 this.path = string.Empty;
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             /// <summary>
-            /// Assembles a relative path from the path given components.
+            /// Assembles a relative path from the path given as components.
             /// </summary>
             /// 
             /// <returns>A relative path built from path components.</returns>
@@ -170,14 +170,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         #endregion
 
         /// <summary>
-        /// Represents the default settings loaded as an <see cref="XmlDocument"/>.
+        /// Represents the default settings loaded as an <see cref="XmlNode"/>.
         /// </summary>
-        private XmlDocument defaultSettingsDocument;
+        private XmlNode defaultSettingsRootNode;
 
         /// <summary>
-        /// Represents the current settings loaded as an <see cref="XmlDocument"/>.
+        /// Represents the current settings loaded as an <see cref="XmlNode"/>.
         /// </summary>
-        private XmlDocument currentSettingsDocument;
+        private XmlNode currentSettingsRootNode;
 
         /// <summary>
         /// Represents a list of exclusion types tracked by this processor.
@@ -198,10 +198,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             ValidateArg.NotNullOrEmpty(currentSettings, nameof(currentSettings));
 
             // Load current settings from string.
-            this.currentSettingsDocument = new XmlDocument();
-            this.currentSettingsDocument.LoadXml(currentSettings);
+            var document = new XmlDocument();
+            document.LoadXml(currentSettings);
 
-            this.Initialize(currentSettingsDocument);
+            this.Initialize(document.DocumentElement);
+        }
+
+        /// <summary>
+        /// Constructs an <see cref="CodeCoverageRunSettingsProcessor"/> object.
+        /// </summary>
+        /// 
+        /// <param name="currentSettingsRootNode">
+        /// The current settings for the code coverage data collector loaded as an
+        /// <see cref="XmlNode"/>.
+        /// </param>
+        public CodeCoverageRunSettingsProcessor(XmlNode currentSettingsRootNode)
+        {
+            ValidateArg.NotNull(currentSettingsRootNode, nameof(currentSettingsRootNode));
+
+            this.Initialize(currentSettingsRootNode);
         }
 
         /// <summary>
@@ -210,30 +225,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// 
         /// <param name="currentSettingsDocument">
         /// The current settings for the code coverage data collector loaded as an
-        /// <see cref="XmlDocument"/>.
+        /// <see cref="XmlDocument"/>
         /// </param>
         public CodeCoverageRunSettingsProcessor(XmlDocument currentSettingsDocument)
         {
             ValidateArg.NotNull(currentSettingsDocument, nameof(currentSettingsDocument));
 
-            this.Initialize(currentSettingsDocument);
+            this.Initialize(currentSettingsDocument.DocumentElement);
         }
 
         /// <summary>
         /// Finishes initialization of the <see cref="CodeCoverageRunSettingsProcessor"/>.
         /// </summary>
         /// 
-        /// <param name="currentSettingsDocument">
+        /// <param name="currentSettingsRootNode">
         /// The current settings for the code coverage data collector loaded as an
-        /// <see cref="XmlDocument"/>.
+        /// <see cref="XmlNode"/>.
         /// </param>
-        private void Initialize(XmlDocument currentSettingsDocument)
+        private void Initialize(XmlNode currentSettingsRootNode)
         {
-            this.currentSettingsDocument = currentSettingsDocument;
+            this.currentSettingsRootNode = currentSettingsRootNode;
 
             // Load default settings from string.
-            this.defaultSettingsDocument = new XmlDocument();
-            this.defaultSettingsDocument.LoadXml(CodeCoverageRunSettingsProcessor.DefaultSettings);
+            var document = new XmlDocument();
+            document.LoadXml(CodeCoverageRunSettingsProcessor.DefaultSettings);
+
+            this.defaultSettingsRootNode = document.DocumentElement.FirstChild;
 
             // Create the exclusion type list.
             this.exclusions = new List<Exclusion>
@@ -251,35 +268,54 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Processes the current settings for the code coverage data collector.
         /// </summary>
         /// 
-        /// <returns>An updated version of the current run settings.</returns>
-        public string Process()
+        /// <returns>
+        /// An updated version of the current run settings as a <see cref="string"/>.
+        /// </returns>
+        public string ProcessToString()
         {
-            // Get the code coverage data collector node.
-            var dataCollectorNode = this.GetDataCollectorNode();
-            if (dataCollectorNode == null)
-            {
-                // No data collector settings for code coverage are found.
-                // TODO: Consider adding defaults nevertheless.
-                return this.currentSettingsDocument.OuterXml;
-            }
+            this.Process();
+            return this.currentSettingsRootNode.OuterXml;
+        }
 
+        /// <summary>
+        /// Processes the current settings for the code coverage data collector.
+        /// </summary>
+        /// 
+        /// <returns>
+        /// An updated version of the current run settings as a <see cref="XmlNode"/>.
+        /// </returns>
+        public XmlNode ProcessToNode()
+        {
+            this.Process();
+            return this.currentSettingsRootNode;
+        }
+        #endregion
+
+        #region Private Methods
+        /// <summary>
+        /// Processes the current settings for the code coverage data collector.
+        /// </summary>
+        /// 
+        /// <returns>An updated version of the current run settings.</returns>
+        private void Process()
+        {
             // Get the code coverage node from the current settings. If unable to get any
             // particular component down the path just add the default values for that component
             // from the default settings document and return since there's nothing else to be done.
-            var codeCoveragePathComponents = new List<string>() { "Configuration", "CodeCoverage" };
+            var codeCoveragePathComponents = new List<string>() { "CodeCoverage" };
             var currentCodeCoverageNode = this.SelectNodeOrAddDefaults(
-                dataCollectorNode,
-                this.defaultSettingsDocument.FirstChild,
+                this.currentSettingsRootNode,
+                this.defaultSettingsRootNode,
                 codeCoveragePathComponents);
 
             if (currentCodeCoverageNode == null)
             {
-                return this.currentSettingsDocument.OuterXml;
+                return;
             }
 
             // Get the code coverage node from the default settings.
             var defaultCodeCoverageNode = this.ExtractNode(
-                this.defaultSettingsDocument.FirstChild,
+                this.defaultSettingsRootNode,
                 Exclusion.BuildPath(codeCoveragePathComponents));
 
             foreach (var exclusion in this.exclusions)
@@ -313,45 +349,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // Merge both the current and the default settings for the current exclusion rule.
                 this.MergeNodes(currentNode, exclusion);
             }
-
-            return this.currentSettingsDocument.OuterXml;
-        }
-        #endregion
-
-        #region Private Methods
-        /// <summary>
-        /// Gets the code coverage data collector node from the current settings document.
-        /// </summary>
-        /// 
-        /// <returns>
-        /// The code coverage data collector node from the current settings document.
-        /// </returns>
-        private XmlNode GetDataCollectorNode()
-        {
-            const string prefixPath = @"/RunSettings/DataCollectionRunSettings/DataCollectors";
-            const string attributeName = "uri";
-            const string attributeValue = "datacollector://microsoft/CodeCoverage/2.0";
-
-            // Extract all data collectors.
-            var dataCollectorsNode = this.ExtractNode(this.currentSettingsDocument, prefixPath);
-            if (dataCollectorsNode == null)
-            {
-                return dataCollectorsNode;
-            }
-
-            // Identify the correct data collector node for code coverage.
-            foreach (XmlNode node in dataCollectorsNode.ChildNodes)
-            {
-                foreach (XmlAttribute attribute in node.Attributes)
-                {
-                    if (attribute.Name == attributeName && attribute.Value == attributeValue)
-                    {
-                        return node;
-                    }
-                }
-            }
-
-            return null;
         }
 
         /// <summary>

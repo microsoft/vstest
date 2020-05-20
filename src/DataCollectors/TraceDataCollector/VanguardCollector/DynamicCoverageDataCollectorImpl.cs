@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using TestPlatform.ObjectModel;
     using TraceCollector;
     using TraceCollector.Interfaces;
@@ -107,6 +108,9 @@ namespace Microsoft.VisualStudio.Coverage
             IDataCollectionSink dataSink,
             IDataCollectionLogger logger)
         {
+            var processor = new CodeCoverageRunSettingsProcessor(configurationElement);
+            configurationElement = (XmlElement)processor.ProcessToNode();
+
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
             if (string.IsNullOrEmpty(configurationElement?.InnerXml))
             {

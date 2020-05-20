@@ -154,8 +154,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             ValidateArg.NotNull(settingsXml, "settingsXml");
 
-            settingsXml = (new CodeCoverageRunSettingsProcessor(settingsXml)).Process();
-
             var sessionId = new SessionId(Guid.NewGuid());
             var dataCollectionContext = new DataCollectionContext(sessionId);
             this.dataCollectionEnvironmentContext = DataCollectionEnvironmentContext.CreateForLocalEnvironment(dataCollectionContext);
