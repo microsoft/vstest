@@ -5,12 +5,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinalization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -194,6 +197,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
+        public void MultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments)
+        {
+            var data = this.dataSerializer.SerializePayload(
+                    MessageType.MultiTestRunsFinalizationComplete,
+                    new MultiTestRunsFinalizationCompletePayload
+                    {
+                        Attachments = attachments
+                    },
+                    this.protocolVersion);
+            this.SendData(data);
+        }
+
+        /// <inheritdoc />
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             var waitHandle = new ManualResetEventSlim(false);
@@ -354,6 +370,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                     testRunCriteriaWithTests.TestExecutionContext,
                                     this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
                                     testRunEventsHandler),
+                                0);
+
+                        break;
+                    }
+
+                case MessageType.MultiTestRunsFinalization:
+                    {
+                        EqtTrace.Info("Multi test runs finalization started.");
+                        var multiTestRunsFinalizationEventsHandler = new MultiTestRunsFinalizationEventsHandler(this);
+                        var multiTestRunsFinalizationManager = new MultiTestRunsFinalizationManager(new MultiTestRunsDataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler()));
+                        var multiTestRunsFinalizationPayload = this.dataSerializer.DeserializePayload<MultiTestRunsFinalizationPayload>(message);
+
+                        jobQueue.QueueJob(
+                                () =>
+                                multiTestRunsFinalizationManager
+                                .FinalizeMultiTestRuns(
+                                    multiTestRunsFinalizationPayload.Attachments,
+                                    multiTestRunsFinalizationEventsHandler),
                                 0);
 
                         break;

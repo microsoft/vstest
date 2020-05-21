@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// <summary>
         /// Multi test runs finalization callback
         /// </summary>
-        public const string MultiTestRunsFinalizationCallback = "TestExecution.MultiTestRunsFinalizationCallback";
+        public const string MultiTestRunsFinalizationComplete = "TestExecution.MultiTestRunsFinalizationComplete";
 
         /// <summary>
         /// Extensions Initialization

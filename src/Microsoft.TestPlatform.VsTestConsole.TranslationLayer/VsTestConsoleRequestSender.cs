@@ -19,7 +19,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
@@ -385,7 +384,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler testSessionEventsHandler)
         {
             this.SendMessageAndListenAndReportAttachements(attachments, testSessionEventsHandler);
         }
@@ -732,7 +731,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private void SendMessageAndListenAndReportAttachements(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler)
+        private void SendMessageAndListenAndReportAttachements(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler)
         {
             try
             {
@@ -750,7 +749,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     var message = this.TryReceiveMessage();
 
-                    if (string.Equals(MessageType.MultiTestRunsFinalizationCallback, message.MessageType))
+                    if (string.Equals(MessageType.MultiTestRunsFinalizationComplete, message.MessageType))
                     {
                         if (EqtTrace.IsInfoEnabled)
                         {

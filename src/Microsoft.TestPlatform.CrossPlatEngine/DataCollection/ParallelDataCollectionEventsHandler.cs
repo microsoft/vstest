@@ -3,10 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
-    using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -19,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
+        private readonly MultiTestRunsDataCollectorAttachmentsHandler attachmentsHandler;
 
         public ParallelDataCollectionEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,
@@ -27,6 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ParallelRunDataAggregator runDataAggregator) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
+            // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
+            attachmentsHandler = new MultiTestRunsDataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler());
         }
 
         internal ParallelDataCollectionEventsHandler(IRequestData requestData,
@@ -53,27 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-                {
-                    var coverageHandler = new CodeCoverageDataAttachmentsHandler();
-                    Uri attachementUri = coverageHandler.GetExtensionUri();
-                    if (attachementUri != null)
-                    {
-                        var coverageAttachments = runDataAggregator.RunContextAttachments
-                            .Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
-
-                        foreach (var coverageAttachment in coverageAttachments)
-                        {
-                            runDataAggregator.RunContextAttachments.Remove(coverageAttachment);
-                        }
-
-                        ICollection<AttachmentSet> attachments = coverageHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments));
-                        foreach (var attachment in attachments)
-                        {
-                            runDataAggregator.RunContextAttachments.Add(attachment);
-                        }
-                    }
-                }
+                attachmentsHandler.HandleAttachements(runDataAggregator.RunContextAttachments);
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,

@@ -18,6 +18,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// <param name="attachments">List of attachements</param>
         /// <param name="multiTestRunsFinalizationCompleteEventsHandler">EventHandler to receive session complete event</param>
-        void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler multiTestRunsFinalizationCompleteEventsHandler);
+        void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler multiTestRunsFinalizationCompleteEventsHandler);
     }
 }
