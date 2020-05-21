@@ -10,7 +10,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <AssemblyName>datacollector.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

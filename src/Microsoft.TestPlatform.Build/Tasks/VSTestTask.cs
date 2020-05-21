@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
@@ -103,6 +104,41 @@ namespace Microsoft.TestPlatform.Build.Tasks
         }
 
         public string VSTestBlame
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameCrash
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameCrashDumpType
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameCrashCollectAlways
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameHang
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameHangDumpType
+        {
+            get;
+            set;
+        }
+        public string VSTestBlameHangTimeout
         {
             get;
             set;
@@ -242,8 +278,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
             if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
             {
-                var normalTestLogging = new List<string>() {"n", "normal", "d", "detailed", "diag", "diagnostic"};
-                var quietTestLogging = new List<string>() {"q", "quiet"};
+                var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
+                var quietTestLogging = new List<string>() { "q", "quiet" };
 
                 string vsTestVerbosity = "minimal";
                 if (normalTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
@@ -258,9 +294,51 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestBlame))
+            var blameCrash = !string.IsNullOrEmpty(this.VSTestBlameCrash);
+            var blameHang = !string.IsNullOrEmpty(this.VSTestBlameHang);
+            if (!string.IsNullOrEmpty(this.VSTestBlame) || blameCrash || blameHang)
             {
-                allArgs.Add("--Blame");
+                var blameArgs = "--Blame";
+
+                var dumpArgs = new List<string>();
+                if (blameCrash || blameHang)
+                {
+                    if (blameCrash)
+                    {
+                        dumpArgs.Add("CollectDump");
+                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashCollectAlways))
+                        {
+                            dumpArgs.Add($"CollectAlways={this.VSTestBlameCrashCollectAlways}");
+                        }
+
+                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashDumpType))
+                        {
+                            dumpArgs.Add($"DumpType={this.VSTestBlameCrashDumpType}");
+                        }
+                    }
+
+                    if (blameHang)
+                    {
+                        dumpArgs.Add("CollectHangDump");
+
+                        if (!string.IsNullOrEmpty(this.VSTestBlameHangDumpType))
+                        {
+                            dumpArgs.Add($"HangDumpType={this.VSTestBlameHangDumpType}");
+                        }
+
+                        if (!string.IsNullOrEmpty(this.VSTestBlameHangTimeout))
+                        {
+                            dumpArgs.Add($"TestTimeout={this.VSTestBlameHangTimeout}");
+                        }
+                    }
+
+                    if (dumpArgs.Any())
+                    {
+                        blameArgs += $":\"{string.Join(";", dumpArgs)}\"";
+                    }
+                }
+
+                allArgs.Add(blameArgs);
             }
 
             if (this.VSTestCollect != null && this.VSTestCollect.Length > 0)
@@ -302,7 +380,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if(!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
+            if (!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
             {
                 allArgs.Add("--nologo");
             }

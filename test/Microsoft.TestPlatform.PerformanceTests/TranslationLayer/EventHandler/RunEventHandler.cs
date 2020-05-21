@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler
+    public class RunEventHandler : ITestRunEventsHandler2
     {
         /// <summary>
         /// Gets the test results.
@@ -74,6 +74,12 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         {
             // No op
             return -1;
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            // No op
+            return true;
         }
     }
 }

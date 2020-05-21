@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 2;
+        private int protocolVersion = 3;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with vstest.console process
@@ -643,6 +643,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                    {
+                        AttachDebuggerToProcess(customHostLauncher, message);
+                    }
                 }
             }
             catch (Exception exception)
@@ -705,6 +709,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
+                    }
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                    {
+                        AttachDebuggerToProcess(customHostLauncher, message);
                     }
                 }
             }
@@ -828,6 +836,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 // Always unblock the Vstest.console thread which is indefinitely waiting on this ACK
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload, this.protocolVersion);
+            }
+        }
+
+        private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+        {
+            var ackPayload = new EditorAttachDebuggerAckPayload() { Attached = false, ErrorMessage = null };
+
+            try
+            {
+                var pid = this.dataSerializer.DeserializePayload<int>(message);
+
+                ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
+                    ? launcher.AttachDebuggerToProcess(pid)
+                    : false;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}", ex);
+
+                // vstest.console will send the abort message properly while cleaning up all the
+                // flow, so do not abort here.
+                // Let the ack go through and let vstest.console handle the error.
+                ackPayload.ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                // Always unblock the vstest.console thread which is indefintitely waiting on this ACK.
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebuggerCallback, ackPayload, this.protocolVersion);
             }
         }
     }

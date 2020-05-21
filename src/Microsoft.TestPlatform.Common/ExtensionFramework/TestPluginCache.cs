@@ -342,8 +342,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
         {
             // Check if extensions from this assembly have already been discovered.
-            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(this.TestExtensions.GetTestExtensionCache<TPluginInfo>(), extensionAssembly);
-
+            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+                this.TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+                extensionAssembly);
 
             if (extensions != null)
             {
@@ -568,6 +569,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 var executors = this.TestExtensions.TestExecutors != null ? string.Join(",", this.TestExtensions.TestExecutors.Keys.ToArray()) : null;
                 EqtTrace.Verbose("TestPluginCache: Executors are '{0}'.", executors);
+
+                var executors2 = this.TestExtensions.TestExecutors2 != null ? string.Join(",", this.TestExtensions.TestExecutors2.Keys.ToArray()) : null;
+                EqtTrace.Verbose("TestPluginCache: Executors2 are '{0}'.", executors2);
 
                 var settingsProviders = this.TestExtensions.TestSettingsProviders != null ? string.Join(",", this.TestExtensions.TestSettingsProviders.Keys.ToArray()) : null;
                 EqtTrace.Verbose("TestPluginCache: Setting providers are '{0}'.", settingsProviders);

@@ -198,4 +198,7 @@
   <data name="TestDiscoveryCancelled" xml:space="preserve">
     <value>Discovery of tests cancelled.</value>
   </data>
+  <data name="AttachDebuggerToDefaultTestHostFailure" xml:space="preserve">
+    <value>Cannot attach the debugger to the default test host with process ID: {0}.</value>
+  </data>
 </root>

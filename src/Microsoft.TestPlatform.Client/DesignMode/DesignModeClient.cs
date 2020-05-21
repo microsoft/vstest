@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// The design mode client.
@@ -31,18 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     public class DesignModeClient : IDesignModeClient
     {
         private readonly ICommunicationManager communicationManager;
-
         private readonly IDataSerializer dataSerializer;
 
-        private object ackLockObject = new object();
-
         private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
-
         private IEnvironment platformEnvironment;
-
-        protected Action<Message> onAckMessageReceived;
-
         private TestSessionMessageLogger testSessionMessageLogger;
+        private object lockObject = new object();
+
+        protected Action<Message> onCustomTestHostLaunchAckReceived;
+        protected Action<Message> onAttachDebuggerAckRecieved;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -221,7 +219,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.CustomTestHostLaunchCallback:
                             {
-                                this.onAckMessageReceived?.Invoke(message);
+                                this.onCustomTestHostLaunchAckReceived?.Invoke(message);
+                                break;
+                            }
+
+                        case MessageType.EditorAttachDebuggerCallback:
+                            {
+                                this.onAttachDebuggerAckRecieved?.Invoke(message);
                                 break;
                             }
 
@@ -264,11 +268,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// </returns>
         public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
-            lock (ackLockObject)
+            lock (this.lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message ackMessage = null;
-                this.onAckMessageReceived = (ackRawMessage) =>
+                this.onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
                 {
                     ackMessage = ackRawMessage;
                     waitHandle.Set();
@@ -285,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-                this.onAckMessageReceived = null;
+                this.onCustomTestHostLaunchAckReceived = null;
 
                 var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
 
@@ -297,6 +301,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     throw new TestPlatformException(ackPayload.ErrorMessage);
                 }
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            // If an attach request is issued but there is no support for attaching on the other
+            // side of the communication channel, we simply return and let the caller know the
+            // request failed.
+            if (this.protocolConfig.Version < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+            {
+                return false;
+            }
+
+            lock (this.lockObject)
+            {
+                var waitHandle = new AutoResetEvent(false);
+                Message ackMessage = null;
+                this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
+                {
+                    ackMessage = ackRawMessage;
+                    waitHandle.Set();
+                };
+
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
+
+                WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
+
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
+                this.onAttachDebuggerAckRecieved = null;
+
+                var ackPayload = this.dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
+                if (!ackPayload.Attached)
+                {
+                    EqtTrace.Warning(ackPayload.ErrorMessage);
+                }
+
+                return ackPayload.Attached;
             }
         }
 
@@ -439,7 +481,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
-
         #endregion
     }
 }

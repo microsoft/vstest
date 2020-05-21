@@ -144,6 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             var enableDump = false;
+            var enableHangDump = false;
             var exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, argument);
             Dictionary<string, string> collectDumpParameters = null;
 
@@ -151,21 +152,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 // Get blame argument list.
                 var blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
+                Func<string, bool> isDumpCollect = a => Constants.BlameCollectDumpKey.Equals(a, StringComparison.OrdinalIgnoreCase);
+                Func<string, bool> isHangDumpCollect = a => Constants.BlameCollectHangDumpKey.Equals(a, StringComparison.OrdinalIgnoreCase);
 
                 // Get collect dump key.
-                var collectDumpKey = blameArgumentList[0];
-                bool isCollectDumpKeyValid = ValidateCollectDumpKey(collectDumpKey);
+                var hasCollectDumpKey = blameArgumentList.Any(isDumpCollect);
+                var hasCollectHangDumpKey = blameArgumentList.Any(isHangDumpCollect);
 
                 // Check if dump should be enabled or not.
-                enableDump = isCollectDumpKeyValid && IsDumpCollectionSupported();
+                enableDump = hasCollectDumpKey && IsDumpCollectionSupported();
 
-                // Get collect dump parameters.
-                var collectDumpParameterArgs = blameArgumentList.Skip(1);
-                collectDumpParameters = ArgumentProcessorUtilities.GetArgumentParameters(collectDumpParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
+                // Check if dump should be enabled or not.
+                enableHangDump = hasCollectHangDumpKey && IsHangDumpCollectionSupported();
+
+                if (!enableDump && !enableHangDump)
+                {
+                    Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, argument));
+                }
+                else
+                {
+                    // Get collect dump parameters.
+                    var collectDumpParameterArgs = blameArgumentList.Where(a => !isDumpCollect(a) && !isHangDumpCollect(a));
+                    collectDumpParameters = ArgumentProcessorUtilities.GetArgumentParameters(collectDumpParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
+                }
             }
 
             // Initialize blame.
-            InitializeBlame(enableDump, collectDumpParameters);
+            InitializeBlame(enableDump, enableHangDump, collectDumpParameters);
         }
 
         /// <summary>
@@ -181,9 +194,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initialize blame.
         /// </summary>
-        /// <param name="enableDump">Enable dump.</param>
+        /// <param name="enableCrashDump">Enable dump.</param>
         /// <param name="blameParameters">Blame parameters.</param>
-        private void InitializeBlame(bool enableDump, Dictionary<string, string> collectDumpParameters)
+        private void InitializeBlame(bool enableCrashDump, bool enableHangDump, Dictionary<string, string> collectDumpParameters)
         {
             // Add Blame Logger
             LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, this.runSettingsManager);
@@ -217,9 +230,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             node.InnerText = resultsDirectory;
 
             // Add collect dump node in configuration element.
-            if (enableDump)
+            if (enableCrashDump)
             {
-                AddCollectDumpNode(collectDumpParameters, XmlDocument, outernode);
+                var dumpParameters = collectDumpParameters
+                    .Where(p => new[] { "CollectAlways", "DumpType" }.Contains(p.Key))
+                    .ToDictionary(p => p.Key, p => p.Value);
+
+                if (!dumpParameters.ContainsKey("DumpType"))
+                {
+                    dumpParameters.Add("DumpType", "Full");
+                }
+
+                AddCollectDumpNode(dumpParameters, XmlDocument, outernode);
+            }
+
+            // Add collect hang dump node in configuration element.
+            if (enableHangDump)
+            {
+                var hangDumpParameters = collectDumpParameters
+                    .Where(p => new[] { "TestTimeout", "HangDumpType" }.Contains(p.Key))
+                    .ToDictionary(p => p.Key, p => p.Value);
+
+                if (!hangDumpParameters.ContainsKey("TestTimeout"))
+                {
+                    hangDumpParameters.Add("TestTimeout", TimeSpan.FromHours(1).TotalMilliseconds.ToString());
+                }
+
+                if (!hangDumpParameters.ContainsKey("HangDumpType"))
+                {
+                    hangDumpParameters.Add("HangDumpType", "Full");
+                }
+                
+                AddCollectHangDumpNode(hangDumpParameters, XmlDocument, outernode);
             }
 
             // Add blame configuration element to blame collector.
@@ -263,14 +305,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Checks if dump collection is supported.
+        /// Checks if crash dump collection is supported.
         /// </summary>
         /// <returns>Dump collection supported flag.</returns>
         private bool IsDumpCollectionSupported()
         {
-            var dumpCollectionSupported = this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
-                    this.environment.Architecture != PlatformArchitecture.ARM64 &&
-                    this.environment.Architecture != PlatformArchitecture.ARM;
+            var dumpCollectionSupported =
+                this.environment.OperatingSystem == PlatformOperatingSystem.Windows
+                && this.environment.Architecture != PlatformArchitecture.ARM64
+                && this.environment.Architecture != PlatformArchitecture.ARM;
 
             if (!dumpCollectionSupported)
             {
@@ -281,20 +324,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Check if collect dump key is valid.
+        /// Checks if hang dump collection is supported.
         /// </summary>
-        /// <param name="collectDumpKey">Collect dump key.</param>
-        /// <returns>Flag for collect dump key valid or not.</returns>
-        private bool ValidateCollectDumpKey(string collectDumpKey)
+        /// <returns>Dump collection supported flag.</returns>
+        private bool IsHangDumpCollectionSupported()
         {
-            var isCollectDumpKeyValid = collectDumpKey != null && collectDumpKey.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase);
+            var dumpCollectionSupported =
+                this.environment.OperatingSystem != PlatformOperatingSystem.OSX
+                && this.environment.Architecture != PlatformArchitecture.ARM64
+                && this.environment.Architecture != PlatformArchitecture.ARM;
 
-            if (!isCollectDumpKeyValid)
+            if (!dumpCollectionSupported)
             {
-                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, collectDumpKey));
+                Output.Warning(false, CommandLineResources.BlameCollectDumpTestTimeoutNotSupportedForPlatform);
             }
 
-            return isCollectDumpKeyValid;
+            return dumpCollectionSupported;
         }
 
         /// <summary>
@@ -306,6 +351,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
         {
             var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
+            if (parameters != null && parameters.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> entry in parameters)
+                {
+                    var attribute = XmlDocument.CreateAttribute(entry.Key);
+                    attribute.Value = entry.Value;
+                    dumpNode.Attributes.Append(attribute);
+                }
+            }
+            outernode.AppendChild(dumpNode);
+        }
+
+        /// <summary>
+        /// Adds collect dump node in outer node.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="XmlDocument">Xml document.</param>
+        /// <param name="outernode">Outer node.</param>
+        private void AddCollectHangDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
+        {
+            var dumpNode = XmlDocument.CreateElement(Constants.CollectDumpOnTestSessionHang);
             if (parameters != null && parameters.Count > 0)
             {
                 foreach (KeyValuePair<string, string> entry in parameters)

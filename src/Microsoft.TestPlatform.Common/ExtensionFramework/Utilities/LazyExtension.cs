@@ -130,6 +130,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             }
         }
 
+        internal TestPluginInformation TestPluginInfo => this.testPluginInfo;
+
         /// <summary>
         /// Gets the test extension instance.
         /// </summary>

@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Globalization;
     using Execution;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     /// <summary>
     /// Handle to the framework which is passed to the test executors.
     /// </summary>
-    internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle, IDisposable
+    internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisposable
     {
         /// <summary>
         /// boolean that gives the value of EnableShutdownAfterTestRun.
@@ -110,6 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(processInfo);
         }
 
+        /// <inheritdoc />
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
+        }
 
         public void Dispose()
         {

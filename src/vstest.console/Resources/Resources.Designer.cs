@@ -8,11 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
-{
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
-    using System.Reflection;
-
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -188,11 +186,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CollectDump option for Blame is not supported for this platform..
+        ///   Looks up a localized string similar to Collecting crash dumps by option CollectDump for Blame is not supported for this platform..
         /// </summary>
         internal static string BlameCollectDumpNotSupportedForPlatform {
             get {
                 return ResourceManager.GetString("BlameCollectDumpNotSupportedForPlatform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform..
+        /// </summary>
+        internal static string BlameCollectDumpTestTimeoutNotSupportedForPlatform {
+            get {
+                return ResourceManager.GetString("BlameCollectDumpTestTimeoutNotSupportedForPlatform", resourceCulture);
             }
         }
         
