@@ -124,14 +124,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
         /// <summary>
-        /// Test session end
+        /// Multi test runs finalization
         /// </summary>
-        public const string OnTestSessionEnd = "TestExecution.OnTestSessionEnd";
+        public const string MultiTestRunsFinalization = "TestExecution.MultiTestRunsFinalization";
 
         /// <summary>
-        /// Test session end callback
+        /// Multi test runs finalization callback
         /// </summary>
-        public const string OnTestSessionEndCallback = "TestExecution.OnTestSessionEnd";
+        public const string MultiTestRunsFinalizationCallback = "TestExecution.MultiTestRunsFinalizationCallback";
 
         /// <summary>
         /// Extensions Initialization

@@ -239,59 +239,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.SessionFinalizationRequestStartEventId)]
-        public void SessionFinalizationRequestStart()
+        [Event(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationRequestStartEventId)]
+        public void MultiTestRunsFinalizationRequestStart()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationRequestStartEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationRequestStartEventId);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.SessionFinalizationRequestStopEventId)]
-        public void SessionFinalizationRequestStop()
+        [Event(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationRequestStopEventId)]
+        public void MultiTestRunsFinalizationRequestStop()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationRequestStopEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationRequestStopEventId);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStartEventId)]
-        public void AdapterSessionFinalizationStart(long numberOfAttachements)
+        [Event(TestPlatformInstrumentationEvents.AdapterMultiTestRunsFinalizationStartEventId)]
+        public void AdapterMultiTestRunsFinalizationStart(long numberOfAttachements)
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStartEventId, numberOfAttachements);
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterMultiTestRunsFinalizationStartEventId, numberOfAttachements);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStopEventId)]
-        public void AdapterSessionFinalizationStop(long numberOfAttachements)
+        [Event(TestPlatformInstrumentationEvents.AdapterMultiTestRunsFinalizationStopEventId)]
+        public void AdapterMultiTestRunsFinalizationStop(long numberOfAttachements)
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSessionFinalizationStopEventId, numberOfAttachements);
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterMultiTestRunsFinalizationStopEventId, numberOfAttachements);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.SessionFinalizationStartEventId)]
-        public void SessionFinalizationStart()
+        [Event(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationStartEventId)]
+        public void MultiTestRunsFinalizationStart()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationStartEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationStartEventId);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.SessionFinalizationStopEventId)]
-        public void SessionFinalizationStop(long numberOfAttachements)
+        [Event(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationStopEventId)]
+        public void MultiTestRunsFinalizationStop(long numberOfAttachements)
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.SessionFinalizationStopEventId, numberOfAttachements);
+            this.WriteEvent(TestPlatformInstrumentationEvents.MultiTestRunsFinalizationStopEventId, numberOfAttachements);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStartEventId)]
-        public void TranslationLayerSessionFinalizationStart()
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerMultiTestRunsFinalizationStartEventId)]
+        public void TranslationLayerMultiTestRunsFinalizationStart()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStartEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerMultiTestRunsFinalizationStartEventId);
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStopEventId)]
-        public void TranslationLayerSessionFinalizationStop()
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerMultiTestRunsFinalizationStopEventId)]
+        public void TranslationLayerMultiTestRunsFinalizationStop()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerSessionFinalizationStopEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerMultiTestRunsFinalizationStopEventId);
         }
     }
 }

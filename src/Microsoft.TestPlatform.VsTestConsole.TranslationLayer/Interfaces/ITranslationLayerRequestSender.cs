@@ -115,7 +115,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Provides back all attachements to TestPlatform for additional processing (for example merging)
         /// </summary>
         /// <param name="attachments">List of attachements</param>
-        /// <param name="testSessionEventsHandler"></param>
-        void OnTestSessionEnd(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler testSessionEventsHandler);
+        /// <param name="multiTestRunsFinalizationCompleteEventsHandler"></param>
+        void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler multiTestRunsFinalizationCompleteEventsHandler);
     }
 }

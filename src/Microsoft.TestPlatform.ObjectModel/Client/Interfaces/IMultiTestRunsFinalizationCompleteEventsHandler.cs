@@ -6,14 +6,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Collections.Generic;
 
     /// <summary>
-    /// Interface contract for handling test session complete events
+    /// Interface contract for handling multi test runs finalization complete events
     /// </summary>
-    public interface ITestSessionEventsHandler : ITestMessageEventHandler
+    public interface IMultiTestRunsFinalizationCompleteEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
         /// Dispatch SessionComplete event to listeners.
         /// </summary>
         /// <param name="attachments">Attachments reprocessed.</param>
-        void HandleTestSessionComplete(IEnumerable<AttachmentSet> attachments);
+        void HandleMultiTestRunsFinalizationComplete(IEnumerable<AttachmentSet> attachments);
     }
 }

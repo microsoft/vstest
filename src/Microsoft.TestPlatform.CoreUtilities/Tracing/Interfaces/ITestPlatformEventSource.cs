@@ -184,52 +184,52 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         void MetricsDisposeStop();
 
         /// <summary>
-        /// The session finalization request start.
+        /// The multi test runs finalization request start.
         /// </summary>
-        void SessionFinalizationRequestStart();
+        void MultiTestRunsFinalizationRequestStart();
 
         /// <summary>
-        /// The session finalization request stop.
+        /// The multi test runs finalization request stop.
         /// </summary>
-        void SessionFinalizationRequestStop();
+        void MultiTestRunsFinalizationRequestStop();
 
         /// <summary>
-        /// The adapter session finalization start.
+        /// The adapter multi test runs finalization start.
         /// </summary>
         /// <param name="numberOfAttachements">
         /// The number of attachements.
         /// </param>
-        void AdapterSessionFinalizationStart(long numberOfAttachements);
+        void AdapterMultiTestRunsFinalizationStart(long numberOfAttachements);
 
         /// <summary>
-        /// The adapter session finalization stop.
+        /// The adapter multi test runs finalization stop.
         /// </summary>
         /// <param name="numberOfAttachements">
         /// The number of attachements.
         /// </param>
-        void AdapterSessionFinalizationStop(long numberOfAttachements);
+        void AdapterMultiTestRunsFinalizationStop(long numberOfAttachements);
 
         /// <summary>
-        /// The session finalization start.
+        /// The multi test runs finalization start.
         /// </summary>
-        void SessionFinalizationStart();
+        void MultiTestRunsFinalizationStart();
 
         /// <summary>
-        /// The session finalization stop.
+        /// The multi test runs finalization stop.
         /// </summary>
         /// <param name="numberOfAttachements">
         /// The number of attachements.
         /// </param>
-        void SessionFinalizationStop(long numberOfAttachements);
+        void MultiTestRunsFinalizationStop(long numberOfAttachements);
 
         /// <summary>
-        /// Mark the start of translation layer session finalization request.
+        /// Mark the start of translation layer multi test runs finalization request.
         /// </summary>
-        void TranslationLayerSessionFinalizationStart();
+        void TranslationLayerMultiTestRunsFinalizationStart();
 
         /// <summary>
-        /// Mark the completion of translation layer session finalization request.
+        /// Mark the completion of translation layer multi test runs finalization request.
         /// </summary>
-        void TranslationLayerSessionFinalizationStop();
+        void TranslationLayerMultiTestRunsFinalizationStop();
     }
 }

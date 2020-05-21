@@ -6,12 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
-    /// The test run complete payload.
+    /// Multi test runs finalization complete payload.
     /// </summary>
-    public class TestSessionCompletePayload
+    public class MultiTestRunsFinalizationCompletePayload
     {
         /// <summary>
         /// Gets or sets the attachments.

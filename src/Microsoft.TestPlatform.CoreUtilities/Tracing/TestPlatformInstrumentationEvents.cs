@@ -161,41 +161,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// <summary>
         /// The session finalization start event id.
         /// </summary>
-        public const int SessionFinalizationStartEventId = 0x40;
+        public const int MultiTestRunsFinalizationStartEventId = 0x40;
 
         /// <summary>
         /// The session finalization stop event id.
         /// </summary>
-        public const int SessionFinalizationStopEventId = 0x41;
+        public const int MultiTestRunsFinalizationStopEventId = 0x41;
 
         /// <summary>
         /// The session finalization request start event id.
         /// </summary>
-        public const int SessionFinalizationRequestStartEventId = 0x42;
+        public const int MultiTestRunsFinalizationRequestStartEventId = 0x42;
 
         /// <summary>
         /// The session finalization request stop event id.
         /// </summary>
-        public const int SessionFinalizationRequestStopEventId = 0x43;
+        public const int MultiTestRunsFinalizationRequestStopEventId = 0x43;
 
         /// <summary>
         /// The adapter session finalization start event id.
         /// </summary>
-        public const int AdapterSessionFinalizationStartEventId = 0x44;
+        public const int AdapterMultiTestRunsFinalizationStartEventId = 0x44;
 
         /// <summary>
         /// The adapter session finalization stop event id.
         /// </summary>
-        public const int AdapterSessionFinalizationStopEventId = 0x45;
+        public const int AdapterMultiTestRunsFinalizationStopEventId = 0x45;
 
         /// <summary>
         /// Events fired on session finalization start of translation layer.
         /// </summary>
-        public const int TranslationLayerSessionFinalizationStartEventId = 0x46;
+        public const int TranslationLayerMultiTestRunsFinalizationStartEventId = 0x46;
 
         /// <summary>
         /// Events fired on session finalization complete in translation layer.
         /// </summary>
-        public const int TranslationLayerSessionFinalizationStopEventId = 0x47;
+        public const int TranslationLayerMultiTestRunsFinalizationStopEventId = 0x47;
     }
 }

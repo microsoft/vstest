@@ -385,7 +385,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void OnTestSessionEnd(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler testSessionEventsHandler)
         {
             this.SendMessageAndListenAndReportAttachements(attachments, testSessionEventsHandler);
         }
@@ -732,35 +732,35 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private void SendMessageAndListenAndReportAttachements(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler eventHandler)
+        private void SendMessageAndListenAndReportAttachements(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler eventHandler)
         {
             try
             {
-                var payload = new OnTestSessionEndPayload
+                var payload = new MultiTestRunsFinalizationPayload
                 {
                     Attachments = attachments
                 };
-                this.communicationManager.SendMessage(MessageType.OnTestSessionEnd, payload);
-                var isSessionComplete = false;
+                this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalization, payload);
+                var isMultiTestRunsFinalizationComplete = false;
 
                 // Cycle through the messages that the vstest.console sends.
                 // Currently each of the operations are not separate tasks since they should not each take much time.
                 // This is just a notification.
-                while (!isSessionComplete)
+                while (!isMultiTestRunsFinalizationComplete)
                 {
                     var message = this.TryReceiveMessage();
 
-                    if (string.Equals(MessageType.OnTestSessionEndCallback, message.MessageType))
+                    if (string.Equals(MessageType.MultiTestRunsFinalizationCallback, message.MessageType))
                     {
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachements: Process complete.");
                         }
 
-                        var testSessionCompletePayload = this.dataSerializer.DeserializePayload<TestSessionCompletePayload>(message);
+                        var multiTestRunsFinalizationCompletePayload = this.dataSerializer.DeserializePayload<MultiTestRunsFinalizationCompletePayload>(message);
 
-                        eventHandler.HandleTestSessionComplete(testSessionCompletePayload.Attachments);
-                        isSessionComplete = true;
+                        eventHandler.HandleMultiTestRunsFinalizationComplete(multiTestRunsFinalizationCompletePayload.Attachments);
+                        isMultiTestRunsFinalizationComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
@@ -772,8 +772,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedSessionFinalization);               
-                eventHandler.HandleTestSessionComplete(null);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedMultiTestRunsFinalization);               
+                eventHandler.HandleMultiTestRunsFinalizationComplete(null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions
                 // Removing that code because vstest.console might be in a healthy state and letting the client
@@ -782,7 +782,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             
             // TODO: do we need events?
-            this.testPlatformEventSource.TranslationLayerSessionFinalizationStop(); 
+            this.testPlatformEventSource.TranslationLayerMultiTestRunsFinalizationStop(); 
         }
 
         private Message TryReceiveMessage()

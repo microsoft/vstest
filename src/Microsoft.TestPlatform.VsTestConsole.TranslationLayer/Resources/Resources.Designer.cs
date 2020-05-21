@@ -62,11 +62,11 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Session Finalization was aborted..
+        ///   Looks up a localized string similar to The active Multi Test Runs Finalization was aborted..
         /// </summary>
-        internal static string AbortedSessionFinalization {
+        internal static string AbortedMultiTestRunsFinalization {
             get {
-                return ResourceManager.GetString("AbortedSessionFinalization", resourceCulture);
+                return ResourceManager.GetString("AbortedMultiTestRunsFinalization", resourceCulture);
             }
         }
         

@@ -273,13 +273,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.sessionStarted = false;
         }
 
+        #endregion
+
+        #region IVsTestConsoleWrapper2
+
         /// <inheritdoc/>
-        public void OnTestSessionEnd(IEnumerable<AttachmentSet> attachments, ITestSessionEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler testSessionEventsHandler)
         {
             this.EnsureInitialized();
 
-            this.requestSender.OnTestSessionEnd(attachments, testSessionEventsHandler);
-            this.requestSender.FinalizeSession(attachments, testSessionEventsHandler);
+            this.requestSender.FinalizeMultiTestRuns(attachments, testSessionEventsHandler);
         }
 
         #endregion
