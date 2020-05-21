@@ -278,10 +278,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         #region IVsTestConsoleWrapper2
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler testSessionEventsHandler)
         {
-            this.EnsureInitialized();
+            this.testPlatformEventSource.TranslationLayerMultiTestRunsFinalizationStart();
 
+            this.EnsureInitialized();
             this.requestSender.FinalizeMultiTestRuns(attachments, testSessionEventsHandler);
         }
 

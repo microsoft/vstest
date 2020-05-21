@@ -116,6 +116,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// <param name="attachments">List of attachements</param>
         /// <param name="multiTestRunsFinalizationCompleteEventsHandler"></param>
-        void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler multiTestRunsFinalizationCompleteEventsHandler);
+        void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler multiTestRunsFinalizationCompleteEventsHandler);
     }
 }

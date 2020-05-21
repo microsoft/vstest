@@ -385,7 +385,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRuns(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler testSessionEventsHandler)
         {
             this.SendMessageAndListenAndReportAttachements(attachments, testSessionEventsHandler);
         }
@@ -732,7 +732,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private void SendMessageAndListenAndReportAttachements(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationCompleteEventsHandler eventHandler)
+        private void SendMessageAndListenAndReportAttachements(IEnumerable<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler)
         {
             try
             {

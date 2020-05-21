@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     /// <summary>
     /// Interface contract for handling multi test runs finalization complete events
     /// </summary>
-    public interface IMultiTestRunsFinalizationCompleteEventsHandler : ITestMessageEventHandler
+    public interface IMultiTestRunsFinalizationEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
         /// Dispatch SessionComplete event to listeners.
