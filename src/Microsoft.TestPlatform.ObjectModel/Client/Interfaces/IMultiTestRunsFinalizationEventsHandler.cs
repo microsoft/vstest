@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public interface IMultiTestRunsFinalizationEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
-        /// Dispatch SessionComplete event to listeners.
+        /// Dispatch MultiTestRunsFinalizationComplete event to listeners.
         /// </summary>
         /// <param name="attachments">Attachments reprocessed.</param>
         void HandleMultiTestRunsFinalizationComplete(IEnumerable<AttachmentSet> attachments);

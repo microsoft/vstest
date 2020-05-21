@@ -61,6 +61,11 @@
         <target state="translated">Die Datei "{0}" ist nicht vorhanden.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedMultiTestRunsFinalization">
+        <source>The active Multi Test Runs Finalization was aborted.</source>
+        <target state="new">The active Multi Test Runs Finalization was aborted.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
