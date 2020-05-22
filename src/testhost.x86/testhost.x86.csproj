@@ -8,6 +8,7 @@
     <AssemblyName>testhost.x86</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
+    <RuntimeFrameworkVersion>2.1.15</RuntimeFrameworkVersion>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>true</Prefer32Bit>

@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -19,15 +20,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// The Run Tests using VsTestConsoleWrapper API's
     /// </summary>
     [TestClass]
-    public class RunTests : AcceptanceTestBase
+    public class FinalizeMultiTestRunsTests : AcceptanceTestBase
     {
         private IVsTestConsoleWrapper2 vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
+        private MultiTestRunsFinalizationEventHandler multiTestRunsFinalizationEventHandler;
 
         private void Setup()
         {
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
+            this.multiTestRunsFinalizationEventHandler = new MultiTestRunsFinalizationEventHandler();
         }
 
         [TestCleanup]
@@ -37,20 +40,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource]
+        //[NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void RunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
 
             // Assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+
+            this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
+            Assert.AreEqual(1, this.multiTestRunsFinalizationEventHandler.Attachments.Count);
         }
 
         [TestMethod]
@@ -187,6 +195,49 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                      };
 
             return testAssemblies;
+        }
+
+        /// <summary>
+        /// Default RunSettings
+        /// </summary>
+        /// <returns></returns>
+        public string GetCodeCoverageRunSettings()
+        {
+            string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
+            if (this.testEnvironment.TargetFramework.Equals(IntegrationTestBase.DesktopRunnerFramework))
+            {
+                traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, $@"artifacts\{IntegrationTestEnvironment.BuildConfiguration}\Microsoft.CodeCoverage");
+            }            
+
+            string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                                    <RunSettings>
+                                        <RunConfiguration>
+                                            <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
+                                            <TestAdaptersPaths>{traceDataCollectorDir}</TestAdaptersPaths>
+                                        </RunConfiguration>
+                                        <DataCollectionRunSettings>
+                                            <DataCollectors>
+                                                <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
+                                                    <Configuration>
+                                                      <CodeCoverage>
+                                                        <ModulePaths>
+                                                          <Exclude>
+                                                            <ModulePath>.*CPPUnitTestFramework.*</ModulePath>
+                                                          </Exclude>
+                                                        </ModulePaths>
+
+                                                        <!-- We recommend you do not change the following values: -->
+                                                        <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>
+                                                        <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>
+                                                        <CollectFromChildProcesses>True</CollectFromChildProcesses>
+                                                        <CollectAspDotNet>False</CollectAspDotNet>
+                                                      </CodeCoverage>
+                                                    </Configuration>
+                                                </DataCollector>
+                                            </DataCollectors>
+                                        </DataCollectionRunSettings>
+                                    </RunSettings>";
+            return runSettingsXml;
         }
     }
 }

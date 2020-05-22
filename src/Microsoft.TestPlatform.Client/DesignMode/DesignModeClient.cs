@@ -17,11 +17,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
     using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
@@ -196,6 +198,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                     this.communicationManager.DeserializePayload<TestRunRequestPayload>(
                                         message);
                                 this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: false);
+                                break;
+                            }
+
+                        case MessageType.MultiTestRunsFinalization:
+                            {
+                                var multiTestRunsFinalizationPayload =
+                                    this.communicationManager.DeserializePayload<MultiTestRunsFinalizationPayload>(message);
+                                this.FinalizeMultiTestRuns(multiTestRunsFinalizationPayload);
                                 break;
                             }
 
@@ -456,6 +466,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
                     }
                 });
+        }
+
+        private void FinalizeMultiTestRuns(MultiTestRunsFinalizationPayload finalizationPayload)
+        {
+            lock(this.lockObject)
+            {
+                try
+                {
+                    var handler = new MultiTestRunsDataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler());
+                    handler.HandleAttachements(finalizationPayload.Attachments);
+
+                    var payload = new MultiTestRunsFinalizationCompletePayload()
+                    {
+                        Attachments = finalizationPayload.Attachments
+                    };
+
+                    // Send run complete to translation layer
+                    this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
+
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                    this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                    var payload = new MultiTestRunsFinalizationCompletePayload()
+                    {
+                        Attachments = null
+                    };
+
+                    // Send run complete to translation layer
+                    this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
+                }
+            }
         }
 
         #region IDisposable Support

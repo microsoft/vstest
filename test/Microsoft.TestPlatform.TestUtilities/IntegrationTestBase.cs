@@ -451,7 +451,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        public IVsTestConsoleWrapper2 GetVsTestConsoleWrapper()
         {
             var logFileName = Path.GetFileName(Path.GetTempFileName());
             var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");

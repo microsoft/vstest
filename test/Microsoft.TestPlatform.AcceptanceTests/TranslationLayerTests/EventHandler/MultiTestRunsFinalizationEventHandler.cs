@@ -11,13 +11,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler2
+    public class MultiTestRunsFinalizationEventHandler : IMultiTestRunsFinalizationEventsHandler
     {
-        /// <summary>
-        /// Gets the test results.
-        /// </summary>
-        public List<TestResult> TestResults { get; private set; }
-
         /// <summary>
         /// Gets the attachments.
         /// </summary>
@@ -40,9 +35,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public TestMessageLevel TestMessageLevel { get; private set; }
 
-        public RunEventHandler()
+        public MultiTestRunsFinalizationEventHandler()
         {
-            this.TestResults = new List<TestResult>();
             this.Errors = new List<string>();
             this.Attachments = new List<AttachmentSet>();
         }
@@ -64,33 +58,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
         }
 
-        public void HandleTestRunComplete(
-            TestRunCompleteEventArgs testRunCompleteArgs,
-            TestRunChangedEventArgs lastChunkArgs,
-            ICollection<AttachmentSet> runContextAttachments,
-            ICollection<string> executorUris)
-        {
-            if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
-            {
-                this.TestResults.AddRange(lastChunkArgs.NewTestResults);
-            }
-
-            if(runContextAttachments != null)
-            {
-                this.Attachments.AddRange(runContextAttachments);
-            }
-
-            this.Metrics = testRunCompleteArgs.Metrics;
-        }
-
-        public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
-        {
-            if (testRunChangedArgs != null && testRunChangedArgs.NewTestResults != null)
-            {
-                this.TestResults.AddRange(testRunChangedArgs.NewTestResults);
-            }
-        }
-
         public void HandleRawMessage(string rawMessage)
         {
             // No op
@@ -106,6 +73,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             // No op
             return true;
+        }
+
+        public void HandleMultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments)
+        {
+            if(attachments != null)
+            {
+                this.Attachments.AddRange(attachments);
+            }
         }
     }
 }
