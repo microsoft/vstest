@@ -29,7 +29,7 @@
     <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
-    <JsonNetVersion>9.0.1</JsonNetVersion>
+    <JsonNetVersion>12.0.2</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.7.0-preview-3657262</TestPlatformExternalsVersion>
     <MicrosoftFakesVersion>16.6.3-beta.20221.2</MicrosoftFakesVersion>

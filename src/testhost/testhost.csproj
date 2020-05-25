@@ -16,6 +16,7 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\testhost.x86\Class1.cs" Link="Class1.cs" />
     <Compile Include="..\testhost.x86\DebugAssertException.cs" Link="DebugAssertException.cs" />
     <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs;..\testhost.x86\UnitTestClient.cs" />
     <Compile Include="..\testhost.x86\TestHostTraceListener.cs" Link="TestHostTraceListener.cs" />
@@ -38,6 +39,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+    <ItemGroup>
+    <PackageReference Include="StreamJsonRpc" Version="2.4.48" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

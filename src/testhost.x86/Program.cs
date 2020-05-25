@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
+    using Client;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -32,6 +33,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             try
             {
                 TestPlatformEventSource.Instance.TestHostStart();
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+                new Class1().Add(1, 1).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
                 Run(args);
             }
             catch (Exception ex)
@@ -92,7 +96,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 while (!IsDebuggerPresent())
                 {
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
                     System.Threading.Tasks.Task.Delay(1000).Wait();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
                 }
 
                 DebugBreak();
@@ -106,7 +112,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     while (!Debugger.IsAttached)
                     {
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
                         System.Threading.Tasks.Task.Delay(1000).Wait();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
                     }
 
                     Debugger.Break();
