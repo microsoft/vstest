@@ -108,8 +108,8 @@ namespace Microsoft.VisualStudio.Coverage
             IDataCollectionSink dataSink,
             IDataCollectionLogger logger)
         {
-            var processor = new CodeCoverageRunSettingsProcessor(configurationElement);
-            configurationElement = (XmlElement)processor.ProcessToNode();
+            var processor = new CodeCoverageRunSettingsProcessor();
+            configurationElement = (XmlElement)processor.Process(configurationElement);
 
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
             if (string.IsNullOrEmpty(configurationElement?.InnerXml))
