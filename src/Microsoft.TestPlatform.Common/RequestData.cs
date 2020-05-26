@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
     public class RequestData : IRequestData
     {
         /// <summary>
-        /// The metrics collection.
+        /// The metrics collection. 
         /// </summary>
         private IMetricsCollection metricsCollection;
 
