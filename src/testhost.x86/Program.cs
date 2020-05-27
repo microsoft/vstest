@@ -32,10 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             try
             {
+
                 TestPlatformEventSource.Instance.TestHostStart();
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                new Class1().Add(1, 1).GetAwaiter().GetResult();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
                 Run(args);
             }
             catch (Exception ex)
@@ -56,6 +54,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         public static void Run(string[] args)
         {
             WaitForDebuggerIfEnabled();
+
+
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+            new Class1().Add(1, 1).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+
             SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 

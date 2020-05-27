@@ -42,6 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             var task = new RpcServer().ServeAsync();
             var result = new Executor(ConsoleOutput.Instance).Execute(args);
+            task.GetAwaiter().GetResult();
             return result;
         }
 

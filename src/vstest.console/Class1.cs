@@ -12,8 +12,8 @@ namespace Server
             int clientId = 0;
             while (true)
             {
-                Console.WriteLine("Waiting for client to make a connection...");
-                var stream = new NamedPipeServerStream("StreamJsonRpcSamplePipe", PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                Console.WriteLine($"JSON RPC: Waiting for client to make a connection...");
+                var stream = new NamedPipeServerStream($"StreamJsonRpcSamplePipe", PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
                 await stream.WaitForConnectionAsync();
                 Task nowait = ResponseToRpcRequestsAsync(stream, ++clientId);
             }
@@ -21,11 +21,11 @@ namespace Server
 
         private static async Task ResponseToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
         {
-            Console.WriteLine($"Connection request #{clientId} received. Spinning off an async Task to cater to requests.");
+            Console.WriteLine($"JSON RPC: Connection request #{clientId} received. Spinning off an async Task to cater to requests.");
             var jsonRpc = JsonRpc.Attach(stream, new Worker());
-            Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
+            Console.WriteLine($"JSON RPC: JSON-RPC listener attached to #{clientId}. Waiting for requests...");
             await jsonRpc.Completion;
-            Console.WriteLine($"Connection #{clientId} terminated.");
+            Console.WriteLine($"JSON RPC: Connection #{clientId} terminated.");
         }
     }
 
@@ -33,7 +33,7 @@ namespace Server
     {
         public int Add(int a, int b)
         {
-            Console.WriteLine($"Received request: {a} + {b}");
+            Console.WriteLine($"JSON RPC: Received request: {a} + {b}");
             return a + b;
         }
     }

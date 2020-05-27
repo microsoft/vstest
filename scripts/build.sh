@@ -319,7 +319,7 @@ function publish_package()
         for i in ${runtimeproviders[@]}; do
             mv $packageDir/${i} $extensionsDir
         done
-        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
+        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/12.0.3/lib/netstandard1.0/Newtonsoft.Json.dll
         cp $newtonsoft $packageDir
     done
 
