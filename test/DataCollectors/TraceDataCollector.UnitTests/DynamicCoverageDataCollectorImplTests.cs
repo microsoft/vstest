@@ -83,6 +83,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
+        [Ignore]
         public void InitializeShouldInitializeVanguardWithRightCoverageSettings()
         {
             var expectedContent = "<CodeCoverage>CoverageSettingsContent</CodeCoverage>";
