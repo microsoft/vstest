@@ -72,14 +72,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             /// <returns>A relative path built from path components.</returns>
             public static string BuildPath(IEnumerable<string> pathComponents)
             {
-                var path = ".";
+                var sb = new StringBuilder();
+                sb.Append(".");
 
                 foreach (var component in pathComponents)
                 {
-                    path += "/" + component;
+                    sb.Append("/");
+                    sb.Append(component);
                 }
 
-                return path;
+                return sb.ToString();
             }
         }
         #endregion
@@ -337,14 +339,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             IEnumerable<string> pathComponents)
         {
             var currentNode = currentRootNode;
-            var partialPath = ".";
+            var partialPath = new StringBuilder();
+            
+            partialPath.Append(".");
 
             foreach (var component in pathComponents)
             {
                 var currentPathComponent = "/" + component;
 
                 // Append the current path component to the partial path.
-                partialPath += currentPathComponent;
+                partialPath.Append(currentPathComponent);
 
                 // Extract the node corresponding to the latest path component.
                 var tempNode = this.ExtractNode(currentNode, "." + currentPathComponent);
@@ -355,7 +359,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 {
                     var defaultNode = this.ExtractNode(
                         defaultRootNode,
-                        partialPath);
+                        partialPath.ToString());
 
                     var importedChild = currentNode.OwnerDocument.ImportNode(defaultNode, true);
                     currentNode.AppendChild(importedChild);
