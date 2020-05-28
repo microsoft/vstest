@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using System.Globalization;
     using System.Linq;
     using System.Text;
-
+    using System.Xml.XPath;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -94,6 +94,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         ///  Property Id storing the ExecutionId.
         /// </summary>
         public const string ExecutionIdPropertyIdentifier = "ExecutionId";
+
+        // Figure out the longest result string (+1 for ! where applicable), so we don't 
+        // get misaligned output on non-english systems
+        private static int LongestResultIndicator = new[]
+        {
+            CommandLineResources.Failed.Length + 1,
+            CommandLineResources.Passed.Length + 1,
+            CommandLineResources.Skipped.Length + 1,
+            CommandLineResources.None.Length
+        }.Max();
 
         #endregion
 
@@ -521,7 +531,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
-            
+
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -684,8 +694,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            var d = DateTime.Now;
-            Output.WriteLine($"called at { d:hh:mm:ss.fff tt}", OutputLevel.Information);
             // Stop the progress indicator as we are about to print the summary
             this.progressIndicator?.Stop();
             var passedTests = 0;
@@ -739,11 +747,88 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
                 {
-                    var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
-                    var resultString = sourceSummary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
-                    var color = sourceSummary.FailedTests > 0 ? ConsoleColor.Red : sourceSummary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
-                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString, sourceSummary.TotalTests, sourceSummary.PassedTests, sourceSummary.FailedTests, sourceSummary.SkippedTests, GetFormattedDurationString(sourceSummary.Duration), sd.Key.Split('\\').Last(), frameworkString);
-                    Output.Information(false, color, outputLine);
+                    TestOutcome sourceOutcome = TestOutcome.None;
+                    if (sourceSummary.FailedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Failed;
+                    }
+                    else if (sourceSummary.PassedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Passed;
+                    }
+                    else if (sourceSummary.SkippedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Skipped;
+                    }
+
+
+                    string resultString;
+                    switch (sourceOutcome)
+                    {
+                        case TestOutcome.Failed:
+                            resultString = (CommandLineResources.Failed + "!").PadRight(LongestResultIndicator);
+                            break;
+                        case TestOutcome.Passed:
+                            resultString = (CommandLineResources.Passed + "!").PadRight(LongestResultIndicator);
+                            break;
+                        case TestOutcome.Skipped:
+                            resultString = (CommandLineResources.Skipped + "!").PadRight(LongestResultIndicator);
+                            break;
+                        default:
+                            resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
+                            break;
+                    };
+
+                    var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
+                    var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
+                    var skipped = sourceSummary.SkippedTests.ToString().PadLeft(5);
+                    var total = sourceSummary.TotalTests.ToString().PadLeft(5);
+
+
+                    var frameworkString = string.IsNullOrEmpty(targetFramework)
+                        ? string.Empty
+                        : $"({targetFramework})";
+
+                    var duration = GetFormattedDurationString(sourceSummary.Duration);
+                    var sourceName = sd.Key.Split('\\').Last();
+
+                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+                        resultString,
+                        failed,
+                        passed,
+                        skipped,
+                        total,
+                        duration,
+                        sourceName,
+                        frameworkString);
+
+                    
+                    ConsoleColor? color = null;
+                    if (sourceOutcome == TestOutcome.Failed)
+                    {
+                        color = ConsoleColor.Red;
+                    }
+                    else if (sourceOutcome == TestOutcome.Passed)
+                    {
+                        color = ConsoleColor.Green;
+                    }
+                    else if (sourceOutcome == TestOutcome.Skipped)
+                    {
+                        color = ConsoleColor.Yellow;
+                    }
+
+                    if (color != null)
+                    {
+                        Output.Information(false, color.Value, outputLine);
+                    }
+                    else
+                    {
+                        Output.Information(false, outputLine);
+                    }
+
+                    Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+                        sourceName,
+                        frameworkString);
                 }
 
                 passedTests += sourceSummary.PassedTests;

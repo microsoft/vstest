@@ -11,8 +11,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
 {
     using System;
-    using System.Reflection;
-
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -1030,6 +1029,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        internal static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to App package &apos;{0}&apos; does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project..
         /// </summary>
         internal static string NoTestEntryPoint {
@@ -1330,6 +1338,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Skipped.
+        /// </summary>
+        internal static string Skipped {
+            get {
+                return ResourceManager.GetString("Skipped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Skipped  {0}.
         /// </summary>
         internal static string SkippedTestIndicator {
@@ -1578,11 +1595,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}..
+        ///   Looks up a localized string similar to {0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}.
         /// </summary>
         internal static string TestRunSummary {
             get {
                 return ResourceManager.GetString("TestRunSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to - {0} {1}.
+        /// </summary>
+        internal static string TestRunSummaryAssemblyAndFramework {
+            get {
+                return ResourceManager.GetString("TestRunSummaryAssemblyAndFramework", resourceCulture);
             }
         }
         

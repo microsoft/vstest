@@ -611,8 +611,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.Passed, 2, 1, 0, 1, "1 m 2 s", "TestSourcePassed", expectedFramework), OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, CommandLineResources.Failed, 3, 1, 1, 1, "1 h 6 m", "TestSource", expectedFramework), OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
+                (CommandLineResources.Passed + "!").PadRight(8),
+                0.ToString().PadLeft(5), 
+                1.ToString().PadLeft(5), 
+                1.ToString().PadLeft(5), 2
+                .ToString().PadLeft(5), 
+                "1 m 2 s"), OutputLevel.Information), Times.Once);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, 
+                "TestSourcePassed", 
+                expectedFramework), OutputLevel.Information), Times.Once);    
+            
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
+                (CommandLineResources.Failed + "!").PadRight(8),
+                1.ToString().PadLeft(5),
+                1.ToString().PadLeft(5),
+                1.ToString().PadLeft(5),
+                3.ToString().PadLeft(5), 
+                "1 h 6 m"), OutputLevel.Information), Times.Once);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, 
+                "TestSource", 
+                expectedFramework), OutputLevel.Information), Times.Once);
         }
 
         [TestMethod]
