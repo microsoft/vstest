@@ -538,12 +538,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var executionId = GetExecutionId(e.Result);
             var parentExecutionId = GetParentExecutionId(e.Result);
 
-            if (parentExecutionId != Guid.Empty && leafTestResults.ContainsKey(parentExecutionId))
+            if (parentExecutionId != Guid.Empty)
             {
+                // Not checking the result value.
+                // This would return false if the id did not exist,
+                // or true if it did exist. In either case the id is not in the dictionary
+                // which is our goal.
                 leafTestResults.TryRemove(parentExecutionId, out _);
             }
 
-            leafTestResults.TryAdd(executionId, e.Result);
+            if (!leafTestResults.TryAdd(executionId, e.Result))
+            {
+                // This would happen if the key already exists. This should not happen, because we are 
+                // inserting by GUID key, so this would mean an error in our code.
+                throw new InvalidOperationException($"ExecutionId {executionId} already exists.");
+            };
 
             switch (e.Result.Outcome)
             {
@@ -675,6 +684,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
+            var d = DateTime.Now;
+            Output.WriteLine($"called at { d:hh:mm:ss.fff tt}", OutputLevel.Information);
             // Stop the progress indicator as we are about to print the summary
             this.progressIndicator?.Stop();
             var passedTests = 0;
@@ -706,7 +717,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 foreach (var result in sd.ToArray())
                 {
-                    sourceSummary.Duration += result.Duration;                    
+                    sourceSummary.Duration += result.Duration;
                     switch (result.Outcome)
                     {
                         case TestOutcome.Passed:
@@ -724,15 +735,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         default:
                             break;
                     }
+                }
 
-                    if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
-                    {
-                        var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
-                        var resultString = sourceSummary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
-                        var color = sourceSummary.FailedTests > 0 ? ConsoleColor.Red : sourceSummary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
-                        var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString, sourceSummary.TotalTests, sourceSummary.PassedTests, sourceSummary.FailedTests, sourceSummary.SkippedTests, GetFormattedDurationString(sourceSummary.Duration), sd.Key.Split('\\').Last(), frameworkString);
-                        Output.Information(false, color, outputLine);
-                    }
+                if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                {
+                    var frameworkString = string.IsNullOrEmpty(targetFramework) ? string.Empty : string.Concat('(', targetFramework, ')');
+                    var resultString = sourceSummary.FailedTests > 0 ? CommandLineResources.Failed : CommandLineResources.Passed;
+                    var color = sourceSummary.FailedTests > 0 ? ConsoleColor.Red : sourceSummary.SkippedTests > 0 ? ConsoleColor.Yellow : ConsoleColor.Green;
+                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, resultString, sourceSummary.TotalTests, sourceSummary.PassedTests, sourceSummary.FailedTests, sourceSummary.SkippedTests, GetFormattedDurationString(sourceSummary.Duration), sd.Key.Split('\\').Last(), frameworkString);
+                    Output.Information(false, color, outputLine);
                 }
 
                 passedTests += sourceSummary.PassedTests;
