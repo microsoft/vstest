@@ -848,7 +848,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummary">
-        <source>{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</source>
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
         <target state="new">{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</target>
         <note></note>
       </trans-unit>
@@ -867,6 +867,21 @@
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
         <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
 Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Skipped">
+        <source>Skipped</source>
+        <target state="new">Skipped</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source>- {0} {1}</source>
+        <target state="new">- {0} {1}</target>
         <note></note>
       </trans-unit>
     </body>

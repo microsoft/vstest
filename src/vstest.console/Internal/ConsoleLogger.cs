@@ -867,15 +867,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (passedTests > 0)
                 {
-                    Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, passedTests));
+                    Output.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, passedTests), OutputLevel.Information, ConsoleColor.Green);
                 }
                 if (failedTests > 0)
                 {
-                    Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, failedTests));
+                    Output.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, failedTests), OutputLevel.Information, ConsoleColor.Red);
                 }
                 if (skippedTests > 0)
                 {
-                    Output.Information(false, ConsoleColor.Yellow, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, skippedTests));
+                    Output.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, skippedTests), OutputLevel.Information, ConsoleColor.Yellow);
                 }
             }
 
