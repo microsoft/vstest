@@ -62,7 +62,7 @@
       </trans-unit>
       <trans-unit id="UnexpectedValueForInactivityTimespanValue">
         <source>Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</source>
-        <target state="new">Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
+        <target state="translated">Zaman aşımı olarak beklenmeyen '{0}' değeri sağlandı. Lütfen şu biçimde bir değer girin: 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
         <note></note>
       </trans-unit>
     </body>
