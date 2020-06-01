@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using System.Xml;
     using System.Xml.XPath;
@@ -16,194 +17,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public class CodeCoverageRunSettingsProcessor
     {
-        #region Type Members
-        /// <summary>
-        /// Represents the exclusion type for code coverage run settings.
-        /// </summary>
-        private class Exclusion
-        {
-            /// <summary>
-            /// Represents the <see cref="XPathNavigator"/> style path of the exclusion type.
-            /// </summary>
-            private string path;
-
-            /// <summary>
-            /// Gets the path components for the current exclusion type.
-            /// </summary>
-            public IEnumerable<string> PathComponents { get; }
-
-            /// <summary>
-            /// Gets the exclusion rules for the current exclusion type.
-            /// </summary>
-            public IDictionary<string, XmlNode> ExclusionRules { get; }
-
-            /// <summary>
-            /// Gets the actual exclusion type path generated from the individual path components.
-            /// </summary>
-            public string Path
-            {
-                get
-                {
-                    if (string.IsNullOrEmpty(this.path))
-                    {
-                        this.path = Exclusion.BuildPath(this.PathComponents);
-                    }
-
-                    return this.path;
-                }
-            }
-
-            /// <summary>
-            /// Constructs an <see cref="Exclusion"/> object.
-            /// </summary>
-            /// 
-            /// <param name="pathComponents">The path split in components.</param>
-            public Exclusion(IEnumerable<string> pathComponents)
-            {
-                this.path = string.Empty;
-                this.PathComponents = pathComponents;
-                this.ExclusionRules = new Dictionary<string, XmlNode>();
-            }
-
-            /// <summary>
-            /// Assembles a relative path from the path given as components.
-            /// </summary>
-            /// 
-            /// <returns>A relative path built from path components.</returns>
-            public static string BuildPath(IEnumerable<string> pathComponents)
-            {
-                var sb = new StringBuilder();
-                sb.Append(".");
-
-                foreach (var component in pathComponents)
-                {
-                    sb.Append("/");
-                    sb.Append(component);
-                }
-
-                return sb.ToString();
-            }
-        }
-        #endregion
-
         #region Members
-        #region Default Settings String
-        /// <summary>
-        /// Represents the default settings for the code coverage data collector.
-        /// </summary>
-        private static readonly string DefaultSettings = string.Join(
-            Environment.NewLine,
-            @"<DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">",
-            @"  <Configuration>",
-            @"    <CodeCoverage>",
-            @"      <ModulePaths>",
-            @"        <Exclude>",
-            @"           <ModulePath>.*CPPUnitTestFramework.*</ModulePath>",
-            @"           <ModulePath>.*vstest.console.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.intellitrace.*</ModulePath>",
-            @"           <ModulePath>.*testhost.*</ModulePath>",
-            @"           <ModulePath>.*datacollector.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>",
-            @"           <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>",
-            @"           <ModulePath>.*qtagent32.*</ModulePath>",
-            @"           <ModulePath>.*msvcr.*dll$</ModulePath>",
-            @"           <ModulePath>.*msvcp.*dll$</ModulePath>",
-            @"           <ModulePath>.*clr.dll$</ModulePath>",
-            @"           <ModulePath>.*clr.ni.dll$</ModulePath>",
-            @"           <ModulePath>.*clrjit.dll$</ModulePath>",
-            @"           <ModulePath>.*clrjit.ni.dll$</ModulePath>",
-            @"           <ModulePath>.*mscoree.dll$</ModulePath>",
-            @"           <ModulePath>.*mscoreei.dll$</ModulePath>",
-            @"           <ModulePath>.*mscoreei.ni.dll$</ModulePath>",
-            @"           <ModulePath>.*mscorlib.dll$</ModulePath>",
-            @"           <ModulePath>.*mscorlib.ni.dll$</ModulePath>",
-            @"           <ModulePath>.*cryptbase.dll$</ModulePath>",
-            @"           <ModulePath>.*bcryptPrimitives.dll$</ModulePath>",
-            @"         </Exclude>",
-            @"      </ModulePaths>",
-            @"      <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>",
-            @"      <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>",
-            @"      <CollectFromChildProcesses>True</CollectFromChildProcesses>",
-            @"      <CollectAspDotNet>false</CollectAspDotNet>",
-            @"      <SymbolSearchPaths />",
-            @"      <Functions>",
-            @"        <Exclude>",
-            @"          <Function>^std::.*</Function>",
-            @"          <Function>^ATL::.*</Function>",
-            @"          <Function>.*::__GetTestMethodInfo.*</Function>",
-            @"          <Function>.*__CxxPureMSILEntry.*</Function>",
-            @"          <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>",
-            @"          <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>",
-            @"          <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>",
-            @"          <Function>^__.*</Function>",
-            @"          <Function>.*::__.*</Function>",
-            @"        </Exclude>",
-            @"      </Functions>",
-            @"      <Attributes>",
-            @"        <Exclude>",
-            @"          <Attribute>^System.Diagnostics.DebuggerHiddenAttribute$</Attribute>",
-            @"          <Attribute>^System.Diagnostics.DebuggerNonUserCodeAttribute$</Attribute>",
-            @"          <Attribute>System.Runtime.CompilerServices.CompilerGeneratedAttribute$</Attribute>",
-            @"          <Attribute>^System.CodeDom.Compiler.GeneratedCodeAttribute$</Attribute>",
-            @"          <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>",
-            @"          <Attribute>^Microsoft.VisualStudio.TestPlatform.TestSDKAutoGeneratedCode.*</Attribute>",
-            @"        </Exclude>",
-            @"      </Attributes>",
-            @"      <Sources>",
-            @"        <Exclude>",
-            @"          <Source>.*\\atlmfc\\.*</Source>",
-            @"          <Source>.*\\vctools\\.*</Source>",
-            @"          <Source>.*\\public\\sdk\\.*</Source>",
-            @"          <Source>.*\\externalapis\\.*</Source>",
-            @"          <Source>.*\\microsoft sdks\\.*</Source>",
-            @"          <Source>.*\\vc\\include\\.*</Source>",
-            @"          <Source>.*\\msclr\\.*</Source>",
-            @"          <Source>.*\\ucrt\\.*</Source>",
-            @"        </Exclude>",
-            @"      </Sources>",
-            @"      <CompanyNames/>",
-            @"      <PublicKeyTokens/>",
-            @"    </CodeCoverage>",
-            @"  </Configuration>",
-            @"</DataCollector>");
-        #endregion
-
         /// <summary>
         /// Represents the default settings loaded as an <see cref="XmlNode"/>.
         /// </summary>
         private XmlNode defaultSettingsRootNode;
-
-        /// <summary>
-        /// Represents a list of exclusion types tracked by this processor.
-        /// </summary>
-        private IEnumerable<Exclusion> exclusions;
         #endregion
 
         #region Constructors & Helpers
         /// <summary>
         /// Constructs an <see cref="CodeCoverageRunSettingsProcessor"/> object.
         /// </summary>
-        public CodeCoverageRunSettingsProcessor()
+        /// 
+        /// <param name="defaultSettingsRootNode">The default settings root node.</param>
+        public CodeCoverageRunSettingsProcessor(XmlNode defaultSettingsRootNode)
         {
-            // Load default settings from string.
-            var document = new XmlDocument();
-            document.LoadXml(CodeCoverageRunSettingsProcessor.DefaultSettings);
-
-            this.defaultSettingsRootNode = document.DocumentElement.FirstChild;
-
-            // Create the exclusion type list.
-            this.exclusions = new List<Exclusion>
+            if (defaultSettingsRootNode == null)
             {
-                new Exclusion(new List<string> { "ModulePaths", "Exclude" }),
-                new Exclusion(new List<string> { "Attributes", "Exclude" }),
-                new Exclusion(new List<string> { "Sources", "Exclude" }),
-                new Exclusion(new List<string> { "Functions", "Exclude" })
-            };
+                throw new ArgumentNullException("Default settings root node is null.");
+            }
+
+            this.defaultSettingsRootNode = defaultSettingsRootNode;
         }
         #endregion
 
@@ -271,6 +105,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 this.defaultSettingsRootNode,
                 codeCoveragePathComponents);
 
+            // Cannot extract current code coverage node from the given settings so we bail out.
+            // However, the default code coverage node has already been added to the document's
+            // root.
             if (currentCodeCoverageNode == null)
             {
                 return currentSettingsRootNode;
@@ -279,9 +116,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             // Get the code coverage node from the default settings.
             var defaultCodeCoverageNode = this.ExtractNode(
                 this.defaultSettingsRootNode,
-                Exclusion.BuildPath(codeCoveragePathComponents));
+                this.BuildPath(codeCoveragePathComponents));
 
-            foreach (var exclusion in this.exclusions)
+            // Create the exclusion type list.
+            var exclusions = new List<IList<string>>
+            {
+                new List<string> { "ModulePaths", "Exclude" },
+                new List<string> { "Attributes", "Exclude" },
+                new List<string> { "Sources", "Exclude" },
+                new List<string> { "Functions", "Exclude" }
+            };
+
+            foreach (var exclusion in exclusions)
             {
                 // Get the <Exclude> node for the current exclusion type. If unable to get any
                 // particular component down the path just add the default values for that
@@ -290,11 +136,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 var currentNode = this.SelectNodeOrAddDefaults(
                     currentCodeCoverageNode,
                     defaultCodeCoverageNode,
-                    exclusion.PathComponents);
+                    exclusion);
 
                 // Check if the node extraction was successful and we should process the current
                 // node in order to merge the current exclusion rules with the default ones.
-                if (currentNode == null || !this.ShouldProcessCurrentExclusion(currentNode))
+                if (currentNode == null)
                 {
                     continue;
                 }
@@ -302,15 +148,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // Extract the <Exclude> node from the default settings.
                 var defaultNode = this.ExtractNode(
                     defaultCodeCoverageNode,
-                    exclusion.Path);
+                    this.BuildPath(exclusion));
 
-                // Add nodes from both the current and the default settings to current exclusion
-                // type's exclusion rules.
-                this.AddNodes(defaultNode, exclusion);
-                this.AddNodes(currentNode, exclusion);
-
-                // Merge both the current and the default settings for the current exclusion rule.
-                this.MergeNodes(currentNode, exclusion);
+                // Merge the current and default settings for the current exclusion rule.
+                this.MergeNodes(currentNode, defaultNode);
             }
 
             return currentSettingsRootNode;
@@ -336,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private XmlNode SelectNodeOrAddDefaults(
             XmlNode currentRootNode,
             XmlNode defaultRootNode,
-            IEnumerable<string> pathComponents)
+            IList<string> pathComponents)
         {
             var currentNode = currentRootNode;
             var partialPath = new StringBuilder();
@@ -352,6 +193,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                 // Extract the node corresponding to the latest path component.
                 var tempNode = this.ExtractNode(currentNode, "." + currentPathComponent);
+
+                // Extraction is pruned here because we shouldn't be processing the current node.
+                if (tempNode != null && !this.ShouldProcessCurrentExclusion(tempNode))
+                {
+                    return null;
+                }
 
                 // If the current node extraction is unsuccessful then add the corresponding
                 // default settings node and bail out.
@@ -387,17 +234,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private bool ShouldProcessCurrentExclusion(XmlNode node)
         {
             const string attributeName = "mergeDefaults";
-            const string attributeValue = "false";
 
             foreach (XmlAttribute attribute in node.Attributes)
             {
-                if (attribute.Name == attributeName && attribute.Value == attributeValue)
+                // If the attribute is present and set on 'false' we skip processing for the
+                // current exclusion.
+                if (attribute.Name == attributeName
+                    && bool.TryParse(attribute.Value, out var value)
+                    && !value)
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Assembles a relative path from the path given as components.
+        /// </summary>
+        /// 
+        /// <returns>A relative path built from path components.</returns>
+        private string BuildPath(IList<string> pathComponents)
+        {
+            return string.Join("/", new[] { "." }.Concat(pathComponents));
         }
 
         /// <summary>
@@ -425,59 +285,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Adds all children nodes of the current root to the current exclusion type's exclusion
-        /// rules cache.
-        /// </summary>
-        /// 
-        /// <param name="node">The root node.</param>
-        /// <param name="exclusion">The exclusion rule.</param>
-        private void AddNodes(XmlNode node, Exclusion exclusion)
-        {
-            foreach (XmlNode child in node.ChildNodes)
-            {
-                var key = child.OuterXml;
-
-                // Ignore keys that are already present in the current exclusion type's exclusion
-                // rules cache.
-                if (exclusion.ExclusionRules.ContainsKey(key))
-                {
-                    continue;
-                }
-
-                // Add the current exclusion rule to the exclusion type's cache.
-                exclusion.ExclusionRules.Add(key, child);
-            }
-        }
-
-        /// <summary>
         /// Merges the current settings rules with the default settings rules.
         /// </summary>
         /// 
-        /// <param name="node">The root node.</param>
-        /// <param name="exclusion">The exclusion rule.</param>
-        private void MergeNodes(XmlNode node, Exclusion exclusion)
+        /// <param name="currentNode">The current settings root node.</param>
+        /// <param name="defaultNode">The default settings root node.</param>
+        private void MergeNodes(XmlNode currentNode, XmlNode defaultNode)
         {
-            // Iterate through all the children nodes of the given root.
-            foreach (XmlNode child in node.ChildNodes)
+            var exclusionCache = new HashSet<string>();
+
+            // Add current exclusions to the exclusion cache.
+            foreach (XmlNode child in currentNode.ChildNodes)
             {
-                if (!exclusion.ExclusionRules.ContainsKey(child.OuterXml))
+                exclusionCache.Add(child.OuterXml);
+            }
+
+            // Iterate through default exclusions and import missing ones.
+            foreach (XmlNode child in defaultNode.ChildNodes)
+            {
+                if (exclusionCache.Contains(child.OuterXml))
                 {
                     continue;
                 }
 
-                // Remove exclusion rule from the current exclusion type's cache.
-                exclusion.ExclusionRules.Remove(child.OuterXml);
+                // Import missing default exclusions.
+                var importedChild = currentNode.OwnerDocument.ImportNode(child, true);
+                currentNode.AppendChild(importedChild);
             }
-
-            // Iterate through remaining items in the current exclusion type cache.
-            foreach (var child in exclusion.ExclusionRules.Values)
-            {
-                // Import any remaining items in the current settings document.
-                var importedChild = node.OwnerDocument.ImportNode(child, true);
-                node.AppendChild(importedChild);
-            }
-
-            exclusion.ExclusionRules.Clear();
         }
         #endregion
     }
