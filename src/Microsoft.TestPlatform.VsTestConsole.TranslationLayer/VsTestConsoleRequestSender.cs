@@ -389,6 +389,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.SendMessageAndListenAndReportAttachements(attachments, testSessionEventsHandler);
         }
 
+        /// <inheritdoc/>
+        public void CancelMultiTestRunsFinalization()
+        {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.CancelMultiTestRunsFinalization: Canceling multi test runs finalization.");
+            }
+            this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationCancel);
+        }
+
         /// <summary>
         /// Closes the communication channel
         /// </summary>
@@ -739,7 +749,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     Attachments = attachments
                 };
-                this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalization, payload);
+                this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationStart, payload);
                 var isMultiTestRunsFinalizationComplete = false;
 
                 // Cycle through the messages that the vstest.console sends.

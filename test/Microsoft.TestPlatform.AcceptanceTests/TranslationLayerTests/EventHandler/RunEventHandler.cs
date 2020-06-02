@@ -75,9 +75,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 this.TestResults.AddRange(lastChunkArgs.NewTestResults);
             }
 
-            if(runContextAttachments != null)
+            if (testRunCompleteArgs.AttachmentSets != null)
             {
-                this.Attachments.AddRange(runContextAttachments);
+                this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
             }
 
             this.Metrics = testRunCompleteArgs.Metrics;

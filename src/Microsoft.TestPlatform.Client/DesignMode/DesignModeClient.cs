@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.MultiTestRunsFinalization:
+                        case MessageType.MultiTestRunsFinalizationStart:
                             {
                                 var multiTestRunsFinalizationPayload =
                                     this.communicationManager.DeserializePayload<MultiTestRunsFinalizationPayload>(message);

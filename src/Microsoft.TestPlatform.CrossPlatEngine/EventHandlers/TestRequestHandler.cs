@@ -375,7 +375,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
                     }
 
-                case MessageType.MultiTestRunsFinalization:
+                case MessageType.MultiTestRunsFinalizationStart:
                     {
                         EqtTrace.Info("Multi test runs finalization started.");
                         var multiTestRunsFinalizationEventsHandler = new MultiTestRunsFinalizationEventsHandler(this);

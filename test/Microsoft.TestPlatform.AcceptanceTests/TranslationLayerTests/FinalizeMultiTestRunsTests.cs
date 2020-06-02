@@ -39,47 +39,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.vstestConsoleWrapper?.EndSession();
         }
 
-        //[TestMethod]
-        //[NetFullTargetFrameworkDataSource]
-        //[NetCoreTargetFrameworkDataSource]
-        //public void RunAllTests(RunnerInfo runnerInfo)
-        //{
-        //    AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-        //    this.Setup();
-
-        //    this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
-        //    this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
-
-        //    // Assert
-        //    Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-        //    Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
-        //    Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        //    Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        //    Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-
-        //    this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
-        //    Assert.AreEqual(1, this.multiTestRunsFinalizationEventHandler.Attachments.Count);
-        //}
-
         [TestMethod]
-        public void RunAllTests()
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void FinalizeMultiTestRuns(RunnerInfo runnerInfo)
         {
-            RunnerInfo runnerInfo = new RunnerInfo(AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.DesktopTargetFramework);
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
-            //this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
+            
+            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
+
+            this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
 
             // Assert
-            Assert.AreEqual(3, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.Attachments.Count);
-            //Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            //Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            //Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-
-            //this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
-            //Assert.AreEqual(1, this.multiTestRunsFinalizationEventHandler.Attachments.Count);
+            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.multiTestRunsFinalizationEventHandler.Attachments.Count);
         }
 
         [TestMethod]
@@ -92,7 +69,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(), this.runEventHandler);
+
+            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
+
+            this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
             this.vstestConsoleWrapper?.EndSession();
 
             // Assert

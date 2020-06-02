@@ -19,5 +19,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="attachments">List of attachements</param>
         /// <param name="multiTestRunsFinalizationCompleteEventsHandler">EventHandler to receive session complete event</param>
         void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler multiTestRunsFinalizationCompleteEventsHandler);
+
+        /// <summary>
+        /// Cancel last multi test runs finalization
+        /// </summary>
+        void CancelMultiTestRunsFinalization();
     }
 }
