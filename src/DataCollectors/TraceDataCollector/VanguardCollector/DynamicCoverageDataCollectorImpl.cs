@@ -110,8 +110,22 @@ namespace Microsoft.VisualStudio.Coverage
         {
             var defaultConfigurationElement = DynamicCoverageDataCollectorImpl.GetDefaultConfiguration();
 
-            var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
-            configurationElement = (XmlElement)processor.Process(configurationElement);
+            try
+            {
+                var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
+                configurationElement = (XmlElement)processor.Process(configurationElement);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        string.Join(
+                            " ",
+                            "DynamicCoverageDataCollectorImpl.Initialize: Exception encountered while processing the configuration element.",
+                            "Keeping the configuration element unaltered. More info about the exception: {0}"),
+                        ex.Message));
+            }
 
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
             if (string.IsNullOrEmpty(configurationElement?.InnerXml))
