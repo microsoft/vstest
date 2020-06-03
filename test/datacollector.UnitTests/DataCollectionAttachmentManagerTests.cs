@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.ComponentModel;
     using System.IO;
     using System.Threading;
+    using System.Security.AccessControl;
+
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -72,18 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             Assert.AreEqual(Path.Combine(TempDirectoryPath, this.sessionId.Id.ToString()), this.attachmentManager.SessionOutputDirectory);
         }
-
-        [TestMethod]
-        public void InitializeShouldNotCreateDirectoryIfNotHaveAccessToFolder()
-        {
-            string tempDirectoryPath = Environment.SystemDirectory;
-            
-            Assert.ThrowsException<UnauthorizedAccessException>(() =>
-            {
-                this.attachmentManager.Initialize(this.sessionId, tempDirectoryPath, this.messageSink.Object);
-            });   
-        }
-
+        
         [TestMethod]
         public void AddAttachmentShouldNotAddNewFileTransferIfSessionIsNotConfigured()
         {

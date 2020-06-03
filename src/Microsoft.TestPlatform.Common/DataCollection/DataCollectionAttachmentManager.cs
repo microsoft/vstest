@@ -126,10 +126,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     Directory.CreateDirectory(this.SessionOutputDirectory);
                 }
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException accessException)
             {
-                string currentFolderPath = Directory.GetParent(outputDirectory).FullName;
-                string accessDeniedMessage = string.Format(CultureInfo.CurrentCulture, Resources.Resources.AccessDenied, currentFolderPath);
+                string accessDeniedMessage = string.Format(CultureInfo.CurrentCulture, Resources.Resources.AccessDenied, accessException.Message);
                 ConsoleOutput.Instance.Error(false, accessDeniedMessage);
                 throw;
             }
