@@ -61,6 +61,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied while trying to create &quot;TestResults&quot; folder in {0} location. You are getting this exception because you are running vstest.console.exe from a folder which requires administrator rights. To solve the issue : please open command line &quot;As Administrator&quot; or run vstest.console.exe from a folder where you have admin privileges. For more information, please look at the error message :.
+        /// </summary>
+        internal static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancelling the operation as requested..
         /// </summary>
         internal static string CancellationRequested {

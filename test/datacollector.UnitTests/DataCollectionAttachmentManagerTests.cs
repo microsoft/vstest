@@ -74,6 +74,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
+        public void InitializeShouldNotCreateDirectoryIfNotHaveAccessToFolder()
+        {
+            string tempDirectoryPath = Environment.SystemDirectory;
+            
+            Assert.ThrowsException<UnauthorizedAccessException>(() =>
+            {
+                this.attachmentManager.Initialize(this.sessionId, tempDirectoryPath, this.messageSink.Object);
+            });   
+        }
+
+        [TestMethod]
         public void AddAttachmentShouldNotAddNewFileTransferIfSessionIsNotConfigured()
         {
             var filename = "filename.txt";
