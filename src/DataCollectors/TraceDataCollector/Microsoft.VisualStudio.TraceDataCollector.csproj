@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
+    <ProjectReference Include="..\..\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Internal.CodeCoverage">

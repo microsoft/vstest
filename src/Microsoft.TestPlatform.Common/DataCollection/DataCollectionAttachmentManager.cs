@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
@@ -117,11 +118,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 this.SessionOutputDirectory = Path.Combine(absolutePath, id.Id.ToString());
             }
 
-            // Create the output directory if it doesn't exist.
-            if (!Directory.Exists(this.SessionOutputDirectory))
+            try
             {
-                Directory.CreateDirectory(this.SessionOutputDirectory);
+                // Create the output directory if it doesn't exist.
+                if (!Directory.Exists(this.SessionOutputDirectory))
+                {
+                    Directory.CreateDirectory(this.SessionOutputDirectory);
+                }
             }
+            catch (UnauthorizedAccessException accessException)
+            {
+                string accessDeniedMessage = string.Format(CultureInfo.CurrentCulture, Resources.Resources.AccessDenied, accessException.Message);
+                ConsoleOutput.Instance.Error(false, accessDeniedMessage);
+                throw;
+            }
+
         }
 
         /// <inheritdoc/>

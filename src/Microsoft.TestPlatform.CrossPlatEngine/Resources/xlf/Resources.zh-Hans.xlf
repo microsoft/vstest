@@ -209,7 +209,7 @@
       </trans-unit>
       <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
         <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
-        <target state="new">Cannot attach the debugger to the default test host with process ID: {0}.</target>
+        <target state="translated">无法将调试程序附加到进程 ID 为“{0}”的默认测试主机。</target>
         <note></note>
       </trans-unit>
     </body>

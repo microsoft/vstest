@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
@@ -85,9 +86,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldInitializeVanguardWithRightCoverageSettings()
         {
-            var expectedContent = "<CodeCoverage>CoverageSettingsContent</CodeCoverage>";
             XmlElement configElement =
-                DynamicCoverageDataCollectorImplTests.CreateXmlElement($"<Configuration>{expectedContent}</Configuration>");
+                DynamicCoverageDataCollectorImplTests.CreateXmlElement(@"<Configuration><CodeCoverage></CodeCoverage></Configuration>");
 
             this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>()))
                 .Callback<string>((path) =>
@@ -101,8 +101,20 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
             this.collectorImpl.Initialize(configElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
 
+            XmlDocument defaultDocument = new XmlDocument();
+            defaultDocument.LoadXml(DynamicCoverageDataCollectorImplTests.GetDefaultCodeCoverageConfig());
+
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
-            Assert.AreEqual(expectedContent, File.ReadAllText(this.aConfigFileName));
+
+            XmlDocument currentDocument = new XmlDocument();
+            currentDocument.LoadXml(File.ReadAllText(this.aConfigFileName));
+
+            var codeCoverageNodes = new Tuple<XmlNode, XmlNode>(currentDocument.DocumentElement, defaultDocument.DocumentElement);
+
+            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./ModulePaths/Exclude");
+            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Functions/Exclude");
+            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Attributes/Exclude");
+            this.CompareResults(codeCoverageNodes.Item1, codeCoverageNodes.Item2, "./Sources/Exclude");
         }
 
         [TestMethod]
@@ -372,6 +384,58 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 DynamicCoverageDataCollectorImplTests.GetDefaultCodeCoverageConfig().Replace(" ", string.Empty)
                     .Replace(Environment.NewLine, string.Empty),
                 File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
+        }
+
+        private XmlNode ExtractNode(XmlNode node, string path)
+        {
+            try
+            {
+                return node.SelectSingleNode(path);
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
+
+        private Tuple<XmlNode, XmlNode> ExtractNodes(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
+        {
+            var currentNode = this.ExtractNode(currentSettingsRoot, path);
+            var defaultNode = this.ExtractNode(defaultSettingsRoot, path);
+            Assert.IsNotNull(currentNode);
+            Assert.IsNotNull(defaultNode);
+
+            return new Tuple<XmlNode, XmlNode>(currentNode, defaultNode);
+        }
+
+        private void CompareResults(XmlNode currentSettingsRoot, XmlNode defaultSettingsRoot, string path)
+        {
+            var nodes = this.ExtractNodes(currentSettingsRoot, defaultSettingsRoot, path);
+
+            Assert.AreEqual(nodes.Item1.ChildNodes.Count, nodes.Item2.ChildNodes.Count);
+
+            var set = new HashSet<string>();
+            foreach (XmlNode child in nodes.Item1.ChildNodes)
+            {
+                if (!set.Contains(child.OuterXml))
+                {
+                    set.Add(child.OuterXml);
+                }
+            }
+
+            foreach (XmlNode child in nodes.Item2.ChildNodes)
+            {
+                if (!set.Contains(child.OuterXml))
+                {
+                    set.Add(child.OuterXml);
+                    continue;
+                }
+
+                set.Remove(child.OuterXml);
+            }
+
+            Assert.AreEqual(set.Count, 0);
         }
 
         #endregion
