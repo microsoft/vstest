@@ -50,11 +50,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             Assert.IsNotNull(mockOutput.Messages.First().Message, "First Printed Message cannot be null or empty");
 
             // Just check first 20 characters - don't need to check whole thing as assembly version is variable
-            Assert.IsTrue(
-                mockOutput.Messages.First()
-                    .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
-                "First Printed message must be Microsoft Copyright");
-
+            // "First Printed message must be Microsoft Copyright");
+            StringAssert.Contains(mockOutput.Messages.First()
+                    .Message, CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20));
+            
             Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(assemblyVersion));
         }
 
