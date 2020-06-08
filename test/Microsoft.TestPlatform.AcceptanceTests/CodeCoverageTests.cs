@@ -55,6 +55,34 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.CollectCodeCoverage(runnerInfo, "x64", withRunsettings: true);
         }
 
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CodeCoverageShouldAvoidExclusionsX86(RunnerInfo runnerInfo)
+        {
+            const string assemblyName = "CodeCoverageTest.dll";
+
+            var runSettingsPath = Path.Combine(
+                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                @"scripts\vstest-codecoverage2.runsettings");
+
+            this.CollectCodeCoverage(runnerInfo, "x86", assemblyName, runSettingsPath);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CodeCoverageShouldAvoidExclusionsX64(RunnerInfo runnerInfo)
+        {
+            const string assemblyName = "CodeCoverageTest.dll";
+
+            var runSettingsPath = Path.Combine(
+                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                @"scripts\vstest-codecoverage2.runsettings");
+
+            this.CollectCodeCoverage(runnerInfo, "x64", assemblyName, runSettingsPath);
+        }
+
         private void CollectCodeCoverage(RunnerInfo runnerInfo, string targetPlatform, bool withRunsettings)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -76,12 +104,54 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Directory.Delete(this.resultsDirectory, true);
         }
 
-        private string CreateArguments(RunnerInfo runnerInfo, string targetPlatform, bool withRunsettings,
+        private void CollectCodeCoverage(
+            RunnerInfo runnerInfo,
+            string targetPlatform,
+            string assemblyName,
+            string runSettings)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = CreateArguments(runnerInfo, targetPlatform, assemblyName, runSettings, out var trxFilePath);
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 1);
+
+            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
+            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
+            Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
+
+            // Microsoft.VisualStudio.Coverage.Analysis assembly not available for .NET Core.
+#if NET451
+            this.ValidateCoverageData(actualCoverageFile);
+#endif
+            Directory.Delete(this.resultsDirectory, true);
+        }
+
+        private string CreateArguments(
+            RunnerInfo runnerInfo,
+            string targetPlatform,
+            bool withRunsettings,
+            out string trxFilePath)
+        {
+            var runSettingsPath = Path.Combine(
+                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                @"scripts\vstest-codecoverage.runsettings");
+
+            var runSettings = (withRunsettings) ? $" /settings:{runSettingsPath}" : $" /collect:\"Code Coverage\"";
+
+            return this.CreateArguments(runnerInfo, targetPlatform, this.assemblyName, runSettings, out trxFilePath);
+        }
+
+        private string CreateArguments(
+            RunnerInfo runnerInfo,
+            string targetPlatform,
+            string assemblyName,
+            string runSettings,
             out string trxFilePath)
         {
             var assemblyPaths = this.GetAssetFullPath(assemblyName);
-            string runSettings = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"scripts\vstest-codecoverage.runsettings");
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
@@ -96,15 +166,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
-            if (withRunsettings)
-            {
-                arguments = string.Concat(arguments, $" /settings:{runSettings}");
-            }
-            else
-            {
-                // With /collect:"Code Coverage" option.
-                arguments = string.Concat(arguments, $" /collect:\"Code Coverage\"");
-            }
+            arguments = string.Concat(arguments, runSettings);
 
             return arguments;
         }
