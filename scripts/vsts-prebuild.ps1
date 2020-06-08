@@ -1,13 +1,13 @@
 # Sets variables which are used across the build tasks.
 
-
-
-[Parameter(Mandatory)] 
-[string] $BuildSuffix
-[Parameter(Mandatory)] 
-[string] $IsRtmBuild
-[Parameter(Mandatory)] 
-$Branch
+param ( 
+  [Parameter(Mandatory)] 
+  [string] $BuildSuffix,
+  [Parameter(Mandatory)] 
+  [string] $IsRtmBuild,
+  [Parameter(Mandatory)] 
+  $Branch
+)
 
 $TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
 
