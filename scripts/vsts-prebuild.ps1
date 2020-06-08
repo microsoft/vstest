@@ -17,7 +17,7 @@ $buildPrefix = $TpVersion.Trim()
 
 if ($IsRtmBuild.ToLower() -eq "false") 
 { 
-  if ($null -ne $Branch -and $Branch -like "rel/*")
+  if ($null -ne $Branch -and $Branch -like "refs/heads/rel/*")
   { 
     $BuildSuffix -replace "preview", "release"
   }
