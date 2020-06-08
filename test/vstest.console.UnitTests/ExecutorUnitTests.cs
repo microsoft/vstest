@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System;
 
     [TestClass]
     public class ExecutorUnitTests
@@ -51,10 +52,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 
             // Just check first 20 characters - don't need to check whole thing as assembly version is variable
             // "First Printed message must be Microsoft Copyright");
-            StringAssert.Contains(mockOutput.Messages.First()
-                    .Message, CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20));
-            
-            Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(assemblyVersion));
+            StringAssert.Contains(mockOutput.Messages.First().Message, 
+                CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20));
+
+            var suffixIndex = assemblyVersion.IndexOf("-");
+            var version = suffixIndex == -1 ? assemblyVersion : assemblyVersion.Substring(0, suffixIndex);
+            StringAssert.Contains(mockOutput.Messages.First().Message, 
+                version);
         }
 
         [TestMethod]
