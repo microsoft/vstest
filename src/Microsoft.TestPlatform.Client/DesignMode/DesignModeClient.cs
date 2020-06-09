@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             {
                                 var multiTestRunsFinalizationPayload =
                                     this.communicationManager.DeserializePayload<MultiTestRunsFinalizationPayload>(message);
-                                this.FinalizeMultiTestRuns(multiTestRunsFinalizationPayload);
+                                this.FinalizeMultiTestRuns(multiTestRunsFinalizationPayload, testRequestManager);
                                 break;
                             }
 
@@ -468,7 +468,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
         }
 
-        private void FinalizeMultiTestRuns(MultiTestRunsFinalizationPayload finalizationPayload)
+        private void FinalizeMultiTestRuns(MultiTestRunsFinalizationPayload finalizationPayload, ITestRequestManager testRequestManager)
         {
             lock(this.lockObject)
             {
