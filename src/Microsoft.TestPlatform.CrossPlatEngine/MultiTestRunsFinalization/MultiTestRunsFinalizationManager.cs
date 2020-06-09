@@ -34,5 +34,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinal
             attachmentsHandler.HandleAttachements(attachments);
             eventHandler.HandleMultiTestRunsFinalizationComplete(attachments);
         }
+
+        /// <summary>
+        /// Aborts multi test runs finalization
+        /// </summary>
+        public void Abort()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

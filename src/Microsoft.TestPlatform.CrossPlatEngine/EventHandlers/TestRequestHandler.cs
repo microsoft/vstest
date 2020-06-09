@@ -375,24 +375,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
                     }
 
-                case MessageType.MultiTestRunsFinalizationStart:
-                    {
-                        EqtTrace.Info("Multi test runs finalization started.");
-                        var multiTestRunsFinalizationEventsHandler = new MultiTestRunsFinalizationEventsHandler(this);
-                        var multiTestRunsFinalizationManager = new MultiTestRunsFinalizationManager(new MultiTestRunsDataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler()));
-                        var multiTestRunsFinalizationPayload = this.dataSerializer.DeserializePayload<MultiTestRunsFinalizationPayload>(message);
-
-                        jobQueue.QueueJob(
-                                () =>
-                                multiTestRunsFinalizationManager
-                                .FinalizeMultiTestRuns(
-                                    multiTestRunsFinalizationPayload.Attachments,
-                                    multiTestRunsFinalizationEventsHandler),
-                                0);
-
-                        break;
-                    }
-
                 case MessageType.CancelTestRun:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();

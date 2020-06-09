@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             {
                                 var multiTestRunsFinalizationPayload =
                                     this.communicationManager.DeserializePayload<MultiTestRunsFinalizationPayload>(message);
-                                this.FinalizeMultiTestRuns(multiTestRunsFinalizationPayload, testRequestManager);
+                                this.StartMultiTestRunsFinalization(multiTestRunsFinalizationPayload, testRequestManager);
                                 break;
                             }
 
@@ -468,39 +468,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
         }
 
-        private void FinalizeMultiTestRuns(MultiTestRunsFinalizationPayload finalizationPayload, ITestRequestManager testRequestManager)
+        private void StartMultiTestRunsFinalization(MultiTestRunsFinalizationPayload finalizationPayload, ITestRequestManager testRequestManager)
         {
-            lock(this.lockObject)
-            {
-                try
+            Task.Run(
+                delegate
                 {
-                    var handler = new MultiTestRunsDataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler());
-                    handler.HandleAttachements(finalizationPayload.Attachments);
-
-                    var payload = new MultiTestRunsFinalizationCompletePayload()
+                    try
                     {
-                        Attachments = finalizationPayload.Attachments
-                    };
-
-                    // Send run complete to translation layer
-                    this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
-                }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
-
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                    this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-
-                    var payload = new MultiTestRunsFinalizationCompletePayload()
+                        testRequestManager.ResetOptions();
+                        testRequestManager.FinalizeMultiTestRuns(finalizationPayload);
+                    }
+                    catch (Exception ex)
                     {
-                        Attachments = null
-                    };
+                        EqtTrace.Error("DesignModeClient: Exception in StartMultiTestRunsFinalization: " + ex);
 
-                    // Send run complete to translation layer
-                    this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
-                }
-            }
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                        var payload = new MultiTestRunsFinalizationCompletePayload()
+                        {
+                            Attachments = null
+                        };
+
+                        // Send run complete to translation layer
+                        this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
+                    }
+                });
         }
 
         #region IDisposable Support

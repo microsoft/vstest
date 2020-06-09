@@ -62,6 +62,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private IDiscoveryRequest currentDiscoveryRequest;
 
+        /// <summary>
+        /// Maintains the current active multi test runs finalization request
+        /// Assumption : There can only be one active discovery request.
+        /// </summary>
+        private IMultiTestRunsFinalizationRequest currentMultiTestRunsFinalizationRequest;
+
         #region Constructor
 
         public TestRequestManager()
@@ -160,9 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 // Collect Commands
                 this.LogCommandsTelemetryPoints(requestData);
             }
-
-            
-
+           
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
             {
@@ -301,6 +305,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
+        /// <summary>
+        /// Discover Tests given a list of sources, run settings.
+        /// </summary>
+        /// <param name="discoveryPayload">Discovery payload</param>
+        /// <param name="discoveryEventsRegistrar">EventHandler for discovered tests</param>
+        /// <param name="protocolConfig">Protocol related information</param>
+        /// <returns>True, if successful</returns>
+        public void FinalizeMultiTestRuns(MultiTestRunsFinalizationPayload multiTestRunsFinalizationPayload)
+        {
+            EqtTrace.Info("TestRequestManager.FinalizeMultiTestRuns: Multi test runs finalization started.");
+
+            // Make sure to run the run request inside a lock as the below section is not thread-safe
+            // There can be only one discovery, execution or finalization request at a given point in time
+            lock (this.syncObject)
+            {
+                try
+                {
+                    EqtTrace.Info("TestRequestManager.FinalizeMultiTestRuns: Synchronization context taken");
+
+                    this.currentMultiTestRunsFinalizationRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, discoveryPayload.TestPlatformOptions);
+                    this.currentMultiTestRunsFinalizationRequest.FinalizeMultiTestRunsAsync();
+                    this.currentMultiTestRunsFinalizationRequest.WaitForCompletion();
+                }
+                finally
+                {
+                    if (this.currentMultiTestRunsFinalizationRequest != null)
+                    {
+                        this.currentMultiTestRunsFinalizationRequest.Dispose();
+                        this.currentMultiTestRunsFinalizationRequest = null;
+                    }
+
+                    EqtTrace.Info("TestRequestManager.FinalizeMultiTestRuns: Multi test runs finalization completed.");
+                    this.testPlatformEventSource.MultiTestRunsFinalizationRequestStop();
+                }
+            }
+        }
+
         private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
@@ -331,6 +372,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
             this.currentDiscoveryRequest?.Abort();
+        }
+
+        /// <summary>
+        /// Cancel the multi test runs finalization.
+        /// </summary>
+        public void CancelMultiTestRunsFinalization()
+        {
+            EqtTrace.Info("TestRequestManager.CancelMultiTestRunsFinalization: Sending cancel request.");
+            this.currentMultiTestRunsFinalizationRequest?.Abort();
         }
 
         /// <summary>
