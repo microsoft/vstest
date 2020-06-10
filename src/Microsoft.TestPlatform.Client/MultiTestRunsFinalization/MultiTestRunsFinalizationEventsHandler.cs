@@ -1,29 +1,29 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers
+namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunsFinalization
 {
-    using System.Collections.Generic;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using System.Collections.Generic;
 
     /// <summary>
     /// The multi test finalization event handler.
     /// </summary>
     public class MultiTestRunsFinalizationEventsHandler : IMultiTestRunsFinalizationEventsHandler
     {
-        private ITestRequestHandler requestHandler;
+        private ICommunicationManager communicationManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiTestRunsFinalizationEventsHandler"/> class.
         /// </summary>
         /// <param name="requestHandler"> The Request Handler. </param>
-        public MultiTestRunsFinalizationEventsHandler(ITestRequestHandler requestHandler)
+        public MultiTestRunsFinalizationEventsHandler(ICommunicationManager communicationManager)
         {
-            this.requestHandler = requestHandler;
+            this.communicationManager = communicationManager;
         }
 
         /// <summary>
@@ -33,26 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// <param name="message"> Logging message. </param>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            switch ((TestMessageLevel)level)
-            {
-                case TestMessageLevel.Informational:
-                    EqtTrace.Info(message);
-                    break;
-
-                case TestMessageLevel.Warning:
-                    EqtTrace.Warning(message);
-                    break;
-
-                case TestMessageLevel.Error:
-                    EqtTrace.Error(message);
-                    break;
-
-                default:
-                    EqtTrace.Info(message);
-                    break;
-            }
-
-            this.requestHandler.SendLog(level, message);
+            var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
+            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
         }
 
         public void HandleMultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments)
@@ -62,13 +44,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
                 EqtTrace.Info("Multi test runs finalization completed.");
             }
 
-            this.requestHandler.MultiTestRunsFinalizationComplete(attachments);
+            var payload = new MultiTestRunsFinalizationCompletePayload()
+            {
+                Attachments = null
+            };
+
+            // Send run complete to translation layer
+            this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
         }
 
         public void HandleRawMessage(string rawMessage)
         {
             // No-Op
-            // TestHost at this point has no functionality where it requires rawmessage
         }
     }
 }

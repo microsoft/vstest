@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
@@ -19,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectorAttachmentsHandler = dataCollectorAttachmentsHandler;
         }
 
-        public void HandleAttachements(ICollection<AttachmentSet> attachments)
+        public void HandleAttachements(ICollection<AttachmentSet> attachments, CancellationToken cancellationToken)
         {
             Uri attachementUri = dataCollectorAttachmentsHandler.GetExtensionUri();
             if (attachementUri != null)
@@ -31,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     attachments.Remove(coverageAttachment);
                 }
 
-                ICollection<AttachmentSet> mergedAttachments = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments));
+                ICollection<AttachmentSet> mergedAttachments = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments), cancellationToken);
                 foreach (var attachment in mergedAttachments)
                 {
                     attachments.Add(attachment);

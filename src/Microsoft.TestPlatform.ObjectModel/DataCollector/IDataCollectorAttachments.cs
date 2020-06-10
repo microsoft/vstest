@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     /// <summary>
     /// Interface for data collectors add-ins that choose to handle attachment(s) generated
@@ -15,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Gets the attachment set after Test Run Session
         /// </summary>
         /// <returns>Gets the attachment set after Test Run Session</returns>
-        ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments);
+        ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the attachment Uri, which is handled by current Collector

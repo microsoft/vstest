@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -30,12 +31,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return CodeCoverageDataCollectorUri;
         }
 
-        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
+        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, CancellationToken cancellationToken)
         {
             if (dataCollectionAttachments != null && dataCollectionAttachments.Any())
             {
                 var codeCoverageFiles = dataCollectionAttachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
-                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles);
+                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles, cancellationToken);
                 var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
                 if (!string.IsNullOrEmpty(outputFile))
@@ -51,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return new Collection<AttachmentSet>();
         }
 
-        private string MergeCodeCoverageFiles(IList<string> files)
+        private string MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
         {
             string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
             string outputfileName = files[0];
@@ -61,6 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
                 var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
 
@@ -70,9 +72,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 {
                     for (int i = 1; i < files.Count; i++)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         methodInfo.Invoke(null, new object[] { files[i], outputfileName, fileName, true });
-                        File.Copy(fileName, outputfileName, true);
 
+                        cancellationToken.ThrowIfCancellationRequested();
+                        File.Copy(fileName, outputfileName, true);
+                        
+                        cancellationToken.ThrowIfCancellationRequested();
                         File.Delete(files[i]);
                     }
 
@@ -80,6 +86,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
 
                 return outputfileName;
+            }
+            catch (OperationCanceledException)
+            {
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("CodeCoverageDataCollectorAttachmentsHandler: operation was cancelled.");
+                }
+                throw;
+            }
+            catch (ObjectDisposedException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

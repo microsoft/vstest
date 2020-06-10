@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -29,18 +32,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinal
         /// </summary>
         /// <param name="attachments">Attachments</param>
         /// <param name="eventHandler">EventHandler for handling multi test runs finalization events from Engine</param>
-        public void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public async Task FinalizeMultiTestRunsAsync(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
         {
-            attachmentsHandler.HandleAttachements(attachments);
-            eventHandler.HandleMultiTestRunsFinalizationComplete(attachments);
-        }
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-        /// <summary>
-        /// Aborts multi test runs finalization
-        /// </summary>
-        public void Abort()
-        {
-            throw new System.NotImplementedException();
+                var taskCompletionSource = new TaskCompletionSource<object>();
+                cancellationToken.Register(() =>
+                {
+                    taskCompletionSource.TrySetCanceled();
+                });
+
+                Task task = Task.Run(() =>
+                {
+                    attachmentsHandler.HandleAttachements(attachments, cancellationToken);
+                    eventHandler.HandleMultiTestRunsFinalizationComplete(attachments);
+                });
+
+                var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
+
+                if (completedTask == task)
+                {
+                    eventHandler.HandleMultiTestRunsFinalizationComplete(attachments);
+                }
+                else
+                {
+                    eventHandler.HandleMultiTestRunsFinalizationComplete(null);
+                }
+            }
+            catch (Exception e)
+            {
+                EqtTrace.Error("MultiTestRunsFinalizationManager: Exception in FinalizeMultiTestRunsAsync: " + e);
+
+                eventHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
+                eventHandler.HandleMultiTestRunsFinalizationComplete(null);
+            }
+
         }
     }
 }

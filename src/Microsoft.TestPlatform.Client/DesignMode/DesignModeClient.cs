@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunsFinalization;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -476,7 +476,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     try
                     {
                         testRequestManager.ResetOptions();
-                        testRequestManager.FinalizeMultiTestRuns(finalizationPayload);
+                        testRequestManager.FinalizeMultiTestRuns(finalizationPayload, new MultiTestRunsFinalizationEventsHandler(this.communicationManager));
                     }
                     catch (Exception ex)
                     {

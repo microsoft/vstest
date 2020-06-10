@@ -35,8 +35,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using vstest.console.UnitTests.TestDoubles;
 	using Microsoft.VisualStudio.TestPlatform.Utilities;
 	using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-	[TestClass]
+    [TestClass]
 	public class TestRequestManagerTests
 	{
 		private DummyLoggerEvents mockLoggerEvents;
@@ -55,6 +56,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		private Task<IMetricsPublisher> mockMetricsPublisherTask;
 		private Mock<IMetricsPublisher> mockMetricsPublisher;
 		private Mock<IProcessHelper> mockProcessHelper;
+		private Mock<IMultiTestRunsFinalizationManager> mockFinalizationManager;
 
 		private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
 				<RunSettings>
@@ -86,7 +88,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 			this.mockMetricsCollection = new Mock<IMetricsCollection>();
 			this.mockRequestData = new Mock<IRequestData>();
 			this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
@@ -100,6 +103,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				.Returns(new FrameworkName(Constants.DotNetFramework40));
 			this.mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
 			this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
+			this.mockFinalizationManager = new Mock<IMultiTestRunsFinalizationManager>();
 		}
 
 		[TestCleanup]
@@ -122,7 +126,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 new Mock<ITestPlatformEventSource>().Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                this.mockProcessHelper.Object);
+                this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
 		}
@@ -203,8 +208,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				TestRunResultAggregator.Instance,
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
-			this.mockMetricsPublisherTask,
-			this.mockProcessHelper.Object);
+				this.mockMetricsPublisherTask,
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
 
@@ -253,7 +259,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
@@ -300,7 +307,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 
 			// Act
@@ -349,7 +357,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 
 			// Act
@@ -392,7 +401,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 
 			// Act
@@ -435,7 +445,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 
 			// Act
@@ -478,7 +489,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			CommandLineOptions.Instance.Parallel = true;
 			CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -533,7 +545,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.testsettings";
 
@@ -580,7 +593,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.vsmdi";
 
@@ -627,7 +641,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.testrunConfig";
 
@@ -949,7 +964,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			CommandLineOptions.Instance.Parallel = true;
 			CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -1016,7 +1032,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                this.mockProcessHelper.Object);
+                this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
             // Act.
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1065,7 +1082,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			// Act.
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1112,7 +1130,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			// Act.
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1159,7 +1178,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockFinalizationManager.Object);
 
 			this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 

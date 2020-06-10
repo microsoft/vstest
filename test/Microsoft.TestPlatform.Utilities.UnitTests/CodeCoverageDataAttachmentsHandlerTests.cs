@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.ObjectModel;
+    using System.Threading;
 
     [TestClass]
     public class CodeCoverageDataAttachmentsHandlerTests
@@ -23,12 +24,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         {
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet>();
             ICollection<AttachmentSet> resultAttachmentSets =
-                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment);
+                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
 
-            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null);
+            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
@@ -41,7 +42,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var attachmentSet = new AttachmentSet(new Uri("//badrui//"), string.Empty);
 
             ICollection<AttachmentSet> resultAttachmentSets =
-                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment);
+                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);

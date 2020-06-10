@@ -3,6 +3,8 @@
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
@@ -16,11 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="attachments">Attachments</param>
         /// <param name="eventHandler">EventHandler for handling multi test runs finalization events from Engine</param>
-        void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler);
-
-        /// <summary>
-        /// Aborts multi test runs finalization
-        /// </summary>
-        void Abort();
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task FinalizeMultiTestRunsAsync(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
     }
 }
