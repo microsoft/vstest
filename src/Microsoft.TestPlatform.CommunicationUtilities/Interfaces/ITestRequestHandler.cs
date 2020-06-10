@@ -80,12 +80,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void DiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk);
 
         /// <summary>
-        /// The multi test runs finalization complete handler
-        /// </summary>
-        /// <param name="attachments">Attachments</param>
-        void MultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments);
-
-        /// <summary>
         /// Launches a process with a given process info under debugger
         /// Adapter get to call into this to launch any additional processes under debugger
         /// </summary>

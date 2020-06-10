@@ -11,9 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinalization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -191,19 +189,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
                         IsAborted = discoveryCompleteEventArgs.IsAborted,
                         Metrics = discoveryCompleteEventArgs.Metrics
-                    },
-                    this.protocolVersion);
-            this.SendData(data);
-        }
-
-        /// <inheritdoc />
-        public void MultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments)
-        {
-            var data = this.dataSerializer.SerializePayload(
-                    MessageType.MultiTestRunsFinalizationComplete,
-                    new MultiTestRunsFinalizationCompletePayload
-                    {
-                        Attachments = attachments
                     },
                     this.protocolVersion);
             this.SendData(data);

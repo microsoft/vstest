@@ -227,6 +227,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.MultiTestRunsFinalizationCancel:
+                            {
+                                testRequestManager.CancelMultiTestRunsFinalization();
+                                break;
+                            }
+
                         case MessageType.CustomTestHostLaunchCallback:
                             {
                                 this.onCustomTestHostLaunchAckReceived?.Invoke(message);
