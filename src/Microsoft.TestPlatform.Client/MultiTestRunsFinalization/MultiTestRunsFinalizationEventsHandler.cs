@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunsFinalization
 
             var payload = new MultiTestRunsFinalizationCompletePayload()
             {
-                Attachments = null
+                Attachments = attachments
             };
 
             // Send run complete to translation layer

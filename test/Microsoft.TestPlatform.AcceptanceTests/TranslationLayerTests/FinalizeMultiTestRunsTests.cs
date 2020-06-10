@@ -56,6 +56,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
 
             // Assert
+            multiTestRunsFinalizationEventHandler.EnsureSuccess();
             Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.multiTestRunsFinalizationEventHandler.Attachments.Count);
         }
 

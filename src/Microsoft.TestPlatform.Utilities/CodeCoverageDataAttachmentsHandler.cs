@@ -89,14 +89,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
             catch (OperationCanceledException)
             {
-                if (EqtTrace.IsInfoEnabled)
+                if (EqtTrace.IsWarningEnabled)
                 {
-                    EqtTrace.Info("CodeCoverageDataCollectorAttachmentsHandler: operation was cancelled.");
+                    EqtTrace.Warning("CodeCoverageDataCollectorAttachmentsHandler: operation was cancelled.");
                 }
                 throw;
             }
             catch (ObjectDisposedException)
             {
+                if (EqtTrace.IsWarningEnabled)
+                {
+                    EqtTrace.Warning("CodeCoverageDataCollectorAttachmentsHandler: object disposed.");
+                }
                 throw;
             }
             catch (Exception ex)

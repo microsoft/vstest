@@ -53,11 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinal
 
                 var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
 
-                if (completedTask == task)
-                {
-                    eventHandler.HandleMultiTestRunsFinalizationComplete(attachments);
-                }
-                else
+                if (completedTask != task)
                 {
                     eventHandler.HandleMultiTestRunsFinalizationComplete(null);
                 }
