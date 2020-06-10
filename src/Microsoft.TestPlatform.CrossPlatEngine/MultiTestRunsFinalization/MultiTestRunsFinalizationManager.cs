@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinalization
 {

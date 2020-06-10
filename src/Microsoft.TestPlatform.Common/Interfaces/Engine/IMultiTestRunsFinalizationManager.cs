@@ -4,10 +4,10 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using System.Collections.Generic;
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     /// <summary>
-    /// Orchestrates multi test runs finalization operations for the engine communicating with the test host process.
+    /// Orchestrates multi test runs finalization operations.
     /// </summary>
     public interface IMultiTestRunsFinalizationManager
     {

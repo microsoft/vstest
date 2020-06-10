@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using System;
 using System.Threading;
 
