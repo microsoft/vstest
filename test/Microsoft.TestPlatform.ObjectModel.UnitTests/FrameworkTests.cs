@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var fx = Framework.FromString("net472");
             Assert.AreEqual(".NETFramework,Version=v4.7.2", fx.Name);
-            Assert.AreEqual("4.5.1.0", fx.Version);
+            Assert.AreEqual("4.7.2.0", fx.Version);
 
             var corefx = Framework.FromString("netcoreapp2.0");
             Assert.AreEqual(".NETCoreApp,Version=v2.0", corefx.Name);

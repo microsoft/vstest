@@ -16,7 +16,7 @@
          serialization. This is also defined in build script. -->
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
 
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
     <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
@@ -109,7 +109,7 @@
     <!-- Disable code analysis by default. Ignore SA0001 until we've xml documentation enabled for
          all projects -->
     <EnableCodeAnalysis>false</EnableCodeAnalysis>
-    <NoWarn>$(NoWarn);SA0001</NoWarn>
+    <NoWarn>$(NoWarn);SA0001;VSTHRD110;VSTHRD002;VSTHRD200;VSTHRD105</NoWarn>
 
     <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>

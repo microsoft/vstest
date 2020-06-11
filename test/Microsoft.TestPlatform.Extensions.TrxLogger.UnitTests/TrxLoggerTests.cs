@@ -716,7 +716,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
             this.parameters[TrxLoggerConstants.LogFilePrefixKey] = prefixName;
-            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
             this.testableTrxLogger.Initialize(events.Object, this.parameters);
 
             this.MakeTestRunComplete();
@@ -734,7 +734,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
             var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
             this.parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
-            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
             this.testableTrxLogger.Initialize(events.Object, this.parameters);
 
             this.MakeTestRunComplete();
@@ -752,7 +752,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.parameters[TrxLoggerConstants.LogFileNameKey] = "results.trx";
             var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
             this.parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
-            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
 
             Assert.ThrowsException<ArgumentException>(() => this.testableTrxLogger.Initialize(events.Object, this.parameters));
         }

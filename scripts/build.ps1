@@ -996,10 +996,10 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Forma
 Install-DotNetCli
 Clear-Package
 Restore-Package
-# Update-LocalizedResources
+Update-LocalizedResources
 Invoke-Build
 Publish-Package
-# Create-VsixPackage
+Create-VsixPackage
 Create-NugetPackages
 Generate-Manifest
 Publish-PatchedDotnet

@@ -423,7 +423,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             var parameters = new Dictionary<string, string>();
             parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
             parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
-            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -441,7 +441,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             var parameters = new Dictionary<string, string>();
             parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample";
             parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
-            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -459,7 +459,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             var parameters = new Dictionary<string, string>();
             parameters[HtmlLoggerConstants.LogFilePrefixKey] = null;
             parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
-            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
 
             var testCase1 = CreateTestCase("TestCase1");
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
@@ -497,7 +497,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.parameters[HtmlLoggerConstants.LogFileNameKey] = "results.html";
             var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
             this.parameters[HtmlLoggerConstants.LogFilePrefixKey] = "HtmlPrefix";
-            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.7.2";
 
             Assert.ThrowsException<ArgumentException>(() => this.htmlLogger.Initialize(events.Object, this.parameters));
         }
