@@ -27,15 +27,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 Uri attachementUri = dataCollectorAttachmentsHandler.GetExtensionUri();
                 if (attachementUri != null)
                 {
-                    var coverageAttachments = attachments.Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
+                    var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
 
-                    foreach (var coverageAttachment in coverageAttachments)
+                    foreach (var attachment in attachmentsToBeProcessed)
                     {
-                        attachments.Remove(coverageAttachment);
+                        attachments.Remove(attachment);
                     }
 
-                    ICollection<AttachmentSet> mergedAttachments = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments), cancellationToken);
-                    foreach (var attachment in mergedAttachments)
+                    ICollection<AttachmentSet> processedAttachements = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), cancellationToken);
+                    foreach (var attachment in processedAttachements)
                     {
                         attachments.Add(attachment);
                     }

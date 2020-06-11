@@ -194,25 +194,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         void MultiTestRunFinalizationRequestStop();
 
         /// <summary>
-        /// The adapter multi test run finalization start.
-        /// </summary>
-        /// <param name="numberOfAttachements">
-        /// The number of attachements.
-        /// </param>
-        void AdapterMultiTestRunFinalizationStart(long numberOfAttachements);
-
-        /// <summary>
-        /// The adapter multi test run finalization stop.
-        /// </summary>
-        /// <param name="numberOfAttachements">
-        /// The number of attachements.
-        /// </param>
-        void AdapterMultiTestRunFinalizationStop(long numberOfAttachements);
-
-        /// <summary>
         /// The multi test run finalization start.
         /// </summary>
-        void MultiTestRunFinalizationStart();
+        /// <param name="numberOfAttachements">
+        /// The number of attachements.
+        /// </param>
+        void MultiTestRunFinalizationStart(long numberOfAttachements);
 
         /// <summary>
         /// The multi test run finalization stop.

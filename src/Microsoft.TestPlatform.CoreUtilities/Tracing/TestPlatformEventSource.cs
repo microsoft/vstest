@@ -253,24 +253,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         }
 
         /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.AdapterMultiTestRunFinalizationStartEventId)]
-        public void AdapterMultiTestRunFinalizationStart(long numberOfAttachements)
-        {
-            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterMultiTestRunFinalizationStartEventId, numberOfAttachements);
-        }
-
-        /// <inheritdoc/>
-        [Event(TestPlatformInstrumentationEvents.AdapterMultiTestRunFinalizationStopEventId)]
-        public void AdapterMultiTestRunFinalizationStop(long numberOfAttachements)
-        {
-            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterMultiTestRunFinalizationStopEventId, numberOfAttachements);
-        }
-
-        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.MultiTestRunFinalizationStartEventId)]
-        public void MultiTestRunFinalizationStart()
+        public void MultiTestRunFinalizationStart(long numberOfAttachements)
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.MultiTestRunFinalizationStartEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.MultiTestRunFinalizationStartEventId, numberOfAttachements);
         }
 
         /// <inheritdoc/>

@@ -179,23 +179,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         public const int MultiTestRunFinalizationRequestStopEventId = 0x43;
 
         /// <summary>
-        /// The adapter session finalization start event id.
-        /// </summary>
-        public const int AdapterMultiTestRunFinalizationStartEventId = 0x44;
-
-        /// <summary>
-        /// The adapter session finalization stop event id.
-        /// </summary>
-        public const int AdapterMultiTestRunFinalizationStopEventId = 0x45;
-
-        /// <summary>
         /// Events fired on session finalization start of translation layer.
         /// </summary>
-        public const int TranslationLayerMultiTestRunFinalizationStartEventId = 0x46;
+        public const int TranslationLayerMultiTestRunFinalizationStartEventId = 0x44;
 
         /// <summary>
         /// Events fired on session finalization complete in translation layer.
         /// </summary>
-        public const int TranslationLayerMultiTestRunFinalizationStopEventId = 0x47;
+        public const int TranslationLayerMultiTestRunFinalizationStopEventId = 0x45;
     }
 }

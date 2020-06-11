@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -18,13 +19,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
     public class MultiTestRunFinalizationManager : IMultiTestRunFinalizationManager
     {
         private readonly DataCollectorAttachmentsHandler attachmentsHandler;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiTestRunFinalizationManager"/> class.
         /// </summary>
-        public MultiTestRunFinalizationManager(DataCollectorAttachmentsHandler attachmentsHandler)
+        public MultiTestRunFinalizationManager(DataCollectorAttachmentsHandler attachmentsHandler, ITestPlatformEventSource testPlatformEventSource)
         {
-            this.attachmentsHandler = attachmentsHandler;
+            this.attachmentsHandler = attachmentsHandler ?? throw new ArgumentNullException(nameof(attachmentsHandler));
+            this.testPlatformEventSource = testPlatformEventSource ?? throw new ArgumentNullException(nameof(testPlatformEventSource));
         }
 
         /// <summary>
@@ -39,6 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                testPlatformEventSource.MultiTestRunFinalizationStart(attachments.Count);
+
                 var taskCompletionSource = new TaskCompletionSource<object>();
                 cancellationToken.Register(() =>
                 {
@@ -47,15 +52,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
 
                 Task task = Task.Run(() =>
                 {
-                    attachmentsHandler.HandleAttachements(attachments, cancellationToken);
-                    eventHandler.HandleMultiTestRunFinalizationComplete(attachments);
+                    attachmentsHandler.HandleAttachements(attachments, cancellationToken);                    
                 });
 
                 var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
 
-                if (completedTask != task)
+                if (completedTask == task)
+                {
+                    eventHandler.HandleMultiTestRunFinalizationComplete(attachments);
+                    testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
+                }
+                else
                 {
                     eventHandler.HandleMultiTestRunFinalizationComplete(null);
+                    testPlatformEventSource.MultiTestRunFinalizationStop(0);
                 }
             }
             catch (Exception e)
@@ -64,6 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
 
                 eventHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
                 eventHandler.HandleMultiTestRunFinalizationComplete(null);
+                testPlatformEventSource.MultiTestRunFinalizationStop(0);
             }
 
         }
