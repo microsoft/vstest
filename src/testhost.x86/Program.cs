@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
-    using Client;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -54,11 +53,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         public static void Run(string[] args)
         {
             WaitForDebuggerIfEnabled();
-
-
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-            new Class1().Add(1, 1).GetAwaiter().GetResult();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
             SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);

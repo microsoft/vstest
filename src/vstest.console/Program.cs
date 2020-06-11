@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System;
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Server;
 
     /// <summary>
     /// Main entry point for the command line runner.
@@ -40,10 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             SetCultureSpecifiedByUser();
 
-            var task = new RpcServer().ServeAsync();
-            var result = new Executor(ConsoleOutput.Instance).Execute(args);
-            task.GetAwaiter().GetResult();
-            return result;
+            return new Executor(ConsoleOutput.Instance).Execute(args);
         }
 
         private static void SetCultureSpecifiedByUser()
