@@ -531,14 +531,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
                 }
                 catch (Exception e)
-                {
-                    string exceptionMessage = ExceptionUtilities.GetExceptionMessage(e);
-
-                    if (e is UnauthorizedAccessException)
-                    {
-                        exceptionMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.AccessDenied, e.Message);
-                    }
-
+                {                     
+                    string exceptionMessage = (e is UnauthorizedAccessException)
+                            ? string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.AccessDenied, e.Message)
+                            : ExceptionUtilities.GetExceptionMessage(e);
+                    
                     exceptionsHitDuringRunTests = true;
 
                     if (EqtTrace.IsErrorEnabled)
