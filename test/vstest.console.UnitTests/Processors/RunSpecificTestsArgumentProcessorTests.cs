@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         private Task<IMetricsPublisher> mockMetricsPublisherTask;
         private Mock<IMetricsPublisher> mockMetricsPublisher;
         private Mock<IProcessHelper> mockProcessHelper;
-        private Mock<IMultiTestRunsFinalizationManager> mockFinalizationManager;
+        private Mock<IMultiTestRunFinalizationManager> mockFinalizationManager;
 
         private RunSpecificTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
         {
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
             this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
-            this.mockFinalizationManager = new Mock<IMultiTestRunsFinalizationManager>();
+            this.mockFinalizationManager = new Mock<IMultiTestRunFinalizationManager>();
         }
 
         [TestMethod]

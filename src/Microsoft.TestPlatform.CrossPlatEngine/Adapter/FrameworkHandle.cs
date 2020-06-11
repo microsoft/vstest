@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 
 
         /// <summary>
-        /// Give a hint to the execution framework to enable the shutdown of execution process after the test run is complete. This should be used only in out of process test runs when IRunContext.KeepAlive is true
+        /// Give a hint to the execution framework to enable the shutdown of execution process after the test run is complete. This should be used only in out of process test run when IRunContext.KeepAlive is true
         /// and should be used only when absolutely required as using it degrades the performance of the subsequent run.
         /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false.
         /// </summary>

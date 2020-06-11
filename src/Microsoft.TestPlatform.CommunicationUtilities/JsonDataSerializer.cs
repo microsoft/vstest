@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // MemoryTraceWriter can help diagnose serialization issues. Enable it for
             // debug builds only.
             // Note that MemoryTraceWriter is not thread safe, please don't use it in parallel
-            // test runs. See https://github.com/JamesNK/Newtonsoft.Json/issues/1279
+            // test run. See https://github.com/JamesNK/Newtonsoft.Json/issues/1279
             payloadSerializer.TraceWriter = new MemoryTraceWriter();
             payloadSerializer2.TraceWriter = new MemoryTraceWriter();
 #endif

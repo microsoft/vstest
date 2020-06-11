@@ -6,14 +6,14 @@ using System.Collections.Generic;
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     /// <summary>
-    /// Interface contract for handling multi test runs finalization complete events
+    /// Interface contract for handling multi test run finalization complete events
     /// </summary>
-    public interface IMultiTestRunsFinalizationEventsHandler : ITestMessageEventHandler
+    public interface IMultiTestRunFinalizationEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
-        /// Dispatch MultiTestRunsFinalizationComplete event to listeners.
+        /// Dispatch MultiTestRunFinalizationComplete event to listeners.
         /// </summary>
         /// <param name="attachments">Attachments reprocessed.</param>
-        void HandleMultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments);
+        void HandleMultiTestRunFinalizationComplete(ICollection<AttachmentSet> attachments);
     }
 }

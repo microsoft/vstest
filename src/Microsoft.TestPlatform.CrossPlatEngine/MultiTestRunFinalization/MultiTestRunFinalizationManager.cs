@@ -10,30 +10,30 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinalization
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization
 {
     /// <summary>
-    /// Orchestrates multi test runs finalization operations for the engine communicating with the test host process.
+    /// Orchestrates multi test run finalization operations for the engine communicating with the test host process.
     /// </summary>
-    public class MultiTestRunsFinalizationManager : IMultiTestRunsFinalizationManager
+    public class MultiTestRunFinalizationManager : IMultiTestRunFinalizationManager
     {
-        private readonly MultiTestRunsDataCollectorAttachmentsHandler attachmentsHandler;
+        private readonly DataCollectorAttachmentsHandler attachmentsHandler;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiTestRunsFinalizationManager"/> class.
+        /// Initializes a new instance of the <see cref="MultiTestRunFinalizationManager"/> class.
         /// </summary>
-        public MultiTestRunsFinalizationManager(MultiTestRunsDataCollectorAttachmentsHandler attachmentsHandler)
+        public MultiTestRunFinalizationManager(DataCollectorAttachmentsHandler attachmentsHandler)
         {
             this.attachmentsHandler = attachmentsHandler;
         }
 
         /// <summary>
-        /// Finalizes multi test runs
+        /// Finalizes multi test run
         /// </summary>
         /// <param name="attachments">Attachments</param>
-        /// <param name="eventHandler">EventHandler for handling multi test runs finalization events from Engine</param>
+        /// <param name="eventHandler">EventHandler for handling multi test run finalization events from Engine</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async Task FinalizeMultiTestRunsAsync(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
+        public async Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
         {
             try
             {
@@ -48,22 +48,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunsFinal
                 Task task = Task.Run(() =>
                 {
                     attachmentsHandler.HandleAttachements(attachments, cancellationToken);
-                    eventHandler.HandleMultiTestRunsFinalizationComplete(attachments);
+                    eventHandler.HandleMultiTestRunFinalizationComplete(attachments);
                 });
 
                 var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
 
                 if (completedTask != task)
                 {
-                    eventHandler.HandleMultiTestRunsFinalizationComplete(null);
+                    eventHandler.HandleMultiTestRunFinalizationComplete(null);
                 }
             }
             catch (Exception e)
             {
-                EqtTrace.Error("MultiTestRunsFinalizationManager: Exception in FinalizeMultiTestRunsAsync: " + e);
+                EqtTrace.Error("MultiTestRunFinalizationManager: Exception in FinalizeMultiTestRunAsync: " + e);
 
                 eventHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
-                eventHandler.HandleMultiTestRunsFinalizationComplete(null);
+                eventHandler.HandleMultiTestRunFinalizationComplete(null);
             }
 
         }

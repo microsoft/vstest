@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
-        private readonly MultiTestRunsDataCollectorAttachmentsHandler attachmentsHandler;
+        private readonly DataCollectorAttachmentsHandler attachmentsHandler;
 
         public ParallelDataCollectionEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,
@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
             // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-            attachmentsHandler = new MultiTestRunsDataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler());
+            attachmentsHandler = new DataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler());
         }
 
         internal ParallelDataCollectionEventsHandler(IRequestData requestData,

@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         private Task<IMetricsPublisher> mockMetricsPublisherTask;
         private Mock<IMetricsPublisher> mockMetricsPublisher;
         private Mock<IProcessHelper> mockProcessHelper;
-        private Mock<IMultiTestRunsFinalizationManager> mockFinalizationManager;
+        private Mock<IMultiTestRunFinalizationManager> mockFinalizationManager;
 
         public RunTestsArgumentProcessorTests()
         {
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 .Returns(Architecture.X86);
             this.mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.mockFinalizationManager = new Mock<IMultiTestRunsFinalizationManager>();
+            this.mockFinalizationManager = new Mock<IMultiTestRunFinalizationManager>();
         }
 
         [TestMethod]

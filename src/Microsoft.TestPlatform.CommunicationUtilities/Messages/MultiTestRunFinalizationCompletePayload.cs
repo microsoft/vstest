@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
@@ -8,9 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
-    /// Multi test runs finalization complete payload.
+    /// Multi test run finalization complete payload.
     /// </summary>
-    public class MultiTestRunsFinalizationCompletePayload
+    public class MultiTestRunFinalizationCompletePayload
     {
         /// <summary>
         /// Gets or sets the attachments.

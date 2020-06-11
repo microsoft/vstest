@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class MultiTestRunsFinalizationEventHandler : IMultiTestRunsFinalizationEventsHandler
+    public class MultiTestRunFinalizationEventHandler : IMultiTestRunFinalizationEventsHandler
     {
         /// <summary>
         /// Gets the attachments.
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public TestMessageLevel TestMessageLevel { get; private set; }
 
-        public MultiTestRunsFinalizationEventHandler()
+        public MultiTestRunFinalizationEventHandler()
         {
             this.Errors = new List<string>();
             this.Attachments = new List<AttachmentSet>();
@@ -75,7 +75,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             return true;
         }
 
-        public void HandleMultiTestRunsFinalizationComplete(ICollection<AttachmentSet> attachments)
+        public void HandleMultiTestRunFinalizationComplete(ICollection<AttachmentSet> attachments)
         {
             if(attachments != null)
             {

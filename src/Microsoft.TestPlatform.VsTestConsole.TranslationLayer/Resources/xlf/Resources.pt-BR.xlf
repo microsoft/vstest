@@ -61,7 +61,7 @@
         <target state="translated">O arquivo {0} não existe</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="AbortedMultiTestRunsFinalization">
+      <trans-unit id="AbortedMultiTestRunFinalization">
         <source>The active Multi Test Runs Finalization was aborted.</source>
         <target state="new">The active Multi Test Runs Finalization was aborted.</target>
         <note></note>

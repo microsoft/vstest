@@ -20,17 +20,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// The Run Tests using VsTestConsoleWrapper API's
     /// </summary>
     [TestClass]
-    public class FinalizeMultiTestRunsTests : AcceptanceTestBase
+    public class FinalizeMultiTestRunTests : AcceptanceTestBase
     {
         private IVsTestConsoleWrapper2 vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
-        private MultiTestRunsFinalizationEventHandler multiTestRunsFinalizationEventHandler;
+        private MultiTestRunFinalizationEventHandler multiTestRunFinalizationEventHandler;
 
         private void Setup()
         {
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
-            this.multiTestRunsFinalizationEventHandler = new MultiTestRunsFinalizationEventHandler();
+            this.multiTestRunFinalizationEventHandler = new MultiTestRunFinalizationEventHandler();
         }
 
         [TestCleanup]
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void FinalizeMultiTestRuns(RunnerInfo runnerInfo)
+        public void FinalizeMultiTestRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
@@ -53,11 +53,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
+            this.vstestConsoleWrapper.FinalizeMultiTestRun(runEventHandler.Attachments, multiTestRunFinalizationEventHandler);
 
             // Assert
-            multiTestRunsFinalizationEventHandler.EnsureSuccess();
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.multiTestRunsFinalizationEventHandler.Attachments.Count);
+            multiTestRunFinalizationEventHandler.EnsureSuccess();
+            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.multiTestRunFinalizationEventHandler.Attachments.Count);
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            this.vstestConsoleWrapper.FinalizeMultiTestRuns(runEventHandler.Attachments, multiTestRunsFinalizationEventHandler);
+            this.vstestConsoleWrapper.FinalizeMultiTestRun(runEventHandler.Attachments, multiTestRunFinalizationEventHandler);
             this.vstestConsoleWrapper?.EndSession();
 
             // Assert

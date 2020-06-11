@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     /// <summary>
-    /// Orchestrates multi test runs finalization operations.
+    /// Orchestrates multi test run finalization operations.
     /// </summary>
-    public interface IMultiTestRunsFinalizationManager
+    public interface IMultiTestRunFinalizationManager
     {
         /// <summary>
-        /// Finalizes multi test runs
+        /// Finalizes multi test run
         /// </summary>
         /// <param name="attachments">Attachments</param>
-        /// <param name="eventHandler">EventHandler for handling multi test runs finalization events from Engine</param>
+        /// <param name="eventHandler">EventHandler for handling multi test run finalization events from Engine</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunsAsync(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
+        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
     }
 }

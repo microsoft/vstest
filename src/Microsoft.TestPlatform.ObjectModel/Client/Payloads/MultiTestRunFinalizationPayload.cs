@@ -7,9 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Class used to define the MultiTestRunsFinalizationPayload sent by the Vstest.console translation layers into design mode
+    /// Class used to define the MultiTestRunFinalizationPayload sent by the Vstest.console translation layers into design mode
     /// </summary>
-    public class MultiTestRunsFinalizationPayload
+    public class MultiTestRunFinalizationPayload
     {
         /// <summary>
         /// Settings used for the discovery request.

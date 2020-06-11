@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunsFinalization;
+    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -17,13 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
     using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
@@ -201,11 +199,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.MultiTestRunsFinalizationStart:
+                        case MessageType.MultiTestRunFinalizationStart:
                             {
-                                var multiTestRunsFinalizationPayload =
-                                    this.communicationManager.DeserializePayload<MultiTestRunsFinalizationPayload>(message);
-                                this.StartMultiTestRunsFinalization(multiTestRunsFinalizationPayload, testRequestManager);
+                                var multiTestRunFinalizationPayload =
+                                    this.communicationManager.DeserializePayload<MultiTestRunFinalizationPayload>(message);
+                                this.StartMultiTestRunFinalization(multiTestRunFinalizationPayload, testRequestManager);
                                 break;
                             }
 
@@ -227,9 +225,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.MultiTestRunsFinalizationCancel:
+                        case MessageType.MultiTestRunFinalizationCancel:
                             {
-                                testRequestManager.CancelMultiTestRunsFinalization();
+                                testRequestManager.CancelMultiTestRunFinalization();
                                 break;
                             }
 
@@ -474,30 +472,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
         }
 
-        private void StartMultiTestRunsFinalization(MultiTestRunsFinalizationPayload finalizationPayload, ITestRequestManager testRequestManager)
+        private void StartMultiTestRunFinalization(MultiTestRunFinalizationPayload finalizationPayload, ITestRequestManager testRequestManager)
         {
             Task.Run(
                 delegate
                 {
                     try
                     {
-                        testRequestManager.ResetOptions();
-                        testRequestManager.FinalizeMultiTestRuns(finalizationPayload, new MultiTestRunsFinalizationEventsHandler(this.communicationManager));
+                        testRequestManager.FinalizeMultiTestRun(finalizationPayload, new MultiTestRunFinalizationEventsHandler(this.communicationManager));
                     }
                     catch (Exception ex)
                     {
-                        EqtTrace.Error("DesignModeClient: Exception in StartMultiTestRunsFinalization: " + ex);
+                        EqtTrace.Error("DesignModeClient: Exception in StartMultiTestRunFinalization: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 
-                        var payload = new MultiTestRunsFinalizationCompletePayload()
+                        var payload = new MultiTestRunFinalizationCompletePayload()
                         {
                             Attachments = null
                         };
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationComplete, payload);
+                        this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationComplete, payload);
                     }
                 });
         }

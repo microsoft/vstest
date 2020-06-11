@@ -56,7 +56,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		private Task<IMetricsPublisher> mockMetricsPublisherTask;
 		private Mock<IMetricsPublisher> mockMetricsPublisher;
 		private Mock<IProcessHelper> mockProcessHelper;
-		private Mock<IMultiTestRunsFinalizationManager> mockFinalizationManager;
+		private Mock<IMultiTestRunFinalizationManager> mockFinalizationManager;
 
 		private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
 				<RunSettings>
@@ -103,7 +103,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				.Returns(new FrameworkName(Constants.DotNetFramework40));
 			this.mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
 			this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
-			this.mockFinalizationManager = new Mock<IMultiTestRunsFinalizationManager>();
+			this.mockFinalizationManager = new Mock<IMultiTestRunFinalizationManager>();
 		}
 
 		[TestCleanup]

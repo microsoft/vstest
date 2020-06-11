@@ -278,16 +278,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         #region IVsTestConsoleWrapper2
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRun(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler)
         {
-            this.testPlatformEventSource.TranslationLayerMultiTestRunsFinalizationStart();
+            this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStart();
 
             this.EnsureInitialized();
-            this.requestSender.FinalizeMultiTestRuns(attachments, testSessionEventsHandler);
+            this.requestSender.FinalizeMultiTestRun(attachments, testSessionEventsHandler);
         }
 
         /// <inheritdoc/>
-        public void CancelMultiTestRunsFinalization()
+        public void CancelMultiTestRunFinalization()
         {
             throw new System.NotImplementedException();
         }

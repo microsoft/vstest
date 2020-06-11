@@ -23,7 +23,7 @@
         <target state="new">File {0} does not exists</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="AbortedMultiTestRunsFinalization">
+      <trans-unit id="AbortedMultiTestRunFinalization">
         <source>The active Multi Test Runs Finalization was aborted.</source>
         <target state="new">The active Multi Test Runs Finalization was aborted.</target>
         <note></note>

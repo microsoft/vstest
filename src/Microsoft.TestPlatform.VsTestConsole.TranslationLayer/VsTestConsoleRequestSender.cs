@@ -384,19 +384,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRuns(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler testSessionEventsHandler)
+        public void FinalizeMultiTestRun(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler)
         {
             this.SendMessageAndListenAndReportAttachements(attachments, testSessionEventsHandler);
         }
 
         /// <inheritdoc/>
-        public void CancelMultiTestRunsFinalization()
+        public void CancelMultiTestRunFinalization()
         {
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("VsTestConsoleRequestSender.CancelMultiTestRunsFinalization: Canceling multi test runs finalization.");
+                EqtTrace.Info("VsTestConsoleRequestSender.CancelMultiTestRunFinalization: Canceling multi test run finalization.");
             }
-            this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationCancel);
+            this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationCancel);
         }
 
         /// <summary>
@@ -741,35 +741,35 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private void SendMessageAndListenAndReportAttachements(ICollection<AttachmentSet> attachments, IMultiTestRunsFinalizationEventsHandler eventHandler)
+        private void SendMessageAndListenAndReportAttachements(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler)
         {
             try
             {
-                var payload = new MultiTestRunsFinalizationPayload
+                var payload = new MultiTestRunFinalizationPayload
                 {
                     Attachments = attachments
                 };
-                this.communicationManager.SendMessage(MessageType.MultiTestRunsFinalizationStart, payload);
-                var isMultiTestRunsFinalizationComplete = false;
+                this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationStart, payload);
+                var isMultiTestRunFinalizationComplete = false;
 
                 // Cycle through the messages that the vstest.console sends.
                 // Currently each of the operations are not separate tasks since they should not each take much time.
                 // This is just a notification.
-                while (!isMultiTestRunsFinalizationComplete)
+                while (!isMultiTestRunFinalizationComplete)
                 {
                     var message = this.TryReceiveMessage();
 
-                    if (string.Equals(MessageType.MultiTestRunsFinalizationComplete, message.MessageType))
+                    if (string.Equals(MessageType.MultiTestRunFinalizationComplete, message.MessageType))
                     {
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachements: Process complete.");
                         }
 
-                        var multiTestRunsFinalizationCompletePayload = this.dataSerializer.DeserializePayload<MultiTestRunsFinalizationCompletePayload>(message);
+                        var multiTestRunFinalizationCompletePayload = this.dataSerializer.DeserializePayload<MultiTestRunFinalizationCompletePayload>(message);
 
-                        eventHandler.HandleMultiTestRunsFinalizationComplete(multiTestRunsFinalizationCompletePayload.Attachments);
-                        isMultiTestRunsFinalizationComplete = true;
+                        eventHandler.HandleMultiTestRunFinalizationComplete(multiTestRunFinalizationCompletePayload.Attachments);
+                        isMultiTestRunFinalizationComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
@@ -781,8 +781,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedMultiTestRunsFinalization);               
-                eventHandler.HandleMultiTestRunsFinalizationComplete(null);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedMultiTestRunFinalization);               
+                eventHandler.HandleMultiTestRunFinalizationComplete(null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions
                 // Removing that code because vstest.console might be in a healthy state and letting the client
@@ -791,7 +791,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             
             // TODO: do we need events?
-            this.testPlatformEventSource.TranslationLayerMultiTestRunsFinalizationStop(); 
+            this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStop(); 
         }
 
         private Message TryReceiveMessage()
