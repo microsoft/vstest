@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -403,6 +404,81 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             Assert.IsTrue(this.complateEvent.WaitOne(Timeout), "Discovery not completed.");
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldSendTestMessageAndFinalizationCompleteOnExceptionInFinalization()
+        {
+            var payload = new MultiTestRunFinalizationPayload();
+            var startFinalization = new Message { MessageType = MessageType.MultiTestRunFinalizationStart, Payload = JToken.FromObject(payload) };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startFinalization);
+            this.mockCommunicationManager
+                .Setup(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.IsAny<MultiTestRunFinalizationCompletePayload>()))
+                .Callback(() => complateEvent.Set());
+            this.mockTestRequestManager.Setup(
+                    rm => rm.FinalizeMultiTestRun(
+                        It.IsAny<MultiTestRunFinalizationPayload>(),
+                        It.IsAny<IMultiTestRunFinalizationEventsHandler>()))
+                .Throws(new Exception());
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            Assert.IsTrue(this.complateEvent.WaitOne(Timeout), "Finalization not completed.");
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.Is<MultiTestRunFinalizationCompletePayload>(p => p.Attachments == null)), Times.Once());
+        }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnTestPlatformExceptionInFinalization()
+        {
+            var payload = new MultiTestRunFinalizationPayload();
+            var startFinalization = new Message { MessageType = MessageType.MultiTestRunFinalizationStart, Payload = JToken.FromObject(payload) };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startFinalization);
+            this.mockCommunicationManager
+                .Setup(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.IsAny<MultiTestRunFinalizationCompletePayload>()))
+                .Callback(() => complateEvent.Set());
+            this.mockTestRequestManager.Setup(
+                    rm => rm.FinalizeMultiTestRun(
+                        It.IsAny<MultiTestRunFinalizationPayload>(),
+                        It.IsAny<IMultiTestRunFinalizationEventsHandler>()))
+                .Throws(new TestPlatformException("Hello world"));
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            Assert.IsTrue(this.complateEvent.WaitOne(Timeout), "Finalization not completed.");
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.Is<MultiTestRunFinalizationCompletePayload>(p => p.Attachments == null)), Times.Once());
+        }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldCallRequestManagerForFinalizationStart()
+        {
+            var payload = new MultiTestRunFinalizationPayload();
+            var startFinalization = new Message { MessageType = MessageType.MultiTestRunFinalizationStart, Payload = JToken.FromObject(payload) };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startFinalization);
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.IsAny<MultiTestRunFinalizationCompletePayload>()), Times.Never);
+            this.mockTestRequestManager.Verify(rm => rm.FinalizeMultiTestRun(It.IsAny<MultiTestRunFinalizationPayload>(), It.IsAny<MultiTestRunFinalizationEventsHandler>()));
+        }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldCallRequestManagerForFinalizationCancel()
+        {
+            var cancelFinalization = new Message { MessageType = MessageType.MultiTestRunFinalizationCancel };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(cancelFinalization);
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.IsAny<MultiTestRunFinalizationCompletePayload>()), Times.Never);
+            this.mockTestRequestManager.Verify(rm => rm.CancelMultiTestRunFinalization());
         }
 
         [TestMethod]
