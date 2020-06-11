@@ -1588,7 +1588,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
-        <target state="new">Blame için CollectDump seçeneği bu platformda desteklenmez.</target>
+        <target state="translated">Blame için CollectDump seçeneğine göre kilitlenme bilgi dökümlerinin toplanması bu platform için desteklenmiyor.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
@@ -1665,7 +1665,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
         <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
-        <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
+        <target state="translated">Blame için TestTimeout ile CollectDump seçeneğine göre asılı kalma bilgi dökümlerinin toplanması bu platform için desteklenmiyor.</target>
         <note></note>
       </trans-unit>
     </body>

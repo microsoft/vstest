@@ -1588,7 +1588,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
-        <target state="new">A opção CollectDump para Blame não é compatível com esta plataforma.</target>
+        <target state="translated">A coleta de despejos de memória pela opção CollectDump para Blame não tem suporte nesta plataforma.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
@@ -1665,7 +1665,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       </trans-unit>
       <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
         <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
-        <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
+        <target state="translated">A coleta de despejos de trava pela opção CollectDump com TestTimeout para Blame não é tem suporte para esta plataforma.</target>
         <note></note>
       </trans-unit>
     </body>

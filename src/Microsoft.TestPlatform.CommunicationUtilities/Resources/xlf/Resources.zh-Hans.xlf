@@ -83,7 +83,7 @@
       </trans-unit>
       <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
         <source>Cannot attach the debugger to the default test host.</source>
-        <target state="new">Cannot attach the debugger to the default test host.</target>
+        <target state="translated">无法将调试程序附加到默认测试主机。</target>
         <note></note>
       </trans-unit>
     </body>

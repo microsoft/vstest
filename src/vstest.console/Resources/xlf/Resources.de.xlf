@@ -1588,7 +1588,7 @@
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
-        <target state="new">Die CollectDump-Option für Blame wird für diese Plattform nicht unterstützt.</target>
+        <target state="translated">Das Sammeln von Absturzabbildern über die Option "CollectDump" für "Blame" wird für diese Plattform nicht unterstützt.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
@@ -1665,7 +1665,7 @@
       </trans-unit>
       <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
         <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
-        <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
+        <target state="translated">Das Sammeln von Abbildern bei Reaktionsunfähigkeit über die Option "CollectDump" mit "TestTimeout" für "Blame" wird für diese Plattform nicht unterstützt.</target>
         <note></note>
       </trans-unit>
     </body>

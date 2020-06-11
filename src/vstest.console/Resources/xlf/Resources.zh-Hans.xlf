@@ -1588,7 +1588,7 @@
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
-        <target state="new">此平台不支持用于追责的 CollectDump 选项。</target>
+        <target state="translated">此平台不支持通过 CollectDump for Blame 选项收集故障转储。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
@@ -1665,7 +1665,7 @@
       </trans-unit>
       <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
         <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
-        <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
+        <target state="translated">此平台不支持通过 CollectDump with TestTimeout for Blame 选项收集挂起转储。</target>
         <note></note>
       </trans-unit>
     </body>
