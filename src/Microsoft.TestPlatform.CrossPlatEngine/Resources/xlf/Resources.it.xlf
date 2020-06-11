@@ -209,7 +209,7 @@
       </trans-unit>
       <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
         <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
-        <target state="new">Cannot attach the debugger to the default test host with process ID: {0}.</target>
+        <target state="translated">Non è possibile collegare il debugger all'host di test predefinito con ID processo {0}.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="AccessDenied">

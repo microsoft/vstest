@@ -209,7 +209,7 @@
       </trans-unit>
       <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
         <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
-        <target state="new">Cannot attach the debugger to the default test host with process ID: {0}.</target>
+        <target state="translated">Hata ayıklayıcı, {0} işlem kimliğine sahip varsayılan test ana bilgisayarına eklenemiyor.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="AccessDenied">
