@@ -458,6 +458,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var exceptionsHitDuringRunTests = false;
             var executorsFromDeprecatedLocations = false;
             double totalTimeTakenByAdapters = 0;
+
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
                 // Get the executor from the cache.
@@ -530,7 +531,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
                 }
                 catch (Exception e)
-                {
+                {                     
+                    string exceptionMessage = (e is UnauthorizedAccessException)
+                            ? string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.AccessDenied, e.Message)
+                            : ExceptionUtilities.GetExceptionMessage(e);
+                    
                     exceptionsHitDuringRunTests = true;
 
                     if (EqtTrace.IsErrorEnabled)
@@ -547,7 +552,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             CultureInfo.CurrentCulture,
                             CrossPlatEngineResources.ExceptionFromRunTests,
                             executorUriExtensionTuple.Item1,
-                            ExceptionUtilities.GetExceptionMessage(e)));
+                            exceptionMessage));
                 }
                 finally
                 {
