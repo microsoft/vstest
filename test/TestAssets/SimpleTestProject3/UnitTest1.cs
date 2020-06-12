@@ -7,7 +7,7 @@ namespace SampleUnitTestProject3
     using System.IO;
     using System.Reflection;
     using System.Threading;
-#if net472
+#if NETFRAMEWORK
     using System.Windows.Forms;
 #endif
 
@@ -36,7 +36,7 @@ namespace SampleUnitTestProject3
             Span<byte> s = stackalloc byte[int.MaxValue];
         }
 
-#if net472
+#if NETFRAMEWORK
         [TestMethod]
         public void UITestMethod()
         {
