@@ -28,16 +28,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 if (attachementUri != null)
                 {
                     var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
-
-                    foreach (var attachment in attachmentsToBeProcessed)
+                    if(attachmentsToBeProcessed.Any())
                     {
-                        attachments.Remove(attachment);
-                    }
+                        foreach (var attachment in attachmentsToBeProcessed)
+                        {
+                            attachments.Remove(attachment);
+                        }
 
-                    ICollection<AttachmentSet> processedAttachements = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), cancellationToken);
-                    foreach (var attachment in processedAttachements)
-                    {
-                        attachments.Add(attachment);
+                        ICollection<AttachmentSet> processedAttachements = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), cancellationToken);
+                        foreach (var attachment in processedAttachements)
+                        {
+                            attachments.Add(attachment);
+                        }
                     }
                 }
             }
