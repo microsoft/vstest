@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// <summary>
     /// Orchestrates multi test run finalization operations.
     /// </summary>
-    public interface IMultiTestRunFinalizationManager
+    internal interface IMultiTestRunFinalizationManager
     {
         /// <summary>
         /// Finalizes multi test run

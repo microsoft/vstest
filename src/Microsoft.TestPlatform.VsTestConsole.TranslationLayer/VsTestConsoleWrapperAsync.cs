@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -220,6 +221,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             await this.EnsureInitializedAsync();
             await this.requestSender.StartTestRunWithCustomHostAsync(testCaseList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public async Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        {
+            this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStart();
+
+            await this.EnsureInitializedAsync();
+            await requestSender.FinalizeMultiTestRunAsync(attachments, testSessionEventsHandler, cancellationToken);
         }
 
         /// <inheritdoc/>

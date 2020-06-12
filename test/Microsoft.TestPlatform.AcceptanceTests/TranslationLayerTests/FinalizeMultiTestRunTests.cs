@@ -6,7 +6,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
@@ -14,6 +13,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
@@ -22,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class FinalizeMultiTestRunTests : AcceptanceTestBase
     {
-        private IVsTestConsoleWrapper2 vstestConsoleWrapper;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
         private MultiTestRunFinalizationEventHandler multiTestRunFinalizationEventHandler;
 
@@ -42,7 +43,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void FinalizeMultiTestRun(RunnerInfo runnerInfo)
+        public async Task FinalizeMultiTestRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
@@ -53,7 +54,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            this.vstestConsoleWrapper.FinalizeMultiTestRun(runEventHandler.Attachments, multiTestRunFinalizationEventHandler);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // Assert
             multiTestRunFinalizationEventHandler.EnsureSuccess();
@@ -63,7 +64,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
+        public async Task EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
         {
             var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
 
@@ -76,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            this.vstestConsoleWrapper.FinalizeMultiTestRun(runEventHandler.Attachments, multiTestRunFinalizationEventHandler);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, multiTestRunFinalizationEventHandler, CancellationToken.None);
             this.vstestConsoleWrapper?.EndSession();
 
             // Assert

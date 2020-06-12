@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunTests : AcceptanceTestBase
     {
-        private IVsTestConsoleWrapper2 vstestConsoleWrapper;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
         private void Setup()

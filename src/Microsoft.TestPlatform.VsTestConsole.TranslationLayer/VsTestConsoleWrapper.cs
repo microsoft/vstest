@@ -7,7 +7,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -24,7 +25,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
     /// via the <c>vstest.console</c> test runner.
     /// </summary>
-    public class VsTestConsoleWrapper : IVsTestConsoleWrapper2
+    public class VsTestConsoleWrapper : IVsTestConsoleWrapper
     {
         #region Private Members
 
@@ -273,17 +274,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.sessionStarted = false;
         }
 
-        #endregion
-
-        #region IVsTestConsoleWrapper2
-
         /// <inheritdoc/>
-        public void FinalizeMultiTestRun(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler)
+        public Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
         {
             this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStart();
 
             this.EnsureInitialized();
-            this.requestSender.FinalizeMultiTestRun(attachments, testSessionEventsHandler);
+            return requestSender.FinalizeMultiTestRunAsync(attachments, testSessionEventsHandler, cancellationToken);
         }
 
         /// <inheritdoc/>

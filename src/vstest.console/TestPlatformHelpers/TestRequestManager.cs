@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
                   new ProcessHelper(),
-                  new MultiTestRunFinalizationManager(new CrossPlatEngine.DataCollection.DataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler()), TestPlatformEventSource.Instance))
+                  new MultiTestRunFinalizationManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler()))
         {
         }
 

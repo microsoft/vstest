@@ -384,19 +384,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRun(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler)
+        public Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
         {
-            this.SendMessageAndListenAndReportAttachments(attachments, testSessionEventsHandler);
-        }
-
-        /// <inheritdoc/>
-        public void CancelMultiTestRunFinalization()
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("VsTestConsoleRequestSender.CancelMultiTestRunFinalization: Canceling multi test run finalization.");
-            }
-            this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationCancel);
+            return this.SendMessageAndListenAndReportFinalizationResultAsync(attachments, testSessionEventsHandler, cancellationToken);
         }
 
         /// <summary>
@@ -741,7 +731,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private void SendMessageAndListenAndReportAttachments(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler)
+        private async Task SendMessageAndListenAndReportFinalizationResultAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
         {
             try
             {
@@ -752,12 +742,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationStart, payload);
                 var isMultiTestRunFinalizationComplete = false;
 
+                cancellationToken.Register(() => this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationCancel));
+
                 // Cycle through the messages that the vstest.console sends.
                 // Currently each of the operations are not separate tasks since they should not each take much time.
                 // This is just a notification.
                 while (!isMultiTestRunFinalizationComplete)
                 {
-                    var message = this.TryReceiveMessage();
+                    var message = await this.TryReceiveMessageAsync();
 
                     if (string.Equals(MessageType.MultiTestRunFinalizationComplete, message.MessageType))
                     {

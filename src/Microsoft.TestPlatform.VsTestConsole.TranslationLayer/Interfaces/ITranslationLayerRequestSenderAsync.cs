@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -76,5 +77,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// See <see cref="ITranslationLayerRequestSender.OnProcessExited"/>.
         /// </summary>
         void OnProcessExited();
+
+        /// <summary>
+        /// Provides back all attachements to TestPlatform for additional processing (for example merging)
+        /// </summary>
+        /// <param name="attachments">List of attachements</param>
+        /// <param name="multiTestRunFinalizationCompleteEventsHandler">Events handler</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
     }
 }

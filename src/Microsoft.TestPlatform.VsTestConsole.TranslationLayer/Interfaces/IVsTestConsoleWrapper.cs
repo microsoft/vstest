@@ -4,7 +4,8 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System.Collections.Generic;
-
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -118,6 +119,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="testRunEventsHandler">EventHandler to receive test run events.</param>
         /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
         void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
+        /// Provides back all attachements to TestPlatform for additional processing (for example merging)
+        /// </summary>
+        /// <param name="attachments">List of attachements</param>
+        /// <param name="multiTestRunFinalizationCompleteEventsHandler">EventHandler to receive session complete event</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
 
         /// <summary>
         /// Cancel the last test run.

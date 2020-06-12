@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization
@@ -18,16 +20,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
     /// </summary>
     public class MultiTestRunFinalizationManager : IMultiTestRunFinalizationManager
     {
-        private readonly DataCollectorAttachmentsHandler attachmentsHandler;
         private readonly ITestPlatformEventSource testPlatformEventSource;
+        private readonly IDataCollectorAttachments[] dataCollectorAttachmentsHandlers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiTestRunFinalizationManager"/> class.
         /// </summary>
-        public MultiTestRunFinalizationManager(DataCollectorAttachmentsHandler attachmentsHandler, ITestPlatformEventSource testPlatformEventSource)
+        public MultiTestRunFinalizationManager(ITestPlatformEventSource testPlatformEventSource, params IDataCollectorAttachments[] dataCollectorAttachmentsHandlers)
         {
-            this.attachmentsHandler = attachmentsHandler ?? throw new ArgumentNullException(nameof(attachmentsHandler));
             this.testPlatformEventSource = testPlatformEventSource ?? throw new ArgumentNullException(nameof(testPlatformEventSource));
+            this.dataCollectorAttachmentsHandlers = dataCollectorAttachmentsHandlers ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentsHandlers));
         }
 
         /// <summary>
@@ -52,19 +54,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
 
                 Task task = Task.Run(() =>
                 {
-                    attachmentsHandler.HandleAttachements(attachments, cancellationToken);                    
+                    HandleAttachements(attachments, cancellationToken);                    
                 });
 
                 var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
 
                 if (completedTask == task)
                 {
-                    eventHandler.HandleMultiTestRunFinalizationComplete(attachments);
+                    eventHandler?.HandleMultiTestRunFinalizationComplete(attachments);
                     testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
                 }
                 else
                 {
-                    eventHandler.HandleMultiTestRunFinalizationComplete(null);
+                    eventHandler?.HandleMultiTestRunFinalizationComplete(null);
                     testPlatformEventSource.MultiTestRunFinalizationStop(0);
                 }
             }
@@ -72,11 +74,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             {
                 EqtTrace.Error("MultiTestRunFinalizationManager: Exception in FinalizeMultiTestRunAsync: " + e);
 
-                eventHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
-                eventHandler.HandleMultiTestRunFinalizationComplete(null);
+                eventHandler?.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
+                eventHandler?.HandleMultiTestRunFinalizationComplete(null);
                 testPlatformEventSource.MultiTestRunFinalizationStop(0);
             }
+        }
 
+        private void HandleAttachements(ICollection<AttachmentSet> attachments, CancellationToken cancellationToken)
+        {
+            foreach (var dataCollectorAttachmentsHandler in dataCollectorAttachmentsHandlers)
+            {
+                Uri attachementUri = dataCollectorAttachmentsHandler.GetExtensionUri();
+                if (attachementUri != null)
+                {
+                    var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
+                    if (attachmentsToBeProcessed.Any())
+                    {
+                        foreach (var attachment in attachmentsToBeProcessed)
+                        {
+                            attachments.Remove(attachment);
+                        }
+
+                        ICollection<AttachmentSet> processedAttachements = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), cancellationToken);
+                        foreach (var attachment in processedAttachements)
+                        {
+                            attachments.Add(attachment);
+                        }
+                    }
+                }
+            }
         }
     }
 }

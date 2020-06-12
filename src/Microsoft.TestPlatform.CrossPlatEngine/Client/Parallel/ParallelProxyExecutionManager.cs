@@ -256,12 +256,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             if (concurrentManager is ProxyExecutionManagerWithDataCollection)
             {
+                var concurrentManagerWithDataCollection = concurrentManager as ProxyExecutionManagerWithDataCollection;
+
                 return new ParallelDataCollectionEventsHandler(
                             this.requestData,
-                            concurrentManager,
+                            concurrentManagerWithDataCollection,
                             this.currentRunEventsHandler,
                             this,
-                            this.currentRunDataAggregator);
+                            this.currentRunDataAggregator,
+                            concurrentManagerWithDataCollection.CancellationToken);
             }
 
             return new ParallelRunEventsHandler(

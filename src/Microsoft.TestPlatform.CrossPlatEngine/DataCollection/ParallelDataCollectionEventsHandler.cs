@@ -7,7 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -16,17 +18,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
-        private readonly DataCollectorAttachmentsHandler attachmentsHandler;
+        private readonly IMultiTestRunFinalizationManager finalizationManager;
+        private readonly CancellationToken cancellationToken;
 
         public ParallelDataCollectionEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
-            ParallelRunDataAggregator runDataAggregator) :
+            ParallelRunDataAggregator runDataAggregator,
+            CancellationToken cancellationToken) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
             // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-            attachmentsHandler = new DataCollectorAttachmentsHandler(new CodeCoverageDataAttachmentsHandler());
+            this.finalizationManager = new MultiTestRunFinalizationManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
+            this.cancellationToken = cancellationToken;
         }
 
         internal ParallelDataCollectionEventsHandler(IRequestData requestData,
@@ -53,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                attachmentsHandler.HandleAttachements(runDataAggregator.RunContextAttachments, CancellationToken.None);
+                finalizationManager.FinalizeMultiTestRunAsync(runDataAggregator.RunContextAttachments, null, cancellationToken).Wait();
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
