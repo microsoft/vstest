@@ -31,6 +31,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return CodeCoverageDataCollectorUri;
         }
 
+        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
+        {
+            return HandleDataCollectionAttachmentSets(dataCollectionAttachments, CancellationToken.None);
+        }
+
         public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, CancellationToken cancellationToken)
         {
             if (dataCollectionAttachments != null && dataCollectionAttachments.Any())

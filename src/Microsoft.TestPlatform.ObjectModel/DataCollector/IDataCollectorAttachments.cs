@@ -16,8 +16,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Gets the attachment set after Test Run Session
         /// </summary>
         /// <returns>Gets the attachment set after Test Run Session</returns>
+        ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments);
+
+        /// <summary>
+        /// Gets the attachment set after Test Run Session
+        /// </summary>
+        /// <returns>Gets the attachment set after Test Run Session</returns>
         ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, CancellationToken cancellationToken);
-        // TODO: add new method
 
         /// <summary>
         /// Gets the attachment Uri, which is handled by current Collector

@@ -27,11 +27,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
+            IMultiTestRunFinalizationManager finalizationManager,
             CancellationToken cancellationToken) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
-            // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-            this.finalizationManager = new MultiTestRunFinalizationManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
+            this.finalizationManager = finalizationManager;
             this.cancellationToken = cancellationToken;
         }
 
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    attachments,
+                    attachments ?? runDataAggregator.RunContextAttachments,
                     this.runDataAggregator.ElapsedTime);
 
                 // Add Metrics from Test Host
