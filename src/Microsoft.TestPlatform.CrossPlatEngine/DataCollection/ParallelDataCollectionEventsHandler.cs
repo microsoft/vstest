@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -58,13 +59,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                finalizationManager.FinalizeMultiTestRunAsync(runDataAggregator.RunContextAttachments, null, cancellationToken).Wait();
+                Collection<AttachmentSet> attachments = finalizationManager.FinalizeMultiTestRunAsync(runDataAggregator.RunContextAttachments, cancellationToken).Result;
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    this.runDataAggregator.RunContextAttachments,
+                    attachments,
                     this.runDataAggregator.ElapsedTime);
 
                 // Add Metrics from Test Host
