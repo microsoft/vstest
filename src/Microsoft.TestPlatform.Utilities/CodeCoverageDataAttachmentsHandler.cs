@@ -82,9 +82,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                         cancellationToken.ThrowIfCancellationRequested();
                         File.Copy(fileName, outputfileName, true);
-                        
-                        cancellationToken.ThrowIfCancellationRequested();
-                        File.Delete(files[i]);
                     }
 
                     File.Delete(fileName);
