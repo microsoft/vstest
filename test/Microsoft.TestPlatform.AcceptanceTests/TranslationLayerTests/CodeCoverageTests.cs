@@ -267,7 +267,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 FileName = GetCodeCoverageExePath(),
                 Arguments = $"analyze /include_skipped_functions /include_skipped_modules /output:\"{output}\" \"{attachment.Attachments.First().Uri.LocalPath}\"",
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                UseShellExecute = false
             });
 
             string analysisOutput = analyze.StandardOutput.ReadToEnd();
