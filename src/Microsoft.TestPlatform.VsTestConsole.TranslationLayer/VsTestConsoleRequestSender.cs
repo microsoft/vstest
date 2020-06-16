@@ -782,7 +782,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // Also, connection termination might not kill the process which could result in files being locked by testhost.
             }
             
-            // TODO: do we need events?
             this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStop(); 
         }
 
