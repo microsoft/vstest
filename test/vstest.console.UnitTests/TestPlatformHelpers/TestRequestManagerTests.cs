@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
 	using System;
@@ -25,6 +22,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 	using System.Runtime.Versioning;
@@ -2182,6 +2180,65 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
 			Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
 			Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+		}
+
+		[TestMethod]
+		public void FinalizeMultiTestRunShouldSucceed()
+        {
+			var mockEventsHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+			mockFinalizationManager
+				.Setup(m => m.FinalizeMultiTestRunAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IMultiTestRunFinalizationEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns(Task.FromResult(true));
+
+			var payload = new MultiTestRunFinalizationPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
+			};
+
+			testRequestManager.FinalizeMultiTestRun(payload, mockEventsHandler.Object);
+
+			mockFinalizationManager.Verify(m => m.FinalizeMultiTestRunAsync(payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStop());
+		}
+
+		[TestMethod]
+		public async Task CancelMultiTestRunFinalizationShouldSucceedIfRequestInProgress()
+		{
+			var mockEventsHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+			mockFinalizationManager
+				.Setup(m => m.FinalizeMultiTestRunAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IMultiTestRunFinalizationEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns((ICollection<AttachmentSet> a, IMultiTestRunFinalizationEventsHandler h, CancellationToken token) => Task.Run(() =>
+				{
+					int i = 0;
+					while (!token.IsCancellationRequested)
+                    {
+						i++;
+						Console.WriteLine($"Iteration {i}");
+						Task.Delay(5).Wait();
+                    }
+				}));
+
+			var payload = new MultiTestRunFinalizationPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
+			};
+
+			Task task = Task.Run(() => testRequestManager.FinalizeMultiTestRun(payload, mockEventsHandler.Object));
+			await Task.Delay(50);
+			testRequestManager.CancelMultiTestRunFinalization();
+
+			await task;
+
+			mockFinalizationManager.Verify(m => m.FinalizeMultiTestRunAsync(payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStop());
+		}
+
+		[TestMethod]
+		public void CancelMultiTestRunFinalizationShouldSucceedIfNoRequest()
+		{
+			testRequestManager.CancelMultiTestRunFinalization();
 		}
 
 		private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
