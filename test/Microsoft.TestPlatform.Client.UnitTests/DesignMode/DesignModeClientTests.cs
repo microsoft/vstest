@@ -460,8 +460,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startFinalization);
 
+            this.mockTestRequestManager
+                .Setup(
+                    rm => rm.FinalizeMultiTestRun(
+                        It.IsAny<MultiTestRunFinalizationPayload>(),
+                        It.IsAny<IMultiTestRunFinalizationEventsHandler>()))
+                .Callback(() => complateEvent.Set());
+
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
 
+            Assert.IsTrue(this.complateEvent.WaitOne(Timeout), "Finalization not completed.");
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Never);
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.IsAny<MultiTestRunFinalizationCompletePayload>()), Times.Never);
             this.mockTestRequestManager.Verify(rm => rm.FinalizeMultiTestRun(It.IsAny<MultiTestRunFinalizationPayload>(), It.IsAny<MultiTestRunFinalizationEventsHandler>()));
