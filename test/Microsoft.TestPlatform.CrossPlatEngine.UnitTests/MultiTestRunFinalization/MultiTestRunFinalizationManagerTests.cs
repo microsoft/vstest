@@ -450,21 +450,27 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
 
             mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, CancellationToken cancellation) =>
             {
-                for (int i = 0; i < 1000; ++i)
+                try
                 {
-                    Task.Delay(100).Wait();
-                    Console.WriteLine($"Iteration: {i}");
+                    for (int i = 0; i < 1000; ++i)
+                    {
+                        Task.Delay(100).Wait();
+                        Console.WriteLine($"Iteration: {i}");
 
-                    cancellation.ThrowIfCancellationRequested();
+                        cancellation.ThrowIfCancellationRequested();
 
-                    if (i == 3)
-                    {                        
-                        cancellationTokenSource.Cancel();
-                        Task.Delay(500).Wait();
+                        if (i == 3)
+                        {
+                            cancellationTokenSource.Cancel();
+                            Task.Delay(500).Wait();
+                        }
                     }
                 }
+                finally
+                {
+                    innerTaskCompletionSource.TrySetResult(null);
+                }
 
-                innerTaskCompletionSource.TrySetResult(null);
                 return outputAttachments;
             });
 
