@@ -283,12 +283,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return requestSender.FinalizeMultiTestRunAsync(attachments, testSessionEventsHandler, cancellationToken);
         }
 
-        /// <inheritdoc/>
-        public void CancelMultiTestRunFinalization()
-        {
-            throw new System.NotImplementedException();
-        }
-
         #endregion
 
         private void EnsureInitialized()

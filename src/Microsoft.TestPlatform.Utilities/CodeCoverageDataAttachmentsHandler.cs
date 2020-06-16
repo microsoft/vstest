@@ -100,14 +100,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
                 throw;
             }
-            catch (ObjectDisposedException)
-            {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("CodeCoverageDataCollectorAttachmentsHandler: object disposed.");
-                }
-                throw;
-            }
             catch (Exception ex)
             {
                 if (EqtTrace.IsErrorEnabled)

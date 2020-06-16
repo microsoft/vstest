@@ -8,13 +8,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
@@ -59,13 +56,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                Collection<AttachmentSet> attachments = finalizationManager.FinalizeMultiTestRunAsync(runDataAggregator.RunContextAttachments, cancellationToken).Result;
+                runDataAggregator.RunContextAttachments = finalizationManager.FinalizeMultiTestRunAsync(runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    attachments ?? runDataAggregator.RunContextAttachments,
+                    runDataAggregator.RunContextAttachments,
                     this.runDataAggregator.ElapsedTime);
 
                 // Add Metrics from Test Host
