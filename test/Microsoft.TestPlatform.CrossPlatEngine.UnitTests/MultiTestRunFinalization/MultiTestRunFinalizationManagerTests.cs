@@ -452,14 +452,15 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             {
                 for (int i = 0; i < 1000; ++i)
                 {
-                    Task.Delay(100);
+                    Task.Delay(100).Wait();
                     Console.WriteLine($"Iteration: {i}");
 
-                    if (cancellation.IsCancellationRequested) break;
+                    cancellation.ThrowIfCancellationRequested();
 
                     if (i == 3)
-                    {
+                    {                        
                         cancellationTokenSource.Cancel();
+                        Task.Delay(500).Wait();
                     }
                 }
 
