@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public class MultiTestRunFinalizationPayload
     {
         /// <summary>
-        /// Settings used for the discovery request.
+        /// Collection of attachments.
         /// </summary>
         [DataMember]
         public ICollection<AttachmentSet> Attachments { get; set; }

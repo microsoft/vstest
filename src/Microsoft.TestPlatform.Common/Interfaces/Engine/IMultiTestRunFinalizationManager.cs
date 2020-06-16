@@ -17,16 +17,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Finalizes multi test run and provides results through handler
         /// </summary>
-        /// <param name="attachments">Attachments</param>
-        /// <param name="eventHandler">EventHandler for handling multi test run finalization events from Engine</param>
+        /// <param name="attachments">Collection of attachments</param>
+        /// <param name="eventHandler">EventHandler for handling multi test run finalization event</param>
         /// <param name="cancellationToken">Cancellation token</param>
         Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Finalizes multi test
+        /// Finalizes multi test run
         /// </summary>
-        /// <param name="attachments">Attachments</param>
+        /// <param name="attachments">Collection of attachments</param>
         /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of attachments.</returns>
         Task<Collection<AttachmentSet>> FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, CancellationToken cancellationToken);
     }
 }

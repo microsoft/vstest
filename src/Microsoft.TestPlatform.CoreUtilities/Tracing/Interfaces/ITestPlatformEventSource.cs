@@ -196,18 +196,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// <summary>
         /// The multi test run finalization start.
         /// </summary>
-        /// <param name="numberOfAttachements">
-        /// The number of attachements.
+        /// <param name="numberOfAttachments">
+        /// The number of attachments.
         /// </param>
-        void MultiTestRunFinalizationStart(long numberOfAttachements);
+        void MultiTestRunFinalizationStart(long numberOfAttachments);
 
         /// <summary>
         /// The multi test run finalization stop.
         /// </summary>
-        /// <param name="numberOfAttachements">
-        /// The number of attachements.
+        /// <param name="numberOfAttachments">
+        /// The number of attachments.
         /// </param>
-        void MultiTestRunFinalizationStop(long numberOfAttachements);
+        void MultiTestRunFinalizationStop(long numberOfAttachments);
 
         /// <summary>
         /// Mark the start of translation layer multi test run finalization request.

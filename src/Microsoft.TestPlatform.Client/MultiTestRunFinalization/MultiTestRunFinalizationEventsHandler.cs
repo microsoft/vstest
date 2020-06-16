@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
     using System.Collections.Generic;
 
     /// <summary>
-    /// The multi test finalization event handler.
+    /// The multi test finalization events handler.
     /// </summary>
     public class MultiTestRunFinalizationEventsHandler : IMultiTestRunFinalizationEventsHandler
     {
@@ -20,23 +20,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiTestRunFinalizationEventsHandler"/> class.
         /// </summary>
-        /// <param name="requestHandler"> The Request Handler. </param>
+        /// <param name="communicationManager"> The communication manager. </param>
         public MultiTestRunFinalizationEventsHandler(ICommunicationManager communicationManager)
         {
             this.communicationManager = communicationManager;
         }
 
-        /// <summary>
-        /// The handle discovery message.
-        /// </summary>
-        /// <param name="level"> Logging level. </param>
-        /// <param name="message"> Logging message. </param>
+        /// <inheritdoc/>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
             var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
             this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
         }
 
+        /// <inheritdoc/>
         public void HandleMultiTestRunFinalizationComplete(ICollection<AttachmentSet> attachments)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -53,6 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
             this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationComplete, payload);
         }
 
+        /// <inheritdoc/>
         public void HandleRawMessage(string rawMessage)
         {
             // No-Op

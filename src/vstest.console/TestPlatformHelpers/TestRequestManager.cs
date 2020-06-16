@@ -312,13 +312,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        /// <summary>
-        /// Discover Tests given a list of sources, run settings.
-        /// </summary>
-        /// <param name="discoveryPayload">Discovery payload</param>
-        /// <param name="discoveryEventsRegistrar">EventHandler for discovered tests</param>
-        /// <param name="protocolConfig">Protocol related information</param>
-        /// <returns>True, if successful</returns>
+        /// <inheritdoc/>
         public void FinalizeMultiTestRun(MultiTestRunFinalizationPayload finalizationPayload, IMultiTestRunFinalizationEventsHandler finalizationEventsHandler)
         {
             EqtTrace.Info("TestRequestManager.FinalizeMultiTestRun: Multi test run finalization started.");
@@ -392,9 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.currentTestRunRequest?.Abort();
         }
 
-        /// <summary>
-        /// Cancel the multi test run finalization.
-        /// </summary>
+        /// <inheritdoc/>
         public void CancelMultiTestRunFinalization()
         {
             EqtTrace.Info("TestRequestManager.CancelMultiTestRunFinalization: Sending cancel request.");

@@ -79,9 +79,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void OnProcessExited();
 
         /// <summary>
-        /// Provides back all attachements to TestPlatform for additional processing (for example merging)
+        /// Provides back all attachments to TestPlatform for additional processing (for example merging)
         /// </summary>
-        /// <param name="attachments">List of attachements</param>
+        /// <param name="attachments">Collection of attachments</param>
         /// <param name="multiTestRunFinalizationCompleteEventsHandler">Events handler</param>
         /// <param name="cancellationToken">Cancellation token</param>
         Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);

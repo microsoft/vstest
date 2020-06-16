@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization
 {
     /// <summary>
-    /// Orchestrates multi test run finalization operations for the engine communicating with the test host process.
+    /// Orchestrates multi test run finalization operations.
     /// </summary>
     public class MultiTestRunFinalizationManager : IMultiTestRunFinalizationManager
     {
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
 
                 Task task = Task.Run(() =>
                 {
-                    HandleAttachements(attachments, cancellationToken);
+                    HandleAttachments(attachments, cancellationToken);
                 });
 
                 var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             }
         }
 
-        private void HandleAttachements(ICollection<AttachmentSet> attachments, CancellationToken cancellationToken)
+        private void HandleAttachments(ICollection<AttachmentSet> attachments, CancellationToken cancellationToken)
         {
             foreach (var dataCollectorAttachmentsHandler in dataCollectorAttachmentsHandlers)
             {
@@ -107,8 +107,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                             attachments.Remove(attachment);
                         }
 
-                        ICollection<AttachmentSet> processedAttachements = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), cancellationToken);
-                        foreach (var attachment in processedAttachements)
+                        ICollection<AttachmentSet> processedAttachments = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), cancellationToken);
+                        foreach (var attachment in processedAttachments)
                         {
                             attachments.Add(attachment);
                         }

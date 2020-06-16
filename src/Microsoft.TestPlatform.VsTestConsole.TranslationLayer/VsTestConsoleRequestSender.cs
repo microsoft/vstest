@@ -755,7 +755,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachements: Process complete.");
+                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
                         }
 
                         var multiTestRunFinalizationCompletePayload = this.dataSerializer.DeserializePayload<MultiTestRunFinalizationCompletePayload>(message);
