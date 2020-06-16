@@ -7,17 +7,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Net.Mail;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
-    using VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The Multi test run finalization tests using VsTestConsoleWrapper API's
