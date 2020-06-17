@@ -322,7 +322,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""12.0.3""
+                    ""Newtonsoft.Json"": ""9.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -391,7 +391,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""12.0.3""
+                    ""Newtonsoft.Json"": ""9.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -670,7 +670,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""12.0.3""
+                    ""Newtonsoft.Json"": ""9.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -735,7 +735,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""12.0.3""
+                    ""Newtonsoft.Json"": ""9.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
@@ -803,7 +803,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             ""microsoft.testplatform.testhost/15.0.0-Dev"": {
                 ""dependencies"": {
                     ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
-                    ""Newtonsoft.Json"": ""12.0.3""
+                    ""Newtonsoft.Json"": ""9.0.1""
                 },
                 ""runtime"": {
                     ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
