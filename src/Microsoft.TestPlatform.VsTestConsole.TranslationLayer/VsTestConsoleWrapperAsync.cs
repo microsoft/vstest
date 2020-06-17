@@ -228,8 +228,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStart();
 
-            await this.EnsureInitializedAsync();
-            await requestSender.FinalizeMultiTestRunAsync(attachments, testSessionEventsHandler, cancellationToken);
+            await this.EnsureInitializedAsync().ConfigureAwait(false);
+            await requestSender.FinalizeMultiTestRunAsync(attachments, testSessionEventsHandler, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

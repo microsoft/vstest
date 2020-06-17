@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
         /// <inheritdoc/>
         public async Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
         {
-            await InternalFinalizeMultiTestRunAsync(new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken);
+            await InternalFinalizeMultiTestRunAsync(new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -53,30 +53,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                 cancellationToken.ThrowIfCancellationRequested();                
 
                 var taskCompletionSource = new TaskCompletionSource<object>();
-                cancellationToken.Register(() =>
+                using (cancellationToken.Register(() => taskCompletionSource.TrySetCanceled()))
                 {
-                    taskCompletionSource.TrySetCanceled();
-                });
+                    Task task = Task.Run(() =>
+                    {
+                        HandleAttachments(attachments, cancellationToken);
+                    });
 
-                Task task = Task.Run(() =>
-                {
-                    HandleAttachments(attachments, cancellationToken);
-                });
+                    var completedTask = await Task.WhenAny(task, taskCompletionSource.Task).ConfigureAwait(false);
 
-                var completedTask = await Task.WhenAny(task, taskCompletionSource.Task);
-
-                if (completedTask == task)
-                {
-                    await task;
-                    eventHandler?.HandleMultiTestRunFinalizationComplete(attachments);
-                    testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
-                    return attachments;
-                }
-                else
-                {
-                    eventHandler?.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Informational, "Finalization was cancelled.");
-                    eventHandler?.HandleMultiTestRunFinalizationComplete(null);
-                    testPlatformEventSource.MultiTestRunFinalizationStop(0);                    
+                    if (completedTask == task)
+                    {
+                        await task;
+                        eventHandler?.HandleMultiTestRunFinalizationComplete(attachments);
+                        testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
+                        return attachments;
+                    }
+                    else
+                    {
+                        eventHandler?.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Informational, "Finalization was cancelled.");
+                        eventHandler?.HandleMultiTestRunFinalizationComplete(null);
+                        testPlatformEventSource.MultiTestRunFinalizationStop(0);
+                    }
                 }
 
                 return null;

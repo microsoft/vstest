@@ -742,31 +742,32 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationStart, payload);
                 var isMultiTestRunFinalizationComplete = false;
 
-                cancellationToken.Register(() => this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationCancel));
-
-                // Cycle through the messages that the vstest.console sends.
-                // Currently each of the operations are not separate tasks since they should not each take much time.
-                // This is just a notification.
-                while (!isMultiTestRunFinalizationComplete)
+                using (cancellationToken.Register(() => this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationCancel)))
                 {
-                    var message = await this.TryReceiveMessageAsync();
-
-                    if (string.Equals(MessageType.MultiTestRunFinalizationComplete, message.MessageType))
+                    // Cycle through the messages that the vstest.console sends.
+                    // Currently each of the operations are not separate tasks since they should not each take much time.
+                    // This is just a notification.
+                    while (!isMultiTestRunFinalizationComplete)
                     {
-                        if (EqtTrace.IsInfoEnabled)
+                        var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+
+                        if (string.Equals(MessageType.MultiTestRunFinalizationComplete, message.MessageType))
                         {
-                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
+                            if (EqtTrace.IsInfoEnabled)
+                            {
+                                EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
+                            }
+
+                            var multiTestRunFinalizationCompletePayload = this.dataSerializer.DeserializePayload<MultiTestRunFinalizationCompletePayload>(message);
+
+                            eventHandler.HandleMultiTestRunFinalizationComplete(multiTestRunFinalizationCompletePayload.Attachments);
+                            isMultiTestRunFinalizationComplete = true;
                         }
-
-                        var multiTestRunFinalizationCompletePayload = this.dataSerializer.DeserializePayload<MultiTestRunFinalizationCompletePayload>(message);
-
-                        eventHandler.HandleMultiTestRunFinalizationComplete(multiTestRunFinalizationCompletePayload.Attachments);
-                        isMultiTestRunFinalizationComplete = true;
-                    }
-                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                    {
-                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                        eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                        else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                        {
+                            var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                            eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                        }
                     }
                 }
             }
