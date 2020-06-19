@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             finally
             {
                 stopwatch.Stop();
-                requestData.MetricsCollection.Metrics.Add(TelemetryDataConstants.TimeTakenInSecForFinalization, stopwatch.Elapsed.TotalSeconds);
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForFinalization, stopwatch.Elapsed.TotalSeconds);
             }
         }
 
@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             eventHandler?.HandleMultiTestRunFinalizationComplete(attachments);
             testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
             requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterFinalization, attachments.Count);
-            requestData.MetricsCollection.Add(TelemetryDataConstants.FinalizationState, attachments.Count);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.FinalizationState, finalizationState);
 
             return attachments;
         }

@@ -2183,7 +2183,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			var mockEventsHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
 			mockFinalizationManager
 				.Setup(m => m.FinalizeMultiTestRunAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IMultiTestRunFinalizationEventsHandler>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(true));
+				.Returns((IRequestData r, ICollection<AttachmentSet> a, IMultiTestRunFinalizationEventsHandler h, CancellationToken token) => Task.Run(() =>
+				{
+					r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForFinalization, 5);
+					r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterFinalization, 1);
+				}));
 
 			var payload = new MultiTestRunFinalizationPayload()
 			{
@@ -2196,6 +2200,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			mockFinalizationManager.Verify(m => m.FinalizeMultiTestRunAsync(It.Is<IRequestData>(r => r.IsTelemetryOptedIn), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
 			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStart());
 			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStop());
+
+			mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestFinalizationCompleteEvent,
+				It.Is<Dictionary<string, object>>(m => m.Count == 2 && 
+					m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForFinalization) && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForFinalization] == 5 &&
+					m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterFinalization) && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterFinalization] == 1)));
 		}
 
 		[TestMethod]
@@ -2225,7 +2234,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			var mockEventsHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
 			mockFinalizationManager
 				.Setup(m => m.FinalizeMultiTestRunAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IMultiTestRunFinalizationEventsHandler>(), It.IsAny<CancellationToken>()))
-				.Returns((ICollection<AttachmentSet> a, IMultiTestRunFinalizationEventsHandler h, CancellationToken token) => Task.Run(() =>
+				.Returns((IRequestData r, ICollection<AttachmentSet> a, IMultiTestRunFinalizationEventsHandler h, CancellationToken token) => Task.Run(() =>
 				{
 					int i = 0;
 					while (!token.IsCancellationRequested)
@@ -2234,11 +2243,14 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 						Console.WriteLine($"Iteration {i}");
 						Task.Delay(5).Wait();
                     }
+
+					r.MetricsCollection.Add(TelemetryDataConstants.FinalizationState, "Canceled");
 				}));
 
 			var payload = new MultiTestRunFinalizationPayload()
 			{
-				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = true
 			};
 
 			Task task = Task.Run(() => testRequestManager.FinalizeMultiTestRun(payload, mockEventsHandler.Object, this.protocolConfig));
@@ -2250,6 +2262,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			mockFinalizationManager.Verify(m => m.FinalizeMultiTestRunAsync(It.IsAny<IRequestData>(), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
 			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStart());
 			mockTestPlatformEventSource.Verify(es => es.MultiTestRunFinalizationRequestStop());
+
+			mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestFinalizationCompleteEvent,
+				It.Is<Dictionary<string, object>>(m => m.Count == 1 && m.ContainsKey(TelemetryDataConstants.FinalizationState) && (string)m[TelemetryDataConstants.FinalizationState] == "Canceled")));
 		}
 
 		[TestMethod]
