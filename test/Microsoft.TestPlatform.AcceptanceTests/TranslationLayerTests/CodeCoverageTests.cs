@@ -164,10 +164,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             await finalization;
             multiTestRunFinalizationEventHandler.EnsureSuccess();
 
-            if(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework))
-            {
-                Assert.AreEqual(0, this.multiTestRunFinalizationEventHandler.Attachments.Count);
-            }            
+            Assert.AreEqual(1000, this.multiTestRunFinalizationEventHandler.Attachments.Count);       
         }
 
         [TestMethod]
