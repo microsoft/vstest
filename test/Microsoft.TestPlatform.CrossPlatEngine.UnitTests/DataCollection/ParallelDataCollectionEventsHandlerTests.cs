@@ -61,14 +61,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 new AttachmentSet(new Uri(uri1), "uri1_input1")
             };
 
-            mockMultiTestRunFinalizationManager.Setup(f => f.FinalizeMultiTestRunAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(outputAttachments));
+            mockMultiTestRunFinalizationManager.Setup(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(outputAttachments));
 
             // act
             parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
 
             // assert
             mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(outputAttachments[0])), It.IsAny<ICollection<string>>()));
-            mockMultiTestRunFinalizationManager.Verify(f => f.FinalizeMultiTestRunAsync(It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
+            mockMultiTestRunFinalizationManager.Verify(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
         }
 
         [TestMethod]
@@ -82,14 +82,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 new AttachmentSet(new Uri(uri3), "uri3_input1")
             };
 
-            mockMultiTestRunFinalizationManager.Setup(f => f.FinalizeMultiTestRunAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
+            mockMultiTestRunFinalizationManager.Setup(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
 
             // act
             parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
 
             // assert
             mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 3), It.IsAny<ICollection<string>>()));
-            mockMultiTestRunFinalizationManager.Verify(f => f.FinalizeMultiTestRunAsync(It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
+            mockMultiTestRunFinalizationManager.Verify(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
         }
     }
 }

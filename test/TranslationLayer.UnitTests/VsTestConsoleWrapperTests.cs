@@ -314,10 +314,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.consoleWrapper.FinalizeMultiTestRunAsync(
                 attachments,
+                true,
                 new Mock<IMultiTestRunFinalizationEventsHandler>().Object,
                 cancellationToken);
 
-            this.mockRequestSender.Verify(rs => rs.FinalizeMultiTestRunAsync(attachments, It.IsAny<IMultiTestRunFinalizationEventsHandler>(), cancellationToken));
+            this.mockRequestSender.Verify(rs => rs.FinalizeMultiTestRunAsync(attachments, true, It.IsAny<IMultiTestRunFinalizationEventsHandler>(), cancellationToken));
         }
 
         [TestMethod]

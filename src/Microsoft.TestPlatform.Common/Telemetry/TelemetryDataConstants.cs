@@ -90,9 +90,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string NumberOfAdapterUsedToDiscoverTests = "VS.TestDiscovery.AdaptersUsedCount";
 
+        // *********************Finalization****************************
+        public static string NumberOfAttachmentsSentForFinalization = "VS.TestFinalization.InitialAttachmentsCount";
+
+        public static string NumberOfAttachmentsAfterFinalization = "VS.TestFinalization.FinalAttachmentsCount";
+
+        public static string TimeTakenInSecForFinalization = "VS.TestFinalization.TotalTimeTakenInSec";
+        public static string FinalizationState = "VS.TestFinalization.FinalizationState";
+
         // **************Events Name **********************************
         public static string TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession";
 
         public static string TestExecutionCompleteEvent = "vs/testplatform/testrunsession";
+
+        public static string TestFinalizationCompleteEvent = "vs/testplatform/testfinalizationsession";
     }
 }

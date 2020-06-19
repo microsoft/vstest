@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                runDataAggregator.RunContextAttachments = finalizationManager.FinalizeMultiTestRunAsync(runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
+                runDataAggregator.RunContextAttachments = finalizationManager.FinalizeMultiTestRunAsync(requestData, runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,

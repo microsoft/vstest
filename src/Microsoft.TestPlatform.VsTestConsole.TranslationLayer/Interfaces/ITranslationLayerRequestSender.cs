@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     /// <summary>
     /// Defines contract to send test platform requests to test host
     /// </summary>
-    internal interface ITranslationLayerRequestSender : IDisposable
+    internal interface ITranslationLayerRequestSender : IDisposable, ITranslationLayerRequestSenderAsync
     {
         /// <summary>
         /// Initializes the communication for sending requests
@@ -111,13 +111,5 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Cancels the discovery of tests
         /// </summary>
         void CancelDiscovery();
-
-        /// <summary>
-        /// Provides back all attachments to TestPlatform for additional processing (for example merging)
-        /// </summary>
-        /// <param name="attachments">Collection of attachments</param>
-        /// <param name="multiTestRunFinalizationCompleteEventsHandler">Events handler</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
     }
 }

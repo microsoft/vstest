@@ -38,11 +38,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
-        /// See <see cref="IVsTestConsoleWrapper.CancelDiscovery"/>.
-        /// </summary>
-        void CancelDiscovery();
-
-        /// <summary>
         /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTests(IEnumerable{string}, string, ITestRunEventsHandler)"/>.
         /// </summary>
         Task RunTestsAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler);
@@ -86,23 +81,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Provides back all attachments to TestPlatform for additional processing (for example merging)
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
+        /// <param name="collectMetrics">Enables metrics collection</param>
         /// <param name="multiTestRunFinalizationCompleteEventsHandler">EventHandler to receive session complete event</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// See <see cref="IVsTestConsoleWrapper.CancelTestRun"/>.
-        /// </summary>
-        void CancelTestRun();
-
-        /// <summary>
-        /// See <see cref="IVsTestConsoleWrapper.AbortTestRun"/>.
-        /// </summary>
-        void AbortTestRun();
-
-        /// <summary>
-        /// See <see cref="IVsTestConsoleWrapper.EndSession"/>.
-        /// </summary>
-        void EndSession();
+        /// <param name="cancellationToken">Cancellation token</param>        
+        Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
     }
 }

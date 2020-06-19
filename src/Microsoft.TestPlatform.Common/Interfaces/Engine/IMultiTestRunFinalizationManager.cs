@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="attachments">Collection of attachments</param>
         /// <param name="eventHandler">EventHandler for handling multi test run finalization event</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
+        Task FinalizeMultiTestRunAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
 
         /// <summary>
         /// Finalizes multi test run
@@ -28,6 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="attachments">Collection of attachments</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of attachments.</returns>
-        Task<Collection<AttachmentSet>> FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, CancellationToken cancellationToken);
+        Task<Collection<AttachmentSet>> FinalizeMultiTestRunAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, CancellationToken cancellationToken);
     }
 }

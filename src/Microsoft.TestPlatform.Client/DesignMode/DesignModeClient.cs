@@ -479,7 +479,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     try
                     {
-                        testRequestManager.FinalizeMultiTestRun(finalizationPayload, new MultiTestRunFinalizationEventsHandler(this.communicationManager));
+                        testRequestManager.FinalizeMultiTestRun(finalizationPayload, new MultiTestRunFinalizationEventsHandler(this.communicationManager), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {

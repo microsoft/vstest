@@ -1,22 +1,23 @@
-﻿using System.Collections.Generic;
-
-namespace Microsoft.TestPlatform.Utilities.UnitTests
+﻿namespace Microsoft.TestPlatform.Utilities.UnitTests
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
 
     [TestClass]
     public class CodeCoverageDataAttachmentsHandlerTests
     {
-        private CodeCoverageDataAttachmentsHandler coverageDataAttachmentsHandler;
+        private readonly Mock<IProgress<int>> mockProgressReporter;
+        private readonly CodeCoverageDataAttachmentsHandler coverageDataAttachmentsHandler;
 
         public CodeCoverageDataAttachmentsHandlerTests()
         {
+            mockProgressReporter = new Mock<IProgress<int>>();
             coverageDataAttachmentsHandler = new CodeCoverageDataAttachmentsHandler();
         }
 
@@ -25,15 +26,17 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         {
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet>();
             ICollection<AttachmentSet> resultAttachmentSets =
-                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, CancellationToken.None);
+                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
 
-            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null, CancellationToken.None);
+            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null, mockProgressReporter.Object, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
+
+            mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
         }
 
         [TestMethod]
@@ -49,9 +52,11 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                 attachmentSet
             };
 
-            Assert.ThrowsException<OperationCanceledException>(() => coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, cts.Token));
+            Assert.ThrowsException<OperationCanceledException>(() => coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, cts.Token));
 
             Assert.AreEqual(1, attachment.Count);
+
+            mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
         }
 
         [TestMethod]
@@ -71,11 +76,13 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                 attachmentSet2
             };
 
-            var result = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, cts.Token);
+            var result = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, cts.Token);
 
             Assert.AreEqual(2, result.Count);
             Assert.IsTrue(result.Contains(attachmentSet1));
             Assert.IsTrue(result.Contains(attachmentSet2));
+
+            mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
         }
     }
 }

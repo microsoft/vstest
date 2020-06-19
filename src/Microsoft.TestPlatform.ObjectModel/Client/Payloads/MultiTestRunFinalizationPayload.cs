@@ -15,6 +15,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Collection of attachments.
         /// </summary>
         [DataMember]
-        public ICollection<AttachmentSet> Attachments { get; set; }
+        public IEnumerable<AttachmentSet> Attachments { get; set; }
+
+        /// <summary>
+        ///  Gets or sets whether Metrics should be collected or not.
+        /// </summary>
+        [DataMember]
+        public bool CollectMetrics { get; set; }
     }
 }

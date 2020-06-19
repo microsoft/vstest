@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -21,11 +22,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     [TestClass]
     public class VsTestConsoleWrapperAsyncTests
     {
-        private IVsTestConsoleWrapperAsync consoleWrapper;
+        private IVsTestConsoleWrapper consoleWrapper;
 
         private Mock<IProcessManager> mockProcessManager;
 
-        private Mock<ITranslationLayerRequestSenderAsync> mockRequestSender;
+        private Mock<ITranslationLayerRequestSender> mockRequestSender;
+
+        private Mock<IProcessHelper> mockProcessHelper;
 
         private readonly List<string> testSources = new List<string> { "Hello", "World" };
 
@@ -42,13 +45,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleParameters = new ConsoleParameters();
 
-            this.mockRequestSender = new Mock<ITranslationLayerRequestSenderAsync>();
+            this.mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.mockProcessManager = new Mock<IProcessManager>();
-            this.consoleWrapper = new VsTestConsoleWrapperAsync(
+            this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.consoleWrapper = new VsTestConsoleWrapper(
                 this.mockRequestSender.Object,
                 this.mockProcessManager.Object,
                 this.consoleParameters,
-                new Mock<ITestPlatformEventSource>().Object);
+                new Mock<ITestPlatformEventSource>().Object,
+                this.mockProcessHelper.Object);
 
             this.mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(100));
         }
@@ -312,10 +317,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.consoleWrapper.FinalizeMultiTestRunAsync(
                 attachments,
+                true,
                 new Mock<IMultiTestRunFinalizationEventsHandler>().Object,
                 cancellationToken);
 
-            this.mockRequestSender.Verify(rs => rs.FinalizeMultiTestRunAsync(attachments, It.IsAny<IMultiTestRunFinalizationEventsHandler>(), cancellationToken));
+            this.mockRequestSender.Verify(rs => rs.FinalizeMultiTestRunAsync(attachments, true, It.IsAny<IMultiTestRunFinalizationEventsHandler>(), cancellationToken));
         }
 
         [TestMethod]

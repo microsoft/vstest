@@ -313,9 +313,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRun(MultiTestRunFinalizationPayload finalizationPayload, IMultiTestRunFinalizationEventsHandler finalizationEventsHandler)
+        public void FinalizeMultiTestRun(MultiTestRunFinalizationPayload finalizationPayload, IMultiTestRunFinalizationEventsHandler finalizationEventsHandler, ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.FinalizeMultiTestRun: Multi test run finalization started.");
+
+            this.telemetryOptedIn = finalizationPayload.CollectMetrics;
+            var requestData = this.GetRequestData(protocolConfig);
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // There can be only one discovery, execution or finalization request at a given point in time
@@ -328,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     this.currentFinalizationCancellationTokenSource = new CancellationTokenSource();
 
-                    Task task = this.finalizationManager.FinalizeMultiTestRunAsync(finalizationPayload.Attachments, finalizationEventsHandler, this.currentFinalizationCancellationTokenSource.Token);
+                    Task task = this.finalizationManager.FinalizeMultiTestRunAsync(requestData, finalizationPayload.Attachments, finalizationEventsHandler, this.currentFinalizationCancellationTokenSource.Token);
                     task.Wait();                   
                 }
                 finally
@@ -341,6 +344,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     EqtTrace.Info("TestRequestManager.FinalizeMultiTestRun: Multi test run finalization completed.");
                     this.testPlatformEventSource.MultiTestRunFinalizationRequestStop();
+
+                    // Post the finalization complete event
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestFinalizationCompleteEvent, requestData.MetricsCollection.Metrics);
                 }
             }
         }

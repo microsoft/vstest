@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// </summary>
         /// <param name="multiTestRunFinalizationPayload">Multi test run finalization payload</param>
         /// <param name="multiTestRunFinalizationEventsHandler">Multi test run finalization events handler</param>
-        void FinalizeMultiTestRun(MultiTestRunFinalizationPayload multiTestRunFinalizationPayload, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationEventsHandler);
+        void FinalizeMultiTestRun(MultiTestRunFinalizationPayload multiTestRunFinalizationPayload, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationEventsHandler, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request

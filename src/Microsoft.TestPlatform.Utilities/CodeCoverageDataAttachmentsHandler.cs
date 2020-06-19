@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Resources;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -33,15 +34,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
         {
-            return HandleDataCollectionAttachmentSets(dataCollectionAttachments, CancellationToken.None);
+            return HandleDataCollectionAttachmentSets(dataCollectionAttachments, null, CancellationToken.None);
         }
 
-        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, CancellationToken cancellationToken)
+        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
             if (dataCollectionAttachments != null && dataCollectionAttachments.Any())
             {
                 var codeCoverageFiles = dataCollectionAttachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
-                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles, cancellationToken);
+                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles, progressReporter, cancellationToken);
                 var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
                 if (!string.IsNullOrEmpty(outputFile))
@@ -57,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return new Collection<AttachmentSet>();
         }
 
-        private string MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
+        private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
             string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
             string outputfileName = files[0];
@@ -82,11 +83,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                         cancellationToken.ThrowIfCancellationRequested();
                         File.Copy(fileName, outputfileName, true);
+
+                        progressReporter?.Report(100 * i / files.Count);
                     }
 
                     File.Delete(fileName);
                 }
 
+                progressReporter?.Report(100);
                 return outputfileName;
             }
             catch (OperationCanceledException)

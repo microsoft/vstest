@@ -102,7 +102,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // Assert
             multiTestRunFinalizationEventHandler.EnsureSuccess();
@@ -128,7 +128,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(3, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // Assert
             multiTestRunFinalizationEventHandler.EnsureSuccess();
@@ -154,7 +154,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             CancellationTokenSource cts = new CancellationTokenSource();
             
-            Task finalization = this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(attachments, multiTestRunFinalizationEventHandler, cts.Token);
+            Task finalization = this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(attachments, true, multiTestRunFinalizationEventHandler, cts.Token);
             await Task.Delay(TimeSpan.FromSeconds(1));
 
             // act
@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // act
             this.vstestConsoleWrapper?.EndSession();

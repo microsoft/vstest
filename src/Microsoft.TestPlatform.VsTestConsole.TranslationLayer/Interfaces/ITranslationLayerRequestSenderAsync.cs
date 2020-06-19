@@ -24,16 +24,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task<int> InitializeCommunicationAsync(int clientConnectionTimeout);
 
         /// <summary>
-        /// See <see cref="ITranslationLayerRequestSender.Close"/>
-        /// </summary>
-        void Close();
-
-        /// <summary>
-        /// See <see cref="ITranslationLayerRequestSender.InitializeExtensions"/>
-        /// </summary>
-        void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions);
-
-        /// <summary>
         /// Asynchronous equivalent of ITranslationLayerRequestSender.DiscoverTests/>.
         /// </summary>
         Task DiscoverTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
@@ -59,31 +49,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task StartTestRunWithCustomHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// See <see cref="ITranslationLayerRequestSender.EndSession"/>.
-        /// </summary>
-        void EndSession();
-
-        /// <summary>
-        /// See <see cref="ITranslationLayerRequestSender.CancelTestRun"/>.
-        /// </summary>
-        void CancelTestRun();
-
-        /// <summary>
-        /// See <see cref="ITranslationLayerRequestSender.AbortTestRun"/>.
-        /// </summary>
-        void AbortTestRun();
-
-        /// <summary>
-        /// See <see cref="ITranslationLayerRequestSender.OnProcessExited"/>.
-        /// </summary>
-        void OnProcessExited();
-
-        /// <summary>
         /// Provides back all attachments to TestPlatform for additional processing (for example merging)
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
+        /// <param name="collectMetrics">Enables metrics collection</param>
         /// <param name="multiTestRunFinalizationCompleteEventsHandler">Events handler</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
+        Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
     }
 }

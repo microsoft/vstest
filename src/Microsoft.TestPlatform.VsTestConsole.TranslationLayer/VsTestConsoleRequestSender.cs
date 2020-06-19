@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
     /// </summary>
-    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender, ITranslationLayerRequestSenderAsync
+    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
         private readonly ICommunicationManager communicationManager;
 
@@ -384,9 +384,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public Task FinalizeMultiTestRunAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        public Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
         {
-            return this.SendMessageAndListenAndReportFinalizationResultAsync(attachments, testSessionEventsHandler, cancellationToken);
+            return this.SendMessageAndListenAndReportFinalizationResultAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken);
         }
 
         /// <summary>
@@ -731,14 +731,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private async Task SendMessageAndListenAndReportFinalizationResultAsync(ICollection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
+        private async Task SendMessageAndListenAndReportFinalizationResultAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
         {
             try
             {
                 var payload = new MultiTestRunFinalizationPayload
                 {
-                    Attachments = attachments
+                    Attachments = attachments,
+                    CollectMetrics = collectMetrics
                 };
+
                 this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationStart, payload);
                 var isMultiTestRunFinalizationComplete = false;
 
@@ -782,8 +784,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // know of the error, so that the TL can wait for the next instruction from the client itself.
                 // Also, connection termination might not kill the process which could result in files being locked by testhost.
             }
-            
-            this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStop(); 
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStop();
+            }
         }
 
         private Message TryReceiveMessage()
