@@ -446,19 +446,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Process is not started.");
                 await this.StartSessionAsync();
-                this.sessionStarted = this.WaitForConnection();
 
-                if (this.sessionStarted)
-                {
-                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Send a request to initialize extensions.");
-                    this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
-                }
-            }
-
-            if (!this.sessionStarted && this.requestSender != null)
-            {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Process Started.");
-                this.sessionStarted = this.WaitForConnection();
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Send a request to initialize extensions.");
+                this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
             }
         }
 
