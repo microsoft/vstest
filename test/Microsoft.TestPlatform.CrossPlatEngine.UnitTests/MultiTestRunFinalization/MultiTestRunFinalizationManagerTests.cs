@@ -533,6 +533,18 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri2), "uri2_output")
             };
 
+            var innerTaskCompletionSource = new TaskCompletionSource<object>();
+
+            int counter = 0;
+            mockEventsHandler.Setup(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>())).Callback(() => 
+            { 
+                counter++;
+                if(counter == 6)
+                {
+                    innerTaskCompletionSource.TrySetResult(null);
+                }
+            });
+
             mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 progress.Report(25);
@@ -555,6 +567,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, CancellationToken.None);
 
             // assert
+            await innerTaskCompletionSource.Task;
             VerifyCompleteEvent(false, false, outputAttachments1[0], outputAttachments2[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Exactly(6));
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 25, uri1))));
