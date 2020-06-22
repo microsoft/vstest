@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Reso" +
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         /// <summary>
         ///   Looks up a localized string similar to The active Multi Test Runs Finalization was aborted..
         /// </summary>
-        internal static string AbortedMultiTestRunFinalization {
+        public static string AbortedMultiTestRunFinalization {
             get {
                 return ResourceManager.GetString("AbortedMultiTestRunFinalization", resourceCulture);
             }
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Discovery was aborted..
         /// </summary>
-        internal static string AbortedTestsDiscovery {
+        public static string AbortedTestsDiscovery {
             get {
                 return ResourceManager.GetString("AbortedTestsDiscovery", resourceCulture);
             }
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Run was aborted..
         /// </summary>
-        internal static string AbortedTestsRun {
+        public static string AbortedTestsRun {
             get {
                 return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
             }
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         /// <summary>
         ///   Looks up a localized string similar to Failed to receive message from vstest.console process.
         /// </summary>
-        internal static string FailedToReceiveMessage {
+        public static string FailedToReceiveMessage {
             get {
                 return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
             }
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         /// <summary>
         ///   Looks up a localized string similar to File {0} does not exists.
         /// </summary>
-        internal static string InvalidFilePath {
+        public static string InvalidFilePath {
             get {
                 return ResourceManager.GetString("InvalidFilePath", resourceCulture);
             }
@@ -109,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         /// <summary>
         ///   Looks up a localized string similar to vstest.console process exited abnormally.
         /// </summary>
-        internal static string VsTestProcessExitedAbnormally {
+        public static string VsTestProcessExitedAbnormally {
             get {
                 return ResourceManager.GetString("VsTestProcessExitedAbnormally", resourceCulture);
             }
