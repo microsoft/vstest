@@ -134,6 +134,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string MultiTestRunFinalizationComplete = "MultiTestRunFinalization.Complete";
 
         /// <summary>
+        /// Multi test run finalization progress
+        /// </summary>
+        public const string MultiTestRunFinalizationProgress = "MultiTestRunFinalization.Progress";
+
+        /// <summary>
         /// Cancel multi test run finalization
         /// </summary>
         public const string MultiTestRunFinalizationCancel = "MultiTestRunFinalization.Cancel";

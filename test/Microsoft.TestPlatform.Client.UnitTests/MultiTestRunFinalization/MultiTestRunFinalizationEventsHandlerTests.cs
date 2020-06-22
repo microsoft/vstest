@@ -38,10 +38,21 @@ namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
         public void EventsHandlerHandleMultiTestRunFinalizationCompleteShouldSendFinalizationCompleteMessage()
         {
             var attachments = new[] { new AttachmentSet(new System.Uri("http://www.bing.com/"), "code coverage") };
+            var args = new MultiTestRunFinalizationCompleteEventArgs(false, false, null);
 
-            handler.HandleMultiTestRunFinalizationComplete(attachments);
+            handler.HandleMultiTestRunFinalizationComplete(args, attachments);
 
-            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.Is<MultiTestRunFinalizationCompletePayload>(p => p.Attachments == attachments)));
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.Is<MultiTestRunFinalizationCompletePayload>(p => p.Attachments == attachments && p.FinalizationCompleteEventArgs == args)));
+        }
+
+        [TestMethod]
+        public void EventsHandlerHandleMultiTestRunFinalizationProgressShouldSendFinalizationProgressMessage()
+        {
+            var args = new MultiTestRunFinalizationProgressEventArgs(1, "CC", 90, 2);
+
+            handler.HandleMultiTestRunFinalizationProgress(args);
+
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationProgress, It.Is<MultiTestRunFinalizationProgressPayload>(p => p.FinalizationProgressEventArgs == args)));
         }
 
         [TestMethod]

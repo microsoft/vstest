@@ -82,5 +82,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 this.Attachments.AddRange(attachments);
             }
         }
+
+        public void HandleMultiTestRunFinalizationComplete(MultiTestRunFinalizationCompleteEventArgs finalizationCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
+        {
+            if (lastChunk != null)
+            {
+                this.Attachments.AddRange(lastChunk);
+            }
+
+            if (finalizationCompleteEventArgs.Error != null)
+            {
+                Errors.Add(finalizationCompleteEventArgs.Error.Message);
+            }
+        }
+
+        public void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void HandleMultiTestRunFinalizationProgress(MultiTestRunFinalizationProgressEventArgs finalizationProgressEventArgs)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

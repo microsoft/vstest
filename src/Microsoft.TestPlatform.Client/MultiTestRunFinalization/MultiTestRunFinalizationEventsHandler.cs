@@ -27,14 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
         }
 
         /// <inheritdoc/>
-        public void HandleLogMessage(TestMessageLevel level, string message)
-        {
-            var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-        }
-
-        /// <inheritdoc/>
-        public void HandleMultiTestRunFinalizationComplete(ICollection<AttachmentSet> attachments)
+        public void HandleMultiTestRunFinalizationComplete(MultiTestRunFinalizationCompleteEventArgs finalizationCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -43,11 +36,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
 
             var payload = new MultiTestRunFinalizationCompletePayload()
             {
-                Attachments = attachments
+                FinalizationCompleteEventArgs = finalizationCompleteEventArgs,
+                Attachments = lastChunk
             };
 
-            // Send run complete to translation layer
             this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationComplete, payload);
+        }
+
+        /// <inheritdoc/>
+        public void HandleMultiTestRunFinalizationProgress(MultiTestRunFinalizationProgressEventArgs finalizationProgressEventArgs)
+        {
+            var payload = new MultiTestRunFinalizationProgressPayload()
+            {
+                FinalizationProgressEventArgs = finalizationProgressEventArgs,
+            };
+
+            this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationProgress, payload);
+        }
+
+        /// <inheritdoc/>
+        public void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void HandleLogMessage(TestMessageLevel level, string message)
+        {
+            var testMessagePayload = new TestMessagePayload { MessageLevel = level, Message = message };
+            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
         }
 
         /// <inheritdoc/>

@@ -13,7 +13,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Dispatch MultiTestRunFinalizationComplete event to listeners.
         /// </summary>
-        /// <param name="attachments">Attachments reprocessed.</param>
-        void HandleMultiTestRunFinalizationComplete(ICollection<AttachmentSet> attachments);
+        /// <param name="finalizationCompleteEventArgs">Finalization Complete event args.</param>
+        /// <param name="attachments">Last set of processed attachment sets.</param>
+        void HandleMultiTestRunFinalizationComplete(MultiTestRunFinalizationCompleteEventArgs finalizationCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk);
+
+        /// <summary>
+        /// Dispatch FinalisedAttachments event to listeners.
+        /// </summary>
+        /// <param name="attachments">Finalised attachment sets.</param>
+        void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments);
+
+        /// <summary>
+        /// Dispatch MultiTestRunFinalizationProgress event to listeners.
+        /// </summary>
+        /// <param name="finalizationProgressEventArgs">Finalization Progress event args.</param>
+        void HandleMultiTestRunFinalizationProgress(MultiTestRunFinalizationProgressEventArgs finalizationProgressEventArgs);
     }
 }

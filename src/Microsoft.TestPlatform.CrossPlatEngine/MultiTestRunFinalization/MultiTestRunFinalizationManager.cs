@@ -65,19 +65,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                 {
                     Task<Collection<AttachmentSet>> task = Task.Run(() =>
                     {
-                        return ProcessAttachments(new Collection<AttachmentSet>(attachments.ToList()), new ProgressReporter(eventHandler, dataCollectorAttachmentsHandlers.Length), cancellationToken);
+                        return ProcessAttachments(new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken);
                     });
 
                     var completedTask = await Task.WhenAny(task, taskCompletionSource.Task).ConfigureAwait(false);
 
                     if (completedTask == task)
                     {
-                        return FinalizeOperation(requestData, await task, eventHandler, FinalizationCompleted);
+                        return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(false, false, null), await task, eventHandler);
                     }
                     else
                     {
                         eventHandler?.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Informational, "Finalization was cancelled.");
-                        return FinalizeOperation(requestData, attachments, eventHandler, FinalizationCanceled);
+                        return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(true, false, null), attachments, eventHandler);
                     }
                 }
             }
@@ -87,14 +87,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                 {
                     EqtTrace.Warning("MultiTestRunFinalizationManager: operation was cancelled.");
                 }
-                return FinalizeOperation(requestData, attachments, eventHandler, FinalizationCanceled);
+                return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(true, false, null), attachments, eventHandler);
             }
             catch (Exception e)
             {
                 EqtTrace.Error("MultiTestRunFinalizationManager: Exception in FinalizeMultiTestRunAsync: " + e);
 
                 eventHandler?.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
-                return FinalizeOperation(requestData, attachments, eventHandler, FinalizationFailed);
+                return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(false, true, e), attachments, eventHandler);
             }
             finally
             {
@@ -103,12 +103,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             }
         }
 
-        private Collection<AttachmentSet> ProcessAttachments(Collection<AttachmentSet> attachments, ProgressReporter progressReporter, CancellationToken cancellationToken)
+        private Collection<AttachmentSet> ProcessAttachments(Collection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventsHandler, CancellationToken cancellationToken)
         {
-            if (attachments == null || !attachments.Any()) return attachments;           
+            if (attachments == null || !attachments.Any()) return attachments;
 
-            foreach (var dataCollectorAttachmentsHandler in dataCollectorAttachmentsHandlers)
+            for (int i = 0; i < dataCollectorAttachmentsHandlers.Length; i++)
             {
+                IDataCollectorAttachments dataCollectorAttachmentsHandler = dataCollectorAttachmentsHandlers[i];
+                string attachmentsHandlerName = dataCollectorAttachmentsHandler.GetType().FullName;
+
                 Uri attachementUri = dataCollectorAttachmentsHandler.GetExtensionUri();
                 if (attachementUri != null)
                 {
@@ -120,6 +123,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                             attachments.Remove(attachment);
                         }
 
+                        IProgress<int> progressReporter = new Progress<int>((int progress) => 
+                            eventsHandler?.HandleMultiTestRunFinalizationProgress(
+                                new MultiTestRunFinalizationProgressEventArgs(i + 1, attachmentsHandlerName, progress, dataCollectorAttachmentsHandlers.Length)));
                         ICollection<AttachmentSet> processedAttachments = dataCollectorAttachmentsHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(attachmentsToBeProcessed), progressReporter, cancellationToken);
                         foreach (var attachment in processedAttachments)
                         {
@@ -132,38 +138,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             return attachments;
         }
 
-        private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, Collection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, string finalizationState)
-        {
-            eventHandler?.HandleMultiTestRunFinalizationComplete(attachments);
+        private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, MultiTestRunFinalizationCompleteEventArgs completeArgs, Collection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler)
+        {            
             testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
             requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterFinalization, attachments.Count);
-            requestData.MetricsCollection.Add(TelemetryDataConstants.FinalizationState, finalizationState);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.FinalizationState, completeArgs.IsAborted ? FinalizationFailed : completeArgs.IsCanceled ? FinalizationCanceled : FinalizationCompleted);
+
+            completeArgs.Metrics = requestData.MetricsCollection.Metrics;
+            eventHandler?.HandleMultiTestRunFinalizationComplete(completeArgs, attachments);
 
             return attachments;
-        }
-
-        private class ProgressReporter : IProgress<int>
-        {
-            private readonly IMultiTestRunFinalizationEventsHandler eventsHandler;
-            private readonly int totalNumberOfHandlers;
-            private int currentHandlerIndex;
-
-            public ProgressReporter(IMultiTestRunFinalizationEventsHandler eventsHandler, int totalNumberOfHandlers)
-            {
-                this.eventsHandler = eventsHandler;
-                this.currentHandlerIndex = 0;
-                this.totalNumberOfHandlers = totalNumberOfHandlers;
-            }
-
-            public void IncremenetHandlerIndex()
-            {
-                currentHandlerIndex++;
-            }
-
-            public void Report(int value)
-            {
-                //eventsHandler.report( current, total, value)
-            }
         }
     }
 }
