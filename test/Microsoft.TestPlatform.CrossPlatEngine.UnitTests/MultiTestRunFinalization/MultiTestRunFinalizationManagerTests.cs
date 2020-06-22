@@ -63,16 +63,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(false, false, false);
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationComplete(It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => !a.IsAborted && !a.IsCanceled), It.Is<ICollection<AttachmentSet>>(c => c.Count == 0)));
+            VerifyCompleteEvent(false, false);
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationComplete(It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => !a.IsCanceled), It.Is<ICollection<AttachmentSet>>(c => c.Count == 0)));
             mockEventsHandler.Verify(h => h.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Never);
             mockEventSource.Verify(s => s.MultiTestRunFinalizationStart(0));
             mockEventSource.Verify(s => s.MultiTestRunFinalizationStop(0));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri(), Times.Never);
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(0, 0);
         }
@@ -90,8 +90,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             Assert.AreEqual(0, result.Count);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri(), Times.Never);
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(0, 0);
         }
@@ -109,13 +109,13 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(false, false, false, inputAttachments[0]);
+            VerifyCompleteEvent(false, false, inputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Never);
             mockEventsHandler.Verify(h => h.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1);
         }
@@ -137,8 +137,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             Assert.IsTrue(result.Contains(inputAttachments[0]));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1);
         }
@@ -157,19 +157,19 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri1), "uri1_output")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns(outputAttachments);
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns(outputAttachments);
 
             // act
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(false, false, false, outputAttachments[0]);
+            VerifyCompleteEvent(false, false, outputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Never);
             mockEventsHandler.Verify(h => h.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1);
         }
@@ -188,7 +188,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri1), "uri1_output")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns(outputAttachments);
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns(outputAttachments);
 
             // act
             var result = await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, cancellationTokenSource.Token);
@@ -200,8 +200,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             mockEventSource.Verify(s => s.MultiTestRunFinalizationStop(1));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1);
         }
@@ -215,19 +215,19 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Throws(new Exception("exception message"));
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Throws(new Exception("exception message"));
 
             // act
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(true, false, true, inputAttachments[0]);
+            VerifyCompleteEvent(false, true, inputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Never);
             mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, "exception message"), Times.Once);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1, "Failed");
         }
@@ -241,7 +241,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Throws(new Exception("exception message"));
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Throws(new Exception("exception message"));
 
             // act
             var result = await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, cancellationTokenSource.Token);
@@ -251,8 +251,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             Assert.IsTrue(result.Contains(inputAttachments[0]));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1, "Failed");
         }
@@ -271,12 +271,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(false, true, false, inputAttachments[0]);
+            VerifyCompleteEvent(true, false, inputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Never);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri(), Times.Never);
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             
             VerifyMetrics(1, 1, "Canceled");
         }
@@ -299,8 +299,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             Assert.IsTrue(result.Contains(inputAttachments[0]));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri(), Times.Never);
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1, "Canceled");
         }
@@ -328,20 +328,20 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri2), "uri2_output")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler1);
-            mockAttachmentHandler2.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler2);
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler1);
+            mockAttachmentHandler2.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler2);
 
             // act
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(false, false, false, inputAttachments[4], outputAttachmentsForHandler1.First(), outputAttachmentsForHandler2.First());
+            VerifyCompleteEvent(false, false, inputAttachments[4], outputAttachmentsForHandler1.First(), outputAttachmentsForHandler2.First());
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Never);
             mockEventsHandler.Verify(h => h.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[0]) && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[2]) && c.Contains(inputAttachments[3])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[0]) && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[2]) && c.Contains(inputAttachments[3])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
 
             VerifyMetrics(5, 3);
         }
@@ -369,8 +369,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri2), "uri2_output")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler1);
-            mockAttachmentHandler2.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler2);
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler1);
+            mockAttachmentHandler2.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns(outputAttachmentsForHandler2);
 
             // act
             var result = await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, cancellationTokenSource.Token);
@@ -382,8 +382,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             Assert.IsTrue(result.Contains(outputAttachmentsForHandler2[0]));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[0]) && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[2]) && c.Contains(inputAttachments[3])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[0]) && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[2]) && c.Contains(inputAttachments[3])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
 
             VerifyMetrics(5, 3);
         }
@@ -404,7 +404,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
 
             var innerTaskCompletionSource = new TaskCompletionSource<object>();
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, CancellationToken cancellation) =>
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 try
                 {
@@ -412,6 +412,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                     {
                         Task.Delay(100).Wait();
                         Console.WriteLine($"Iteration: {i}");
+                        logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
                         cancellation.ThrowIfCancellationRequested();
                         progress.Report(i + 1);
@@ -437,7 +438,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             await innerTaskCompletionSource.Task;
 
             // assert
-            VerifyCompleteEvent(false, true, false, inputAttachments[0]);
+            VerifyCompleteEvent(true, false, inputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Exactly(4));
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgs(a, 1))));
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgs(a, 2))));
@@ -446,8 +447,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Informational, "Finalization was cancelled."));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1, "Canceled");
         }
@@ -468,7 +469,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
 
             var innerTaskCompletionSource = new TaskCompletionSource<object>();
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> p, CancellationToken cancellation) =>
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> p, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 try
                 {
@@ -476,6 +477,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                     {
                         Task.Delay(100).Wait();
                         Console.WriteLine($"Iteration: {i}");
+                        logger.SendMessage(TestMessageLevel.Informational, $"Iteration: {i}");
 
                         cancellation.ThrowIfCancellationRequested();
 
@@ -505,8 +507,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             Assert.IsTrue(result.Contains(inputAttachments[0]));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri(), Times.Never);
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), cancellationTokenSource.Token));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
             VerifyMetrics(1, 1, "Canceled");
         }
@@ -531,18 +533,20 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
                 new AttachmentSet(new Uri(uri2), "uri2_output")
             };
 
-            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, CancellationToken cancellation) =>
+            mockAttachmentHandler1.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 progress.Report(25);
                 progress.Report(50);
                 progress.Report(75);
+                logger.SendMessage(TestMessageLevel.Error, "error");
                 progress.Report(100);
                 return outputAttachments1;
             });
 
-            mockAttachmentHandler2.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, CancellationToken cancellation) =>
+            mockAttachmentHandler2.Setup(h => h.HandleDataCollectionAttachmentSets(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Returns((ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
                 progress.Report(50);
+                logger.SendMessage(TestMessageLevel.Informational, "info");
                 progress.Report(100);
                 return outputAttachments2;
             });
@@ -551,18 +555,21 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             await manager.FinalizeMultiTestRunAsync(mockRequestData.Object, inputAttachments, mockEventsHandler.Object, CancellationToken.None);
 
             // assert
-            VerifyCompleteEvent(false, false, false, outputAttachments1[0], outputAttachments2[0]);
+            VerifyCompleteEvent(false, false, outputAttachments1[0], outputAttachments2[0]);
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>()), Times.Exactly(6));
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 25))));
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 50))));
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 75))));
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 100))));
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 2, 50))));
-            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 2, 100))));
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 25, uri1))));
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 50, uri1))));
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 75, uri1))));
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 1, 100, uri1))));
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 2, 50, uri2))));
+            mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => VerifyProgressArgsForTwoHandlers(a, 2, 100, uri2))));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUri());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUri());
-            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), CancellationToken.None));
-            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), CancellationToken.None));
+            mockAttachmentHandler1.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), CancellationToken.None));
+            mockAttachmentHandler2.Verify(h => h.HandleDataCollectionAttachmentSets(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), CancellationToken.None));
+
+            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Informational, "info"));
+            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, "error"));
 
             VerifyMetrics(2, 2, "Completed");
         }
@@ -578,10 +585,10 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
             mockMetricsCollection.Verify(m => m.Add(TelemetryDataConstants.TimeTakenInSecForFinalization, It.IsAny<double>()));
         }
 
-        private void VerifyCompleteEvent(bool isAborted, bool isCanceled, bool containsError, params AttachmentSet[] expectedSets)
+        private void VerifyCompleteEvent(bool isCanceled, bool containsError, params AttachmentSet[] expectedSets)
         {
             mockEventsHandler.Verify(h => h.HandleMultiTestRunFinalizationComplete(
-                It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => a.IsAborted == isAborted && a.IsCanceled == isCanceled && (a.Error != null) == containsError),
+                It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => a.IsCanceled == isCanceled && (a.Error != null) == containsError),
                 It.Is<ICollection<AttachmentSet>>(c => c.Count == expectedSets.Length && expectedSets.All(e => c.Contains(e)))));
         }
 
@@ -589,13 +596,13 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.MultiTestRunFinalizat
         {
             Assert.AreEqual(1, args.CurrentHandlerIndex);
             Assert.AreEqual(2, args.HandlersCount);
-            Assert.IsTrue(args.CurrentHandlerName.StartsWith("Castle.Proxies.ObjectProxy"));
+            Assert.AreEqual(uri1, args.CurrentHandlerUri.AbsoluteUri);
             return progress == args.CurrentHandlerProgress;
         }
 
-        private bool VerifyProgressArgsForTwoHandlers(MultiTestRunFinalizationProgressEventArgs args, long handlerIndex, long progress)
+        private bool VerifyProgressArgsForTwoHandlers(MultiTestRunFinalizationProgressEventArgs args, long handlerIndex, long progress, string uri)
         {
-            return progress == args.CurrentHandlerProgress && args.CurrentHandlerIndex == handlerIndex && args.CurrentHandlerName.StartsWith("Castle.Proxies.ObjectProxy") && args.HandlersCount == 2;
+            return progress == args.CurrentHandlerProgress && args.CurrentHandlerIndex == handlerIndex && args.CurrentHandlerUri.AbsoluteUri == uri && args.HandlersCount == 2;
         }
     }
 }

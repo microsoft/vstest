@@ -9,10 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Resources;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachments
@@ -34,10 +34,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
         {
-            return HandleDataCollectionAttachmentSets(dataCollectionAttachments, null, CancellationToken.None);
+            return HandleDataCollectionAttachmentSets(dataCollectionAttachments, null, null, CancellationToken.None);
         }
 
-        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, CancellationToken cancellationToken)
+        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
             if (dataCollectionAttachments != null && dataCollectionAttachments.Any())
             {
@@ -60,10 +60,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
-            string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
+            if(files.Count == 1)
+            {
+                return files[0];
+            }
+
+            string tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
             string outputfileName = files[0];
 
-            File.Create(fileName).Dispose();
+            File.Create(tempFileName).Dispose();
             var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageAnalysisAssemblyName + ".dll");
 
             try
@@ -76,19 +81,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                 if (methodInfo != null)
                 {
+                    IList<string> filesToDelete = new List<string>(files.Count) { tempFileName };
+
                     for (int i = 1; i < files.Count; i++)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         progressReporter?.Report(100 * i / files.Count);
 
                         cancellationToken.ThrowIfCancellationRequested();
-                        methodInfo.Invoke(null, new object[] { files[i], outputfileName, fileName, true });
+                        methodInfo.Invoke(null, new object[] { files[i], outputfileName, tempFileName, true });
 
                         cancellationToken.ThrowIfCancellationRequested();
-                        File.Copy(fileName, outputfileName, true);                        
+                        File.Copy(tempFileName, outputfileName, true);
+
+                        filesToDelete.Add(files[i]);
                     }
 
-                    File.Delete(fileName);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    foreach (string fileName in filesToDelete)
+                    {
+                        File.Delete(fileName);
+                    }
                 }
 
                 progressReporter?.Report(100);

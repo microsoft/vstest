@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
         public void EventsHandlerHandleMultiTestRunFinalizationCompleteShouldSendFinalizationCompleteMessage()
         {
             var attachments = new[] { new AttachmentSet(new System.Uri("http://www.bing.com/"), "code coverage") };
-            var args = new MultiTestRunFinalizationCompleteEventArgs(false, false, null);
+            var args = new MultiTestRunFinalizationCompleteEventArgs(false, null);
 
             handler.HandleMultiTestRunFinalizationComplete(args, attachments);
 
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
         [TestMethod]
         public void EventsHandlerHandleMultiTestRunFinalizationProgressShouldSendFinalizationProgressMessage()
         {
-            var args = new MultiTestRunFinalizationProgressEventArgs(1, "CC", 90, 2);
+            var args = new MultiTestRunFinalizationProgressEventArgs(1, new System.Uri("http://www.bing.com/"), 90, 2);
 
             handler.HandleMultiTestRunFinalizationProgress(args);
 

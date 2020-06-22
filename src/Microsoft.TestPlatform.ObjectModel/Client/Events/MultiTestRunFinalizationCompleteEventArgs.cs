@@ -14,20 +14,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Default constructor.
         /// </summary>
         /// <param name="isCanceled">Specifies whether the finalization is canceled.</param>
-        /// <param name="isAborted">Specifies whether the finalization is aborted.</param>
         /// <param name="error">Specifies the error encountered during the execution of the finalization.</param>
-        public MultiTestRunFinalizationCompleteEventArgs(bool isCanceled, bool isAborted, Exception error)
+        public MultiTestRunFinalizationCompleteEventArgs(bool isCanceled, Exception error)
         {
             this.IsCanceled = isCanceled;
-            this.IsAborted = isAborted;
             this.Error = error;
         }
-
-        /// <summary>
-        /// Gets a value indicating whether the finalization is aborted or not.
-        /// </summary>
-        [DataMember]
-        public bool IsAborted { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the finalization is canceled or not.

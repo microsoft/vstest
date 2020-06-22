@@ -112,7 +112,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.multiTestRunFinalizationEventHandler.Attachments);
 
-            Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsAborted);
             Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
@@ -121,7 +120,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("Microsoft.VisualStudio.TestPlatform.Utilities.CodeCoverageDataAttachmentsHandler", progressArgs.CurrentHandlerName);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
                 Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
             }
@@ -130,6 +129,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2L, multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForFinalization]);
             Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1L : 2L, multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterFinalization]);
             Assert.IsTrue(multiTestRunFinalizationEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForFinalization));
+
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath) != testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework));
         }
 
         [TestMethod]
@@ -156,7 +158,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.multiTestRunFinalizationEventHandler.Attachments);
 
-            Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsAborted);
             Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
@@ -165,12 +166,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("Microsoft.VisualStudio.TestPlatform.Utilities.CodeCoverageDataAttachmentsHandler", progressArgs.CurrentHandlerName);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
                 Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
             }
 
             Assert.IsTrue(multiTestRunFinalizationEventHandler.CompleteArgs.Metrics.IsNullOrEmpty());
+
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath) != testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework));
         }
 
         [TestMethod]
@@ -198,7 +202,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.multiTestRunFinalizationEventHandler.Attachments);
 
-            Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsAborted);
             Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
@@ -207,7 +210,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("Microsoft.VisualStudio.TestPlatform.Utilities.CodeCoverageDataAttachmentsHandler", progressArgs.CurrentHandlerName);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
                 Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentHandlerProgress);
             }
@@ -216,6 +219,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(3L, multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForFinalization]);
             Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1L : 3L, multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterFinalization]);
             Assert.IsTrue(multiTestRunFinalizationEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForFinalization));
+
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath) != testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework));
         }
 
         [TestMethod]
@@ -262,7 +268,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(1000, this.multiTestRunFinalizationEventHandler.Attachments.Count);
 
-            Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsAborted);
             Assert.IsTrue(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
@@ -271,7 +276,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("Microsoft.VisualStudio.TestPlatform.Utilities.CodeCoverageDataAttachmentsHandler", progressArgs.CurrentHandlerName);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
 
                 if (i == 5)
@@ -288,6 +293,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(1000L, multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForFinalization]);
             Assert.AreEqual(1000L, multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterFinalization]);
             Assert.IsTrue(multiTestRunFinalizationEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForFinalization));
+
+            Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]

@@ -13,13 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Default constructor.
         /// </summary>
         /// <param name="currentHandlerIndex">Specifies current handler index.</param>
-        /// <param name="currentHandlerName">Specifies current handler name.</param>
+        /// <param name="currentHandlerUri">Specifies current handler Uri.</param>
         /// <param name="currentHandlerProgress">Specifies current handler progress.</param>
         /// <param name="handlersCount">Specifies the overall number of handlers.</param>
-        public MultiTestRunFinalizationProgressEventArgs(long currentHandlerIndex, string currentHandlerName, long currentHandlerProgress, long handlersCount)
+        public MultiTestRunFinalizationProgressEventArgs(long currentHandlerIndex, Uri currentHandlerUri, long currentHandlerProgress, long handlersCount)
         {
             CurrentHandlerIndex = currentHandlerIndex;
-            CurrentHandlerName = currentHandlerName;
+            CurrentHandlerUri = currentHandlerUri;
             CurrentHandlerProgress = currentHandlerProgress;
             HandlersCount = handlersCount;
         }
@@ -31,10 +31,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public long CurrentHandlerIndex { get; private set; }
 
         /// <summary>
-        /// Gets a current handler name.
+        /// Gets a current handler URI.
         /// </summary>
         [DataMember]
-        public string CurrentHandlerName { get; private set; }
+        public Uri CurrentHandlerUri { get; private set; }
 
         /// <summary>
         /// Gets a current handler progress.

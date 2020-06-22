@@ -782,7 +782,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedMultiTestRunFinalization);               
-                eventHandler.HandleMultiTestRunFinalizationComplete(new MultiTestRunFinalizationCompleteEventArgs(false, true, exception), null);
+                eventHandler.HandleMultiTestRunFinalizationComplete(new MultiTestRunFinalizationCompleteEventArgs(false, exception), null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions
                 // Removing that code because vstest.console might be in a healthy state and letting the client

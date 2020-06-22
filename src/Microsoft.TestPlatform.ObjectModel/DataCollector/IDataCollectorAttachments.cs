@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using System;
     using System.Collections.Generic;
     using System.Threading;
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="progressReporter">Progress reporter. Accepts integers from 0 to 100</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Gets the attachment set after Test Run Session</returns>
-        ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, CancellationToken cancellationToken);
+        ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the attachment Uri, which is handled by current Collector

@@ -7,6 +7,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Threading;
 
     [TestClass]
@@ -26,17 +27,33 @@
         {
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet>();
             ICollection<AttachmentSet> resultAttachmentSets =
-                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, CancellationToken.None);
+                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
 
-            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null, mockProgressReporter.Object, CancellationToken.None);
+            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
 
             mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void HandleDataCollectionAttachmentSetsShouldReturnInputIfOnly1Attachment()
+        {
+            var attachmentSet = new AttachmentSet(new Uri("//badrui//"), string.Empty);
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
+
+            Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
+            ICollection<AttachmentSet> resultAttachmentSets =
+                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+
+            Assert.IsNotNull(resultAttachmentSets);
+            Assert.IsTrue(resultAttachmentSets.Count == 1);
+            Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
+            Assert.AreEqual("file:///C:/temp/aa", resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
         }
 
         [TestMethod]
@@ -49,12 +66,13 @@
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> 
             {
+                attachmentSet,
                 attachmentSet
             };
 
-            Assert.ThrowsException<OperationCanceledException>(() => coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, cts.Token));
+            Assert.ThrowsException<OperationCanceledException>(() => coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, cts.Token));
 
-            Assert.AreEqual(1, attachment.Count);
+            Assert.AreEqual(2, attachment.Count);
 
             mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
         }
@@ -76,7 +94,7 @@
                 attachmentSet2
             };
 
-            var result = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, cts.Token);
+            var result = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, cts.Token);
 
             Assert.AreEqual(2, result.Count);
             Assert.IsTrue(result.Contains(attachmentSet1));
