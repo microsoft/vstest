@@ -13,15 +13,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// <inheritdoc />
     public class MultiTestRunFinalizationEventHandler : IMultiTestRunFinalizationEventsHandler
     {
-        /// <summary>
-        /// Gets the attachments.
-        /// </summary>
         public List<AttachmentSet> Attachments { get; private set; }
 
-        /// <summary>
-        /// Gets the metrics.
-        /// </summary>
-        public IDictionary<string, object> Metrics { get; private set; }
+        public MultiTestRunFinalizationCompleteEventArgs CompleteArgs { get; private set; }
+
+        public List<MultiTestRunFinalizationProgressEventArgs> ProgressArgs { get; private set; }
 
         /// <summary>
         /// Gets the log message.
@@ -39,6 +35,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             this.Errors = new List<string>();
             this.Attachments = new List<AttachmentSet>();
+            this.ProgressArgs = new List<MultiTestRunFinalizationProgressEventArgs>();
         }
 
         public void EnsureSuccess()
@@ -53,7 +50,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             this.LogMessage = message;
             this.TestMessageLevel = level;
-            if (level == TestMessageLevel.Error) {
+            if (level == TestMessageLevel.Error) 
+            {
                 this.Errors.Add(message);
             }
         }
@@ -94,6 +92,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 Errors.Add(finalizationCompleteEventArgs.Error.Message);
             }
+
+            CompleteArgs = finalizationCompleteEventArgs;
         }
 
         public void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments)
@@ -103,7 +103,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void HandleMultiTestRunFinalizationProgress(MultiTestRunFinalizationProgressEventArgs finalizationProgressEventArgs)
         {
-            throw new NotImplementedException();
+            ProgressArgs.Add(finalizationProgressEventArgs);
         }
     }
 }

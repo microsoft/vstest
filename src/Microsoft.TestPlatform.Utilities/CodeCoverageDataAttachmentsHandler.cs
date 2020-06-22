@@ -79,12 +79,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     for (int i = 1; i < files.Count; i++)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
+                        progressReporter?.Report(100 * i / files.Count);
+
+                        cancellationToken.ThrowIfCancellationRequested();
                         methodInfo.Invoke(null, new object[] { files[i], outputfileName, fileName, true });
 
                         cancellationToken.ThrowIfCancellationRequested();
-                        File.Copy(fileName, outputfileName, true);
-
-                        progressReporter?.Report(100 * i / files.Count);
+                        File.Copy(fileName, outputfileName, true);                        
                     }
 
                     File.Delete(fileName);
