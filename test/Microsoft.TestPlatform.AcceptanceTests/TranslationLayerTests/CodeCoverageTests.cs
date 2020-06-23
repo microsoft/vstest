@@ -115,14 +115,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 2 : 0, multiTestRunFinalizationEventHandler.ProgressArgs.Count);
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
-                Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
+                if (multiTestRunFinalizationEventHandler.ProgressArgs.Count == 2)
+                {
+                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
+                }                
             }
 
             Assert.AreEqual("Completed", multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.FinalizationState]);
@@ -161,14 +163,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 2 : 0, multiTestRunFinalizationEventHandler.ProgressArgs.Count);
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
-                Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
+                if (multiTestRunFinalizationEventHandler.ProgressArgs.Count == 2)
+                {
+                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
+                }                    
             }
 
             Assert.IsTrue(multiTestRunFinalizationEventHandler.CompleteArgs.Metrics.IsNullOrEmpty());
@@ -205,14 +209,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsFalse(multiTestRunFinalizationEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(multiTestRunFinalizationEventHandler.CompleteArgs.Error);
 
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 3 : 0, multiTestRunFinalizationEventHandler.ProgressArgs.Count);
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
                 Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
-                Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentHandlerProgress);
+
+                if (multiTestRunFinalizationEventHandler.ProgressArgs.Count == 3)
+                {
+                    Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentHandlerProgress);
+                }                    
             }
 
             Assert.AreEqual("Completed", multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.FinalizationState]);
@@ -279,14 +286,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
                 Assert.AreEqual(1, progressArgs.HandlersCount);
 
-                if (i == 5)
+                if (i == 0)
                 {
                     Assert.AreEqual(0, progressArgs.CurrentHandlerProgress);
-                } 
-                else if (i == 15)
-                {
-                    Assert.AreEqual(1, progressArgs.CurrentHandlerProgress);
-                }                               
+                }                       
             }
 
             Assert.AreEqual("Canceled", multiTestRunFinalizationEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.FinalizationState]);
