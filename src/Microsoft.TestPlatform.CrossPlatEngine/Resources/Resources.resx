@@ -201,4 +201,7 @@
   <data name="AttachDebuggerToDefaultTestHostFailure" xml:space="preserve">
     <value>Cannot attach the debugger to the default test host with process ID: {0}.</value>
   </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</value>
+  </data>
 </root>
