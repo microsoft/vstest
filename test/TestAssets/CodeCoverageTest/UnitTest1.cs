@@ -4,11 +4,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CodeCoverageTest
 {
     [TestClass]
-    public class UnitTest
+    public class UnitTest1
     {
         private Logic logic;
 
-        public UnitTest()
+        public UnitTest1()
         {
             this.logic = new Logic();
         }
@@ -27,12 +27,6 @@ namespace CodeCoverageTest
             Assert.AreEqual(logic.Sign(0), 0);
             Assert.AreEqual(logic.Sign(-5), -1);
             Assert.AreEqual(logic.Sign(7), 1);
-        }
-
-        [TestMethod]
-        public void FailingTest()
-        {
-            Assert.AreEqual(logic.Sign(0), -1);
         }
     }
 }

@@ -13,11 +13,35 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using VisualStudio.Coverage.Analysis;
 #endif
 
+    internal struct TestParameters
+    {
+        public enum SettingsType
+        {
+            None = 0,
+            Default = 1,
+            Custom = 2
+        }
+
+        public string AssemblyName { get; set; }
+
+        public string TargetPlatform { get; set; }
+
+        public SettingsType RunSettingsType { get; set; }
+
+        public string RunSettingsPath { get; set; }
+
+        public int ExpectedPassedTests { get; set; }
+
+        public int ExpectedSkippedTests { get; set; }
+
+        public int ExpectedFailedTests { get; set; }
+    }
+
     [TestClass]
     public class CodeCoverageTests : AcceptanceTestBase
     {
         private readonly string resultsDirectory;
-        private readonly string assemblyName = "SimpleTestProject.dll";
+
         public CodeCoverageTests()
         {
             this.resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -28,7 +52,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CollectCodeCoverageWithCollectOptionForx86(RunnerInfo runnerInfo)
         {
-            this.CollectCodeCoverage(runnerInfo, "x86", withRunsettings: false);
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "SimpleTestProject.dll",
+                TargetPlatform = "x86",
+                RunSettingsPath = string.Empty,
+                RunSettingsType = TestParameters.SettingsType.None,
+                ExpectedPassedTests = 1,
+                ExpectedSkippedTests = 1,
+                ExpectedFailedTests = 1
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -36,7 +71,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CollectCodeCoverageWithCollectOptionForx64(RunnerInfo runnerInfo)
         {
-            this.CollectCodeCoverage(runnerInfo, "x64", withRunsettings: false);
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "SimpleTestProject.dll",
+                TargetPlatform = "x64",
+                RunSettingsPath = string.Empty,
+                RunSettingsType = TestParameters.SettingsType.None,
+                ExpectedPassedTests = 1,
+                ExpectedSkippedTests = 1,
+                ExpectedFailedTests = 1
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -44,7 +90,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CollectCodeCoverageX86WithRunSettings(RunnerInfo runnerInfo)
         {
-            this.CollectCodeCoverage(runnerInfo, "x86", withRunsettings: true);
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "SimpleTestProject.dll",
+                TargetPlatform = "x86",
+                RunSettingsPath = string.Empty,
+                RunSettingsType = TestParameters.SettingsType.Default,
+                ExpectedPassedTests = 1,
+                ExpectedSkippedTests = 1,
+                ExpectedFailedTests = 1
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -52,7 +109,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CollectCodeCoverageX64WithRunSettings(RunnerInfo runnerInfo)
         {
-            this.CollectCodeCoverage(runnerInfo, "x64", withRunsettings: true);
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "SimpleTestProject.dll",
+                TargetPlatform = "x64",
+                RunSettingsPath = string.Empty,
+                RunSettingsType = TestParameters.SettingsType.Default,
+                ExpectedPassedTests = 1,
+                ExpectedSkippedTests = 1,
+                ExpectedFailedTests = 1
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -60,13 +128,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CodeCoverageShouldAvoidExclusionsX86(RunnerInfo runnerInfo)
         {
-            const string assemblyName = "CodeCoverageTest.dll";
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "CodeCoverageTest.dll",
+                TargetPlatform = "x86",
+                RunSettingsPath = Path.Combine(
+                    IntegrationTestEnvironment.TestPlatformRootDirectory,
+                    @"scripts\vstest-codecoverage2.runsettings"),
+                RunSettingsType = TestParameters.SettingsType.Custom,
+                ExpectedPassedTests = 2,
+                ExpectedSkippedTests = 0,
+                ExpectedFailedTests = 0
+            };
 
-            var runSettingsPath = Path.Combine(
-                IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"scripts\vstest-codecoverage2.runsettings");
-
-            this.CollectCodeCoverage(runnerInfo, "x86", assemblyName, runSettingsPath);
+            this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
         [TestMethod]
@@ -74,24 +149,34 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CodeCoverageShouldAvoidExclusionsX64(RunnerInfo runnerInfo)
         {
-            const string assemblyName = "CodeCoverageTest.dll";
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "CodeCoverageTest.dll",
+                TargetPlatform = "x64",
+                RunSettingsPath = Path.Combine(
+                    IntegrationTestEnvironment.TestPlatformRootDirectory,
+                    @"scripts\vstest-codecoverage2.runsettings"),
+                RunSettingsType = TestParameters.SettingsType.Custom,
+                ExpectedPassedTests = 2,
+                ExpectedSkippedTests = 0,
+                ExpectedFailedTests = 0
+            };
 
-            var runSettingsPath = Path.Combine(
-                IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"scripts\vstest-codecoverage2.runsettings");
-
-            this.CollectCodeCoverage(runnerInfo, "x64", assemblyName, runSettingsPath);
+            this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
-        private void CollectCodeCoverage(RunnerInfo runnerInfo, string targetPlatform, bool withRunsettings)
+        private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = CreateArguments(runnerInfo, targetPlatform, withRunsettings, out var trxFilePath);
+            var arguments = this.CreateArguments(runnerInfo, testParameters, out var trxFilePath);
 
             this.InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 1, 1);
+            this.ValidateSummaryStatus(
+                testParameters.ExpectedPassedTests,
+                testParameters.ExpectedSkippedTests,
+                testParameters.ExpectedFailedTests);
 
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
@@ -99,59 +184,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             // Microsoft.VisualStudio.Coverage.Analysis assembly not available for .NET Core.
 #if NET451
-            this.ValidateCoverageData(actualCoverageFile);
-#endif
-            Directory.Delete(this.resultsDirectory, true);
-        }
-
-        private void CollectCodeCoverage(
-            RunnerInfo runnerInfo,
-            string targetPlatform,
-            string assemblyName,
-            string runSettings)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-
-            var arguments = CreateArguments(runnerInfo, targetPlatform, assemblyName, runSettings, out var trxFilePath);
-
-            this.InvokeVsTest(arguments);
-
-            this.ValidateSummaryStatus(1, 1, 1);
-
-            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
-            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
-            Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
-
-            // Microsoft.VisualStudio.Coverage.Analysis assembly not available for .NET Core.
-#if NET451
-            this.ValidateCoverageData(actualCoverageFile);
+            this.ValidateCoverageData(actualCoverageFile, testParameters.AssemblyName);
 #endif
             Directory.Delete(this.resultsDirectory, true);
         }
 
         private string CreateArguments(
             RunnerInfo runnerInfo,
-            string targetPlatform,
-            bool withRunsettings,
+            TestParameters testParameters,
             out string trxFilePath)
         {
-            var runSettingsPath = Path.Combine(
-                IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"scripts\vstest-codecoverage.runsettings");
-
-            var runSettings = (withRunsettings) ? $" /settings:{runSettingsPath}" : $" /collect:\"Code Coverage\"";
-
-            return this.CreateArguments(runnerInfo, targetPlatform, this.assemblyName, runSettings, out trxFilePath);
-        }
-
-        private string CreateArguments(
-            RunnerInfo runnerInfo,
-            string targetPlatform,
-            string assemblyName,
-            string runSettings,
-            out string trxFilePath)
-        {
-            var assemblyPaths = this.GetAssetFullPath(assemblyName);
+            var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
@@ -161,10 +204,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDirectory}", $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}");
-            arguments = string.Concat(arguments, $" /Platform:{targetPlatform}");
+            arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
             trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
+
+            var defaultRunSettingsPath = Path.Combine(
+                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                @"scripts\vstest-codecoverage.runsettings");
+
+            var runSettings = string.Empty;
+            switch (testParameters.RunSettingsType)
+            {
+                case TestParameters.SettingsType.None:
+                    runSettings = $" /collect:\"Code Coverage\"";
+                    break;
+                case TestParameters.SettingsType.Default:
+                    runSettings = $" /settings:{defaultRunSettingsPath}";
+                    break;
+                case TestParameters.SettingsType.Custom:
+                    runSettings = $" /settings:{testParameters.RunSettingsPath}";
+                    break;
+            }
 
             arguments = string.Concat(arguments, runSettings);
 
@@ -172,12 +233,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
 #if NET451
-        private void ValidateCoverageData(string coverageFile)
+        private void ValidateCoverageData(string coverageFile, string assemblyName)
         {
             using (var converageInfo = CoverageInfo.CreateFromFile(coverageFile))
             {
                 CoverageDS coverageDs = converageInfo.BuildDataSet();
-                AssertModuleCoverageCollected(coverageDs);
+                AssertModuleCoverageCollected(coverageDs, assemblyName);
                 AssertSourceFileName(coverageDs);
             }
         }
@@ -193,7 +254,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 $"Code Coverage not collected for file: {expectedFileName}");
         }
 
-        private void AssertModuleCoverageCollected(CoverageDS coverageDS)
+        private void AssertModuleCoverageCollected(CoverageDS coverageDS, string assemblyName)
         {
             var moduleFound = false;
             for (int i = 0; i < coverageDS.Module.Count; i++)
