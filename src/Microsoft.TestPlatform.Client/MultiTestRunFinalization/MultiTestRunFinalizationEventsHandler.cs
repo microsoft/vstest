@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
         }
 
         /// <inheritdoc/>
-        public void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments)
+        public void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments)
         {
             throw new System.NotImplementedException();
         }

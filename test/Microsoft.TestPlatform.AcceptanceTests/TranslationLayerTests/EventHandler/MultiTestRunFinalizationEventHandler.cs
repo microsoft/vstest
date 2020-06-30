@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             CompleteArgs = finalizationCompleteEventArgs;
         }
 
-        public void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments)
+        public void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments)
         {
             throw new NotImplementedException();
         }

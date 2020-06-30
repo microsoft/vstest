@@ -407,7 +407,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        public async Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
         {
             this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStart();
 

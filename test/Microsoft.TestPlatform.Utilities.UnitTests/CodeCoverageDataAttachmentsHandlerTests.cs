@@ -1,14 +1,16 @@
 ﻿namespace Microsoft.TestPlatform.Utilities.UnitTests
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class CodeCoverageDataAttachmentsHandlerTests
@@ -23,16 +25,16 @@
         }
 
         [TestMethod]
-        public void HandleDataCollectionAttachmentSetsShouldReturnEmptySetWhenNoAttachmentsOrAttachmentsAreNull()
+        public async Task HandleDataCollectionAttachmentSetsShouldReturnEmptySetWhenNoAttachmentsOrAttachmentsAreNull()
         {
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet>();
-            ICollection<AttachmentSet> resultAttachmentSets =
-                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+            ICollection<AttachmentSet> resultAttachmentSets = await
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
 
-            resultAttachmentSets = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(null, mockProgressReporter.Object, null, CancellationToken.None);
+            resultAttachmentSets = await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(null, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
@@ -41,14 +43,14 @@
         }
 
         [TestMethod]
-        public void HandleDataCollectionAttachmentSetsShouldReturnInputIfOnly1Attachment()
+        public async Task HandleDataCollectionAttachmentSetsShouldReturnInputIfOnly1Attachment()
         {
             var attachmentSet = new AttachmentSet(new Uri("//badrui//"), string.Empty);
             attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
-            ICollection<AttachmentSet> resultAttachmentSets =
-                coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+            ICollection<AttachmentSet> resultAttachmentSets = await
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 1);
@@ -57,7 +59,7 @@
         }
 
         [TestMethod]
-        public void HandleDataCollectionAttachmentSetsShouldThrowIfCancellationRequested()
+        public async Task HandleDataCollectionAttachmentSetsShouldThrowIfCancellationRequested()
         {
             var attachmentSet = new AttachmentSet(new Uri("//badrui//"), string.Empty);
             attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
@@ -70,7 +72,7 @@
                 attachmentSet
             };
 
-            Assert.ThrowsException<OperationCanceledException>(() => coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, cts.Token));
+            await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, cts.Token));
 
             Assert.AreEqual(2, attachment.Count);
 
@@ -78,7 +80,7 @@
         }
 
         [TestMethod]
-        public void HandleDataCollectionAttachmentSetsShouldReturnExistingAttachmentsIfFailedToLoadLibrary()
+        public async Task HandleDataCollectionAttachmentSetsShouldReturnExistingAttachmentsIfFailedToLoadLibrary()
         {
             var attachmentSet1 = new AttachmentSet(new Uri("//badrui//"), string.Empty);
             attachmentSet1.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
@@ -94,7 +96,7 @@
                 attachmentSet2
             };
 
-            var result = coverageDataAttachmentsHandler.HandleDataCollectionAttachmentSets(attachment, mockProgressReporter.Object, null, cts.Token);
+            var result = await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, cts.Token);
 
             Assert.AreEqual(2, result.Count);
             Assert.IsTrue(result.Contains(attachmentSet1));

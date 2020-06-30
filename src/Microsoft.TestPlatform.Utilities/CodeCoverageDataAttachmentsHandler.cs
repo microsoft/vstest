@@ -10,12 +10,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Linq;
     using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-    public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachments
+    public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProcessor
     {
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
         private const string CoverageFileExtension = ".coverage";
@@ -27,35 +28,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
 
-        public Uri GetExtensionUri()
-        {
-            return CodeCoverageDataCollectorUri;
-        }
+        public bool SupportsIncrementalProcessing => true;
 
-        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
+        public IEnumerable<Uri> GetExtensionUris()
         {
-            return HandleDataCollectionAttachmentSets(dataCollectionAttachments, null, null, CancellationToken.None);
-        }
+            yield return CodeCoverageDataCollectorUri;
+        }    
 
-        public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
-            if (dataCollectionAttachments != null && dataCollectionAttachments.Any())
+            if (attachments != null && attachments.Any())
             {
-                var codeCoverageFiles = dataCollectionAttachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
+                var codeCoverageFiles = attachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
                 var outputFile = MergeCodeCoverageFiles(codeCoverageFiles, progressReporter, cancellationToken);
                 var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
                 if (!string.IsNullOrEmpty(outputFile))
                 {
                     attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
-                    return new Collection<AttachmentSet> { attachmentSet };
+                    return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet> { attachmentSet });
                 }
 
                 // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
-                return dataCollectionAttachments;
+                return Task.FromResult(attachments);
             }
 
-            return new Collection<AttachmentSet>();
+            return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet>());
         }
 
         private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)

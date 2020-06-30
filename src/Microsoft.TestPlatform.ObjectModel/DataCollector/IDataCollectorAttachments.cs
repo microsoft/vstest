@@ -3,14 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using System;
     using System.Collections.Generic;
-    using System.Threading;
 
     /// <summary>
     /// Interface for data collectors add-ins that choose to handle attachment(s) generated
     /// </summary>
+    [Obsolete("Interface is deprecated. Please use IDataCollectorAttachmentProcessor instead")]
     public interface IDataCollectorAttachments
     {
         /// <summary>
@@ -18,15 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         /// <returns>Gets the attachment set after Test Run Session</returns>
         ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments);
-
-        /// <summary>
-        /// Gets the attachment set after Test Run Session
-        /// </summary>
-        /// <param name="dataCollectionAttachments">Attachments to be processed</param>
-        /// <param name="progressReporter">Progress reporter. Accepts integers from 0 to 100</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Gets the attachment set after Test Run Session</returns>
-        ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the attachment Uri, which is handled by current Collector

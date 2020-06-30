@@ -81,9 +81,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Provides back all attachments to TestPlatform for additional processing (for example merging)
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
-        /// <param name="collectMetrics">Enables metrics collection</param>
-        /// <param name="multiTestRunFinalizationCompleteEventsHandler">EventHandler to receive session complete event</param>
+        /// <param name="multiTestRunCompleted">Indicates that all test executions are done and all data is provided</param>
+        /// <param name="collectMetrics">Enables metrics collection (used for telemetry)</param>
+        /// <param name="eventsHandler">EventHandler to receive session complete event</param>
         /// <param name="cancellationToken">Cancellation token</param>        
-        Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
+        Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, IMultiTestRunFinalizationEventsHandler eventsHandler, CancellationToken cancellationToken);
     }
 }

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     [DataContract]
@@ -12,40 +13,40 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="currentHandlerIndex">Specifies current handler index.</param>
-        /// <param name="currentHandlerUri">Specifies current handler Uri.</param>
-        /// <param name="currentHandlerProgress">Specifies current handler progress.</param>
-        /// <param name="handlersCount">Specifies the overall number of handlers.</param>
-        public MultiTestRunFinalizationProgressEventArgs(long currentHandlerIndex, Uri currentHandlerUri, long currentHandlerProgress, long handlersCount)
+        /// <param name="currentAttachmentProcessorIndex">Specifies current attachment processor index.</param>
+        /// <param name="currentAttachmentProcessorUris">Specifies current processor Uris.</param>
+        /// <param name="currentAttachmentProcessorProgress">Specifies current processor progress.</param>
+        /// <param name="attachmentProcessorsCount">Specifies the overall number of processors.</param>
+        public MultiTestRunFinalizationProgressEventArgs(long currentAttachmentProcessorIndex, ICollection<Uri> currentAttachmentProcessorUris, long currentAttachmentProcessorProgress, long attachmentProcessorsCount)
         {
-            CurrentHandlerIndex = currentHandlerIndex;
-            CurrentHandlerUri = currentHandlerUri;
-            CurrentHandlerProgress = currentHandlerProgress;
-            HandlersCount = handlersCount;
+            CurrentAttachmentProcessorIndex = currentAttachmentProcessorIndex;
+            CurrentAttachmentProcessorUris = currentAttachmentProcessorUris;
+            CurrentAttachmentProcessorProgress = currentAttachmentProcessorProgress;
+            AttachmentProcessorsCount = attachmentProcessorsCount;
         }
 
         /// <summary>
-        /// Gets a current handler index.
+        /// Gets a current attachment processor index.
         /// </summary>
         [DataMember]
-        public long CurrentHandlerIndex { get; private set; }
+        public long CurrentAttachmentProcessorIndex { get; private set; }
 
         /// <summary>
-        /// Gets a current handler URI.
+        /// Gets a current attachment processor URI.
         /// </summary>
         [DataMember]
-        public Uri CurrentHandlerUri { get; private set; }
+        public ICollection<Uri> CurrentAttachmentProcessorUris { get; private set; }
 
         /// <summary>
-        /// Gets a current handler progress.
+        /// Gets a current attachment processor progress.
         /// </summary>
         [DataMember]
-        public long CurrentHandlerProgress { get; private set; }
+        public long CurrentAttachmentProcessorProgress { get; private set; }
 
         /// <summary>
-        /// Gets the overall number of handlers.
+        /// Gets the overall number of attachment processors.
         /// </summary>
         [DataMember]
-        public long HandlersCount { get; private set; }
+        public long AttachmentProcessorsCount { get; private set; }
     }
 }

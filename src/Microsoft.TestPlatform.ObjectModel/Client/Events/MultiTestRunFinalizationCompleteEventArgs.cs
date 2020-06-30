@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public Exception Error { get; private set; }
 
         /// <summary>
-        /// Get or Sets the Metrics
+        /// Get or Sets the Metrics (used for telemetry)
         /// </summary>
         [DataMember]
         public IDictionary<string, object> Metrics { get; set; }

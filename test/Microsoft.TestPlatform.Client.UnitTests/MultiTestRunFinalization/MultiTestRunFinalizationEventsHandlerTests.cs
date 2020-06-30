@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
         [TestMethod]
         public void EventsHandlerHandleMultiTestRunFinalizationProgressShouldSendFinalizationProgressMessage()
         {
-            var args = new MultiTestRunFinalizationProgressEventArgs(1, new System.Uri("http://www.bing.com/"), 90, 2);
+            var args = new MultiTestRunFinalizationProgressEventArgs(1, new[] { new System.Uri("http://www.bing.com/") }, 90, 2);
 
             handler.HandleMultiTestRunFinalizationProgress(args);
 

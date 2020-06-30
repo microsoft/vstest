@@ -2005,7 +2005,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var progressPayload = new MultiTestRunFinalizationProgressPayload()
             {
-                FinalizationProgressEventArgs = new MultiTestRunFinalizationProgressEventArgs(1, new System.Uri("http://www.bing.com/"), 50, 2)
+                FinalizationProgressEventArgs = new MultiTestRunFinalizationProgressEventArgs(1, new[] { new Uri("http://www.bing.com/") }, 50, 2)
             };
 
             var finalizationProgress = new Message()
@@ -2023,7 +2023,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel), Times.Never);
             mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.IsAny<MultiTestRunFinalizationCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Finalization Complete must be called");
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => a.CurrentHandlerIndex == 1 && a.CurrentHandlerUri == new System.Uri("http://www.bing.com/") && a.CurrentHandlerProgress == 50 && a.HandlersCount == 2)), Times.Once, "Finalization Progress must be called");
+            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => a.CurrentAttachmentProcessorIndex == 1 && a.CurrentAttachmentProcessorUris.First() == new Uri("http://www.bing.com/") && a.CurrentAttachmentProcessorProgress == 50 && a.AttachmentProcessorsCount == 2)), Times.Once, "Finalization Progress must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Never);
         }
 

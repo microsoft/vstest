@@ -104,7 +104,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // Assert
             multiTestRunFinalizationEventHandler.EnsureSuccess();
@@ -118,12 +118,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.HandlersCount);
+                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorUris.Count);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
+                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
                 if (multiTestRunFinalizationEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
+                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentAttachmentProcessorProgress);
                 }                
             }
 
@@ -152,7 +153,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, false, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, false, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // Assert
             multiTestRunFinalizationEventHandler.EnsureSuccess();
@@ -166,12 +167,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.HandlersCount);
+                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorUris.Count);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
+                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
                 if (multiTestRunFinalizationEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentHandlerProgress);
+                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentAttachmentProcessorProgress);
                 }                    
             }
 
@@ -198,7 +200,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(3, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // Assert
             multiTestRunFinalizationEventHandler.EnsureSuccess();
@@ -212,13 +214,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.HandlersCount);
+                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
+                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
 
                 if (multiTestRunFinalizationEventHandler.ProgressArgs.Count == 3)
                 {
-                    Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentHandlerProgress);
+                    Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentAttachmentProcessorProgress);
                 }                    
             }
 
@@ -250,7 +252,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             CancellationTokenSource cts = new CancellationTokenSource();
             
-            Task finalization = this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(attachments, true, multiTestRunFinalizationEventHandler, cts.Token);
+            Task finalization = this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(attachments, true, true, multiTestRunFinalizationEventHandler, cts.Token);
             
             while (true)
             {
@@ -282,13 +284,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < multiTestRunFinalizationEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.MultiTestRunFinalizationProgressEventArgs progressArgs = multiTestRunFinalizationEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentHandlerIndex);
-                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentHandlerUri.AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.HandlersCount);
+                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
+                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
 
                 if (i == 0)
                 {
-                    Assert.AreEqual(0, progressArgs.CurrentHandlerProgress);
+                    Assert.AreEqual(0, progressArgs.CurrentAttachmentProcessorProgress);
                 }                       
             }
 
@@ -316,7 +318,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.FinalizeMultiTestRunAsync(runEventHandler.Attachments, true, true, multiTestRunFinalizationEventHandler, CancellationToken.None);
 
             // act
             this.vstestConsoleWrapper?.EndSession();

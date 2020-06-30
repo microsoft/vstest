@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     /// <summary>
-    /// Interface contract for handling multi test run finalization complete events
+    /// Interface contract for handling multi test run finalization events
     /// </summary>
     public interface IMultiTestRunFinalizationEventsHandler : ITestMessageEventHandler
     {
@@ -18,10 +18,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         void HandleMultiTestRunFinalizationComplete(MultiTestRunFinalizationCompleteEventArgs finalizationCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk);
 
         /// <summary>
-        /// Dispatch FinalisedAttachments event to listeners.
+        /// Dispatch ProcessedAttachmentsChunk event to listeners.
         /// </summary>
-        /// <param name="attachments">Finalised attachment sets.</param>
-        void HandleFinalisedAttachments(IEnumerable<AttachmentSet> attachments);
+        /// <param name="attachments">Processed attachment sets.</param>
+        void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments);
 
         /// <summary>
         /// Dispatch MultiTestRunFinalizationProgress event to listeners.
