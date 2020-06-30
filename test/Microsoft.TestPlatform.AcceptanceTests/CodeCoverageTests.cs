@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Xml;
@@ -35,6 +36,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public int ExpectedSkippedTests { get; set; }
 
         public int ExpectedFailedTests { get; set; }
+
+        public bool CheckSkippedMethods { get; set; }
     }
 
     [TestClass]
@@ -138,7 +141,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 RunSettingsType = TestParameters.SettingsType.Custom,
                 ExpectedPassedTests = 2,
                 ExpectedSkippedTests = 0,
-                ExpectedFailedTests = 0
+                ExpectedFailedTests = 0,
+                CheckSkippedMethods = true
             };
 
             this.CollectCodeCoverage(runnerInfo, parameters);
@@ -159,7 +163,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 RunSettingsType = TestParameters.SettingsType.Custom,
                 ExpectedPassedTests = 2,
                 ExpectedSkippedTests = 0,
-                ExpectedFailedTests = 0
+                ExpectedFailedTests = 0,
+                CheckSkippedMethods = true
             };
 
             this.CollectCodeCoverage(runnerInfo, parameters);
@@ -184,7 +189,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             // Microsoft.VisualStudio.Coverage.Analysis assembly not available for .NET Core.
 #if NET451
-            this.ValidateCoverageData(actualCoverageFile, testParameters.AssemblyName);
+            var coverageDs = this.CreateCoverageData(actualCoverageFile, testParameters.AssemblyName);
+            if (testParameters.CheckSkippedMethods)
+            {
+                this.AssertSkippedMethod(coverageDs);
+            }
+            this.ValidateCoverageData(coverageDs, testParameters.AssemblyName);
 #endif
             Directory.Delete(this.resultsDirectory, true);
         }
@@ -233,14 +243,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
 #if NET451
-        private void ValidateCoverageData(string coverageFile, string assemblyName)
+        private CoverageDS CreateCoverageData(string coverageFile, string assemblyName)
         {
             using (var converageInfo = CoverageInfo.CreateFromFile(coverageFile))
             {
-                CoverageDS coverageDs = converageInfo.BuildDataSet();
-                AssertModuleCoverageCollected(coverageDs, assemblyName);
-                AssertSourceFileName(coverageDs);
+                return converageInfo.BuildDataSet();
             }
+        }
+
+        private void ValidateCoverageData(CoverageDS coverageDs, string assemblyName)
+        {
+            AssertModuleCoverageCollected(coverageDs, assemblyName);
+            AssertSourceFileName(coverageDs);
         }
 
         private static void AssertSourceFileName(CoverageDS coverageDS)
@@ -252,6 +266,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 sourceFileNames.ToArray(),
                 expectedFileName,
                 $"Code Coverage not collected for file: {expectedFileName}");
+        }
+
+        private void AssertSkippedMethod(CoverageDS coverageDS)
+        {
+            var dict = new Dictionary<string, bool>()
+            {
+                {"TestSign()", false},
+                {"TestAbs()", true}
+            };
+
+            for (int i = 0; i < coverageDS.Method.Count; ++i)
+            {
+                var method = coverageDS.Method[i];
+                if (dict.TryGetValue(method.MethodName, out bool value))
+                {
+                    Assert.IsTrue(value);
+                    dict.Remove(method.MethodName);
+                }
+            }
+
+            foreach (var element in dict)
+            {
+                Assert.IsFalse(element.Value);
+            }
         }
 
         private void AssertModuleCoverageCollected(CoverageDS coverageDS, string assemblyName)

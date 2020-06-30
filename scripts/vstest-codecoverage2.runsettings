@@ -32,7 +32,7 @@
 
 			<Functions>
 				<Exclude>
-					<Function>^TestSign.*</Function>
+					<Function>.*TestSign.*</Function>
 				</Exclude>
 			</Functions>
 
