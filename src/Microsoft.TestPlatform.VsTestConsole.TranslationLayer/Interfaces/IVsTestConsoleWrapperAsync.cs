@@ -100,7 +100,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="collectMetrics">Enables metrics collection (used for telemetry)</param>
         /// <param name="eventsHandler">EventHandler to receive session complete event</param>
         /// <param name="cancellationToken">Cancellation token</param>        
-        Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, IMultiTestRunFinalizationEventsHandler eventsHandler, CancellationToken cancellationToken);
+        Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler eventsHandler, CancellationToken cancellationToken);
 
         /// <summary>
         /// See <see cref="IVsTestConsoleWrapper.EndSession"/>.

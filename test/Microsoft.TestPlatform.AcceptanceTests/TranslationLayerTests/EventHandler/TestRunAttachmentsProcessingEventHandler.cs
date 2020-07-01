@@ -11,13 +11,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class MultiTestRunFinalizationEventHandler : IMultiTestRunFinalizationEventsHandler
+    public class TestRunAttachmentsProcessingEventHandler : ITestRunAttachmentsProcessingEventsHandler
     {
         public List<AttachmentSet> Attachments { get; private set; }
 
-        public MultiTestRunFinalizationCompleteEventArgs CompleteArgs { get; private set; }
+        public TestRunAttachmentsProcessingCompleteEventArgs CompleteArgs { get; private set; }
 
-        public List<MultiTestRunFinalizationProgressEventArgs> ProgressArgs { get; private set; }
+        public List<TestRunAttachmentsProcessingProgressEventArgs> ProgressArgs { get; private set; }
 
         /// <summary>
         /// Gets the log message.
@@ -31,11 +31,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public TestMessageLevel TestMessageLevel { get; private set; }
 
-        public MultiTestRunFinalizationEventHandler()
+        public TestRunAttachmentsProcessingEventHandler()
         {
             this.Errors = new List<string>();
             this.Attachments = new List<AttachmentSet>();
-            this.ProgressArgs = new List<MultiTestRunFinalizationProgressEventArgs>();
+            this.ProgressArgs = new List<TestRunAttachmentsProcessingProgressEventArgs>();
         }
 
         public void EnsureSuccess()
@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             return true;
         }
 
-        public void HandleMultiTestRunFinalizationComplete(ICollection<AttachmentSet> attachments)
+        public void HandleTestRunAttachmentsProcessingComplete(ICollection<AttachmentSet> attachments)
         {
             if(attachments != null)
             {
@@ -81,19 +81,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
         }
 
-        public void HandleMultiTestRunFinalizationComplete(MultiTestRunFinalizationCompleteEventArgs finalizationCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
+        public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
         {
             if (lastChunk != null)
             {
                 this.Attachments.AddRange(lastChunk);
             }
 
-            if (finalizationCompleteEventArgs.Error != null)
+            if (attachmentsProcessingCompleteEventArgs.Error != null)
             {
-                Errors.Add(finalizationCompleteEventArgs.Error.Message);
+                Errors.Add(attachmentsProcessingCompleteEventArgs.Error.Message);
             }
 
-            CompleteArgs = finalizationCompleteEventArgs;
+            CompleteArgs = attachmentsProcessingCompleteEventArgs;
         }
 
         public void HandleProcessedAttachmentsChunk(IEnumerable<AttachmentSet> attachments)
@@ -101,9 +101,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             throw new NotImplementedException();
         }
 
-        public void HandleMultiTestRunFinalizationProgress(MultiTestRunFinalizationProgressEventArgs finalizationProgressEventArgs)
+        public void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs)
         {
-            ProgressArgs.Add(finalizationProgressEventArgs);
+            ProgressArgs.Add(AttachmentsProcessingProgressEventArgs);
         }
     }
 }

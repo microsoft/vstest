@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private readonly Mock<IProxyExecutionManager> mockProxyExecutionManager;
         private readonly Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
         private readonly Mock<IParallelProxyExecutionManager> mockParallelProxyExecutionManager;
-        private readonly Mock<IMultiTestRunFinalizationManager> mockMultiTestRunFinalizationManager;
+        private readonly Mock<ITestRunAttachmentsProcessingManager> mockTestRunAttachmentsProcessingManager;
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly ParallelDataCollectionEventsHandler parallelDataCollectionEventsHandler;
 
@@ -37,16 +37,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             mockProxyExecutionManager = new Mock<IProxyExecutionManager>();
             mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
-            mockMultiTestRunFinalizationManager = new Mock<IMultiTestRunFinalizationManager>();
+            mockTestRunAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
             cancellationTokenSource = new CancellationTokenSource();
             parallelDataCollectionEventsHandler = new ParallelDataCollectionEventsHandler(mockRequestData.Object, mockProxyExecutionManager.Object, mockTestRunEventsHandler.Object,
-                mockParallelProxyExecutionManager.Object, new ParallelRunDataAggregator(), mockMultiTestRunFinalizationManager.Object, cancellationTokenSource.Token);
+                mockParallelProxyExecutionManager.Object, new ParallelRunDataAggregator(), mockTestRunAttachmentsProcessingManager.Object, cancellationTokenSource.Token);
 
             mockParallelProxyExecutionManager.Setup(m => m.HandlePartialRunComplete(It.IsAny<IProxyExecutionManager>(), It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>())).Returns(true);
         }
 
         [TestMethod]
-        public void HandleTestRunComplete_ShouldCallFinalizerWithAttachmentsAndUseResults()
+        public void HandleTestRunComplete_ShouldCallProcessTestRunAttachmentsAsyncWithAttachmentsAndUseResults()
         {
             // arrange
             List<AttachmentSet> inputAttachments = new List<AttachmentSet>
@@ -61,18 +61,18 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 new AttachmentSet(new Uri(uri1), "uri1_input1")
             };
 
-            mockMultiTestRunFinalizationManager.Setup(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(outputAttachments));
+            mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(outputAttachments));
 
             // act
             parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
 
             // assert
             mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(outputAttachments[0])), It.IsAny<ICollection<string>>()));
-            mockMultiTestRunFinalizationManager.Verify(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
+            mockTestRunAttachmentsProcessingManager.Verify(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
         }
 
         [TestMethod]
-        public void HandleTestRunComplete_ShouldCallFinalizerWithAttachmentsAndNotUserResults_IfFinalizerReturnsNull()
+        public void HandleTestRunComplete_ShouldCallProcessTestRunAttachmentsAsyncWithAttachmentsAndNotUserResults_IfManagerReturnsNull()
         {
             // arrange
             List<AttachmentSet> inputAttachments = new List<AttachmentSet>
@@ -82,14 +82,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 new AttachmentSet(new Uri(uri3), "uri3_input1")
             };
 
-            mockMultiTestRunFinalizationManager.Setup(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
+            mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
 
             // act
             parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
 
             // assert
             mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 3), It.IsAny<ICollection<string>>()));
-            mockMultiTestRunFinalizationManager.Verify(f => f.FinalizeMultiTestRunAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
+            mockTestRunAttachmentsProcessingManager.Verify(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
         }
     }
 }

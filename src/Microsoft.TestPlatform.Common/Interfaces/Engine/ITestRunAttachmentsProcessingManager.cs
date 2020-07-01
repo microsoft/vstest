@@ -10,24 +10,24 @@ using System.Threading.Tasks;
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     /// <summary>
-    /// Orchestrates multi test run finalization operations.
+    /// Orchestrates test run attachments processing operations.
     /// </summary>
-    internal interface IMultiTestRunFinalizationManager
+    internal interface ITestRunAttachmentsProcessingManager
     {
         /// <summary>
-        /// Finalizes multi test run and provides results through handler
+        /// Processes attachments and provides results through handler
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
-        /// <param name="eventHandler">EventHandler for handling multi test run finalization event</param>
+        /// <param name="eventHandler">EventHandler for handling test run attachments processing event</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken);
+        Task ProcessTestRunAttachmentsAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Finalizes multi test run
+        /// Processes attachments
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of attachments.</returns>
-        Task<Collection<AttachmentSet>> FinalizeMultiTestRunAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, CancellationToken cancellationToken);
+        Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, CancellationToken cancellationToken);
     }
 }

@@ -1893,79 +1893,79 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         #endregion
 
-        #region Finalization Tests
+        #region Attachments Processing Tests
 
         [TestMethod]
-        public async Task FinalizeTestsShouldCompleteWithZeroAttachments()
+        public async Task ProcessTestRunAttachmentsAsyncShouldCompleteWithZeroAttachments()
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var payload = new MultiTestRunFinalizationCompletePayload()
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
             { 
-                FinalizationCompleteEventArgs = new MultiTestRunFinalizationCompleteEventArgs(false, null),
+                AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(false, null),
                 Attachments = new AttachmentSet[0] 
             };
 
-            var finalizationComplete = new Message()
+            var attachmentsProcessingComplete = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationComplete,
+                MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(payload)
             };
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationComplete));
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, CancellationToken.None);
 
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel), Times.Never);
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => !a.IsCanceled && a.Error == null), It.Is<ICollection<AttachmentSet>>(a => a.Count == 0)), Times.Once, "Finalization Complete must be called");
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => !a.IsCanceled && a.Error == null), It.Is<ICollection<AttachmentSet>>(a => a.Count == 0)), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
 
         [TestMethod]
-        public async Task FinalizeTestsShouldCompleteWithOneAttachment()
+        public async Task ProcessTestRunAttachmentsAsyncShouldCompleteWithOneAttachment()
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var payload = new MultiTestRunFinalizationCompletePayload() 
+            var payload = new TestRunAttachmentsProcessingCompletePayload() 
             {
-                FinalizationCompleteEventArgs = new MultiTestRunFinalizationCompleteEventArgs(true, new Exception("msg")),
+                AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(true, new Exception("msg")),
                 Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") } 
             };
-            var finalizationComplete = new Message()
+            var attachmentsProcessingComplete = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationComplete,
+                MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(payload)
             };
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationComplete));
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, CancellationToken.None);
 
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel), Times.Never);
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => a.IsCanceled && a.Error != null), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Finalization Complete must be called");
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => a.IsCanceled && a.Error != null), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
 
         [TestMethod]
-        public async Task FinalizeTestsShouldCompleteWithOneAttachmentAndTestMessage()
+        public async Task ProcessTestRunAttachmentsAsyncShouldCompleteWithOneAttachmentAndTestMessage()
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var payload = new MultiTestRunFinalizationCompletePayload()
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
             {
-                FinalizationCompleteEventArgs = new MultiTestRunFinalizationCompleteEventArgs(false, null),
+                AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(false, null),
                 Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
             };
 
-            var finalizationComplete = new Message()
+            var attachmentsProcessingComplete = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationComplete,
+                MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(payload)
             };
 
@@ -1974,75 +1974,75 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationComplete)));
+                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete)));
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, CancellationToken.None);
 
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel), Times.Never);
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.IsAny<MultiTestRunFinalizationCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Finalization Complete must be called");
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Once, "TestMessage event must be called");
         }
 
         [TestMethod]
-        public async Task FinalizeTestsShouldCompleteWithOneAttachmentAndProgressMessage()
+        public async Task ProcessTestRunAttachmentsAsyncShouldCompleteWithOneAttachmentAndProgressMessage()
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var completePayload = new MultiTestRunFinalizationCompletePayload()
+            var completePayload = new TestRunAttachmentsProcessingCompletePayload()
             {
-                FinalizationCompleteEventArgs = new MultiTestRunFinalizationCompleteEventArgs(false, null),
+                AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(false, null),
                 Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
             };
 
-            var finalizationComplete = new Message()
+            var attachmentsProcessingComplete = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationComplete,
+                MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(completePayload)
             };
 
-            var progressPayload = new MultiTestRunFinalizationProgressPayload()
+            var progressPayload = new TestRunAttachmentsProcessingProgressPayload()
             {
-                FinalizationProgressEventArgs = new MultiTestRunFinalizationProgressEventArgs(1, new[] { new Uri("http://www.bing.com/") }, 50, 2)
+                AttachmentsProcessingProgressEventArgs = new TestRunAttachmentsProcessingProgressEventArgs(1, new[] { new Uri("http://www.bing.com/") }, 50, 2)
             };
 
-            var finalizationProgress = new Message()
+            var attachmentsProcessingProgress = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationProgress,
+                MessageType = MessageType.TestRunAttachmentsProcessingProgress,
                 Payload = JToken.FromObject(progressPayload)
             };
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationProgress));
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingProgress));
 
-            mockHandler.Setup(mh => mh.HandleMultiTestRunFinalizationProgress(It.IsAny<MultiTestRunFinalizationProgressEventArgs>())).Callback(
-                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationComplete)));
+            mockHandler.Setup(mh => mh.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback(
+                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete)));
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, CancellationToken.None);
 
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel), Times.Never);
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.IsAny<MultiTestRunFinalizationCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Finalization Complete must be called");
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationProgress(It.Is<MultiTestRunFinalizationProgressEventArgs>(a => a.CurrentAttachmentProcessorIndex == 1 && a.CurrentAttachmentProcessorUris.First() == new Uri("http://www.bing.com/") && a.CurrentAttachmentProcessorProgress == 50 && a.AttachmentProcessorsCount == 2)), Times.Once, "Finalization Progress must be called");
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Attachments Processing Complete must be called");
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingProgress(It.Is<TestRunAttachmentsProcessingProgressEventArgs>(a => a.CurrentAttachmentProcessorIndex == 1 && a.CurrentAttachmentProcessorUris.First() == new Uri("http://www.bing.com/") && a.CurrentAttachmentProcessorProgress == 50 && a.AttachmentProcessorsCount == 2)), Times.Once, "Attachments processing Progress must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Never);
         }
 
         [TestMethod]
-        public async Task FinalizeTestsShouldSendCancelMessageIfCancellationTokenCancelled()
+        public async Task ProcessTestRunAttachmentsAsyncShouldSendCancelMessageIfCancellationTokenCancelled()
         {
             await this.InitializeCommunicationAsync();
 
             var cts = new CancellationTokenSource();
 
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var payload = new MultiTestRunFinalizationCompletePayload()
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
             {
                 Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
             };
-            var finalizationComplete = new Message()
+            var attachmentsProcessingComplete = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationComplete,
+                MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(payload)
             };
 
@@ -2053,56 +2053,56 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(() =>
             {
                 cts.Cancel();
-                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationComplete));
+                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
             });
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, cts.Token);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, cts.Token);
 
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel));
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.IsAny<MultiTestRunFinalizationCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Finalization Complete must be called");
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel));
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Once, "TestMessage event must be called");
         }
 
         [TestMethod]
-        public async Task FinalizeTestsShouldSendCancelMessageIfCancellationTokenCancelledAtTheBeginning()
+        public async Task ProcessTestRunAttachmentsAsyncShouldSendCancelMessageIfCancellationTokenCancelledAtTheBeginning()
         {
             await this.InitializeCommunicationAsync();
 
             var cts = new CancellationTokenSource();
             cts.Cancel();
 
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var payload = new MultiTestRunFinalizationCompletePayload()
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
             {
                 Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
             };
-            var finalizationComplete = new Message()
+            var attachmentsProcessingComplete = new Message()
             {
-                MessageType = MessageType.MultiTestRunFinalizationComplete,
+                MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(payload)
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(finalizationComplete));
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, cts.Token);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, cts.Token);
 
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>()));
-            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.MultiTestRunFinalizationCancel));
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.IsAny<MultiTestRunFinalizationCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Finalizationomplete must be called");
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
+            mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel));
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.IsAny<TestRunAttachmentsProcessingCompleteEventArgs>(), It.Is<ICollection<AttachmentSet>>(a => a.Count == 1)), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Never, "TestMessage event must be called");
         }
 
         [TestMethod]
-        public async Task FinalizeTestsShouldAbortOnExceptionInSendMessage()
+        public async Task ProcessTestRunAttachmentsAsyncShouldAbortOnExceptionInSendMessage()
         {
-            var mockHandler = new Mock<IMultiTestRunFinalizationEventsHandler>();
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationStart, It.IsAny<object>())).Throws(new IOException());
+            var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>())).Throws(new IOException());
 
-            await this.requestSender.FinalizeMultiTestRunAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }, false, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }, false, mockHandler.Object, CancellationToken.None);
 
-            mockHandler.Verify(mh => mh.HandleMultiTestRunFinalizationComplete(It.Is<MultiTestRunFinalizationCompleteEventArgs>(a => !a.IsCanceled && a.Error is IOException), null), Times.Once, "Finalization Complete must be called");
+            mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => !a.IsCanceled && a.Error is IOException), null), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
         }

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
+namespace Microsoft.TestPlatform.Client.UnitTests.TestRunAttachmentsProcessing
 {
-    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization;
+    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -13,15 +13,15 @@ namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
     using Moq;
 
     [TestClass]
-    public class MultiTestRunFinalizationEventsHandlerTests
+    public class TestRunAttachmentsProcessingEventsHandlerTests
     {
         private readonly Mock<ICommunicationManager> mockCommunicationManager;
-        private readonly IMultiTestRunFinalizationEventsHandler handler;
+        private readonly ITestRunAttachmentsProcessingEventsHandler handler;
 
-        public MultiTestRunFinalizationEventsHandlerTests()
+        public TestRunAttachmentsProcessingEventsHandlerTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.handler = new MultiTestRunFinalizationEventsHandler(mockCommunicationManager.Object);
+            this.handler = new TestRunAttachmentsProcessingEventsHandler(mockCommunicationManager.Object);
         }
 
         [TestMethod]
@@ -35,24 +35,24 @@ namespace Microsoft.TestPlatform.Client.UnitTests.MultiTestRunFinalization
         }
 
         [TestMethod]
-        public void EventsHandlerHandleMultiTestRunFinalizationCompleteShouldSendFinalizationCompleteMessage()
+        public void EventsHandlerHandleTestRunAttachmentsProcessingCompleteShouldSendAttachmentsProcessingCompleteMessage()
         {
             var attachments = new[] { new AttachmentSet(new System.Uri("http://www.bing.com/"), "code coverage") };
-            var args = new MultiTestRunFinalizationCompleteEventArgs(false, null);
+            var args = new TestRunAttachmentsProcessingCompleteEventArgs(false, null);
 
-            handler.HandleMultiTestRunFinalizationComplete(args, attachments);
+            handler.HandleTestRunAttachmentsProcessingComplete(args, attachments);
 
-            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationComplete, It.Is<MultiTestRunFinalizationCompletePayload>(p => p.Attachments == attachments && p.FinalizationCompleteEventArgs == args)));
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, It.Is<TestRunAttachmentsProcessingCompletePayload>(p => p.Attachments == attachments && p.AttachmentsProcessingCompleteEventArgs == args)));
         }
 
         [TestMethod]
-        public void EventsHandlerHandleMultiTestRunFinalizationProgressShouldSendFinalizationProgressMessage()
+        public void EventsHandlerHandleTestRunAttachmentsProcessingProgressShouldSendAttachmentsProcessingProgressMessage()
         {
-            var args = new MultiTestRunFinalizationProgressEventArgs(1, new[] { new System.Uri("http://www.bing.com/") }, 90, 2);
+            var args = new TestRunAttachmentsProcessingProgressEventArgs(1, new[] { new System.Uri("http://www.bing.com/") }, 90, 2);
 
-            handler.HandleMultiTestRunFinalizationProgress(args);
+            handler.HandleTestRunAttachmentsProcessingProgress(args);
 
-            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.MultiTestRunFinalizationProgress, It.Is<MultiTestRunFinalizationProgressPayload>(p => p.FinalizationProgressEventArgs == args)));
+            mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingProgress, It.Is<TestRunAttachmentsProcessingProgressPayload>(p => p.AttachmentsProcessingProgressEventArgs == args)));
         }
 
         [TestMethod]

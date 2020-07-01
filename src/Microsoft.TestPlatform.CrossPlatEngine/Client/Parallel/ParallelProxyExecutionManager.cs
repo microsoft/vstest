@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -262,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var concurrentManagerWithDataCollection = concurrentManager as ProxyExecutionManagerWithDataCollection;
 
                 // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-                var finalizationManager = new MultiTestRunFinalizationManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
+                var attachmentsProcessingManager = new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
 
                 return new ParallelDataCollectionEventsHandler(
                             this.requestData,
@@ -270,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                             this.currentRunEventsHandler,
                             this,
                             this.currentRunDataAggregator,
-                            finalizationManager,
+                            attachmentsProcessingManager,
                             concurrentManagerWithDataCollection.CancellationToken);
             }
 

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
+namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing
 {
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -11,47 +11,48 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization
     using System.Collections.Generic;
 
     /// <summary>
-    /// The multi test finalization events handler.
+    /// The test run attachments processing events handler.
     /// </summary>
-    public class MultiTestRunFinalizationEventsHandler : IMultiTestRunFinalizationEventsHandler
+    /// 
+    public class TestRunAttachmentsProcessingEventsHandler : ITestRunAttachmentsProcessingEventsHandler
     {
         private readonly ICommunicationManager communicationManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiTestRunFinalizationEventsHandler"/> class.
+        /// Initializes a new instance of the <see cref="TestRunAttachmentsProcessingEventsHandler"/> class.
         /// </summary>
         /// <param name="communicationManager"> The communication manager. </param>
-        public MultiTestRunFinalizationEventsHandler(ICommunicationManager communicationManager)
+        public TestRunAttachmentsProcessingEventsHandler(ICommunicationManager communicationManager)
         {
             this.communicationManager = communicationManager;
         }
 
         /// <inheritdoc/>
-        public void HandleMultiTestRunFinalizationComplete(MultiTestRunFinalizationCompleteEventArgs finalizationCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
+        public void HandleTestRunAttachmentsProcessingComplete(TestRunAttachmentsProcessingCompleteEventArgs attachmentsProcessingCompleteEventArgs, IEnumerable<AttachmentSet> lastChunk)
         {
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Multi test run finalization completed.");
+                EqtTrace.Info("Test run attachments processing completed.");
             }
 
-            var payload = new MultiTestRunFinalizationCompletePayload()
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
             {
-                FinalizationCompleteEventArgs = finalizationCompleteEventArgs,
+                AttachmentsProcessingCompleteEventArgs = attachmentsProcessingCompleteEventArgs,
                 Attachments = lastChunk
             };
 
-            this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationComplete, payload);
+            this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
         }
 
         /// <inheritdoc/>
-        public void HandleMultiTestRunFinalizationProgress(MultiTestRunFinalizationProgressEventArgs finalizationProgressEventArgs)
+        public void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs)
         {
-            var payload = new MultiTestRunFinalizationProgressPayload()
+            var payload = new TestRunAttachmentsProcessingProgressPayload()
             {
-                FinalizationProgressEventArgs = finalizationProgressEventArgs,
+                AttachmentsProcessingProgressEventArgs = AttachmentsProcessingProgressEventArgs,
             };
 
-            this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationProgress, payload);
+            this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingProgress, payload);
         }
 
         /// <inheritdoc/>

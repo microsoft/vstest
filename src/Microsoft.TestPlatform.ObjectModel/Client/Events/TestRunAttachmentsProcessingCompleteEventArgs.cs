@@ -8,27 +8,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     [DataContract]
-    public class MultiTestRunFinalizationCompleteEventArgs : EventArgs
+    public class TestRunAttachmentsProcessingCompleteEventArgs : EventArgs
     {
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="isCanceled">Specifies whether the finalization is canceled.</param>
-        /// <param name="error">Specifies the error encountered during the execution of the finalization.</param>
-        public MultiTestRunFinalizationCompleteEventArgs(bool isCanceled, Exception error)
+        /// <param name="isCanceled">Specifies whether the attachments processing is canceled.</param>
+        /// <param name="error">Specifies the error encountered during the execution of the attachments processing.</param>
+        public TestRunAttachmentsProcessingCompleteEventArgs(bool isCanceled, Exception error)
         {
             this.IsCanceled = isCanceled;
             this.Error = error;
         }
 
         /// <summary>
-        /// Gets a value indicating whether the finalization is canceled or not.
+        /// Gets a value indicating whether the attachments processing is canceled or not.
         /// </summary>
         [DataMember]
         public bool IsCanceled { get; private set; }
 
         /// <summary>
-        /// Gets the error encountered during the finalization of the test runs. Null if there is no error.
+        /// Gets the error encountered during the attachments processing of the test runs. Null if there is no error.
         /// </summary>
         [DataMember]
         public Exception Error { get; private set; }

@@ -407,12 +407,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, IMultiTestRunFinalizationEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        public async Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
         {
-            this.testPlatformEventSource.TranslationLayerMultiTestRunFinalizationStart();
+            this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStart();
 
             await this.EnsureInitializedAsync().ConfigureAwait(false);
-            await requestSender.FinalizeMultiTestRunAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken).ConfigureAwait(false);
+            await requestSender.ProcessTestRunAttachmentsAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion

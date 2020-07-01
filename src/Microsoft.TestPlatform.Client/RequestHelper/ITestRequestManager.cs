@@ -45,11 +45,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         void RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig);
 
         /// <summary>
-        /// Finalize multi test run
+        /// Processes test run attachments
         /// </summary>
-        /// <param name="multiTestRunFinalizationPayload">Multi test run finalization payload</param>
-        /// <param name="multiTestRunFinalizationEventsHandler">Multi test run finalization events handler</param>
-        void FinalizeMultiTestRun(MultiTestRunFinalizationPayload multiTestRunFinalizationPayload, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationEventsHandler, ProtocolConfig protocolConfig);
+        /// <param name="testRunAttachmentsProcessingPayload">Test run attachments processing payload</param>
+        /// <param name="testRunAttachmentsProcessingEventsHandler">Test run attachments processing events handler</param>
+        void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload testRunAttachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request
@@ -67,8 +67,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         void CancelDiscovery();
 
         /// <summary>
-        /// Cancels the current multi test run finalization request
+        /// Cancels the current test run attachments processing request
         /// </summary>
-        void CancelMultiTestRunFinalization();
+        void CancelTestRunAttachmentsProcessing();
     }
 }

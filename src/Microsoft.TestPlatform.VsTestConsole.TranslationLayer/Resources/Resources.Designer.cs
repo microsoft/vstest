@@ -62,11 +62,11 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Multi Test Runs Finalization was aborted..
+        ///   Looks up a localized string similar to The active Test Run Attachments Processing was aborted..
         /// </summary>
-        public static string AbortedMultiTestRunFinalization {
+        public static string AbortedTestRunAttachmentsProcessing {
             get {
-                return ResourceManager.GetString("AbortedMultiTestRunFinalization", resourceCulture);
+                return ResourceManager.GetString("AbortedTestRunAttachmentsProcessing", resourceCulture);
             }
         }
         

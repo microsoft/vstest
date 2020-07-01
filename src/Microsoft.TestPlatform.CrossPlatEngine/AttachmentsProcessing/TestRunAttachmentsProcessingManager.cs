@@ -16,48 +16,48 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing
 {
     /// <summary>
-    /// Orchestrates multi test run finalization operations.
+    /// Orchestrates test run attachments processing operations.
     /// </summary>
-    public class MultiTestRunFinalizationManager : IMultiTestRunFinalizationManager
+    public class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessingManager
     {
-        private static string FinalizationCompleted = "Completed";
-        private static string FinalizationCanceled = "Canceled";
-        private static string FinalizationFailed = "Failed";
+        private static string AttachmentsProcessingCompleted = "Completed";
+        private static string AttachmentsProcessingCanceled = "Canceled";
+        private static string AttachmentsProcessingFailed = "Failed";
 
         private readonly ITestPlatformEventSource testPlatformEventSource;
         private readonly IDataCollectorAttachmentProcessor[] dataCollectorAttachmentsProcessors;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiTestRunFinalizationManager"/> class.
+        /// Initializes a new instance of the <see cref="TestRunAttachmentsProcessingManager"/> class.
         /// </summary>
-        public MultiTestRunFinalizationManager(ITestPlatformEventSource testPlatformEventSource, params IDataCollectorAttachmentProcessor[] dataCollectorAttachmentsProcessors)
+        public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource, params IDataCollectorAttachmentProcessor[] dataCollectorAttachmentsProcessors)
         {
             this.testPlatformEventSource = testPlatformEventSource ?? throw new ArgumentNullException(nameof(testPlatformEventSource));
             this.dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessors ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentsProcessors));
         }
 
         /// <inheritdoc/>
-        public async Task FinalizeMultiTestRunAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
+        public async Task ProcessTestRunAttachmentsAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
         {
-            await InternalFinalizeMultiTestRunAsync(requestData, new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken).ConfigureAwait(false);
+            await InternalProcessTestRunAttachmentsAsync(requestData, new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken).ConfigureAwait(false);
         }
         /// <inheritdoc/>
-        public Task<Collection<AttachmentSet>> FinalizeMultiTestRunAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, CancellationToken cancellationToken)
+        public Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, CancellationToken cancellationToken)
         {
-            return InternalFinalizeMultiTestRunAsync(requestData, new Collection<AttachmentSet>(attachments.ToList()), null, cancellationToken);
+            return InternalProcessTestRunAttachmentsAsync(requestData, new Collection<AttachmentSet>(attachments.ToList()), null, cancellationToken);
         }
 
-        private async Task<Collection<AttachmentSet>> InternalFinalizeMultiTestRunAsync(IRequestData requestData, Collection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventHandler, CancellationToken cancellationToken)
+        private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(IRequestData requestData, Collection<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             try
             {
-                testPlatformEventSource.MultiTestRunFinalizationStart(attachments?.Count ?? 0);
-                requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForFinalization, attachments?.Count ?? 0);
+                testPlatformEventSource.TestRunAttachmentsProcessingStart(attachments?.Count ?? 0);
+                requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, attachments?.Count ?? 0);
                 
                 cancellationToken.ThrowIfCancellationRequested();                
 
@@ -70,12 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
 
                     if (completedTask == task)
                     {
-                        return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(false, null), await task, stopwatch, eventHandler);
+                        return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, null), await task, stopwatch, eventHandler);
                     }
                     else
                     {
-                        eventHandler?.HandleLogMessage(TestMessageLevel.Informational, "Finalization was cancelled.");
-                        return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
+                        eventHandler?.HandleLogMessage(TestMessageLevel.Informational, "Attachments processing was cancelled.");
+                        return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
                     }
                 }
             }
@@ -83,20 +83,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             {
                 if (EqtTrace.IsWarningEnabled)
                 {
-                    EqtTrace.Warning("MultiTestRunFinalizationManager: operation was cancelled.");
+                    EqtTrace.Warning("TestRunAttachmentsProcessingManager: operation was cancelled.");
                 }
-                return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
+                return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
             }
             catch (Exception e)
             {
-                EqtTrace.Error("MultiTestRunFinalizationManager: Exception in FinalizeMultiTestRunAsync: " + e);
+                EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessTestRunAttachmentsAsync: " + e);
 
                 eventHandler?.HandleLogMessage(TestMessageLevel.Error, e.Message);
-                return FinalizeOperation(requestData, new MultiTestRunFinalizationCompleteEventArgs(false, e), attachments, stopwatch, eventHandler);
+                return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, e), attachments, stopwatch, eventHandler);
             }
         }
 
-        private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(Collection<AttachmentSet> attachments, IMultiTestRunFinalizationEventsHandler eventsHandler, CancellationToken cancellationToken)
+        private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(Collection<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventsHandler, CancellationToken cancellationToken)
         {
             if (attachments == null || !attachments.Any()) return attachments;
 
@@ -119,8 +119,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                         }
 
                         IProgress<int> progressReporter = new Progress<int>((int progress) => 
-                            eventsHandler?.HandleMultiTestRunFinalizationProgress(
-                                new MultiTestRunFinalizationProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
+                            eventsHandler?.HandleTestRunAttachmentsProcessingProgress(
+                                new TestRunAttachmentsProcessingProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
 
                         ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.ProcessAttachmentSetsAsync(new Collection<AttachmentSet>(attachmentsToBeProcessed), progressReporter, logger, cancellationToken).ConfigureAwait(false);
 
@@ -135,31 +135,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
             return attachments;
         }
 
-        private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, MultiTestRunFinalizationCompleteEventArgs completeArgs, Collection<AttachmentSet> attachments, Stopwatch stopwatch, IMultiTestRunFinalizationEventsHandler eventHandler)
+        private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, TestRunAttachmentsProcessingCompleteEventArgs completeArgs, Collection<AttachmentSet> attachments, Stopwatch stopwatch, ITestRunAttachmentsProcessingEventsHandler eventHandler)
         {            
-            testPlatformEventSource.MultiTestRunFinalizationStop(attachments.Count);
-            requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterFinalization, attachments.Count);
-            requestData.MetricsCollection.Add(TelemetryDataConstants.FinalizationState, completeArgs.Error != null ? FinalizationFailed : completeArgs.IsCanceled ? FinalizationCanceled : FinalizationCompleted);
+            testPlatformEventSource.TestRunAttachmentsProcessingStop(attachments.Count);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing, attachments.Count);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.AttachmentsProcessingState, completeArgs.Error != null ? AttachmentsProcessingFailed : completeArgs.IsCanceled ? AttachmentsProcessingCanceled : AttachmentsProcessingCompleted);
 
             stopwatch.Stop();
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForFinalization, stopwatch.Elapsed.TotalSeconds);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing, stopwatch.Elapsed.TotalSeconds);
 
             completeArgs.Metrics = requestData.MetricsCollection.Metrics;
-            eventHandler?.HandleMultiTestRunFinalizationComplete(completeArgs, attachments);
+            eventHandler?.HandleTestRunAttachmentsProcessingComplete(completeArgs, attachments);
 
             return attachments;
         }
 
-        private IMessageLogger CreateMessageLogger(IMultiTestRunFinalizationEventsHandler eventsHandler)
+        private IMessageLogger CreateMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
         {
-            return eventsHandler != null ? (IMessageLogger)new FinalizationMessageLogger(eventsHandler) : new NullMessageLogger();
+            return eventsHandler != null ? (IMessageLogger)new AttachmentsProcessingMessageLogger(eventsHandler) : new NullMessageLogger();
         }
 
-        private class FinalizationMessageLogger : IMessageLogger
+        private class AttachmentsProcessingMessageLogger : IMessageLogger
         {
-            private readonly IMultiTestRunFinalizationEventsHandler eventsHandler;
+            private readonly ITestRunAttachmentsProcessingEventsHandler eventsHandler;
 
-            public FinalizationMessageLogger(IMultiTestRunFinalizationEventsHandler eventsHandler)
+            public AttachmentsProcessingMessageLogger(ITestRunAttachmentsProcessingEventsHandler eventsHandler)
             {
                 this.eventsHandler = eventsHandler ?? throw new ArgumentNullException(nameof(eventsHandler));
             }

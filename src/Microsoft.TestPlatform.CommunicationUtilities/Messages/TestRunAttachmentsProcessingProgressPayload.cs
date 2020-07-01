@@ -6,13 +6,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
-    /// Multi test run finalization complete payload.
+    /// Test run attachments processing complete payload.
     /// </summary>
-    public class MultiTestRunFinalizationProgressPayload
+    public class TestRunAttachmentsProcessingProgressPayload
     {
         /// <summary>
-        /// Gets or sets the multi test run finalization complete args.
+        /// Gets or sets the test run attachments processing complete args.
         /// </summary>
-        public MultiTestRunFinalizationProgressEventArgs FinalizationProgressEventArgs { get; set; }
+        public TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs { get; set; }
     }
 }

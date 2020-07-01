@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization;
+    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -199,11 +199,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.MultiTestRunFinalizationStart:
+                        case MessageType.TestRunAttachmentsProcessingStart:
                             {
-                                var multiTestRunFinalizationPayload =
-                                    this.communicationManager.DeserializePayload<MultiTestRunFinalizationPayload>(message);
-                                this.StartMultiTestRunFinalization(multiTestRunFinalizationPayload, testRequestManager);
+                                var testRunAttachmentsProcessingPayload =
+                                    this.communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                                this.StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
                                 break;
                             }
 
@@ -225,9 +225,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.MultiTestRunFinalizationCancel:
+                        case MessageType.TestRunAttachmentsProcessingCancel:
                             {
-                                testRequestManager.CancelMultiTestRunFinalization();
+                                testRequestManager.CancelTestRunAttachmentsProcessing();
                                 break;
                             }
 
@@ -472,29 +472,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
         }
 
-        private void StartMultiTestRunFinalization(MultiTestRunFinalizationPayload finalizationPayload, ITestRequestManager testRequestManager)
+        private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRequestManager testRequestManager)
         {
             Task.Run(
                 delegate
                 {
                     try
                     {
-                        testRequestManager.FinalizeMultiTestRun(finalizationPayload, new MultiTestRunFinalizationEventsHandler(this.communicationManager), this.protocolConfig);
+                        testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(this.communicationManager), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
-                        EqtTrace.Error("DesignModeClient: Exception in StartMultiTestRunFinalization: " + ex);
+                        EqtTrace.Error("DesignModeClient: Exception in StartTestRunAttachmentsProcessing: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 
-                        var payload = new MultiTestRunFinalizationCompletePayload()
+                        var payload = new TestRunAttachmentsProcessingCompletePayload()
                         {
                             Attachments = null
                         };
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.MultiTestRunFinalizationComplete, payload);
+                        this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
                     }
                 });
         }

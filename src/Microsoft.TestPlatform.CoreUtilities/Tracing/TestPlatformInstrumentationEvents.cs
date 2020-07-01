@@ -159,33 +159,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         public const int MetricsDisposeStopEventId = 0x39;
 
         /// <summary>
-        /// The session finalization start event id.
+        /// The session attachments processing start event id.
         /// </summary>
-        public const int MultiTestRunFinalizationStartEventId = 0x40;
+        public const int TestRunAttachmentsProcessingStartEventId = 0x40;
 
         /// <summary>
-        /// The session finalization stop event id.
+        /// The session attachments processing stop event id.
         /// </summary>
-        public const int MultiTestRunFinalizationStopEventId = 0x41;
+        public const int TestRunAttachmentsProcessingStopEventId = 0x41;
 
         /// <summary>
-        /// The session finalization request start event id.
+        /// The session attachments processing request start event id.
         /// </summary>
-        public const int MultiTestRunFinalizationRequestStartEventId = 0x42;
+        public const int TestRunAttachmentsProcessingRequestStartEventId = 0x42;
 
         /// <summary>
-        /// The session finalization request stop event id.
+        /// The session attachments processing request stop event id.
         /// </summary>
-        public const int MultiTestRunFinalizationRequestStopEventId = 0x43;
+        public const int TestRunAttachmentsProcessingRequestStopEventId = 0x43;
 
         /// <summary>
-        /// Events fired on session finalization start of translation layer.
+        /// Events fired on session attachments processing start of translation layer.
         /// </summary>
-        public const int TranslationLayerMultiTestRunFinalizationStartEventId = 0x44;
+        public const int TranslationLayerTestRunAttachmentsProcessingStartEventId = 0x44;
 
         /// <summary>
-        /// Events fired on session finalization complete in translation layer.
+        /// Events fired on session attachments processing complete in translation layer.
         /// </summary>
-        public const int TranslationLayerMultiTestRunFinalizationStopEventId = 0x45;
+        public const int TranslationLayerTestRunAttachmentsProcessingStopEventId = 0x45;
     }
 }

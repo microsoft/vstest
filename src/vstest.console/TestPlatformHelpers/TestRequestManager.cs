@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Xml;
     using System.Xml.XPath;
     using Microsoft.VisualStudio.TestPlatform.Client;
-    using Microsoft.VisualStudio.TestPlatform.Client.MultiTestRunFinalization;
+    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinalization;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly Task<IMetricsPublisher> metricsPublisher;
         private bool isDisposed;
         private IProcessHelper processHelper;
-        private IMultiTestRunFinalizationManager finalizationManager;
+        private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -68,10 +68,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private IDiscoveryRequest currentDiscoveryRequest;
 
         /// <summary>
-        /// Maintains the current active multi test run finalization cancellation token source
-        /// Assumption : There can only be one active finalization request.
+        /// Maintains the current active test run attachments processing cancellation token source
+        /// Assumption : There can only be one active attachments processing request.
         /// </summary>
-        private CancellationTokenSource currentFinalizationCancellationTokenSource;
+        private CancellationTokenSource currentAttachmentsProcessingCancellationTokenSource;
 
         #region Constructor
 
@@ -84,11 +84,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
                   new ProcessHelper(),
-                  new MultiTestRunFinalizationManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler()))
+                  new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler()))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper, IMultiTestRunFinalizationManager finalizationManager)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper, ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
             this.processHelper = processHelper;
-            this.finalizationManager = finalizationManager;
+            this.attachmentsProcessingManager = attachmentsProcessingManager;
         }
 
         #endregion
@@ -313,40 +313,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <inheritdoc/>
-        public void FinalizeMultiTestRun(MultiTestRunFinalizationPayload finalizationPayload, IMultiTestRunFinalizationEventsHandler finalizationEventsHandler, ProtocolConfig protocolConfig)
+        public void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler attachmentsProcessingEventsHandler, ProtocolConfig protocolConfig)
         {
-            EqtTrace.Info("TestRequestManager.FinalizeMultiTestRun: Multi test run finalization started.");
+            EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing started.");
 
-            this.telemetryOptedIn = finalizationPayload.CollectMetrics;
+            this.telemetryOptedIn = attachmentsProcessingPayload.CollectMetrics;
             var requestData = this.GetRequestData(protocolConfig);
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe
-            // There can be only one discovery, execution or finalization request at a given point in time
+            // There can be only one discovery, execution or attachments processing request at a given point in time
             lock (this.syncObject)
             {
                 try
                 {
-                    EqtTrace.Info("TestRequestManager.FinalizeMultiTestRun: Synchronization context taken");
-                    this.testPlatformEventSource.MultiTestRunFinalizationRequestStart();
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Synchronization context taken");
+                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStart();
 
-                    this.currentFinalizationCancellationTokenSource = new CancellationTokenSource();
+                    this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
-                    Task task = this.finalizationManager.FinalizeMultiTestRunAsync(requestData, finalizationPayload.Attachments, finalizationEventsHandler, this.currentFinalizationCancellationTokenSource.Token);
+                    Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, attachmentsProcessingPayload.Attachments, attachmentsProcessingEventsHandler, this.currentAttachmentsProcessingCancellationTokenSource.Token);
                     task.Wait();                   
                 }
                 finally
                 {
-                    if (this.currentFinalizationCancellationTokenSource != null)
+                    if (this.currentAttachmentsProcessingCancellationTokenSource != null)
                     {
-                        this.currentFinalizationCancellationTokenSource.Dispose();
-                        this.currentFinalizationCancellationTokenSource = null;
+                        this.currentAttachmentsProcessingCancellationTokenSource.Dispose();
+                        this.currentAttachmentsProcessingCancellationTokenSource = null;
                     }
 
-                    EqtTrace.Info("TestRequestManager.FinalizeMultiTestRun: Multi test run finalization completed.");
-                    this.testPlatformEventSource.MultiTestRunFinalizationRequestStop();
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing completed.");
+                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStop();
 
-                    // Post the finalization complete event
-                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestFinalizationCompleteEvent, requestData.MetricsCollection.Metrics);
+                    // Post the attachments processing complete event
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent, requestData.MetricsCollection.Metrics);
                 }
             }
         }
@@ -393,10 +393,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <inheritdoc/>
-        public void CancelMultiTestRunFinalization()
+        public void CancelTestRunAttachmentsProcessing()
         {
-            EqtTrace.Info("TestRequestManager.CancelMultiTestRunFinalization: Sending cancel request.");
-            this.currentFinalizationCancellationTokenSource?.Cancel();
+            EqtTrace.Info("TestRequestManager.CancelTestRunAttachmentsProcessing: Sending cancel request.");
+            this.currentAttachmentsProcessingCancellationTokenSource?.Cancel();
         }
 
         #endregion

@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
-        private readonly IMultiTestRunFinalizationManager finalizationManager;
+        private readonly ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
         private readonly CancellationToken cancellationToken;
 
         public ParallelDataCollectionEventsHandler(IRequestData requestData,
@@ -24,11 +24,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
-            IMultiTestRunFinalizationManager finalizationManager,
+            ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
             CancellationToken cancellationToken) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
-            this.finalizationManager = finalizationManager;
+            this.attachmentsProcessingManager = attachmentsProcessingManager;
             this.cancellationToken = cancellationToken;
         }
 
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                runDataAggregator.RunContextAttachments = finalizationManager.FinalizeMultiTestRunAsync(requestData, runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
+                runDataAggregator.RunContextAttachments = attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,

@@ -124,24 +124,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
         /// <summary>
-        /// Multi test run finalization
+        /// Test run attachments processing
         /// </summary>
-        public const string MultiTestRunFinalizationStart = "MultiTestRunFinalization.Start";
+        public const string TestRunAttachmentsProcessingStart = "TestRunAttachmentsProcessing.Start";
 
         /// <summary>
-        /// Multi test run finalization callback
+        /// Test run attachments processing callback
         /// </summary>
-        public const string MultiTestRunFinalizationComplete = "MultiTestRunFinalization.Complete";
+        public const string TestRunAttachmentsProcessingComplete = "TestRunAttachmentsProcessing.Complete";
 
         /// <summary>
-        /// Multi test run finalization progress
+        /// Test run attachments processing progress
         /// </summary>
-        public const string MultiTestRunFinalizationProgress = "MultiTestRunFinalization.Progress";
+        public const string TestRunAttachmentsProcessingProgress = "TestRunAttachmentsProcessing.Progress";
 
         /// <summary>
-        /// Cancel multi test run finalization
+        /// Cancel test run attachments processing
         /// </summary>
-        public const string MultiTestRunFinalizationCancel = "MultiTestRunFinalization.Cancel";
+        public const string TestRunAttachmentsProcessingCancel = "TestRunAttachmentsProcessing.Cancel";
 
         /// <summary>
         /// Extensions Initialization

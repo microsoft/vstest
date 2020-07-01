@@ -53,8 +53,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
         /// <param name="collectMetrics">Enables metrics collection</param>
-        /// <param name="multiTestRunFinalizationCompleteEventsHandler">Events handler</param>
+        /// <param name="testRunAttachmentsProcessingCompleteEventsHandler">Events handler</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, IMultiTestRunFinalizationEventsHandler multiTestRunFinalizationCompleteEventsHandler, CancellationToken cancellationToken);
+        Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingCompleteEventsHandler, CancellationToken cancellationToken);
     }
 }

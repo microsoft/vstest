@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     [DataContract]
-    public class MultiTestRunFinalizationProgressEventArgs : EventArgs
+    public class TestRunAttachmentsProcessingProgressEventArgs : EventArgs
     {
         /// <summary>
         /// Default constructor.
@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="currentAttachmentProcessorUris">Specifies current processor Uris.</param>
         /// <param name="currentAttachmentProcessorProgress">Specifies current processor progress.</param>
         /// <param name="attachmentProcessorsCount">Specifies the overall number of processors.</param>
-        public MultiTestRunFinalizationProgressEventArgs(long currentAttachmentProcessorIndex, ICollection<Uri> currentAttachmentProcessorUris, long currentAttachmentProcessorProgress, long attachmentProcessorsCount)
+        public TestRunAttachmentsProcessingProgressEventArgs(long currentAttachmentProcessorIndex, ICollection<Uri> currentAttachmentProcessorUris, long currentAttachmentProcessorProgress, long attachmentProcessorsCount)
         {
             CurrentAttachmentProcessorIndex = currentAttachmentProcessorIndex;
             CurrentAttachmentProcessorUris = currentAttachmentProcessorUris;

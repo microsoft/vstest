@@ -184,39 +184,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         void MetricsDisposeStop();
 
         /// <summary>
-        /// The multi test run finalization request start.
+        /// The test run attachments processing request start.
         /// </summary>
-        void MultiTestRunFinalizationRequestStart();
+        void TestRunAttachmentsProcessingRequestStart();
 
         /// <summary>
-        /// The multi test run finalization request stop.
+        /// The test run attachments processing request stop.
         /// </summary>
-        void MultiTestRunFinalizationRequestStop();
+        void TestRunAttachmentsProcessingRequestStop();
 
         /// <summary>
-        /// The multi test run finalization start.
+        /// The test run attachments processing start.
         /// </summary>
         /// <param name="numberOfAttachments">
         /// The number of attachments.
         /// </param>
-        void MultiTestRunFinalizationStart(long numberOfAttachments);
+        void TestRunAttachmentsProcessingStart(long numberOfAttachments);
 
         /// <summary>
-        /// The multi test run finalization stop.
+        /// The test run attachments processing stop.
         /// </summary>
         /// <param name="numberOfAttachments">
         /// The number of attachments.
         /// </param>
-        void MultiTestRunFinalizationStop(long numberOfAttachments);
+        void TestRunAttachmentsProcessingStop(long numberOfAttachments);
 
         /// <summary>
-        /// Mark the start of translation layer multi test run finalization request.
+        /// Mark the start of translation layer test run attachments processing request.
         /// </summary>
-        void TranslationLayerMultiTestRunFinalizationStart();
+        void TranslationLayerTestRunAttachmentsProcessingStart();
 
         /// <summary>
-        /// Mark the completion of translation layer multi test run finalization request.
+        /// Mark the completion of translation layer test run attachments processing request.
         /// </summary>
-        void TranslationLayerMultiTestRunFinalizationStop();
+        void TranslationLayerTestRunAttachmentsProcessingStop();
     }
 }
