@@ -276,7 +276,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #endregion
 
-        #region IVsTestConsoleWrapper
+        #region IVsTestConsoleWrapperAsync
 
         /// <inheritdoc/>
         public async Task StartSessionAsync()
@@ -407,7 +407,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        public async Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, string processingSettings, bool isLastBatch, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
         {
             this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStart();
 

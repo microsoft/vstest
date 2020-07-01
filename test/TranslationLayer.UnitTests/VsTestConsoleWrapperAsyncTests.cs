@@ -317,6 +317,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.consoleWrapper.ProcessTestRunAttachmentsAsync(
                 attachments,
+                null,
                 true,
                 true,
                 new Mock<ITestRunAttachmentsProcessingEventsHandler>().Object,

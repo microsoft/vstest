@@ -74,7 +74,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(0, 0);
+            VerifyMetrics(inputCount: 0, outputCount: 0);
         }
 
         [TestMethod]
@@ -93,7 +93,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(0, 0);
+            VerifyMetrics(inputCount: 0, outputCount: 0);
         }
 
         [TestMethod]
@@ -117,7 +117,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1);
+            VerifyMetrics(inputCount: 1, outputCount: 1);
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1);
+            VerifyMetrics(inputCount: 1, outputCount: 1);
         }
 
         [TestMethod]
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1);
+            VerifyMetrics(inputCount: 1, outputCount: 1);
         }
 
         [TestMethod]
@@ -203,7 +203,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1);
+            VerifyMetrics(inputCount: 1, outputCount: 1);
         }
 
         [TestMethod]
@@ -229,7 +229,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1, "Failed");
+            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Failed");
         }
 
         [TestMethod]
@@ -254,7 +254,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1, "Failed");
+            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Failed");
         }
 
         [TestMethod]
@@ -277,8 +277,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Never);
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
-            
-            VerifyMetrics(1, 1, "Canceled");
+
+            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Canceled");
         }
 
         [TestMethod]
@@ -302,7 +302,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1, "Canceled");
+            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Canceled");
         }
 
         [TestMethod]
@@ -343,7 +343,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[0]) && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[2]) && c.Contains(inputAttachments[3])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
 
-            VerifyMetrics(5, 3);
+            VerifyMetrics(inputCount: 5, outputCount: 3);
         }
 
         [TestMethod]
@@ -385,7 +385,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[0]) && c.Contains(inputAttachments[1])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 2 && c.Contains(inputAttachments[2]) && c.Contains(inputAttachments[3])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
 
-            VerifyMetrics(5, 3);
+            VerifyMetrics(inputCount: 5, outputCount: 3);
         }
 
         [TestMethod]
@@ -450,7 +450,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1, "Canceled");
+            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Canceled");
         }
 
         [TestMethod]
@@ -510,7 +510,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(1, 1, "Canceled");
+            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Canceled");
         }
 
         [TestMethod]
@@ -584,7 +584,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Informational, "info"));
             mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, "error"));
 
-            VerifyMetrics(2, 2, "Completed");
+            VerifyMetrics(inputCount: 2, outputCount: 2);
         }
 
         private void VerifyMetrics(int inputCount, int outputCount, string status = "Completed")

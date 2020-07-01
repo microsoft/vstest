@@ -104,7 +104,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -153,7 +153,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -200,7 +200,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(3, this.runEventHandler.Attachments.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -252,7 +252,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             CancellationTokenSource cts = new CancellationTokenSource();
             
-            Task attachmentsProcessing = this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(attachments, true, true, testRunAttachmentsProcessingEventHandler, cts.Token);
+            Task attachmentsProcessing = this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(attachments, null, true, true, testRunAttachmentsProcessingEventHandler, cts.Token);
             
             while (true)
             {
@@ -318,7 +318,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // act
             this.vstestConsoleWrapper?.EndSession();
