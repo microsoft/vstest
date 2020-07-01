@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Xml;
@@ -187,13 +188,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
+            var coverageDocument = this.RunCodeCoverage(actualCoverageFile);
+            if (testParameters.CheckSkippedMethods)
+            {
+                this.AssertSkippedMethod(coverageDocument);
+            }
+
             // Microsoft.VisualStudio.Coverage.Analysis assembly not available for .NET Core.
 #if NET451
             var coverageDs = this.CreateCoverageData(actualCoverageFile, testParameters.AssemblyName);
-            if (testParameters.CheckSkippedMethods)
-            {
-                this.AssertSkippedMethod(coverageDs);
-            }
             this.ValidateCoverageData(coverageDs, testParameters.AssemblyName);
 #endif
             Directory.Delete(this.resultsDirectory, true);
@@ -242,6 +245,66 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return arguments;
         }
 
+        private XmlDocument RunCodeCoverage(string coverageResult)
+        {
+            var codeCoveragePath = Path.Combine(
+                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                @"artifacts\Debug\Microsoft.CodeCoverage\CodeCoverage");
+
+            var codeCoverageExe = Path.Combine(
+                codeCoveragePath,
+                "CodeCoverage.exe");
+
+            string xmlResult = Path.Combine(this.resultsDirectory, "result.xml");
+            if (File.Exists(xmlResult))
+            {
+                File.Delete(xmlResult);
+            }
+
+            using (var process = new Process())
+            {
+                process.StartInfo.FileName = codeCoverageExe;
+                process.StartInfo.WorkingDirectory = codeCoveragePath;
+                process.StartInfo.Arguments = $"analyze /include_skipped_functions /include_skipped_modules /output:\"{xmlResult}\" \"{coverageResult}\"";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+
+                Console.WriteLine($"Starting {codeCoverageExe}");
+                var watch = new Stopwatch();
+
+                watch.Start();
+                process.Start();
+
+                process.WaitForExit();
+
+                watch.Stop();
+                Console.WriteLine($"Total execution time: {watch.Elapsed.Duration()}");
+
+                Assert.IsTrue(0 == process.ExitCode, "Code Coverage analyze failed: " + process.StandardOutput.ReadToEnd());
+            }
+
+            XmlDocument coverage = new XmlDocument();
+            coverage.Load(xmlResult);
+
+            return coverage;
+        }
+
+        private void AssertSkippedMethod(XmlDocument document)
+        {
+            var module = document.DocumentElement.SelectSingleNode("//module[@name='codecoveragetest.dll']");
+            Assert.IsNotNull(module);
+
+            var coverage = double.Parse(module.Attributes["block_coverage"].Value);
+            Assert.IsTrue(coverage > 40.0);
+
+            var testSignFunction = module.SelectSingleNode("//skipped_function[@name='TestSign()']");
+            Assert.IsNotNull(testSignFunction);
+            Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
+
+            var testAbsFunction = module.SelectSingleNode("//function[@name='TestAbs()']");
+            Assert.IsNotNull(testAbsFunction);
+        }
+
 #if NET451
         private CoverageDS CreateCoverageData(string coverageFile, string assemblyName)
         {
@@ -266,30 +329,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 sourceFileNames.ToArray(),
                 expectedFileName,
                 $"Code Coverage not collected for file: {expectedFileName}");
-        }
-
-        private void AssertSkippedMethod(CoverageDS coverageDS)
-        {
-            var dict = new Dictionary<string, bool>()
-            {
-                {"TestSign()", false},
-                {"TestAbs()", true}
-            };
-
-            for (int i = 0; i < coverageDS.Method.Count; ++i)
-            {
-                var method = coverageDS.Method[i];
-                if (dict.TryGetValue(method.MethodName, out bool value))
-                {
-                    Assert.IsTrue(value);
-                    dict.Remove(method.MethodName);
-                }
-            }
-
-            foreach (var element in dict)
-            {
-                Assert.IsFalse(element.Value);
-            }
         }
 
         private void AssertModuleCoverageCollected(CoverageDS coverageDS, string assemblyName)
