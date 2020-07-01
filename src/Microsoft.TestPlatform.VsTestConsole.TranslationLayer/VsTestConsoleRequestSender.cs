@@ -775,6 +775,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
                             eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                         }
+                        else
+                        {
+                            EqtTrace.Warning($"VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Unexpected message received {message.MessageType}.");
+                        }
                     }
                 }
             }
