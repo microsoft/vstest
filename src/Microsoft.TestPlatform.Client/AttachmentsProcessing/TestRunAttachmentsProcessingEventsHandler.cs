@@ -45,11 +45,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessin
         }
 
         /// <inheritdoc/>
-        public void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs AttachmentsProcessingProgressEventArgs)
+        public void HandleTestRunAttachmentsProcessingProgress(TestRunAttachmentsProcessingProgressEventArgs attachmentsProcessingProgressEventArgs)
         {
             var payload = new TestRunAttachmentsProcessingProgressPayload()
             {
-                AttachmentsProcessingProgressEventArgs = AttachmentsProcessingProgressEventArgs,
+                AttachmentsProcessingProgressEventArgs = attachmentsProcessingProgressEventArgs,
             };
 
             this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingProgress, payload);
