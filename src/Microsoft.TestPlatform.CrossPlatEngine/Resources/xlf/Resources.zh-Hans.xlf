@@ -214,7 +214,7 @@
       </trans-unit>
       <trans-unit id="AccessDenied">
         <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</source>
-        <target state="new">{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</target>
+        <target state="translated">{0} 尝试在所述位置创建 "TestResults" 文件夹时，访问被拒。你收到此异常是因为你正在从需要具有写入权限的文件夹运行 vstest.console.exe。若要解决此问题，请从你具有写入权限的文件夹运行 vstest.console.exe。</target>
         <note></note>
       </trans-unit>
     </body>

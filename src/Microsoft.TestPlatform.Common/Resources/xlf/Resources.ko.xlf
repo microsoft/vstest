@@ -281,7 +281,7 @@
       </trans-unit>
       <trans-unit id="AccessDenied">
         <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
-        <target state="new">Access denied while trying to create "TestResults" folder in current location. You are getting this exception because you are running vstest.console.exe from a folder which requires administrator rights. To solve the issue : please open command line "As Administrator" or run vstest.console.exe from a folder where you have admin privileges.</target>
+        <target state="translated">{0} "TestResults" 폴더를 언급된 위치에 만드는 동안 액세스가 거부되었습니다. 쓰기 권한이 필요한 폴더에서 vstest.console.exe를 실행하고 있으므로 이 예외가 발생했습니다. 이 문제를 해결하려면 쓰기 권한이 있는 폴더에서 vstest.console.exe를 실행하세요. 자세한 내용은 다음 오류 메시지를 확인하세요.</target>
         <note></note>
       </trans-unit>
     </body>
