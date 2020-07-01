@@ -39,12 +39,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="discoverySettings">Settings XML for test discovery</param>
         /// <param name="options">Options to be passed into the platform.</param>
         /// <param name="discoveryEventsHandler">EventHandler to receive discovery events</param>
-        void DiscoverTests(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
+        void DiscoverTests(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);        
 
         /// <summary>
         /// Cancels the last discovery request.
         /// </summary>
-        void CancelDiscovery();
+        new void CancelDiscovery();
 
         /// <summary>
         /// Starts a test run given a list of sources.
@@ -121,16 +121,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <summary>
         /// Cancel the last test run.
         /// </summary>
-        void CancelTestRun();
+        new void CancelTestRun();
 
         /// <summary>
         /// Abort the last test run.
         /// </summary>
-        void AbortTestRun();
+        new void AbortTestRun();
 
         /// <summary>
         /// Ends the test session and stops processing requests.
         /// </summary>
-        void EndSession();
+        new void EndSession();
     }
 }

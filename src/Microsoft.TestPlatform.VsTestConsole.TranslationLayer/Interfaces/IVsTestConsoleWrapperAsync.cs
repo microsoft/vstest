@@ -38,6 +38,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
+        /// See <see cref="IVsTestConsoleWrapper.CancelDiscovery"/>.
+        /// </summary>
+        void CancelDiscovery();
+
+        /// <summary>
         /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTests(IEnumerable{string}, string, ITestRunEventsHandler)"/>.
         /// </summary>
         Task RunTestsAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler);
@@ -78,6 +83,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task RunTestsWithCustomTestHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// See <see cref="IVsTestConsoleWrapper.CancelTestRun"/>.
+        /// </summary>
+        void CancelTestRun();
+
+        /// <summary>
+        /// See <see cref="IVsTestConsoleWrapper.AbortTestRun"/>.
+        /// </summary>
+        void AbortTestRun();
+
+        /// <summary>
         /// Provides back all attachments to TestPlatform for additional processing (for example merging)
         /// </summary>
         /// <param name="attachments">Collection of attachments</param>
@@ -86,5 +101,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="eventsHandler">EventHandler to receive session complete event</param>
         /// <param name="cancellationToken">Cancellation token</param>        
         Task FinalizeMultiTestRunAsync(IEnumerable<AttachmentSet> attachments, bool multiTestRunCompleted, bool collectMetrics, IMultiTestRunFinalizationEventsHandler eventsHandler, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// See <see cref="IVsTestConsoleWrapper.EndSession"/>.
+        /// </summary>
+        void EndSession();
     }
 }
