@@ -107,10 +107,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
                 int attachmentsHandlerIndex = i + 1;
 
-                ICollection<Uri> attachementProcessorUris = dataCollectorAttachmentsProcessor.GetExtensionUris()?.ToList();
-                if (attachementProcessorUris != null && attachementProcessorUris.Any())
+                ICollection<Uri> attachmentProcessorUris = dataCollectorAttachmentsProcessor.GetExtensionUris()?.ToList();
+                if (attachmentProcessorUris != null && attachmentProcessorUris.Any())
                 {
-                    var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachementProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
+                    var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachmentProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
                     if (attachmentsToBeProcessed.Any())
                     {
                         foreach (var attachment in attachmentsToBeProcessed)
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.MultiTestRunFinali
 
                         IProgress<int> progressReporter = new Progress<int>((int progress) => 
                             eventsHandler?.HandleMultiTestRunFinalizationProgress(
-                                new MultiTestRunFinalizationProgressEventArgs(attachmentsHandlerIndex, attachementProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
+                                new MultiTestRunFinalizationProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
 
                         ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.ProcessAttachmentSetsAsync(new Collection<AttachmentSet>(attachmentsToBeProcessed), progressReporter, logger, cancellationToken).ConfigureAwait(false);
 
