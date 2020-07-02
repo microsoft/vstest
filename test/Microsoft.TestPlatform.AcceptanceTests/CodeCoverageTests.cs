@@ -249,7 +249,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var codeCoveragePath = Path.Combine(
                 IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"artifacts\Debug\Intellitrace\Team Tools\Dynamic Code Coverage Tools");
+                $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0\CodeCoverage");
 
             var codeCoverageExe = Path.Combine(
                 codeCoveragePath,
