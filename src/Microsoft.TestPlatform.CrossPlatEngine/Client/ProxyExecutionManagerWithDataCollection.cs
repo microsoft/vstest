@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -69,6 +69,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             get; private set;
         }
+
+        /// <summary>
+        /// Gets the cancellation token for execution.
+        /// </summary>
+        internal CancellationToken CancellationToken => CancellationTokenSource.Token;
 
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.

@@ -281,7 +281,7 @@
       </trans-unit>
       <trans-unit id="AccessDenied">
         <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
-        <target state="new">Access denied while trying to create "TestResults" folder in current location. You are getting this exception because you are running vstest.console.exe from a folder which requires administrator rights. To solve the issue : please open command line "As Administrator" or run vstest.console.exe from a folder where you have admin privileges.</target>
+        <target state="translated">{0} Accesso negato durante il tentativo di creare la cartella "TestResults" nel percorso indicato. Si riceve questa eccezione perché si esegue vstest.console.exe da una cartella per cui è necessario l'accesso in scrittura. Per risolvere il problema, eseguire vstest.console.exe da una cartella per cui si hanno privilegi di scrittura. Per altre informazioni, vedere il messaggio di errore:</target>
         <note></note>
       </trans-unit>
     </body>

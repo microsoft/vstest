@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         }
 
         [TestMethod]
-        public void ToResultFilesShouldAddAttachementsWithRelativeURI()
+        public void ToResultFilesShouldAddAttachmentsWithRelativeURI()
         {
             UriDataAttachment uriDataAttachment1 =
                 new UriDataAttachment(new Uri($"/mnt/c/abc.txt", UriKind.Relative), "Description 1");

@@ -281,7 +281,7 @@
       </trans-unit>
       <trans-unit id="AccessDenied">
         <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
-        <target state="new">Access denied while trying to create "TestResults" folder in current location. You are getting this exception because you are running vstest.console.exe from a folder which requires administrator rights. To solve the issue : please open command line "As Administrator" or run vstest.console.exe from a folder where you have admin privileges.</target>
+        <target state="translated">{0} Belirtilen konumda "TestResults" klasörü oluşturulmaya çalışılırken erişim engellendi. Yazma erişimi gerektiren bir klasörden vstest.console.exe çalıştırdığınız için bu özel durumu aldınız. Sorunu çözmek için: Lütfen yazma ayrıcalıklarına sahip olduğunuz bir klasörden vstest.console.exe dosyasını çalıştırın. Daha fazla bilgi için lütfen hata iletisine bakın:</target>
         <note></note>
       </trans-unit>
     </body>
