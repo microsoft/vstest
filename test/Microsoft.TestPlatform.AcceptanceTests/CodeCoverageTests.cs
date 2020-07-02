@@ -624,7 +624,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.AssertSkippedMethod(coverageDocument);
             }
 
-            this.ValidateCoverageData(coverageDocument);
+            this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName);
 
             Directory.Delete(this.resultsDirectory, true);
         }
@@ -688,9 +688,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsNotNull(testAbsFunction);
         }
 
-        private void ValidateCoverageData(XmlDocument document)
+        private void ValidateCoverageData(XmlDocument document, string moduleName)
         {
-            var module = this.GetModuleNode(document.DocumentElement, "codecoveragetest.dll");
+            var module = this.GetModuleNode(document.DocumentElement, moduleName.ToLower());
             Assert.IsNotNull(module);
 
             this.AssertCoverage(module, ExpectedMinimalModuleCoverage);
