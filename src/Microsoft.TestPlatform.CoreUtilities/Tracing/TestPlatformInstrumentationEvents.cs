@@ -157,5 +157,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// Event fired on Metrics Dispose completes.
         /// </summary>
         public const int MetricsDisposeStopEventId = 0x39;
+
+        /// <summary>
+        /// The session attachments processing start event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingStartEventId = 0x40;
+
+        /// <summary>
+        /// The session attachments processing stop event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingStopEventId = 0x41;
+
+        /// <summary>
+        /// The session attachments processing request start event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingRequestStartEventId = 0x42;
+
+        /// <summary>
+        /// The session attachments processing request stop event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingRequestStopEventId = 0x43;
+
+        /// <summary>
+        /// Events fired on session attachments processing start of translation layer.
+        /// </summary>
+        public const int TranslationLayerTestRunAttachmentsProcessingStartEventId = 0x44;
+
+        /// <summary>
+        /// Events fired on session attachments processing complete in translation layer.
+        /// </summary>
+        public const int TranslationLayerTestRunAttachmentsProcessingStopEventId = 0x45;
     }
 }

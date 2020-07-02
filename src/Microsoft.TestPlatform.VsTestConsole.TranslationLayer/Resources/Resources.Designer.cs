@@ -10,7 +10,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -20,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -40,7 +39,8 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Reso" +
+                            "urces", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,7 +60,16 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 resourceCulture = value;
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The active Test Run Attachments Processing was aborted..
+        /// </summary>
+        public static string AbortedTestRunAttachmentsProcessing {
+            get {
+                return ResourceManager.GetString("AbortedTestRunAttachmentsProcessing", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Discovery was aborted..
         /// </summary>
@@ -69,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("AbortedTestsDiscovery", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Run was aborted..
         /// </summary>
@@ -78,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Failed to receive message from vstest.console process.
         /// </summary>
@@ -87,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to File {0} does not exists.
         /// </summary>
@@ -96,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("InvalidFilePath", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to vstest.console process exited abnormally.
         /// </summary>

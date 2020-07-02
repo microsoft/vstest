@@ -19,6 +19,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public List<TestResult> TestResults { get; private set; }
 
         /// <summary>
+        /// Gets the attachments.
+        /// </summary>
+        public List<AttachmentSet> Attachments { get; private set; }
+
+        /// <summary>
         /// Gets the metrics.
         /// </summary>
         public IDictionary<string, object> Metrics { get; private set; }
@@ -39,6 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             this.TestResults = new List<TestResult>();
             this.Errors = new List<string>();
+            this.Attachments = new List<AttachmentSet>();
         }
 
         public void EnsureSuccess()
@@ -67,6 +73,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
             {
                 this.TestResults.AddRange(lastChunkArgs.NewTestResults);
+            }
+
+            if (testRunCompleteArgs.AttachmentSets != null)
+            {
+                this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
             }
 
             this.Metrics = testRunCompleteArgs.Metrics;

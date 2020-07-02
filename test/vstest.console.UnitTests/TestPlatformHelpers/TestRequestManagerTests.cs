@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
 	using System;
@@ -25,6 +22,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 	using System.Runtime.Versioning;
@@ -35,8 +33,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using vstest.console.UnitTests.TestDoubles;
 	using Microsoft.VisualStudio.TestPlatform.Utilities;
 	using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-	[TestClass]
+    [TestClass]
 	public class TestRequestManagerTests
 	{
 		private DummyLoggerEvents mockLoggerEvents;
@@ -49,12 +48,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		private InferHelper inferHelper;
 		private ITestRequestManager testRequestManager;
 		private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
-		private Mock<IRequestData> mockRequestData;
-		private Mock<IMetricsCollection> mockMetricsCollection;
 		private ProtocolConfig protocolConfig;
 		private Task<IMetricsPublisher> mockMetricsPublisherTask;
 		private Mock<IMetricsPublisher> mockMetricsPublisher;
 		private Mock<IProcessHelper> mockProcessHelper;
+		private Mock<ITestRunAttachmentsProcessingManager> mockAttachmentsProcessingManager;
 
 		private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
 				<RunSettings>
@@ -79,6 +77,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
 			this.mockMetricsPublisher = new Mock<IMetricsPublisher>();
 			this.mockMetricsPublisherTask = Task.FromResult(this.mockMetricsPublisher.Object);
+			this.mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
 			this.testRequestManager = new TestRequestManager(
 				this.commandLineOptions,
 				this.mockTestPlatform.Object,
@@ -86,10 +85,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
-			this.mockMetricsCollection = new Mock<IMetricsCollection>();
-			this.mockRequestData = new Mock<IRequestData>();
-			this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 			this.mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>()))
 				.Returns(this.mockDiscoveryRequest.Object);
 			this.mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>()))
@@ -99,7 +96,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
 				.Returns(new FrameworkName(Constants.DotNetFramework40));
 			this.mockProcessHelper.Setup(x => x.GetCurrentProcessId()).Returns(1234);
-			this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
+			this.mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");			
 		}
 
 		[TestCleanup]
@@ -122,7 +119,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 new Mock<ITestPlatformEventSource>().Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                this.mockProcessHelper.Object);
+                this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
 		}
@@ -203,8 +201,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				TestRunResultAggregator.Instance,
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
-			this.mockMetricsPublisherTask,
-			this.mockProcessHelper.Object);
+				this.mockMetricsPublisherTask,
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
 
@@ -253,7 +252,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
@@ -300,7 +300,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
@@ -349,7 +350,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
@@ -392,7 +394,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
@@ -435,7 +438,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
@@ -478,7 +482,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.Parallel = true;
 			CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -533,7 +538,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.testsettings";
 
@@ -580,7 +586,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.vsmdi";
 
@@ -627,7 +634,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.testrunConfig";
 
@@ -949,7 +957,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.Parallel = true;
 			CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -1016,7 +1025,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                this.mockProcessHelper.Object);
+                this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
             // Act.
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1065,7 +1075,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			// Act.
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1112,7 +1123,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			// Act.
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1159,7 +1171,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
@@ -2162,6 +2175,102 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
 			Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
 			Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+		}
+
+		[TestMethod]
+		public void ProcessTestRunAttachmentsShouldSucceedWithTelemetryEnabled()
+        {
+			var mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+			mockAttachmentsProcessingManager
+				.Setup(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns((IRequestData r, ICollection<AttachmentSet> a, ITestRunAttachmentsProcessingEventsHandler h, CancellationToken token) => Task.Run(() =>
+				{
+					r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, 5);
+					r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing, 1);
+				}));
+
+			var payload = new TestRunAttachmentsProcessingPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = true
+			};
+
+			testRequestManager.ProcessTestRunAttachments(payload, mockEventsHandler.Object, this.protocolConfig);
+
+			mockAttachmentsProcessingManager.Verify(m => m.ProcessTestRunAttachmentsAsync(It.Is<IRequestData>(r => r.IsTelemetryOptedIn), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
+
+			mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
+				It.Is<Dictionary<string, object>>(m => m.Count == 2 && 
+					m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing] == 5 &&
+					m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing] == 1)));
+		}
+
+		[TestMethod]
+		public void ProcessTestRunAttachmentsShouldSucceedWithTelemetryDisabled()
+		{
+			var mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+			mockAttachmentsProcessingManager
+				.Setup(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns(Task.FromResult(true));
+
+			var payload = new TestRunAttachmentsProcessingPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = false
+			};
+
+			testRequestManager.ProcessTestRunAttachments(payload, mockEventsHandler.Object, this.protocolConfig);
+
+			mockAttachmentsProcessingManager.Verify(m => m.ProcessTestRunAttachmentsAsync(It.Is<IRequestData>(r => !r.IsTelemetryOptedIn), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
+		}
+
+		[TestMethod]
+		public async Task CancelTestRunAttachmentsProcessingShouldSucceedIfRequestInProgress()
+		{
+			var mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+			mockAttachmentsProcessingManager
+				.Setup(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns((IRequestData r, ICollection<AttachmentSet> a, ITestRunAttachmentsProcessingEventsHandler h, CancellationToken token) => Task.Run(() =>
+				{
+					int i = 0;
+					while (!token.IsCancellationRequested)
+                    {
+						i++;
+						Console.WriteLine($"Iteration {i}");
+						Task.Delay(5).Wait();
+                    }
+
+					r.MetricsCollection.Add(TelemetryDataConstants.AttachmentsProcessingState, "Canceled");
+				}));
+
+			var payload = new TestRunAttachmentsProcessingPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = true
+			};
+
+			Task task = Task.Run(() => testRequestManager.ProcessTestRunAttachments(payload, mockEventsHandler.Object, this.protocolConfig));
+			await Task.Delay(50);
+			testRequestManager.CancelTestRunAttachmentsProcessing();
+
+			await task;
+
+			mockAttachmentsProcessingManager.Verify(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
+
+			mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
+				It.Is<Dictionary<string, object>>(m => m.Count == 1 && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState) && (string)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
+		}
+
+		[TestMethod]
+		public void CancelTestRunAttachmentsProcessingShouldSucceedIfNoRequest()
+		{
+			testRequestManager.CancelTestRunAttachmentsProcessing();
 		}
 
 		private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

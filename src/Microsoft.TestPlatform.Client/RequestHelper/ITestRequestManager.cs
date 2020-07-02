@@ -45,6 +45,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         void RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig);
 
         /// <summary>
+        /// Processes test run attachments
+        /// </summary>
+        /// <param name="testRunAttachmentsProcessingPayload">Test run attachments processing payload</param>
+        /// <param name="testRunAttachmentsProcessingEventsHandler">Test run attachments processing events handler</param>
+        void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload testRunAttachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler, ProtocolConfig protocolConfig);
+
+        /// <summary>
         /// Cancel the current TestRun request
         /// </summary>
         void CancelTestRun();
@@ -58,5 +65,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// Cancels the current discovery request
         /// </summary>
         void CancelDiscovery();
+
+        /// <summary>
+        /// Cancels the current test run attachments processing request
+        /// </summary>
+        void CancelTestRunAttachmentsProcessing();
     }
 }
