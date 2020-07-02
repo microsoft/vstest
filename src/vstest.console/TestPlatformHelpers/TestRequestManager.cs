@@ -8,10 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.XPath;
     using Microsoft.VisualStudio.TestPlatform.Client;
+    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -24,9 +26,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -49,6 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly Task<IMetricsPublisher> metricsPublisher;
         private bool isDisposed;
         private IProcessHelper processHelper;
+        private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -62,6 +67,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private IDiscoveryRequest currentDiscoveryRequest;
 
+        /// <summary>
+        /// Maintains the current active test run attachments processing cancellation token source
+        /// Assumption : There can only be one active attachments processing request.
+        /// </summary>
+        private CancellationTokenSource currentAttachmentsProcessingCancellationTokenSource;
+
         #region Constructor
 
         public TestRequestManager()
@@ -72,11 +83,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestPlatformEventSource.Instance,
                   new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
-                  new ProcessHelper())
+                  new ProcessHelper(),
+                  new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler()))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper, ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
@@ -85,6 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
             this.processHelper = processHelper;
+            this.attachmentsProcessingManager = attachmentsProcessingManager;
         }
 
         #endregion
@@ -160,9 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 // Collect Commands
                 this.LogCommandsTelemetryPoints(requestData);
             }
-
-            
-
+           
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
             {
@@ -301,6 +312,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
+        /// <inheritdoc/>
+        public void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler attachmentsProcessingEventsHandler, ProtocolConfig protocolConfig)
+        {
+            EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing started.");
+
+            this.telemetryOptedIn = attachmentsProcessingPayload.CollectMetrics;
+            var requestData = this.GetRequestData(protocolConfig);
+
+            // Make sure to run the run request inside a lock as the below section is not thread-safe
+            // There can be only one discovery, execution or attachments processing request at a given point in time
+            lock (this.syncObject)
+            {
+                try
+                {
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Synchronization context taken");
+                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStart();
+
+                    this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
+
+                    Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, attachmentsProcessingPayload.Attachments, attachmentsProcessingEventsHandler, this.currentAttachmentsProcessingCancellationTokenSource.Token);
+                    task.Wait();                   
+                }
+                finally
+                {
+                    if (this.currentAttachmentsProcessingCancellationTokenSource != null)
+                    {
+                        this.currentAttachmentsProcessingCancellationTokenSource.Dispose();
+                        this.currentAttachmentsProcessingCancellationTokenSource = null;
+                    }
+
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing completed.");
+                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStop();
+
+                    // Post the attachments processing complete event
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent, requestData.MetricsCollection.Metrics);
+                }
+            }
+        }
+
         private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
@@ -340,6 +390,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
             this.currentTestRunRequest?.Abort();
+        }
+
+        /// <inheritdoc/>
+        public void CancelTestRunAttachmentsProcessing()
+        {
+            EqtTrace.Info("TestRequestManager.CancelTestRunAttachmentsProcessing: Sending cancel request.");
+            this.currentAttachmentsProcessingCancellationTokenSource?.Cancel();
         }
 
         #endregion

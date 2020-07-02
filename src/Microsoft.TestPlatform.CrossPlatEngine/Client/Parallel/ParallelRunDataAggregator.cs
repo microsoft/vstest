@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public TimeSpan ElapsedTime { get; set; }
 
-        public Collection<AttachmentSet> RunContextAttachments { get; }
+        public Collection<AttachmentSet> RunContextAttachments { get; set; }
 
         public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
