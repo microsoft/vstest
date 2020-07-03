@@ -256,7 +256,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void AssertSkippedModule(XmlDocument document)
         {
-            var module = this.GetNode(document.DocumentElement, "skipped_module", "cryptbase.dll");
+            var module = this.GetNode(document.DocumentElement, "skipped_module", "bcryptprimitives.dll");
             Assert.IsNotNull(module);
             Assert.AreEqual("path_is_excluded", module.Attributes["reason"].Value);
         }
