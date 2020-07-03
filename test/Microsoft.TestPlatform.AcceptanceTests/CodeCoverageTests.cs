@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public int ExpectedFailedTests { get; set; }
 
-        public bool CheckSkippedMethods { get; set; }
+        public bool CheckSkipped { get; set; }
     }
 
     [TestClass]
@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedPassedTests = 2,
                 ExpectedSkippedTests = 0,
                 ExpectedFailedTests = 0,
-                CheckSkippedMethods = true
+                CheckSkipped = true
             };
 
             this.CollectCodeCoverage(runnerInfo, parameters);
@@ -160,7 +160,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ExpectedPassedTests = 2,
                 ExpectedSkippedTests = 0,
                 ExpectedFailedTests = 0,
-                CheckSkippedMethods = true
+                CheckSkipped = true
             };
 
             this.CollectCodeCoverage(runnerInfo, parameters);
@@ -184,9 +184,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
             var coverageDocument = this.GetXmlCoverage(actualCoverageFile);
-            if (testParameters.CheckSkippedMethods)
+            if (testParameters.CheckSkipped)
             {
                 this.AssertSkippedMethod(coverageDocument);
+                this.AssertSkippedModule(coverageDocument);
             }
 
             this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName);
@@ -251,6 +252,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var testAbsFunction = this.GetNode(module, "function", "TestAbs()");
             Assert.IsNotNull(testAbsFunction);
+        }
+
+        private void AssertSkippedModule(XmlDocument document)
+        {
+            var module = this.GetNode(document.DocumentElement, "skipped_module", "cryptbase.dll");
+            Assert.IsNotNull(module);
+            Assert.AreEqual("path_is_excluded", module.Attributes["reason"].Value);
         }
 
         private void ValidateCoverageData(XmlDocument document, string moduleName)

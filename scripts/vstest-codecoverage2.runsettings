@@ -18,8 +18,6 @@
               <ModulePath>.*mscoreei.ni.dll$</ModulePath>
               <ModulePath>.*mscorlib.dll$</ModulePath>
               <ModulePath>.*mscorlib.ni.dll$</ModulePath>
-              <ModulePath>.*cryptbase.dll$</ModulePath>
-              <ModulePath>.*bcryptPrimitives.dll$</ModulePath>
               <ModulePath>.*CodeCoverage.exe$</ModulePath>
              </Exclude>
             </ModulePaths>
