@@ -1307,8 +1307,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
-        <target state="translated">Con error   {0}</target>
+        <source>Failed</source>
+        <target state="new">Con error   {0}</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1316,8 +1316,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
-        <target state="translated">Correctas   {0}</target>
+        <source>Passed</source>
+        <target state="new">Correctas   {0}</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1325,9 +1325,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
-        <target state="translated">Omitidas   {0}</target>
-        <note />
+        <source>Skipped</source>
+        <target state="new">Omitidas   {0}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
@@ -1450,9 +1450,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
-        <target state="translated">No ejecutar {0}</target>
-        <note />
+        <source>Not Run</source>
+        <target state="new">No ejecutar {0}</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
