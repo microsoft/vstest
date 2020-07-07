@@ -267,7 +267,7 @@
     <value>        Uri: {0}</value>
   </data>
   <data name="FailedTestIndicator" xml:space="preserve">
-    <value>Failed   {0}</value>
+    <value>Failed</value>
     <comment>Message which is written to the console when a test fails.</comment>
   </data>
   <data name="FileNotFound" xml:space="preserve">
@@ -436,7 +436,7 @@
       Process Id of the Parent Process responsible for launching current process.</value>
   </data>
   <data name="PassedTestIndicator" xml:space="preserve">
-    <value>Passed   {0}</value>
+    <value>Passed</value>
     <comment>Message which is written to the console when a test passes.</comment>
   </data>
   <data name="PhoneAppContainerTestPrerequisiteFail" xml:space="preserve">
@@ -499,7 +499,7 @@
     <value>        SettingName: {0}</value>
   </data>
   <data name="SkippedTestIndicator" xml:space="preserve">
-    <value>Skipped  {0}</value>
+    <value>Skipped</value>
   </data>
   <data name="SomeTestsUnavailableAfterFiltering" xml:space="preserve">
     <value>A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</value>
@@ -629,7 +629,7 @@
     <value>The /InIsolation flag is deprecated. The tests are always run in a separate process</value>
   </data>
   <data name="NotRunTestIndicator" xml:space="preserve">
-    <value>Not Run  {0}</value>
+    <value>Not Run</value>
   </data>
   <data name="VstestDiagLogOutputPath" xml:space="preserve">
     <value>Logging Vstest Diagnostics in file: {0}</value>

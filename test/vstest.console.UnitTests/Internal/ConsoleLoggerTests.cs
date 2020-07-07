@@ -32,9 +32,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         private ConsoleLogger consoleLogger;
         private Mock<IProgressIndicator> mockProgressIndicator;
 
-        private const string PassedTestIndicator = "  \u221a ";
-        private const string FailedTestIndicator = "  X ";
-        private const string SkippedTestIndicator = "  ! ";
+        private const string PassedTestIndicator = "  Passed ";
+        private const string FailedTestIndicator = "  Failed ";
+        private const string SkippedTestIndicator = "  Skipped ";
 
         [TestInitialize]
         public void Initialize()
