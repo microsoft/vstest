@@ -135,7 +135,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     IntegrationTestEnvironment.TestPlatformRootDirectory,
                     @"scripts\vstest-codecoverage2.runsettings"),
                 RunSettingsType = TestParameters.SettingsType.Custom,
-                ExpectedPassedTests = 2,
+                ExpectedPassedTests = 3,
                 ExpectedSkippedTests = 0,
                 ExpectedFailedTests = 0,
                 CheckSkipped = true
@@ -157,7 +157,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     IntegrationTestEnvironment.TestPlatformRootDirectory,
                     @"scripts\vstest-codecoverage2.runsettings"),
                 RunSettingsType = TestParameters.SettingsType.Custom,
-                ExpectedPassedTests = 2,
+                ExpectedPassedTests = 3,
                 ExpectedSkippedTests = 0,
                 ExpectedFailedTests = 0,
                 CheckSkipped = true
@@ -187,7 +187,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             if (testParameters.CheckSkipped)
             {
                 this.AssertSkippedMethod(coverageDocument);
-                this.AssertSkippedModule(coverageDocument);
             }
 
             this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName);
@@ -250,15 +249,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsNotNull(testSignFunction);
             Assert.AreEqual("name_excluded", testSignFunction.Attributes["reason"].Value);
 
+            var skippedTestMethod = this.GetNode(module, "skipped_function", "__CxxPureMSILEntry_Test()");
+            Assert.IsNotNull(skippedTestMethod);
+            Assert.AreEqual("name_excluded", skippedTestMethod.Attributes["reason"].Value);
+
             var testAbsFunction = this.GetNode(module, "function", "TestAbs()");
             Assert.IsNotNull(testAbsFunction);
-        }
-
-        private void AssertSkippedModule(XmlDocument document)
-        {
-            var module = this.GetNode(document.DocumentElement, "skipped_module", "bcryptprimitives.dll");
-            Assert.IsNotNull(module);
-            Assert.AreEqual("path_is_excluded", module.Attributes["reason"].Value);
         }
 
         private void ValidateCoverageData(XmlDocument document, string moduleName)

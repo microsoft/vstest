@@ -28,5 +28,11 @@ namespace CodeCoverageTest
             Assert.AreEqual(logic.Sign(-5), -1);
             Assert.AreEqual(logic.Sign(7), 1);
         }
+
+        [TestMethod]
+        public void __CxxPureMSILEntry_Test()
+        {
+            Assert.AreEqual(logic.Abs(0), 0);
+        }
     }
 }
