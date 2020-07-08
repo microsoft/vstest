@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
             var client = new DiagnosticsClient(processId);
-            client.WriteDump(type == DumpTypeOption.Full ? DumpType.Full : DumpType.Normal, outputFile);
+            client.WriteDump(type == DumpTypeOption.Full ? DumpType.Full : DumpType.Normal, outputFile, logDumpGeneration: true);
         }
     }
 }

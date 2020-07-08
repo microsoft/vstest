@@ -41,6 +41,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             // Log all standard output message of procdump in diag files.
             // Otherwise they end up coming on console in pipleine.
+            // Console.WriteLine(data);
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
