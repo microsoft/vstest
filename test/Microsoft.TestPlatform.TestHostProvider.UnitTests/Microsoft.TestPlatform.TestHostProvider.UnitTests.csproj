@@ -16,11 +16,11 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.Common.UnitTests\Microsoft.TestPlatform.Common.UnitTests.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.PlatformAbstractions\Microsoft.TestPlatform.PlatformAbstractions.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-  </ItemGroup>
+  </ItemGroup>-->
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

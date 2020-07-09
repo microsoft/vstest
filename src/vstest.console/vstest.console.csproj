@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.IO" />
     <Reference Include="System.Runtime" />
+    <Reference Include="System.Collections" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
