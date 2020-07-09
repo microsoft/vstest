@@ -63,7 +63,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestRunAttachmentsProcessing">
         <source>The active Test Run Attachments Processing was aborted.</source>
-        <target state="new">The active Test Run Attachments Processing was aborted.</target>
+        <target state="translated">L'elaborazione degli allegati dell'esecuzione dei test attiva è stata interrotta.</target>
         <note></note>
       </trans-unit>
     </body>

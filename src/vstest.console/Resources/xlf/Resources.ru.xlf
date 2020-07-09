@@ -1305,7 +1305,7 @@
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
         <source>Failed</source>
-        <target state="new">Не пройдено:  {0}</target>
+        <target state="translated">Не пройден</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1314,7 +1314,7 @@
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
         <source>Passed</source>
-        <target state="new">Пройдено:  {0}</target>
+        <target state="translated">Пройден</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1323,7 +1323,7 @@
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
         <source>Skipped</source>
-        <target state="new">Пропущено:  {0}</target>
+        <target state="translated">Пропущен</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
@@ -1448,7 +1448,7 @@
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run</source>
-        <target state="new">Не запущен {0}</target>
+        <target state="translated">Не выполнен</target>
         <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
