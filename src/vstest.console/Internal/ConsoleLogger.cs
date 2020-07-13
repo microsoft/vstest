@@ -433,7 +433,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             ValidateArg.NotNull<TestRunStartEventArgs>(e, "e");
 
             // Print all test containers.
-            Output.WriteLine(string.Empty, OutputLevel.Information);
             Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
             if (verbosityLevel == Verbosity.Detailed)
             {
