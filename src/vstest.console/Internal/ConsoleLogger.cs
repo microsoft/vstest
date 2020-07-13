@@ -824,6 +824,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
             {
+                if (e.IsCanceled)
+                {
+                    Output.Error(false, CommandLineResources.TestRunCanceled);
+                }
+                else if (e.IsAborted)
+                {
+                    Output.Error(false, CommandLineResources.TestRunAborted);
+                }
+
                 return;
             }
 
