@@ -35,5 +35,8 @@
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(TestPlatformExternalsVersion)" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0-preview2-26406-04" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestAssets\CodeCoverageTest\" />
+  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

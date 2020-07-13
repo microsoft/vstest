@@ -258,8 +258,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Check for tick or ? both, in some cases as unicode character for tick is not available
                 // in std out and gets replaced by ?
-                var flag = this.standardTestOutput.Contains("\\u221a " + test)
-                           || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test))
+                var flag = this.standardTestOutput.Contains("Passed " + test)
+                           || this.standardTestOutput.Contains("Passed " + GetTestMethodName(test))
                            || this.standardTestOutput.Contains("\\ufffd " + test)
                            || this.standardTestOutput.Contains("\\ufffd " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
@@ -278,8 +278,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             foreach (var test in failedTests)
             {
-                var flag = this.standardTestOutput.Contains("X " + test)
-                           || this.standardTestOutput.Contains("X " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("Failed " + test)
+                           || this.standardTestOutput.Contains("Failed " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
                 // Verify stack information as well.
@@ -296,8 +296,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             foreach (var test in skippedTests)
             {
-                var flag = this.standardTestOutput.Contains("! " + test)
-                           || this.standardTestOutput.Contains("! " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("Skipped " + test)
+                           || this.standardTestOutput.Contains("Skipped " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in skipped tests list.", test);
             }
         }

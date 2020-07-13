@@ -1,14 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.	
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using Castle.Core.Internal;
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -16,20 +10,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml;
 
-    /// <summary>
-    /// The Test run attachments processing tests using VsTestConsoleWrapper API's
-    /// </summary>
-    [TestClass]
-    public class CodeCoverageTests : AcceptanceTestBase
+    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Castle.Core.Internal;
+
+    public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
-        /*
-         * Below value is just safe coverage result for which all tests are passing.
-         * Inspecting this value gives us confidence that there is no big drop in overall coverage.
-         */
-        private const double ExpectedMinimalModuleCoverage = 30.0;
-
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
         private TestRunAttachmentsProcessingEventHandler testRunAttachmentsProcessingEventHandler;
@@ -99,7 +90,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            
+
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
 
@@ -125,7 +116,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
                     Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentAttachmentProcessorProgress);
-                }                
+                }
             }
 
             Assert.AreEqual("Completed", testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
@@ -174,7 +165,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
                     Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentAttachmentProcessorProgress);
-                }                    
+                }
             }
 
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.IsNullOrEmpty());
@@ -221,7 +212,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 3)
                 {
                     Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentAttachmentProcessorProgress);
-                }                    
+                }
             }
 
             Assert.AreEqual("Completed", testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
@@ -251,9 +242,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             List<AttachmentSet> attachments = Enumerable.Range(0, 1000).Select(i => this.runEventHandler.Attachments.First()).ToList();
 
             CancellationTokenSource cts = new CancellationTokenSource();
-            
+
             Task attachmentsProcessing = this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(attachments, null, true, true, testRunAttachmentsProcessingEventHandler, cts.Token);
-            
+
             while (true)
             {
                 try
@@ -291,7 +282,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 if (i == 0)
                 {
                     Assert.AreEqual(0, progressArgs.CurrentAttachmentProcessorProgress);
-                }                       
+                }
             }
 
             Assert.AreEqual("Canceled", testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
@@ -343,13 +334,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// Default RunSettings
         /// </summary>
         /// <returns></returns>
-        public string GetCodeCoverageRunSettings(int cpuCount)
+        private string GetCodeCoverageRunSettings(int cpuCount)
         {
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                             <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                            <TestAdaptersPaths>{GetCodeCoveragePath()}</TestAdaptersPaths>
+                                            <TestAdaptersPaths>{this.GetCodeCoveragePath()}</TestAdaptersPaths>
                                             <MaxCpuCount>{cpuCount}</MaxCpuCount>
                                         </RunConfiguration>
                                         <DataCollectionRunSettings>
@@ -381,63 +372,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             if (attachments.Count == 1)
             {
-                var xmlCoverage = GetXmlCoverage(attachments.First());
+                var xmlCoverage = this.GetXmlCoverage(attachments.First().Attachments.First().Uri.LocalPath);
 
-                foreach (var project in GetProjects())
+                foreach (var project in this.GetProjects())
                 {
-                    var moduleNode = GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
-                    AssertCoverage(moduleNode, ExpectedMinimalModuleCoverage);
+                    var moduleNode = this.GetModuleNode(xmlCoverage.DocumentElement, project.ToLower());
+                    this.AssertCoverage(moduleNode, CodeCoverageAcceptanceTestBase.ExpectedMinimalModuleCoverage);
                 }
             }
-        }
-
-        private XmlDocument GetXmlCoverage(AttachmentSet attachment)
-        {
-            string output = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
-
-            var analyze = Process.Start(new ProcessStartInfo
-            {
-                FileName = GetCodeCoverageExePath(),
-                Arguments = $"analyze /include_skipped_functions /include_skipped_modules /output:\"{output}\" \"{attachment.Attachments.First().Uri.LocalPath}\"",
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            });
-
-            string analysisOutput = analyze.StandardOutput.ReadToEnd();
-
-            analyze.WaitForExit();
-            Assert.IsTrue(0 == analyze.ExitCode, $"Code Coverage analyze failed: {analysisOutput}");
-
-            XmlDocument coverage = new XmlDocument();
-            coverage.Load(output);
-            return coverage;
-        }
-
-        private string GetCodeCoveragePath()
-        {
-            return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
-        }
-
-        private string GetCodeCoverageExePath()
-        {
-            return Path.Combine(GetCodeCoveragePath(), "CodeCoverage", "CodeCoverage.exe");
-        }
-
-        private XmlNode GetModuleNode(XmlNode node, string name)
-        {
-            return GetNode(node, "module", name);
-        }
-
-        private XmlNode GetNode(XmlNode node, string type, string name)
-        {
-            return node.SelectSingleNode($"//{type}[@name='{name}']");
-        }
-
-        private void AssertCoverage(XmlNode node, double expectedCoverage)
-        {
-            var coverage = double.Parse(node.Attributes["block_coverage"].Value);
-            Console.WriteLine($"Checking coverage for {node.Name} {node.Attributes["name"].Value}. Expected at least: {expectedCoverage}. Result: {coverage}");
-            Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {node.Name} {node.Attributes["name"].Value}. Expected at least: {expectedCoverage}. Found: {coverage}");
         }
     }
 }
