@@ -611,7 +611,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
+            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
                 (CommandLineResources.PassedTestIndicator + "!").PadRight(8),
                 0.ToString().PadLeft(5), 
                 1.ToString().PadLeft(5), 
@@ -623,7 +623,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 "TestSourcePassed", 
                 expectedFramework), OutputLevel.Information), Times.Once);    
             
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
+            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
                 (CommandLineResources.FailedTestIndicator + "!").PadRight(8),
                 1.ToString().PadLeft(5),
                 1.ToString().PadLeft(5),
