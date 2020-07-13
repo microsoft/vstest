@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -45,6 +46,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private IInactivityTimer inactivityTimer;
         private TimeSpan inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
         private int testHostProcessId;
+        private bool dumpWasCollectedByHangDumper;
+        private string targetFramework;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -62,7 +65,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// BlameReaderWriter instance.
         /// </param>
         /// <param name="processDumpUtility">
-        /// ProcessDumpUtility instance.
+        /// IProcessDumpUtility instance.
         /// </param>
         /// <param name="inactivityTimer">
         /// InactivityTimer instance.
@@ -138,6 +141,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     this.ValidateAndAddHangBasedProcessDumpParameters(collectHangBasedDumpNode);
                 }
+
+                var tfm = this.configurationElement[Constants.TargetFramework]?.InnerText;
+                if (!string.IsNullOrWhiteSpace(tfm))
+                {
+                    this.targetFramework = tfm;
+                }
             }
 
             this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
@@ -157,8 +166,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         private void CollectDumpAndAbortTesthost()
         {
-            EqtTrace.Info(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes));
             this.inactivityTimerAlreadyFired = true;
+            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes);
+            EqtTrace.Warning(message);
+            this.logger.LogWarning(this.context.SessionDataCollectionContext, message);
 
             try
             {
@@ -170,6 +181,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Verbose("Inactivity timer is already disposed.");
             }
 
+            try
+            {
+                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.Instance.Error(true, $"Blame: Creating hang dump failed with error {ex}.");
+            }
+
             if (this.collectProcessDumpOnTrigger)
             {
                 // Detach procdump from the testhost process to prevent testhost process from crashing
@@ -179,18 +199,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error($"BlameCollector.CollectDumpAndAbortTesthost: Failed with error {ex}");
-            }
-
-            try
-            {
                 var dumpFile = this.processDumpUtility.GetDumpFile();
                 if (!string.IsNullOrEmpty(dumpFile))
                 {
+                    this.dumpWasCollectedByHangDumper = true;
                     var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
                     this.dataCollectionSink.SendFileAsync(fileTransferInformation);
                 }
@@ -207,7 +219,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                Process.GetProcessById(this.testHostProcessId).Kill();
+                var p = Process.GetProcessById(this.testHostProcessId);
+                try
+                {
+                    if (!p.HasExited)
+                    {
+                        p.Kill();
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                }
             }
             catch (Exception ex)
             {
@@ -263,9 +285,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     case XmlAttribute attribute when string.Equals(attribute.Name, Constants.TestTimeout, StringComparison.OrdinalIgnoreCase):
 
-                        if (!string.IsNullOrWhiteSpace(attribute.Value) && int.TryParse(attribute.Value, out int inactivityTimespanInMilliseconds))
+                        if (!string.IsNullOrWhiteSpace(attribute.Value) && TimeSpanParser.TryParse(attribute.Value, out var timeout))
                         {
-                            this.inactivityTimespan = TimeSpan.FromMilliseconds(inactivityTimespanInMilliseconds);
+                            this.inactivityTimespan = timeout;
                         }
                         else
                         {
@@ -274,7 +296,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                         break;
 
-                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.HangDumpTypeKey, StringComparison.OrdinalIgnoreCase):
 
                         if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
                         {
@@ -365,7 +387,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // And send the attachment
                 if (this.testStartCount > this.testEndCount)
                 {
-                    var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
+                    var filepath = Path.Combine(this.GetTempDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
+
                     filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
                     var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
                     this.dataCollectionSink.SendFileAsync(fileTranferInformation);
@@ -374,7 +397,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (this.collectProcessDumpOnTrigger)
                 {
                     // If there was a test case crash or if we need to collect dump on process exit.
-                    if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
+                    //
+                    // Do not try to collect dump when we already collected one from the hang dump
+                    // we won't dump the killed process again and that would just show a warning on the command line
+                    if ((this.testStartCount > this.testEndCount || this.collectDumpAlways) && !this.dumpWasCollectedByHangDumper)
                     {
                         try
                         {
@@ -404,7 +430,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (this.collectProcessDumpOnTrigger)
                 {
                     this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
-                    this.processDumpUtility.TerminateProcess();
                 }
 
                 this.DeregisterEvents();
@@ -428,7 +453,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
+                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled, ".NETFramework,Version=v4.0");
             }
             catch (TestPlatformException e)
             {
@@ -481,24 +506,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.events.TestCaseEnd -= this.EventsTestCaseEnd;
         }
 
-        private string GetResultsDirectory()
+        private string GetTempDirectory()
         {
-            try
+            var tmp = Path.GetTempPath();
+            if (!Directory.Exists(tmp))
             {
-                XmlElement resultsDirectoryElement = this.configurationElement["ResultsDirectory"];
-                string resultsDirectory = resultsDirectoryElement != null ? resultsDirectoryElement.InnerText : string.Empty;
-
-                return Environment.ExpandEnvironmentVariables(resultsDirectory);
+                Directory.CreateDirectory(tmp);
             }
-            catch (NullReferenceException exception)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("Blame Collector : " + exception);
-                }
 
-                return string.Empty;
-            }
+            return tmp;
         }
     }
 }

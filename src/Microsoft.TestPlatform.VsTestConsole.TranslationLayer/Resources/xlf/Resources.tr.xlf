@@ -61,6 +61,11 @@
         <target state="translated">{0} dosyası yok</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="translated">Etkin Test Çalıştırması Ekleri İşlemi durduruldu.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

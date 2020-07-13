@@ -1304,8 +1304,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
-        <target state="translated">Počet neúspěšných: {0}</target>
+        <source>Failed</source>
+        <target state="translated">Neúspěšné</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1313,8 +1313,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
-        <target state="translated">Počet úspěšných: {0}</target>
+        <source>Passed</source>
+        <target state="translated">Úspěšné</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1322,9 +1322,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
-        <target state="translated">Počet přeskočených: {0}</target>
-        <note />
+        <source>Skipped</source>
+        <target state="translated">Přeskočeno</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
@@ -1447,9 +1447,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
-        <target state="translated">Nespuštěno: {0}</target>
-        <note />
+        <source>Not Run</source>
+        <target state="translated">Nespuštěno</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
@@ -1587,9 +1587,9 @@
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
-        <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="translated">Možnost CollectDump pro Blame není pro tuto platformu podporovaná.</target>
-        <note />
+        <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
+        <target state="translated">Shromažďování výpisů stavu systému pomocí možnosti CollectDump pro Blame se pro tuto platformu nepodporuje.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
@@ -1656,21 +1656,6 @@
         <target state="translated">Celkový počet testovacích souborů, které odpovídají zadanému vzoru: {0}</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="TestRunSummary">
-        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
-        <target state="new">{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Failed">
-        <source>Failed</source>
-        <target state="new">Failed</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Passed">
-        <source>Passed</source>
-        <target state="new">Passed</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
@@ -1678,14 +1663,19 @@
      Formát: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
+        <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
+        <target state="translated">Shromažďování výpisů stavu systému při zablokování pomocí možnosti CollectDump s TestTimeout pro Blame se pro tuto platformu nepodporuje.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="None">
         <source>None</source>
         <target state="new">None</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Skipped">
-        <source>Skipped</source>
-        <target state="new">Skipped</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryAssemblyAndFramework">

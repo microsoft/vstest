@@ -81,6 +81,11 @@
         <target state="translated">Сбой хост-процесса теста</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">Не удается подключить отладчик к узлу тестирования по умолчанию.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

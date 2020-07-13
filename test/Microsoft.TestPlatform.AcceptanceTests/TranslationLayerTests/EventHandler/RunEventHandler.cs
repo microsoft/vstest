@@ -11,12 +11,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler
+    public class RunEventHandler : ITestRunEventsHandler2
     {
         /// <summary>
         /// Gets the test results.
         /// </summary>
         public List<TestResult> TestResults { get; private set; }
+
+        /// <summary>
+        /// Gets the attachments.
+        /// </summary>
+        public List<AttachmentSet> Attachments { get; private set; }
 
         /// <summary>
         /// Gets the metrics.
@@ -39,6 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             this.TestResults = new List<TestResult>();
             this.Errors = new List<string>();
+            this.Attachments = new List<AttachmentSet>();
         }
 
         public void EnsureSuccess()
@@ -69,6 +75,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 this.TestResults.AddRange(lastChunkArgs.NewTestResults);
             }
 
+            if (testRunCompleteArgs.AttachmentSets != null)
+            {
+                this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
+            }
+
             this.Metrics = testRunCompleteArgs.Metrics;
         }
 
@@ -89,6 +100,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             // No op
             return -1;
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            // No op
+            return true;
         }
     }
 }

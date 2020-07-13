@@ -81,6 +81,11 @@
         <target state="translated">Proces testovacího hostitele se chybově ukončil.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">Ladicí program se nedá připojit k výchozímu hostiteli testů.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

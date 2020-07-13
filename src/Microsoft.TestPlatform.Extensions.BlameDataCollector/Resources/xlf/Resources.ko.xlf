@@ -61,8 +61,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="UnexpectedValueForInactivityTimespanValue">
-        <source>Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input.</source>
-        <target state="translated">ExpectedExecutionTimeOfLongestRunningTestInMinutes에 대해 예기치 않은 값 {0}이(가) 제공되었습니다. 입력으로 양의 정수를 제공하세요.</target>
+        <source>Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</source>
+        <target state="translated">예기치 않은 값 '{0}'이(가) 시간 제한으로 제공되었습니다. 1.5h/90m/5400s/5400000ms/5400000 형식으로 값을 제공하세요.</target>
         <note></note>
       </trans-unit>
     </body>

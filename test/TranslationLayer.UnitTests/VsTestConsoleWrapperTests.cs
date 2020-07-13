@@ -13,7 +13,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Moq;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class VsTestConsoleWrapperTests
@@ -53,6 +56,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(100));
         }
 
         [TestMethod]
@@ -301,6 +305,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestHostLauncher>().Object);
 
             this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", options, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task ProcessTestRunAttachmentsAsyncShouldSucceed()
+        {
+            var attachments = new Collection<AttachmentSet>();
+            var cancellationToken = new CancellationToken();
+
+            await this.consoleWrapper.ProcessTestRunAttachmentsAsync(
+                attachments,
+                null,
+                true,
+                true,
+                new Mock<ITestRunAttachmentsProcessingEventsHandler>().Object,
+                cancellationToken);
+
+            this.mockRequestSender.Verify(rs => rs.ProcessTestRunAttachmentsAsync(attachments, true, It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), cancellationToken));
         }
 
         [TestMethod]

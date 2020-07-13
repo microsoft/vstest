@@ -36,6 +36,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string BlameCollectDumpKey = "CollectDump";
 
         /// <summary>
+        /// Name of collect dump option for blame.
+        /// </summary>
+        public const string BlameCollectHangDumpKey = "CollectHangDump";
+
+        /// <summary>
+        /// Name of collect hang dump option for blame.
+        /// </summary>
+        public const string CollectDumpOnTestSessionHang = "CollectDumpOnTestSessionHang";
+
+        /// <summary>
         /// Name of data collection settings node in RunSettings.
         /// </summary>
         public const string DataCollectionRunSettingsName = "DataCollectionRunSettings";
@@ -158,7 +168,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The default protocol version
         /// </summary>
-        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 2 };
+        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 3 };
+
+        /// <summary>
+        /// The minimum protocol version that has debug support
+        /// </summary>
+        public const int MinimumProtocolVersionWithDebugSupport = 3;
 
         /// <summary>
         /// Name of the results directory

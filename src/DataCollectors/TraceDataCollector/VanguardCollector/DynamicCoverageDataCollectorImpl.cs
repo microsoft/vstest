@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using TestPlatform.ObjectModel;
     using TraceCollector;
     using TraceCollector.Interfaces;
@@ -107,10 +108,29 @@ namespace Microsoft.VisualStudio.Coverage
             IDataCollectionSink dataSink,
             IDataCollectionLogger logger)
         {
+            var defaultConfigurationElement = DynamicCoverageDataCollectorImpl.GetDefaultConfiguration();
+
+            try
+            {
+                var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
+                configurationElement = (XmlElement)processor.Process(configurationElement);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        string.Join(
+                            " ",
+                            "DynamicCoverageDataCollectorImpl.Initialize: Exception encountered while processing the configuration element.",
+                            "Keeping the configuration element unaltered. More info about the exception: {0}"),
+                        ex.Message));
+            }
+
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
             if (string.IsNullOrEmpty(configurationElement?.InnerXml))
             {
-                configurationElement = DynamicCoverageDataCollectorImpl.GetDefaultConfiguration();
+                configurationElement = defaultConfigurationElement;
             }
 
             this.logger = logger;

@@ -81,6 +81,11 @@
         <target state="translated">テストのホスト プロセスがクラッシュしました</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">デバッガーを既定のテスト ホストにアタッチできません。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

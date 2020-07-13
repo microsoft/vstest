@@ -8,9 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
-{
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
+    
     
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
@@ -187,11 +187,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CollectDump option for Blame is not supported for this platform..
+        ///   Looks up a localized string similar to Collecting crash dumps by option CollectDump for Blame is not supported for this platform..
         /// </summary>
         internal static string BlameCollectDumpNotSupportedForPlatform {
             get {
                 return ResourceManager.GetString("BlameCollectDumpNotSupportedForPlatform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform..
+        /// </summary>
+        internal static string BlameCollectDumpTestTimeoutNotSupportedForPlatform {
+            get {
+                return ResourceManager.GetString("BlameCollectDumpTestTimeoutNotSupportedForPlatform", resourceCulture);
             }
         }
         
@@ -549,15 +558,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         
         /// <summary>
         ///   Looks up a localized string similar to Failed.
-        /// </summary>
-        internal static string Failed {
-            get {
-                return ResourceManager.GetString("Failed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed   {0}.
         /// </summary>
         internal static string FailedTestIndicator {
             get {
@@ -1065,7 +1065,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not Run  {0}.
+        ///   Looks up a localized string similar to Not Run.
         /// </summary>
         internal static string NotRunTestIndicator {
             get {
@@ -1125,15 +1125,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         
         /// <summary>
         ///   Looks up a localized string similar to Passed.
-        /// </summary>
-        internal static string Passed {
-            get {
-                return ResourceManager.GetString("Passed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Passed   {0}.
         /// </summary>
         internal static string PassedTestIndicator {
             get {
@@ -1339,15 +1330,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         
         /// <summary>
         ///   Looks up a localized string similar to Skipped.
-        /// </summary>
-        internal static string Skipped {
-            get {
-                return ResourceManager.GetString("Skipped", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Skipped  {0}.
         /// </summary>
         internal static string SkippedTestIndicator {
             get {

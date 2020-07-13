@@ -5,7 +5,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -13,7 +14,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     /// <summary>
     /// Defines contract to send test platform requests to test host
     /// </summary>
-    internal interface ITranslationLayerRequestSender : IDisposable
+    internal interface ITranslationLayerRequestSender : IDisposable, ITranslationLayerRequestSenderAsync
     {
         /// <summary>
         /// Initializes the communication for sending requests

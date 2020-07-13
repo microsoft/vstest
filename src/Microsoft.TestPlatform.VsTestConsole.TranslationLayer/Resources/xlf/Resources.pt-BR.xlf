@@ -61,6 +61,11 @@
         <target state="translated">O arquivo {0} não existe</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="translated">O Processamento de Anexos de Execução de Teste ativo foi anulado.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

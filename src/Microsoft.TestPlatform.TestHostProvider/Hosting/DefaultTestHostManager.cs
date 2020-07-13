@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// </summary>
     [ExtensionUri(DefaultTestHostUri)]
     [FriendlyName(DefaultTestHostFriendlyName)]
-    public class DefaultTestHostManager : ITestRuntimeProvider
+    public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
@@ -262,6 +262,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Task.FromResult(true);
         }
 
+        /// <inheritdoc />
+        public bool AttachDebuggerToTestHost()
+        {
+            return this.customTestHostLauncher is ITestHostLauncher2 launcher
+                ? launcher.AttachDebuggerToProcess(this.testHostProcess.Id)
+                : false;
+        }
+
         /// <summary>
         /// Filter duplicate extensions, include only the highest versioned extension
         /// </summary>
@@ -365,10 +373,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
             EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-            if (this.customTestHostLauncher == null)
+            // We launch the test host process here if we're on the normal test running workflow.
+            // If we're debugging and we have access to the newest version of the testhost launcher
+            // interface we launch it here as well, but we expect to attach later to the test host
+            // process by using its PID.
+            // For every other workflow (e.g.: profiling) we ask the IDE to launch the custom test
+            // host for us. In the profiling case this is needed because then the IDE sets some
+            // additional environmental variables for us to help with probing.
+            if ((this.customTestHostLauncher == null)
+                || (this.customTestHostLauncher.IsDebug
+                    && this.customTestHostLauncher is ITestHostLauncher2))
             {
                 EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-
                 cancellationToken.ThrowIfCancellationRequested();
                 this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) as Process;
             }

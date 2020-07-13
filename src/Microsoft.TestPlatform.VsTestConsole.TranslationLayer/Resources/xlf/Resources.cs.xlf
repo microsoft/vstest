@@ -61,6 +61,11 @@
         <target state="translated">Soubor {0} neexistuje.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="translated">Aktivní zpracovávání příloh testovacího běhu se přerušilo.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

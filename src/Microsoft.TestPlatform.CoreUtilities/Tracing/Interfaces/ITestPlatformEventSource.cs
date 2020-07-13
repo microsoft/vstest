@@ -182,5 +182,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// Mark the completion of Metrics Dispose.
         /// </summary>
         void MetricsDisposeStop();
+
+        /// <summary>
+        /// The test run attachments processing request start.
+        /// </summary>
+        void TestRunAttachmentsProcessingRequestStart();
+
+        /// <summary>
+        /// The test run attachments processing request stop.
+        /// </summary>
+        void TestRunAttachmentsProcessingRequestStop();
+
+        /// <summary>
+        /// The test run attachments processing start.
+        /// </summary>
+        /// <param name="numberOfAttachments">
+        /// The number of attachments.
+        /// </param>
+        void TestRunAttachmentsProcessingStart(long numberOfAttachments);
+
+        /// <summary>
+        /// The test run attachments processing stop.
+        /// </summary>
+        /// <param name="numberOfAttachments">
+        /// The number of attachments.
+        /// </param>
+        void TestRunAttachmentsProcessingStop(long numberOfAttachments);
+
+        /// <summary>
+        /// Mark the start of translation layer test run attachments processing request.
+        /// </summary>
+        void TranslationLayerTestRunAttachmentsProcessingStart();
+
+        /// <summary>
+        /// Mark the completion of translation layer test run attachments processing request.
+        /// </summary>
+        void TranslationLayerTestRunAttachmentsProcessingStop();
     }
 }

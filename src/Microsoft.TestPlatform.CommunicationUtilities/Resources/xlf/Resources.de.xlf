@@ -81,6 +81,11 @@
         <target state="translated">Der Testhostprozess ist abgestürzt.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">Der Debugger kann nicht an den Standardtesthost angefügt werden.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

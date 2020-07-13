@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// </remarks>
     [ExtensionUri(DotnetTestHostUri)]
     [FriendlyName(DotnetTestHostFriendlyName)]
-    public class DotnetTestHostManager : ITestRuntimeProvider
+    public class DotnetTestHostManager : ITestRuntimeProvider2
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendlyName = "DotnetTestHost";
@@ -371,6 +371,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Task.FromResult(true);
         }
 
+        /// <inheritdoc />
+        public bool AttachDebuggerToTestHost()
+        {
+            return this.customTestHostLauncher is ITestHostLauncher2 launcher
+                ? launcher.AttachDebuggerToProcess(this.testHostProcess.Id)
+                : false;
+        }
+
         /// <summary>
         /// Raises HostLaunched event
         /// </summary>
@@ -401,7 +409,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
-            if (this.customTestHostLauncher == null)
+
+            // We launch the test host process here if we're on the normal test running workflow.
+            // If we're debugging and we have access to the newest version of the testhost launcher
+            // interface we launch it here as well, but we expect to attach later to the test host
+            // process by using its PID.
+            // For every other workflow (e.g.: profiling) we ask the IDE to launch the custom test
+            // host for us. In the profiling case this is needed because then the IDE sets some
+            // additional environmental variables for us to help with probing.
+            if ((this.customTestHostLauncher == null)
+                || (this.customTestHostLauncher.IsDebug
+                    && this.customTestHostLauncher is ITestHostLauncher2))
             {
                 EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 

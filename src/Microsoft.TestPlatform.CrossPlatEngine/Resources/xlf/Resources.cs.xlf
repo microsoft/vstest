@@ -207,6 +207,16 @@
         <target state="translated">Zjišťování testů bylo zrušeno.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
+        <target state="translated">Ladicí program se nedá připojit k výchozímu hostiteli testů s ID procesu {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</source>
+        <target state="translated">{0} Při pokusu o vytvoření složky TestResults v uvedeném umístění došlo k odepření přístupu. Tato výjimka se vyvolala, protože spouštíte vstest.console.exe ze složky, která vyžaduje, abyste měli přístup pro zápis. Pokud chcete problém vyřešit, spusťte prosím vstest.console.exe ze složky, ve které máte oprávnění k zápisu.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -279,6 +279,11 @@
         <target state="translated">Fehler beim Laden von Erweiterungen aus der Datei "{0}". Verwenden Sie "/diag", um weitere Informationen zu erhalten.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
+        <target state="translated">{0} Beim Erstellen des Ordners "TestResults" am angegebenen Speicherort wurde der Zugriff verweigert. Sie erhalten diese Ausnahme, weil Sie "vstest.console.exe" von einem Ordner aus ausführen, für den Schreibzugriff erforderlich ist. So beheben Sie das Problem: Führen Sie "vstest.console.exe" in einem Ordner aus, für den Sie Schreibberechtigungen besitzen. Weitere Informationen finden Sie in der Fehlermeldung:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

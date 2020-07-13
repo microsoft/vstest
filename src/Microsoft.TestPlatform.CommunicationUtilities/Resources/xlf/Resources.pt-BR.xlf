@@ -81,6 +81,11 @@
         <target state="translated">Falha no processo do host de teste</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">Não é possível anexar o depurador ao host de teste padrão.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

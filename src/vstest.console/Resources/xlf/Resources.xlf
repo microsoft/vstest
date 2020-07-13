@@ -554,15 +554,15 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
+        <source>Failed</source>
         <note>Message which is written to the console when a test fails.</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
+        <source>Passed</source>
         <note>Message which is written to the console when a test passes.</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
+        <source>Skipped</source>
         <note></note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
@@ -602,7 +602,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
+        <source>Not Run</source>
         <target state="new">Not Run  {0}</target>
         <note></note>
       </trans-unit>
@@ -778,7 +778,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
-        <source>CollectDump option for Blame is not supported for this platform.</source>
+        <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
         <target state="new">CollectDump option for Blame is not supported for this platform.</target>
         <note></note>
       </trans-unit>
@@ -847,21 +847,6 @@
         <target state="new">A total of {0} test source files are discovered.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="TestRunSummary">
-        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
-        <target state="new">{0}! Total: {1}. Pass: {2}. Fail: {3}. Skip: {4}. ({5}) {6} {7}.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Failed">
-        <source>Failed</source>
-        <target state="new">Failed</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Passed">
-        <source>Passed</source>
-        <target state="new">Passed</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
@@ -869,14 +854,19 @@
 Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
+        <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
+        <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="None">
         <source>None</source>
         <target state="new">None</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Skipped">
-        <source>Skipped</source>
-        <target state="new">Skipped</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryAssemblyAndFramework">

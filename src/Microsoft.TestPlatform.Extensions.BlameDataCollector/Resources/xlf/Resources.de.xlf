@@ -61,8 +61,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="UnexpectedValueForInactivityTimespanValue">
-        <source>Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input.</source>
-        <target state="translated">Für "ExpectedExecutionTimeOfLongestRunningTestInMinutes" wurde der unerwartete Wert "{0}" angegeben. Geben Sie eine positive ganze Zahl als Eingabe an.</target>
+        <source>Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</source>
+        <target state="translated">Unerwarteter Wert "{0}" als Timeout angegeben. Geben Sie einen Wert in folgendem Format an: 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
         <note></note>
       </trans-unit>
     </body>

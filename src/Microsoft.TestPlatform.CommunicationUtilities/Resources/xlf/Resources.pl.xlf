@@ -81,6 +81,11 @@
         <target state="translated">Wystąpiła awaria procesu hosta testu</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">Nie można dołączyć debugera do domyślnego hosta testowego.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -514,14 +514,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class TestableTestRequestHandler : TestRequestHandler
     {
-        public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
-            : base(testHostConnectionInfo, communicationEndpointFactory, dataSerializer, jobQueue, OnAckMessageReceived)
+        public TestableTestRequestHandler(
+            TestHostConnectionInfo testHostConnectionInfo,
+            ICommunicationEndpointFactory communicationEndpointFactory,
+            IDataSerializer dataSerializer,
+            JobQueue<Action> jobQueue)
+            : base(
+                  testHostConnectionInfo,
+                  communicationEndpointFactory,
+                  dataSerializer,
+                  jobQueue,
+                  OnLaunchAdapterProcessWithDebuggerAttachedAckReceived,
+                  OnAttachDebuggerAckRecieved)
         {
         }
 
-        private static void OnAckMessageReceived(Message message)
+        private static void OnLaunchAdapterProcessWithDebuggerAttachedAckReceived(Message message)
         {
             Assert.AreEqual(message.MessageType, MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback);
+        }
+
+        private static void OnAttachDebuggerAckRecieved(Message message)
+        {
+            Assert.AreEqual(message.MessageType, MessageType.AttachDebuggerCallback);
         }
     }
 }
