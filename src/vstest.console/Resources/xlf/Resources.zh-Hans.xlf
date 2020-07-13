@@ -1305,7 +1305,7 @@
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
         <source>Failed</source>
-        <target state="new">{0} 个失败</target>
+        <target state="translated">失败</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1314,7 +1314,7 @@
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
         <source>Passed</source>
-        <target state="new">已通过 {0} 个</target>
+        <target state="translated">已通过</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1323,7 +1323,7 @@
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
         <source>Skipped</source>
-        <target state="new">已跳过 {0} 个</target>
+        <target state="translated">已跳过</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
@@ -1448,7 +1448,7 @@
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run</source>
-        <target state="new">未运行 {0}</target>
+        <target state="translated">未运行</target>
         <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
