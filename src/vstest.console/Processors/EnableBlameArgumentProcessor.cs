@@ -330,9 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private bool IsHangDumpCollectionSupported()
         {
             var dumpCollectionSupported =
-                this.environment.OperatingSystem != PlatformOperatingSystem.OSX
-                && this.environment.Architecture != PlatformArchitecture.ARM64
-                && this.environment.Architecture != PlatformArchitecture.ARM;
+                this.environment.OperatingSystem != PlatformOperatingSystem.OSX;
 
             if (!dumpCollectionSupported)
             {
