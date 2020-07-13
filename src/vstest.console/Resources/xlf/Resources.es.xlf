@@ -1682,7 +1682,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryAssemblyAndFramework">
-        <source>- {0} {1}</source>
+        <source> - {0} {1}</source>
         <target state="new">- {0} {1}</target>
         <note></note>
       </trans-unit>

@@ -804,11 +804,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                     if (color != null)
                     {
-                        Output.Information(false, color.Value, outputLine);
+                        Output.Write(outputLine, OutputLevel.Information, color.Value);
                     }
                     else
                     {
-                        Output.Information(false, outputLine);
+                        Output.Write(outputLine, OutputLevel.Information);
                     }
 
                     Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,

@@ -745,7 +745,7 @@
     <value>None</value>
   </data>
   <data name="TestRunSummaryAssemblyAndFramework" xml:space="preserve">
-    <value>- {0} {1}</value>
+    <value> - {0} {1}</value>
   </data>
   <data name="BlameCollectDumpTestTimeoutNotSupportedForPlatform" xml:space="preserve">
     <value>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</value>
