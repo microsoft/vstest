@@ -687,7 +687,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (incompatiblityFound)
             {
-                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, chosenFramework, defaultArchitecture, warnings.ToString(), multiTargettingForwardLink);
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, defaultArchitecture, warnings.ToString(), multiTargettingForwardLink);
             }
 
             return compatibleSources;

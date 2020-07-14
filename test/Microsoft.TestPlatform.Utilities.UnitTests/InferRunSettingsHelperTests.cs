@@ -404,7 +404,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sb.AppendLine(GetSourceIncompatibleMessage("x64net47.exe"));
 			sb.AppendLine(GetSourceIncompatibleMessage("x86net45.dll"));
 
-			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
 			#endregion
 
 			string warningMessage = string.Empty;
@@ -428,7 +428,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sb.AppendLine();
 			sb.AppendLine(GetSourceIncompatibleMessage("x64net45.exe"));
 
-			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
 
 			string warningMessage = string.Empty;
 			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);

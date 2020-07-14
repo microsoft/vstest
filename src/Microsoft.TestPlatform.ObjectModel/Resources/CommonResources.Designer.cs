@@ -70,8 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Test run detected DLL(s) which were built for {0} framework and {1} platform. Following DLL(s) do not match current settings which are {2} framework and {3} platform.{4}Go to {5} for more details on managing these settings.
-        ///.
+        ///   Looks up a localized string similar to Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings..
         /// </summary>
         public static string DisplayChosenSettings {
             get {
