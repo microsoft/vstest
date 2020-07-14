@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateTestRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
         {
-            this.CheckMatch("weburl", @"http://localhost//abc");
+            this.CheckRunSettingsAreUpdated("weburl", @"http://localhost//abc");
         }
 
         [TestMethod]
@@ -153,13 +153,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateTestRunParameterSettingsNodeWithSpecialCharactersNameShouldSucceed()
         {
-            this.CheckMatch("weburl:name", @"http://localhost//abc");
+            this.CheckRunSettingsAreUpdated("weburl:name", @"http://localhost//abc");
         }
 
         [TestMethod]
         public void UpdateTestRunParameterSettingsNodeWithSingleCharacterNameShouldSucceed()
         {
-            this.CheckMatch("a", @"http://localhost//abc");
+            this.CheckRunSettingsAreUpdated("a", @"http://localhost//abc");
         }
 
         [TestMethod]
@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             Assert.AreEqual("x86", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.TargetPlatform"));
         }
 
-        private void CheckMatch(string parameterName, string parameterValue)
+        private void CheckRunSettingsAreUpdated(string parameterName, string parameterValue)
         {
             var match = this.runSettingsProvider.GetTestRunParameterNodeMatch($"TestRunParameters.Parameter(name=\"{parameterName}\",value=\"{parameterValue}\")");
             var runSettingsWithTestRunParameters = $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"{parameterName}\" value=\"{parameterValue}\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
