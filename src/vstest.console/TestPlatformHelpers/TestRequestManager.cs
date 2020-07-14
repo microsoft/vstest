@@ -444,7 +444,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
 
-                    // Choose default architecture based on the bitness of Operating System
+                    // Set default architecture as X86
                     Architecture defaultArchitecture = Architecture.X86;
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
