@@ -48,7 +48,7 @@ done
 #
 # Variables
 #
-PROJECT_NAME_PATTERNS=**Unit*bin*$CONFIGURATION*netcoreapp1.0*UnitTests*dll
+PROJECT_NAME_PATTERNS=**Unit*bin*$CONFIGURATION*netcoreapp2.1*UnitTests*dll
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
 TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"
@@ -67,7 +67,7 @@ DOTNET_CLI_VERSION="latest"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
-TPB_TargetFrameworkCore="netcoreapp2.0"
+TPB_TargetFrameworkCore="netcoreapp2.1"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
 TPB_Verbose=$VERBOSE
@@ -119,7 +119,7 @@ function invoke_test()
 #
 _get_dotnet_path()
 {
-    echo "$TP_TOOLS_DIR/dotnet/dotnet"
+    echo "$TP_TOOLS_DIR/dotnet-linux/dotnet"
 }
 
 invoke_test
