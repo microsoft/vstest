@@ -15,7 +15,7 @@ NOCOLOR='\033[0m'
 # Parse options
 #
 CONFIGURATION="Debug"
-TARGET_RUNTIME="ubuntu.16.04-x64"
+TARGET_RUNTIME="ubuntu.18.04-x64"
 VERSION="" # Will set this later by reading TestPlatform.Settings.targets file.
 VERSION_SUFFIX="dev"
 FAIL_FAST=false
