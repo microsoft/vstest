@@ -266,12 +266,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetResolutionPathsShouldReturnExtensionAssemblyDirectoryAndTPCommonDirectory()
         {
-            var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths(@"C:\temp\Idonotexist.dll");
+            var temp = Path.GetTempPath();
+            var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths($@"{temp}{Path.DirectorySeparatorChar}Idonotexist.dll").Select(p => p.Replace("/", "\\")).ToList();
 
             var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-            var expectedPaths = new List<string> { "C:\\temp", tpCommonDirectory };
+            var expectedPaths = new List<string> { temp, tpCommonDirectory }.Select(p => p.Replace("/", "\\").TrimEnd('\\')).ToList();
 
-            CollectionAssert.AreEqual(expectedPaths, resolutionPaths.ToList());
+            CollectionAssert.AreEqual(expectedPaths, resolutionPaths, $"Collection {string.Join(", ", resolutionPaths)}, is not equal to the expected collection {string.Join(", ", expectedPaths)}.");
         }
 
         [TestMethod]

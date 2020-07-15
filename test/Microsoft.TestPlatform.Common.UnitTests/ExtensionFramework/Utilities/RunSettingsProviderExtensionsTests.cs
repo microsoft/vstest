@@ -16,8 +16,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
     [TestClass]
     public class RunSettingsProviderExtensionsTests
     {
-        private const string DefaultRunSettingsTemplate =
-            "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>%ResultsDirectory%</ResultsDirectory>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>%DefaultFramework%</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
+        private string DefaultRunSettingsTemplate =
+            "<RunSettings>" + Environment.NewLine 
+ + "  <RunConfiguration>" + Environment.NewLine 
+ + "    <ResultsDirectory>%ResultsDirectory%</ResultsDirectory>" + Environment.NewLine 
+ + "    <TargetPlatform>X86</TargetPlatform>" + Environment.NewLine 
+ + "    <TargetFrameworkVersion>%DefaultFramework%</TargetFrameworkVersion>" + Environment.NewLine 
+ + "  </RunConfiguration>" + Environment.NewLine 
+ + "</RunSettings>";
         private IRunSettingsProvider runSettingsProvider;
 
         [TestInitialize]
@@ -29,7 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateRunSettingsShouldUpdateGivenSettingsXml()
         {
-            const string runSettingsXml = "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>";
+            string runSettingsXml = "<RunSettings>" + Environment.NewLine 
+ + "  <RunConfiguration>" + Environment.NewLine 
+ + "    <TargetPlatform>X86</TargetPlatform>" + Environment.NewLine 
+ + "  </RunConfiguration>" + Environment.NewLine 
+ + "</RunSettings>";
 
             this.runSettingsProvider.UpdateRunSettings(runSettingsXml);
 
@@ -71,7 +81,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void AddDefaultRunSettingsShouldAddUnspecifiedSettings()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>" + Environment.NewLine 
+ + "  <RunConfiguration>" + Environment.NewLine 
+ + "    <TargetPlatform>X86</TargetPlatform>" + Environment.NewLine 
+ + "  </RunConfiguration>" + Environment.NewLine 
+ + "</RunSettings>");
 
             this.runSettingsProvider.AddDefaultRunSettings();
 
@@ -84,7 +98,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         public void AddDefaultRunSettingsShouldNotChangeSpecifiedSettings()
         {
 
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>" + Environment.NewLine 
+ + "  <RunConfiguration>" + Environment.NewLine 
+ + "    <TargetPlatform>X64</TargetPlatform>" + Environment.NewLine 
+ + "  </RunConfiguration>" + Environment.NewLine 
+ + "</RunSettings>");
 
             this.runSettingsProvider.AddDefaultRunSettings();
 
@@ -135,9 +153,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         public void UpdateTestRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
         {
             var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")");
-            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + Environment.NewLine 
+ + "<RunSettings>" + Environment.NewLine 
+ + "  <TestRunParameters>" + Environment.NewLine 
+ + "    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />" + Environment.NewLine 
+ + "  </TestRunParameters>" + Environment.NewLine 
+ + "</RunSettings>";
 
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>" + Environment.NewLine 
+ + "  </RunSettings>");
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
             Assert.AreEqual(runSettingsWithTestRunParameters, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
@@ -146,8 +170,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateTetsRunParameterSettingsNodeShouldOverrideValueIfKeyIsAlreadyPresent()
         {
-            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
-            var runSettingsWithTestRunParametersOverrode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//def\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + Environment.NewLine 
+ + "<RunSettings>" + Environment.NewLine 
+ + "  <TestRunParameters>" + Environment.NewLine 
+ + "    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />" + Environment.NewLine 
+ + "  </TestRunParameters>" + Environment.NewLine 
+ + "</RunSettings>";
+            var runSettingsWithTestRunParametersOverrode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + Environment.NewLine 
+ + "<RunSettings>" + Environment.NewLine 
+ + "  <TestRunParameters>" + Environment.NewLine 
+ + "    <Parameter name=\"weburl\" value=\"http://localhost//def\" />" + Environment.NewLine 
+ + "  </TestRunParameters>" + Environment.NewLine 
+ + "</RunSettings>";
 
             this.runSettingsProvider.UpdateRunSettings(runSettingsWithTestRunParameters);
             var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//def\")");

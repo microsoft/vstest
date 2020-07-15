@@ -53,8 +53,8 @@ namespace TestPlatform.Common.UnitTests
             // So they do not exactly match.
             // Assert.AreEqual(emptyRunSettings, runSettings.SettingsXml);
 
-            var expectedRunSettings = @"<RunSettings>
-</RunSettings>";
+            var expectedRunSettings = "<RunSettings>" + Environment.NewLine 
+                                      + "</RunSettings>";
             StringAssert.Contains(runSettings.SettingsXml, expectedRunSettings);
         }
 
