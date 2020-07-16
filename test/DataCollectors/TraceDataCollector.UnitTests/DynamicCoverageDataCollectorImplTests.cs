@@ -382,8 +382,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         {
             Assert.AreEqual(
                 DynamicCoverageDataCollectorImplTests.GetDefaultCodeCoverageConfig().Replace(" ", string.Empty)
-                    .Replace(Environment.NewLine, string.Empty),
-                File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
+                    .Replace("\r", string.Empty).Replace("\n", string.Empty),
+                File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty));
         }
 
         private XmlNode ExtractNode(XmlNode node, string path)
