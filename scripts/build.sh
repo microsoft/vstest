@@ -15,7 +15,7 @@ NOCOLOR='\033[0m'
 # Parse options
 #
 CONFIGURATION="Debug"
-TARGET_RUNTIME="ubuntu.16.04-x64"
+TARGET_RUNTIME="ubuntu.18.04-x64"
 VERSION="" # Will set this later by reading TestPlatform.Settings.targets file.
 VERSION_SUFFIX="dev"
 FAIL_FAST=false
@@ -238,7 +238,7 @@ function invoke_build()
     log ".. .. Build: Source: $TPB_Solution"
     
     # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
+    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.7.2/1.0.0/lib/net472/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
         if [[ $TP_USE_REPO_API = 0 ]]; then

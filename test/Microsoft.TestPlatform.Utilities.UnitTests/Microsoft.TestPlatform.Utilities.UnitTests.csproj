@@ -23,6 +23,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DefaultCodeCoverageConfig.xml" />
