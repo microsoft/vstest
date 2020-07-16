@@ -122,6 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             TestRunDetails = new TestRunDetails();
             Results = new ConcurrentDictionary<Guid, ObjectModel.TestResult>();
             ResultCollectionDictionary = new ConcurrentDictionary<string, TestResultCollection>();
+
+            // Ensure test results directory exists.
+            Directory.CreateDirectory(testResultsDirPath);
         }
 
         /// <inheritdoc/>

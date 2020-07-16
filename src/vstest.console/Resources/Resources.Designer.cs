@@ -11,6 +11,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
     
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -556,7 +557,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed   {0}.
+        ///   Looks up a localized string similar to Failed.
         /// </summary>
         internal static string FailedTestIndicator {
             get {
@@ -1055,7 +1056,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not Run  {0}.
+        ///   Looks up a localized string similar to Not Run.
         /// </summary>
         internal static string NotRunTestIndicator {
             get {
@@ -1114,7 +1115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Passed   {0}.
+        ///   Looks up a localized string similar to Passed.
         /// </summary>
         internal static string PassedTestIndicator {
             get {
@@ -1319,7 +1320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Skipped  {0}.
+        ///   Looks up a localized string similar to Skipped.
         /// </summary>
         internal static string SkippedTestIndicator {
             get {

@@ -4,21 +4,20 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
-    using System.Collections.Generic;
+    using System.Xml;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Xml;
     using System.Xml.XPath;
+    using System.Threading;
+    using System.Reflection;
+    using System.Globalization;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Client;
-    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -35,6 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -444,26 +444,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
 
-                    // Choose default architecture based on the framework
-                    // For .NET core, the default platform architecture should be based on the process.
-                    // For a 64 bit process,
+                    // Set default architecture as X86
                     Architecture defaultArchitecture = Architecture.X86;
-                    if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        var currentProcessName = this.processHelper.GetProcessName(this.processHelper.GetCurrentProcessId());
-                        defaultArchitecture = (currentProcessName.StartsWith("dotnet", StringComparison.OrdinalIgnoreCase) && !Environment.Is64BitProcess) ? Architecture.X86: Architecture.X64;
-                    }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
-                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
+                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, defaultArchitecture, sourcePlatforms, sourceFrameworks, registrar);
                     settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
                     settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
                     settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
                     settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
-                }
+                }              
             }
 
             return settingsUpdated;
@@ -516,10 +508,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
+        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, Architecture defaultArchitecture, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
         {
             // Find compatible sources
-            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, defaultArchitecture, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
 
             // Raise warnings for incompatible sources
             if (!string.IsNullOrEmpty(incompatibleSettingWarning))

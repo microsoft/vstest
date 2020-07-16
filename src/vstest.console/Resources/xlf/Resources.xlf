@@ -554,15 +554,15 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
+        <source>Failed</source>
         <note>Message which is written to the console when a test fails.</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
+        <source>Passed</source>
         <note>Message which is written to the console when a test passes.</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
+        <source>Skipped</source>
         <note></note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
@@ -602,7 +602,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
+        <source>Not Run</source>
         <target state="new">Not Run  {0}</target>
         <note></note>
       </trans-unit>
