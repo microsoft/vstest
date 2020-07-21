@@ -6,7 +6,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using System.Xml;
+
     using Microsoft.TestPlatform.TestUtilities;
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -19,6 +22,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -240,5 +245,211 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             // Verify.
             mockLogger.Verify(rd => rd.HandleLogMessage(It.IsAny<TestMessageLevel>(), "verify that the HandleLogMessage method will not be invoked when handler is not initialized"), Times.Never);
         }
+
+        #region Implementations
+
+        #region Discoverers
+
+        private abstract class AbstractTestDiscoverer : ITestDiscoverer
+        {
+            public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private class ValidDiscoverer : ITestDiscoverer
+        {
+            public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private class ValidDiscoverer2 : ITestDiscoverer
+        {
+            public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region Executors
+
+        [ExtensionUri("ValidExecutor")]
+        private class ValidExecutor : ITestExecutor
+        {
+            public void Cancel()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [ExtensionUri("ValidExecutor2")]
+        private class ValidExecutor2 : ITestExecutor
+        {
+            public void Cancel()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [ExtensionUri("ValidExecutor")]
+        private class DuplicateExecutor : ITestExecutor
+        {
+            public void Cancel()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region Loggers
+
+        [ExtensionUri("csv")]
+        private class ValidLogger : ITestLogger
+        {
+            public void Initialize(TestLoggerEvents events, string testRunDirectory)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [ExtensionUri("docx")]
+        private class ValidLogger2 : ITestLogger
+        {
+            public void Initialize(TestLoggerEvents events, string testRunDirectory)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [ExtensionUri("csv")]
+        private class DuplicateLogger : ITestLogger
+        {
+            public void Initialize(TestLoggerEvents events, string testRunDirectory)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region Settings Providers
+
+        [SettingsName("ValidSettingsProvider")]
+        private class ValidSettingsProvider : ISettingsProvider
+        {
+            public void Load(XmlReader reader)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [SettingsName("ValidSettingsProvider2")]
+        private class ValidSettingsProvider2 : ISettingsProvider
+        {
+            public void Load(XmlReader reader)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [SettingsName("ValidSettingsProvider")]
+        private class DuplicateSettingsProvider : ISettingsProvider
+        {
+            public void Load(XmlReader reader)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region  DataCollectors
+
+        public class InvalidDataCollector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// The a data collector inheriting from another data collector.
+        /// </summary>
+        [DataCollectorFriendlyName("Foo1")]
+        [DataCollectorTypeUri("datacollector://foo/bar1")]
+        public class ADataCollectorInheritingFromAnotherDataCollector : InvalidDataCollector
+        {
+        }
+
+        [DataCollectorFriendlyName("Foo")]
+        [DataCollectorTypeUri("datacollector://foo/bar")]
+        public class ValidDataCollector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+        #endregion
+
+        internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
+        {
+            /// <summary>
+            /// Default constructor
+            /// </summary>
+            /// <param name="type"> The Type. </param>
+            public FaultyTestExecutorPluginInformation(Type type) : base(type)
+            {
+                throw new Exception();
+            }
+        }
+        #endregion
     }
 }
