@@ -7,7 +7,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -69,7 +69,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldReturnTestDiscovererExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests));
 
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
@@ -88,7 +88,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void GetTestExtensionsShouldDiscoverExtensionsOnlyOnce()
         {
             var discoveryCount = 0;
-            TestPluginCacheTests.SetupMockExtensions(() => { discoveryCount++; });
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => { discoveryCount++; });
 
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;

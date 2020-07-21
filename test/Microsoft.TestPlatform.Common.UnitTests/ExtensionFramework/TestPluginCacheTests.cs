@@ -8,7 +8,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -294,7 +294,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldReturnExtensionsInAssembly()
         {
-            SetupMockAdditionalPathExtensions();
+            TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestPluginCacheTests));
 
             TestPluginCache.Instance.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location);
 
@@ -345,7 +345,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DiscoverTestExtensionsShouldDiscoverExtensionsFromExtensionsFolder()
         {
-            SetupMockAdditionalPathExtensions();
+            TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestPluginCacheTests));
 
             TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
@@ -358,7 +358,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DiscoverTestExtensionsShouldSetCachedBoolToTrue()
         {
-            SetupMockAdditionalPathExtensions();
+            TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestPluginCacheTests));
 
             TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
@@ -368,63 +368,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         #endregion
 
-        #region Setup mocks
-
-        public static TestableTestPluginCache SetupMockAdditionalPathExtensions()
-        {
-            return SetupMockAdditionalPathExtensions(
-                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
-        }
-
-        public static TestableTestPluginCache SetupMockAdditionalPathExtensions(string[] extensions)
-        {
-            var mockFileHelper = new Mock<IFileHelper>();
-            var testPluginCache = new TestableTestPluginCache();
-
-            TestPluginCache.Instance = testPluginCache;
-
-            // Stub the default extensions folder.
-            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-
-            TestPluginCache.Instance.UpdateExtensions(extensions, true);
-
-            return testPluginCache;
-        }
-
-        public static void SetupMockExtensions(Mock<IFileHelper> mockFileHelper = null)
-        {
-            SetupMockExtensions(() => { }, mockFileHelper);
-        }
-
-        public static void SetupMockExtensions(Action callback, Mock<IFileHelper> mockFileHelper = null)
-        {
-            SetupMockExtensions(new[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location }, callback, mockFileHelper);
-        }
-
-        public static void SetupMockExtensions(string[] extensions, Action callback, Mock<IFileHelper> mockFileHelper = null)
-        {
-            // Setup mocks.
-            if (mockFileHelper == null)
-            {
-                mockFileHelper = new Mock<IFileHelper>();
-            }
-
-            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-
-            var testableTestPluginCache = new TestableTestPluginCache(extensions.ToList());
-            testableTestPluginCache.Action = callback;
-
-            // Setup the testable instance.
-            TestPluginCache.Instance = testableTestPluginCache;
-        }
-
-        public static void ResetExtensionsCache()
-        {
-            TestPluginCache.Instance = null;
-            SettingsProviderExtensionManager.Destroy();
-        }
-
-        #endregion
 
         private void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
         {
@@ -437,36 +380,5 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             CollectionAssert.AreEquivalent(expectedExtensions, extensions);
         }
     }
-
-    #region Testable implementation
-
-    public class TestableTestPluginCache : TestPluginCache
-    {
-        public Action Action;
-        public TestableTestPluginCache(List<string> extensionsPath)
-        {
-            TestDiscoveryExtensionManager.Destroy();
-            TestExecutorExtensionManager.Destroy();
-            SettingsProviderExtensionManager.Destroy();
-            this.UpdateExtensions(extensionsPath, skipExtensionFilters: false);
-        }
-
-        public TestableTestPluginCache() : this(new List<string>())
-        {
-        }
-
-        protected override IEnumerable<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
-        {
-            this.Action?.Invoke();
-            return extensions;
-        }
-
-        new public void SetupAssemblyResolver(string extensionAssembly)
-        {
-            base.SetupAssemblyResolver(extensionAssembly);
-        }
-    }
-
-    #endregion
 }
 

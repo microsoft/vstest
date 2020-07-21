@@ -6,8 +6,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-
-    using Common.UnitTests.ExtensionFramework;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -23,8 +22,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.Utilities;
 
     using static RunTestsWithSourcesTests;
 
@@ -74,11 +71,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        public void InitializeShouldLoadAndInitializeAllExtension()
+        public void InitializeShouldLoadAndInitializeAllExtensions()
         {
-            var commonAssemblyLocation = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
+            var commonAssemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
             var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { commonAssemblyLocation },
                 () => { });
 
@@ -110,7 +107,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void StartTestRunShouldRunTestsInTheProvidedSources()
         {
             var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { assemblyLocation },
                 () => { });
             TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestPlatformConstants.TestAdapterEndsWithPattern);
@@ -172,7 +169,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                             "A.dll"));
                 fh.RecordResult(tr);
             };
-            TestPluginCacheTests.SetupMockExtensions(new string[] { assemblyLocation }, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(new string[] { assemblyLocation }, () => { });
 
 
             this.executionManager.StartTestRun(tests, null, null, testExecutionContext, null, mockTestRunEventsHandler.Object);
@@ -219,7 +216,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         //{
         //    var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
         //    var mockLogger = new Mock<ITestMessageEventHandler>();
-        //    TestPluginCacheTests.SetupMockExtensions(
+        //    TestPluginCacheHelper.SetupMockExtensions(
         //       new string[] { assemblyLocation },
         //       () => { });
         //    //Act
