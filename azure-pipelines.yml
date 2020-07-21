@@ -72,7 +72,6 @@ jobs:
   steps:
   - script: ./build.sh -c $(buildConfiguration)
     displayName: './build.sh -c $(buildConfiguration)'
-    steps:
   - script: ./test.sh -c $(buildConfiguration)
     displayName: './test.sh -c $(buildConfiguration)'
    
