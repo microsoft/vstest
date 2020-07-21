@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -90,6 +91,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// See <see cref="IVsTestConsoleWrapper.AbortTestRun"/>.
         /// </summary>
         void AbortTestRun();
+
+        /// <summary>
+        /// Provides back all attachments to TestPlatform for additional processing (for example merging)
+        /// </summary>
+        /// <param name="attachments">Collection of attachments</param>
+        /// <param name="processingSettings">XML processing settings</param>
+        /// <param name="isLastBatch">Indicates that all test executions are done and all data is provided</param>
+        /// <param name="collectMetrics">Enables metrics collection (used for telemetry)</param>
+        /// <param name="eventsHandler">EventHandler to receive session complete event</param>
+        /// <param name="cancellationToken">Cancellation token</param>        
+        Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, string processingSettings, bool isLastBatch, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler eventsHandler, CancellationToken cancellationToken);
 
         /// <summary>
         /// See <see cref="IVsTestConsoleWrapper.EndSession"/>.

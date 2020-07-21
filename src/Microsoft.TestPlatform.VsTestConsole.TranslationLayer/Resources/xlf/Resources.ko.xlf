@@ -61,6 +61,11 @@
         <target state="translated">{0} 파일이 없습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="translated">활성 테스트 실행 첨부 파일 처리가 중단되었습니다.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -61,6 +61,11 @@
         <target state="translated">文件 {0} 不存在</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="translated">已中止正在进行的测试运行附件处理操作。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

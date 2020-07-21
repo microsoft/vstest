@@ -84,7 +84,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             else
             {
-                this.StdOutputContains("Following DLL(s) do not match framework/platform settings. ");
+                this.StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X86 platform.");
                 this.ValidateSummaryStatus(1, 0, 0);
             }
         }

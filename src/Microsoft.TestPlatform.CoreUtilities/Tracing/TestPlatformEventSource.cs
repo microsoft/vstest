@@ -237,5 +237,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.MetricsDisposeStopEventId);
         }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStartEventId)]
+        public void TestRunAttachmentsProcessingRequestStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStopEventId)]
+        public void TestRunAttachmentsProcessingRequestStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStartEventId)]
+        public void TestRunAttachmentsProcessingStart(long numberOfAttachments)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStartEventId, numberOfAttachments);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStopEventId)]
+        public void TestRunAttachmentsProcessingStop(long numberOfAttachments)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStopEventId, numberOfAttachments);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStartEventId)]
+        public void TranslationLayerTestRunAttachmentsProcessingStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId)]
+        public void TranslationLayerTestRunAttachmentsProcessingStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId);
+        }
     }
 }
