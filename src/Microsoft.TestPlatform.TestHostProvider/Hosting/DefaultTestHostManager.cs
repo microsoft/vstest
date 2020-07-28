@@ -137,14 +137,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             TestRunnerConnectionInfo connectionInfo)
         {
             var targetFrameworkMoniker = this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
-            if (targetFrameworkMoniker == "451")
-            {
-                // This is the default host, it does not need any suffix.
-                targetFrameworkMoniker = string.Empty;
-            }
+
+            // Default host is net451 and is named testhost.exe it does not need any suffix.
+            var targetFrameworkSuffix = targetFrameworkMoniker == "451" ? string.Empty : $".net{targetFrameworkMoniker}";
 
             // Default test host manager supports shared test sources
-            var testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, $".net{targetFrameworkMoniker}");
+            var testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
