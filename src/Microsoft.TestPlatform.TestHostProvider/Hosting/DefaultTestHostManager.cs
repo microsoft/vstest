@@ -136,13 +136,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             IDictionary<string, string> environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
-            var targetFrameworkMoniker = this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
+            string testHostProcessName;
+            if (this.targetFramework.Name.StartsWith(".NETFramework,Version=v"))
+            {
+                var targetFrameworkMoniker = this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
 
-            // Default host is net451 and is named testhost.exe it does not need any suffix.
-            var targetFrameworkSuffix = targetFrameworkMoniker == "451" ? string.Empty : $".net{targetFrameworkMoniker}";
+                // Default host is net451 and is named testhost.exe it does not need any suffix.
+                var targetFrameworkSuffix = targetFrameworkMoniker == "451" ? string.Empty : $".net{targetFrameworkMoniker}";
 
-            // Default test host manager supports shared test sources
-            var testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
+                // Default test host manager supports shared test sources
+                testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
+            }
+            else
+            {
+                // This path is probably happening only in our tests, because otherwise we are first running CanExecuteCurrentRunConfiguration
+                // which would disqualify anything that is not netframework.
+                testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, string.Empty);
+            }
+
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 

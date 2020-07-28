@@ -172,7 +172,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
             this.mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/mono");
             this.mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
             this.mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
-            var source = "C:\temp\a.dll";
+            var source = @"C:\temp\a.dll";
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 new List<string>() { source },
