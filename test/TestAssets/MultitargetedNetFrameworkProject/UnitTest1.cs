@@ -55,6 +55,7 @@ namespace MultitargetedNetFrameworkProject
                 MemoryStream stream = new MemoryStream();
                 SslStream sslStream = new SslStream(stream);
 
+                // this throws SSLException on net451-net462, on net471 onwards it passes so we can use it to test that we target correctly
                 sslStream.BeginAuthenticateAsClient("microsoft.com", null, SslProtocols.None, false, new AsyncCallback(ProcessInformation), null);
             }
             catch (Exception ex)
