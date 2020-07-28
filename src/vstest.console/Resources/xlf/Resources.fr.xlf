@@ -1668,6 +1668,21 @@
         <target state="translated">La collecte des vidages sur blocage par l'option CollectDump avec TestTimeout pour Blame n'est pas prise en charge pour cette plateforme.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source> - {0} {1}</source>
+        <target state="new">- {0} {1}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

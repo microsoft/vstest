@@ -1668,6 +1668,21 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <target state="translated">A coleta de despejos de trava pela opção CollectDump com TestTimeout para Blame não é tem suporte para esta plataforma.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source> - {0} {1}</source>
+        <target state="new">- {0} {1}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
