@@ -139,11 +139,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             string testHostProcessName;
             if (this.targetFramework.Name.StartsWith(".NETFramework,Version=v"))
             {
-                var targetFrameworkMoniker = this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
+                var targetFrameworkMoniker = "net" + this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
 
                 // Net451 or older will use the default testhost.exe that is compiled against net451.
                 var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
-                var targetFrameworkSuffix = isSupportedNetTarget ? $".net{targetFrameworkMoniker}" : string.Empty;
+                var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
 
                 // Default test host manager supports shared test sources
                 testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
