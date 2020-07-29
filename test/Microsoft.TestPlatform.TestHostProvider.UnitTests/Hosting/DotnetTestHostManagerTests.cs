@@ -492,7 +492,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 #if !NET451
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
@@ -519,7 +519,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";

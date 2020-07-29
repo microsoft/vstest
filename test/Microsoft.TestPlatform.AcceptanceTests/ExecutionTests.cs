@@ -204,7 +204,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings. SimpleTestProject3.dll is built for Framework .NETFramework,Version=v4.5.1 and Platform X64";
+            var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject3.dll is built for Framework .NETFramework,Version=v4.5.1 and Platform X64";
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
@@ -217,6 +217,51 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             // When both x64 & x86 DLL is passed x64 dll will be ignored.
             this.StdOutputContains(expectedWarningContains);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void NoIncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProjectx86 is built for Framework .NETFramework,Version=v4.5.1 and Platform X86";
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProjectx86.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 0, 0);
+            this.ExitCodeEquals(0);
+            
+            this.StdOutputDoesNotContains(expectedWarningContains);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsoleOnlyWhenRunningIn32BitOS(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var expectedWarningContains = @"Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.5.1 framework and X86 platform. SimpleTestProject2.dll is built for Framework .NETFramework,Version=v4.5.1 and Platform X64";
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject2.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 1);
+            this.ExitCodeEquals(1);
+
+            // If we are running this test on 64 bit OS, it should not output any warning
+            if (Environment.Is64BitOperatingSystem)
+            {
+                this.StdOutputDoesNotContains(expectedWarningContains);
+            }
+            // If we are running this test on 32 bit OS, it should output warning message
+            else
+            {
+                this.StdOutputContains(expectedWarningContains);
+            }
         }
     }
 }

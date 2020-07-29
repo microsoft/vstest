@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // If testhost.exe is available use it, unless user specified path to dotnet.exe, then we will use the testhost.dll
             bool testHostExeFound = false;
-            if (!useCustomDotnetHostpath && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            if (!useCustomDotnetHostpath && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) && (this.platformEnvironment.Architecture == PlatformArchitecture.X64 || this.platformEnvironment.Architecture == PlatformArchitecture.X86))
             {
                 var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
                 var fullExePath = Path.Combine(sourceDirectory, exeName);
@@ -346,7 +346,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // This is expected to be called once every run so returning a new instance every time.
             if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+                || framework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return true;
             }

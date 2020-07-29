@@ -1305,7 +1305,7 @@
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
         <source>Failed</source>
-        <target state="new">Zakończone niepowodzeniem: {0}</target>
+        <target state="translated">Niepowodzenie</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1314,7 +1314,7 @@
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
         <source>Passed</source>
-        <target state="new">Zakończone pomyślnie: {0}</target>
+        <target state="translated">Powodzenie</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1323,7 +1323,7 @@
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
         <source>Skipped</source>
-        <target state="new">Pominięte: {0}</target>
+        <target state="translated">Pominięto</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
@@ -1448,7 +1448,7 @@
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run</source>
-        <target state="new">Nie uruchomiono: {0}</target>
+        <target state="translated">Nie uruchomiono</target>
         <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
@@ -1666,6 +1666,21 @@
       <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
         <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
         <target state="translated">Zbieranie zrzutów po zawieszeniu przez opcję CollectDump z opcją TestTimeout programu Blame nie jest obsługiwane w przypadku tej platformy.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source> - {0} {1}</source>
+        <target state="new">- {0} {1}</target>
         <note></note>
       </trans-unit>
     </body>

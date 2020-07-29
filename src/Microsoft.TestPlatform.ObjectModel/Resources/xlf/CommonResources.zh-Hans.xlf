@@ -30,11 +30,10 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
-</source>
-        <target state="translated">测试运行将使用为框架 {0} 和平台 {1} 生成的 DLL。以下 DLL 将不是运行的一部分: {2}转到 {3} 了解有关管理这些设置的详细信息。
+        <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
+        <target state="new">测试运行将使用为框架 {0} 和平台 {1} 生成的 DLL。以下 DLL 将不是运行的一部分: {2}转到 {3} 了解有关管理这些设置的详细信息。
 </target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testlauf verwendet DLLs für Framework {0} und {1}-Plattform integriert. Folgende DLLs nicht Teil ausführen: {2} zur {3} Einzelheiten auf diese Einstellungen.</target>
         </alt-trans>
