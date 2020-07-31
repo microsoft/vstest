@@ -9,13 +9,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     public class AcceptanceTestBase : IntegrationTestBase
     {
+        public const string Net451TargetFramework = "net451";
+        public const string Net452TargetFramework = "net452";
+        public const string Net46TargetFramework = "net46";
+        public const string Net461TargetFramework = "net461";
+        public const string Net462TargetFramework = "net462";
+        public const string Net47TargetFramework = "net47";
+        public const string Net471TargetFramework = "net471";
+        public const string Net472TargetFramework = "net472";
+        public const string Net48TargetFramework = "net48";
         public const string DesktopTargetFramework = "net451";
         public const string Core21TargetFramework = "netcoreapp2.1";
         public const string Core31TargetFramework = "netcoreapp3.1";
 
+        public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
+        public const string Net451FrameworkArgValue = ".NETFramework,Version=v4.5.1";
+        public const string Net452FrameworkArgValue = ".NETFramework,Version=v4.5.2";
+        public const string Net46FrameworkArgValue = ".NETFramework,Version=v4.6";
+        public const string Net461FrameworkArgValue = ".NETFramework,Version=v4.6.1";
+        public const string Net462FrameworkArgValue = ".NETFramework,Version=v4.6.2";
+        public const string Net47FrameworkArgValue = ".NETFramework,Version=v4.7";
+        public const string Net471FrameworkArgValue = ".NETFramework,Version=v4.7.1";
+        public const string Net472FrameworkArgValue = ".NETFramework,Version=v4.7.2";
+        public const string Net48FrameworkArgValue = ".NETFramework,Version=v4.8";
+
         public const string Core21FrameworkArgValue = ".NETCoreApp,Version=v2.1";
         public const string Core31FrameworkArgValue = ".NETCoreApp,Version=v3.1";
-        public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
         public const string DesktopRunnerTargetRuntime = "win7-x64";
         public const string CoreRunnerTargetRuntime = "";
         public const string InIsolation = "/InIsolation";
@@ -37,8 +56,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     return Core21FrameworkArgValue;
                 case Core31TargetFramework:
                     return Core31FrameworkArgValue;
-                case DesktopTargetFramework:
-                    return DesktopFrameworkArgValue;
+                case Net451TargetFramework:
+                    return Net451FrameworkArgValue;
+                case Net452TargetFramework:
+                    return Net452FrameworkArgValue;
+                case Net46TargetFramework:
+                    return Net46FrameworkArgValue;
+                case Net461TargetFramework:
+                    return Net461FrameworkArgValue;
+                case Net462TargetFramework:
+                    return Net462FrameworkArgValue;
+                case Net47TargetFramework:
+                    return Net47FrameworkArgValue;
+                case Net471TargetFramework:
+                    return Net471FrameworkArgValue;
+                case Net472TargetFramework:
+                    return Net472FrameworkArgValue;
+                case Net48TargetFramework:
+                    return Net48FrameworkArgValue;
                 default:
                     throw new NotSupportedException($"{testEnvironment.TargetFramework} is not supported TargetFramework value.");
             }

@@ -31,18 +31,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return new NetClientDumper();
             }
 
-            // this is not supported yet
-            // if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            // {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                if (!string.IsNullOrWhiteSpace(targetFramework) && !targetFramework.Contains("v5.0"))
+                {
+                    EqtTrace.Info($"HangDumperFactory: This is OSX on {targetFramework}, This combination of OS and framework is not supported.");
 
-            // if (frameworkVersion != default && frameworkVersion <= new Version("5.0"))
-            // {
-            //    return new SigtrapDumper();
-            // }
+                    throw new PlatformNotSupportedException($"Unsupported target framework {targetFramework} on OS {RuntimeInformation.OSDescription}");
+                }
 
-            // EqtTrace.Info($"HangDumperFactory: This is OSX on netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
-            // return new NetClientDumper();
-            // }
+                EqtTrace.Info($"HangDumperFactory: This is OSX on net5.0 or newer, returning the standard NETClient library dumper.");
+
+                // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
+                Environment.SetEnvironmentVariable("COMPlus_DbgEnableElfDumpOnMacOS", "1");
+                return new NetClientDumper();
+            }
+
             throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");
         }
     }
