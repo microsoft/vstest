@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
 
                 EqtTrace.Info($"HangDumperFactory: This is Linux netcoreapp3.1 or newer, returning the standard NETClient library dumper.");
-                return new NetClientDumper();
+                return new NetClientHangDumper();
             }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
 
                 EqtTrace.Info($"HangDumperFactory: This is OSX on net5.0 or newer, returning the standard NETClient library dumper.");
-                return new NetClientDumper();
+                return new NetClientHangDumper();
             }
 
             throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}");

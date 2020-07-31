@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using Microsoft.Diagnostics.NETCore.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    internal class NetClientDumper : IHangDumper
+    internal class NetClientHangDumper : IHangDumper
     {
         public void Dump(int processId, string outputFile, DumpTypeOption type)
         {
