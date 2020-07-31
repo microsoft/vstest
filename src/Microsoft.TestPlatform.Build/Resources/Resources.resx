@@ -127,7 +127,7 @@
     <value>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</value>
   </data>
   <data name="TestRunningSummary" xml:space="preserve">
-    <value>Test run for {0}({1})</value>
+    <value>Test run for {0} ({1})</value>
   </data>
   <data name="UpdateTestSdkForCollectingCodeCoverage" xml:space="preserve">
     <value>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</value>
