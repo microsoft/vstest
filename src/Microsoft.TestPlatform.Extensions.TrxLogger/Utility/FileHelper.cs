@@ -316,7 +316,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             Debug.Assert(!string.IsNullOrEmpty(originalName), "originalName is Null");
             Debug.Assert(helper != null, "helper is null");
 
-            var rng = new Random();
             uint iteration = 0;
             do
             {

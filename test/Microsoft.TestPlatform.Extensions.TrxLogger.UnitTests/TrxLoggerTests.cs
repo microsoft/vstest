@@ -33,7 +33,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private Dictionary<string, string> parameters;
         private static string DefaultTestRunDirectory = Path.GetTempPath();
         private static string DefaultLogFileNameParameterValue = "logfilevalue.trx";
-        private static string DefaultLogFilePrefixParameterValue = "log_prefix-";
+        private const string DefaultLogFilePrefixParameterValue = "log_prefix";
+
+        private const int MultipleLoggerInstanceCount = 10;
 
         [TestInitialize]
         public void Initialize()
@@ -640,7 +642,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
 
-            var loggers = new TestableTrxLogger[10];
+            var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
+
+            Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get a seperate file name!");
+        }
+
+        private string[] TestMultipleTrxLoggers(int count)
+        {
+            var loggers = new TestableTrxLogger[count];
             for (int i = 0; i < loggers.Length; i++)
             {
                 loggers[i] = new TestableTrxLogger();
@@ -660,7 +669,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
                 files = loggers.Select(l => l.trxFile).Distinct().ToArray();
 
-                Assert.IsTrue(files.Length == loggers.Length, "All logger instances should get a seperate file name!");
+                return files;
             }
             finally
             {
@@ -680,41 +689,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TrxFileNameShouldNotIterate()
         {
-            var loggers = new TestableTrxLogger[10];
-            for (int i = 0; i < loggers.Length; i++)
-            {
-                loggers[i] = new TestableTrxLogger();
-                loggers[i].Initialize(this.events.Object, this.parameters);
-            }
+            var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
 
-            string[] files = null;
-            try
-            {
-                loggers.AsParallel().ForAll(l =>
-                {
-                    var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                    l.TestResultHandler(new object(), pass.Object);
-                    var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                    l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-                });
+            Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
 
-                files = loggers.Select(l => l.trxFile).Distinct().ToArray();
-
-                Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
-            }
-            finally
-            {
-                if (files != null)
-                {
-                    foreach (var file in files)
-                    {
-                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
-                        {
-                            File.Delete(file);
-                        }
-                    }
-                }
-            }
         }
 
         [TestMethod]
@@ -723,41 +701,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
             this.parameters[TrxLoggerConstants.LogFilePrefixKey] = DefaultLogFilePrefixParameterValue;
 
-            var loggers = new TestableTrxLogger[10];
-            for (int i = 0; i < loggers.Length; i++)
-            {
-                loggers[i] = new TestableTrxLogger();
-                loggers[i].Initialize(this.events.Object, this.parameters);
-            }
+            var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
 
-            string[] files = null;
-            try
-            {
-                loggers.AsParallel().ForAll(l =>
-                {
-                    var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                    l.TestResultHandler(new object(), pass.Object);
-                    var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                    l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-                });
-
-                files = loggers.Select(l => l.trxFile).Distinct().ToArray();
-
-                Assert.IsTrue(files.Length == 10, "All logger instances should get the same file name!");
-            }
-            finally
-            {
-                if (files != null)
-                {
-                    foreach (var file in files)
-                    {
-                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
-                        {
-                            File.Delete(file);
-                        }
-                    }
-                }
-            }
+            Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get the same file name!");
         }
 
         [TestMethod]
