@@ -3,6 +3,15 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 {
+    using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
+    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using NuGet.Frameworks;
+    using ObjectModel.Logging;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -11,17 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using System.Globalization;
     using System.IO;
     using System.Text;
+    using System.Threading;
     using System.Xml;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using NuGet.Frameworks;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using ObjectModel.Logging;
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
@@ -40,8 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <summary>
         /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// </summary>
-        public TrxLogger():
-            this (new Utilities.Helpers.FileHelper())
+        public TrxLogger() :
+            this(new Utilities.Helpers.FileHelper())
         {
         }
 
@@ -64,6 +64,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         // The converter class
         private Converter converter;
+
+
+        private const int MutexTimeout = 120 * 1000;
+        private static readonly Mutex createLogFileMutex = new Mutex(initiallyOwned: false, "Global\\Microsoft.TestPlatform.Extensions.TrxLogger.PopulateTrxFile");
 
         private TrxLoggerObjectModel.TestRun testRun;
         private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
@@ -389,9 +393,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
 
-            //Save results to Trx file
-            this.DeriveTrxFilePath();
-            this.PopulateTrxFile(this.trxFilePath, rootElement);
+            EqtAssert.IsTrue(createLogFileMutex.WaitOne(MutexTimeout), "Cannot acquire the global file population mutex.");
+            try
+            {
+                //Save results to Trx file
+                this.DeriveTrxFilePath();
+                this.PopulateTrxFile(this.trxFilePath, rootElement);
+            }
+            finally
+            {
+                createLogFileMutex.ReleaseMutex();
+            }
         }
 
         /// <summary>
@@ -446,7 +458,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.results = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
             this.innerResults = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
             this.testElements = new ConcurrentDictionary<Guid, ITestElement>();
-            this.entries = new ConcurrentDictionary<Guid,TestEntry>();
+            this.entries = new ConcurrentDictionary<Guid, TestEntry>();
             this.innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
             this.runLevelErrorsAndWarnings = new List<RunInfo>();
             this.testRun = null;
@@ -487,17 +499,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             if (isLogFilePrefixParameterExists)
             {
-                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))              
+                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))
                 {
-                    var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
-                    if (framework != null)
+                    if (this.parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
                     {
                         framework = NuGetFramework.Parse(framework).GetShortFolderName();
                         logFilePrefixValue = logFilePrefixValue + "_" + framework;
                     }
 
-                    logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + this.trxFileExtension;
-                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFilePrefixValue);
+                    this.trxFilePath = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
                     return;
                 }
             }

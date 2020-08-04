@@ -303,6 +303,11 @@ Fehlerdetails: {1}: {2}</target>
         <target state="translated">LogFileName 및 LogFilePrefix 매개 변수는 함께 사용할 수 없습니다. </target>
         <note></note>
       </trans-unit>
+      <trans-unit id="Common_CannotGetNextTimestampFileName">
+        <source>Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</source>
+        <target state="new">Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

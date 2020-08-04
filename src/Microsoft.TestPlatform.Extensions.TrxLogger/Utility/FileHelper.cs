@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-
+    using System.Threading;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
@@ -131,6 +131,45 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             EqtAssert.StringNotNullOrEmpty(parentDirectoryName, "parentDirectoryName");
             EqtAssert.StringNotNullOrEmpty(originalFileName, "originalFileName");
             return GetNextIterationNameHelper(parentDirectoryName, originalFileName, new FileIterationHelper(checkMatchingDirectory));
+        }
+
+        /// <summary>
+        /// Constructs and returns first available timestamped file name. 
+        /// This does not checks for the file permissions.
+        /// </summary>
+        /// <param name="directoryName">Directory to try timestamped file names in.</param>
+        /// <param name="fileName">Filename (with extension) of the desired file. Timestamp will be added just before extension.</param>
+        /// <param name="timestampFormat">Timestamp format to be passed into DateTime.ToString method.</param>
+        /// <returns>First available filename with the format of `FileName{Timestamp}.ext`.</returns>
+        /// <example>
+        ///     <code>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</code> will return "c:\data\log_20200801185521.txt", if available.
+        /// </example>
+        public static string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
+        {
+            EqtAssert.StringNotNullOrEmpty(directoryName, "parentDirectoryName");
+            EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
+            EqtAssert.StringNotNullOrEmpty(timestampFormat, "timestampFormat");
+
+            uint iteration = 0;
+            var iterationStamp = DateTime.Now;
+            var fileNamePrefix = Path.GetFileNameWithoutExtension(fileName);
+            var extension = Path.GetExtension(fileName);
+            do
+            {
+                var tryMe = fileNamePrefix + iterationStamp.ToString(timestampFormat, DateTimeFormatInfo.InvariantInfo) + extension;
+
+                string tryMePath = Path.Combine(directoryName, tryMe);
+                if (!File.Exists(tryMePath))
+                {
+                    return tryMePath;
+                }
+
+                iterationStamp = iterationStamp.AddSeconds(1);
+                ++iteration;
+            }
+            while (iteration <= ushort.MaxValue);
+
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextTimestampFileName, fileName, directoryName, timestampFormat));
         }
 
         public static string MakePathRelative(string path, string basePath)
@@ -278,6 +317,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             Debug.Assert(!string.IsNullOrEmpty(originalName), "originalName is Null");
             Debug.Assert(helper != null, "helper is null");
 
+            var rng = new Random();
             uint iteration = 0;
             do
             {
@@ -289,6 +329,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     return tryMePath;
                 }
 
+                // Sleep a random amount before trying the next iteration
+                Thread.Sleep(rng.Next(1, 150));
                 ++iteration;
             }
             while (iteration != uint.MaxValue);
