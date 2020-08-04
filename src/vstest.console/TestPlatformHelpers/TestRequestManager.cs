@@ -451,7 +451,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                         || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        defaultArchitecture =  Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86;
+                        defaultArchitecture =  Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
                     }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
