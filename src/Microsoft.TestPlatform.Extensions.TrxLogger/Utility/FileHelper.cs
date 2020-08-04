@@ -149,7 +149,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
             EqtAssert.StringNotNullOrEmpty(timestampFormat, "timestampFormat");
 
-            uint iteration = 0;
+            ushort iteration = 0;
             var iterationStamp = DateTime.Now;
             var fileNamePrefix = Path.GetFileNameWithoutExtension(fileName);
             var extension = Path.GetExtension(fileName);
@@ -166,7 +166,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 iterationStamp = iterationStamp.AddSeconds(1);
                 ++iteration;
             }
-            while (iteration <= ushort.MaxValue);
+            while (iteration != ushort.MaxValue);
 
             throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextTimestampFileName, fileName, directoryName, timestampFormat));
         }
