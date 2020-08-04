@@ -647,22 +647,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                 loggers[i].Initialize(this.events.Object, this.parameters);
             }
 
-            loggers.AsParallel().ForAll(l => {
-                var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                l.TestResultHandler(new object(), pass.Object);
-                var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-            });
-
-            var files = loggers.Select(l => l.trxFile).Distinct().ToArray();
-
-            Assert.IsTrue(files.Length == loggers.Length, "All logger instances should get a seperate file name!");
-
-            foreach (var file in files)
+            string[] files = null;
+            try
             {
-                if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                loggers.AsParallel().ForAll(l =>
                 {
-                    File.Delete(file);
+                    var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
+                    l.TestResultHandler(new object(), pass.Object);
+                    var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+                    l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+                });
+
+                files = loggers.Select(l => l.trxFile).Distinct().ToArray();
+
+                Assert.IsTrue(files.Length == loggers.Length, "All logger instances should get a seperate file name!");
+            }
+            finally
+            {
+                if (files != null)
+                {
+                    foreach (var file in files)
+                    {
+                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                        {
+                            File.Delete(file);
+                        }
+                    }
                 }
             }
         }
@@ -677,22 +687,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                 loggers[i].Initialize(this.events.Object, this.parameters);
             }
 
-            loggers.AsParallel().ForAll(l => {
-                var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                l.TestResultHandler(new object(), pass.Object);
-                var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-            });
-
-            var files = loggers.Select(l => l.trxFile).Distinct().ToArray();
-
-            Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
-
-            foreach (var file in files)
+            string[] files = null;
+            try
             {
-                if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                loggers.AsParallel().ForAll(l =>
                 {
-                    File.Delete(file);
+                    var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
+                    l.TestResultHandler(new object(), pass.Object);
+                    var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+                    l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+                });
+
+                files = loggers.Select(l => l.trxFile).Distinct().ToArray();
+
+                Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
+            }
+            finally
+            {
+                if (files != null)
+                {
+                    foreach (var file in files)
+                    {
+                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                        {
+                            File.Delete(file);
+                        }
+                    }
                 }
             }
         }
@@ -710,22 +730,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                 loggers[i].Initialize(this.events.Object, this.parameters);
             }
 
-            loggers.AsParallel().ForAll(l => {
-                var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                l.TestResultHandler(new object(), pass.Object);
-                var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-            });
-
-            var files = loggers.Select(l => l.trxFile).Distinct().ToArray();
-
-            Assert.IsTrue(files.Length == 10, "All logger instances should get the same file name!");
-
-            foreach (var file in files)
+            string[] files = null;
+            try
             {
-                if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                loggers.AsParallel().ForAll(l =>
                 {
-                    File.Delete(file);
+                    var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
+                    l.TestResultHandler(new object(), pass.Object);
+                    var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+                    l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+                });
+
+                files = loggers.Select(l => l.trxFile).Distinct().ToArray();
+
+                Assert.IsTrue(files.Length == 10, "All logger instances should get the same file name!");
+            }
+            finally
+            {
+                if (files != null)
+                {
+                    foreach (var file in files)
+                    {
+                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                        {
+                            File.Delete(file);
+                        }
+                    }
                 }
             }
         }
@@ -905,9 +935,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             using (FileStream file = File.OpenRead(trxFileName))
             using (XmlReader reader = XmlReader.Create(file))
             {
-                while(reader.Read())
+                while (reader.Read())
                 {
-                    if(reader.Name.Equals(fieldName) && reader.NodeType == XmlNodeType.Element)
+                    if (reader.Name.Equals(fieldName) && reader.NodeType == XmlNodeType.Element)
                     {
                         return reader.ReadElementContentAsString();
                     }

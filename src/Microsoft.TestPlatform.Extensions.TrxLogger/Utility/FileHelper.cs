@@ -11,7 +11,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Threading;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
@@ -329,8 +328,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     return tryMePath;
                 }
 
-                // Sleep a random amount before trying the next iteration
-                Thread.Sleep(rng.Next(1, 150));
                 ++iteration;
             }
             while (iteration != uint.MaxValue);
