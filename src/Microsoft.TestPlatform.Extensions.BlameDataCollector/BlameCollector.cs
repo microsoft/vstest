@@ -135,6 +135,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     this.ValidateAndAddTriggerBasedProcessDumpParameters(collectDumpNode);
 
+                    // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
 
@@ -147,6 +148,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.collectProcessDumpOnTestHostHang = collectHangBasedDumpNode != null;
                 if (this.collectProcessDumpOnTestHostHang)
                 {
+                    // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
 
                     this.ValidateAndAddHangBasedProcessDumpParameters(collectHangBasedDumpNode);
