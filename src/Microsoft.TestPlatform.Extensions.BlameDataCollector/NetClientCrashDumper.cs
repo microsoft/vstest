@@ -3,23 +3,17 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
     internal class NetClientCrashDumper : ICrashDumper
     {
-        public void AttachToTargetProcess(int processId, string outputFile, DumpTypeOption dumpType)
+        public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType)
         {
-            // COMPlus_DbgMiniDumpName
-            Environment.SetEnvironmentVariable("COMPlus_DbgEnableMiniDump", "1");
-            Environment.SetEnvironmentVariable("COMPlus_CreateDumpDiagnostics", "1");
+            // we don't need to do anything directly here, we setup the env variables
+            // in the dumper configuration, including the path
         }
 
         public void DetachFromTargetProcess(int processId)
         {
-            Environment.SetEnvironmentVariable("COMPlus_DbgEnableMiniDump", "0");
-            Environment.SetEnvironmentVariable("COMPlus_CreateDumpDiagnostics", "0");
+            // here we might consider renaming the files to have timestamp
         }
 
         public void WaitForDumpToFinish()

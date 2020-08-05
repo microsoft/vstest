@@ -11,9 +11,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     internal class WindowsHangDumper : IHangDumper
     {
-        public void Dump(int processId, string outputFile, DumpTypeOption type)
+        public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             var process = Process.GetProcessById(processId);
+            var outputFile = Path.Combine(outputDirectory, $"{process.ProcessName}_{process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
             CollectDump(process, outputFile, type);
         }
 
