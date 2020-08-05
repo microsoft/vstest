@@ -65,10 +65,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         // The converter class
         private Converter converter;
 
-
-        private const int MutexTimeout = 120 * 1000;
-        private static readonly Mutex createLogFileMutex = new Mutex(initiallyOwned: false, "Global\\Microsoft.TestPlatform.Extensions.TrxLogger.PopulateTrxFile");
-
         private TrxLoggerObjectModel.TestRun testRun;
         private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
         private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
@@ -393,17 +389,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
 
-            EqtAssert.IsTrue(createLogFileMutex.WaitOne(MutexTimeout), "Cannot acquire the global file population mutex.");
-            try
-            {
-                //Save results to Trx file
-                this.DeriveTrxFilePath();
-                this.PopulateTrxFile(this.trxFilePath, rootElement);
-            }
-            finally
-            {
-                createLogFileMutex.ReleaseMutex();
-            }
+
+            this.ReserveTrxFilePath();
+            this.PopulateTrxFile(this.trxFilePath, rootElement);
         }
 
         /// <summary>
@@ -419,21 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             try
             {
-                var trxFileDirPath = Path.GetDirectoryName(trxFilePath);
-                if (Directory.Exists(trxFileDirPath) == false)
-                {
-                    Directory.CreateDirectory(trxFileDirPath);
-                }
-
-                if (File.Exists(trxFilePath))
-                {
-                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture,
-                        TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName);
-                    ConsoleOutput.Instance.Warning(false, overwriteWarningMsg);
-                    EqtTrace.Warning(overwriteWarningMsg);
-                }
-
-                using (var fs = File.Open(trxFileName, FileMode.Create))
+                using (var fs = File.Open(trxFileName, FileMode.Truncate))
                 {
                     using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize, Indent = true }))
                     {
@@ -492,45 +466,79 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.AddRunLevelInformationalMessage(message);
         }
 
-        private void DeriveTrxFilePath()
+        private void ReserveTrxFilePath()
         {
-            var isLogFilePrefixParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue);
-            var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue);
+            for (short retries = 0; retries != short.MaxValue; retries++)
+            {
+                var filePath = AcquireTrxFileNamePath(out var shouldOverwrite);
 
+                if (shouldOverwrite && File.Exists(filePath))
+                {
+                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, filePath);
+                    ConsoleOutput.Instance.Warning(false, overwriteWarningMsg);
+                    EqtTrace.Warning(overwriteWarningMsg);
+                }
+                else
+                {
+                    try
+                    {
+                        using (var fs = File.Open(filePath, FileMode.CreateNew)) { }
+                    }
+                    catch (IOException)
+                    {
+                        // File already exists, try again!
+                        continue;
+                    }
+                }
+
+                trxFilePath = filePath;
+                return;
+            }
+        }
+
+        private string AcquireTrxFileNamePath(out bool shouldOverwrite)
+        {
+            shouldOverwrite = false;
+            var isLogFileNameParameterExists = parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue);
+            var isLogFilePrefixParameterExists = parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue);
+
+            string filePath = null;
             if (isLogFilePrefixParameterExists)
             {
-                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))
+                if (parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
                 {
-                    if (this.parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
-                    {
-                        framework = NuGetFramework.Parse(framework).GetShortFolderName();
-                        logFilePrefixValue = logFilePrefixValue + "_" + framework;
-                    }
-
-                    this.trxFilePath = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
-                    return;
+                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
+
+                filePath = FileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
             }
 
             else if (isLogFileNameParameterExists)
             {
-                if (!string.IsNullOrWhiteSpace(logFileNameValue))
-                {
-                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
-                    return;
-                }
+                filePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                shouldOverwrite = true;
             }
 
-            this.SetDefaultTrxFilePath();
+            filePath = filePath ?? this.SetDefaultTrxFilePath();
+
+            var trxFileDirPath = Path.GetDirectoryName(filePath);
+            if (Directory.Exists(trxFileDirPath) == false)
+            {
+                Directory.CreateDirectory(trxFileDirPath);
+            }
+
+            return filePath;
         }
 
         /// <summary>
-        /// Sets auto generated Trx file name under test results directory.
+        /// Returns an auto generated Trx file name under test results directory.
         /// </summary>
-        private void SetDefaultTrxFilePath()
+        private string SetDefaultTrxFilePath()
         {
             var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
-            this.trxFilePath = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
+            
+            return FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 
         /// <summary>

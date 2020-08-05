@@ -659,13 +659,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             string[] files = null;
             try
             {
-                loggers.AsParallel().ForAll(l =>
+                foreach (var logger in loggers)
                 {
                     var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                    l.TestResultHandler(new object(), pass.Object);
+                    logger.TestResultHandler(new object(), pass.Object);
                     var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                    l.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-                });
+                    logger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+                }
 
                 files = loggers.Select(l => l.trxFile).Distinct().ToArray();
 
@@ -692,7 +692,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
 
             Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
-
         }
 
         [TestMethod]
