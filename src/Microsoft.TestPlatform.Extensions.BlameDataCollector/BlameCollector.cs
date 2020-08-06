@@ -140,8 +140,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
 
                     var guid = Guid.NewGuid().ToString();
-                    var dumpPath = Path.Combine(Path.GetTempPath(), guid, $"dotnet_%d_crashdump.dmp");
-                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
+
+                    // TODO: USE THIS GUID
+                    // var dumpPath = Path.Combine(Path.GetTempPath(), guid, $"dotnet_%d_crashdump.dmp");
+                    // var dumpPath = Path.Combine(Path.GetTempPath(), $"dotnet_%d_crashdump.dmp");
+                    // this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
 
                 var collectHangBasedDumpNode = this.configurationElement[Constants.CollectDumpOnTestSessionHang];
@@ -473,7 +476,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, ".NETFramework,Version=v4.0");
+                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
             }
             catch (TestPlatformException e)
             {
