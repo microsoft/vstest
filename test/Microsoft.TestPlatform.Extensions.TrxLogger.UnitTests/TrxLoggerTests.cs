@@ -656,7 +656,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var fileName = Path.GetFileName(testableTrxLogger.trxFile);
             var expectedName = $"{DefaultLogFilePrefixParameterValue}{time:_yyyyMMddHHmmss}.trx";
 
-            Assert.AreEqual(expectedName, fileName, "Trx file name pattern has changed. It should be in the form of prefix_yyyyMMddHHmmss.trx");
+            Assert.AreEqual(expectedName, fileName, "Trx file name pattern has changed. It should be in the form of prefix_yyyyMMddHHmmss.trx, Azure Devops VSTest task depends on this naming.");
         }
 
         [TestMethod]
