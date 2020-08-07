@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     /// <summary>
     /// Helper function to deal with file name.
     /// </summary>
-    internal class InternalFileHelper
+    internal class TrxFileHelper
 
     {
         private const string RelativeDirectorySeparator = "..";
@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Reviewed. Suppression is OK here.")]
 
         // Have to init InvalidFileNameChars dynamically.
-        static InternalFileHelper()
+        static TrxFileHelper()
         {
             // Create a hash table of invalid chars. On Windows, this should match the contents of System.IO.Path.GetInvalidFileNameChars.
             // See https://github.com/dotnet/coreclr/blob/8e99cd8031b2f568ea69116e7cf96d55e32cb7f5/src/mscorlib/shared/System/IO/Path.Windows.cs#L12-L19
@@ -64,9 +64,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             AdditionalInvalidFileNameChars.Add(' ', null);
         }
 
-        public InternalFileHelper() : this(() => DateTime.Now) { }
+        public TrxFileHelper() : this(() => DateTime.Now) { }
 
-        public InternalFileHelper(Func<DateTime> timeProvider)
+        public TrxFileHelper(Func<DateTime> timeProvider)
         {
             TimeProvider = timeProvider ?? (() => DateTime.Now);
         }

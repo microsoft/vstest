@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             TestOutcome outcome,
             TestType testType,
             TestListCategoryId testCategoryId,
-            InternalFileHelper internalFileHelper
-            ) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId, internalFileHelper) { }
+            TrxFileHelper trxFileHelper
+            ) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId, trxFileHelper) { }
     }
 }

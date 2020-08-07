@@ -646,9 +646,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.parameters[TrxLoggerConstants.LogFilePrefixKey] = DefaultLogFilePrefixParameterValue;
 
             var time = DateTime.Now;
-            var internalFileHelper = new InternalFileHelper(() => time);
+            var trxFileHelper = new TrxFileHelper(() => time);
 
-            testableTrxLogger = new TestableTrxLogger(new FileHelper(), internalFileHelper);
+            testableTrxLogger = new TestableTrxLogger(new FileHelper(), trxFileHelper);
             testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
             MakeTestRunComplete();
@@ -696,9 +696,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             {
                 var time = new DateTime(2020, 1, 1, 0, 0, 0);
 
-                var internalFileHelper = new InternalFileHelper(() => time);
-                var trxLogger1 = new TestableTrxLogger(new FileHelper(), internalFileHelper);
-                var trxLogger2 = new TestableTrxLogger(new FileHelper(), internalFileHelper);
+                var trxFileHelper = new TrxFileHelper(() => time);
+                var trxLogger1 = new TestableTrxLogger(new FileHelper(), trxFileHelper);
+                var trxLogger2 = new TestableTrxLogger(new FileHelper(), trxFileHelper);
 
                 trxLogger1.Initialize(this.events.Object, this.parameters);
                 trxLogger2.Initialize(this.events.Object, this.parameters);
@@ -749,7 +749,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
-            var converter = new Converter(new Mock<IFileHelper>().Object, new InternalFileHelper());
+            var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
             List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
             List<String> listCategoriesExpected = new List<string>();
@@ -959,7 +959,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     internal class TestableTrxLogger : TrxLogger
     {
         public TestableTrxLogger() : base() { }
-        public TestableTrxLogger(IFileHelper fileHelper, InternalFileHelper internalFileHelper) : base(fileHelper, internalFileHelper) { }
+        public TestableTrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper) : base(fileHelper, trxFileHelper) { }
 
         public string trxFile;
         internal override void PopulateTrxFile(string trxFileName, XmlElement rootElement)

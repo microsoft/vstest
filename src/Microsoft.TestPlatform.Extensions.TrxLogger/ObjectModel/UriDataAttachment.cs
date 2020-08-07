@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     {
-        private readonly InternalFileHelper internalFileHelper;
+        private readonly TrxFileHelper trxFileHelper;
         #region Private fields
 
         /// <summary>
@@ -37,12 +37,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         /// <param name="description">Short description for the attachment</param>
         /// <param name="uri">The URI pointing to the resource</param>
-        /// <param name="internalFileHelper">InternalFileHelper class instance to use in file operations.</param>
+        /// <param name="trxFileHelper">InternalFileHelper class instance to use in file operations.</param>
         /// <exception cref="ArgumentException">'name' is null or empty</exception>
         /// <exception cref="ArgumentNullException">'uri' is null</exception>
-        public UriDataAttachment(string description, Uri uri, InternalFileHelper internalFileHelper)
+        public UriDataAttachment(string description, Uri uri, TrxFileHelper trxFileHelper)
         {
-            this.internalFileHelper = internalFileHelper;
+            this.trxFileHelper = trxFileHelper;
 
             Initialize(description, uri);
         }
@@ -125,10 +125,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 }
                 else
                 {
-                    uriToUse = new Uri(internalFileHelper.MakePathRelative(this.uri.OriginalString, baseDirectory), UriKind.Relative);
+                    uriToUse = new Uri(trxFileHelper.MakePathRelative(this.uri.OriginalString, baseDirectory), UriKind.Relative);
                 }
 
-                return new UriDataAttachment(this.description, uriToUse, internalFileHelper);
+                return new UriDataAttachment(this.description, uriToUse, trxFileHelper);
             }
 
             // The URI in this instance is already how we want it, and since this class is immutable, no need to clone

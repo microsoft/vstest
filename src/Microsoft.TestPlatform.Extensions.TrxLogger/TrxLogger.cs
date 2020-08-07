@@ -45,12 +45,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="fileHelper">The file helper interface.</param>
-        protected TrxLogger(IFileHelper fileHelper) : this(new Utilities.Helpers.FileHelper(), new InternalFileHelper()) { }
+        protected TrxLogger(IFileHelper fileHelper) : this(new Utilities.Helpers.FileHelper(), new TrxFileHelper()) { }
 
-        internal TrxLogger(IFileHelper fileHelper, InternalFileHelper internalFileHelper)
+        internal TrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper)
         {
-            this.converter = new Converter(fileHelper, internalFileHelper);
-            this.internalFileHelper = internalFileHelper;
+            this.converter = new Converter(fileHelper, trxFileHelper);
+            this.trxFileHelper = trxFileHelper;
         }
 
         #endregion
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
         private ConcurrentDictionary<Guid, TestEntry> innerTestEntries;
 
-        private readonly InternalFileHelper internalFileHelper;
+        private readonly TrxFileHelper trxFileHelper;
 
         /// <summary>
         /// Specifies the run level "out" messages
@@ -513,7 +513,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
 
-                filePath = internalFileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
+                filePath = trxFileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
             }
 
             else if (isLogFileNameParameterExists)
@@ -540,7 +540,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
             
-            return internalFileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
+            return trxFileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 
         /// <summary>
@@ -562,8 +562,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.testRun.Started = this.testRunStartTime;
 
             // Save default test settings
-            string runDeploymentRoot = internalFileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
-            TestRunConfiguration testrunConfig = new TestRunConfiguration("default", internalFileHelper);
+            string runDeploymentRoot = trxFileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
+            TestRunConfiguration testrunConfig = new TestRunConfiguration("default", trxFileHelper);
             testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
             this.testRun.RunConfiguration = testrunConfig;
         }
