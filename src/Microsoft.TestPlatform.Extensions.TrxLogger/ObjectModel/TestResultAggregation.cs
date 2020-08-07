@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
     using System;
     using System.Collections.Generic;
+    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
     /// <summary>
@@ -23,7 +24,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             string computerName,
             TestOutcome outcome,
             TestType testType,
-            TestListCategoryId testCategoryId) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId) { }
+            TestListCategoryId testCategoryId,
+            InternalFileHelper internalFileHelper) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId, internalFileHelper) { }
 
         /// <summary>
         /// Gets the inner results.

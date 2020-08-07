@@ -20,6 +20,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         #region  Fields
         private TestRunConfigurationId id;
+        private readonly InternalFileHelper internalFileHelper;
 
         [StoreXmlSimpleField(DefaultValue = "")]
         private string name;
@@ -34,14 +35,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="name">
         /// The name of Run Configuration.
         /// </param>
-        public TestRunConfiguration(string name)
+        /// <param name="internalFileHelper">
+        /// InternalFileHelper instance to use in file operations.
+        /// </param>
+        internal TestRunConfiguration(string name, InternalFileHelper internalFileHelper)
         {
             EqtAssert.ParameterNotNull(name, "name");
 
             this.name = name;
-
             this.runDeploymentRoot = string.Empty;
             this.id = new TestRunConfigurationId();
+            this.internalFileHelper = internalFileHelper;
         }
 
         #region IXmlTestStoreCustom Members
@@ -141,7 +145,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 helper.SaveSimpleField(
                         element,
                         "Deployment/@runDeploymentRoot",
-                        FileHelper.MakePathRelative(this.runDeploymentRoot, Path.GetDirectoryName(this.runDeploymentRoot)),
+                        internalFileHelper.MakePathRelative(this.runDeploymentRoot, Path.GetDirectoryName(this.runDeploymentRoot)),
                     string.Empty);
             }
             else

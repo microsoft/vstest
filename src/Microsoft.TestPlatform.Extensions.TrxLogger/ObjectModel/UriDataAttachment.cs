@@ -17,6 +17,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     {
+        private readonly InternalFileHelper internalFileHelper;
         #region Private fields
 
         /// <summary>
@@ -36,11 +37,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         /// <param name="description">Short description for the attachment</param>
         /// <param name="uri">The URI pointing to the resource</param>
+        /// <param name="internalFileHelper">InternalFileHelper class instance to use in file operations.</param>
         /// <exception cref="ArgumentException">'name' is null or empty</exception>
         /// <exception cref="ArgumentNullException">'uri' is null</exception>
-        public UriDataAttachment(string description, Uri uri)
+        public UriDataAttachment(string description, Uri uri, InternalFileHelper internalFileHelper)
         {
-            this.Initialize(description, uri);
+            this.internalFileHelper = internalFileHelper;
+
+            Initialize(description, uri);
         }
 
         #region IDataAttachment Members
@@ -121,10 +125,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 }
                 else
                 {
-                    uriToUse = new Uri(FileHelper.MakePathRelative(this.uri.OriginalString, baseDirectory), UriKind.Relative);
+                    uriToUse = new Uri(internalFileHelper.MakePathRelative(this.uri.OriginalString, baseDirectory), UriKind.Relative);
                 }
 
-                return new UriDataAttachment(this.description, uriToUse);
+                return new UriDataAttachment(this.description, uriToUse, internalFileHelper);
             }
 
             // The URI in this instance is already how we want it, and since this class is immutable, no need to clone

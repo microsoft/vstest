@@ -16,19 +16,21 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     /// <summary>
     /// Helper function to deal with file name.
     /// </summary>
-    internal static class FileHelper
+    internal class InternalFileHelper
+
     {
         private const string RelativeDirectorySeparator = "..";
 
         private static readonly Dictionary<char, object> InvalidFileNameChars;
         private static readonly Dictionary<char, object> AdditionalInvalidFileNameChars;
         private static readonly Regex ReservedFileNamesRegex = new Regex(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
+        private readonly Func<DateTime> TimeProvider;
 
         #region Constructors
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Reviewed. Suppression is OK here.")]
 
         // Have to init InvalidFileNameChars dynamically.
-        static FileHelper()
+        static InternalFileHelper()
         {
             // Create a hash table of invalid chars. On Windows, this should match the contents of System.IO.Path.GetInvalidFileNameChars.
             // See https://github.com/dotnet/coreclr/blob/8e99cd8031b2f568ea69116e7cf96d55e32cb7f5/src/mscorlib/shared/System/IO/Path.Windows.cs#L12-L19
@@ -62,6 +64,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             AdditionalInvalidFileNameChars.Add(' ', null);
         }
 
+        public InternalFileHelper() : this(() => DateTime.Now) { }
+
+        public InternalFileHelper(Func<DateTime> timeProvider)
+        {
+            TimeProvider = timeProvider ?? (() => DateTime.Now);
+        }
+
         #endregion
 
         /// <summary>
@@ -69,7 +78,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="fileName">the name of the file</param>
         /// <returns>Replaced string.</returns>
-        public static string ReplaceInvalidFileNameChars(string fileName)
+        public string ReplaceInvalidFileNameChars(string fileName)
         {
             EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
 
@@ -125,7 +134,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        public static string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
+        public string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
         {
             EqtAssert.StringNotNullOrEmpty(parentDirectoryName, "parentDirectoryName");
             EqtAssert.StringNotNullOrEmpty(originalFileName, "originalFileName");
@@ -143,14 +152,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <example>
         ///     <code>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</code> will return "c:\data\log_20200801185521.txt", if available.
         /// </example>
-        public static string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
+        public string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
         {
             EqtAssert.StringNotNullOrEmpty(directoryName, "parentDirectoryName");
             EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
             EqtAssert.StringNotNullOrEmpty(timestampFormat, "timestampFormat");
 
             ushort iteration = 0;
-            var iterationStamp = DateTime.Now;
+            var iterationStamp = TimeProvider();
             var fileNamePrefix = Path.GetFileNameWithoutExtension(fileName);
             var extension = Path.GetExtension(fileName);
             do
@@ -171,7 +180,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextTimestampFileName, fileName, directoryName, timestampFormat));
         }
 
-        public static string MakePathRelative(string path, string basePath)
+        public string MakePathRelative(string path, string basePath)
         {
             EqtAssert.StringNotNullOrEmpty(path, "path");
 

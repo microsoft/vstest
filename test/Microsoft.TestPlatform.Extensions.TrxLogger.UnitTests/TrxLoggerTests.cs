@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
@@ -15,6 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Xml;
     using System.Xml.Linq;
     using VisualStudio.TestPlatform.ObjectModel;
@@ -35,7 +37,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private static string DefaultLogFileNameParameterValue = "logfilevalue.trx";
         private const string DefaultLogFilePrefixParameterValue = "log_prefix";
 
-        private const int MultipleLoggerInstanceCount = 10;
+        private const int MultipleLoggerInstanceCount = 2;
 
         [TestInitialize]
         public void Initialize()
@@ -638,38 +640,73 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void DefaultTrxFileNameVerification()
+        {
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = DefaultLogFilePrefixParameterValue;
+
+            var time = DateTime.Now;
+            var internalFileHelper = new InternalFileHelper(() => time);
+            
+            testableTrxLogger = new TestableTrxLogger(new FileHelper(), internalFileHelper);
+            testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            MakeTestRunComplete();
+
+            var fileName = Path.GetFileName(testableTrxLogger.trxFile);
+            var expectedName = $"{DefaultLogFilePrefixParameterValue}{time:_yyyyMMddHHmmss}.trx";
+
+            Assert.AreEqual(expectedName, fileName, "Trx file name pattern has changed. It should be in the form of prefix_yyyyMMddHHmmss.trx");
+        } 
+
+        [TestMethod]
         public void DefaultTrxFileShouldIterateIfLogFileNameParameterNotPassed()
         {
             this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
 
-            var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
+            var files = TestMultipleTrxLoggers();
 
             Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get a seperate file name!");
         }
 
-        private string[] TestMultipleTrxLoggers(int count)
+        [TestMethod]
+        public void TrxFileNameShouldNotIterate()
         {
-            var loggers = new TestableTrxLogger[count];
-            for (int i = 0; i < loggers.Length; i++)
-            {
-                loggers[i] = new TestableTrxLogger();
-                loggers[i].Initialize(this.events.Object, this.parameters);
-            }
+            var files = TestMultipleTrxLoggers();
 
+            Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
+        }
+
+        [TestMethod]
+        public void TrxPrefixFileNameShouldIterate()
+        {
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = DefaultLogFilePrefixParameterValue;
+
+            var files = TestMultipleTrxLoggers();
+
+            Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get the same file name!");
+        }
+
+        private string[] TestMultipleTrxLoggers()
+        {
             string[] files = null;
+
             try
             {
-                foreach (var logger in loggers)
-                {
-                    var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-                    logger.TestResultHandler(new object(), pass.Object);
-                    var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-                    logger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-                }
+                var time = new DateTime(2020, 1, 1, 0, 0, 0);
 
-                files = loggers.Select(l => l.trxFile).Distinct().ToArray();
+                var internalFileHelper = new InternalFileHelper(() => time);
+                var trxLogger1 = new TestableTrxLogger(new FileHelper(), internalFileHelper);
+                var trxLogger2 = new TestableTrxLogger(new FileHelper(), internalFileHelper);
 
-                return files;
+                trxLogger1.Initialize(this.events.Object, this.parameters);
+                trxLogger2.Initialize(this.events.Object, this.parameters);
+
+                MakeTestRunComplete(trxLogger1);
+                MakeTestRunComplete(trxLogger2);
+
+                files = (new[] { trxLogger1.trxFile, trxLogger2.trxFile }).Distinct().ToArray();
             }
             finally
             {
@@ -684,25 +721,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                     }
                 }
             }
-        }
 
-        [TestMethod]
-        public void TrxFileNameShouldNotIterate()
-        {
-            var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
-
-            Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
-        }
-
-        [TestMethod]
-        public void TrxPrefixFileNameShouldIterate()
-        {
-            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
-            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = DefaultLogFilePrefixParameterValue;
-
-            var files = TestMultipleTrxLoggers(MultipleLoggerInstanceCount);
-
-            Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get the same file name!");
+            return files;
         }
 
         [TestMethod]
@@ -712,6 +732,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue), this.testableTrxLogger.trxFile, "Wrong Trx file name");
         }
+
+
 
         /// <summary>
         /// Unit test for reading TestCategories from the TestCase which is part of test result.
@@ -724,7 +746,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
-            var converter = new Converter(new Mock<IFileHelper>().Object);
+            var converter = new Converter(new Mock<IFileHelper>().Object, new InternalFileHelper());
             List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
             List<String> listCategoriesExpected = new List<string>();
@@ -920,17 +942,22 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             return new Mock<TestResultEventArgs>(passResult);
         }
 
-        private void MakeTestRunComplete()
+        private void MakeTestRunComplete() => this.MakeTestRunComplete(this.testableTrxLogger);
+
+        private void MakeTestRunComplete(TestableTrxLogger testableTrxLogger)
         {
             var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
-            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
+            testableTrxLogger.TestResultHandler(new object(), pass.Object);
             var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
-            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
         }
     }
 
     internal class TestableTrxLogger : TrxLogger
     {
+        public TestableTrxLogger() : base() { }
+        public TestableTrxLogger(IFileHelper fileHelper, InternalFileHelper internalFileHelper) : base(fileHelper, internalFileHelper) { }
+
         public string trxFile;
         internal override void PopulateTrxFile(string trxFileName, XmlElement rootElement)
         {
