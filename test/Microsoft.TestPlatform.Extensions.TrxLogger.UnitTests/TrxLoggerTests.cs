@@ -647,7 +647,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var time = DateTime.Now;
             var internalFileHelper = new InternalFileHelper(() => time);
-            
+
             testableTrxLogger = new TestableTrxLogger(new FileHelper(), internalFileHelper);
             testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
@@ -657,7 +657,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var expectedName = $"{DefaultLogFilePrefixParameterValue}{time:_yyyyMMddHHmmss}.trx";
 
             Assert.AreEqual(expectedName, fileName, "Trx file name pattern has changed. It should be in the form of prefix_yyyyMMddHHmmss.trx");
-        } 
+        }
 
         [TestMethod]
         public void DefaultTrxFileShouldIterateIfLogFileNameParameterNotPassed()
@@ -690,7 +690,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
         private string[] TestMultipleTrxLoggers()
         {
-            string[] files = null;
+            var files = new string[2];
 
             try
             {
@@ -704,20 +704,23 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                 trxLogger2.Initialize(this.events.Object, this.parameters);
 
                 MakeTestRunComplete(trxLogger1);
-                MakeTestRunComplete(trxLogger2);
+                files[0] = trxLogger1.trxFile;
 
-                files = (new[] { trxLogger1.trxFile, trxLogger2.trxFile }).Distinct().ToArray();
+                MakeTestRunComplete(trxLogger2);
+                files[1] = trxLogger2.trxFile;
             }
             finally
             {
-                if (files != null)
+                files = files
+                    .Where(i => !string.IsNullOrWhiteSpace(i))
+                    .Distinct()
+                    .ToArray();
+
+                foreach (var file in files)
                 {
-                    foreach (var file in files)
+                    if (!string.IsNullOrEmpty(file) && File.Exists(file))
                     {
-                        if (!string.IsNullOrEmpty(file) && File.Exists(file))
-                        {
-                            File.Delete(file);
-                        }
+                        File.Delete(file);
                     }
                 }
             }
