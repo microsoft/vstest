@@ -23,9 +23,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public string TargetPlatform { get; set; }
 
-        public SettingsType RunSettingsType { get; set; }
+        public string TraceDataCollectorPath { get; set; }
 
         public string RunSettingsPath { get; set; }
+
+        public SettingsType RunSettingsType { get; set; }
 
         public int ExpectedPassedTests { get; set; }
 
@@ -40,6 +42,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         private readonly string resultsDirectory;
+        private readonly string vstestTraceDataCollector = Path.Combine(
+            IntegrationTestEnvironment.TestPlatformRootDirectory,
+            $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
+        private readonly string vsTraceDataCollector = Path.Combine(
+            IntegrationTestEnvironment.TestPlatformRootDirectory,
+            $@"packages\microsoft.internal.testplatform.extensions\16.8.0-preview-3933530\contentFiles\any\any\Extensions"
+            );
 
         public CodeCoverageTests()
         {
@@ -55,6 +64,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 AssemblyName = "SimpleTestProject.dll",
                 TargetPlatform = "x86",
+                TraceDataCollectorPath = vstestTraceDataCollector,
                 RunSettingsPath = string.Empty,
                 RunSettingsType = TestParameters.SettingsType.None,
                 ExpectedPassedTests = 1,
@@ -74,6 +84,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 AssemblyName = "SimpleTestProject.dll",
                 TargetPlatform = "x64",
+                TraceDataCollectorPath = vstestTraceDataCollector,
                 RunSettingsPath = string.Empty,
                 RunSettingsType = TestParameters.SettingsType.None,
                 ExpectedPassedTests = 1,
@@ -93,6 +104,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 AssemblyName = "SimpleTestProject.dll",
                 TargetPlatform = "x86",
+                TraceDataCollectorPath = vstestTraceDataCollector,
                 RunSettingsPath = string.Empty,
                 RunSettingsType = TestParameters.SettingsType.Default,
                 ExpectedPassedTests = 1,
@@ -112,6 +124,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 AssemblyName = "SimpleTestProject.dll",
                 TargetPlatform = "x64",
+                TraceDataCollectorPath = vstestTraceDataCollector,
                 RunSettingsPath = string.Empty,
                 RunSettingsType = TestParameters.SettingsType.Default,
                 ExpectedPassedTests = 1,
@@ -131,6 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 AssemblyName = "CodeCoverageTest.dll",
                 TargetPlatform = "x86",
+                TraceDataCollectorPath = vstestTraceDataCollector,
                 RunSettingsPath = Path.Combine(
                     IntegrationTestEnvironment.TestPlatformRootDirectory,
                     @"scripts\vstest-codecoverage2.runsettings"),
@@ -153,6 +167,62 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 AssemblyName = "CodeCoverageTest.dll",
                 TargetPlatform = "x64",
+                TraceDataCollectorPath = vstestTraceDataCollector,
+                RunSettingsPath = Path.Combine(
+                    IntegrationTestEnvironment.TestPlatformRootDirectory,
+                    @"scripts\vstest-codecoverage2.runsettings"),
+                RunSettingsType = TestParameters.SettingsType.Custom,
+                ExpectedPassedTests = 3,
+                ExpectedSkippedTests = 0,
+                ExpectedFailedTests = 0,
+                CheckSkipped = true
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CodeCoverageShouldAvoidExclusionsX86VS(RunnerInfo runnerInfo)
+        {
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "CodeCoverageTest.dll",
+                TargetPlatform = "x86",
+                TraceDataCollectorPath = vsTraceDataCollector,
+                RunSettingsPath = Path.Combine(
+                    IntegrationTestEnvironment.TestPlatformRootDirectory,
+                    @"scripts\vstest-codecoverage2.runsettings"),
+                RunSettingsType = TestParameters.SettingsType.Custom,
+                ExpectedPassedTests = 3,
+                ExpectedSkippedTests = 0,
+                ExpectedFailedTests = 0,
+                CheckSkipped = true
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CodeCoverageShouldAvoidExclusionsX64VS(RunnerInfo runnerInfo)
+        {
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+            else
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "CodeCoverageTest.dll",
+                TargetPlatform = "x64",
+                TraceDataCollectorPath = vsTraceDataCollector,
                 RunSettingsPath = Path.Combine(
                     IntegrationTestEnvironment.TestPlatformRootDirectory,
                     @"scripts\vstest-codecoverage2.runsettings"),
@@ -201,8 +271,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
 
-            string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
-                $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
+            string traceDataCollectorDir = testParameters.TraceDataCollectorPath;
 
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
