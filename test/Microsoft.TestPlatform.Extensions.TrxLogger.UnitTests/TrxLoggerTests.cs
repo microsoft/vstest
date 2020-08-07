@@ -666,7 +666,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var files = TestMultipleTrxLoggers();
 
-            Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get a seperate file name!");
+            Assert.AreEqual(MultipleLoggerInstanceCount, files.Length, "All logger instances should get a seperate file name!");
         }
 
         [TestMethod]
@@ -674,7 +674,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             var files = TestMultipleTrxLoggers();
 
-            Assert.IsTrue(files.Length == 1, "All logger instances should get the same file name!");
+            Assert.AreEqual(1, files.Length, "All logger instances should get the same file name!");
         }
 
         [TestMethod]
@@ -685,7 +685,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var files = TestMultipleTrxLoggers();
 
-            Assert.IsTrue(files.Length == MultipleLoggerInstanceCount, "All logger instances should get the same file name!");
+            Assert.AreEqual(MultipleLoggerInstanceCount, files.Length, "All logger instances should get the same file name!");
         }
 
         private string[] TestMultipleTrxLoggers()
