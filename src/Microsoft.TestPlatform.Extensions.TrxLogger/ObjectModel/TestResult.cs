@@ -231,6 +231,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// Directory containing the test result files, relative to the root test results directory
         /// </summary>
         private string relativeTestResultsDirectory;
+        private readonly TrxFileHelper trxFileHelper;
 
         /// <summary>
         /// Paths to test result files, relative to the test results folder, sorted in increasing order
@@ -270,7 +271,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             string computerName,
             TestOutcome outcome,
             TestType testType,
-            TestListCategoryId testCategoryId)
+            TestListCategoryId testCategoryId,
+            TrxFileHelper trxFileHelper) 
         {
             Debug.Assert(computerName != null, "computername is null");
             Debug.Assert(!Guid.Empty.Equals(executionId), "ExecutionId is empty");
@@ -285,6 +287,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             this.outcome = outcome;
             this.categoryId = testCategoryId;
             this.relativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
+            this.trxFileHelper = trxFileHelper;
         }
 
         #endregion
@@ -532,7 +535,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 Debug.Assert(!string.IsNullOrEmpty(resultFile), "'resultFile' is null or empty");
                 Debug.Assert(resultFile.Trim() == resultFile, "'resultFile' has whitespace at the ends");
 
-                this.resultFiles[FileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
+                this.resultFiles[trxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
             }
         }
 

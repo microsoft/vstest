@@ -214,4 +214,7 @@ Error Details: {1}:{2}</value>
   <data name="PrefixAndNameProvidedError" xml:space="preserve">
     <value>The parameters LogFileName and LogFilePrefix cannot be used together. </value>
   </data>
+  <data name="Common_CannotGetNextTimestampFileName" xml:space="preserve">
+    <value>Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</value>
+  </data>
 </root>
