@@ -112,7 +112,14 @@ namespace Microsoft.VisualStudio.Coverage
 
             try
             {
-                configurationElement = this.RunSettingsProcessor(configurationElement, defaultConfigurationElement);
+                // WARNING: Do NOT remove this function call !
+                //
+                // Due to a dependency we took on Microsoft.TestPlatform.Utilities.dll, an
+                // exception may be thrown if we cannot resolve CodeCoverageRunSettingsProcessor.
+                // If such an exception is thrown we cannot catch it in this try-catch block
+                // because all method dependencies must be resolved before the method call, thus
+                // we introduced an additional layer of indirection.
+                configurationElement = this.AddDefaultExclusions(configurationElement, defaultConfigurationElement);
             }
             catch (Exception ex)
             {
@@ -326,7 +333,13 @@ namespace Microsoft.VisualStudio.Coverage
             }
         }
 
-        private XmlElement RunSettingsProcessor(XmlElement configurationElement, XmlElement defaultConfigurationElement)
+        /// <summary>
+        /// Adding default exclusions to the configuration element.
+        /// </summary>
+        /// <param name="configurationElement">The configuration element.</param>
+        /// <param name="defaultConfigurationElement">The default configuration element.</param>
+        /// <returns>The original configuration element with additional default exclusions.</returns>
+        private XmlElement AddDefaultExclusions(XmlElement configurationElement, XmlElement defaultConfigurationElement)
         {
             var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
             return (XmlElement)processor.Process(configurationElement);
