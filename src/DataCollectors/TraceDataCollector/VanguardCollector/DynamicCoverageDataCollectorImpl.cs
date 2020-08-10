@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.Coverage
 
             try
             {
-                // WARNING: Do NOT remove this function call !
+                // WARNING: Do NOT remove this function call !!!
                 //
                 // Due to a dependency we took on Microsoft.TestPlatform.Utilities.dll, an
                 // exception may be thrown if we cannot resolve CodeCoverageRunSettingsProcessor.
