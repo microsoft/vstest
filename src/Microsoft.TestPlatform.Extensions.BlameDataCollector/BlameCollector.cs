@@ -141,10 +141,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                     var guid = Guid.NewGuid().ToString();
 
-                    // TODO: USE THIS GUID
-                    // var dumpPath = Path.Combine(Path.GetTempPath(), guid, $"dotnet_%d_crashdump.dmp");
-                    // var dumpPath = Path.Combine(Path.GetTempPath(), $"dotnet_%d_crashdump.dmp");
-                    // this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
+                    // TODO: use this guid
+                    var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
+                    Directory.CreateDirectory(dumpDirectory);
+                    var dumpPath = Path.Combine(dumpDirectory, $"dotnet_%d_crashdump.dmp");
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
 
                 var collectHangBasedDumpNode = this.configurationElement[Constants.CollectDumpOnTestSessionHang];
@@ -212,9 +213,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
-                var dumpFiles = this.processDumpUtility.GetDumpFiles();
-                foreach (var dumpFile in dumpFiles)
-                {
+            var dumpFiles = this.processDumpUtility.GetDumpFiles();
+            foreach (var dumpFile in dumpFiles)
+            {
                 try
                 {
                     if (!string.IsNullOrEmpty(dumpFile))
@@ -531,11 +532,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         private string GetTempDirectory()
         {
-            var tmp = Path.GetTempPath();
-            if (!Directory.Exists(tmp))
+            string tempPath = null;
+            var netDumperPath = this.environmentVariables.SingleOrDefault(p => p.Key == "COMPlus_DbgMiniDumpName").Value;
+
+            try
             {
-                Directory.CreateDirectory(tmp);
+                if (!string.IsNullOrWhiteSpace(netDumperPath))
+                {
+                    tempPath = Path.GetDirectoryName(netDumperPath);
+                }
             }
+            catch (ArgumentException)
+            {
+                // the path was not correct do nothing
+            }
+
+            var tmp = !string.IsNullOrWhiteSpace(tempPath) ? tempPath : Path.GetTempPath();
+
+            Directory.CreateDirectory(tmp);
 
             return tmp;
         }
