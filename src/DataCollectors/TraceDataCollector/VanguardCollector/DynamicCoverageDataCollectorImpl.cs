@@ -112,8 +112,7 @@ namespace Microsoft.VisualStudio.Coverage
 
             try
             {
-                var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
-                configurationElement = (XmlElement)processor.Process(configurationElement);
+                configurationElement = this.RunSettingsProcessor(configurationElement, defaultConfigurationElement);
             }
             catch (Exception ex)
             {
@@ -325,6 +324,12 @@ namespace Microsoft.VisualStudio.Coverage
                     string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, path, ex));
                 throw;
             }
+        }
+
+        private XmlElement RunSettingsProcessor(XmlElement configurationElement, XmlElement defaultConfigurationElement)
+        {
+            var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
+            return (XmlElement)processor.Process(configurationElement);
         }
     }
 }
