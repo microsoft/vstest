@@ -48,6 +48,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private int testHostProcessId;
         private bool dumpWasCollectedByHangDumper;
         private string targetFramework;
+        private List<KeyValuePair<string, string>> environmentVariables = new List<KeyValuePair<string, string>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -91,7 +92,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Environment variables that should be set in the test execution environment</returns>
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
         {
-            return Enumerable.Empty<KeyValuePair<string, string>>();
+            return this.environmentVariables;
         }
 
         /// <summary>
@@ -139,6 +140,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.collectProcessDumpOnTestHostHang = collectHangBasedDumpNode != null;
                 if (this.collectProcessDumpOnTestHostHang)
                 {
+                    // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
+
                     this.ValidateAndAddHangBasedProcessDumpParameters(collectHangBasedDumpNode);
                 }
 
