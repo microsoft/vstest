@@ -67,6 +67,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     ? this.fileHelper.EnumerateFiles(this.hangDumpDirectory, SearchOption.AllDirectories, new[] { ".dmp" })
     : new List<string>();
 
+            var foundDumps = new List<string>();
             foreach (var dumpPath in crashDumps.Concat(hangDumps))
             {
                 EqtTrace.Info($"ProcessDumpUtility.GetDumpFiles: Looking for dump file '{dumpPath}'.");
@@ -74,6 +75,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (found)
                 {
                     EqtTrace.Info($"ProcessDumpUtility.GetDumpFile: Found dump file '{dumpPath}'.");
+                    foundDumps.Add(dumpPath);
                 }
                 else
                 {
@@ -86,7 +88,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Could not find any dump file in {this.hangDumpDirectory}.");
             }
 
-            return crashDumps;
+            return foundDumps;
         }
 
         /// <inheritdoc/>
