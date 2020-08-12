@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using Microsoft.Win32.SafeHandles;
 
@@ -14,12 +15,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             var process = Process.GetProcessById(processId);
-            var outputFile = Path.Combine(outputDirectory, $"{process.ProcessName}_{process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
-            CollectDump(process, outputFile, type);
+            var processTree = process.GetProcessTree();
+
+            //Console.WriteLine($"Dumping this process tree (from bottom):");
+            //foreach (var p in processTree.OrderBy(t => t.Level))
+            //{
+            //    Console.WriteLine($"{(p.Level != 0 ? "+" : ">")}{new string('-', p.Level)} {p.Process.ProcessName}");
+            //}
+
+            foreach (var p in processTree.OrderByDescending(t => t.Level).Select(t => t.Process))
+            {
+                p.Suspend();
+            }
+
+            foreach (var p in processTree.OrderByDescending(t => t.Level).Select(t => t.Process))
+            {
+                var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
+
+                CollectDump(p, outputFile, type);
+                p.Kill();
+            }
         }
 
         internal static void CollectDump(Process process, string outputFile, DumpTypeOption type)
         {
+            if (process.HasExited)
+            {
+                return;
+            }
+
             // Open the file for writing
             using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
