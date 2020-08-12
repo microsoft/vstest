@@ -64,8 +64,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 : new List<string>();
 
             IEnumerable<string> hangDumps = this.fileHelper.DirectoryExists(this.hangDumpDirectory)
-    ? this.fileHelper.EnumerateFiles(this.hangDumpDirectory, SearchOption.AllDirectories, new[] { ".dmp" })
-    : new List<string>();
+                ? this.fileHelper.EnumerateFiles(this.hangDumpDirectory, SearchOption.TopDirectoryOnly, new[] { ".dmp" })
+                : new List<string>();
 
             var foundDumps = new List<string>();
             foreach (var dumpPath in crashDumps.Concat(hangDumps))

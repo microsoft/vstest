@@ -547,7 +547,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // the path was not correct do nothing
             }
 
-            var tmp = !string.IsNullOrWhiteSpace(tempPath) ? tempPath : Path.GetTempPath();
+            var tmp = !string.IsNullOrWhiteSpace(tempPath) ? tempPath : Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
             Directory.CreateDirectory(tmp);
 
