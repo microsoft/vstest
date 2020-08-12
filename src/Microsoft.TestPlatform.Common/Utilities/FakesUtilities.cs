@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
-#if NET451
+#if NETFRAMEWORK
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
