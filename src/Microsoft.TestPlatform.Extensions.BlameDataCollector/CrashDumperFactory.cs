@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // return new NetClientCrashDumper();
             }
 
-            if (!string.IsNullOrWhiteSpace(targetFramework) && !targetFramework.Contains("v5.0"))
+            if (!string.IsNullOrWhiteSpace(targetFramework) && targetFramework.Contains("v5.0"))
             {
                 EqtTrace.Info($"CrashDumperFactory: This is {RuntimeInformation.OSDescription} on {targetFramework} .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
                 return new NetClientCrashDumper();

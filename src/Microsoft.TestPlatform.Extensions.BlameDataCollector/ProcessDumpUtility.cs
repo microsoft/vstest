@@ -58,7 +58,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.crashDumper.WaitForDumpToFinish();
             }
 
-            var anyFound = false;
             IEnumerable<string> crashDumps = this.fileHelper.DirectoryExists(this.crashDumpDirectory)
                 ? this.fileHelper.EnumerateFiles(this.crashDumpDirectory, SearchOption.AllDirectories, new[] { ".dmp" })
                 : new List<string>();
@@ -83,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
-            if (!anyFound)
+            if (!foundDumps.Any())
             {
                 EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Could not find any dump file in {this.hangDumpDirectory}.");
             }
@@ -138,9 +137,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                ConsoleOutput.Instance.Information(false, $"Blame: Creating hang dump of process {processName} ({processId}).");
                 dumper.Dump(processId, tempDirectory, dumpType);
-                EqtTrace.Info($"ProcessDumpUtility.HangDump: Process {processName} ({processId}) was dumped into temporary path '{tempDirectory}'.");
             }
             catch (Exception ex)
             {

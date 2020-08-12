@@ -27,14 +27,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Suspending processes is not supported on non-windows returning.");
                 return;
             }
 
             if (process.HasExited)
             {
+                EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Process {process.Id} - {process.ProcessName} already exited, skipping.");
                 return;
             }
 
+            EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Suspending process {process.Id} - {process.ProcessName}.");
             NtSuspendProcess(process.Handle);
         }
 
@@ -184,8 +187,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 var path = $"/proc/{pid}/stat";
                 try
                 {
-                    var stat = System.IO.File.ReadAllText(path);
+                    var stat = File.ReadAllText(path);
                     var parts = stat.Split(' ');
+
                     if (parts.Length < 5)
                     {
                         return invalidPid;
