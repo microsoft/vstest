@@ -9,7 +9,7 @@ namespace MultitargetedNetFrameworkProject
     public class UnitTest1
     {
 
-#if NETFRAMEWORK
+#if NET451
         public string TargetFramework { get; } = "NET451";
 #endif
 
