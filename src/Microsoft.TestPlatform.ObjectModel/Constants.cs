@@ -194,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The default execution thread apartment state.
         /// </summary>
         [CLSCompliant(false)]
-#if NET451
+#if NETFRAMEWORK
         // Keeping default STA thread for desktop tests for UI/Functional test scenarios
         public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.STA;
 #else

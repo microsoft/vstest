@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void DefaultFrameworkShouldBeNet40OnDesktop()
         {
-#if NET451
+#if NETFRAMEWORK
             Assert.AreEqual(".NETFramework,Version=v4.0", Framework.DefaultFramework.Name);
 #endif
         }

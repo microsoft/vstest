@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketServer.Stop();
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else
@@ -131,7 +131,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             };
 
             // Close the client channel. Message loop should stop.
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else
