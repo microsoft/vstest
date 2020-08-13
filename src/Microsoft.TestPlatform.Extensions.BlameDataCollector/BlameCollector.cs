@@ -212,28 +212,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
-            var dumpFiles = this.processDumpUtility.GetDumpFiles();
-            foreach (var dumpFile in dumpFiles)
+            try
             {
-                try
+                var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                foreach (var dumpFile in dumpFiles)
                 {
-                    if (!string.IsNullOrEmpty(dumpFile))
+                    try
                     {
-                        this.dumpWasCollectedByHangDumper = true;
-                        var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
-                        this.dataCollectionSink.SendFileAsync(fileTransferInformation);
+                        if (!string.IsNullOrEmpty(dumpFile))
+                        {
+                            this.dumpWasCollectedByHangDumper = true;
+                            var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
+                            this.dataCollectionSink.SendFileAsync(fileTransferInformation);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Eat up any exception here and log it but proceed with killing the test host process.
+                        EqtTrace.Error(ex);
+                    }
+
+                    if (!dumpFiles.Any())
+                    {
+                        EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
                     }
                 }
-                catch (Exception ex)
-                {
-                    // Eat up any exception here and log it but proceed with killing the test host process.
-                    EqtTrace.Error(ex);
-                }
-
-                if (!dumpFiles.Any())
-                {
-                    EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
-                }
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.Instance.Error(true, $"Blame: Collecting hang dump failed with error {ex}.");
             }
 
             try
