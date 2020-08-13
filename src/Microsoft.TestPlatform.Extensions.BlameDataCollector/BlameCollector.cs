@@ -428,28 +428,30 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     // we won't dump the killed process again and that would just show a warning on the command line
                     if ((this.testStartCount > this.testEndCount || this.collectDumpAlways) && !this.dumpWasCollectedByHangDumper)
                     {
-                        var dumpFiles = this.processDumpUtility.GetDumpFiles();
-                        foreach (var dumpFile in dumpFiles)
+                        try
                         {
-                            if (!string.IsNullOrEmpty(dumpFile))
+                            var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                            foreach (var dumpFile in dumpFiles)
                             {
-                                try
+                                if (!string.IsNullOrEmpty(dumpFile))
                                 {
-                                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                                    this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-                                }
-                                catch (FileNotFoundException ex)
-                                {
-                                    EqtTrace.Warning(ex.ToString());
-                                    this.logger.LogWarning(args.Context, ex.ToString());
+                                    try
+                                    {
+                                        var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                                        this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                                    }
+                                    catch (FileNotFoundException ex)
+                                    {
+                                        EqtTrace.Warning(ex.ToString());
+                                        this.logger.LogWarning(args.Context, ex.ToString());
+                                    }
                                 }
                             }
                         }
-
-                        if (!dumpFiles.Any())
+                        catch (FileNotFoundException ex)
                         {
-                            EqtTrace.Warning("BlameCollector.SessionEndedHandler: blame:CollectDump was enabled but dump file was not generated.");
-                            this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
+                            EqtTrace.Warning(ex.ToString());
+                            this.logger.LogWarning(args.Context, ex.ToString());
                         }
                     }
                 }

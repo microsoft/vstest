@@ -85,6 +85,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             if (!foundDumps.Any())
             {
                 EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Could not find any dump file in {this.hangDumpDirectory}.");
+                throw new FileNotFoundException(Resources.Resources.DumpFileNotGeneratedErrorMessage);
             }
 
             return foundDumps;
@@ -110,7 +111,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework)
         {
-            var processName = Process.GetProcessById(processId).ProcessName;
+            var processName = this.processHelper.GetProcessName(processId);
             EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
             this.crashDumpDirectory = tempDirectory;
 
@@ -128,7 +129,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             this.wasHangDumped = true;
 
-            var processName = Process.GetProcessById(processId).ProcessName;
+            var processName = this.processHelper.GetProcessName(processId);
             EqtTrace.Info($"ProcessDumpUtility.HangDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
 
             this.hangDumpDirectory = tempDirectory;

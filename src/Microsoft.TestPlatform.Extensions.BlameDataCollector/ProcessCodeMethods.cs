@@ -44,12 +44,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         public static List<ProcessTreeNode> GetProcessTree(this Process process)
         {
-            var sw = Stopwatch.StartNew();
             var childProcesses = Process.GetProcesses()
             .Where(p => IsChildCandidate(p, process))
             .ToList();
 
-            Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             var acc = new List<ProcessTreeNode>();
             foreach (var c in childProcesses)
             {
@@ -84,19 +82,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             try
             {
-                Process.Start("kill", "-STOP {process.Id}");
                 var output = new StringBuilder();
                 var err = new StringBuilder();
                 Process ps = new Process();
-                ps.StartInfo.FileName = "ps";
-                ps.StartInfo.Arguments = $"-o ppid= {process.Id}";
+                ps.StartInfo.FileName = "kill";
+                ps.StartInfo.Arguments = $"-STOP {process.Id}";
                 ps.StartInfo.UseShellExecute = false;
                 ps.StartInfo.RedirectStandardOutput = true;
                 ps.OutputDataReceived += (_, e) => output.Append(e.Data);
                 ps.ErrorDataReceived += (_, e) => err.Append(e.Data);
                 ps.Start();
                 ps.BeginOutputReadLine();
-                ps.WaitForExit();
+                ps.WaitForExit(5_000);
 
                 if (!string.IsNullOrWhiteSpace(err.ToString()))
                 {
@@ -190,7 +187,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 ps.ErrorDataReceived += (_, e) => err.Append(e.Data);
                 ps.Start();
                 ps.BeginOutputReadLine();
-                ps.WaitForExit();
+                ps.WaitForExit(5_000);
 
                 var o = output.ToString();
                 var parent = int.TryParse(o.Trim(), out var ppid) ? ppid : InvalidProcessId;
@@ -263,9 +260,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         [DllImport("ntdll.dll", SetLastError = true)]
         private static extern IntPtr NtSuspendProcess(IntPtr processHandle);
-
-        [DllImport("libpsl-native")]
-        private static extern int GetPPid(int pid);
 
 #pragma warning restore SA1201 // Elements must appear in the correct order
     }
