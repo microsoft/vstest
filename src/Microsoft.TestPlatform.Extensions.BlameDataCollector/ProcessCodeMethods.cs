@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -25,20 +26,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         public static void Suspend(this Process process)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Suspending processes is not supported on non-windows returning.");
-                return;
-            }
-
             if (process.HasExited)
             {
                 EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Process {process.Id} - {process.ProcessName} already exited, skipping.");
                 return;
             }
 
-            EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Suspending process {process.Id} - {process.ProcessName}.");
-            NtSuspendProcess(process.Handle);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                SuspendWindows(process);
+            }
+            else
+            {
+                SuspendLinuxMacOs(process);
+            }
         }
 
         public static List<ProcessTreeNode> GetProcessTree(this Process process)
@@ -73,6 +74,41 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             return new List<ProcessTreeNode> { new ProcessTreeNode { Process = process, Level = 0 } }.Concat(acc.Where(a => a.Level > 0)).ToList();
         }
 
+        internal static void SuspendWindows(Process process)
+        {
+            EqtTrace.Verbose($"ProcessCodeMethods.Suspend: Suspending process {process.Id} - {process.ProcessName}.");
+            NtSuspendProcess(process.Handle);
+        }
+
+        internal static void SuspendLinuxMacOs(Process process)
+        {
+            try
+            {
+                Process.Start("kill", "-STOP {process.Id}");
+                var output = new StringBuilder();
+                var err = new StringBuilder();
+                Process ps = new Process();
+                ps.StartInfo.FileName = "ps";
+                ps.StartInfo.Arguments = $"-o ppid= {process.Id}";
+                ps.StartInfo.UseShellExecute = false;
+                ps.StartInfo.RedirectStandardOutput = true;
+                ps.OutputDataReceived += (_, e) => output.Append(e.Data);
+                ps.ErrorDataReceived += (_, e) => err.Append(e.Data);
+                ps.Start();
+                ps.BeginOutputReadLine();
+                ps.WaitForExit();
+
+                if (!string.IsNullOrWhiteSpace(err.ToString()))
+                {
+                    EqtTrace.Verbose($"ProcessCodeMethods.SuspendLinuxMacOs: Error suspending process {process.Id} - {process.ProcessName}, {err}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidMacOs: Error getting parent of process {process.Id} - {process.ProcessName}, {ex}.");
+            }
+        }
+
         /// <summary>
         /// Returns the parent id of a process or -1 if it fails.
         /// </summary>
@@ -81,31 +117,96 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         internal static int GetParentPid(Process process)
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? GetParentPidWindows(process.Handle)
+                ? GetParentPidWindows(process)
                 : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
                     ? GetParentPidLinux(process)
-                    : throw new NotSupportedException();
+                    : RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ?
+                        GetParentPidMacOs(process)
+                        : throw new PlatformNotSupportedException();
         }
 
+        internal static int GetParentPidWindows(Process process)
+        {
+            try
+            {
+                var handle = process.Handle;
+                PROCESS_BASIC_INFORMATION pbi;
+                int size;
+                var res = NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out size);
+
+                var p = res != 0 ? InvalidProcessId : pbi.InheritedFromUniqueProcessId.ToInt32();
+
+                return p;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidLinux: Error getting parent of process {process.Id} - {process.ProcessName}, {ex}.");
+                return InvalidProcessId;
+            }
+        }
+
+        /// <summary>Read the /proc file system for information about the parent.</summary>
+        /// <param name="process">The process to get the parent process from.</param>
+        /// <returns>The process id.</returns>
         internal static int GetParentPidLinux(Process process)
         {
-            return NonWindowsGetProcessParentPid(process.Id);
+            var pid = process.Id;
+
+            // read /proc/<pid>/stat
+            // 4th column will contain the ppid, 92 in the example below
+            // ex: 93 (bash) S 92 93 2 4294967295 ...
+            var path = $"/proc/{pid}/stat";
+            try
+            {
+                var stat = File.ReadAllText(path);
+                var parts = stat.Split(' ');
+
+                if (parts.Length < 5)
+                {
+                    return InvalidProcessId;
+                }
+
+                return int.Parse(parts[3]);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidLinux: Error getting parent of process {process.Id} - {process.ProcessName}, {ex}.");
+                return InvalidProcessId;
+            }
         }
 
-        internal static int NonWindowsGetProcessParentPid(int pid)
+        internal static int GetParentPidMacOs(Process process)
         {
-            return /*RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Unix.NativeMethods.GetPPid(pid) : */ Unix.GetProcFSParentPid(pid);
-        }
+            try
+            {
+                var output = new StringBuilder();
+                var err = new StringBuilder();
+                Process ps = new Process();
+                ps.StartInfo.FileName = "ps";
+                ps.StartInfo.Arguments = $"-o ppid= {process.Id}";
+                ps.StartInfo.UseShellExecute = false;
+                ps.StartInfo.RedirectStandardOutput = true;
+                ps.OutputDataReceived += (_, e) => output.Append(e.Data);
+                ps.ErrorDataReceived += (_, e) => err.Append(e.Data);
+                ps.Start();
+                ps.BeginOutputReadLine();
+                ps.WaitForExit();
 
-        internal static int GetParentPidWindows(IntPtr processHandle)
-        {
-            PROCESS_BASIC_INFORMATION pbi;
-            int size;
-            var res = NtQueryInformationProcess(processHandle, 0, out pbi, Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out size);
+                var o = output.ToString();
+                var parent = int.TryParse(o.Trim(), out var ppid) ? ppid : InvalidProcessId;
 
-            var p = res != 0 ? InvalidProcessId : pbi.InheritedFromUniqueProcessId.ToInt32();
+                if (!string.IsNullOrWhiteSpace(err.ToString()))
+                {
+                    EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidMacOs: Error getting parent of process {process.Id} - {process.ProcessName}, {err}.");
+                }
 
-            return p;
+                return parent;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose($"ProcessCodeMethods.GetParentPidMacOs: Error getting parent of process {process.Id} - {process.ProcessName}, {ex}.");
+                return InvalidProcessId;
+            }
         }
 
         private static void ResolveChildren(Process parent, List<ProcessTreeNode> acc, int level, int limit)
@@ -162,46 +263,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         [DllImport("ntdll.dll", SetLastError = true)]
         private static extern IntPtr NtSuspendProcess(IntPtr processHandle);
+
+        [DllImport("libpsl-native")]
+        private static extern int GetPPid(int pid);
+
 #pragma warning restore SA1201 // Elements must appear in the correct order
-
-        /// <summary>Unix specific implementations of required functionality.</summary>
-        internal static class Unix
-        {
-            ///// <summary>The native methods class.</summary>
-            // internal static class NativeMethods
-            // {
-            //    [DllImport(psLib)]
-            //    internal static extern int GetPPid(int pid);
-            // }
-
-            /// <summary>Read the /proc file system for information about the parent.</summary>
-            /// <param name="pid">The process id used to get the parent process.</param>
-            /// <returns>The process id.</returns>
-            public static int GetProcFSParentPid(int pid)
-            {
-                const int invalidPid = -1;
-
-                // read /proc/<pid>/stat
-                // 4th column will contain the ppid, 92 in the example below
-                // ex: 93 (bash) S 92 93 2 4294967295 ...
-                var path = $"/proc/{pid}/stat";
-                try
-                {
-                    var stat = File.ReadAllText(path);
-                    var parts = stat.Split(' ');
-
-                    if (parts.Length < 5)
-                    {
-                        return invalidPid;
-                    }
-
-                    return int.Parse(parts[3]);
-                }
-                catch (Exception)
-                {
-                    return invalidPid;
-                }
-            }
-        }
     }
 }
