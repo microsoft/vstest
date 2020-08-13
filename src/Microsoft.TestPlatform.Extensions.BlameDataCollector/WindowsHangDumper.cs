@@ -6,19 +6,87 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.Win32.SafeHandles;
 
     internal class WindowsHangDumper : IHangDumper
     {
-        public void Dump(int processId, string outputFile, DumpTypeOption type)
+        public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             var process = Process.GetProcessById(processId);
-            CollectDump(process, outputFile, type);
+            var processTree = process.GetProcessTree();
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                if (processTree.Count > 1)
+                {
+                    EqtTrace.Verbose("WindowsHangDumper.Dump: Dumping this process tree (from bottom):");
+                    foreach (var p in processTree.OrderBy(t => t.Level))
+                    {
+                        EqtTrace.Verbose($"WindowsHangDumper.Dump: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process.Id} - {p.Process.ProcessName}");
+                        ConsoleOutput.Instance.Information(false, $"Blame: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process.Id} - {p.Process.ProcessName}");
+                    }
+                }
+                else
+                {
+                    EqtTrace.Verbose($"NetClientHangDumper.Dump: Dumping {process.Id} - {process.ProcessName}.");
+                    ConsoleOutput.Instance.Information(false, $"Blame: Dumping {process.Id} - {process.ProcessName}");
+                }
+            }
+
+            var bottomUpTree = processTree.OrderByDescending(t => t.Level).Select(t => t.Process);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                foreach (var p in bottomUpTree)
+                {
+                    try
+                    {
+                        p.Suspend();
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error($"WindowsHangDumper.Dump: Error suspending process {p.Id} - {p.ProcessName}: {ex}.");
+                    }
+                }
+            }
+
+            foreach (var p in bottomUpTree)
+            {
+                try
+                {
+                    var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
+                    CollectDump(p, outputFile, type);
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error($"WindowsHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName}: {ex}.");
+                }
+
+                try
+                {
+                    EqtTrace.Verbose($"WindowsHangDumper.Dump: Killing process {p.Id} - {p.ProcessName}.");
+                    p.Kill();
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error($"WindowsHangDumper.Dump: Error killing process {p.Id} - {p.ProcessName}: {ex}.");
+                }
+            }
         }
 
         internal static void CollectDump(Process process, string outputFile, DumpTypeOption type)
         {
+            if (process.HasExited)
+            {
+                EqtTrace.Verbose($"WindowsHangDumper.CollectDump: {process.Id} - {process.ProcessName} already exited, skipping.");
+                return;
+            }
+
+            EqtTrace.Verbose($"WindowsHangDumper.CollectDump: Selected dump type {type}. Dumping {process.Id} - {process.ProcessName} in {outputFile}. ");
+
             // Open the file for writing
             using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
@@ -68,6 +136,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     }
                 }
             }
+
+            EqtTrace.Verbose($"WindowsHangDumper.CollectDump: Finished dumping {process.Id} - {process.ProcessName} in {outputFile}. ");
         }
 
         private static class NativeMethods

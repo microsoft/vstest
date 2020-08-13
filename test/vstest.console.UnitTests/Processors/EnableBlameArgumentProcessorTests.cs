@@ -105,7 +105,6 @@ namespace vstest.console.UnitTests.Processors
 
             var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
             {
-                Tuple.Create(PlatformOperatingSystem.Unix, PlatformArchitecture.X64),
                 Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM),
                 Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64)
             };

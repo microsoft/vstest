@@ -48,6 +48,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private int testHostProcessId;
         private bool dumpWasCollectedByHangDumper;
         private string targetFramework;
+        private List<KeyValuePair<string, string>> environmentVariables = new List<KeyValuePair<string, string>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -91,7 +92,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Environment variables that should be set in the test execution environment</returns>
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
         {
-            return Enumerable.Empty<KeyValuePair<string, string>>();
+            return this.environmentVariables;
         }
 
         /// <summary>
@@ -133,12 +134,26 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (this.collectProcessDumpOnTrigger)
                 {
                     this.ValidateAndAddTriggerBasedProcessDumpParameters(collectDumpNode);
+
+                    // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
+
+                    var guid = Guid.NewGuid().ToString();
+
+                    var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
+                    Directory.CreateDirectory(dumpDirectory);
+                    var dumpPath = Path.Combine(dumpDirectory, $"dotnet_%d_crashdump.dmp");
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
 
                 var collectHangBasedDumpNode = this.configurationElement[Constants.CollectDumpOnTestSessionHang];
                 this.collectProcessDumpOnTestHostHang = collectHangBasedDumpNode != null;
                 if (this.collectProcessDumpOnTestHostHang)
                 {
+                    // enabling dumps on MacOS needs to be done explicitly https://github.com/dotnet/runtime/pull/40105
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
+
                     this.ValidateAndAddHangBasedProcessDumpParameters(collectHangBasedDumpNode);
                 }
 
@@ -183,7 +198,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
+                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
             }
             catch (Exception ex)
             {
@@ -199,22 +214,33 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                var dumpFile = this.processDumpUtility.GetDumpFile();
-                if (!string.IsNullOrEmpty(dumpFile))
+                var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                foreach (var dumpFile in dumpFiles)
                 {
-                    this.dumpWasCollectedByHangDumper = true;
-                    var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
-                    this.dataCollectionSink.SendFileAsync(fileTransferInformation);
-                }
-                else
-                {
-                    EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(dumpFile))
+                        {
+                            this.dumpWasCollectedByHangDumper = true;
+                            var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
+                            this.dataCollectionSink.SendFileAsync(fileTransferInformation);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Eat up any exception here and log it but proceed with killing the test host process.
+                        EqtTrace.Error(ex);
+                    }
+
+                    if (!dumpFiles.Any())
+                    {
+                        EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                // Eat up any exception here and log it but proceed with killing the test host process.
-                EqtTrace.Error(ex);
+                ConsoleOutput.Instance.Error(true, $"Blame: Collecting hang dump failed with error {ex}.");
             }
 
             try
@@ -404,16 +430,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     {
                         try
                         {
-                            var dumpFile = this.processDumpUtility.GetDumpFile();
-                            if (!string.IsNullOrEmpty(dumpFile))
+                            var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                            foreach (var dumpFile in dumpFiles)
                             {
-                                var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                                this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-                            }
-                            else
-                            {
-                                EqtTrace.Warning("BlameCollector.SessionEndedHandler: blame:CollectDump was enabled but dump file was not generated.");
-                                this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
+                                if (!string.IsNullOrEmpty(dumpFile))
+                                {
+                                    try
+                                    {
+                                        var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                                        this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                                    }
+                                    catch (FileNotFoundException ex)
+                                    {
+                                        EqtTrace.Warning(ex.ToString());
+                                        this.logger.LogWarning(args.Context, ex.ToString());
+                                    }
+                                }
                             }
                         }
                         catch (FileNotFoundException ex)
@@ -453,7 +485,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetTempDirectory(), this.processFullDumpEnabled, ".NETFramework,Version=v4.0");
+                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
             }
             catch (TestPlatformException e)
             {
@@ -508,11 +540,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         private string GetTempDirectory()
         {
-            var tmp = Path.GetTempPath();
-            if (!Directory.Exists(tmp))
+            string tempPath = null;
+            var netDumperPath = this.environmentVariables.SingleOrDefault(p => p.Key == "COMPlus_DbgMiniDumpName").Value;
+
+            try
             {
-                Directory.CreateDirectory(tmp);
+                if (!string.IsNullOrWhiteSpace(netDumperPath))
+                {
+                    tempPath = Path.GetDirectoryName(netDumperPath);
+                }
             }
+            catch (ArgumentException)
+            {
+                // the path was not correct do nothing
+            }
+
+            var tmp = !string.IsNullOrWhiteSpace(tempPath) ? tempPath : Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            Directory.CreateDirectory(tmp);
 
             return tmp;
         }

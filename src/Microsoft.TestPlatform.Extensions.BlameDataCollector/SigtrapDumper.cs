@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     internal class SigtrapDumper : IHangDumper
     {
-        public void Dump(int processId, string outputFile, DumpTypeOption type)
+        public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             Process.Start("kill", $"-s SIGTRAP {processId}");
         }
