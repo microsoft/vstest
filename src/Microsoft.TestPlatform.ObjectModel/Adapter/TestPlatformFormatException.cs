@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     /// Exception thrown on parsing error in user provided filter expression.
     /// This can happen when filter has invalid format or has unsupported properties.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public class TestPlatformFormatException : Exception
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         {
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization constructor.
         /// </summary>
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
             private set;
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper.
         /// </summary>

@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.tcpListener.Stop();
 
                 // Close the client and dispose the underlying stream
-#if NET451
+#if NETFRAMEWORK
                 // tcpClient.Close() calls tcpClient.Dispose().
                 this.tcpClient?.Close();
 #else

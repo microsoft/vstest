@@ -11,25 +11,26 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
-
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Helper function to deal with file name.
     /// </summary>
-    internal static class FileHelper
+    internal class TrxFileHelper
+
     {
         private const string RelativeDirectorySeparator = "..";
 
         private static readonly Dictionary<char, object> InvalidFileNameChars;
         private static readonly Dictionary<char, object> AdditionalInvalidFileNameChars;
         private static readonly Regex ReservedFileNamesRegex = new Regex(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
+        private readonly Func<DateTime> TimeProvider;
 
         #region Constructors
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Reviewed. Suppression is OK here.")]
 
         // Have to init InvalidFileNameChars dynamically.
-        static FileHelper()
+        static TrxFileHelper()
         {
             // Create a hash table of invalid chars. On Windows, this should match the contents of System.IO.Path.GetInvalidFileNameChars.
             // See https://github.com/dotnet/coreclr/blob/8e99cd8031b2f568ea69116e7cf96d55e32cb7f5/src/mscorlib/shared/System/IO/Path.Windows.cs#L12-L19
@@ -63,6 +64,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             AdditionalInvalidFileNameChars.Add(' ', null);
         }
 
+        public TrxFileHelper() : this(() => DateTime.Now) { }
+
+        public TrxFileHelper(Func<DateTime> timeProvider)
+        {
+            TimeProvider = timeProvider ?? (() => DateTime.Now);
+        }
+
         #endregion
 
         /// <summary>
@@ -70,7 +78,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="fileName">the name of the file</param>
         /// <returns>Replaced string.</returns>
-        public static string ReplaceInvalidFileNameChars(string fileName)
+        public string ReplaceInvalidFileNameChars(string fileName)
         {
             EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
 
@@ -126,14 +134,53 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        public static string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
+        public string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
         {
             EqtAssert.StringNotNullOrEmpty(parentDirectoryName, "parentDirectoryName");
             EqtAssert.StringNotNullOrEmpty(originalFileName, "originalFileName");
             return GetNextIterationNameHelper(parentDirectoryName, originalFileName, new FileIterationHelper(checkMatchingDirectory));
         }
 
-        public static string MakePathRelative(string path, string basePath)
+        /// <summary>
+        /// Constructs and returns first available timestamped file name. 
+        /// This does not checks for the file permissions.
+        /// </summary>
+        /// <param name="directoryName">Directory to try timestamped file names in.</param>
+        /// <param name="fileName">Filename (with extension) of the desired file. Timestamp will be added just before extension.</param>
+        /// <param name="timestampFormat">Timestamp format to be passed into DateTime.ToString method.</param>
+        /// <returns>First available filename with the format of `FileName{Timestamp}.ext`.</returns>
+        /// <example>
+        ///     <code>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</code> will return "c:\data\log_20200801185521.txt", if available.
+        /// </example>
+        public string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
+        {
+            EqtAssert.StringNotNullOrEmpty(directoryName, "parentDirectoryName");
+            EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
+            EqtAssert.StringNotNullOrEmpty(timestampFormat, "timestampFormat");
+
+            ushort iteration = 0;
+            var iterationStamp = TimeProvider();
+            var fileNamePrefix = Path.GetFileNameWithoutExtension(fileName);
+            var extension = Path.GetExtension(fileName);
+            do
+            {
+                var tryMe = fileNamePrefix + iterationStamp.ToString(timestampFormat, DateTimeFormatInfo.InvariantInfo) + extension;
+
+                string tryMePath = Path.Combine(directoryName, tryMe);
+                if (!File.Exists(tryMePath))
+                {
+                    return tryMePath;
+                }
+
+                iterationStamp = iterationStamp.AddSeconds(1);
+                ++iteration;
+            }
+            while (iteration != ushort.MaxValue);
+
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextTimestampFileName, fileName, directoryName, timestampFormat));
+        }
+
+        public string MakePathRelative(string path, string basePath)
         {
             EqtAssert.StringNotNullOrEmpty(path, "path");
 
