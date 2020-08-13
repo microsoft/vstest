@@ -141,7 +141,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                     var guid = Guid.NewGuid().ToString();
 
-                    // TODO: use this guid
                     var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
                     Directory.CreateDirectory(dumpDirectory);
                     var dumpPath = Path.Combine(dumpDirectory, $"dotnet_%d_crashdump.dmp");

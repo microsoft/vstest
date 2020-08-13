@@ -40,23 +40,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             var bottomUpTree = processTree.OrderByDescending(t => t.Level).Select(t => t.Process);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+
+            foreach (var p in bottomUpTree)
             {
-                foreach (var p in bottomUpTree)
+                try
                 {
-                    try
-                    {
-                        p.Suspend();
-                    }
-                    catch (Exception ex)
-                    {
-                        EqtTrace.Error($"NetClientHangDumper.Dump: Error suspending process {p.Id} - {p.ProcessName}: {ex}.");
-                    }
+                    p.Suspend();
                 }
-            }
-            else
-            {
-                EqtTrace.Verbose($"NetClientHangDumper.Dump: This is not Windows, not suspending processes. Some of the processes may terminate before we dump them.");
+                catch (Exception ex)
+                {
+                    EqtTrace.Error($"NetClientHangDumper.Dump: Error suspending process {p.Id} - {p.ProcessName}: {ex}.");
+                }
             }
 
             foreach (var p in bottomUpTree)
