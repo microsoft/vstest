@@ -9,13 +9,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     internal class HangDumperFactory : IHangDumperFactory
     {
+        public Action<string> LogWarning { get; set; }
+
         public IHangDumper Create(string targetFramework)
         {
             EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
-                return new WindowsHangDumper();
+                return new WindowsHangDumper(this.LogWarning);
             }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

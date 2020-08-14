@@ -49,6 +49,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private bool dumpWasCollectedByHangDumper;
         private string targetFramework;
         private List<KeyValuePair<string, string>> environmentVariables = new List<KeyValuePair<string, string>>();
+        private string tmp = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -141,8 +142,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                     var guid = Guid.NewGuid().ToString();
 
-                    var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
-                    Directory.CreateDirectory(dumpDirectory);
+                    var dumpDirectory = this.GetTempDirectory();
                     var dumpPath = Path.Combine(dumpDirectory, $"dotnet_%d_crashdump.dmp");
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
@@ -182,7 +182,23 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private void CollectDumpAndAbortTesthost()
         {
             this.inactivityTimerAlreadyFired = true;
-            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes);
+
+            string value;
+            string unit;
+
+            if (this.inactivityTimespan.TotalSeconds <= 90)
+            {
+                value = ((int)this.inactivityTimespan.TotalSeconds).ToString();
+                unit = Resources.Resources.Seconds;
+            }
+            else
+            {
+                value = Math.Round(this.inactivityTimespan.TotalMinutes, 2).ToString();
+                unit = Resources.Resources.Minutes;
+            }
+
+            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, value, unit);
+
             EqtTrace.Warning(message);
             this.logger.LogWarning(this.context.SessionDataCollectionContext, message);
 
@@ -198,7 +214,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
+                Action<string> logWarning = m => this.logger.LogWarning(this.context.SessionDataCollectionContext, m);
+                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework, logWarning);
             }
             catch (Exception ex)
             {
@@ -540,26 +557,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         private string GetTempDirectory()
         {
-            string tempPath = null;
-            var netDumperPath = this.environmentVariables.SingleOrDefault(p => p.Key == "COMPlus_DbgMiniDumpName").Value;
+            Directory.CreateDirectory(this.tmp);
 
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(netDumperPath))
-                {
-                    tempPath = Path.GetDirectoryName(netDumperPath);
-                }
-            }
-            catch (ArgumentException)
-            {
-                // the path was not correct do nothing
-            }
-
-            var tmp = !string.IsNullOrWhiteSpace(tempPath) ? tempPath : Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-
-            Directory.CreateDirectory(tmp);
-
-            return tmp;
+            return this.tmp;
         }
     }
 }

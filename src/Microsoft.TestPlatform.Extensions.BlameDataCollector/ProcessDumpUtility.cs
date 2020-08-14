@@ -92,9 +92,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartHangBasedProcessDump(int processId, string tempDirectory, bool isFullDump, string targetFramework)
+        public void StartHangBasedProcessDump(int processId, string tempDirectory, bool isFullDump, string targetFramework, Action<string> logWarning = null)
         {
-            this.HangDump(processId, tempDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework);
+            this.HangDump(processId, tempDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, logWarning);
         }
 
         /// <inheritdoc/>
@@ -125,7 +125,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType);
         }
 
-        private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework)
+        private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, Action<string> logWarning = null)
         {
             this.wasHangDumped = true;
 
@@ -134,6 +134,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.hangDumpDirectory = tempDirectory;
 
+            // oh how ugly this is, but the whole infra above this starts with initializing the logger in Initialize
+            // the logger needs to pass around 2 parameters, so I am just passing it around as callback instead
+            this.hangDumperFactory.LogWarning = logWarning;
             var dumper = this.hangDumperFactory.Create(targetFramework);
 
             try
