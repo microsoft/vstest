@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// </summary>
         /// <typeparam name="TPluginInfo">
         /// </typeparam>
-        internal void SetTestExtensionsCacheStatus<TPluginInfo>() where TPluginInfo : TestPluginInformation
+        internal void SetTestExtensionsCacheStatusToTrue<TPluginInfo>() where TPluginInfo : TestPluginInformation
         {
             if (typeof(TPluginInfo) == typeof(TestDiscovererPluginInformation))
             {

@@ -176,11 +176,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-            Type[] types;
+            IEnumerable<Type> types;
 
             try
             {
-                types = assembly.GetTypes();
+                types = assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract);
             }
             catch (ReflectionTypeLoadException e)
             {
@@ -196,14 +196,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 return;
             }
 
-            if ((types != null) && (types.Length > 0))
+            if (types != null && types.Count() > 0)
             {
                 foreach (var type in types)
                 {
-                    if (type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract)
-                    {
-                        this.GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
-                    }
+                    this.GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
                 }
             }
         }
