@@ -139,11 +139,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
 
+                    if (!this.processFullDumpEnabled)
+                    {
+                        // https://github.com/dotnet/coreclr/blob/master/Documentation/botr/xplat-minidump-generation.md
+                        // MiniDumpWithPrivateReadWriteMemory = 2
+                        // MiniDumpNormal = 1
+                        this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "2" : "1"));
+                    }
+
                     var guid = Guid.NewGuid().ToString();
 
                     var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
                     Directory.CreateDirectory(dumpDirectory);
-                    var dumpPath = Path.Combine(dumpDirectory, $"dotnet_%d_crashdump.dmp");
+                    var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
 
