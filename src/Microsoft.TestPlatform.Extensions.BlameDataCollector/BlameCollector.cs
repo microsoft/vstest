@@ -139,11 +139,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
 
+                    if (!this.processFullDumpEnabled)
+                    {
+                        // https://github.com/dotnet/coreclr/blob/master/Documentation/botr/xplat-minidump-generation.md
+                        // MiniDumpWithPrivateReadWriteMemory = 2
+                        // MiniDumpNormal = 1
+                        this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "2" : "1"));
+                    }
+
                     var guid = Guid.NewGuid().ToString();
 
                     var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
                     Directory.CreateDirectory(dumpDirectory);
-                    var dumpPath = Path.Combine(dumpDirectory, $"dotnet_%d_crashdump.dmp");
+                    var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
 
@@ -416,8 +424,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     var filepath = Path.Combine(this.GetTempDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
 
                     filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
-                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
-                    this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                    var fti = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
+                    this.dataCollectionSink.SendFileAsync(fti);
+                }
+                else
+                {
+                    this.logger.LogWarning(this.context.SessionDataCollectionContext, Resources.Resources.NotGeneratingSequenceFile);
                 }
 
                 if (this.collectProcessDumpOnTrigger)
