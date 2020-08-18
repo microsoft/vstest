@@ -65,6 +65,11 @@
         <target state="translated">提供了非預期的值 '{0}' 作為逾時。請提供以下格式的值: 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NotGeneratingSequenceFile">
+        <source>All tests finished running, Sequence file will not be generated.</source>
+        <target state="new">All tests finished running, Sequence file will not be generated.</target>
+        <note>"Sequence" is the name of the file.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

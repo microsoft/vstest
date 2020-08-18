@@ -65,6 +65,11 @@
         <target state="translated">Unerwarteter Wert "{0}" als Timeout angegeben. Geben Sie einen Wert in folgendem Format an: 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NotGeneratingSequenceFile">
+        <source>All tests finished running, Sequence file will not be generated.</source>
+        <target state="new">All tests finished running, Sequence file will not be generated.</target>
+        <note>"Sequence" is the name of the file.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
