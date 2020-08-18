@@ -419,11 +419,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // If the last test crashes, it will not invoke a test case end and therefore
                 // In case of crash testStartCount will be greater than testEndCount and we need to write the sequence
                 // And send the attachment
-                var filepath = Path.Combine(this.GetTempDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
+                if (this.testStartCount > this.testEndCount)
+                {
+                    var filepath = Path.Combine(this.GetTempDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
 
-                filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
-                var fti = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
-                this.dataCollectionSink.SendFileAsync(fti);
+                    filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
+                    var fti = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
+                    this.dataCollectionSink.SendFileAsync(fti);
+                }
+                else
+                {
+                    this.logger.LogWarning(this.context.SessionDataCollectionContext, Resources.Resources.NotGeneratingSequenceFile);
+                }
 
                 if (this.collectProcessDumpOnTrigger)
                 {

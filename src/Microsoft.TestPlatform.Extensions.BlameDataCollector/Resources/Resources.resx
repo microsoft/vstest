@@ -132,6 +132,10 @@
   <data name="InactivityTimeout" xml:space="preserve">
     <value>The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process.</value>
   </data>
+  <data name="NotGeneratingSequenceFile" xml:space="preserve">
+    <value>All tests finished running, Sequence file will not be generated.</value>
+    <comment>"Sequence" is the name of the file.</comment>
+  </data>
   <data name="ProcDumpCouldNotStart" xml:space="preserve">
     <value>Could not start process dump: {0}</value>
   </data>
