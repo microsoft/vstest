@@ -65,6 +65,11 @@
         <target state="translated">예기치 않은 값 '{0}'이(가) 시간 제한으로 제공되었습니다. 1.5h/90m/5400s/5400000ms/5400000 형식으로 값을 제공하세요.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NotGeneratingSequenceFile">
+        <source>All tests finished running, Sequence file will not be generated.</source>
+        <target state="new">All tests finished running, Sequence file will not be generated.</target>
+        <note>"Sequence" is the name of the file.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
