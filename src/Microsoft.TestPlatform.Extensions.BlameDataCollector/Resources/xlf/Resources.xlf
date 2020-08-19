@@ -48,7 +48,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NotGeneratingSequenceFile">
-        <source>All tests finished running, Sequence file will not be generated.</source>
+        <source>All tests finished running, Sequence file will not be generated</source>
         <target state="new">All tests finished running, Sequence file will not be generated.</target>
         <note>"Sequence" is the name of the file.</note>
       </trans-unit>

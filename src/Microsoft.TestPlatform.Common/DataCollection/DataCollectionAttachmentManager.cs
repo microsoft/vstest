@@ -140,7 +140,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             try
             {
-                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray()).Wait();
+                if (this.attachmentTasks.TryGetValue(dataCollectionContext, out var tasks))
+                {
+                    Task.WhenAll(tasks.ToArray()).Wait();
+                }
             }
             catch (Exception ex)
             {
