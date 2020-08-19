@@ -134,7 +134,7 @@
   </data>
   <data name="NotGeneratingSequenceFile" xml:space="preserve">
     <value>All tests finished running, Sequence file will not be generated</value>
-    <comment>"Sequence" is the name of the file.</comment>
+    <comment>"Sequence" is the name of the file. No . at the end, because this is a blame message and the . will be added automatically.</comment>
   </data>
   <data name="ProcDumpCouldNotStart" xml:space="preserve">
     <value>Could not start process dump: {0}</value>
