@@ -31,18 +31,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                EqtTrace.Info($"CrashDumperFactory: This is Windows, returning ProcDumpCrashDumper that uses ProcDump utility.");
-                return new ProcDumpCrashDumper();
+                if (!isNet50OrNewer)
+                {
+                    EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework} which is not net5.0 or newer, returning ProcDumpCrashDumper that uses ProcDump utility.");
+                    return new ProcDumpCrashDumper();
+                }
 
-                // enable this once crashdump can trigger itself on exceptions that originate from task, then we can avoid using procdump
-                // if (!string.IsNullOrWhiteSpace(targetFramework) && !targetFramework.Contains("v5.0"))
-                // {
-                //     EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework} which is not net5.0 or newer, returning ProcDumpCrashDumper that uses ProcDump utility.");
-                //     return new ProcDumpCrashDumper();
-                // }
-
-                // EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
-                // return new NetClientCrashDumper();
+                EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
+                return new NetClientCrashDumper();
             }
 
             if (isNet50OrNewer)

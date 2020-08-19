@@ -49,7 +49,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private bool dumpWasCollectedByHangDumper;
         private string targetFramework;
         private List<KeyValuePair<string, string>> environmentVariables = new List<KeyValuePair<string, string>>();
-        private bool skipUploadingDumpFiles;
+        private bool uploadDumpFiles;
+        private string tempDirectory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -219,7 +220,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
-            if (!this.skipUploadingDumpFiles)
+            if (this.uploadDumpFiles)
             {
                 try
                 {
@@ -446,7 +447,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     // we won't dump the killed process again and that would just show a warning on the command line
                     if ((this.testStartCount > this.testEndCount || this.collectDumpAlways) && !this.dumpWasCollectedByHangDumper)
                     {
-                        if (this.skipUploadingDumpFiles)
+                        if (this.uploadDumpFiles)
                         {
                             try
                             {
@@ -566,26 +567,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         private string GetTempDirectory()
         {
-            string tempPath = null;
-            var netDumperPath = this.environmentVariables.SingleOrDefault(p => p.Key == "COMPlus_DbgMiniDumpName").Value;
-
-            try
+            if (string.IsNullOrWhiteSpace(this.tempDirectory))
             {
-                if (!string.IsNullOrWhiteSpace(netDumperPath))
-                {
-                    tempPath = Path.GetDirectoryName(netDumperPath);
-                }
-            }
-            catch (ArgumentException)
-            {
-                // the path was not correct do nothing
+                this.tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                Directory.CreateDirectory(this.tempDirecto);
+                return this.tempDirectory;
             }
 
-            var tmp = !string.IsNullOrWhiteSpace(tempPath) ? tempPath : Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-
-            Directory.CreateDirectory(tmp);
-
-            return tmp;
+            return this.tempDirectory;
         }
 
         private string GetDumpDirectory()
@@ -595,9 +584,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // This will save into the directory specified via VSTEST_DUMP_PATH, and
             //  skip uploading dumps via attachments.
             var dumpDirectoryOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_PATH");
-            this.skipUploadingDumpFiles = !string.IsNullOrEmpty(dumpDirectoryOverride);
+            var dumpDirectoryOverrideHasValue = !string.IsNullOrWhiteSpace(dumpDirectoryOverride);
+            this.uploadDumpFiles = !dumpDirectoryOverrideHasValue;
 
-            var dumpDirectory = dumpDirectoryOverride ?? this.GetTempDirectory();
+            var dumpDirectory = dumpDirectoryOverrideHasValue ? dumpDirectoryOverride : this.GetTempDirectory();
             Directory.CreateDirectory(dumpDirectory);
             var dumpPath = Path.Combine(Path.GetFullPath(dumpDirectory));
             return dumpPath;
