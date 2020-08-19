@@ -750,4 +750,15 @@
   <data name="BlameCollectDumpTestTimeoutNotSupportedForPlatform" xml:space="preserve">
     <value>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</value>
   </data>
+  <data name="EnvironmentArgumentHelp" xml:space="preserve">
+    <value>-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist. This will force the tests to be run in an isolated process.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</value>
+  </data>
+  <data name="EnvironmentVariableXIsOverriden" xml:space="preserve">
+    <value>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</value>
+  </data>
 </root>
