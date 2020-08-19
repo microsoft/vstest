@@ -570,7 +570,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             if (string.IsNullOrWhiteSpace(this.tempDirectory))
             {
                 this.tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-                Directory.CreateDirectory(this.tempDirecto);
+                Directory.CreateDirectory(this.tempDirectory);
                 return this.tempDirectory;
             }
 
