@@ -1685,7 +1685,7 @@
       </trans-unit>
       <trans-unit id="EnvironmentArgumentHelp">
         <source>-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
-      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist. This will force the tests to be run in an isolated process.
 
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
