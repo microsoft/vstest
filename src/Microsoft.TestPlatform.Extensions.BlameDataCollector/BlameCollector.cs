@@ -49,6 +49,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private bool dumpWasCollectedByHangDumper;
         private string targetFramework;
         private List<KeyValuePair<string, string>> environmentVariables = new List<KeyValuePair<string, string>>();
+        private bool skipUploadingDumpFiles;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -147,10 +148,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "2" : "1"));
                     }
 
-                    var guid = Guid.NewGuid().ToString();
-
-                    var dumpDirectory = Path.Combine(Path.GetTempPath(), guid);
-                    Directory.CreateDirectory(dumpDirectory);
+                    var dumpDirectory = this.GetDumpDirectory();
                     var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
                 }
@@ -206,7 +204,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
+                var dumpDirectory = this.GetDumpDirectory();
+                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework);
             }
             catch (Exception ex)
             {
@@ -220,35 +219,42 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
-            try
+            if (!this.skipUploadingDumpFiles)
             {
-                var dumpFiles = this.processDumpUtility.GetDumpFiles();
-                foreach (var dumpFile in dumpFiles)
+                try
                 {
-                    try
+                    var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                    foreach (var dumpFile in dumpFiles)
                     {
-                        if (!string.IsNullOrEmpty(dumpFile))
+                        try
                         {
-                            this.dumpWasCollectedByHangDumper = true;
-                            var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
-                            this.dataCollectionSink.SendFileAsync(fileTransferInformation);
+                            if (!string.IsNullOrEmpty(dumpFile))
+                            {
+                                this.dumpWasCollectedByHangDumper = true;
+                                var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
+                                this.dataCollectionSink.SendFileAsync(fileTransferInformation);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Eat up any exception here and log it but proceed with killing the test host process.
+                            EqtTrace.Error(ex);
+                        }
+
+                        if (!dumpFiles.Any())
+                        {
+                            EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        // Eat up any exception here and log it but proceed with killing the test host process.
-                        EqtTrace.Error(ex);
-                    }
-
-                    if (!dumpFiles.Any())
-                    {
-                        EqtTrace.Error("BlameCollector.CollectDumpAndAbortTesthost: blame:CollectDumpOnHang was enabled but dump file was not generated.");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    ConsoleOutput.Instance.Error(true, $"Blame: Collecting hang dump failed with error {ex}.");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ConsoleOutput.Instance.Error(true, $"Blame: Collecting hang dump failed with error {ex}.");
+                EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
             }
 
             try
@@ -440,30 +446,37 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     // we won't dump the killed process again and that would just show a warning on the command line
                     if ((this.testStartCount > this.testEndCount || this.collectDumpAlways) && !this.dumpWasCollectedByHangDumper)
                     {
-                        try
+                        if (this.skipUploadingDumpFiles)
                         {
-                            var dumpFiles = this.processDumpUtility.GetDumpFiles();
-                            foreach (var dumpFile in dumpFiles)
+                            try
                             {
-                                if (!string.IsNullOrEmpty(dumpFile))
+                                var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                                foreach (var dumpFile in dumpFiles)
                                 {
-                                    try
+                                    if (!string.IsNullOrEmpty(dumpFile))
                                     {
-                                        var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                                        this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-                                    }
-                                    catch (FileNotFoundException ex)
-                                    {
-                                        EqtTrace.Warning(ex.ToString());
-                                        this.logger.LogWarning(args.Context, ex.ToString());
+                                        try
+                                        {
+                                            var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                                            this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                                        }
+                                        catch (FileNotFoundException ex)
+                                        {
+                                            EqtTrace.Warning(ex.ToString());
+                                            this.logger.LogWarning(args.Context, ex.ToString());
+                                        }
                                     }
                                 }
                             }
+                            catch (FileNotFoundException ex)
+                            {
+                                EqtTrace.Warning(ex.ToString());
+                                this.logger.LogWarning(args.Context, ex.ToString());
+                            }
                         }
-                        catch (FileNotFoundException ex)
+                        else
                         {
-                            EqtTrace.Warning(ex.ToString());
-                            this.logger.LogWarning(args.Context, ex.ToString());
+                            EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
                         }
                     }
                 }
@@ -497,7 +510,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, this.GetTempDirectory(), this.processFullDumpEnabled, this.targetFramework);
+                var dumpDirectory = this.GetDumpDirectory();
+                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework);
             }
             catch (TestPlatformException e)
             {
@@ -572,6 +586,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             Directory.CreateDirectory(tmp);
 
             return tmp;
+        }
+
+        private string GetDumpDirectory()
+        {
+            // Using a custom dump path for scenarios where we want to upload the
+            // dump files ourselves, such as when running in Helix.
+            // This will save into the directory specified via VSTEST_DUMP_PATH, and
+            //  skip uploading dumps via attachments.
+            var dumpDirectoryOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_PATH");
+            this.skipUploadingDumpFiles = !string.IsNullOrEmpty(dumpDirectoryOverride);
+
+            var dumpDirectory = dumpDirectoryOverride ?? this.GetTempDirectory();
+            Directory.CreateDirectory(dumpDirectory);
+            var dumpPath = Path.Combine(Path.GetFullPath(dumpDirectory));
+            return dumpPath;
         }
     }
 }
