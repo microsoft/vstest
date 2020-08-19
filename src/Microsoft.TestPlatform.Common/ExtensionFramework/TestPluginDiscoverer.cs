@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     {
         private IFileHelper fileHelper;
 
-        private static List<string> UnloadableFiles = new List<string>();
+        private static HashSet<string> UnloadableFiles = new HashSet<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
