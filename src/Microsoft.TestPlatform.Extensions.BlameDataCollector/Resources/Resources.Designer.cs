@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All tests finished running, Sequence file will not be generated..
+        ///   Looks up a localized string similar to All tests finished running, Sequence file will not be generated.
         /// </summary>
         internal static string NotGeneratingSequenceFile {
             get {
