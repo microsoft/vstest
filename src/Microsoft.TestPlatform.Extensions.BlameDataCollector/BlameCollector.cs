@@ -141,14 +141,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableElfDumpOnMacOS", "1"));
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
 
-                    if (!this.processFullDumpEnabled)
-                    {
-                        // https://github.com/dotnet/coreclr/blob/master/Documentation/botr/xplat-minidump-generation.md
-                        // MiniDumpWithPrivateReadWriteMemory = 2
-                        // MiniDumpNormal = 1
-                        this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "2" : "1"));
-                    }
-
+                    // https://github.com/dotnet/coreclr/blob/master/Documentation/botr/xplat-minidump-generation.md
+                    // 2   MiniDumpWithPrivateReadWriteMemory
+                    // 4   MiniDumpWithFullMemory
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "4" : "2"));
                     var dumpDirectory = this.GetDumpDirectory();
                     var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
@@ -189,7 +185,23 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private void CollectDumpAndAbortTesthost()
         {
             this.inactivityTimerAlreadyFired = true;
-            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, (int)this.inactivityTimespan.TotalMinutes);
+
+            string value;
+            string unit;
+
+            if (this.inactivityTimespan.TotalSeconds <= 90)
+            {
+                value = ((int)this.inactivityTimespan.TotalSeconds).ToString();
+                unit = Resources.Resources.Seconds;
+            }
+            else
+            {
+                value = Math.Round(this.inactivityTimespan.TotalMinutes, 2).ToString();
+                unit = Resources.Resources.Minutes;
+            }
+
+            var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.InactivityTimeout, value, unit);
+
             EqtTrace.Warning(message);
             this.logger.LogWarning(this.context.SessionDataCollectionContext, message);
 
@@ -205,8 +217,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
+                Action<string> logWarning = m => this.logger.LogWarning(this.context.SessionDataCollectionContext, m);
                 var dumpDirectory = this.GetDumpDirectory();
-                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework);
+                this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework, logWarning);
             }
             catch (Exception ex)
             {
@@ -590,6 +603,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             var dumpDirectory = dumpDirectoryOverrideHasValue ? dumpDirectoryOverride : this.GetTempDirectory();
             Directory.CreateDirectory(dumpDirectory);
             var dumpPath = Path.Combine(Path.GetFullPath(dumpDirectory));
+
+            if (!this.uploadDumpFiles)
+            {
+                this.logger.LogWarning(this.context.SessionDataCollectionContext, $"VSTEST_DUMP_PATH is specified. Dump files will be saved in: {dumpPath}, and won't be added to attachments.");
+            }
+
             return dumpPath;
         }
     }

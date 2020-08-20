@@ -38,7 +38,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
             else
             {
-                SuspendLinuxMacOs(process);
+                // TODO: do not suspend on Mac and Linux, this prevents the process from being dumped when we use the net client dumper, checking if we can post a different signal
+                // SuspendLinuxMacOs(process);
             }
         }
 

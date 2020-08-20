@@ -67,7 +67,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         PlatformArgumentProcessorHelpPriority,
 
-
         /// <summary>
         /// EnvironmentArgumentProcessor Help
         /// </summary>

@@ -5,36 +5,51 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.Win32.SafeHandles;
 
     internal class WindowsHangDumper : IHangDumper
     {
+        private Action<string> logWarning;
+
+        public WindowsHangDumper(Action<string> logWarning)
+        {
+            this.logWarning = logWarning ?? (_ => { });
+        }
+
         public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             var process = Process.GetProcessById(processId);
             var processTree = process.GetProcessTree();
 
-            if (EqtTrace.IsVerboseEnabled)
+            if (processTree.Count > 1)
             {
-                if (processTree.Count > 1)
+                var tree = processTree.OrderBy(t => t.Level);
+                EqtTrace.Verbose("WindowsHangDumper.Dump: Dumping this process tree (from bottom):");
+                foreach (var p in tree)
                 {
-                    EqtTrace.Verbose("WindowsHangDumper.Dump: Dumping this process tree (from bottom):");
-                    foreach (var p in processTree.OrderBy(t => t.Level))
-                    {
-                        EqtTrace.Verbose($"WindowsHangDumper.Dump: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process.Id} - {p.Process.ProcessName}");
-                        ConsoleOutput.Instance.Information(false, $"Blame: {(p.Level != 0 ? " + " : " > ")}{new string('-', p.Level)} {p.Process.Id} - {p.Process.ProcessName}");
-                    }
+                    EqtTrace.Verbose($"WindowsHangDumper.Dump: {new string(' ', p.Level)}{(p.Level != 0 ? " +" : " >-")} {p.Process.Id} - {p.Process.ProcessName}");
                 }
-                else
+
+                // logging warning separately to avoid interleving the messages in the log which make this tree unreadable
+                this.logWarning(Resources.Resources.DumpingTree);
+                foreach (var p in tree)
                 {
-                    EqtTrace.Verbose($"NetClientHangDumper.Dump: Dumping {process.Id} - {process.ProcessName}.");
-                    ConsoleOutput.Instance.Information(false, $"Blame: Dumping {process.Id} - {process.ProcessName}");
+                    this.logWarning($"{new string(' ', p.Level)}{(p.Level != 0 ? "+-" : ">")} {p.Process.Id} - {p.Process.ProcessName}");
                 }
+            }
+            else
+            {
+                EqtTrace.Verbose($"NetClientHangDumper.Dump: Dumping {process.Id} - {process.ProcessName}.");
+                var message = string.Format(CultureInfo.CurrentUICulture, Resources.Resources.Dumping, process.Id, process.ProcessName);
+                this.logWarning(message);
             }
 
             var bottomUpTree = processTree.OrderByDescending(t => t.Level).Select(t => t.Process);
@@ -53,10 +68,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
+            Thread.Sleep(1300);
             foreach (var p in bottomUpTree)
             {
                 try
                 {
+                    Thread.Sleep(500);
                     var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
                     CollectDump(p, outputFile, type);
                 }

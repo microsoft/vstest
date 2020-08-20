@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Collections.Generic;
 
     public interface IProcessDumpUtility
@@ -47,7 +48,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="targetFramework">
         /// The target framework of the process
         /// </param>
-        void StartHangBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework);
+        /// <param name="logWarning">
+        /// Callback to datacollector logger to log warning
+        /// </param>
+        void StartHangBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, Action<string> logWarning = null);
 
         /// <summary>
         /// Detaches the proc dump process from the target process
