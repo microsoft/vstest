@@ -133,6 +133,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All tests finished running, Sequence file will not be generated.
+        /// </summary>
+        internal static string NotGeneratingSequenceFile {
+            get {
+                return ResourceManager.GetString("NotGeneratingSequenceFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not start process dump: {0}.
         /// </summary>
         internal static string ProcDumpCouldNotStart {
