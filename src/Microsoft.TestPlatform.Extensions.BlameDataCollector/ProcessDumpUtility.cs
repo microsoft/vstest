@@ -115,11 +115,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
             this.crashDumpDirectory = tempDirectory;
 
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                throw new NotSupportedException($"Operating system {RuntimeInformation.OSDescription} is not supported for crash dumps.");
-            }
-
             this.crashDumper = this.crashDumperFactory.Create(targetFramework);
             ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
             this.crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType);

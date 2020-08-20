@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using Microsoft.Diagnostics.NETCore.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -45,7 +44,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 try
                 {
-                    p.Suspend();
+                   p.Suspend();
                 }
                 catch (Exception ex)
                 {

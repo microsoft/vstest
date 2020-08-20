@@ -142,9 +142,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgEnableMiniDump", "1"));
 
                     // https://github.com/dotnet/coreclr/blob/master/Documentation/botr/xplat-minidump-generation.md
-                    // MiniDumpWithPrivateReadWriteMemory = 2
-                    // MiniDumpNormal = 1
-                    // this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "2" : "1"));
+                    // 2   MiniDumpWithPrivateReadWriteMemory
+                    // 4   MiniDumpWithFullMemory
+                    this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpType", this.processFullDumpEnabled ? "4" : "2"));
                     var dumpDirectory = this.GetDumpDirectory();
                     var dumpPath = Path.Combine(dumpDirectory, $"%e_%p_%t_crashdump.dmp");
                     this.environmentVariables.Add(new KeyValuePair<string, string>("COMPlus_DbgMiniDumpName", dumpPath));
@@ -603,6 +603,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             var dumpDirectory = dumpDirectoryOverrideHasValue ? dumpDirectoryOverride : this.GetTempDirectory();
             Directory.CreateDirectory(dumpDirectory);
             var dumpPath = Path.Combine(Path.GetFullPath(dumpDirectory));
+
+            if (!this.uploadDumpFiles)
+            {
+                this.logger.LogWarning(this.context.SessionDataCollectionContext, $"VSTEST_DUMP_PATH is specified. Dump files will be saved in: {dumpPath}, and won't be added to attachments.");
+            }
+
             return dumpPath;
         }
     }
