@@ -215,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return node;
         }
 
-        public static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
+        private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
         {
             ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
 

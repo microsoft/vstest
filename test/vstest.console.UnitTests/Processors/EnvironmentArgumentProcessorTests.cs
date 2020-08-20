@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Act
             executor1.Initialize("VARIABLE_ONE=VALUE");
             executor2.Initialize("VARIABLE_TWO=VALUE WITH SPACE");
-            executor3.Initialize("VARIABLE_THREE=VALUE WITH SPACE;AND SEMICOLUMN");
+            executor3.Initialize("VARIABLE_THREE=VALUE WITH SPACE;AND SEMICOLON");
 
             // Assert
             var (environmentVariables, inIsolation) = ParseSettingsXML(this.settingsProvider);
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("VALUE WITH SPACE", variables[1].Value);
 
             Assert.AreEqual("VARIABLE_THREE", variables[2].Name.LocalName);
-            Assert.AreEqual("VALUE WITH SPACE;AND SEMICOLUMN", variables[2].Value);
+            Assert.AreEqual("VALUE WITH SPACE;AND SEMICOLON", variables[2].Value);
         }
 
         [TestMethod]

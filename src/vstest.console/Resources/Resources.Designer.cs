@@ -510,11 +510,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to -e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
-        ///      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist. This will force the tests to be run in an isolated process.
+        ///      Sets the value of an environment variable. Creates the variable if it does not exist, overrides if it does. This will imply /InIsolation switch and force the tests to be run in an isolated process.
+        ///      
+        ///      This argument can be specified multiple times to provide multiple variables.
         ///
         ///      Example: -e:VARIABLE1=VALUE1
         ///               -e:ANOTHER_VARIABLE=&quot;VALUE WITH SPACES&quot;
-        ///               -e:ANOTHER_VARIABLE=&quot;VALUE;seperated with;semi-columns&quot;.
+        ///               -e:ANOTHER_VARIABLE=&quot;VALUE;seperated with;semicolons&quot;.
         /// </summary>
         internal static string EnvironmentArgumentHelp {
             get {
