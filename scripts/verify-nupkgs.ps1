@@ -12,7 +12,8 @@ function Unzip
 function Verify-Nuget-Packages($packageDirectory)
 {
     Write-Log "Starting Verify-Nuget-Packages."
-    $expectedNumOfFiles = @{"Microsoft.CodeCoverage" = 29;
+    $expectedNumOfFiles = @{
+                     "Microsoft.CodeCoverage" = 29;
                      "Microsoft.NET.Test.Sdk" = 13;
                      "Microsoft.TestPlatform" = 469;
                      "Microsoft.TestPlatform.Build" = 19;
