@@ -5,6 +5,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     public interface IHangDumper
     {
-        void Dump(int processId, string outputFile, DumpTypeOption dumpType);
+        void Dump(int processId, string outputDirectory, DumpTypeOption dumpType);
     }
 }

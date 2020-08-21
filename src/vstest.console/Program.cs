@@ -19,6 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <returns>0 if everything was successful and 1 otherwise.</returns>
         public static int Main(string[] args)
         {
+            Environment.SetEnvironmentVariable("COMPlus_DbgEnableElfDumpOnMacOS", "1");
+            Environment.SetEnvironmentVariable("COMPlus_DbgEnableMiniDump", "1");
+            
             var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_RUNNER_DEBUG");
             if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
             {

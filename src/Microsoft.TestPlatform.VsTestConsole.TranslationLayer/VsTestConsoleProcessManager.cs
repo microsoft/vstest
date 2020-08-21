@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
-#if NET451
+#if NETFRAMEWORK
             if (consoleParameters.EnvironmentVariables != null)
             {
                 info.EnvironmentVariables.Clear();

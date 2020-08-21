@@ -133,6 +133,11 @@ Error Details: {1}:{2}</source>
         <target state="new">The parameters LogFileName and LogFilePrefix cannot be given together. </target>
         <note></note>
       </trans-unit>
+      <trans-unit id="Common_CannotGetNextTimestampFileName">
+        <source>Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</source>
+        <target state="new">Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

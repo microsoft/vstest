@@ -152,8 +152,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         var testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
                         if (testCaseList.Count > 0)
                         {
-                            var testcase = testCaseList.Last();
-                            faultyTestCaseNames.Add(testcase.FullyQualifiedName);
+                            var testcases = testCaseList.Where(t => !t.IsCompleted).Select(t => t.FullyQualifiedName).ToList();
+                            faultyTestCaseNames.AddRange(testcases);
                         }
                     }
                 }
