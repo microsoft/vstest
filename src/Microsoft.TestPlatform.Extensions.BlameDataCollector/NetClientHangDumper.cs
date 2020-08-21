@@ -51,7 +51,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // do this, then parent that is awaiting child might exit before we get to dumping it.
             var tasks = new List<Task>();
             var timeout = new CancellationTokenSource();
-            timeout.CancelAfter(TimeSpan.FromSeconds(90));
+            timeout.CancelAfter(TimeSpan.FromMinutes(5));
             foreach (var p in bottomUpTree)
             {
                 tasks.Add(Task.Run(
@@ -72,7 +72,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     {
                         EqtTrace.Error($"NetClientHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName}: {ex}.");
                     }
-                }, timeout.Token);
+                }, timeout.Token));
+            }
+
+            try
+            {
+                Task.WhenAll(tasks).GetAwaiter().GetResult();
+            }
+            catch (TaskCanceledException)
+            {
+                EqtTrace.Error($"NetClientHangDumper.Dump: Hang dump timed out.");
             }
 
             foreach (var p in bottomUpTree)
@@ -87,6 +96,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Error($"NetClientHangDumper.Dump: Error killing process {p.Id} - {p.ProcessName}: {ex}.");
                 }
             }
-        }
+            }
     }
 }
