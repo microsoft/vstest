@@ -1,7 +1,13 @@
 # Sets variables which are used across the build tasks.
 
-$buildSuffix = $args[0]
-$IsRtmBuild = $args[1]
+param ( 
+  [Parameter(Mandatory)] 
+  [string] $BuildSuffix,
+  [Parameter(Mandatory)] 
+  [string] $IsRtmBuild,
+  [Parameter(Mandatory)] 
+  $Branch
+)
 
 $TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
 
@@ -11,9 +17,14 @@ $buildPrefix = $TpVersion.Trim()
 
 if ($IsRtmBuild.ToLower() -eq "false") 
 { 
+  if ($null -ne $Branch -and $Branch -like "refs/heads/rel/*")
+  { 
+    $BuildSuffix = $BuildSuffix -replace "preview", "release"
+  }
+
   $packageVersion = $buildPrefix+"-"+$buildSuffix
 } 
-else 
+else
 {
   $packageVersion = $buildPrefix
   $buildSuffix = [string]::Empty
