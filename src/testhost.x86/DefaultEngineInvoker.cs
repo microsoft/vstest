@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Collections.Generic;
     using System.Globalization;
     using System.Net;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -72,6 +73,15 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
             DefaultEngineInvoker.InitializeEqtTrace(argsDictionary);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                var version = typeof(DefaultEngineInvoker)
+                    .GetTypeInfo()
+                    .Assembly
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                EqtTrace.Verbose($"Version: { version }");
+            }
 
             if (EqtTrace.IsInfoEnabled)
             {
@@ -142,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 MetricsCollection =
                     telemetryOptedIn
-                        ? (IMetricsCollection) new MetricsCollection()
+                        ? (IMetricsCollection)new MetricsCollection()
                         : new NoOpMetricsCollection(),
                 IsTelemetryOptedIn = telemetryOptedIn
             };
