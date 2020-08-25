@@ -147,31 +147,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             var testExtensions = new TestExtensions();
 
             testExtensions.TestDiscoverers =
-                this.GetExtensionsDiscoveredFromAssembly<TestDiscovererPluginInformation>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.TestDiscoverers,
                     extensionAssembly);
             testExtensions.TestExecutors =
-                this.GetExtensionsDiscoveredFromAssembly<TestExecutorPluginInformation>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.TestExecutors,
                     extensionAssembly);
             testExtensions.TestExecutors2 =
-                this.GetExtensionsDiscoveredFromAssembly<TestExecutorPluginInformation2>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.TestExecutors2,
                     extensionAssembly);
             testExtensions.TestSettingsProviders =
-                this.GetExtensionsDiscoveredFromAssembly<TestSettingsProviderPluginInformation>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.TestSettingsProviders,
                     extensionAssembly);
             testExtensions.TestLoggers =
-                this.GetExtensionsDiscoveredFromAssembly<TestLoggerPluginInformation>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.TestLoggers,
                     extensionAssembly);
             testExtensions.TestHosts =
-                this.GetExtensionsDiscoveredFromAssembly<TestRuntimePluginInformation>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.TestHosts,
                     extensionAssembly);
             testExtensions.DataCollectors =
-                this.GetExtensionsDiscoveredFromAssembly<DataCollectorConfig>(
+                this.GetExtensionsDiscoveredFromAssembly(
                     this.DataCollectors,
                     extensionAssembly);
 
@@ -192,31 +192,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
         internal Dictionary<string, TPluginInfo> GetTestExtensionCache<TPluginInfo>() where TPluginInfo : TestPluginInformation
         {
-            if (typeof(TPluginInfo) == typeof(TestDiscovererPluginInformation))
+            Type type = typeof(TPluginInfo);
+
+            if (type == typeof(TestDiscovererPluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestDiscoverers;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
+            else if (type == typeof(TestExecutorPluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestExecutors;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            else if (type == typeof(TestExecutorPluginInformation2))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestExecutors2;
             }
-            else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
+            else if (type == typeof(TestLoggerPluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestLoggers;
             }
-            else if (typeof(TPluginInfo) == typeof(TestSettingsProviderPluginInformation))
+            else if (type == typeof(TestSettingsProviderPluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestSettingsProviders;
             }
-            else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
+            else if (type == typeof(TestRuntimePluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestHosts;
             }
-            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            else if (type == typeof(DataCollectorConfig))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.DataCollectors;
             }
@@ -234,31 +236,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// </returns>
         internal bool AreTestExtensionsCached<TPluginInfo>() where TPluginInfo : TestPluginInformation
         {
-            if (typeof(TPluginInfo) == typeof(TestDiscovererPluginInformation))
+            Type type = typeof(TPluginInfo);
+  
+            if (type == typeof(TestDiscovererPluginInformation))
             {
                 return this.AreTestDiscoverersCached;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
+            else if (type == typeof(TestExecutorPluginInformation))
             {
                 return this.AreTestExecutorsCached;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            else if (type == typeof(TestExecutorPluginInformation2))
             {
                 return this.AreTestExecutors2Cached;
             }
-            else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
+            else if (type == typeof(TestLoggerPluginInformation))
             {
                 return this.AreTestLoggersCached;
             }
-            else if (typeof(TPluginInfo) == typeof(TestSettingsProviderPluginInformation))
+            else if (type == typeof(TestSettingsProviderPluginInformation))
             {
                 return this.AreTestSettingsProvidersCached;
             }
-            else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
+            else if (type == typeof(TestRuntimePluginInformation))
             {
                 return this.AreTestHostsCached;
             }
-            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            else if (type == typeof(DataCollectorConfig))
             {
                 return this.AreDataCollectorsCached;
             }
@@ -273,31 +277,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// </typeparam>
         internal void SetTestExtensionsCacheStatusToTrue<TPluginInfo>() where TPluginInfo : TestPluginInformation
         {
-            if (typeof(TPluginInfo) == typeof(TestDiscovererPluginInformation))
+            Type type = typeof(TPluginInfo);
+            
+            if (type == typeof(TestDiscovererPluginInformation))
             {
                 this.AreTestDiscoverersCached = true;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
+            else if (type == typeof(TestExecutorPluginInformation))
             {
                 this.AreTestExecutorsCached = true;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            else if (type == typeof(TestExecutorPluginInformation2))
             {
                 this.AreTestExecutors2Cached = true;
             }
-            else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
+            else if (type == typeof(TestLoggerPluginInformation))
             {
                 this.AreTestLoggersCached = true;
             }
-            else if (typeof(TPluginInfo) == typeof(TestSettingsProviderPluginInformation))
+            else if (type == typeof(TestSettingsProviderPluginInformation))
             {
                 this.AreTestSettingsProvidersCached = true;
             }
-            else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
+            else if (type == typeof(TestRuntimePluginInformation))
             {
                 this.AreTestHostsCached = true;
             }
-            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            else if (type == typeof(DataCollectorConfig))
             {
                 this.AreDataCollectorsCached = true;
             }
@@ -358,31 +364,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
         private void SetTestExtensionCache<TPluginInfo>(Dictionary<string, TPluginInfo> testPluginInfos) where TPluginInfo : TestPluginInformation
         {
-            if (typeof(TPluginInfo) == typeof(TestDiscovererPluginInformation))
+            Type type = typeof(TPluginInfo);
+
+            if (type == typeof(TestDiscovererPluginInformation))
             {
                 this.TestDiscoverers = (Dictionary<string, TestDiscovererPluginInformation>)(object)testPluginInfos;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
+            else if (type == typeof(TestExecutorPluginInformation))
             {
                 this.TestExecutors = (Dictionary<string, TestExecutorPluginInformation>)(object)testPluginInfos;
             }
-            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            else if (type == typeof(TestExecutorPluginInformation2))
             {
                 this.TestExecutors2 = (Dictionary<string, TestExecutorPluginInformation2>)(object)testPluginInfos;
             }
-            else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
+            else if (type == typeof(TestLoggerPluginInformation))
             {
                 this.TestLoggers = (Dictionary<string, TestLoggerPluginInformation>)(object)testPluginInfos;
             }
-            else if (typeof(TPluginInfo) == typeof(TestSettingsProviderPluginInformation))
+            else if (type == typeof(TestSettingsProviderPluginInformation))
             {
                 this.TestSettingsProviders = (Dictionary<string, TestSettingsProviderPluginInformation>)(object)testPluginInfos;
             }
-            else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
+            else if (type == typeof(TestRuntimePluginInformation))
             {
                 this.TestHosts = (Dictionary<string, TestRuntimePluginInformation>)(object)testPluginInfos;
             }
-            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            else if (type == typeof(DataCollectorConfig))
             {
                 this.DataCollectors = (Dictionary<string, DataCollectorConfig>)(object)testPluginInfos;
             }
