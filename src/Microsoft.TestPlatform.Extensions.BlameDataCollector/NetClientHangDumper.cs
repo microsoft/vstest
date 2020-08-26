@@ -55,8 +55,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             foreach (var p in bottomUpTree)
             {
                 tasks.Add(Task.Run(
-                    () =>
-                    {
+                () =>
+                {
                     try
                     {
                         var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
@@ -96,6 +96,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Error($"NetClientHangDumper.Dump: Error killing process {p.Id} - {p.ProcessName}: {ex}.");
                 }
             }
-            }
+        }
     }
 }
