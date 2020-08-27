@@ -22,7 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
     using HtmlResource = Resources.Resources;
     using HtmlLoggerConstants = Constants;
-    using NuGet.Frameworks;
 
     /// <summary>
     /// Logger for generating Html.
@@ -291,7 +290,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
                 if (framework != null)
                 {
-                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    framework = Framework.GetShortFolderName(framework);
                     logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
 

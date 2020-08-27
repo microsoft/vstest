@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using NuGet.Frameworks;
     using ObjectModel.Logging;
     using System;
     using System.Collections.Concurrent;
@@ -509,7 +508,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             {
                 if (parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
                 {
-                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    framework = Framework.GetShortFolderName(framework);
                     logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
 

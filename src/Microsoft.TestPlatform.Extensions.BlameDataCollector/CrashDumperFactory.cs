@@ -6,7 +6,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using NuGet.Frameworks;
 
     internal class CrashDumperFactory : ICrashDumperFactory
     {
@@ -19,15 +18,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             EqtTrace.Info($"CrashDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
 
-            var tfm = NuGetFramework.Parse(targetFramework);
+            var tfm = Framework.FromString(targetFramework);
 
-            if (tfm == null || tfm.IsUnsupported)
+            if (tfm == null)
             {
                 EqtTrace.Error($"CrashDumperFactory: Could not parse target framework {targetFramework}, to a supported framework version.");
                 throw new NotSupportedException($"Could not parse target framework {targetFramework}, to a supported framework version.");
             }
 
-            var isNet50OrNewer = tfm.Framework == ".NETCoreApp" && tfm.Version >= Version.Parse("5.0.0.0");
+            var isNet50OrNewer = tfm.FrameworkName == ".NETCoreApp" && Version.Parse(tfm.Version) >= Version.Parse("5.0.0.0");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

@@ -76,7 +76,6 @@
     <file src="net451\$Runtime$\testhost.net48.x86.exe.config"	target="tools\net451\testhost.net48.x86.exe.config" />
     <file src="net451\$Runtime$\vstest.console.exe"	target="tools\net451\vstest.console.exe" />
     <file src="net451\$Runtime$\vstest.console.exe.config"	target="tools\net451\vstest.console.exe.config" />
-    <file src="net451\$Runtime$\NuGet.Frameworks.dll"	target="tools\net451\NuGet.Frameworks.dll" />
 
     <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\net451\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"	target="tools\net451\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
@@ -291,7 +290,6 @@
     <file src="netcoreapp2.1\vstest.console.dll"	target="tools\netcoreapp2.1\vstest.console.dll" />
     <file src="netcoreapp2.1\vstest.console.dll.config"	target="tools\netcoreapp2.1\vstest.console.dll.config" />
     <file src="netcoreapp2.1\vstest.console.runtimeconfig.json"	target="tools\netcoreapp2.1\vstest.console.runtimeconfig.json" />
-    <file src="netcoreapp2.1\NuGet.Frameworks.dll"	target="tools\netcoreapp2.1\NuGet.Frameworks.dll" />
 
     <file src="netcoreapp2.1\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="netcoreapp2.1\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
@@ -426,7 +424,6 @@
     <file src="netcoreapp2.1\TestHost\Microsoft.TestPlatform.Utilities.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.TestPlatform.Utilities.dll" />
     <file src="netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="netcoreapp2.1\TestHost\NuGet.Frameworks.dll"	target="tools\netcoreapp2.1\TestHost\NuGet.Frameworks.dll" />
     <file src="netcoreapp2.1\TestHost\msdia140typelib_clr0200.dll"	target="tools\netcoreapp2.1\TestHost\msdia140typelib_clr0200.dll" />
     <file src="netcoreapp2.1\TestHost\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\TestHost\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\TestHost\System.Collections.Immutable.dll"	target="tools\netcoreapp2.1\TestHost\System.Collections.Immutable.dll" />

@@ -6,7 +6,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using NuGet.Frameworks;
 
     internal class HangDumperFactory : IHangDumperFactory
     {
@@ -21,9 +20,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
 
-            var tfm = NuGetFramework.Parse(targetFramework);
+            var tfm = Framework.FromString(targetFramework);
 
-            if (tfm == null || tfm.IsUnsupported)
+            if (tfm == null)
             {
                 EqtTrace.Error($"HangDumperFactory: Could not parse target framework {targetFramework}, to a supported framework version.");
                 throw new NotSupportedException($"Could not parse target framework {targetFramework}, to a supported framework version.");
@@ -37,7 +36,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                var isLessThan31 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("3.1.0.0");
+                var isLessThan31 = tfm.FrameworkName == ".NETCoreApp" && Version.Parse(tfm.Version) < Version.Parse("3.1.0.0");
                 if (isLessThan31)
                 {
                     EqtTrace.Info($"HangDumperFactory: This is Linux on netcoreapp2.1, returning SigtrapDumper.");
@@ -51,7 +50,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                var isLessThan50 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("5.0.0.0");
+                var isLessThan50 = tfm.FrameworkName == ".NETCoreApp" && Version.Parse(tfm.Version) < Version.Parse("5.0.0.0");
                 if (isLessThan50)
                 {
                     EqtTrace.Info($"HangDumperFactory: This is OSX on {targetFramework}, This combination of OS and framework is not supported.");
