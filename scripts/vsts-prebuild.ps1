@@ -41,5 +41,5 @@ $JsonNetVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Dep
 Write-Host "##vso[task.setvariable variable=JsonNetVersion;]$JsonNetVersion"
 
 $microsoftFakesVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
-$FakesPackageDir = Join-Path $TP_ROOT_DIR "packages\Microsoft.VisualStudio.TestPlatform.Fakes\$microsoftFakesVersion\lib"
+$FakesPackageDir = Join-Path $TP_ROOT_DIR "packages\Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$microsoftFakesVersion\contentFiles"
 Write-Host "##vso[task.setvariable variable=FakesPackageDir;]$FakesPackageDir"
