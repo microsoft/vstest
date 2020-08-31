@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns></returns>
         public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
         {
-            var attrName = $"(?<{AttributeNameString}>(\\w+\\S*\\w+)|(\\w+))";
+            var attrName = $"(?<{AttributeNameString}>[\\w.:-]+)";
             var attrValue = $"(?<{AttributeValueString}>.+)";
             Regex regex = new Regex($"{Constants.TestRunParametersName}.{ParameterString}\\(name\\s*=\\s*\"{attrName}\"\\s*,\\s*value\\s*=\\s*\"{attrValue}\"\\)");
             Match match = regex.Match(node);

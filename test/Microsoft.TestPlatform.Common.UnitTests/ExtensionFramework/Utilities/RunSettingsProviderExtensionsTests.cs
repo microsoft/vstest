@@ -163,6 +163,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
+        public void TestRunParameterSettingsNodeCanMixSpecialCharacters()
+        {
+            this.CheckRunSettingsAreUpdated("___this_Should:be-valid.2", @"http://localhost//abc");
+        }
+
+        [TestMethod]
         public void UpdateRunSettingsNodeShouldUpdateKeyIfAlreadyPresent()
         {
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
