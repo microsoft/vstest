@@ -84,6 +84,12 @@ namespace Microsoft.TestPlatform.TestUtilities
                 arguments = string.Concat(arguments, " /settings:", runSettings.AddDoubleQuote());
             }
 
+            if (!string.IsNullOrWhiteSpace(framework))
+            {
+                // Append run settings
+                arguments = string.Concat(arguments, " /framework:", framework.AddDoubleQuote());
+            }
+
             arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
 
             if (!string.IsNullOrWhiteSpace(inIsolation))

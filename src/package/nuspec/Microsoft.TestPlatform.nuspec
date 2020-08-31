@@ -168,9 +168,41 @@
     <file src="net451\$Runtime$\System.Reflection.Metadata.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\System.Reflection.Metadata.dll" />
     <file src="net451\$Runtime$\System.Runtime.InteropServices.RuntimeInformation.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\System.Runtime.InteropServices.RuntimeInformation.dll" />
     <file src="net451\$Runtime$\testhost.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.exe" />
-    <file src="net451\$Runtime$\testhost.exe.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.exe.config" />
-    <file src="net451\$Runtime$\testhost.x86.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.x86.exe" />
-    <file src="net451\$Runtime$\testhost.x86.exe.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.exe.config" />
+    <file src="net451\$Runtime$\testhost.net452.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net452.exe" />
+    <file src="net451\$Runtime$\testhost.net452.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net452.exe.config" />
+    <file src="net451\$Runtime$\testhost.net46.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net46.exe" />
+    <file src="net451\$Runtime$\testhost.net46.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net46.exe.config" />
+    <file src="net451\$Runtime$\testhost.net461.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net461.exe" />
+    <file src="net451\$Runtime$\testhost.net461.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net461.exe.config" />
+    <file src="net451\$Runtime$\testhost.net462.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net462.exe" />
+    <file src="net451\$Runtime$\testhost.net462.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net462.exe.config" />
+    <file src="net451\$Runtime$\testhost.net47.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net47.exe" />
+    <file src="net451\$Runtime$\testhost.net47.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net47.exe.config" />
+    <file src="net451\$Runtime$\testhost.net471.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net471.exe" />
+    <file src="net451\$Runtime$\testhost.net471.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net471.exe.config" />
+    <file src="net451\$Runtime$\testhost.net472.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe" />
+    <file src="net451\$Runtime$\testhost.net472.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net472.exe.config" />
+    <file src="net451\$Runtime$\testhost.net48.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net48.exe" />
+    <file src="net451\$Runtime$\testhost.net48.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net48.exe.config" />    
+    <file src="net451\$Runtime$\testhost.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.x86.exe" />
+    <file src="net451\$Runtime$\testhost.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net452.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net452.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net452.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net452.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net46.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net46.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net46.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net46.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net461.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net461.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net461.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net461.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net462.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net462.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net462.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net462.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net47.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net47.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net47.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net47.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net471.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net471.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net471.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net471.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net472.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net472.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net472.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net48.x86.exe"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net48.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net48.x86.exe.config"  target="tools\net451\Common7\IDE\Extensions\TestPlatform\testhost.net48.x86.exe.config" />
     <file src="net451\$Runtime$\ThirdPartyNotices.txt"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\ThirdPartyNotices.txt" />
     <file src="net451\$Runtime$\vstest.console.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" />
     <file src="net451\$Runtime$\vstest.console.exe.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\vstest.console.exe.config" />
@@ -213,7 +245,7 @@
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
- <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\es\vstest.console.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\vstest.console.resources.dll" />
 	<file src="net451\$Runtime$\es\SettingsMigrator.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\SettingsMigrator.resources.dll" />
@@ -372,7 +404,7 @@
     <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
-<file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\tr\vstest.console.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\vstest.console.resources.dll" />
 	<file src="net451\$Runtime$\tr\SettingsMigrator.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\SettingsMigrator.resources.dll" />
@@ -457,6 +489,17 @@
     <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
 
     <!-- External dependencies-->
-    <file src="$FakesPackageDir$\net451\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
+    <file src="$FakesPackageDir$\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
+
+    <file src="$FakesPackageDir$\DataCollector\Microsoft.VisualStudio.Fakes.DataCollector.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Fakes.DataCollector.dll" />
+    <file src="$FakesPackageDir$\DataCollector\Microsoft.Cci.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.Cci.dll" />
+
+    <file src="$FakesPackageDir$\Instrumentation\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" />
+    <file src="$FakesPackageDir$\Instrumentation\x86\FakesInstrumentationProfiler_x86.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x86\FakesInstrumentationProfiler_x86.config" />
+    <file src="$FakesPackageDir$\Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" />
+    <file src="$FakesPackageDir$\Instrumentation\x64\FakesInstrumentationProfiler_x64.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x64\FakesInstrumentationProfiler_x64.config" />
+
+    <file src="$FakesPackageDir$\MicrosoftInstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll"	target="tools\net451\Common7\IDE\CommonExtensions\Platform\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
+    <file src="$FakesPackageDir$\MicrosoftInstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll"	target="tools\net451\Common7\IDE\CommonExtensions\Platform\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
   </files>
 </package>

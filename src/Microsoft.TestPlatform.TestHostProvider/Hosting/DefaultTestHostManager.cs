@@ -39,15 +39,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     [FriendlyName(DefaultTestHostFriendlyName)]
     public class DefaultTestHostManager : ITestRuntimeProvider2
     {
-        private const string X64TestHostProcessName = "testhost.exe";
-        private const string X86TestHostProcessName = "testhost.x86.exe";
+        private const string X64TestHostProcessName = "testhost{0}.exe";
+        private const string X86TestHostProcessName = "testhost{0}.x86.exe";
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
         private const string DefaultTestHostFriendlyName = "DefaultTestHost";
         private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
         private Architecture architecture;
-
+        private Framework targetFramework;
         private IProcessHelper processHelper;
         private IFileHelper fileHelper;
         private IEnvironment environment;
@@ -136,8 +136,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             IDictionary<string, string> environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
-            // Default test host manager supports shared test sources
-            var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
+            string testHostProcessName;
+            if (this.targetFramework.Name.StartsWith(".NETFramework,Version=v"))
+            {
+                var targetFrameworkMoniker = "net" + this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
+
+                // Net451 or older will use the default testhost.exe that is compiled against net451.
+                var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
+                var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
+
+                // Default test host manager supports shared test sources
+                testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
+            }
+            else
+            {
+                // This path is probably happening only in our tests, because otherwise we are first running CanExecuteCurrentRunConfiguration
+                // which would disqualify anything that is not netframework.
+                testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, string.Empty);
+            }
+
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
@@ -239,6 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             this.messageLogger = logger;
             this.architecture = runConfiguration.TargetPlatform;
+            this.targetFramework = runConfiguration.TargetFramework;
             this.testHostProcess = null;
 
             this.Shared = !runConfiguration.DisableAppDomain;

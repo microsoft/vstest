@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-#if NET451
+#if NETFRAMEWORK
     using System;
 #endif
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Class that holds Trait.
     /// A traits is Name, Value pair.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     [DataContract]
