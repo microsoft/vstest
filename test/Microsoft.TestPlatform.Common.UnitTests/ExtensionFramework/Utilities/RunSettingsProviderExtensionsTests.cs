@@ -151,13 +151,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
-        public void UpdateTestRunParameterSettingsNodeWithSpecialCharactersNameShouldSucceed()
+        public void TestRunParameterSettingsNodeCanContainSpecialCharacters()
         {
             this.CheckRunSettingsAreUpdated("weburl:name", @"http://localhost//abc");
         }
 
         [TestMethod]
-        public void UpdateTestRunParameterSettingsNodeWithSingleCharacterNameShouldSucceed()
+        public void TestRunParameterSettingsNodeCanBeJustASingleCharacter()
         {
             this.CheckRunSettingsAreUpdated("a", @"http://localhost//abc");
         }
@@ -238,8 +238,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
 
         private void CheckRunSettingsAreUpdated(string parameterName, string parameterValue)
         {
-            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch($"TestRunParameters.Parameter(name=\"{parameterName}\",value=\"{parameterValue}\")");
-            var runSettingsWithTestRunParameters = $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"{parameterName}\" value=\"{parameterValue}\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch(
+                $@"TestRunParameters.Parameter(name=""{parameterName}"",value=""{parameterValue}"")");
+            var runSettingsWithTestRunParameters = string.Join(
+                Environment.NewLine,
+                $@"<?xml version=""1.0"" encoding=""utf-16""?>",
+                $@"<RunSettings>",
+                $@"  <TestRunParameters>",
+                $@"    <Parameter name=""{parameterName}"" value=""{parameterValue}"" />",
+                $@"  </TestRunParameters>",
+                $@"</RunSettings>");
 
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  </RunSettings>");
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
