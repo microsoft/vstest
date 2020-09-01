@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             var process = Process.GetProcessById(processId);
-            var processTree = process.GetProcessTree();
+            var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName != "conhost" && p.Process.ProcessName != "WerFault").ToList();
 
             if (processTree.Count > 1)
             {
@@ -68,12 +68,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
-            Thread.Sleep(1300);
             foreach (var p in bottomUpTree)
             {
                 try
                 {
-                    Thread.Sleep(500);
                     var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
                     CollectDump(p, outputFile, type);
                 }
