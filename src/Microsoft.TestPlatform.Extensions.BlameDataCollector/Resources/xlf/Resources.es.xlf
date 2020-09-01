@@ -21,9 +21,12 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</source>
-        <target state="translated">La serie de pruebas activa se anuló porque el proceso del host se cerró inesperadamente al ejecutar las pruebas siguientes:</target>
-        <note />
+        <source>The active Test Run was aborted because the host process exited unexpectedly. Please inspect the call stack above, if available, to get more information about where the exception originated from.
+The test running when the crash occurred: 
+{0}
+This test may, or may not be the source of the crash.</source>
+        <target state="new">La serie de pruebas activa se anuló porque el proceso del host se cerró inesperadamente al ejecutar las pruebas siguientes:</target>
+        <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
