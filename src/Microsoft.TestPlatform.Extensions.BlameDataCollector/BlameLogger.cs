@@ -112,15 +112,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
-            this.output.Error(false, Resources.Resources.AbortedTestRun);
-
             StringBuilder sb = new StringBuilder();
             foreach (var tcn in testCaseNames)
             {
                 sb.Append(tcn).Append(Environment.NewLine);
             }
 
-            this.output.Error(false, sb.ToString());
+            this.output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
         }
 
         #endregion
