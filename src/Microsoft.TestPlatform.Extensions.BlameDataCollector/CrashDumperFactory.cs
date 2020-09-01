@@ -37,6 +37,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     return new ProcDumpCrashDumper();
                 }
 
+                // On net5.0 we don't have the capability to crash dump on exit, which is useful in rare cases
+                // like when user exits the testhost process with a random exit code, adding this evn variable
+                // to force using procdump. This relies on netclient dumper actualy doing all it's work in blame collector
+                // where it sets all the environment variables, so in effect we will have two crash dumpers active at the same time.
+                // This proven to be working okay while net5.0 could not create dumps from Task.Run, and I was using this same technique
+                // to get dump of testhost. This needs PROCDUMP_PATH set to directory with procdump.exe, or having it in path.
+                var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCEPROCDUMP")?.Trim();
+                var forceUsingProcdump = string.IsNullOrWhiteSpace(procdumpOverride) && procdumpOverride != "0";
+                if (forceUsingProcdump)
+                {
+                    EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}. Forcing the use of ProcDumpCrashDumper that uses ProcDump utility, via VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride}.");
+                    return new ProcDumpCrashDumper();
+                }
+
                 EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
                 return new NetClientCrashDumper();
             }
