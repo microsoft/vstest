@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System;
 
     [TestClass]
     public class ExecutorUnitTests
