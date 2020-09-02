@@ -5,7 +5,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
@@ -166,15 +168,15 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 Console.WriteLine("Waiting for debugger attach...");
 
-                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                var currentProcess = Process.GetCurrentProcess();
                 Console.WriteLine(string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName));
 
-                while (!System.Diagnostics.Debugger.IsAttached)
+                while (!Debugger.IsAttached)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                 }
 
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             }
 
             // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
