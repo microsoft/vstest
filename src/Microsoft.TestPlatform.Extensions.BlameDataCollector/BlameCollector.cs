@@ -46,7 +46,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private IInactivityTimer inactivityTimer;
         private TimeSpan inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
         private int testHostProcessId;
-        private bool dumpWasCollectedByHangDumper;
         private string targetFramework;
         private List<KeyValuePair<string, string>> environmentVariables = new List<KeyValuePair<string, string>>();
         private bool uploadDumpFiles;
@@ -223,7 +222,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
             catch (Exception ex)
             {
-                ConsoleOutput.Instance.Error(true, $"Blame: Creating hang dump failed with error {ex}.");
+                this.logger.LogError(this.context.SessionDataCollectionContext, $"Blame: Creating hang dump failed with error.", ex);
             }
 
             if (this.collectProcessDumpOnTrigger)
@@ -244,7 +243,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         {
                             if (!string.IsNullOrEmpty(dumpFile))
                             {
-                                this.dumpWasCollectedByHangDumper = true;
                                 var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
                                 this.dataCollectionSink.SendFileAsync(fileTransferInformation);
                             }
@@ -263,7 +261,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
                 catch (Exception ex)
                 {
-                    ConsoleOutput.Instance.Error(true, $"Blame: Collecting hang dump failed with error {ex}.");
+                    this.logger.LogError(this.context.SessionDataCollectionContext, $"Blame: Collecting hang dump failed with error.", ex);
                 }
             }
             else
@@ -452,47 +450,37 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.logger.LogWarning(this.context.SessionDataCollectionContext, Resources.Resources.NotGeneratingSequenceFile);
                 }
 
-                if (this.collectProcessDumpOnTrigger)
+                if (this.uploadDumpFiles)
                 {
-                    // If there was a test case crash or if we need to collect dump on process exit.
-                    //
-                    // Do not try to collect dump when we already collected one from the hang dump
-                    // we won't dump the killed process again and that would just show a warning on the command line
-                    if ((this.testStartCount > this.testEndCount || this.collectDumpAlways) && !this.dumpWasCollectedByHangDumper)
+                    try
                     {
-                        if (this.uploadDumpFiles)
+                        var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                        foreach (var dumpFile in dumpFiles)
                         {
-                            try
+                            if (!string.IsNullOrEmpty(dumpFile))
                             {
-                                var dumpFiles = this.processDumpUtility.GetDumpFiles();
-                                foreach (var dumpFile in dumpFiles)
+                                try
                                 {
-                                    if (!string.IsNullOrEmpty(dumpFile))
-                                    {
-                                        try
-                                        {
-                                            var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                                            this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-                                        }
-                                        catch (FileNotFoundException ex)
-                                        {
-                                            EqtTrace.Warning(ex.ToString());
-                                            this.logger.LogWarning(args.Context, ex.ToString());
-                                        }
-                                    }
+                                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                                    this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                                }
+                                catch (FileNotFoundException ex)
+                                {
+                                    EqtTrace.Warning(ex.ToString());
+                                    this.logger.LogWarning(args.Context, ex.ToString());
                                 }
                             }
-                            catch (FileNotFoundException ex)
-                            {
-                                EqtTrace.Warning(ex.ToString());
-                                this.logger.LogWarning(args.Context, ex.ToString());
-                            }
-                        }
-                        else
-                        {
-                            EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
                         }
                     }
+                    catch (FileNotFoundException ex)
+                    {
+                        EqtTrace.Warning(ex.ToString());
+                        this.logger.LogWarning(args.Context, ex.ToString());
+                    }
+                }
+                else
+                {
+                    EqtTrace.Info("BlameCollector.CollectDumpAndAbortTesthost: Custom path to dump directory was provided via VSTEST_DUMP_PATH. Skipping attachment upload, the caller is responsible for collecting and uploading the dumps themselves.");
                 }
             }
             finally
