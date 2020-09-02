@@ -404,33 +404,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The trigger session ended handler should not dump files if proc dump was enabled and test host did not crash
-        /// </summary>
-        [TestMethod]
-        public void TriggerSessionEndedHandlerShouldNotGetDumpFileIfNoCrash()
-        {
-            // Initializing Blame Data Collector
-            this.blameDataCollector.Initialize(
-                this.GetDumpConfigurationElement(),
-                this.mockDataColectionEvents.Object,
-                this.mockDataCollectionSink.Object,
-                this.mockLogger.Object,
-                this.context);
-
-            // Setup
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles()).Returns(new[] { this.filepath });
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
-                .Returns(this.filepath);
-
-            // Raise
-            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
-            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
-
-            // Verify GetDumpFiles Call
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(), Times.Never);
-        }
-
-        /// <summary>
         /// The trigger session ended handler should get dump files if collect dump on exit was enabled irrespective of completed test case count
         /// </summary>
         [TestMethod]
