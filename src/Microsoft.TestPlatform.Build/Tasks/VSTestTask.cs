@@ -161,6 +161,10 @@ namespace Microsoft.TestPlatform.Build.Tasks
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
             Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
 
+            // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
+            // write MSBuild error. https://github.com/dotnet/msbuild/blob/51a1071f8871e0c93afbaf1b2ac2c9e59c7b6491/src/Framework/IBuildEngine7.cs#L12
+            BuildEngine.GetType().GetProperty("AllowFailureWithoutError")?.SetValue(BuildEngine, true);
+
             vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
