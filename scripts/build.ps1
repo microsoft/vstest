@@ -717,7 +717,7 @@ function Create-NugetPackages
 
     # Additional external dependency folders
     $microsoftFakesVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
-    $FakesPackageDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TestPlatform.Fakes\$microsoftFakesVersion\lib"
+    $FakesPackageDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$microsoftFakesVersion\contentFiles"
 
     # package them from stagingDir
     foreach ($file in $nuspecFiles) {

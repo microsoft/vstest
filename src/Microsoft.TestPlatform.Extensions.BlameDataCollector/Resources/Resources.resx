@@ -118,7 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AbortedTestRun" xml:space="preserve">
-    <value>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</value>
+    <value>The active Test Run was aborted because the host process exited unexpectedly. Please inspect the call stack above, if available, to get more information about where the exception originated from.
+The test running when the crash occurred: 
+{0}
+This test may, or may not be the source of the crash.</value>
+    <comment>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</comment>
   </data>
   <data name="BlameParameterKeyIncorrect" xml:space="preserve">
     <value>The blame parameter key specified {0} is not valid. Ignoring this key.</value>

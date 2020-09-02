@@ -89,7 +89,7 @@
       <Version>16.3.23</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.TestPlatform.Fakes">
+    <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness">
       <Version>$(MicrosoftFakesVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
