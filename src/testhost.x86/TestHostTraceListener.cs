@@ -76,7 +76,21 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static DebugAssertException GetException(string message)
         {
             var debugTypes = new Type[] { typeof(Debug), typeof(Trace) };
+#if NETCOREAPP1_0
+            Exception exceptionForStack;
+            try
+            {
+                throw new Exception();
+            }
+            catch (Exception e)
+            {
+                exceptionForStack = e;
+            }
+
+            var stack = new StackTrace(exceptionForStack, true);
+#else
             var stack = new StackTrace(true);
+#endif
 
             var debugMethodFound = false;
             var frameCount = 0;
@@ -97,7 +111,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
             }
 
+#if NETCOREAPP1_0
+            var stackTrace = string.Join(Environment.NewLine, stack.ToString().Replace(Environment.NewLine, "\n").Split('\n').Reverse().Take(frameCount).Reverse());
+#else
             var stackTrace = string.Join(Environment.NewLine, stack.ToString().Split(Environment.NewLine).TakeLast(frameCount));
+#endif
             var methodName = method != null ? $"{method.DeclaringType.Name}.{method.Name}" : "<method>";
             var wholeMessage = $"Method {methodName} failed with '{message}', and was translated to { typeof(DebugAssertException).FullName } to avoid terminating the process hosting the test.";
 
