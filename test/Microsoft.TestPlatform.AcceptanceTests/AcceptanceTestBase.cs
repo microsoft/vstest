@@ -43,10 +43,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public const string CoreRunnerTargetRuntime = "";
         public const string InIsolation = "/InIsolation";
 
-        public const string NETFX452_48 = "net452;net46;net472;net48";
-        public const string NETFX451_48 = "net452;net46;net472;net48";
+        public const string NETFX452_48 = "net452;net461;net472;net48";
+        public const string NETFX451_48 = "net452;net461;net472;net48";
         public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
-        public const string NETFX452_NET50 = "net452;net46;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
+        public const string NETFX452_NET50 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
+        public const string NETFX452_NET31 = "net452;net461;net472;net48;netcoreapp2.1;netcoreapp3.1";
 
         public static string And(string left, string right)
         {

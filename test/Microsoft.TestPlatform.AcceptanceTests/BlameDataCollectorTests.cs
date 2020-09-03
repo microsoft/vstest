@@ -10,12 +10,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Linq;
     using System.Text;
     using System.Xml;
-    using static AcceptanceTestBase;
 
     [TestClass]
     public class BlameDataCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
+
+        public const string NETCOREANDFX = "net452;net472;netcoreapp3.1";
+        public const string NET50 = "net5.0";
 
         public BlameDataCollectorTests()
         {
@@ -66,9 +68,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource(NETFX452_NET50)]
-        // [NetCoreTargetFrameworkDataSource]
-        public void CollectsDumpOnHang(RunnerInfo runnerInfo)
+        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // should make no difference, keeping for easy debug 
+        // [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+        public void HangDumpOnTimeout(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
 
@@ -81,6 +84,90 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateDump();
         }
 
+        [TestMethod]
+        // net5.0 does not suppord dump on exit
+        [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+        // should make no difference, keeping for easy debug 
+        // [NetCoreRunner("net452;net472;netcoreapp3.1")]
+        public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("timeout.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true;CollectHangDump""");
+            this.InvokeVsTest(arguments);
+
+            this.ValidateDump();
+        }
+
+        [TestMethod]
+        // net5.0 does not suppord dump on exit
+        [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+        // should make no difference, keeping for easy debug 
+        // [NetCoreRunner("net452;net472;netcoreapp3.1")]
+        public void CrashDumpOnExit(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("timeout.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full;CollectAlways=true""");
+            this.InvokeVsTest(arguments);
+
+            this.ValidateDump();
+        }
+
+        [TestMethod]
+        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // should make no difference, keeping for easy debug 
+        // [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+        public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("crash.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
+            this.InvokeVsTest(arguments);
+
+            this.ValidateDump();
+        }
+
+        [TestMethod]
+        [NetFrameworkRunner(NET50)]
+        // should make no difference, keeping for easy debug 
+        // [NetCoreRunner(NET50)]
+        public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("child-crash.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $@" /Blame:""CollectDump;DumpType=full""");
+            this.InvokeVsTest(arguments);
+
+            this.ValidateDump(2);
+        }
+
+        [TestMethod]
+        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // should make no difference, keeping for easy debug 
+        // [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+        public void HangDumpChildProcesses(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("child-hang.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s""");
+            this.InvokeVsTest(arguments);
+
+            this.ValidateDump(2);
+        }
+
+
         private void ValidateDump(int expectedDumpCount = 1)
         {
             var attachments = this.StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
@@ -91,13 +178,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var output = string.Join(Environment.NewLine, attachments);
             if (!attachments.Any(a => a.Contains("Sequence_")))
             {
-                throw new AssertFailedException("Expected Sequence file in Attachments, but there was none." + Environment.NewLine + output);
+                // sequence file is pretty flaky, and easily substituted by diag log
+                // throw new AssertFailedException("Expected Sequence file in Attachments, but there was none." 
+                //    + Environment.NewLine 
+                //    + output);
             }
 
-            var dumps = attachments.Where(a => a.EndsWith(".dmp")).Select(a => a.Trim()).ToList();
+            var dumps = attachments
+                .Where(a => a.EndsWith(".dmp"))
+                // On Windows we might collect conhost which tells us nothing 
+                // or WerFault in case we would start hanging during crash
+                // we don't want these to make cross-platform checks more difficult
+                // so we filter them out.
+                .Where(a => !a.Contains("WerFault") && !a.Contains("conhost"))
+                .Select(a => a.Trim()).ToList();
+
             if (dumps.Count < expectedDumpCount)
             {
-                throw new AssertFailedException($"Expected at least {1} dump file in Attachments, but there were {dumps.Count}." + Environment.NewLine + output);
+                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}." + Environment.NewLine + output);
             }
 
             var nonExistingDumps = new List<string>();
@@ -118,10 +216,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 }
             }
 
-            if (nonExistingDumps.Any() || emptyDumps.Any())
+            // allow some child dumps to be missing, they manage to terminate early from time to time
+            if ((dumps.Count == 1 && nonExistingDumps.Any()) || (dumps.Count > 1 && nonExistingDumps.Count > 1)
+                || emptyDumps.Any())
             {
                 var err = new StringBuilder();
-                err.AppendLine("Expected all dumps in the list of attachments to exist and to not be empty but:");
+                err.AppendLine("Expected all dumps in the list of attachments to exist, and not be empty, but:");
                 if (nonExistingDumps.Any())
                 {
                     err.AppendLine($"{nonExistingDumps.Count} don't exist:")
@@ -134,7 +234,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     .AppendLine(string.Join(Environment.NewLine, emptyDumps));
                 }
 
-                err.AppendLine("Reported attachements:")
+                err.AppendLine("Reported attachments:")
                 .AppendLine(output);
 
                 throw new AssertFailedException(err.ToString());

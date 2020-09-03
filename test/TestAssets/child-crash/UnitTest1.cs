@@ -12,8 +12,13 @@ namespace child_crash
         [TestMethod]
         public void TestMethod1()
         {
+#if DEBUG
+            var directory = "Debug";
+#else
+            var directory = "Release";
+#endif
             // wait for two children to crash
-            var childProcess = Path.GetFullPath($@"../../../../problematic-child/bin/Debug/net5.0/problematic-child{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ".dll")}");
+            var childProcess = Path.GetFullPath($@"../../../../problematic-child/bin/{directory}/net5.0/problematic-child{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ".dll")}");
             if (!File.Exists(childProcess))
             {
                 throw new FileNotFoundException(childProcess);
