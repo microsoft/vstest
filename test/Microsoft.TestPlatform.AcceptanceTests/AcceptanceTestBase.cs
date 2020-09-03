@@ -4,7 +4,8 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
-
+    using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.TestPlatform.TestUtilities;
 
     public class AcceptanceTestBase : IntegrationTestBase
@@ -21,6 +22,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public const string DesktopTargetFramework = "net451";
         public const string Core21TargetFramework = "netcoreapp2.1";
         public const string Core31TargetFramework = "netcoreapp3.1";
+        public const string Core50TargetFramework = "net5.0";
 
         public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
         public const string Net451FrameworkArgValue = ".NETFramework,Version=v4.5.1";
@@ -35,9 +37,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public const string Core21FrameworkArgValue = ".NETCoreApp,Version=v2.1";
         public const string Core31FrameworkArgValue = ".NETCoreApp,Version=v3.1";
+        public const string Core50FrameworkArgValue = ".NETCoreApp,Version=v5.0";
+
         public const string DesktopRunnerTargetRuntime = "win7-x64";
         public const string CoreRunnerTargetRuntime = "";
         public const string InIsolation = "/InIsolation";
+
+        public const string NETFX452_48 = "net452;net46;net472;net48";
+        public const string NETFX451_48 = "net452;net46;net472;net48";
+        public const string NETCORE21_50 = "netcoreapp2.1;netcoreapp3.1;net5.0";
+        public const string NETFX452_NET50 = "net452;net46;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0";
+
+        public static string And(string left, string right)
+        {
+            return string.Join(";", left, right);
+        }
 
         protected string FrameworkArgValue => DeriveFrameworkArgValue(this.testEnvironment);
 
@@ -56,6 +70,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     return Core21FrameworkArgValue;
                 case Core31TargetFramework:
                     return Core31FrameworkArgValue;
+                case Core50TargetFramework:
+                    return Core50FrameworkArgValue;
                 case Net451TargetFramework:
                     return Net451FrameworkArgValue;
                 case Net452TargetFramework:

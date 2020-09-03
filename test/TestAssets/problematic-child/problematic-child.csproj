@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net452;net472;net48;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>problematic_child</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>

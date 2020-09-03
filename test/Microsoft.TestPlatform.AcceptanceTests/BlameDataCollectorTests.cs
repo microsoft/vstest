@@ -5,8 +5,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Text;
     using System.Xml;
+    using static AcceptanceTestBase;
 
     [TestClass]
     public class BlameDataCollectorTests : AcceptanceTestBase
@@ -61,6 +65,82 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.VaildateOutput(true);
         }
 
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(NETFX452_NET50)]
+        // [NetCoreTargetFrameworkDataSource]
+        public void CollectsDumpOnHang(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("timeout.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s""");
+            this.InvokeVsTest(arguments);
+
+            this.ValidateDump();
+        }
+
+        private void ValidateDump(int expectedDumpCount = 1)
+        {
+            var attachments = this.StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .SkipWhile(l => !l.Contains("Attachments:")).Skip(1)
+                .Where(l => !string.IsNullOrWhiteSpace(l))
+                .ToList();
+
+            var output = string.Join(Environment.NewLine, attachments);
+            if (!attachments.Any(a => a.Contains("Sequence_")))
+            {
+                throw new AssertFailedException("Expected Sequence file in Attachments, but there was none." + Environment.NewLine + output);
+            }
+
+            var dumps = attachments.Where(a => a.EndsWith(".dmp")).Select(a => a.Trim()).ToList();
+            if (dumps.Count < expectedDumpCount)
+            {
+                throw new AssertFailedException($"Expected at least {1} dump file in Attachments, but there were {dumps.Count}." + Environment.NewLine + output);
+            }
+
+            var nonExistingDumps = new List<string>();
+            var emptyDumps = new List<string>();
+            foreach (var dump in dumps)
+            {
+                if (!File.Exists(dump))
+                {
+                    nonExistingDumps.Add(dump);
+                }
+                else
+                {
+                    var file = new FileInfo(dump);
+                    if (file.Length == 0)
+                    {
+                        emptyDumps.Add(dump);
+                    }
+                }
+            }
+
+            if (nonExistingDumps.Any() || emptyDumps.Any())
+            {
+                var err = new StringBuilder();
+                err.AppendLine("Expected all dumps in the list of attachments to exist and to not be empty but:");
+                if (nonExistingDumps.Any())
+                {
+                    err.AppendLine($"{nonExistingDumps.Count} don't exist:")
+                    .AppendLine(string.Join(Environment.NewLine, nonExistingDumps));
+                }
+
+                if (emptyDumps.Any())
+                {
+                    err.AppendLine($"{emptyDumps.Count} are empty:")
+                    .AppendLine(string.Join(Environment.NewLine, emptyDumps));
+                }
+
+                err.AppendLine("Reported attachements:")
+                .AppendLine(output);
+
+                throw new AssertFailedException(err.ToString());
+            }
+        }
+
         private void VaildateOutput(bool validateDumpFile = false)
         {
             bool isSequenceAttachmentReceived = false;
@@ -70,7 +150,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("Sequence_");
             var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
 
-            foreach(var file in resultFiles)
+            foreach (var file in resultFiles)
             {
                 if (file.Contains("Sequence_"))
                 {
