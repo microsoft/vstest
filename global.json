@@ -1,6 +1,6 @@
 {
   "sdk": {
-    "version": "5.0.100-rc.1.20380.12",
+    "version": "5.0.100-rc.1.20453.7",
     "rollForward": "minor",
     "allowPrerelease": false,
     "architecture": "x64"
