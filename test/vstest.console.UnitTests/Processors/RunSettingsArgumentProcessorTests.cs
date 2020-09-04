@@ -244,8 +244,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 $"<RunSettings>\r\n" +
                 $"  <RunConfiguration>\r\n" +
                 $"    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n" +
-                $"    <TargetPlatform>X86</TargetPlatform>\r\n" +
-                $"    <TargetFrameworkVersion>.NETCoreApp,Version=v1.0</TargetFrameworkVersion>\r\n" +
+                $"    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>\r\n" +
+                $"    <TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>\r\n" +
                 $"  </RunConfiguration>\r\n" +
                 $"  <MSTest>\r\n" +
                 $"    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
