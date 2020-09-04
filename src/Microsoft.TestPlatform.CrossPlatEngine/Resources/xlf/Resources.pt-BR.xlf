@@ -209,7 +209,12 @@
       </trans-unit>
       <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
         <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
-        <target state="new">Cannot attach the debugger to the default test host with process ID: {0}.</target>
+        <target state="translated">Não é possível anexar o depurador ao host de teste padrão com a ID de processo: {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</source>
+        <target state="translated">{0} Acesso negado ao tentar criar a pasta "TestResults" no local mencionado. Você está recebendo esta exceção porque está executando o vstest.console.exe em uma pasta que requer acesso para gravação. Para resolver o problema: execute vstest.console.exe em uma pasta na qual você tenha privilégios de gravação.</target>
         <note></note>
       </trans-unit>
     </body>

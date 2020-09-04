@@ -4,7 +4,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <AssemblyName>restore</AssemblyName>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -89,15 +89,15 @@
       <Version>16.3.23</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.TestPlatform.Fakes">
+    <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness">
       <Version>$(MicrosoftFakesVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.
-         We've to set to net46 since the net451 and other packages have assemblies in wrong case.
+         We've to set to net472 since the net451 and other packages have assemblies in wrong case.
          E.g. System.XML instead of System.Xml. -->
-    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.6">
-      <Version>1.0.1</Version>
+    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.7.2">
+      <Version>1.0.0</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>

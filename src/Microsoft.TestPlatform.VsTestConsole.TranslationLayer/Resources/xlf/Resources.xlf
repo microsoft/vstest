@@ -23,6 +23,11 @@
         <target state="new">File {0} does not exists</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="new">The active Test Run Attachments Processing was aborted.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

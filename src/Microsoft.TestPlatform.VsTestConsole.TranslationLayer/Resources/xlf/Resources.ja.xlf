@@ -61,6 +61,11 @@
         <target state="translated">ファイル {0} が存在しません</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedTestRunAttachmentsProcessing">
+        <source>The active Test Run Attachments Processing was aborted.</source>
+        <target state="translated">アクティブなテストの実行の添付ファイルの処理が中止されました。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

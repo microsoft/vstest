@@ -554,15 +554,15 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
+        <source>Failed</source>
         <note>Message which is written to the console when a test fails.</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
+        <source>Passed</source>
         <note>Message which is written to the console when a test passes.</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
+        <source>Skipped</source>
         <note></note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
@@ -602,7 +602,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
+        <source>Not Run</source>
         <target state="new">Not Run  {0}</target>
         <note></note>
       </trans-unit>
@@ -857,6 +857,43 @@ Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")
       <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
         <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
         <target state="new">Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source> - {0} {1}</source>
+        <target state="new">- {0} {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnvironmentArgumentHelp">
+        <source>-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if it does not exist, overrides if it does. This will imply /InIsolation switch and force the tests to be run in an isolated process.
+      
+      This argument can be specified multiple times to provide multiple variables.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
+        <target state="new">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnvironmentVariableXIsOverriden">
+        <source>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</source>
+        <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
         <note></note>
       </trans-unit>
     </body>

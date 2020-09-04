@@ -279,6 +279,11 @@
         <target state="translated">ファイル '{0}' から拡張機能を読み込めませんでした。詳細な情報を得るには、/diag をご使用ください。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
+        <target state="translated">{0} 記載した場所に "TestResults" フォルダーを作成しようとしたときにアクセスが拒否されました。書き込みアクセスを必要とするフォルダーから vstest.console.exe を実行しているため、この例外が発生しています。この問題を解決するには、書き込み権限のあるフォルダーから vstest.console.exe を実行してください。詳細については、次のエラー メッセージをご覧ください。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

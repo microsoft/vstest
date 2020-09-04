@@ -81,7 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
             // and default to FrameworkCore10 for .Net Core 
             if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                targetFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return FrameworkVersion.FrameworkCore10;
             }
@@ -215,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
-#if NET451
+#if NETFRAMEWORK
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);

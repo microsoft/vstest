@@ -63,6 +63,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
+        /// </summary>
+        /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
+        public NetCoreTargetFrameworkDataSource(string[] targetFrameworks)
+        {
+            foreach (var fmw in targetFrameworks)
+            {
+                this.AddRunnerDataRow(IntegrationTestBase.CoreRunnerFramework, fmw);
+            }
+        }
+
         private void AddRunnerDataRow(string runnerFramework, string targetFramework)
         {
             var runnerInfo = new RunnerInfo(runnerFramework, targetFramework);

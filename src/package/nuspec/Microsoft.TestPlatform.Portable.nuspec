@@ -40,8 +40,40 @@
     <file src="net451\$Runtime$\System.Runtime.InteropServices.RuntimeInformation.dll"	target="tools\net451\System.Runtime.InteropServices.RuntimeInformation.dll" />
     <file src="net451\$Runtime$\testhost.exe"	target="tools\net451\testhost.exe" />
     <file src="net451\$Runtime$\testhost.exe.config"	target="tools\net451\testhost.exe.config" />
+    <file src="net451\$Runtime$\testhost.net452.exe"	target="tools\net451\testhost.net452.exe" />
+    <file src="net451\$Runtime$\testhost.net452.exe.config"	target="tools\net451\testhost.net452.exe.config" />
+    <file src="net451\$Runtime$\testhost.net46.exe"	target="tools\net451\testhost.net46.exe" />
+    <file src="net451\$Runtime$\testhost.net46.exe.config"	target="tools\net451\testhost.net46.exe.config" />
+    <file src="net451\$Runtime$\testhost.net461.exe"	target="tools\net451\testhost.net461.exe" />
+    <file src="net451\$Runtime$\testhost.net461.exe.config"	target="tools\net451\testhost.net461.exe.config" />
+    <file src="net451\$Runtime$\testhost.net462.exe"	target="tools\net451\testhost.net462.exe" />
+    <file src="net451\$Runtime$\testhost.net462.exe.config"	target="tools\net451\testhost.net462.exe.config" />
+    <file src="net451\$Runtime$\testhost.net47.exe"	target="tools\net451\testhost.net47.exe" />
+    <file src="net451\$Runtime$\testhost.net47.exe.config"	target="tools\net451\testhost.net47.exe.config" />
+    <file src="net451\$Runtime$\testhost.net471.exe"	target="tools\net451\testhost.net471.exe" />
+    <file src="net451\$Runtime$\testhost.net471.exe.config"	target="tools\net451\testhost.net471.exe.config" />
+    <file src="net451\$Runtime$\testhost.net472.exe"	target="tools\net451\testhost.net472.exe" />
+    <file src="net451\$Runtime$\testhost.net472.exe.config"	target="tools\net451\testhost.net472.exe.config" />
+    <file src="net451\$Runtime$\testhost.net48.exe"	target="tools\net451\testhost.net48.exe" />
+    <file src="net451\$Runtime$\testhost.net48.exe.config"	target="tools\net451\testhost.net48.exe.config" />
     <file src="net451\$Runtime$\testhost.x86.exe"	target="tools\net451\testhost.x86.exe" />
     <file src="net451\$Runtime$\testhost.x86.exe.config"	target="tools\net451\testhost.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net452.x86.exe"	target="tools\net451\testhost.net452.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net452.x86.exe.config"	target="tools\net451\testhost.net452.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net46.x86.exe"	target="tools\net451\testhost.net46.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net46.x86.exe.config"	target="tools\net451\testhost.net46.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net461.x86.exe"	target="tools\net451\testhost.net461.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net461.x86.exe.config"	target="tools\net451\testhost.net461.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net462.x86.exe"	target="tools\net451\testhost.net462.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net462.x86.exe.config"	target="tools\net451\testhost.net462.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net47.x86.exe"	target="tools\net451\testhost.net47.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net47.x86.exe.config"	target="tools\net451\testhost.net47.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net471.x86.exe"	target="tools\net451\testhost.net471.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net471.x86.exe.config"	target="tools\net451\testhost.net471.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net472.x86.exe"	target="tools\net451\testhost.net472.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net472.x86.exe.config"	target="tools\net451\testhost.net472.x86.exe.config" />
+    <file src="net451\$Runtime$\testhost.net48.x86.exe"	target="tools\net451\testhost.net48.x86.exe" />
+    <file src="net451\$Runtime$\testhost.net48.x86.exe.config"	target="tools\net451\testhost.net48.x86.exe.config" />
     <file src="net451\$Runtime$\vstest.console.exe"	target="tools\net451\vstest.console.exe" />
     <file src="net451\$Runtime$\vstest.console.exe.config"	target="tools\net451\vstest.console.exe.config" />
     <file src="net451\$Runtime$\NuGet.Frameworks.dll"	target="tools\net451\NuGet.Frameworks.dll" />
@@ -401,8 +433,40 @@
     <file src="netcoreapp2.1\TestHost\System.Reflection.Metadata.dll"	target="tools\netcoreapp2.1\TestHost\System.Reflection.Metadata.dll" />
     <file src="netcoreapp2.1\TestHost\testhost.exe"	target="tools\netcoreapp2.1\TestHost\testhost.exe" />
     <file src="netcoreapp2.1\TestHost\testhost.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net452.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net452.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net452.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net452.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net46.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net46.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net46.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net46.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net461.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net461.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net461.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net461.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net462.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net462.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net462.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net462.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net47.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net47.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net47.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net47.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net471.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net471.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net471.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net471.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net472.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net472.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net472.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net472.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net48.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net48.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net48.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net48.exe.config" />
     <file src="netcoreapp2.1\TestHost\testhost.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.x86.exe" />
     <file src="netcoreapp2.1\TestHost\testhost.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net452.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net452.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net452.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net452.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net46.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net46.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net46.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net46.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net461.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net461.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net461.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net461.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net462.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net462.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net462.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net462.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net47.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net47.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net47.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net47.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net471.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net471.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net471.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net471.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net472.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net472.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net472.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net472.x86.exe.config" />
+    <file src="netcoreapp2.1\TestHost\testhost.net48.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.net48.x86.exe" />
+    <file src="netcoreapp2.1\TestHost\testhost.net48.x86.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.net48.x86.exe.config" />
     <file src="netcoreapp2.1\TestHost\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\TestHost\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="netcoreapp2.1\TestHost\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"	target="tools\netcoreapp2.1\TestHost\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="netcoreapp2.1\TestHost\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll"	target="tools\netcoreapp2.1\TestHost\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />

@@ -209,7 +209,12 @@
       </trans-unit>
       <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
         <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
-        <target state="new">Cannot attach the debugger to the default test host with process ID: {0}.</target>
+        <target state="translated">Impossible d'attacher le débogueur à l'hôte de test par défaut ayant l'ID de processus : {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</source>
+        <target state="translated">{0} Accès refusé durant la tentative de création du dossier "TestResults" à l'emplacement indiqué. Vous obtenez cette exception, car vous exécutez vstest.console.exe à partir d'un dossier qui nécessite un accès en écriture. Pour résoudre le problème, exécutez vstest.console.exe à partir d'un dossier sur lequel vous disposez de privilèges d'accès en écriture.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -199,6 +199,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.TestRunAttachmentsProcessingStart:
+                            {
+                                var testRunAttachmentsProcessingPayload =
+                                    this.communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                                this.StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
+                                break;
+                            }
+
                         case MessageType.CancelDiscovery:
                             {
                                 testRequestManager.CancelDiscovery();
@@ -214,6 +222,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.AbortTestRun:
                             {
                                 testRequestManager.AbortTestRun();
+                                break;
+                            }
+
+                        case MessageType.TestRunAttachmentsProcessingCancel:
+                            {
+                                testRequestManager.CancelTestRunAttachmentsProcessing();
                                 break;
                             }
 
@@ -454,6 +468,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         // Send run complete to translation layer
                         this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
+                    }
+                });
+        }
+
+        private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRequestManager testRequestManager)
+        {
+            Task.Run(
+                delegate
+                {
+                    try
+                    {
+                        testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(this.communicationManager), this.protocolConfig);
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error("DesignModeClient: Exception in StartTestRunAttachmentsProcessing: " + ex);
+
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                        var payload = new TestRunAttachmentsProcessingCompletePayload()
+                        {
+                            Attachments = null
+                        };
+
+                        // Send run complete to translation layer
+                        this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
                     }
                 });
         }

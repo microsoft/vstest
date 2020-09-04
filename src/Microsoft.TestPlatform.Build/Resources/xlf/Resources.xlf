@@ -13,7 +13,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunningSummary">
-        <source>Test run for {0}({1})</source>
+        <source>Test run for {0} ({1})</source>
         <target state="new">Test run for {0}({1})</target>
         <note></note>
       </trans-unit>

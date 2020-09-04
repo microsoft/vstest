@@ -14,11 +14,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
@@ -256,12 +259,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             if (concurrentManager is ProxyExecutionManagerWithDataCollection)
             {
+                var concurrentManagerWithDataCollection = concurrentManager as ProxyExecutionManagerWithDataCollection;
+
+                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
+                var attachmentsProcessingManager = new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
+
                 return new ParallelDataCollectionEventsHandler(
                             this.requestData,
-                            concurrentManager,
+                            concurrentManagerWithDataCollection,
                             this.currentRunEventsHandler,
                             this,
-                            this.currentRunDataAggregator);
+                            this.currentRunDataAggregator,
+                            attachmentsProcessingManager,
+                            concurrentManagerWithDataCollection.CancellationToken);
             }
 
             return new ParallelRunEventsHandler(

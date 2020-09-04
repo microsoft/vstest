@@ -311,9 +311,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private bool IsDumpCollectionSupported()
         {
             var dumpCollectionSupported =
-                this.environment.OperatingSystem == PlatformOperatingSystem.Windows
+                this.environment.OperatingSystem == PlatformOperatingSystem.Unix ||
+                this.environment.OperatingSystem == PlatformOperatingSystem.OSX ||
+                (this.environment.OperatingSystem == PlatformOperatingSystem.Windows
                 && this.environment.Architecture != PlatformArchitecture.ARM64
-                && this.environment.Architecture != PlatformArchitecture.ARM;
+                && this.environment.Architecture != PlatformArchitecture.ARM);
 
             if (!dumpCollectionSupported)
             {
@@ -329,10 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>Dump collection supported flag.</returns>
         private bool IsHangDumpCollectionSupported()
         {
-            var dumpCollectionSupported =
-                this.environment.OperatingSystem != PlatformOperatingSystem.OSX
-                && this.environment.Architecture != PlatformArchitecture.ARM64
-                && this.environment.Architecture != PlatformArchitecture.ARM;
+            var dumpCollectionSupported = true;
 
             if (!dumpCollectionSupported)
             {

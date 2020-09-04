@@ -267,7 +267,7 @@
     <value>        Uri: {0}</value>
   </data>
   <data name="FailedTestIndicator" xml:space="preserve">
-    <value>Failed   {0}</value>
+    <value>Failed</value>
     <comment>Message which is written to the console when a test fails.</comment>
   </data>
   <data name="FileNotFound" xml:space="preserve">
@@ -436,7 +436,7 @@
       Process Id of the Parent Process responsible for launching current process.</value>
   </data>
   <data name="PassedTestIndicator" xml:space="preserve">
-    <value>Passed   {0}</value>
+    <value>Passed</value>
     <comment>Message which is written to the console when a test passes.</comment>
   </data>
   <data name="PhoneAppContainerTestPrerequisiteFail" xml:space="preserve">
@@ -499,7 +499,7 @@
     <value>        SettingName: {0}</value>
   </data>
   <data name="SkippedTestIndicator" xml:space="preserve">
-    <value>Skipped  {0}</value>
+    <value>Skipped</value>
   </data>
   <data name="SomeTestsUnavailableAfterFiltering" xml:space="preserve">
     <value>A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</value>
@@ -629,7 +629,7 @@
     <value>The /InIsolation flag is deprecated. The tests are always run in a separate process</value>
   </data>
   <data name="NotRunTestIndicator" xml:space="preserve">
-    <value>Not Run  {0}</value>
+    <value>Not Run</value>
   </data>
   <data name="VstestDiagLogOutputPath" xml:space="preserve">
     <value>Logging Vstest Diagnostics in file: {0}</value>
@@ -734,11 +734,33 @@
   <data name="TestSourcesDiscovered" xml:space="preserve">
     <value>A total of {0} test files matched the specified pattern.</value>
   </data>
+  <data name="TestRunSummary" xml:space="preserve">
+    <value>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</value>
+  </data>
   <data name="InvalidTestRunParameterArgument" xml:space="preserve">
     <value>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</value>
   </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="TestRunSummaryAssemblyAndFramework" xml:space="preserve">
+    <value> - {0} {1}</value>
+  </data>
   <data name="BlameCollectDumpTestTimeoutNotSupportedForPlatform" xml:space="preserve">
     <value>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</value>
+  </data>
+  <data name="EnvironmentArgumentHelp" xml:space="preserve">
+    <value>-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if it does not exist, overrides if it does. This will imply /InIsolation switch and force the tests to be run in an isolated process.
+      
+      This argument can be specified multiple times to provide multiple variables.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</value>
+  </data>
+  <data name="EnvironmentVariableXIsOverriden" xml:space="preserve">
+    <value>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</value>
   </data>
 </root>

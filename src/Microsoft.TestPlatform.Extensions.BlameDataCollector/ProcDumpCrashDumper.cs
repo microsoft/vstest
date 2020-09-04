@@ -69,8 +69,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void AttachToTargetProcess(int processId, string outputFile, DumpTypeOption dumpType)
+        public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType)
         {
+            var process = Process.GetProcessById(processId);
+            var outputFile = Path.Combine(outputDirectory, $"{process.ProcessName}_{process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_crashdump.dmp");
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: Attaching to process '{processId}' to dump into '{outputFile}'.");
 
             // Procdump will append .dmp at the end of the dump file. We generate this internally so it is rather a safety check.

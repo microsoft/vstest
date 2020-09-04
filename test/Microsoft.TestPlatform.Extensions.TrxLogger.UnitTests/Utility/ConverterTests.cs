@@ -25,11 +25,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
     {
         private Converter converter;
         private Mock<IFileHelper> fileHelper;
+        private readonly TrxFileHelper trxFileHelper;
 
         public ConverterTests()
         {
             this.fileHelper = new Mock<IFileHelper>();
-            this.converter = new Converter(this.fileHelper.Object);
+            this.trxFileHelper = new TrxFileHelper();
+            this.converter = new Converter(this.fileHelper.Object, trxFileHelper);
         }
 
         [TestMethod]
@@ -67,7 +69,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         {
             ConverterTests.SetupForToCollectionEntries(out var tempDir, out var attachmentSets, out var testRun, out var testResultsDirectory);
 
-            this.converter = new Converter(new VisualStudio.TestPlatform.Utilities.Helpers.FileHelper());
+            this.converter = new Converter(new FileHelper(), trxFileHelper);
             List<CollectorDataEntry> collectorDataEntries = this.converter.ToCollectionEntries(attachmentSets, testRun, testResultsDirectory);
 
             Assert.AreEqual($@"{Environment.MachineName}\123.coverage", ((ObjectModel.UriDataAttachment) collectorDataEntries[0].Attachments[0]).Uri.OriginalString);
@@ -145,7 +147,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         }
 
         [TestMethod]
-        public void ToResultFilesShouldAddAttachementsWithRelativeURI()
+        public void ToResultFilesShouldAddAttachmentsWithRelativeURI()
         {
             UriDataAttachment uriDataAttachment1 =
                 new UriDataAttachment(new Uri($"/mnt/c/abc.txt", UriKind.Relative), "Description 1");
@@ -156,7 +158,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             };
 
             var testRun = new TestRun(Guid.NewGuid());
-            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1");
+            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1", trxFileHelper);
             attachmentSets[0].Attachments.Add(uriDataAttachment1);
 
             var resultFiles = this.converter.ToResultFiles(attachmentSets, testRun, @"c:\temp", null);
@@ -214,7 +216,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             };
 
             testRun = new TestRun(Guid.NewGuid());
-            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1");
+            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1", new TrxFileHelper());
             attachmentSets[0].Attachments.Add(uriDataAttachment1);
             attachmentSets[0].Attachments.Add(uriDataAttachment2);
             testResultsDirectory = Path.Combine(tempDir, "TestResults");

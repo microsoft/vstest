@@ -279,6 +279,11 @@
         <target state="translated">Nie można załadować rozszerzeń z pliku „{0}”. Aby uzyskać więcej informacji, użyj opcji /diag.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
+        <target state="translated">{0} Odmowa dostępu podczas próby utworzenia folderu „TestResults” w określonej lokalizacji. Widzisz ten wyjątek, ponieważ program vstest.console.exe został uruchomiony z folderu wymagającego dostępu do zapisu. Aby rozwiązać ten problem: uruchom program vstest.console.exe z folderu, w którym masz uprawnienia do zapisu. Więcej informacji można znaleźć w komunikacie o błędzie:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

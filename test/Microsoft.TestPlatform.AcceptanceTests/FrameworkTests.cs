@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty);
             arguments = string.Concat(arguments, " ", $"/Framework:{this.FrameworkArgValue}");
 
             this.InvokeVsTest(arguments);
@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.testEnvironment.TargetFramework);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty);
             arguments = string.Concat(arguments, " ", $"/Framework:{this.testEnvironment.TargetFramework}");
 
             this.InvokeVsTest(arguments);
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty);
             if (runnerInfo.TargetFramework.Contains("netcore"))
             {
                 arguments = string.Concat(arguments, " ", "/Framework:Framework45");
@@ -72,7 +72,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty);
             arguments = string.Concat(arguments, " ", "/tests:PassingTest");
             arguments = string.Concat(arguments, " ", "/Framework:Framework40");
 
@@ -84,7 +84,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             else
             {
-                this.StdOutputContains("Following DLL(s) do not match framework/platform settings. ");
+                this.StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X86 platform.");
                 this.ValidateSummaryStatus(1, 0, 0);
             }
         }

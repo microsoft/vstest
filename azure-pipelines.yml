@@ -64,11 +64,9 @@ jobs:
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
 
-# Linux build does not work when we mix runtimes and 
-# we don't use the results to do anything, skipping it for now  
 # - job: Linux
 #   pool:
-#     vmImage: 'ubuntu-16.04'
+#     vmImage: 'ubuntu-18.04'
 #   variables:
 #       buildConfiguration: 'Release'
 #   steps:

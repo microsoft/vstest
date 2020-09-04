@@ -7,7 +7,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -275,6 +276,148 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #endregion
 
+        #region IVsTestConsoleWrapperAsync
+
+        /// <inheritdoc/>
+        public async Task StartSessionAsync()
+        {
+            EqtTrace.Info("VsTestConsoleWrapperAsync.StartSessionAsync: Starting VsTestConsoleWrapper session");
+
+            this.testPlatformEventSource.TranslationLayerInitializeStart();
+
+            var timeout = EnvironmentHelper.GetConnectionTimeout();
+            // Start communication
+            var port = await this.requestSender.InitializeCommunicationAsync(timeout * 1000);
+
+            if (port > 0)
+            {
+                // Fill the parameters
+                this.consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
+                this.consoleParameters.PortNumber = port;
+
+                // Start vstest.console.exe process
+                this.vstestConsoleProcessManager.StartProcess(this.consoleParameters);
+            }
+            else
+            {
+                // Close the sender as it failed to host server
+                this.requestSender.Close();
+                throw new TransationLayerException("Error hosting communication channel and connecting to console");
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions)
+        {
+            await this.EnsureInitializedAsync();
+            this.pathToAdditionalExtensions = pathToAdditionalExtensions.ToList();
+            this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+        }
+
+        /// <inheritdoc/>
+        public async Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, ITestDiscoveryEventsHandler discoveryEventsHandler)
+        {
+            this.testPlatformEventSource.TranslationLayerDiscoveryStart();
+            await this.EnsureInitializedAsync();
+
+            // Converts ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
+            var discoveryCompleteEventsHandler2 = new DiscoveryEventsHandleConverter(discoveryEventsHandler);
+            await this.requestSender.DiscoverTestsAsync(sources, discoverySettings, options: null, discoveryEventsHandler: discoveryCompleteEventsHandler2);
+        }
+
+
+        /// <inheritdoc/>
+        public async Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
+        {
+            this.testPlatformEventSource.TranslationLayerDiscoveryStart();
+            await this.EnsureInitializedAsync();
+            await this.requestSender.DiscoverTestsAsync(sources, discoverySettings, options, discoveryEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler)
+        {
+            await RunTestsAsync(sources, runSettings, null, testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler)
+        {
+            var sourceList = sources.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(0, sourceList.Count, 0, runSettings ?? string.Empty);
+
+            await this.EnsureInitializedAsync();
+            await this.requestSender.StartTestRunAsync(sourceList, runSettings, options, testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler)
+        {
+            var testCaseList = testCases.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(0, 0, testCaseList.Count, runSettings ?? string.Empty);
+
+            await this.EnsureInitializedAsync();
+            await this.requestSender.StartTestRunAsync(testCaseList, runSettings, options: null, runEventsHandler: testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler)
+        {
+            var testCaseList = testCases.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(0, 0, testCaseList.Count, runSettings ?? string.Empty);
+
+            await this.EnsureInitializedAsync();
+            await this.requestSender.StartTestRunAsync(testCaseList, runSettings, options, testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
+            await RunTestsWithCustomTestHostAsync(sources, runSettings, null, testRunEventsHandler, customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
+            var sourceList = sources.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(1, sourceList.Count, 0, runSettings ?? string.Empty);
+
+            await this.EnsureInitializedAsync();
+            await this.requestSender.StartTestRunWithCustomHostAsync(sourceList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsWithCustomTestHostAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
+            var testCaseList = testCases.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(1, 0, testCaseList.Count, runSettings ?? string.Empty);
+
+            await this.EnsureInitializedAsync();
+            await this.requestSender.StartTestRunWithCustomHostAsync(testCaseList, runSettings, options: null, runEventsHandler: testRunEventsHandler, customTestHostLauncher: customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsWithCustomTestHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
+            var testCaseList = testCases.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(1, 0, testCaseList.Count, runSettings ?? string.Empty);
+
+            await this.EnsureInitializedAsync();
+            await this.requestSender.StartTestRunWithCustomHostAsync(testCaseList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public async Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, string processingSettings, bool isLastBatch, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        {
+            this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStart();
+
+            await this.EnsureInitializedAsync().ConfigureAwait(false);
+            await requestSender.ProcessTestRunAttachmentsAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken).ConfigureAwait(false);
+        }
+
+        #endregion
+
+
         private void EnsureInitialized()
         {
             if (!this.vstestConsoleProcessManager.IsProcessInitialized())
@@ -294,6 +437,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started.");
                 this.sessionStarted = this.WaitForConnection();
+            }
+        }
+
+        private async Task EnsureInitializedAsync()
+        {
+            if (!this.vstestConsoleProcessManager.IsProcessInitialized())
+            {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Process is not started.");
+                await this.StartSessionAsync();
+
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Send a request to initialize extensions.");
+                this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
             }
         }
 

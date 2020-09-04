@@ -3,30 +3,33 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
+        private readonly ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
+        private readonly CancellationToken cancellationToken;
 
         public ParallelDataCollectionEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
-            ParallelRunDataAggregator runDataAggregator) :
+            ParallelRunDataAggregator runDataAggregator,
+            ITestRunAttachmentsProcessingManager attachmentsProcessingManager,
+            CancellationToken cancellationToken) :
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
+            this.attachmentsProcessingManager = attachmentsProcessingManager;
+            this.cancellationToken = cancellationToken;
         }
 
         internal ParallelDataCollectionEventsHandler(IRequestData requestData,
@@ -53,33 +56,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
-                {
-                    var coverageHandler = new CodeCoverageDataAttachmentsHandler();
-                    Uri attachementUri = coverageHandler.GetExtensionUri();
-                    if (attachementUri != null)
-                    {
-                        var coverageAttachments = runDataAggregator.RunContextAttachments
-                            .Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
-
-                        foreach (var coverageAttachment in coverageAttachments)
-                        {
-                            runDataAggregator.RunContextAttachments.Remove(coverageAttachment);
-                        }
-
-                        ICollection<AttachmentSet> attachments = coverageHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments));
-                        foreach (var attachment in attachments)
-                        {
-                            runDataAggregator.RunContextAttachments.Add(attachment);
-                        }
-                    }
-                }
+                runDataAggregator.RunContextAttachments = attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    this.runDataAggregator.RunContextAttachments,
+                    runDataAggregator.RunContextAttachments,
                     this.runDataAggregator.ElapsedTime);
 
                 // Add Metrics from Test Host
