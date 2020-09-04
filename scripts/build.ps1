@@ -174,13 +174,16 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
 
-    # Pull in additional shared frameworks.
-    # Get netcoreapp2.1 shared components.
-    
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x86 -NoPath
+    ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
+
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '3.1.0' -Channel '3.1.0' -Architecture x64 -NoPath
+    $env:DOTNET_ROOT= $dotnetInstallPath
+
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '3.1.0' -Channel '3.1.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
     
     $env:DOTNET_MULTILEVEL_LOOKUP=0
