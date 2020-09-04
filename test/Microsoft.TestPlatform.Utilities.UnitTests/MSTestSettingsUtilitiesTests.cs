@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using VisualStudio.TestPlatform.ObjectModel;
     using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
@@ -49,9 +48,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 () =>
                 MSTestSettingsUtilities.Import(
                     "C:\\temp\\r.runsettings",
-                    xmlDocument,
-                    Architecture.X86,
-                    FrameworkVersion.Framework45);
+                    xmlDocument);
             Assert.That.Throws<XmlException>(action).WithMessage("Unexpected settings file specified.");
         }
 
@@ -66,9 +63,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 () =>
                 MSTestSettingsUtilities.Import(
                     "C:\\temp\\r.testsettings",
-                    xmlDocument,
-                    Architecture.X86,
-                    FrameworkVersion.Framework45);
+                    xmlDocument);
             Assert.That.Throws<XmlException>(action).WithMessage("Could not find 'RunSettings' node.");
         }
 
@@ -80,14 +75,18 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             xmlDocument.LoadXml(defaultRunSettingsXml);
             var finalxPath = MSTestSettingsUtilities.Import(
                 "C:\\temp\\r.testsettings",
-                xmlDocument,
-                Architecture.X86,
-                FrameworkVersion.Framework45);
+                xmlDocument);
 
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
             var expectedSettingsXml =
-                "<RunSettings>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <RunConfiguration></RunConfiguration>\r\n</RunSettings>";
+                "<RunSettings>\r\n" +
+                "  <MSTest>\r\n" +
+                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
+                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
+                "  </MSTest>\r\n" +
+                "  <RunConfiguration></RunConfiguration>\r\n" +
+                "</RunSettings>";
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
@@ -100,14 +99,18 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             xmlDocument.LoadXml(defaultRunSettingsXml);
             var finalxPath = MSTestSettingsUtilities.Import(
                 "C:\\temp\\r.testsettings",
-                xmlDocument,
-                Architecture.X86,
-                FrameworkVersion.Framework45);
+                xmlDocument);
 
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
             var expectedSettingsXml =
-                "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n</RunSettings>";
+                "<RunSettings>\r\n" +
+                "  <RunConfiguration />\r\n" +
+                "  <MSTest>\r\n" +
+                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
+                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
+                "  </MSTest>\r\n" +
+                "</RunSettings>";
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
