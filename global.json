@@ -6,7 +6,7 @@
     "architecture": "x64"
   },
   "tools": {
-    "dotnet": "5.0.100-rc.1.20380.12"
+    "dotnet": "5.0.100-rc.1.20453.7"
   },
   "msbuild-sdks": {
     "Microsoft.DotNet.Arcade.Sdk": "1.0.0-beta.20427.6",
