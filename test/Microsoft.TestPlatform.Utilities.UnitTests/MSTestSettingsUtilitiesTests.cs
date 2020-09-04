@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using VisualStudio.TestPlatform.ObjectModel;
     using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
@@ -81,7 +80,13 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
             var expectedSettingsXml =
-                "<RunSettings>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <RunConfiguration></RunConfiguration>\r\n</RunSettings>";
+                "<RunSettings>\r\n" +
+                "  <MSTest>\r\n" +
+                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
+                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
+                "  </MSTest>\r\n" +
+                "  <RunConfiguration></RunConfiguration>\r\n" +
+                "</RunSettings>";
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
@@ -99,7 +104,13 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
             var expectedSettingsXml =
-                "<RunSettings>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n</RunSettings>";
+                "<RunSettings>\r\n" +
+                "  <RunConfiguration />\r\n" +
+                "  <MSTest>\r\n" +
+                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
+                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
+                "  </MSTest>\r\n" +
+                "</RunSettings>";
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }

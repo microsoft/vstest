@@ -235,9 +235,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Act.
             executor.Initialize(fileName);
 
+
             // Assert.
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetFrameworkVersion>.NETCoreApp,Version=v1.0</TargetFrameworkVersion>\r\n    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>");
+
+            var expected = 
+                $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
+                $"<RunSettings>\r\n" +
+                $"  <RunConfiguration>\r\n" +
+                $"    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n" +
+                $"    <TargetPlatform>X86</TargetPlatform>\r\n" +
+                $"    <TargetFrameworkVersion>.NETCoreApp,Version=v1.0</TargetFrameworkVersion>\r\n" +
+                $"  </RunConfiguration>\r\n" +
+                $"  <MSTest>\r\n" +
+                $"    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
+                $"    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
+                $"  </MSTest>\r\n" +
+                $"  <DataCollectionRunSettings>\r\n" +
+                $"    <DataCollectors />\r\n" +
+                $"  </DataCollectionRunSettings>\r\n" +
+                $"</RunSettings>";
+            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, expected);
         }
 
 
