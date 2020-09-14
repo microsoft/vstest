@@ -21,7 +21,8 @@ namespace child_hang
             // wait for two children to crash
             var childProcess =  Path.GetFullPath($@"../../../../hanging-child/bin/{directory}/net5.0/hanging-child{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ".dll")}");
             // 2 chidren, that is 3 hanging processes
-            (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Process.Start(childProcess, "2") : Process.Start(GetFullPath("dotnet"), $"{childProcess} 2")).WaitForExit();
+            var process = (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Process.Start(childProcess, "2") : Process.Start(GetFullPath("dotnet"), $"{childProcess} 2"));
+            process.WaitForExit();
 
             // then hang self (+1 hang)
             Thread.Sleep(30_000);

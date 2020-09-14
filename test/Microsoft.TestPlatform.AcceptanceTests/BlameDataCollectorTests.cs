@@ -161,7 +161,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.GetAssetFullPath("child-hang.dll");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=3s""");
+            arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=full;TestTimeout=15s""");
             this.InvokeVsTest(arguments);
 
             this.ValidateDump(2);
@@ -195,7 +195,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (dumps.Count < expectedDumpCount)
             {
-                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}." + Environment.NewLine + output);
+                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}." 
+                    + Environment.NewLine 
+                    + string.Join(Environment.NewLine, dumps));
             }
 
             var nonExistingDumps = new List<string>();
