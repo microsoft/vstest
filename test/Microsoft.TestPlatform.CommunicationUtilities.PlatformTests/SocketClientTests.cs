@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketClient.Stop();
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else
@@ -100,7 +100,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
             // Close the communication from server side
             this.tcpClient.GetStream().Dispose();
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else

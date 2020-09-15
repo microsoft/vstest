@@ -64,12 +64,12 @@ jobs:
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
 
-- job: Linux
-  pool:
-    vmImage: 'ubuntu-18.04'
-  variables:
-      buildConfiguration: 'Release'
-  steps:
-  - script: ./build.sh -c $(buildConfiguration)
-    displayName: './build.sh -c $(buildConfiguration)'
+# - job: Linux
+#   pool:
+#     vmImage: 'ubuntu-18.04'
+#   variables:
+#       buildConfiguration: 'Release'
+#   steps:
+#   - script: ./build.sh -c $(buildConfiguration)
+#     displayName: './build.sh -c $(buildConfiguration)'
    

@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
         public static string GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
         {
             var currentTargetFrameWork = testEnvironment.TargetFramework;
-#if NET451
+#if NETFRAMEWORK
             testEnvironment.TargetFramework = NET451;
 #else
             testEnvironment.TargetFramework = NETCOREAPP21;

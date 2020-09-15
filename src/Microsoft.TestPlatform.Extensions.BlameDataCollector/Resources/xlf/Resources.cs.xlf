@@ -21,9 +21,12 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</source>
-        <target state="translated">Aktivní testovací běh byl přerušen, protože hostitelský proces byl neočekávaně ukončen při provádění následujících testů:</target>
-        <note />
+        <source>The active Test Run was aborted because the host process exited unexpectedly. Please inspect the call stack above, if available, to get more information about where the exception originated from.
+The test running when the crash occurred: 
+{0}
+This test may, or may not be the source of the crash.</source>
+        <target state="new">Aktivní testovací běh byl přerušen, protože hostitelský proces byl neočekávaně ukončen při provádění následujících testů:</target>
+        <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
@@ -56,13 +59,38 @@
         <note />
       </trans-unit>
       <trans-unit id="InactivityTimeout">
-        <source>The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process.</source>
-        <target state="translated">Uplynul zadaný čas nečinnosti {0} min. Shromažďuje se výpis paměti a ukončuje se proces hostitele testu.</target>
-        <note></note>
+        <source>The specified inactivity time of {0} {1} has elapsed. Collecting hang dumps from testhost and its child processes</source>
+        <target state="new">Uplynul zadaný čas nečinnosti {0} min. Shromažďuje se výpis paměti a ukončuje se proces hostitele testu.</target>
+        <note>{0} value, {1} one of the unit strings below, Minutes/Seconds</note>
       </trans-unit>
       <trans-unit id="UnexpectedValueForInactivityTimespanValue">
         <source>Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</source>
         <target state="translated">Jako časový limit se přidala neočekávaná hodnota {0}. Zadejte prosím hodnotu v tomto formátu: 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NotGeneratingSequenceFile">
+        <source>All tests finished running, Sequence file will not be generated</source>
+        <target state="new">All tests finished running, Sequence file will not be generated.</target>
+        <note>"Sequence" is the name of the file.</note>
+      </trans-unit>
+      <trans-unit id="Dumping">
+        <source>Dumping {0} - {1}</source>
+        <target state="new">Dumping {0} - {1}</target>
+        <note>as in creating a process dump, {0} process id, {1} process name</note>
+      </trans-unit>
+      <trans-unit id="DumpingTree">
+        <source>Dumping this process tree (from bottom)</source>
+        <target state="new">Dumping this process tree (from bottom)</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Minutes">
+        <source>minutes</source>
+        <target state="new">minutes</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Seconds">
+        <source>seconds</source>
+        <target state="new">seconds</target>
         <note></note>
       </trans-unit>
     </body>

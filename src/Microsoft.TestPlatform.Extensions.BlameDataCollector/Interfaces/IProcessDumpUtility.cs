@@ -3,6 +3,9 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
+    using System.Collections.Generic;
+
     public interface IProcessDumpUtility
     {
         /// <summary>
@@ -11,7 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>
         /// Path of dump file
         /// </returns>
-        string GetDumpFile();
+        IEnumerable<string> GetDumpFiles();
 
         /// <summary>
         /// Launch proc dump process
@@ -19,9 +22,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="processId">
         /// Process ID of test host
         /// </param>
-        /// <param name="dumpFileGuid">
-        /// Guid as postfix for dump file, testhost.exe_&lt;guid&gt;.dmp
-        /// </param>
         /// <param name="testResultsDirectory">
         /// Path to TestResults directory
         /// </param>
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="targetFramework">
         /// The target framework of the process
         /// </param>
-        void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump, string targetFramework);
+        void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework);
 
         /// <summary>
         /// Launch proc dump process to capture dump in case of a testhost hang and wait for it to exit
@@ -39,9 +39,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="processId">
         /// Process ID of test host
         /// </param>
-        /// <param name="dumpFileGuid">
-        /// Guid as postfix for dump file, testhost.exe_&lt;guid&gt;.dmp
-        /// </param>
         /// <param name="testResultsDirectory">
         /// Path to TestResults directory
         /// </param>
@@ -51,7 +48,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="targetFramework">
         /// The target framework of the process
         /// </param>
-        void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump, string targetFramework);
+        /// <param name="logWarning">
+        /// Callback to datacollector logger to log warning
+        /// </param>
+        void StartHangBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, Action<string> logWarning = null);
 
         /// <summary>
         /// Detaches the proc dump process from the target process
