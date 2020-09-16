@@ -4,19 +4,20 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
-    using System.Collections.Generic;
+    using System.Xml;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
-    using System.Xml;
     using System.Xml.XPath;
+    using System.Threading;
+    using System.Reflection;
+    using System.Globalization;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -24,13 +25,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -49,6 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly Task<IMetricsPublisher> metricsPublisher;
         private bool isDisposed;
         private IProcessHelper processHelper;
+        private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -62,6 +67,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private IDiscoveryRequest currentDiscoveryRequest;
 
+        /// <summary>
+        /// Maintains the current active test run attachments processing cancellation token source
+        /// Assumption : There can only be one active attachments processing request.
+        /// </summary>
+        private CancellationTokenSource currentAttachmentsProcessingCancellationTokenSource;
+
         #region Constructor
 
         public TestRequestManager()
@@ -72,11 +83,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestPlatformEventSource.Instance,
                   new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
-                  new ProcessHelper())
+                  new ProcessHelper(),
+                  new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler()))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper, ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
@@ -85,6 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
             this.processHelper = processHelper;
+            this.attachmentsProcessingManager = attachmentsProcessingManager;
         }
 
         #endregion
@@ -150,6 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
+            var testCaseFilterFromRunsettings = runConfiguration.TestCaseFilter;
 
             if (requestData.IsTelemetryOptedIn)
             {
@@ -163,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
             {
-                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
+                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue ?? testCaseFilterFromRunsettings
             };
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe
@@ -298,13 +312,52 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
+        /// <inheritdoc/>
+        public void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler attachmentsProcessingEventsHandler, ProtocolConfig protocolConfig)
+        {
+            EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing started.");
+
+            this.telemetryOptedIn = attachmentsProcessingPayload.CollectMetrics;
+            var requestData = this.GetRequestData(protocolConfig);
+
+            // Make sure to run the run request inside a lock as the below section is not thread-safe
+            // There can be only one discovery, execution or attachments processing request at a given point in time
+            lock (this.syncObject)
+            {
+                try
+                {
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Synchronization context taken");
+                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStart();
+
+                    this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
+
+                    Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, attachmentsProcessingPayload.Attachments, attachmentsProcessingEventsHandler, this.currentAttachmentsProcessingCancellationTokenSource.Token);
+                    task.Wait();
+                }
+                finally
+                {
+                    if (this.currentAttachmentsProcessingCancellationTokenSource != null)
+                    {
+                        this.currentAttachmentsProcessingCancellationTokenSource.Dispose();
+                        this.currentAttachmentsProcessingCancellationTokenSource = null;
+                    }
+
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing completed.");
+                    this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStop();
+
+                    // Post the attachments processing complete event
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent, requestData.MetricsCollection.Metrics);
+                }
+            }
+        }
+
         private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
 
             if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsTelemetry))
             {
-                foreach( var ciData in legacySettingsTelemetry)
+                foreach (var ciData in legacySettingsTelemetry)
                 {
                     // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
                     requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingPrefix, ciData.Key), ciData.Value);
@@ -337,6 +390,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
             this.currentTestRunRequest?.Abort();
+        }
+
+        /// <inheritdoc/>
+        public void CancelTestRunAttachmentsProcessing()
+        {
+            EqtTrace.Info("TestRequestManager.CancelTestRunAttachmentsProcessing: Sending cancel request.");
+            this.currentAttachmentsProcessingCancellationTokenSource?.Cancel();
         }
 
         #endregion
@@ -385,21 +445,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
 
                     // Choose default architecture based on the framework
-                    // For .NET core, the default platform architecture should be based on the process.
-                    // For a 64 bit process,
+                    // For .NET core, the default platform architecture should be based on the process.	
                     Architecture defaultArchitecture = Architecture.X86;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                        || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+                        || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        var currentProcessName = this.processHelper.GetProcessName(this.processHelper.GetCurrentProcessId());
-                        defaultArchitecture = (currentProcessName.StartsWith("dotnet", StringComparison.OrdinalIgnoreCase) && !Environment.Is64BitProcess) ? Architecture.X86: Architecture.X64;
+                        defaultArchitecture =  Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
                     }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
-                    CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
+                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, defaultArchitecture, sourcePlatforms, sourceFrameworks, registrar);
                     settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
                     settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
-                    settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
+                    settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
                     settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
@@ -412,20 +471,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private bool AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, LoggerRunSettings loggerRunSettings)
         {
             // Update console logger settings
-            bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+            bool consoleLoggerUpdated = this.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
             // In case of CLI, add console logger if not already present.
             bool designMode = runConfiguration.DesignModeSet ? runConfiguration.DesignMode : this.commandLineOptions.IsDesignMode;
             if (!designMode && !consoleLoggerUpdated)
             {
-                AddConsoleLogger(document, loggerRunSettings);
+                this.AddConsoleLogger(document, loggerRunSettings);
             }
 
             // Update is required 1) in case of CLI 2) in case of design mode if console logger is present in runsettings.
             return !designMode || consoleLoggerUpdated;
         }
 
-        private static bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
+        private bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
         {
             bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
             if (updateRequired)
@@ -456,10 +515,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private static void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
+        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, Architecture defaultArchitecture, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
         {
             // Find compatible sources
-            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, defaultArchitecture, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
 
             // Raise warnings for incompatible sources
             if (!string.IsNullOrEmpty(incompatibleSettingWarning))
@@ -524,7 +583,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         /// <param name="document">Runsettings document.</param>
         /// <param name="loggerRunSettings">Logger run settings.</param>
-        private static void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
+        private void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
         {
             var consoleLogger = new LoggerSettings
             {
@@ -545,7 +604,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="document">Runsettings document.</param>
         /// <param name="loggerRunSettings">Logger run settings.</param>
         /// <returns>True if updated console logger in runsettings successfully.</returns>
-        private static bool UpdateConsoleLoggerIfExists(XmlDocument document, LoggerRunSettings loggerRunSettings)
+        private bool UpdateConsoleLoggerIfExists(XmlDocument document, LoggerRunSettings loggerRunSettings)
         {
             var defaultConsoleLogger = new LoggerSettings
             {

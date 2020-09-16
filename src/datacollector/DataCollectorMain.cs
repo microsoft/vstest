@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System;
     using System.Diagnostics;
     using System.Globalization;
-
+    using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
@@ -79,6 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 // Initialize trace.
                 EqtTrace.InitializeTrace(logFile, traceLevel);
 
+
                 // Log warning in case tracelevel passed in arg is invalid
                 if (!isTraceLevelArgValid)
                 {
@@ -88,6 +89,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             else
             {
                 EqtTrace.DoNotInitailize = true;
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                var version = typeof(DataCollectorMain)
+                    .GetTypeInfo()
+                    .Assembly
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                EqtTrace.Verbose($"Version: { version }");
             }
 
             SetCultureSpecifiedByUser();

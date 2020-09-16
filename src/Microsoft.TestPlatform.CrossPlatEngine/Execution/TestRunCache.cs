@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 if (this.inProgressTests == null || this.inProgressTests.Count == 0)
                 {
-                    EqtTrace.Warning("InProgressTests is null");
+                    EqtTrace.Warning("TestRunCache: InProgressTests is null");
                     return false;
                 }
 
@@ -396,7 +396,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var removed = this.OnTestCompletion(result.TestCase);
             if (!removed)
             {
-                EqtTrace.Warning("TestRunCache: No test found corresponding to testResult '{0}' in inProgress list.", result);
+                EqtTrace.Warning("TestRunCache: No test found corresponding to testResult '{0}' in inProgress list.", result.DisplayName);
             }
         }
 

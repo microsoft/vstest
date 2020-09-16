@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
     /// </summary>
-    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender, ITranslationLayerRequestSenderAsync
+    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
         private readonly ICommunicationManager communicationManager;
 
@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 2;
+        private int protocolVersion = 3;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with vstest.console process
@@ -383,6 +383,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
+        /// <inheritdoc/>
+        public Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        {
+            return this.SendMessageAndListenAndReportAttachmentsProcessingResultAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken);
+        }
+
         /// <summary>
         /// Closes the communication channel
         /// </summary>
@@ -640,6 +646,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                    {
+                        AttachDebuggerToProcess(customHostLauncher, message);
+                    }
                 }
             }
             catch (Exception exception)
@@ -703,6 +713,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         HandleCustomHostLaunch(customHostLauncher, message);
                     }
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                    {
+                        AttachDebuggerToProcess(customHostLauncher, message);
+                    }
                 }
             }
             catch (Exception exception)
@@ -719,6 +733,74 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
+        }
+
+        private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var payload = new TestRunAttachmentsProcessingPayload
+                {
+                    Attachments = attachments,
+                    CollectMetrics = collectMetrics
+                };
+
+                this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingStart, payload);
+                var isTestRunAttachmentsProcessingComplete = false;
+
+                using (cancellationToken.Register(() => this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingCancel)))
+                {
+                    // Cycle through the messages that the vstest.console sends.
+                    // Currently each of the operations are not separate tasks since they should not each take much time.
+                    // This is just a notification.
+                    while (!isTestRunAttachmentsProcessingComplete)
+                    {
+                        var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+
+                        if (string.Equals(MessageType.TestRunAttachmentsProcessingComplete, message.MessageType))
+                        {
+                            if (EqtTrace.IsInfoEnabled)
+                            {
+                                EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Process complete.");
+                            }
+
+                            var testRunAttachmentsProcessingCompletePayload = this.dataSerializer.DeserializePayload<TestRunAttachmentsProcessingCompletePayload>(message);
+
+                            eventHandler.HandleTestRunAttachmentsProcessingComplete(testRunAttachmentsProcessingCompletePayload.AttachmentsProcessingCompleteEventArgs, testRunAttachmentsProcessingCompletePayload.Attachments);
+                            isTestRunAttachmentsProcessingComplete = true;
+                        }
+                        else if (string.Equals(MessageType.TestRunAttachmentsProcessingProgress, message.MessageType))
+                        {
+                            var testRunAttachmentsProcessingProgressPayload = this.dataSerializer.DeserializePayload<TestRunAttachmentsProcessingProgressPayload>(message);
+                            eventHandler.HandleTestRunAttachmentsProcessingProgress(testRunAttachmentsProcessingProgressPayload.AttachmentsProcessingProgressEventArgs);
+                        }
+                        else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                        {
+                            var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                            eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                        }
+                        else
+                        {
+                            EqtTrace.Warning($"VsTestConsoleRequestSender.SendMessageAndListenAndReportAttachments: Unexpected message received {message.MessageType}.");
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestRunAttachmentsProcessing);               
+                eventHandler.HandleTestRunAttachmentsProcessingComplete(new TestRunAttachmentsProcessingCompleteEventArgs(false, exception), null);
+
+                // Earlier we were closing the connection with vstest.console in case of exceptions
+                // Removing that code because vstest.console might be in a healthy state and letting the client
+                // know of the error, so that the TL can wait for the next instruction from the client itself.
+                // Also, connection termination might not kill the process which could result in files being locked by testhost.
+            }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
+            }
         }
 
         private Message TryReceiveMessage()
@@ -772,6 +854,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 // Always unblock the Vstest.console thread which is indefinitely waiting on this ACK
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload, this.protocolVersion);
+            }
+        }
+
+        private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+        {
+            var ackPayload = new EditorAttachDebuggerAckPayload() { Attached = false, ErrorMessage = null };
+
+            try
+            {
+                var pid = this.dataSerializer.DeserializePayload<int>(message);
+
+                ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
+                    ? launcher.AttachDebuggerToProcess(pid)
+                    : false;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("VsTestConsoleRequestSender.AttachDebuggerToProcess: Error while attaching debugger to process: {0}", ex);
+
+                // vstest.console will send the abort message properly while cleaning up all the
+                // flow, so do not abort here.
+                // Let the ack go through and let vstest.console handle the error.
+                ackPayload.ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                // Always unblock the vstest.console thread which is indefintitely waiting on this ACK.
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebuggerCallback, ackPayload, this.protocolVersion);
             }
         }
     }

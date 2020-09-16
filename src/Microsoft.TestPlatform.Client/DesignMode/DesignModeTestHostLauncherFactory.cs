@@ -12,12 +12,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     public static class DesignModeTestHostLauncherFactory
     {
         private static ITestHostLauncher defaultLauncher;
-
         private static ITestHostLauncher debugLauncher;
 
         public static ITestHostLauncher GetCustomHostLauncherForTestRun(IDesignModeClient designModeClient, TestRunRequestPayload testRunRequestPayload)
         {
             ITestHostLauncher testHostLauncher = null;
+
             if (!testRunRequestPayload.DebuggingEnabled)
             {
                 testHostLauncher = defaultLauncher = defaultLauncher ?? new DesignModeTestHostLauncher(designModeClient);

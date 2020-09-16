@@ -37,17 +37,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// </summary>
     [ExtensionUri(DefaultTestHostUri)]
     [FriendlyName(DefaultTestHostFriendlyName)]
-    public class DefaultTestHostManager : ITestRuntimeProvider
+    public class DefaultTestHostManager : ITestRuntimeProvider2
     {
-        private const string X64TestHostProcessName = "testhost.exe";
-        private const string X86TestHostProcessName = "testhost.x86.exe";
+        private const string X64TestHostProcessName = "testhost{0}.exe";
+        private const string X86TestHostProcessName = "testhost{0}.x86.exe";
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
         private const string DefaultTestHostFriendlyName = "DefaultTestHost";
         private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
         private Architecture architecture;
-
+        private Framework targetFramework;
         private IProcessHelper processHelper;
         private IFileHelper fileHelper;
         private IEnvironment environment;
@@ -136,8 +136,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             IDictionary<string, string> environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
-            // Default test host manager supports shared test sources
-            var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
+            string testHostProcessName;
+            if (this.targetFramework.Name.StartsWith(".NETFramework,Version=v"))
+            {
+                var targetFrameworkMoniker = "net" + this.targetFramework.Name.Replace(".NETFramework,Version=v", string.Empty).Replace(".", string.Empty);
+
+                // Net451 or older will use the default testhost.exe that is compiled against net451.
+                var isSupportedNetTarget = new[] { "net452", "net46", "net461", "net462", "net47", "net471", "net472", "net48" }.Contains(targetFrameworkMoniker);
+                var targetFrameworkSuffix = isSupportedNetTarget ? $".{targetFrameworkMoniker}" : string.Empty;
+
+                // Default test host manager supports shared test sources
+                testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, targetFrameworkSuffix);
+            }
+            else
+            {
+                // This path is probably happening only in our tests, because otherwise we are first running CanExecuteCurrentRunConfiguration
+                // which would disqualify anything that is not netframework.
+                testHostProcessName = string.Format(this.architecture == Architecture.X86 ? X86TestHostProcessName : X64TestHostProcessName, string.Empty);
+            }
+
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
@@ -239,6 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             this.messageLogger = logger;
             this.architecture = runConfiguration.TargetPlatform;
+            this.targetFramework = runConfiguration.TargetFramework;
             this.testHostProcess = null;
 
             this.Shared = !runConfiguration.DisableAppDomain;
@@ -260,6 +278,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToTestHost()
+        {
+            return this.customTestHostLauncher is ITestHostLauncher2 launcher
+                ? launcher.AttachDebuggerToProcess(this.testHostProcess.Id)
+                : false;
         }
 
         /// <summary>
@@ -365,10 +391,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
             EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-            if (this.customTestHostLauncher == null)
+            // We launch the test host process here if we're on the normal test running workflow.
+            // If we're debugging and we have access to the newest version of the testhost launcher
+            // interface we launch it here as well, but we expect to attach later to the test host
+            // process by using its PID.
+            // For every other workflow (e.g.: profiling) we ask the IDE to launch the custom test
+            // host for us. In the profiling case this is needed because then the IDE sets some
+            // additional environmental variables for us to help with probing.
+            if ((this.customTestHostLauncher == null)
+                || (this.customTestHostLauncher.IsDebug
+                    && this.customTestHostLauncher is ITestHostLauncher2))
             {
                 EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-
                 cancellationToken.ThrowIfCancellationRequested();
                 this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) as Process;
             }

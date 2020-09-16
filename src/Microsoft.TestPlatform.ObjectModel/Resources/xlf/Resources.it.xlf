@@ -400,7 +400,7 @@
       </trans-unit>
       <trans-unit id="SolutionDirectoryNotExists">
         <source>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</source>
-        <target state="translated">La directory '{0}' della soluzione non esiste. Assicurarsi che la directory specificata in runsettings esista e che siano disponibili le autorizzazioni di lettura.</target>
+        <target state="translated">La directory '{0}' della soluzione non esiste. Assicurarsi che la directory della soluzione specificata in runsettings esista e che siano disponibili le autorizzazioni di lettura.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Lösung-Verzeichnis '{0}' ist nicht vorhanden. Stellen Sie sicher Lösung in Runsettings angegebenen Verzeichnis vorhanden ist und über Leseberechtigungen für das Verzeichnis.</target>

@@ -163,17 +163,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         [StoreXmlSimpleField("StackTrace", "")]
         private string stackTrace;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestResultErrorInfo"/> class.
-        /// </summary>
-        /// <param name="message">
-        /// The message.
-        /// </param>
-        public TestResultErrorInfo(string message)
-        {
-            Debug.Assert(message != null, "message is null");
-            this.message = message;
-        }
 
         /// <summary>
         /// Gets or sets the message.
@@ -241,6 +230,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// Directory containing the test result files, relative to the root test results directory
         /// </summary>
         private string relativeTestResultsDirectory;
+        private readonly TrxFileHelper trxFileHelper;
 
         /// <summary>
         /// Paths to test result files, relative to the test results folder, sorted in increasing order
@@ -280,7 +270,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             string computerName,
             TestOutcome outcome,
             TestType testType,
-            TestListCategoryId testCategoryId)
+            TestListCategoryId testCategoryId,
+            TrxFileHelper trxFileHelper) 
         {
             Debug.Assert(computerName != null, "computername is null");
             Debug.Assert(!Guid.Empty.Equals(executionId), "ExecutionId is empty");
@@ -295,6 +286,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             this.outcome = outcome;
             this.categoryId = testCategoryId;
             this.relativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
+            this.trxFileHelper = trxFileHelper;
         }
 
         #endregion
@@ -369,8 +361,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string ErrorMessage
         {
-            get { return (this.errorInfo == null) ? string.Empty : this.errorInfo.Message; }
-            set { this.errorInfo = new TestResultErrorInfo(value); }
+            get { return this.errorInfo?.Message ?? string.Empty; }
+            set
+            {
+                if (this.errorInfo == null)
+                    this.errorInfo = new TestResultErrorInfo();
+
+                this.errorInfo.Message = value;
+            }
         }
 
         /// <summary>
@@ -378,11 +376,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public string ErrorStackTrace
         {
-            get { return (this.errorInfo == null) ? string.Empty : this.errorInfo.StackTrace; }
+            get { return this.errorInfo?.StackTrace ?? string.Empty; }
 
             set
             {
-                Debug.Assert(this.errorInfo != null, "errorInfo is null");
+                if (this.errorInfo == null)
+                    this.errorInfo = new TestResultErrorInfo();
+
                 this.errorInfo.StackTrace = value;
             }
         }
@@ -533,7 +533,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 Debug.Assert(!string.IsNullOrEmpty(resultFile), "'resultFile' is null or empty");
                 Debug.Assert(resultFile.Trim() == resultFile, "'resultFile' has whitespace at the ends");
 
-                this.resultFiles[FileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
+                this.resultFiles[trxFileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
             }
         }
 

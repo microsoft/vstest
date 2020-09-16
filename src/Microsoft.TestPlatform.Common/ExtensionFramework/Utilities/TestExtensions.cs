@@ -40,6 +40,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         internal bool AreTestExecutorsCached { get; set; }
 
         /// <summary>
+        /// Gets or sets test executor 2 extensions.
+        /// </summary>
+        internal Dictionary<string, TestExecutorPluginInformation2> TestExecutors2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether are test executors 2 cached.
+        /// </summary>
+        internal bool AreTestExecutors2Cached { get; set; }
+
+        /// <summary>
         /// Gets or sets test setting provider extensions.
         /// </summary>
         internal Dictionary<string, TestSettingsProviderPluginInformation> TestSettingsProviders { get; set; }
@@ -134,36 +144,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <returns> The test extensions defined the extension assembly if it is already discovered. null if not.</returns>
         internal TestExtensions GetExtensionsDiscoveredFromAssembly(string extensionAssembly)
         {
-            var testExtensions = new TestExtensions
-            {
-                TestDiscoverers =
+            var testExtensions = new TestExtensions();
+
+            testExtensions.TestDiscoverers =
                 this.GetExtensionsDiscoveredFromAssembly<TestDiscovererPluginInformation>(
                     this.TestDiscoverers,
-                    extensionAssembly),
-                TestExecutors =
+                    extensionAssembly);
+            testExtensions.TestExecutors =
                 this.GetExtensionsDiscoveredFromAssembly<TestExecutorPluginInformation>(
                     this.TestExecutors,
-                    extensionAssembly),
-                TestSettingsProviders =
+                    extensionAssembly);
+            testExtensions.TestExecutors2 =
+                this.GetExtensionsDiscoveredFromAssembly<TestExecutorPluginInformation2>(
+                    this.TestExecutors2,
+                    extensionAssembly);
+            testExtensions.TestSettingsProviders =
                 this.GetExtensionsDiscoveredFromAssembly<TestSettingsProviderPluginInformation>(
                     this.TestSettingsProviders,
-                    extensionAssembly),
-                TestLoggers =
+                    extensionAssembly);
+            testExtensions.TestLoggers =
                 this.GetExtensionsDiscoveredFromAssembly<TestLoggerPluginInformation>(
                     this.TestLoggers,
-                    extensionAssembly),
-                TestHosts =
+                    extensionAssembly);
+            testExtensions.TestHosts =
                 this.GetExtensionsDiscoveredFromAssembly<TestRuntimePluginInformation>(
                     this.TestHosts,
-                    extensionAssembly),
-                DataCollectors =
+                    extensionAssembly);
+            testExtensions.DataCollectors =
                 this.GetExtensionsDiscoveredFromAssembly<DataCollectorConfig>(
                     this.DataCollectors,
-                    extensionAssembly)
-            };
+                    extensionAssembly);
 
-            if (testExtensions.TestDiscoverers.Any() || testExtensions.TestExecutors.Any() || testExtensions.TestSettingsProviders.Any() ||
-                testExtensions.TestLoggers.Any() || testExtensions.TestHosts.Any() || testExtensions.DataCollectors.Any())
+            if (testExtensions.TestDiscoverers.Any()
+                || testExtensions.TestExecutors.Any()
+                || testExtensions.TestExecutors2.Any()
+                || testExtensions.TestSettingsProviders.Any()
+                || testExtensions.TestLoggers.Any()
+                || testExtensions.TestHosts.Any()
+                || testExtensions.DataCollectors.Any())
             {
                 // This extension has already been discovered.
                 return testExtensions;
@@ -181,6 +199,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestExecutors;
+            }
+            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            {
+                return (Dictionary<string, TPluginInfo>)(object)this.TestExecutors2;
             }
             else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
             {
@@ -220,6 +242,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             {
                 return this.AreTestExecutorsCached;
             }
+            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            {
+                return this.AreTestExecutors2Cached;
+            }
             else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
             {
                 return this.AreTestLoggersCached;
@@ -255,6 +281,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             {
                 this.AreTestExecutorsCached = true;
             }
+            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            {
+                this.AreTestExecutors2Cached = true;
+            }
             else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
             {
                 this.AreTestLoggersCached = true;
@@ -280,6 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             this.AreTestDiscoverersCached = false;
             this.AreTestExecutorsCached = false;
+            this.AreTestExecutors2Cached = false;
             this.AreTestLoggersCached = false;
             this.AreTestSettingsProvidersCached = false;
             this.AreTestHostsCached = false;
@@ -300,7 +331,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <returns>
         /// The <see cref="Dictionary"/>. of extensions discovered in assembly
         /// </returns>
-        internal Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(Dictionary<string, TPluginInfo> extensionCollection, string extensionAssembly)
+        internal Dictionary<string, TPluginInfo> GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+            Dictionary<string, TPluginInfo> extensionCollection,
+            string extensionAssembly)
         {
             var extensions = new Dictionary<string, TPluginInfo>();
             if (extensionCollection != null)
@@ -332,6 +365,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
             {
                 this.TestExecutors = (Dictionary<string, TestExecutorPluginInformation>)(object)testPluginInfos;
+            }
+            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation2))
+            {
+                this.TestExecutors2 = (Dictionary<string, TestExecutorPluginInformation2>)(object)testPluginInfos;
             }
             else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
             {

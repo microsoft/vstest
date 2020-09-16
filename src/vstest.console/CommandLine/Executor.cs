@@ -99,7 +99,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             else
             {
-                this.PrintSplashScreen();
+                var isDiag = args != null && args.Any(arg => arg.StartsWith("--diag", StringComparison.OrdinalIgnoreCase));
+                this.PrintSplashScreen(isDiag);
             }
 
             int exitCode = 0;
@@ -183,6 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     processors.Add(cliRunSettingsProcessor);
                     break;
                 }
+
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
@@ -374,10 +376,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Displays the Company and Copyright splash title info immediately after launch
         /// </summary>
-        private void PrintSplashScreen()
+        private void PrintSplashScreen(bool isDiag)
         {
-            string assemblyVersion = string.Empty;
-            assemblyVersion = Product.Version;
+            string assemblyVersion = Product.Version;
+            if (!isDiag)
+            {
+                var end = Product.Version?.IndexOf("-release");
+
+                if (end >= 0)
+                {
+                    assemblyVersion = Product.Version?.Substring(0, end.Value);
+                }
+            }
+
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);

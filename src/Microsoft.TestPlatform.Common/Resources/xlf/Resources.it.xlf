@@ -271,12 +271,17 @@
       </trans-unit>
       <trans-unit id="UnableToFetchUriString">
         <source>Unable to find a datacollector with friendly name '{0}'.</source>
-        <target state="translated">Non è possibile trovare un agente di raccolta dati con nome descrittivo '{0}'.</target>
+        <target state="translated">Non è possibile trovare un oggetto datacollector con nome descrittivo '{0}'.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">
         <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
         <target state="translated">Non è stato possibile caricare le estensioni dal file '{0}'. Per altre informazioni, usare /diag.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
+        <target state="translated">{0} Accesso negato durante il tentativo di creare la cartella "TestResults" nel percorso indicato. Si riceve questa eccezione perché si esegue vstest.console.exe da una cartella per cui è necessario l'accesso in scrittura. Per risolvere il problema, eseguire vstest.console.exe da una cartella per cui si hanno privilegi di scrittura. Per altre informazioni, vedere il messaggio di errore:</target>
         <note></note>
       </trans-unit>
     </body>

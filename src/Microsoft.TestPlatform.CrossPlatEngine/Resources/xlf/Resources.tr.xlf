@@ -207,6 +207,16 @@
         <target state="translated">Test bulma iptal edildi.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host with process ID: {0}.</source>
+        <target state="translated">Hata ayıklayıcı, {0} işlem kimliğine sahip varsayılan test ana bilgisayarına eklenemiyor.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</source>
+        <target state="translated">{0} Belirtilen konumda "TestResults" klasörü oluşturulmaya çalışılırken erişim engellendi. Yazma erişimi gerektiren bir klasörden vstest.console.exe çalıştırdığınız için bu özel durumu aldınız. Sorunu çözmek için lütfen yazma ayrıcalıklarına sahip olduğunuz bir klasörden vstest.console.exe dosyasını çalıştırın.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

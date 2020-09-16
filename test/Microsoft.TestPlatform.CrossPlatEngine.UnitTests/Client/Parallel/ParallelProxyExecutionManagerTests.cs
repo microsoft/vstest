@@ -15,6 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -169,6 +170,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.proxyManagerFuncCalled = false;
             parallelExecutionManager.HandlePartialRunComplete(proxyDataCollectionManager, completeArgs, null, null, null);
             Assert.IsTrue(this.proxyManagerFuncCalled);
+        }
+
+        [TestMethod]
+        public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfDataCollectionEnabledAndCreatorWithDataCollection()
+        {
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
+            this.mockRequestSender = new Mock<ITestRequestSender>();
+            this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+            var proxyDataCollectionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var managers = new List<Mock<ProxyExecutionManagerWithDataCollection>>();            
+            this.proxyManagerFunc = () =>
+            {
+                this.proxyManagerFuncCalled = true;
+                var manager = new Mock<ProxyExecutionManagerWithDataCollection>(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+                managers.Add(manager);
+                return manager.Object;
+            };
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2, setupTestCases: true);
+
+            this.proxyManagerFuncCalled = false;
+            parallelExecutionManager.HandlePartialRunComplete(proxyDataCollectionManager, completeArgs, null, null, null);
+            Assert.IsTrue(this.proxyManagerFuncCalled);
+
+            var handler = parallelExecutionManager.GetHandlerForGivenManager(managers.Last().Object);
+            Assert.IsTrue(handler is ParallelDataCollectionEventsHandler);            
         }
 
         [TestMethod]

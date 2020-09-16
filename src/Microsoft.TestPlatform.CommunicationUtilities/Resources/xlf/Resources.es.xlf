@@ -81,6 +81,11 @@
         <target state="translated">Proceso de host de pruebas bloqueado</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">No se puede asociar el depurador al host de prueba predeterminado.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

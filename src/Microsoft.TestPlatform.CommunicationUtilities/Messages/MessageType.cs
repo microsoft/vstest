@@ -124,6 +124,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
         /// <summary>
+        /// Test run attachments processing
+        /// </summary>
+        public const string TestRunAttachmentsProcessingStart = "TestRunAttachmentsProcessing.Start";
+
+        /// <summary>
+        /// Test run attachments processing callback
+        /// </summary>
+        public const string TestRunAttachmentsProcessingComplete = "TestRunAttachmentsProcessing.Complete";
+
+        /// <summary>
+        /// Test run attachments processing progress
+        /// </summary>
+        public const string TestRunAttachmentsProcessingProgress = "TestRunAttachmentsProcessing.Progress";
+
+        /// <summary>
+        /// Cancel test run attachments processing
+        /// </summary>
+        public const string TestRunAttachmentsProcessingCancel = "TestRunAttachmentsProcessing.Cancel";
+
+        /// <summary>
         /// Extensions Initialization
         /// </summary>
         public const string ExtensionsInitialize = "Extensions.Initialize";
@@ -147,6 +167,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Launch Adapter Process With DebuggerAttached
         /// </summary>
         public const string LaunchAdapterProcessWithDebuggerAttachedCallback = "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback";
+
+        /// <summary>
+        /// Attach debugger to process.
+        /// </summary>
+        public const string AttachDebugger = "TestExecution.AttachDebugger";
+
+        /// <summary>
+        /// Attach debugger to process callback.
+        /// </summary>
+        public const string AttachDebuggerCallback = "TestExecution.AttachDebuggerCallback";
+
+        /// <summary>
+        /// Attach debugger to process.
+        /// </summary>
+        public const string EditorAttachDebugger = "TestExecution.EditorAttachDebugger";
+
+        /// <summary>
+        /// Attach debugger to process callback.
+        /// </summary>
+        public const string EditorAttachDebuggerCallback = "TestExecution.EditorAttachDebuggerCallback";
 
         /// <summary>
         /// Data Collection Message

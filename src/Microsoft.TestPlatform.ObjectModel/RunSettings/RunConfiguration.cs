@@ -487,6 +487,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public bool CollectSourceInformationSet { get; private set; } = false;
 
+        /// <summary>
+        /// Default filter to use to filter tests
+        /// </summary>
+        public string TestCaseFilter { get; private set; }
+
+        /// Path to dotnet executable to be used to invoke testhost.dll. Specifying this will skip looking up testhost.exe and will force usage of the testhost.dll. 
+        /// </summary>
+        public string DotnetHostPath { get; private set; }
+
         #endregion
 
         /// <inheritdoc/>
@@ -569,6 +578,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement targetDevice = doc.CreateElement("TargetDevice");
                 targetDevice.InnerXml = this.TargetDevice;
                 root.AppendChild(targetDevice);
+            }
+
+            if (!string.IsNullOrEmpty(this.TestCaseFilter))
+            {
+                XmlElement testCaseFilter = doc.CreateElement(nameof(TestCaseFilter));
+                testCaseFilter.InnerXml = this.TestCaseFilter;
+                root.AppendChild(testCaseFilter);
+            }
+            
+            if (!string.IsNullOrEmpty(this.DotnetHostPath))
+            {
+                XmlElement dotnetHostPath = doc.CreateElement(nameof(DotnetHostPath));
+                dotnetHostPath.InnerXml = this.DotnetHostPath;
+                root.AppendChild(dotnetHostPath);
             }
 
             return root;
@@ -865,6 +888,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "TargetDevice":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TargetDevice = reader.ReadElementContentAsString();
+                            break;
+
+                        case "TestCaseFilter":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.TestCaseFilter = reader.ReadElementContentAsString();
+                            break;
+                            
+                        case "DotNetHostPath":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
                             break;
 
                         default:

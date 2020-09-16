@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public enum PlatformOperatingSystem
     {
         Windows,
-        Unix
+        Unix,
+        OSX
     }
 }

@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
-#if NET451
+#if NETFRAMEWORK
     using System.Runtime.Serialization;
 #endif
 
@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Exception thrown by Run Settings when an error with a settings provider
     /// is encountered.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public class SettingsException : Exception
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization constructor.
         /// </summary>

@@ -347,5 +347,57 @@ namespace vstest.console.UnitTests.Processors
             },
         };
         #endregion
+
+        [TestMethod]
+        public void InitializeShouldMergeTestRunParametersWithSpaces()
+        {
+            // in powershell call: ConsoleApp1.exe --% --TestRunParameters.Parameter(name =\"myParam\", value=\"myValue\")
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in cmd: ConsoleApp1.exe -- TestRunParameters.Parameter(name=\"myParam\", value=\"myValue\")
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in ubuntu wsl without escaping the space: ConsoleApp1.exe-- TestRunParameters.Parameter\(name =\"myParam\", value=\"myValue\"\)
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam",
+            //value = "myValue")
+
+            // in ubuntu wsl with escaping the space: ConsoleApp1.exe-- TestRunParameters.Parameter\(name =\"myParam\",\ value=\"myValue\"\)
+            // args:
+            //--
+            //TestRunParameters.Parameter(name = "myParam", value = "myValue")
+
+            var args = new string[] {
+                "--",
+                "TestRunParameters.Parameter(name=\"myParam\",",
+                "value=\"myValue\")",
+                "TestRunParameters.Parameter(name=\"myParam2\",",
+                "value=\"myValue 2\")",
+            };
+
+            var runsettings = string.Join(Environment.NewLine, new[]{
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors />",
+                "  </DataCollectionRunSettings>",
+                "  <TestRunParameters>",
+                "    <Parameter name=\"myParam\" value=\"myValue\" />",
+                "    <Parameter name=\"myParam2\" value=\"myValue 2\" />",
+                "  </TestRunParameters>",
+                "</RunSettings>"});
+
+            this.executor.Initialize(args);
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(runsettings, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
     }
 }

@@ -81,6 +81,11 @@
         <target state="translated">Plantage du processus hôte de test</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">Impossible d'attacher le débogueur à l'hôte de test par défaut.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

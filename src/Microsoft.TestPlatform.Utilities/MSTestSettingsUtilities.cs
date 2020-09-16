@@ -25,12 +25,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Settings file which need to be imported. The file extension of the settings file will be specified by <paramref name="SettingsFileExtension"/> property.
         /// </param>
         /// <param name="defaultRunSettings"> Input RunSettings document to which settings file need to be imported. </param>
-        /// <param name="architecture"> The architecture. </param>
-        /// <param name="frameworkVersion"> The framework Version. </param>
         /// <returns> Updated RunSetting Xml document with imported settings. </returns>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings, Architecture architecture, FrameworkVersion frameworkVersion)
+        public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings)
         {
             ValidateArg.NotNull(settingsFile, "settingsFile");
             ValidateArg.NotNull(defaultRunSettings, "defaultRunSettings");
@@ -56,14 +54,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 var doc = new XmlDocument();
                 var runConfigurationNode = doc.CreateElement(Constants.RunConfigurationSettingsName);
-
-                var targetPlatformNode = doc.CreateElement("TargetPlatform");
-                targetPlatformNode.InnerXml = architecture.ToString();
-                runConfigurationNode.AppendChild(targetPlatformNode);
-
-                var targetFrameworkVersionNode = doc.CreateElement("TargetFrameworkVersion");
-                targetFrameworkVersionNode.InnerXml = frameworkVersion.ToString();
-                runConfigurationNode.AppendChild(targetFrameworkVersionNode);
 
                 defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(runConfigurationNode, true));
             }

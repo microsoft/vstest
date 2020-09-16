@@ -81,6 +81,11 @@
         <target state="translated">테스트 호스트 프로세스 작동이 중단됨</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AttachDebuggerToDefaultTestHostFailure">
+        <source>Cannot attach the debugger to the default test host.</source>
+        <target state="translated">기본 테스트 호스트에 디버거를 연결할 수 없습니다.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

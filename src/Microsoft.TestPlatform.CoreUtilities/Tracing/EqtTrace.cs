@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         private static IPlatformEqtTrace traceImpl = new PlatformEqtTrace();
 
-#if NET451
+#if NETFRAMEWORK
         public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
             traceImpl.SetupRemoteEqtTraceListeners(childDomain);
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 #endif
 
-#if NETSTANDARD2_0
+#if NETSTANDARD
         public static PlatformTraceLevel TraceLevel
         {
             get

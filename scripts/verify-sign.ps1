@@ -42,7 +42,7 @@ function Verify-Assemblies
             $signature = Get-AuthenticodeSignature -FilePath $_.FullName
 
             if ($signature.Status -eq "Valid") {
-                if ($signature.SignerCertificate.Thumbprint -eq $TPB_SignCertificate) {
+                if ($signature.SignerCertificate.Subject -eq "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US") {
                     Write-Log "Valid: $($_.FullName)"
                 }
                 else {

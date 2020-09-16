@@ -280,6 +280,18 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseDotnetHostPathFromRunsettings()
+        {
+            var dotnetHostPath = @"C:\dotnet.exe";
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, $"<RunSettings><RunConfiguration><DotNetHostPath>{dotnetHostPath}</DotNetHostPath></RunConfiguration></RunSettings>");
+            var startInfo = this.GetDefaultStartInfo();
+
+            StringAssert.Contains(startInfo.FileName, dotnetHostPath);
+        }
+
+        [TestMethod]
         public void GetTestHostProcessStartInfoShouldUseTestHostExeFromNugetIfNotFoundInSourceLocation()
         {
             var testhostExePath = "testhost.exe";
@@ -480,7 +492,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 #if !NET451
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
@@ -507,7 +519,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";

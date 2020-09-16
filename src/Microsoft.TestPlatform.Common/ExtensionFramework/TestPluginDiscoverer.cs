@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
                 {
-                    EqtTrace.Error(
+                    EqtTrace.Warning(
                         "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}'; keeping the first one.",
                         pluginInfo.IdentifierData);
                 }

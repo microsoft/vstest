@@ -105,6 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.testHostProcessStdError = string.Empty;
                 TestHostConnectionInfo testHostConnectionInfo = this.testHostManager.GetTestHostConnectionInfo();
+                
                 var portNumber = 0;
 
                 if (testHostConnectionInfo.Role == ConnectionRole.Client)

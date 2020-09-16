@@ -264,7 +264,7 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="translated">用法: vstest.console.exe [引數] [選項] [[--] &lt;執行設定引數&gt;...]]</target>
+        <target state="translated">用法: vstest.console.exe [引數] [選項] [[--] &lt;RunSettings 引數&gt;...]]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Syntax: vstest.console.exe [Optionen] [Argumente]</target>
@@ -1305,8 +1305,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
-        <target state="translated">失敗   {0}</target>
+        <source>Failed</source>
+        <target state="translated">失敗</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1314,8 +1314,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
-        <target state="translated">成功   {0}</target>
+        <source>Passed</source>
+        <target state="translated">已通過</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1323,9 +1323,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
-        <target state="translated">略過   {0}</target>
-        <note />
+        <source>Skipped</source>
+        <target state="translated">已跳過</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
@@ -1448,9 +1448,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
-        <target state="translated">未執行 {0}</target>
-        <note />
+        <source>Not Run</source>
+        <target state="translated">未執行</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
@@ -1588,9 +1588,9 @@
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
-        <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="translated">對此平台不支援 Blame 的 CollectDump 選項。</target>
-        <note />
+        <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
+        <target state="translated">此平台不支援使用 CollectDump for Blame 選項收集損毀傾印。</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
@@ -1660,8 +1660,50 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">測試回合參數的引數 '{0}' 無效。請使用下面的格式。
+     格式: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
+        <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
+        <target state="translated">此平台不支援使用 Blame 的 CollectDump 及 TestTimeout 選項收集懸置傾印。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source> - {0} {1}</source>
+        <target state="new">- {0} {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnvironmentArgumentHelp">
+        <source>-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if it does not exist, overrides if it does. This will imply /InIsolation switch and force the tests to be run in an isolated process.
+      
+      This argument can be specified multiple times to provide multiple variables.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
+        <target state="new">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnvironmentVariableXIsOverriden">
+        <source>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</source>
+        <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
         <note></note>
       </trans-unit>
     </body>

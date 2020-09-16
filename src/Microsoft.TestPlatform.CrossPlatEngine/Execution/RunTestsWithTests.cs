@@ -12,11 +12,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
-    using ObjectModel;
     using ObjectModel.Client;
 
     internal class RunTestsWithTests : BaseRunTests
@@ -66,9 +66,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return this.executorUriVsTestList.Keys;
         }
 
-        protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUri, RunContext runContext, IFrameworkHandle frameworkHandle)
+        protected override void InvokeExecutor(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUri,
+            RunContext runContext,
+            IFrameworkHandle frameworkHandle)
         {
             executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldAttachDebuggerToTestHost(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUri,
+            RunContext runContext)
+        {
+            // If the adapter doesn't implement the new test executor interface we should attach to
+            // the default test host by default to preserve old behavior.
+            if (!(executor?.Value is ITestExecutor2 convertedExecutor))
+            {
+                return true;
+            }
+
+            return convertedExecutor.ShouldAttachToTestHost(this.executorUriVsTestList[executorUri], runContext);
         }
 
         /// <summary>

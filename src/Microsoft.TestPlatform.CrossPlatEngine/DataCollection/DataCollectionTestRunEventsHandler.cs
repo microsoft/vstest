@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
 
@@ -21,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete.
     /// Existing functionality of ITestRunEventsHandler is decorated with additional call to Data Collection Process.
     /// </summary>
-    internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler
+    internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     {
         private IProxyDataCollectionManager proxyDataCollectionManager;
         private ITestRunEventsHandler testRunEventsHandler;
@@ -155,6 +156,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// The design mode client.
@@ -31,18 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     public class DesignModeClient : IDesignModeClient
     {
         private readonly ICommunicationManager communicationManager;
-
         private readonly IDataSerializer dataSerializer;
 
-        private object ackLockObject = new object();
-
         private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
-
         private IEnvironment platformEnvironment;
-
-        protected Action<Message> onAckMessageReceived;
-
         private TestSessionMessageLogger testSessionMessageLogger;
+        private object lockObject = new object();
+
+        protected Action<Message> onCustomTestHostLaunchAckReceived;
+        protected Action<Message> onAttachDebuggerAckRecieved;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
@@ -201,6 +199,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.TestRunAttachmentsProcessingStart:
+                            {
+                                var testRunAttachmentsProcessingPayload =
+                                    this.communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                                this.StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
+                                break;
+                            }
+
                         case MessageType.CancelDiscovery:
                             {
                                 testRequestManager.CancelDiscovery();
@@ -219,9 +225,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.TestRunAttachmentsProcessingCancel:
+                            {
+                                testRequestManager.CancelTestRunAttachmentsProcessing();
+                                break;
+                            }
+
                         case MessageType.CustomTestHostLaunchCallback:
                             {
-                                this.onAckMessageReceived?.Invoke(message);
+                                this.onCustomTestHostLaunchAckReceived?.Invoke(message);
+                                break;
+                            }
+
+                        case MessageType.EditorAttachDebuggerCallback:
+                            {
+                                this.onAttachDebuggerAckRecieved?.Invoke(message);
                                 break;
                             }
 
@@ -264,11 +282,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// </returns>
         public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
-            lock (ackLockObject)
+            lock (this.lockObject)
             {
                 var waitHandle = new AutoResetEvent(false);
                 Message ackMessage = null;
-                this.onAckMessageReceived = (ackRawMessage) =>
+                this.onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
                 {
                     ackMessage = ackRawMessage;
                     waitHandle.Set();
@@ -285,7 +303,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-                this.onAckMessageReceived = null;
+                this.onCustomTestHostLaunchAckReceived = null;
 
                 var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
 
@@ -297,6 +315,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     throw new TestPlatformException(ackPayload.ErrorMessage);
                 }
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            // If an attach request is issued but there is no support for attaching on the other
+            // side of the communication channel, we simply return and let the caller know the
+            // request failed.
+            if (this.protocolConfig.Version < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+            {
+                return false;
+            }
+
+            lock (this.lockObject)
+            {
+                var waitHandle = new AutoResetEvent(false);
+                Message ackMessage = null;
+                this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
+                {
+                    ackMessage = ackRawMessage;
+                    waitHandle.Set();
+                };
+
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
+
+                WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
+
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
+                this.onAttachDebuggerAckRecieved = null;
+
+                var ackPayload = this.dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
+                if (!ackPayload.Attached)
+                {
+                    EqtTrace.Warning(ackPayload.ErrorMessage);
+                }
+
+                return ackPayload.Attached;
             }
         }
 
@@ -323,10 +379,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="e"></param>
         public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            if (e.Level == TestMessageLevel.Error || e.Level == TestMessageLevel.Warning)
+            // save into trace log and send the message to the IDE
+            //
+            // there is a mismatch between log levels that VS uses and that TP
+            // uses. In VS you can choose Trace level which will enable Test platform
+            // logs on Verbose level. Below we report Errors and warnings always to the 
+            // IDE no matter what the level of VS logging is, but Info only when the Eqt trace 
+            // info level is enabled (so only when VS enables Trace logging)
+            switch (e.Level)
             {
-                var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
-                this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+                case TestMessageLevel.Error:
+                    EqtTrace.Error(e.Message);
+                    SendTestMessage(e.Level, e.Message);
+                    break;
+                case TestMessageLevel.Warning:
+                    EqtTrace.Warning(e.Message);
+                    SendTestMessage(e.Level, e.Message);
+                    break;
+
+                case TestMessageLevel.Informational:
+                    EqtTrace.Info(e.Message);
+
+                    if (EqtTrace.IsInfoEnabled)
+                        SendTestMessage(e.Level, e.Message);
+                    break;
+
+               
+                default:
+                    throw new NotSupportedException($"Test message level '{e.Level}' is not supported.");
             }
         }
 
@@ -392,6 +472,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
         }
 
+        private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRequestManager testRequestManager)
+        {
+            Task.Run(
+                delegate
+                {
+                    try
+                    {
+                        testRequestManager.ProcessTestRunAttachments(attachmentsProcessingPayload, new TestRunAttachmentsProcessingEventsHandler(this.communicationManager), this.protocolConfig);
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error("DesignModeClient: Exception in StartTestRunAttachmentsProcessing: " + ex);
+
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                        var payload = new TestRunAttachmentsProcessingCompletePayload()
+                        {
+                            Attachments = null
+                        };
+
+                        // Send run complete to translation layer
+                        this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
+                    }
+                });
+        }
+
         #region IDisposable Support
 
         private bool disposedValue = false; // To detect redundant calls
@@ -415,7 +522,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
-
         #endregion
     }
 }

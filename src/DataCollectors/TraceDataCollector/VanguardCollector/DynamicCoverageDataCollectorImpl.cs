@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using TestPlatform.ObjectModel;
     using TraceCollector;
     using TraceCollector.Interfaces;
@@ -107,10 +108,35 @@ namespace Microsoft.VisualStudio.Coverage
             IDataCollectionSink dataSink,
             IDataCollectionLogger logger)
         {
+            var defaultConfigurationElement = DynamicCoverageDataCollectorImpl.GetDefaultConfiguration();
+
+            try
+            {
+                // WARNING: Do NOT remove this function call !!!
+                //
+                // Due to a dependency we took on Microsoft.TestPlatform.Utilities.dll, an
+                // exception may be thrown if we cannot resolve CodeCoverageRunSettingsProcessor.
+                // If such an exception is thrown we cannot catch it in this try-catch block
+                // because all method dependencies must be resolved before the method call, thus
+                // we introduced an additional layer of indirection.
+                configurationElement = this.AddDefaultExclusions(configurationElement, defaultConfigurationElement);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        string.Join(
+                            " ",
+                            "DynamicCoverageDataCollectorImpl.Initialize: Exception encountered while processing the configuration element.",
+                            "Keeping the configuration element unaltered. More info about the exception: {0}"),
+                        ex.Message));
+            }
+
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
             if (string.IsNullOrEmpty(configurationElement?.InnerXml))
             {
-                configurationElement = DynamicCoverageDataCollectorImpl.GetDefaultConfiguration();
+                configurationElement = defaultConfigurationElement;
             }
 
             this.logger = logger;
@@ -305,6 +331,18 @@ namespace Microsoft.VisualStudio.Coverage
                     string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, path, ex));
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Adding default exclusions to the configuration element.
+        /// </summary>
+        /// <param name="configurationElement">The configuration element.</param>
+        /// <param name="defaultConfigurationElement">The default configuration element.</param>
+        /// <returns>The original configuration element with additional default exclusions.</returns>
+        private XmlElement AddDefaultExclusions(XmlElement configurationElement, XmlElement defaultConfigurationElement)
+        {
+            var processor = new CodeCoverageRunSettingsProcessor(defaultConfigurationElement);
+            return (XmlElement)processor.Process(configurationElement);
         }
     }
 }

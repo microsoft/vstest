@@ -235,9 +235,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Act.
             executor.Initialize(fileName);
 
+
             // Assert.
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>\r\n    <TargetFrameworkVersion>{Framework.FromString(FrameworkVersion.Framework45.ToString()).Name}</TargetFrameworkVersion>\r\n    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>");
+
+            var expected = 
+                $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
+                $"<RunSettings>\r\n" +
+                $"  <RunConfiguration>\r\n" +
+                $"    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n" +
+                $"    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>\r\n" +
+                $"    <TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>\r\n" +
+                $"  </RunConfiguration>\r\n" +
+                $"  <MSTest>\r\n" +
+                $"    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
+                $"    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
+                $"  </MSTest>\r\n" +
+                $"  <DataCollectionRunSettings>\r\n" +
+                $"    <DataCollectors />\r\n" +
+                $"  </DataCollectionRunSettings>\r\n" +
+                $"</RunSettings>";
+            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, expected);
         }
 
 
@@ -363,6 +381,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsNull(this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
+        [TestMethod]
+        public void InitializeShouldUpdateTestCaseFilterIfProvided()
+        {
+            // Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
+            var filter = "TestCategory=Included";
+            var settingsXml = $"<RunSettings><RunConfiguration><TestCaseFilter>{filter}</TestCaseFilter></RunConfiguration></RunSettings>";
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                this.settingsProvider,
+                settingsXml);
+
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
+            Assert.AreEqual(filter, CommandLineOptions.Instance.TestCaseFilterValue);
+        }
         #endregion
 
         #region Testable Implementations

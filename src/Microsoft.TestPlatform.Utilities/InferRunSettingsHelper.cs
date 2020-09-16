@@ -657,7 +657,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
         /// </summary>
-        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
         {
             incompatibleSettingWarning = string.Empty;
             List<String> compatibleSources = new List<String>();
@@ -687,7 +687,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (incompatiblityFound)
             {
-                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, defaultArchitecture, warnings.ToString(), multiTargettingForwardLink);
             }
 
             return compatibleSources;
@@ -715,8 +715,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 return false;
             }
-
+            if (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem())
+            {
+                return true;
+            }
             return sourcePlatform != targetPlatform;
+
+            bool Is64BitOperatingSystem()
+            {
+#if !NETSTANDARD1_3
+                return Environment.Is64BitOperatingSystem;
+#else
+                // In the absence of APIs to check, assume the majority case
+                return true;
+#endif
+            }
         }
 
         /// <summary>

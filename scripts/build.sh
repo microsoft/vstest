@@ -15,7 +15,7 @@ NOCOLOR='\033[0m'
 # Parse options
 #
 CONFIGURATION="Debug"
-TARGET_RUNTIME="ubuntu.16.04-x64"
+TARGET_RUNTIME="ubuntu.18.04-x64"
 VERSION="" # Will set this later by reading TestPlatform.Settings.targets file.
 VERSION_SUFFIX="dev"
 FAIL_FAST=false
@@ -93,7 +93,7 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
-TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet}"
+TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet-linux}"
 TP_PACKAGES_DIR="${NUGET_PACKAGES:-${TP_ROOT_DIR}/packages}"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
@@ -111,7 +111,7 @@ VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/Te
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="3.1.100"
+DOTNET_CLI_VERSION="5.0.100-rc.1.20380.12"
 #DOTNET_RUNTIME_VERSION="LATEST"
 
 #
@@ -186,12 +186,12 @@ function install_cli()
         chmod u+x $install_script
 
         log "install_cli: Get the latest dotnet cli toolset..."
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_CLI_VERSION
 
         # Get netcoreapp1.1 shared components
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.1.0" --version "2.1.0" --shared-runtime
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "release/2.1.0" --version "2.1.0" --runtime dotnet
         #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-        #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
+        #$install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --runtime dotnet
     fi
 
     local dotnet_path=$(_get_dotnet_path)
@@ -238,7 +238,7 @@ function invoke_build()
     log ".. .. Build: Source: $TPB_Solution"
     
     # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
+    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.7.2/1.0.0/lib/net472/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
         if [[ $TP_USE_REPO_API = 0 ]]; then

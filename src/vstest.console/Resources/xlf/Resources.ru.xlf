@@ -588,7 +588,7 @@
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="translated">Используется режим изоляции для запуска тестов, так как в параметрах запуска включены адаптеры диагностических данных. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
+        <target state="translated">Используется режим изоляции для запуска тестов, так как в файле параметров запуска RUNSETTINGS включены адаптеры диагностических данных. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
@@ -1304,8 +1304,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
-        <source>Failed   {0}</source>
-        <target state="translated">Не пройдено:  {0}</target>
+        <source>Failed</source>
+        <target state="translated">Не пройден</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
@@ -1313,8 +1313,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
-        <source>Passed   {0}</source>
-        <target state="translated">Пройдено:  {0}</target>
+        <source>Passed</source>
+        <target state="translated">Пройден</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übergebene {0}</target>
@@ -1322,9 +1322,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
-        <source>Skipped  {0}</source>
-        <target state="translated">Пропущено:  {0}</target>
-        <note />
+        <source>Skipped</source>
+        <target state="translated">Пропущен</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
@@ -1419,7 +1419,7 @@
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
-        <target state="translated">Один параметр запуска (или несколько) включает в себя недопустимый токен.</target>
+        <target state="translated">Один или несколько файлов RUNSETTINGS включают в себя недопустимый токен</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryArgumentHelp">
@@ -1447,9 +1447,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
-        <source>Not Run  {0}</source>
-        <target state="translated">Не запущен {0}</target>
-        <note />
+        <source>Not Run</source>
+        <target state="translated">Не выполнен</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
@@ -1587,9 +1587,9 @@
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
-        <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="translated">Параметр CollectDump для Blame не поддерживается на этой платформе.</target>
-        <note />
+        <source>Collecting crash dumps by option CollectDump for Blame is not supported for this platform.</source>
+        <target state="translated">Сбор аварийных дампов с помощью параметра CollectDump для Blame не поддерживается для этой платформы.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
@@ -1659,8 +1659,50 @@
       <trans-unit id="InvalidTestRunParameterArgument">
         <source>The test run parameter argument '{0}' is invalid. Please use the format below.
      Format: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</source>
-        <target state="new">The test run parameter argument '{0}' is invalid. Please use the format below.
-Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")</target>
+        <target state="translated">Недопустимый аргумент "{0}" для параметра тестового запуска. Используйте указанный ниже формат.
+     Формат: TestRunParameters.Parameter(name=\"&lt;name&gt;\", value=\"&lt;value&gt;\")</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameCollectDumpTestTimeoutNotSupportedForPlatform">
+        <source>Collecting hang dumps by option CollectDump with TestTimeout for Blame is not supported for this platform.</source>
+        <target state="translated">Сбор дампов зависаний с помощью параметра CollectDump с TestTimeout для Blame не поддерживается для этой платформы.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
+        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="None">
+        <source>None</source>
+        <target state="new">None</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryAssemblyAndFramework">
+        <source> - {0} {1}</source>
+        <target state="new">- {0} {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnvironmentArgumentHelp">
+        <source>-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if it does not exist, overrides if it does. This will imply /InIsolation switch and force the tests to be run in an isolated process.
+      
+      This argument can be specified multiple times to provide multiple variables.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
+        <target state="new">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+
+      Example: -e:VARIABLE1=VALUE1
+               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnvironmentVariableXIsOverriden">
+        <source>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</source>
+        <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
         <note></note>
       </trans-unit>
     </body>

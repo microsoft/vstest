@@ -3,14 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
-#if NET451
+#if NETFRAMEWORK
     using System;
 #endif
 
     /// <summary>
     /// Encapsulates the context of the environment a data collector is being hosted in.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public sealed class DataCollectionEnvironmentContext
