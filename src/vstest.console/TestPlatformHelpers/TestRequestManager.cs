@@ -451,7 +451,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                         || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        defaultArchitecture =  Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
+#if NETCOREAPP
+                        // We are running in vstest.console that is either started via dotnet.exe or via vstest.console.exe .NET Core 
+                        // executable. For AnyCPU dlls this should resolve 32-bit SDK when running from 32-bit dotnet process and 
+                        // 64-bit SDK when running from 64-bit dotnet process.
+                        defaultArchitecture = Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86;
+#else
+                        // We are running in vstest.console.exe that was built against .NET Framework. This console prefers 32-bit
+                        // because it needs to run as 32-bit to be compatible with QTAgent. It runs as 32-bit both under VS and 
+                        // in Developer console. Set the default architecture based on the OS architecture, to find 64-bit dotnet SDK
+                        // when running AnyCPU dll on 64-bit system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
+                        // We want to find 64-bit SDK because it is more likely to be installed.
+                        defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
+#endif
                     }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
