@@ -715,11 +715,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 return false;
             }
-            if (targetPlatform == Architecture.X64 && !Environment.Is64BitOperatingSystem)
+            if (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem())
             {
                 return true;
             }
             return sourcePlatform != targetPlatform;
+
+            bool Is64BitOperatingSystem()
+            {
+#if !NETSTANDARD1_3
+                return Environment.Is64BitOperatingSystem;
+#else
+                // In the absence of APIs to check, assume the majority case
+                return true;
+#endif
+            }
         }
 
         /// <summary>

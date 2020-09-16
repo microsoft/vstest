@@ -6,8 +6,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Utilities</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

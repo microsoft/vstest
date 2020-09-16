@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 #endif
 
-#if NETSTANDARD2_0
+#if NETSTANDARD
         public static PlatformTraceLevel TraceLevel
         {
             get
