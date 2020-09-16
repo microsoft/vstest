@@ -13,8 +13,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         // the underlying test is using xUnit to avoid AppDomain enhancements in MSTest that make this pass even without multitargetting
         // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
-        [NetCoreTargetFrameworkDataSource(targetFrameworks: new string[] { Net452TargetFramework, Net461TargetFramework, Net472TargetFramework, Net48TargetFramework })]
-        [NetFullTargetFrameworkDataSource(targetFrameworks: new string[] { Net452TargetFramework, Net461TargetFramework, Net472TargetFramework, Net48TargetFramework })]
+        [NetCoreRunner(NETFX452_48)]
+        [NetFrameworkRunner(NETFX452_48)]
         public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

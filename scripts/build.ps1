@@ -82,7 +82,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "5.0.100-rc.1.20380.12"
+$env:DOTNET_CLI_VERSION = "5.0.100-rc.1.20453.7"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -174,13 +174,16 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
 
-    # Pull in additional shared frameworks.
-    # Get netcoreapp2.1 shared components.
-    
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x86 -NoPath
+    ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
+
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '3.1.0' -Channel '3.1.0' -Architecture x64 -NoPath
+    $env:DOTNET_ROOT= $dotnetInstallPath
+
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '3.1.0' -Channel '3.1.0' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
     
     $env:DOTNET_MULTILEVEL_LOOKUP=0
