@@ -322,7 +322,6 @@ function Publish-Package
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish src\package\package\package.csproj"
-    
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
     
@@ -373,12 +372,11 @@ function Publish-Package
     Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -recurse
     New-Item -ItemType directory -Path $testhostCore20PackageX86Dir -Force | Out-Null
     Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -recurse
-
+ 
     New-Item -ItemType directory -Path $testhostCore10PackageX64Dir -Force | Out-Null
     Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -recurse
     New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
     Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -recurse
-
     
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
@@ -398,53 +396,35 @@ function Publish-Package
 
     ################################################################################
     # Publish Microsoft.TestPlatform.PlatformAbstractions
-    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
-    & {
-        ($TPB_TargetFramework, $fullCLRPackageDir),                 # net451
-        ($TPB_TargetFrameworkCore20, $coreCLR20PackageDir),         # netcoreapp2.1
-        ($TPB_TargetFrameworkNS1_0, $netstandard10PackageDir),      # netstandard1_0
-      # ($TPB_TargetFrameworkNS1_3, $netstandard13PackageDir),      # netstandard1_3
-        ($TPB_TargetFrameworkNS2_0, $netstandard20PackageDir),      # netstandard2_0
-        ($TPB_TargetFrameworkUap, $testhostUapPackageDir)           # uap
-    } |ForEach-Object {
-        $from = Join-Path $platformAbstraction $_[0];
-        $to = $_[1];
-                
-        New-Item -ItemType directory -Path "$to\" -Force | Out-Null
-        Copy-Item "$from\*" $to -Force -Recurse;
-    }
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFramework       = $fullCLRPackageDir            # net451
+                $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
+                $TPB_TargetFrameworkNS1_0  = $netstandard10PackageDir      # netstandard1_0
+              # $TPB_TargetFrameworkNS1_3  = $netstandard13PackageDir      # netstandard1_3
+                $TPB_TargetFrameworkNS2_0  = $netstandard20PackageDir      # netstandard2_0
+                $TPB_TargetFrameworkUap    = $testhostUapPackageDir        # uap
+              }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.CoreUtilities
-        $coreUtilities = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration"
-    & {
-        ($TPB_TargetFramework, $fullCLRPackageDir),                 # net451
-      # ($TPB_TargetFrameworkNS1_0, $netstandard10PackageDir),      # netstandard1_0
-        ($TPB_TargetFrameworkNS1_3, $netstandard13PackageDir),      # netstandard1_3
-        ($TPB_TargetFrameworkNS2_0, $netstandard20PackageDir)       # netstandard2_0
-    } |ForEach-Object {
-        $from = Join-Path $coreUtilities  $_[0];
-        $to = $_[1];
-        
-        New-Item -ItemType directory -Path "$to\" -Force | Out-Null
-        Copy-Item "$from\*" $to -Force -Recurse;
-    };
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFramework       = $fullCLRPackageDir            # net451
+              # $TPB_TargetFrameworkNS1_0  = $netstandard10PackageDir      # netstandard1_0
+                $TPB_TargetFrameworkNS1_3  = $netstandard13PackageDir      # netstandard1_3
+                $TPB_TargetFrameworkNS2_0  = $netstandard20PackageDir      # netstandard2_0
+              }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.ObjectModel
-    $objectModel = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration"
-    & {
-        ($TPB_TargetFramework, $fullCLRPackageDir),                 # net451
-      # ($TPB_TargetFrameworkNS1_0, $netstandard10PackageDir),      # netstandard1_0
-        ($TPB_TargetFrameworkNS1_3, $netstandard13PackageDir),      # netstandard1_3
-        ($TPB_TargetFrameworkNS2_0, $netstandard20PackageDir)       # netstandard2_0
-    } |ForEach-Object {
-        $from = Join-Path $objectModel  $_[0];
-        $to = $_[1];
-        
-        New-Item -ItemType directory -Path "$to\" -Force | Out-Null
-        Copy-Item "$from\*" $to -Force -Recurse;
-    };
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFramework       = $fullCLRPackageDir            # net451
+              # $TPB_TargetFrameworkNS1_0  = $netstandard10PackageDir      # netstandard1_0
+                $TPB_TargetFrameworkNS1_3  = $netstandard13PackageDir      # netstandard1_3
+                $TPB_TargetFrameworkNS2_0  = $netstandard20PackageDir      # netstandard2_0
+              }
 
     ################################################################################
     # Publish msdia
@@ -584,6 +564,21 @@ function Publish-Package
     Copy-CodeCoverage-Package-Artifacts
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Copy-Bulk {
+    param (
+        [string]$root,
+        [hashtable]$files
+    )
+    
+    $files.GetEnumerator() | ForEach-Object {
+        $from = Join-Path $root $_.Name
+        $to = $_.Value
+          
+        New-Item -ItemType directory -Path "$to\" -Force | Out-Null
+        Copy-Item "$from\*" $to -Force -Recurse
+    }
 }
 
 function Publish-Tests
