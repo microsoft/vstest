@@ -415,6 +415,7 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net48.x86.exe" />
 
       <!-- Localized resources -->
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\%(ResxLang.Identity)\*.*" />
