@@ -465,6 +465,24 @@
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <SignFiles Files="@(CoreAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsNS10Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <SignFiles Files="@(CoreAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsNS13Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <SignFiles Files="@(CoreAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsNS20Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
     <SignFiles Files="@(BuildAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build"
