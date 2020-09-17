@@ -31,17 +31,17 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.ComponentModel.EventBasedAsync" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.ComponentModel.TypeConverter" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Serialization.Json" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XmlDocument" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath.XmlDocument" Condition="'$(TargetFramework)' == 'netstandard1.3'" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'" >
+    <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
     <PackageReference Include="NuGet.Frameworks" Version="4.6.4" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard1.3' ">

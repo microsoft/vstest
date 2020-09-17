@@ -38,7 +38,7 @@ Param(
     [Alias("ci")]
     [Switch] $CIBuild = $false,
 
-	[Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$false)]
     [Alias("pt")]
     [Switch] $PublishTestArtifacts = $false,
 
@@ -96,8 +96,11 @@ $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAsset
 $TPB_TargetFramework = "net451"
 $TPB_TargetFramework472 = "net472"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.1"
+$TPB_TargetFrameworkCore10 = "netcoreapp1.0"
 $TPB_TargetFrameworkUap = "uap10.0"
 $TPB_TargetFrameworkNS2_0 = "netstandard2.0"
+$TPB_TargetFrameworkNS1_3 = "netstandard1.3"
+$TPB_TargetFrameworkNS1_0 = "netstandard1.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_X64_Runtime = "win7-x64"
@@ -294,100 +297,143 @@ function Publish-Package
     Write-Log "Publish-Package: Started."
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
+    $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS1_0");
+    $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS1_3");
+    $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS2_0");
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
     $coreCLR20TestHostPackageDir = Get-CoreCLR20TestHostPackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
+    
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
-    $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
-    $testhostCorePackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
-    $testhostCorePackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
-    $testhostCorePackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
-    $testhostCorePackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
+    $testhostCore20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
+    $testhostCore20PackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
+    $testhostCore20PackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
+    $testhostCore20PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
+    $testhostCore20PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
+    
+    $testhostCore10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10")
+    $testhostCore10PackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X64_Runtime")
+    $testhostCore10PackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X86_Runtime")
+    $testhostCore10PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X64_Runtime")
+    $testhostCore10PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X86_Runtime")
+    
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $settingsMigratorProject = Join-Path $env:TP_ROOT_DIR "src\SettingsMigrator\SettingsMigrator.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish src\package\package\package.csproj"
-
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
-
+    
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
-	
+    
     Write-Log "Package: Publish src\SettingsMigrator\SettingsMigrator.csproj"
     Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework $fullCLRPackageDir
-
+    
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullCLRPackageDir
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
-
-    # Publish testhost
     
+    ################################################################################
+    # Publish testhost
     Write-Log "Package: Publish testhost\testhost.csproj"
     Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
-    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCorePackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCore20PackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore10 $testhostCore10PackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostUapPackageDir
-    Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore20 $TPB_X64_Runtime false $testhostCorePackageTempX64Dir
-
+    Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore20 $TPB_X64_Runtime false $testhostCore20PackageTempX64Dir
+    Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore10 $TPB_X64_Runtime true $testhostCore10PackageTempX64Dir
+    
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
-    Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore20 $TPB_X86_Runtime false $testhostCorePackageTempX86Dir
-
+    Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore20 $TPB_X86_Runtime false $testhostCore20PackageTempX86Dir
+    Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore10 $TPB_X86_Runtime true $testhostCore10PackageTempX86Dir
+    
     # Copy the .NET multitarget testhost exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force 
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.pdb" $testhostFullPackageDir\testhost.$tfm.pdb -Force 
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.exe.config" $testhostFullPackageDir\testhost.$tfm.exe.config -Force 
     }
-
+    
     # Copy the .NET multitarget testhost.x86 exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.x86.exe" $testhostFullPackageDir\testhost.$tfm.x86.exe -Force 
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.x86.pdb" $testhostFullPackageDir\testhost.$tfm.x86.pdb -Force 
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force 
     }
-
+    
     # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
-    New-Item -ItemType directory -Path $testhostCorePackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCorePackageTempX64Dir\testhost* $testhostCorePackageX64Dir -Force -recurse
-    New-Item -ItemType directory -Path $testhostCorePackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCorePackageTempX86Dir\testhost.x86* $testhostCorePackageX86Dir -Force -recurse
-
+    New-Item -ItemType directory -Path $testhostCore20PackageX64Dir -Force | Out-Null
+    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -recurse
+    New-Item -ItemType directory -Path $testhostCore20PackageX86Dir -Force | Out-Null
+    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -recurse
+ 
+    New-Item -ItemType directory -Path $testhostCore10PackageX64Dir -Force | Out-Null
+    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -recurse
+    New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
+    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -recurse
+    
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
-
+    
     Set-ScriptFailedOnError
-
+    
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackageDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force -recurse
-
+    
     Set-ScriptFailedOnError
 
-    # Publish platform abstractions
-    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
-    $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
-    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore20
-    $platformAbstractionUap = Join-Path $platformAbstraction $TPB_TargetFrameworkUap
-    Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
-    Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
-    Copy-Item $platformAbstractionUap\* $testhostUapPackageDir -Force
-    
+    ################################################################################
+    # Publish Microsoft.TestPlatform.PlatformAbstractions
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFramework       = $fullCLRPackageDir            # net451
+                $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
+                $TPB_TargetFrameworkNS1_0  = $netstandard10PackageDir      # netstandard1_0
+              # $TPB_TargetFrameworkNS1_3  = $netstandard13PackageDir      # netstandard1_3
+                $TPB_TargetFrameworkNS2_0  = $netstandard20PackageDir      # netstandard2_0
+                $TPB_TargetFrameworkUap    = $testhostUapPackageDir        # uap
+              }
+
+    ################################################################################
+    # Publish Microsoft.TestPlatform.CoreUtilities
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFramework       = $fullCLRPackageDir            # net451
+              # $TPB_TargetFrameworkNS1_0  = $netstandard10PackageDir      # netstandard1_0
+                $TPB_TargetFrameworkNS1_3  = $netstandard13PackageDir      # netstandard1_3
+                $TPB_TargetFrameworkNS2_0  = $netstandard20PackageDir      # netstandard2_0
+              }
+
+    ################################################################################
+    # Publish Microsoft.TestPlatform.ObjectModel
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFramework       = $fullCLRPackageDir            # net451
+              # $TPB_TargetFrameworkNS1_0  = $netstandard10PackageDir      # netstandard1_0
+                $TPB_TargetFrameworkNS1_3  = $netstandard13PackageDir      # netstandard1_3
+                $TPB_TargetFrameworkNS2_0  = $netstandard20PackageDir      # netstandard2_0
+              }
+
+    ################################################################################
     # Publish msdia
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostCore20PackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostCore10PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostUapPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
@@ -403,7 +449,11 @@ function Publish-Package
 
     # If there are some dependencies for the logger assemblies, those need to be moved too.
     # Ideally we should just be publishing the loggers to the Extensions folder.
-    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb", "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb")
+    $loggers = @(
+        "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb", 
+        "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb"
+    )
+
     foreach($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
@@ -519,38 +569,53 @@ function Publish-Package
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Copy-Bulk {
+    param (
+        [string]$root,
+        [hashtable]$files
+    )
+    
+    $files.GetEnumerator() | ForEach-Object {
+        $from = Join-Path $root $_.Name
+        $to = $_.Value
+          
+        New-Item -ItemType directory -Path "$to\" -Force | Out-Null
+        Copy-Item "$from\*" $to -Force -Recurse
+    }
+}
+
 function Publish-Tests
 {
-	if($TPB_PublishTests)	
-	{
-		$dotnetExe = Get-DotNetPath
-		Write-Log "Publish-Tests: Started."
+    if($TPB_PublishTests)	
+    {
+        $dotnetExe = Get-DotNetPath
+        Write-Log "Publish-Tests: Started."
 
-		# Adding only Perf project for now
-		$fullCLRTestDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework"
-		$fullCLRPerfTestAssetDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets"
+        # Adding only Perf project for now
+        $fullCLRTestDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework"
+        $fullCLRPerfTestAssetDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets"
     
-		$mstest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject"
-		$mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
-		Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $mstest10kPerfProjectDir
+        $mstest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject"
+        $mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
+        Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $mstest10kPerfProjectDir
 
-		$nunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "NUnitAdapterPerfTestProject"
-		$nunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\NUnitAdapterPerfTestProject"
-		Publish-PackageInternal $nunittest10kPerfProject $TPB_TargetFramework $nunittest10kPerfProjectDir
+        $nunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "NUnitAdapterPerfTestProject"
+        $nunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\NUnitAdapterPerfTestProject"
+        Publish-PackageInternal $nunittest10kPerfProject $TPB_TargetFramework $nunittest10kPerfProjectDir
 
-		$xunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "XUnitAdapterPerfTestProject"
-		$xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
-		Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $xunittest10kPerfProjectDir
+        $xunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "XUnitAdapterPerfTestProject"
+        $xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
+        Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $xunittest10kPerfProjectDir
 
-		$testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
-		Publish-PackageInternal $testPerfProject $TPB_TargetFramework $fullCLRTestDir
-	}
+        $testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
+        Publish-PackageInternal $testPerfProject $TPB_TargetFramework $fullCLRTestDir
+    }
 }
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild 
 
     Set-ScriptFailedOnError
 }
@@ -565,26 +630,26 @@ function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, 
 
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
 {
-	foreach($lang in $language) {
+    foreach($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
         if (-not (Test-Path $destinationFolder)) {
             New-Item $destinationFolder -Type Directory -Force | Out-Null
         }
         Copy-Item $dllToCopy $destinationFolder -Force
-	}
+    }
 }
 
 function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
 {
-	foreach($lang in $language) {
+    foreach($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
         if (-not (Test-Path $destinationFolder)) {
             New-Item $destinationFolder -Type Directory -Force | Out-Null
         }
         Move-Item $dllToCopy $destinationFolder -Force
-	}
+    }
 }
 
 function Create-VsixPackage
@@ -616,7 +681,7 @@ function Create-VsixPackage
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
-	# Copy CUIT Related depedencies
+    # Copy CUIT Related depedencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
@@ -631,7 +696,7 @@ function Create-VsixPackage
     }
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $testImpactComComponentsDir -Force
 
-	if (-not (Test-Path $legacyTestImpactComComponentsDir)) {
+    if (-not (Test-Path $legacyTestImpactComComponentsDir)) {
         New-Item $legacyTestImpactComComponentsDir -Type Directory -Force | Out-Null
     }
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
@@ -670,7 +735,7 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
-	$packageOutputDir = $TPB_PackageOutDir
+    $packageOutputDir = $TPB_PackageOutDir
 
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
@@ -708,9 +773,12 @@ function Create-NugetPackages
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.props -Force
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.targets -Force
-	
-	$testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
-    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCorePackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    
+    $testhostCore20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
+    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCore20PackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    
+    $testhostCore10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10")
+    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCore10PackageDir\Microsoft.TestPlatform.TestHost.props -Force
     
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
@@ -730,12 +798,11 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS1_0`;NetStandard13Framework=$TPB_TargetFrameworkNS1_3`;NetStandard20Framework=$TPB_TargetFrameworkNS2_0 $additionalArgs
 
         Set-ScriptFailedOnError
     }
 
-    # Verifies that expected number of files gets shipped in nuget packages.
     # Few nuspec uses wildcard characters.
     Verify-Nuget-Packages $packageOutputDir
 
@@ -949,7 +1016,14 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard2.0", "netcoreapp2.1"), ("netcoreapp2.1", "netcoreapp2.1"))
+    $FrameworksAndOutDirs = ( 
+        ("net451", "net451\win7-x64"), 
+        ("netstandard1.0", "netstandard1.0"), 
+        ("netstandard1.3", "netstandard1.3"), 
+        ("netstandard2.0", "netcoreapp2.1"), 
+        ("netcoreapp2.1", "netcoreapp2.1")
+    );
+
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.

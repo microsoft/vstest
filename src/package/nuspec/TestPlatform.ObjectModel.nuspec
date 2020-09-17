@@ -14,10 +14,25 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <dependencies>
-      <group targetFramework="net451">
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
+      <group>
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
+      </group>
+      <group targetFramework="net451">
+        <!-- <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" /> -->
         <dependency id="NuGet.Frameworks" version="[5.0.0, )" />
+      </group>
+      <group targetFramework="netstandard1.3">
+        <dependency id="System.ComponentModel.EventBasedAsync" version="[4.3.0, )" />
+        <dependency id="System.ComponentModel.TypeConverter" version="[4.3.0, )" />
+        <dependency id="System.Reflection.TypeExtensions" version="[4.3.0, )" />
+        <dependency id="System.Runtime.Serialization.Json" version="[4.3.0, )" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="[4.3.0, )" />
+        <dependency id="System.Xml.XmlDocument" version="[4.3.0, )" />
+        <dependency id="System.Xml.XPath" version="[4.3.0, )" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="[4.3.0, )" />
+
+        <!-- After 4.6.4, netstandard1.3 support is dropped from NuGet.Frameworks -->
+        <dependency id="NuGet.Frameworks" version="[4.6.4]" />
       </group>
       <group targetFramework="netstandard2.0">
         <dependency id="NuGet.Frameworks" version="[5.0.0, )" />
@@ -35,70 +50,106 @@
     </frameworkAssemblies>
   </metadata>
   <files>	
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net451\" />
-    <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net451\" />
-    <file src="net451\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\net451\" />
+    <!-- net451 -->
+      <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net451\" />
+      <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net451\" />
+      <file src="net451\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\net451\" />
 
-    <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard2.0\" />
-    <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard2.0\" />
-    <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard2.0\" />
+      <!-- Add localized resources -->
+      <file src="net451\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\cs" />
+      <file src="net451\$Runtime$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\de" />
+      <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\es" />
+      <file src="net451\$Runtime$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\fr" />
+      <file src="net451\$Runtime$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\it" />
+      <file src="net451\$Runtime$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ja" />
+      <file src="net451\$Runtime$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ko" />
+      <file src="net451\$Runtime$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\pl" />
+      <file src="net451\$Runtime$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\pt-BR" />
+      <file src="net451\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ru" />
+      <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\tr" />
+      <file src="net451\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hans" />
+      <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hant" />
+      <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\cs" />
+      <file src="net451\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\de" />
+      <file src="net451\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\es" />
+      <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\fr" />
+      <file src="net451\$Runtime$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\it" />
+      <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ja" />
+      <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ko" />
+      <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pl" />
+      <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pt-BR" />
+      <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ru" />
+      <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\tr" />
+      <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hans" />
+      <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hant" />
+    <!-- /net451 -->
 
-    <!-- Add localized resources -->
-    <file src="net451\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\cs" />
-    <file src="net451\$Runtime$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\de" />
-    <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\es" />
-    <file src="net451\$Runtime$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\fr" />
-    <file src="net451\$Runtime$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\it" />
-    <file src="net451\$Runtime$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ja" />
-    <file src="net451\$Runtime$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ko" />
-    <file src="net451\$Runtime$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\pl" />
-    <file src="net451\$Runtime$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\pt-BR" />
-    <file src="net451\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ru" />
-    <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\tr" />
-    <file src="net451\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hans" />
-    <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hant" />
+    <!-- netstandard 1.3 -->
+      <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.3\" />
+      <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.3\" />
+      <file src="$NetStandard13Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.3\" />
 
-    <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\cs" />
-    <file src="net451\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\de" />
-    <file src="net451\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\es" />
-    <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\fr" />
-    <file src="net451\$Runtime$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\it" />
-    <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ja" />
-    <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ko" />
-    <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pl" />
-    <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pt-BR" />
-    <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ru" />
-    <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\tr" />
-    <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hans" />
-    <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hant" />
+      <!-- Add localized resources -->
+      <file src="$NetStandard13Framework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\cs" />
+      <file src="$NetStandard13Framework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\de" />
+      <file src="$NetStandard13Framework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\es" />
+      <file src="$NetStandard13Framework$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\fr" />
+      <file src="$NetStandard13Framework$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\it" />
+      <file src="$NetStandard13Framework$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\ja" />
+      <file src="$NetStandard13Framework$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\ko" />
+      <file src="$NetStandard13Framework$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\pl" />
+      <file src="$NetStandard13Framework$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\pt-BR" />
+      <file src="$NetStandard13Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\ru" />
+      <file src="$NetStandard13Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\tr" />
+      <file src="$NetStandard13Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\zh-Hans" />
+      <file src="$NetStandard13Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\zh-Hant" />
+      <file src="$NetStandard13Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\cs" />
+      <file src="$NetStandard13Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\de" />
+      <file src="$NetStandard13Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\es" />
+      <file src="$NetStandard13Framework$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\fr" />
+      <file src="$NetStandard13Framework$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\it" />
+      <file src="$NetStandard13Framework$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\ja" />
+      <file src="$NetStandard13Framework$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\ko" />
+      <file src="$NetStandard13Framework$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\pl" />
+      <file src="$NetStandard13Framework$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\pt-BR" />
+      <file src="$NetStandard13Framework$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\ru" />
+      <file src="$NetStandard13Framework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\tr" />
+      <file src="$NetStandard13Framework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\zh-Hans" />
+      <file src="$NetStandard13Framework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\zh-Hant" />
+    <!-- /netstandard 1.3 -->
 
-    <file src="$NetCoreTargetFramework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\cs" />
-    <file src="$NetCoreTargetFramework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\de" />
-    <file src="$NetCoreTargetFramework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\es" />
-    <file src="$NetCoreTargetFramework$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\fr" />
-    <file src="$NetCoreTargetFramework$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\it" />
-    <file src="$NetCoreTargetFramework$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ja" />
-    <file src="$NetCoreTargetFramework$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ko" />
-    <file src="$NetCoreTargetFramework$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\pl" />
-    <file src="$NetCoreTargetFramework$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\pt-BR" />
-    <file src="$NetCoreTargetFramework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ru" />
-    <file src="$NetCoreTargetFramework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\tr" />
-    <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hans" />
-    <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hant" />
+    <!-- netstandard 2.0 -->
+      <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard2.0\" />
+      <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard2.0\" />
+      <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard2.0\" />
 
-    <file src="$NetCoreTargetFramework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\cs" />
-    <file src="$NetCoreTargetFramework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\de" />
-    <file src="$NetCoreTargetFramework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\es" />
-    <file src="$NetCoreTargetFramework$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\fr" />
-    <file src="$NetCoreTargetFramework$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\it" />
-    <file src="$NetCoreTargetFramework$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ja" />
-    <file src="$NetCoreTargetFramework$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ko" />
-    <file src="$NetCoreTargetFramework$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\pl" />
-    <file src="$NetCoreTargetFramework$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\pt-BR" />
-    <file src="$NetCoreTargetFramework$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ru" />
-    <file src="$NetCoreTargetFramework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\tr" />
-    <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\zh-Hans" />
-    <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\zh-Hant" />
-
+      <!-- Add localized resources -->
+      <file src="$NetCoreTargetFramework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\cs" />
+      <file src="$NetCoreTargetFramework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\de" />
+      <file src="$NetCoreTargetFramework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\es" />
+      <file src="$NetCoreTargetFramework$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\fr" />
+      <file src="$NetCoreTargetFramework$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\it" />
+      <file src="$NetCoreTargetFramework$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ja" />
+      <file src="$NetCoreTargetFramework$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ko" />
+      <file src="$NetCoreTargetFramework$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\pl" />
+      <file src="$NetCoreTargetFramework$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\pt-BR" />
+      <file src="$NetCoreTargetFramework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ru" />
+      <file src="$NetCoreTargetFramework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\tr" />
+      <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hans" />
+      <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hant" />
+      <file src="$NetCoreTargetFramework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\cs" />
+      <file src="$NetCoreTargetFramework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\de" />
+      <file src="$NetCoreTargetFramework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\es" />
+      <file src="$NetCoreTargetFramework$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\fr" />
+      <file src="$NetCoreTargetFramework$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\it" />
+      <file src="$NetCoreTargetFramework$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ja" />
+      <file src="$NetCoreTargetFramework$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ko" />
+      <file src="$NetCoreTargetFramework$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\pl" />
+      <file src="$NetCoreTargetFramework$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\pt-BR" />
+      <file src="$NetCoreTargetFramework$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ru" />
+      <file src="$NetCoreTargetFramework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\tr" />
+      <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\zh-Hans" />
+      <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\zh-Hant" />
+    <!-- /netstandard 2.0 -->
   </files>
 </package>
