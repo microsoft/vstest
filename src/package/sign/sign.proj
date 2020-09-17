@@ -20,6 +20,15 @@
 
     <!-- Directory with .NETCore binaries -->
     <ArtifactsCoreDirectory Condition="'$(ArtifactsCoreDirectory)' == ''">$(ArtifactsBaseDirectory)netcoreapp2.1\</ArtifactsCoreDirectory>
+    
+    <!-- Directory with NetStandard1.0 binaries -->
+    <ArtifactsNS10Directory Condition="'$(ArtifactsNS10Directory)' == ''">$(ArtifactsBaseDirectory)netstandard1.0\</ArtifactsNS10Directory>
+    
+    <!-- Directory with NetStandard1.3 binaries -->
+    <ArtifactsNS13Directory Condition="'$(ArtifactsNS13Directory)' == ''">$(ArtifactsBaseDirectory)netstandard1.3\</ArtifactsNS13Directory>
+    
+    <!-- Directory with NetStandard2.0 binaries -->
+    <ArtifactsNS20Directory Condition="'$(ArtifactsNS20Directory)' == ''">$(ArtifactsBaseDirectory)netstandard2.0\</ArtifactsNS20Directory>
 
     <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(ArtifactsBaseDirectory)obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
   </PropertyGroup>
@@ -297,6 +306,16 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.net48.x86.exe" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\datacollector.exe" />
 
+      <CoreAssembliesToSign Include="$(ArtifactsNS10Directory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+
+      <CoreAssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+
+      <CoreAssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
@@ -306,6 +325,8 @@
 
       <!-- Localized resources -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />
+      <CoreAssembliesToSign Include="$(ArtifactsNS13Directory)%(ResxLang.Identity)\*.*" />
+      <CoreAssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
