@@ -51,7 +51,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         };
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetDumpFiles()
+        public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles = true)
         {
             if (!this.wasHangDumped)
             {
@@ -82,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
-            if (!foundDumps.Any())
+            if (warnOnNoDumpFiles && !foundDumps.Any())
             {
                 EqtTrace.Error($"ProcessDumpUtility.GetDumpFile: Could not find any dump file in {this.hangDumpDirectory}.");
                 throw new FileNotFoundException(Resources.Resources.DumpFileNotGeneratedErrorMessage);
