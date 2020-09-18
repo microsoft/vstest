@@ -306,7 +306,7 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.net48.x86.exe" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\datacollector.exe" />
 
-      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
 
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
