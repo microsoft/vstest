@@ -45,30 +45,34 @@
   <Target Name="SignAssemblies">
     <!-- Sign all files if IncludeLegacyComponents is set to true -->
     <ItemGroup Condition="'$(IncludeLegacyComponents)' == 'true'">
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\VSTestVideoRecorder.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" />
+      <!-- These are already signed, trying to sign them again causes warnings in the build pipeline.
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
+        
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\VSTestVideoRecorder.exe" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" />
 
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\VSTestVideoRecorder.exe" />
+      -->
+
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\VSTestVideoRecorder.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.GenericTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.OrderedTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" />
@@ -135,35 +139,39 @@
       <!-- CUIT related dlls -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Sqm.dll" />
-      <!-- This is already signed -->
-      <!--AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" /-->
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.ShDocVw.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.OLE.Interop.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITesting.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+      
+      <!-- These are already signed, trying to sign them again causes warnings in the build pipeline.
+        <AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.ShDocVw.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITesting.dll" />
+        
+        <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+      -->
+
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -468,55 +476,55 @@
       </CodeCoverageAssembliesToSign>
     </ItemGroup>
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate NetStandard10AssembliesToSign:'%(NetStandard10AssembliesToSign.Authenticode)' for @(NetStandard10AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard10AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS10Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate NetStandard13AssembliesToSign:'%(NetStandard13AssembliesToSign.Authenticode)' for @(NetStandard13AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard13AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS13Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate NetStandard20AssembliesToSign:'%(NetStandard20AssembliesToSign.Authenticode)' for @(NetStandard20AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard20AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS20Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate AssembliesToSign:'%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
     <SignFiles Files="@(AssembliesToSign)"
                BinariesDirectory="$(ArtifactsDirectory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate CoreAssembliesToSign:'%(CoreAssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
     <SignFiles Files="@(CoreAssembliesToSign)"
                BinariesDirectory="$(ArtifactsCoreDirectory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate BuildAssembliesToSign:'%(BuildAssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
     <SignFiles Files="@(BuildAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(TestHostCoreAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate TestHostCoreAssembliesToSign:'%(TestHostCoreAssembliesToSign.Authenticode)' for @(TestHostCoreAssembliesToSign)"/>
     <SignFiles Files="@(TestHostCoreAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(IntellitraceAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate IntellitraceAssembliesToSign:'%(IntellitraceAssembliesToSign.Authenticode)' for @(IntellitraceAssembliesToSign)"/>
     <SignFiles Files="@(IntellitraceAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Intellitrace"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate CodeCoverageAssembliesToSign:'%(CodeCoverageAssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
     <SignFiles Files="@(CodeCoverageAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage"
                IntermediatesDirectory="$(IntermediatesDirectory)"
