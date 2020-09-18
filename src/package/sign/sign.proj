@@ -422,6 +422,21 @@
     </ItemGroup>
 
     <ItemGroup>
+      <NetStandard10AssembliesToSign>
+        <Authenticode>Microsoft402400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </NetStandard10AssembliesToSign>
+      
+      <NetStandard13AssembliesToSign>
+        <Authenticode>Microsoft402400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </NetStandard13AssembliesToSign>
+      
+      <NetStandard20AssembliesToSign>
+        <Authenticode>Microsoft402400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </NetStandard20AssembliesToSign>
+
       <AssembliesToSign>
         <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
