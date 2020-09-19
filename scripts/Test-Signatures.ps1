@@ -29,9 +29,24 @@ $global:ValidThumbprints = @( `
 )
 
 # Allow-list for unsigned binaries
-$global:UnsignedAllowList = @( `
-    "Newtonsoft.Json.dll" `
-);
+$global:UnsignedAllowList = @{
+    # "PackageId" = relative paths
+    "Microsoft.TestPlatform" = @( `
+        ".\tools\net451\Common7\IDE\Extensions\TestPlatform\Newtonsoft.Json.dll" `
+    )
+
+    "Microsoft.TestPlatform.CLI" = @( `
+        ".\contentFiles\any\netcoreapp2.1\TestHost\Newtonsoft.Json.dll", `
+        ".\contentFiles\any\netcoreapp2.1\Newtonsoft.Json.dll"
+    )
+    
+    "Microsoft.TestPlatform.Portable" = @( `
+        ".\tools\net451\Newtonsoft.Json.dll", `
+        ".\tools\netcoreapp2.1\TestHost\Newtonsoft.Json.dll", `
+        ".\tools\netcoreapp2.1\Newtonsoft.Json.dll"
+    )
+}
+
 
 $global:Depth = 0;
 
@@ -134,6 +149,12 @@ function Test-Signatures($rootFolder) {
     $files = (Get-ChildItem $rootFolder -Recurse -Include "*.dll", "*.exe")
     Update-Operation -operation "discovered" -message "$($files.Length) binaries discovered"
 
+    $packageId = ([XML](Get-Content $rootFolder\*.nuspec)).package.metadata.id;
+    $unsignedAllowList = @();
+    if ($global:UnsignedAllowList.ContainsKey($packageId)) {
+        $unsignedAllowList = $global:UnsignedAllowList[$packageId];
+    }
+
     $files | ForEach-Object {
         $relativePath = Get-RelativePath -path $_.FullName -relativeTo $rootFolder
         Update-Operation -operation "processing" -message $relativePath -suppress $CIBuild
@@ -148,7 +169,7 @@ function Test-Signatures($rootFolder) {
                 Update-Operation -operation "inconclusive" -message "$relativePath ($($signature.SignerCertificate.Subject)) [$($signature.SignerCertificate.Thumbprint)]" -NewLine
                 $fail.Add($_.FullName, $signature)
             }
-        } elseif (-not $global:UnsignedAllowList.Contains([System.IO.Path]::GetFileName($_.FullName))) {
+        } elseif (-not $unsignedAllowList.Contains($relativePath)) {
             Undo-Operation -operation "unsigned" -message "$relativePath" -NewLine
             $fail.Add($_.FullName, $null)
         }
@@ -184,5 +205,5 @@ Pop-Location
 if($failCount -eq 0) {
     Write-Host "All binaries passed the check successfully."
 } else {
-    Write-Error "Signature verification failed on $failCount binaries!"
+    Write-Error "$failCount binaries failed signature check!"
 }
