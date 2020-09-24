@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
-                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
+                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument);
             }
 
             return runSettingsDocument;
