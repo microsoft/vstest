@@ -163,7 +163,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
             // write MSBuild error. https://github.com/dotnet/msbuild/blob/51a1071f8871e0c93afbaf1b2ac2c9e59c7b6491/src/Framework/IBuildEngine7.cs#L12
-            BuildEngine.GetType().GetProperty("AllowFailureWithoutError")?.SetValue(BuildEngine, true);
+            var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
+            // setting this to false because the switch is implemented backwards and it won't be fixed till next release
+            allowfailureWithoutError?.SetValue(BuildEngine, false);
 
             vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
