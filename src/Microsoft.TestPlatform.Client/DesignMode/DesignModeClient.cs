@@ -19,9 +19,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
     using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
@@ -169,6 +171,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 // Do not filter the Editor/IDE provided extensions by name
                                 var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
                                 testRequestManager.InitializeExtensions(extensionPaths, skipExtensionFilters: true);
+                                break;
+                            }
+
+                        case MessageType.StartTestRunner:
+                            {
+                                var testRunnerPayload = this.communicationManager.DeserializePayload<StartTestRunnerPayload>(message);
+                                this.StartTestRunner(testRunnerPayload);
                                 break;
                             }
 
@@ -354,6 +363,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 return ackPayload.Attached;
             }
+        }
+
+        /// <inheritdoc/>
+        public void StartTestRunner(StartTestRunnerPayload payload)
+        {
+            // Here we do the work of initializing the runner.
+            this.SendTestRunnerId(-1);
+        }
+
+        /// <inheritdoc/>
+        public void SendTestRunnerId(int pid)
+        {
+            if (this.protocolConfig.Version < ObjectModelConstants.MinimumProtocolVersionWithTestRunnerStartSupport)
+            {
+                return;
+            }
+
+            this.communicationManager.SendMessage(MessageType.StartTestRunnerCallback, pid);
         }
 
         /// <summary>

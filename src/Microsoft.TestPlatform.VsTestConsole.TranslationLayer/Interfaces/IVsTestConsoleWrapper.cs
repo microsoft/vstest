@@ -119,6 +119,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="runSettings"></param>
+        /// <param name="eventHandler"></param>
+        /// <returns></returns>
+        void StartTestRunner(IEnumerable<string> sources, string runSettings, IStartTestRunnerEventsHandler eventHandler);
+
+        /// <summary>
         /// Cancel the last test run.
         /// </summary>
         new void CancelTestRun();

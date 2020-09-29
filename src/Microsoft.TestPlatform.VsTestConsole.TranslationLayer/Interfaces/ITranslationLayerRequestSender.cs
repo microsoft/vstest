@@ -88,6 +88,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="runSettings"></param>
+        /// <param name="eventsHandler"></param>
+        void StartTestRunner(IEnumerable<string> sources, string runSettings, IStartTestRunnerEventsHandler eventsHandler);
+
+        /// <summary>
         /// Ends the Session
         /// </summary>
         void EndSession();

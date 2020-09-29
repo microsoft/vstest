@@ -19,6 +19,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
@@ -37,7 +38,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 3;
+        private int protocolVersion = 4;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with vstest.console process
@@ -331,6 +332,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 },
                 runEventsHandler,
                 customHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public void StartTestRunner(IEnumerable<string> sources, string runSettings, IStartTestRunnerEventsHandler eventsHandler)
+        {
+            this.SendMessageAndListenAndReportStartTestRunner(sources, runSettings, eventsHandler);
         }
 
         /// <inheritdoc/>
@@ -729,6 +736,41 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
+        }
+
+        private void SendMessageAndListenAndReportStartTestRunner(IEnumerable<string> sources, string runSettings, IStartTestRunnerEventsHandler eventHandler)
+        {
+            try
+            {
+                var payload = new StartTestRunnerPayload
+                {
+                    Sources = sources,
+                    RunSettings = runSettings
+                };
+
+                this.communicationManager.SendMessage(MessageType.StartTestRunner, payload, this.protocolVersion);
+                var isStartTestRunnerComplete = false;
+
+                while (!isStartTestRunnerComplete)
+                {
+                    var message = this.TryReceiveMessage();
+
+                    if (string.Equals(MessageType.StartTestRunnerCallback, message.MessageType))
+                    {
+                        var pid = this.dataSerializer.DeserializePayload<int>(message);
+                        eventHandler.HandleStartTestRunnerCallback(pid);
+                        isStartTestRunnerComplete = true;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
+                eventHandler.HandleStartTestRunnerCallback(-1);
+            }
+
+            // TODO: Add event trace writing for start/stop operation.
         }
 
         private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)

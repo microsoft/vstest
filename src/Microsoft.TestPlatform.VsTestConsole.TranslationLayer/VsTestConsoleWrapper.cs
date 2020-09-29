@@ -249,6 +249,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        public void StartTestRunner(IEnumerable<string> sources, string runSettings, IStartTestRunnerEventsHandler eventsHandler)
+        {
+            var sourceList = sources.ToList();
+
+            this.EnsureInitialized();
+            requestSender.StartTestRunner(sources, runSettings, eventsHandler);
+        }
+
+        /// <inheritdoc/>
         public void CancelTestRun()
         {
             this.requestSender.CancelTestRun();
@@ -414,7 +423,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             await this.EnsureInitializedAsync().ConfigureAwait(false);
             await requestSender.ProcessTestRunAttachmentsAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken).ConfigureAwait(false);
         }
-
         #endregion
 
 
