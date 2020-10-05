@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public void Dump(int processId, string outputDirectory, DumpTypeOption type)
         {
             var process = Process.GetProcessById(processId);
-            var processTree = process.GetProcessTree();
+            var processTree = process.GetProcessTree().Where(p => p.Process.ProcessName != "conhost" && p.Process.ProcessName != "WerFault").ToList();
 
             if (processTree.Count > 1)
             {
