@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Xml.XPath;
     using System.Threading;
     using System.Reflection;
-    using System.Globalization;
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Client;
@@ -35,23 +34,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
     /// </summary>
     internal class TestRequestManager : ITestRequestManager
     {
-        private readonly ITestPlatform testPlatform;
-        private CommandLineOptions commandLineOptions;
-        private readonly ITestPlatformEventSource testPlatformEventSource;
-        private TestRunResultAggregator testRunResultAggregator;
         private static ITestRequestManager testRequestManagerInstance;
-        private InferHelper inferHelper;
+
         private const int runRequestTimeout = 5000;
-        private bool telemetryOptedIn;
-        private readonly object syncObject = new object();
+
+        private readonly ITestPlatform testPlatform;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
         private readonly Task<IMetricsPublisher> metricsPublisher;
+        private readonly object syncObject = new object();
+
         private bool isDisposed;
+        private bool telemetryOptedIn;
+        private CommandLineOptions commandLineOptions;
+        private TestRunResultAggregator testRunResultAggregator;
+        private InferHelper inferHelper;
         private IProcessHelper processHelper;
         private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
@@ -284,7 +287,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher,
                                   testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
-                                  testRunRequestPayload.TestPlatformOptions?.FilterOptions);
+                                  testRunRequestPayload.TestPlatformOptions?.FilterOptions,
+                                  testRunRequestPayload.Session);
             }
             else
             {
@@ -294,7 +298,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testRunRequestPayload.KeepAlive,
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
-                                  testHostLauncher);
+                                  testHostLauncher,
+                                  testRunRequestPayload.Session);
             }
 
             // Run tests
@@ -326,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 try
                 {
-                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Synchronization context taken");
+                    EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Synchronization context taken.");
                     this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStart();
 
                     this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
@@ -347,6 +352,63 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     // Post the attachments processing complete event
                     this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent, requestData.MetricsCollection.Metrics);
+                }
+            }
+        }
+
+        public void StartTestRunner(StartTestRunnerPayload runnerPayload, IStartTestRunnerEventsHandler eventsHandler, ProtocolConfig protocolConfig)
+        {
+            EqtTrace.Info("TestRequestManager.StartTestRunner: Starting test runner.");
+
+            this.telemetryOptedIn = runnerPayload.CollectMetrics;
+            var requestData = this.GetRequestData(protocolConfig);
+
+            // Make sure to run the run request inside a lock as the below section is not thread-safe.
+            // There can be only one discovery, execution or attachments processing request at a given point in time.
+            lock (this.syncObject)
+            {
+                try
+                {
+                    EqtTrace.Info("TestRequestManager.StartTestRunner: Synchronization context taken.");
+                    this.testPlatformEventSource.StartTestRunnerStart();
+
+                    //this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
+                    StartTestRunnerCriteria criteria = new StartTestRunnerCriteria()
+                    {
+                        Sources = runnerPayload.Sources,
+                        RunSettings = runnerPayload.RunSettings,
+                        // TODO: This should be set for profiling.
+                        TestHostLauncher = null
+                    };
+
+                    this.testPlatform.CreateStartTestRunnerRequest(requestData, criteria, eventsHandler);
+
+                    /*var testhostManager = ((Microsoft.VisualStudio.TestPlatform.Client.TestPlatform)this.testPlatform)
+                        .TestHostProviderManager.GetTestHostManagerByRunConfiguration(runnerPayload.RunSettings);
+
+                    testhostManager.Initialize(TestSessionMessageLogger.Instance, runnerPayload.RunSettings);
+
+                    TestRunnerPool.Instance.CreateAndStartProxy(
+                        runnerPayload.RunSettings,
+                        runnerPayload.Sources,
+                        requestData,
+                        new TestRequestSender(protocolConfig, testhostManager),
+                        testhostManager
+                    );*/
+                }
+                finally
+                {
+                    /*if (this.currentAttachmentsProcessingCancellationTokenSource != null)
+                    {
+                        this.currentAttachmentsProcessingCancellationTokenSource.Dispose();
+                        this.currentAttachmentsProcessingCancellationTokenSource = null;
+                    }*/
+
+                    EqtTrace.Info("TestRequestManager.StartTestRunner: Starting test runner completed.");
+                    this.testPlatformEventSource.StartTestRunnerStop();
+
+                    // Post the attachments processing complete event
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.StartTestRunnerCompleteEvent, requestData.MetricsCollection.Metrics);
                 }
             }
         }

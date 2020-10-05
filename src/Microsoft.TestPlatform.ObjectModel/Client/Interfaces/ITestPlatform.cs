@@ -40,5 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="options">Test platform options.</param>
         /// <returns>RunRequest object</returns>
         ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options);
+
+        void CreateStartTestRunnerRequest(IRequestData requestData, StartTestRunnerCriteria criteria, IStartTestRunnerEventsHandler eventsHandler);
     }
 }

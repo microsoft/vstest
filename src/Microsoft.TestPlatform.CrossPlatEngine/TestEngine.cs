@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -16,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -133,6 +135,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
 
+                if (testRunCriteria.Session != null)
+                {
+                    // TODO: Take care of proxy with data collection as bellow.
+                    return new ProxyExecutionManager(testRunCriteria.Session);
+                }
+
                 return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings, GetSourcesFromTestRunCriteria(testRunCriteria)))
                                                 : new ProxyExecutionManager(requestData, requestSender, hostManager);
             };
@@ -146,6 +154,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             {
                 return proxyExecutionManagerCreator();
             }
+        }
+
+        public IProxyStartTestRunnerManager GetStartTestRunnerManager(IRequestData requestData, ITestRuntimeProvider testHostManager, StartTestRunnerCriteria testRunCriteria)
+        {
+            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testRunCriteria.Sources.Count, testRunCriteria.RunSettings);
+
+            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringStartTestRunner, parallelLevel > 1 ? "True" : "False");
+
+            //var requestSender = new TestRequestSender(requestData.ProtocolConfig, testHostManager);
+            //var testRunnerProxy = new ProxyStartTestRunnerManager(requestData, requestSender, testHostManager);
+
+            Func<ProxyOperationManager> proxyCreator = delegate
+            {
+                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.RunSettings);
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.RunSettings);
+
+                if (testRunCriteria.TestHostLauncher != null)
+                {
+                    hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
+                }
+
+                var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
+
+                return new ProxyOperationManager(requestData, requestSender, hostManager);
+            };
+
+            if (this.ShouldRunInNoIsolation(testRunCriteria.RunSettings, parallelLevel > 1, false))
+            {
+                var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
+                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
+                // TODO: What should happen here ? In process doesn't necessarily mean only one testhost.
+
+                //return testRunnerProxy;
+            }
+
+            return new ProxyStartTestRunnerManager(proxyCreator, parallelLevel);
         }
 
         /// <summary>

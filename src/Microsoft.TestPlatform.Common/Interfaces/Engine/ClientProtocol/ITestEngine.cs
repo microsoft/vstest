@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
@@ -30,6 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="testRunCriteria">TestRunCriteria of the current test run</param>
         /// <returns>ITestExecutionManager object that can do execution</returns>
         IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria);
+
+        IProxyStartTestRunnerManager GetStartTestRunnerManager(IRequestData requestData, ITestRuntimeProvider testHostManager, StartTestRunnerCriteria testRunCriteria);
 
         /// <summary>
         /// Fetches the extension manager for this engine. This manager would provide extensibility

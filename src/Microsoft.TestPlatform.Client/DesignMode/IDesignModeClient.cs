@@ -37,10 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
         bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken);
 
-        void StartTestRunner(StartTestRunnerPayload payload);
-
-        void SendTestRunnerId(int pid);
-
         /// <summary>
         /// Handles parent process exit
         /// </summary>

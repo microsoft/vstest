@@ -29,22 +29,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task DiscoverTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRun(IEnumerable{string}, string, TestPlatformOptions, ITestRunEventsHandler)"/>.
+        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRun(IEnumerable{string}, string, TestPlatformOptions, Session, ITestRunEventsHandler)"/>.
         /// </summary>
         Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRun(System.Collections.Generic.IEnumerable{Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase},string,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunEventsHandler)"/>.
+        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRun(System.Collections.Generic.IEnumerable{Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase},string,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions, Session, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunEventsHandler)"/>.
         /// </summary>
         Task StartTestRunAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRunWithCustomHost(IEnumerable{string}, string, TestPlatformOptions, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRunWithCustomHost(IEnumerable{string}, string, TestPlatformOptions, Session, ITestRunEventsHandler, ITestHostLauncher)"/>.
         /// </summary>
         Task StartTestRunWithCustomHostAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRunWithCustomHost(System.Collections.Generic.IEnumerable{Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase},string,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunEventsHandler,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher)"/>.
+        /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRunWithCustomHost(System.Collections.Generic.IEnumerable{Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase},string,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestPlatformOptions, Session, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunEventsHandler,Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher)"/>.
         /// </summary>
         Task StartTestRunWithCustomHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 

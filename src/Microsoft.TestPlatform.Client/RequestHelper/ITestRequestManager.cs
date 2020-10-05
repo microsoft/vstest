@@ -5,10 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
 {
     using System;
     using System.Collections.Generic;
-
+    using Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
     /// <summary>
     /// Defines the contract that command line
@@ -50,6 +51,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="testRunAttachmentsProcessingPayload">Test run attachments processing payload</param>
         /// <param name="testRunAttachmentsProcessingEventsHandler">Test run attachments processing events handler</param>
         void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload testRunAttachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler, ProtocolConfig protocolConfig);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="payload"></param>
+        /// <param name="eventsHandler"></param>
+        /// <param name="protocolConfig"></param>
+        void StartTestRunner(StartTestRunnerPayload payload, IStartTestRunnerEventsHandler eventsHandler, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request

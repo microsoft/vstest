@@ -5,8 +5,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -55,8 +53,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="sources">Sources for test run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="options">Options to be passed into the platform</param>
+        /// <param name="session">Session for the test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
-        void StartTestRun(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler);
+        void StartTestRun(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, Session session, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
         /// Starts the TestRun with given test cases and criteria
@@ -64,8 +63,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="testCases">TestCases to run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="options">Options to be passed into the platform</param>
+        /// <param name="session">Session for the test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
-        void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler);
+        void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, Session session, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
         /// Starts the TestRun with given sources and criteria with custom test host
@@ -73,9 +73,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="sources">Sources for test run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="options">Options to be passed into the platform</param>
+        /// <param name="session">Session for the test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         /// <param name="customTestHostLauncher">Custom TestHost launcher</param>
-        void StartTestRunWithCustomHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
+        void StartTestRunWithCustomHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, Session session, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// Starts the TestRun with given test cases and criteria with custom test host
@@ -84,8 +85,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="options">Options to be passed into the platform.</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
+        /// <param name="session">Session for the test run</param>
         /// <param name="customTestHostLauncher">Custom TestHost launcher</param>
-        void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
+        void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, Session session, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// 
@@ -93,7 +95,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="sources"></param>
         /// <param name="runSettings"></param>
         /// <param name="eventsHandler"></param>
-        void StartTestRunner(IEnumerable<string> sources, string runSettings, IStartTestRunnerEventsHandler eventsHandler);
+        Session StartTestRunner(IList<string> sources, string runSettings, IStartTestRunnerEventsHandler eventsHandler);
 
         /// <summary>
         /// Ends the Session

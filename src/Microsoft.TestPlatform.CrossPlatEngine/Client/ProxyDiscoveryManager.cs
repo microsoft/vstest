@@ -23,8 +23,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
     /// </summary>
-    public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager, ITestDiscoveryEventsHandler2
+    public class ProxyDiscoveryManager : IProxyDiscoveryManager, ITestDiscoveryEventsHandler2
     {
+        private ProxyOperationManager proxyOperationManager;
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private bool isCommunicationEstablished;
@@ -64,13 +65,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
             IFileHelper fileHelper)
-            : base(requestData, requestSender, testHostManager)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
             this.fileHelper = fileHelper;
+            this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager);
         }
 
         #endregion
@@ -96,14 +97,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
+                this.isCommunicationEstablished = this.proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
 
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
-                    this.RequestSender.DiscoverTests(discoveryCriteria, this);
+                    this.proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
             }
             catch (Exception exception)
@@ -139,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void Abort()
         {
             // Cancel fast, try to stop testhost deployment/launch
-            this.CancellationTokenSource.Cancel();
+            this.proxyOperationManager.CancellationTokenSource.Cancel();
             this.Close();
         }
 
@@ -192,7 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.RequestSender.InitializeDiscovery(platformExtensions);
+                this.proxyOperationManager.RequestSender.InitializeDiscovery(platformExtensions);
             }
         }
 
@@ -205,6 +206,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             // Log to vstest.console layer.
             this.HandleLogMessage(testMessageLevel, message);
+        }
+
+        public void Close()
+        {
+            this.proxyOperationManager.Close();
         }
     }
 }

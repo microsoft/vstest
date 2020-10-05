@@ -218,5 +218,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// Mark the completion of translation layer test run attachments processing request.
         /// </summary>
         void TranslationLayerTestRunAttachmentsProcessingStop();
+
+        void StartTestRunnerStart();
+
+        void StartTestRunnerStop();
     }
 }

@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
     using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner;
 
     /// <summary>
     /// The design mode client.
@@ -151,6 +152,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     var message = this.communicationManager.ReceiveMessage();
 
+                    /*if (!System.Diagnostics.Debugger.IsAttached)
+                    {
+                        System.Diagnostics.Debugger.Launch();
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debugger.Break();
+                    }*/
+
                     if (EqtTrace.IsInfoEnabled)
                     {
                         EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
@@ -177,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.StartTestRunner:
                             {
                                 var testRunnerPayload = this.communicationManager.DeserializePayload<StartTestRunnerPayload>(message);
-                                this.StartTestRunner(testRunnerPayload);
+                                this.StartTestRunner(testRunnerPayload, testRequestManager);
                                 break;
                             }
 
@@ -365,24 +375,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             }
         }
 
-        /// <inheritdoc/>
-        public void StartTestRunner(StartTestRunnerPayload payload)
-        {
-            // Here we do the work of initializing the runner.
-            this.SendTestRunnerId(-1);
-        }
-
-        /// <inheritdoc/>
-        public void SendTestRunnerId(int pid)
-        {
-            if (this.protocolConfig.Version < ObjectModelConstants.MinimumProtocolVersionWithTestRunnerStartSupport)
-            {
-                return;
-            }
-
-            this.communicationManager.SendMessage(MessageType.StartTestRunnerCallback, pid);
-        }
-
         /// <summary>
         /// Send the raw messages to IDE
         /// </summary>
@@ -524,6 +516,48 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         this.communicationManager.SendMessage(MessageType.TestRunAttachmentsProcessingComplete, payload);
                     }
                 });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="payload"></param>
+        /// <param name="testRequestManager"></param>
+        private void StartTestRunner(StartTestRunnerPayload payload, ITestRequestManager testRequestManager)
+        {
+            Task.Run(
+                delegate
+                {
+                    var eventsHandler = new StartTestRunnerEventsHandler(this.communicationManager);
+
+                    try
+                    {
+                        testRequestManager.ResetOptions();
+                        testRequestManager.StartTestRunner(payload, eventsHandler, this.protocolConfig);
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error("DesignModeClient: Exception in StartTestRunner: " + ex);
+
+                        // TODO: Better signal the error.
+                        eventsHandler.HandleStartTestRunnerComplete(null);
+
+                        /*var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                        var payload = new DiscoveryCompletePayload()
+                        {
+                            IsAborted = true,
+                            LastDiscoveredTests = null,
+                            TotalTests = -1
+                        };
+
+                        // Send run complete to translation layer
+                        this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);*/
+                    }
+                });
+
+            // Here we do the work of initializing the runner.
         }
 
         #region IDisposable Support

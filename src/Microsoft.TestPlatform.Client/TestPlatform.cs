@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
@@ -31,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     /// <summary>
     /// Implementation for TestPlatform
     /// </summary>
-    internal class TestPlatform : ITestPlatform
+    public class TestPlatform : ITestPlatform
     {
         private readonly TestRuntimeProviderManager testHostProviderManager;
 
@@ -69,6 +70,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             this.TestEngine = testEngine;
             this.fileHelper = filehelper;
             this.testHostProviderManager = testHostProviderManager;
+        }
+
+        public TestRuntimeProviderManager TestHostProviderManager
+        {
+            get
+            {
+                return this.testHostProviderManager;
+            }
         }
 
         /// <summary>
@@ -159,6 +168,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
+        }
+
+        public void CreateStartTestRunnerRequest(IRequestData requestData, StartTestRunnerCriteria startTestRunnerCriteria, IStartTestRunnerEventsHandler eventsHandler)
+        {
+            if (startTestRunnerCriteria == null)
+            {
+                throw new ArgumentNullException(nameof(startTestRunnerCriteria));
+            }
+
+            // Initialize loggers
+            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            loggerManager.Initialize(startTestRunnerCriteria.RunSettings);
+
+            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(startTestRunnerCriteria.RunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, startTestRunnerCriteria.RunSettings);
+
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, startTestRunnerCriteria.RunSettings);
+
+            if (startTestRunnerCriteria.TestHostLauncher != null)
+            {
+                testHostManager.SetCustomLauncher(startTestRunnerCriteria.TestHostLauncher);
+            }
+
+            var startTestRunnerManager = this.TestEngine.GetStartTestRunnerManager(requestData, testHostManager, startTestRunnerCriteria);
+
+            // TODO: What should happen on initialization ?
+            startTestRunnerManager.Initialize(false);
+
+            startTestRunnerManager.StartTestRunner(startTestRunnerCriteria, eventsHandler);
         }
 
         /// <summary>

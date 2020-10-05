@@ -163,6 +163,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             ITestHostLauncher testHostLauncher,
             string testCaseFilter,
             FilterOptions filterOptions)
+            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher, testCaseFilter, filterOptions, null)
+        {
+        }
+
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout,
+            ITestHostLauncher testHostLauncher,
+            string testCaseFilter,
+            FilterOptions filterOptions,
+            Session session)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
             var testSources = sources as IList<string> ?? sources.ToList();
@@ -173,6 +187,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
             this.TestCaseFilter = testCaseFilter;
             this.FilterOptions = filterOptions;
+
+            this.Session = session;
         }
 
         /// <summary>
@@ -348,12 +364,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Test host launcher. If null then default will be used.
         /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout, ITestHostLauncher testHostLauncher)
+            : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher, null)
+        {
+        }
+
+        public TestRunCriteria(
+            IEnumerable<TestCase> tests,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout,
+            ITestHostLauncher testHostLauncher,
+            Session session)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
             ValidateArg.NotNullOrEmpty(testCases, "tests");
 
             this.Tests = testCases;
+            this.Session = session;
         }
 
         /// <summary>
@@ -430,6 +459,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 this.filterOptions = value;
             }
         }
+
+        public Session Session { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether run criteria is based on specific tests.

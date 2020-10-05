@@ -187,5 +187,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// Events fired on session attachments processing complete in translation layer.
         /// </summary>
         public const int TranslationLayerTestRunAttachmentsProcessingStopEventId = 0x45;
+
+        /// <summary>
+        /// The start test runner request start event id.
+        /// </summary>
+        public const int StartTestRunnerStartEventId = 0x46;
+
+        /// <summary>
+        /// The start test runner request stop event id.
+        /// </summary>
+        public const int StartTestRunnerStopEventId = 0x47;
     }
 }

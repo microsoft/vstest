@@ -279,5 +279,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId);
         }
+
+        public void StartTestRunnerStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestRunnerStartEventId);
+        }
+
+        public void StartTestRunnerStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestRunnerStopEventId);
+        }
     }
 }

@@ -58,5 +58,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the session.
+        /// </summary>
+        [DataMember]
+        public Session Session { get; set; }
     }
 }

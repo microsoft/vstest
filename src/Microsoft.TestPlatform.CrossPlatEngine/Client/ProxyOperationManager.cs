@@ -29,9 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
-    public abstract class ProxyOperationManager
+    public class ProxyOperationManager
     {
-        private readonly ITestRuntimeProvider testHostManager;
         private readonly IProcessHelper processHelper;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
@@ -44,7 +43,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool initialized;
         private string testHostProcessStdError;
         private bool testHostLaunched;
-        private IRequestData requestData;
 
         #region Constructors
 
@@ -54,31 +52,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestData"></param>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager)
+        public ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager)
         {
             this.RequestSender = requestSender;
             this.CancellationTokenSource = new CancellationTokenSource();
-            this.testHostManager = testHostManager;
+            this.TestHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
             this.initialized = false;
             this.testHostLaunched = false;
             this.testHostProcessId = -1;
-            this.requestData = requestData;
+            this.RequestData = requestData;
         }
 
         #endregion
 
         #region Properties
+        public IRequestData RequestData { get; set; }
 
         /// <summary>
         /// Gets or sets the server for communication.
         /// </summary>
-        protected ITestRequestSender RequestSender { get; set; }
+        public ITestRequestSender RequestSender { get; set; }
+
+        public ITestRuntimeProvider TestHostManager { get; set; }
 
         /// <summary>
         /// Gets or sets the cancellation token source.
         /// </summary>
-        protected CancellationTokenSource CancellationTokenSource { get; set; }
+        public CancellationTokenSource CancellationTokenSource { get; set; }
 
         #endregion
 
@@ -99,12 +100,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
         {
             this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
-            var connTimeout = EnvironmentHelper.GetConnectionTimeout();
 
             if (!this.initialized)
             {
+                var connTimeout = EnvironmentHelper.GetConnectionTimeout();
+
                 this.testHostProcessStdError = string.Empty;
-                TestHostConnectionInfo testHostConnectionInfo = this.testHostManager.GetTestHostConnectionInfo();
+                TestHostConnectionInfo testHostConnectionInfo = this.TestHostManager.GetTestHostConnectionInfo();
                 
                 var portNumber = 0;
 
@@ -118,18 +120,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), TraceLevel = (int)EqtTrace.TraceLevel };
 
                 // Subscribe to TestHost Event
-                this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
-                this.testHostManager.HostExited += this.TestHostManagerHostExited;
+                this.TestHostManager.HostLaunched += this.TestHostManagerHostLaunched;
+                this.TestHostManager.HostExited += this.TestHostManagerHostExited;
 
                 // Get envVars from run settings
                 var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
 
                 // Get the test process start info
-                var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, envVars, connectionInfo));
+                var testHostStartInfo = this.UpdateTestProcessStartInfo(this.TestHostManager.GetTestHostProcessStartInfo(sources, envVars, connectionInfo));
                 try
                 {
                     // Launch the test host.
-                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
+                    var hostLaunchedTask = this.TestHostManager.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
                     this.testHostLaunched = hostLaunchedTask.Result;
 
                     if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
@@ -229,10 +231,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
 
                 // please clean up test host.
-                this.testHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+                this.TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
 
-                this.testHostManager.HostExited -= this.TestHostManagerHostExited;
-                this.testHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
+                this.TestHostManager.HostExited -= this.TestHostManagerHostExited;
+                this.TestHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
             }
         }
 
@@ -247,15 +249,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>
         /// The <see cref="TestProcessStartInfo"/>.
         /// </returns>
-        protected virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-            var telemetryOptedIn = this.requestData.IsTelemetryOptedIn ? "true" : "false";
+            var telemetryOptedIn = this.RequestData.IsTelemetryOptedIn ? "true" : "false";
             testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
             return testProcessStartInfo;
         }
 
-        protected string GetTimestampedLogFile(string logFile)
+        public string GetTimestampedLogFile(string logFile)
         {
             if (string.IsNullOrWhiteSpace(logFile))
             {
@@ -276,7 +278,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="runsettingsXml">runsettings string</param>
         /// <returns>runsetting after removing un-required nodes</returns>
-        protected string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
+        public string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
         {
             var updatedRunSettingsXml = runsettingsXml;
             if (!this.makeRunsettingsCompatibleSet)
@@ -295,18 +297,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void CompatIssueWithVersionCheckAndRunsettings()
         {
-            var properties = this.testHostManager.GetType().GetRuntimeProperties();
+            var properties = this.TestHostManager.GetType().GetRuntimeProperties();
 
             var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
             if (versionCheckProperty != null)
             {
-                this.versionCheckRequired = (bool)versionCheckProperty.GetValue(this.testHostManager);
+                this.versionCheckRequired = (bool)versionCheckProperty.GetValue(this.TestHostManager);
             }
 
             var makeRunsettingsCompatibleProperty = properties.FirstOrDefault(p => string.Equals(p.Name, makeRunsettingsCompatiblePropertyName, StringComparison.OrdinalIgnoreCase));
             if (makeRunsettingsCompatibleProperty != null)
             {
-                this.makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(this.testHostManager);
+                this.makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(this.TestHostManager);
                 this.makeRunsettingsCompatibleSet = true;
             }
         }
