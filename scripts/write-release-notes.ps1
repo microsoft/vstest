@@ -63,7 +63,7 @@ Write-Host "Branch is $branch"
 Write-Host "SourceBranch is $sourceBranch"
 $branchesWithStartTag = git -C $Path branch --contains tags/$start
 
-if (-not $branchesWithStartTag -or $branchesWithStartTag -notmatch $branch) { 
+if (-not $branchesWithStartTag -or -not ($branchesWithStartTag -match $branch)) { 
     Write-Host "This branch $branch$(if($branch -ne $sourceBranch){" ($sourceBranch)"}), does not contain the starting tag $start. Skipping generating release notes."
     if ($branchesWithStartTag) {
         Write-Host "The tag is present on branches:`n$($branchesWithStartTag)."
@@ -78,7 +78,7 @@ $prUrl = "$repoUrl/pull/"
 $v = $tag -replace '^v'
 $b = if ($Stable) { $v } else { $tag -replace '.*?(\d+-\d+)$', '$1' }
 # using .. because I want to know the changes that are on this branch, but don't care about the changes that I don't have https://stackoverflow.com/a/24186641/3065397
-$log = (git -C $Path log "$start..$end" --oneline --pretty="format:%s" --first-parent  --no-merges)
+$log = (git -C $Path log "$start..$end" --oneline --pretty="format:%s" --first-parent)
 $issues = $log | ForEach-Object {
     if ($_ -match '^(?<message>.+)\s\(#(?<pr>\d+)\)?$') {
         $message = "* $($matches.message)"
