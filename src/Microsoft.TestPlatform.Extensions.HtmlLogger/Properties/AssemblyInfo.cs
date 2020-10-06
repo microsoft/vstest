@@ -11,14 +11,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft Corporation")]
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
-[assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.BlameDataCollector")]
+[assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.HtmlLogger")]
 [assembly: AssemblyTrademark("")]
-[assembly: InterestingTypes("Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameLogger")]
+[assembly: InterestingTypes("Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger")]
+
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("716373d6-9162-4ac6-9ae7-b5a3a4286808")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM.
+
+[assembly: Guid("1f26e9c7-5018-4091-a22a-89280f2f98a9")]

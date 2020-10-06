@@ -4,46 +4,35 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+  
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Resources.Resources;
 
     /// <summary>
     /// Discovers test extensions in a directory.
     /// </summary>
     internal class TestPluginDiscoverer
     {
-        private IFileHelper fileHelper;
-
         private static HashSet<string> UnloadableFiles = new HashSet<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
         /// </summary>
-        public TestPluginDiscoverer() : this(new FileHelper())
+        public TestPluginDiscoverer()
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
-        /// </summary>
-        /// <param name="fileHelper">
-        /// The file Helper.
-        /// </param>
-        internal TestPluginDiscoverer(IFileHelper fileHelper)
-        {
-            this.fileHelper = fileHelper;
         }
 
         #region Fields
@@ -179,8 +168,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<Type> types;
 
             try
-            {
-                types = assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract);
+            {               
+                var customAttribute = assembly.GetCustomAttributes(typeof(InterestingTypesAttribute), false).OfType<InterestingTypesAttribute>().FirstOrDefault();
+                if (customAttribute != null)
+                {
+                    var interestingTypes = customAttribute.Types;
+                    var list = new List<Type>();
+                    foreach(string type in interestingTypes)
+                    {
+                        list.Add(assembly.GetType(type));          
+                    }
+                    types = list;
+                }
+                else
+                {
+                    types = assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract);
+                }
+
             }
             catch (ReflectionTypeLoadException e)
             {
