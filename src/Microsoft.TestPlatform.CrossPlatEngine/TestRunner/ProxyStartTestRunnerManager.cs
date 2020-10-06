@@ -4,6 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
 {
     using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -41,14 +43,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
         {
             var session = new Session();
 
-            // Should be done by spawning a task.
+            var taskList = new List<Task>();
             while (parallelLevel-- > 0)
             {
-                var operationManagerProxy = this.proxyCreator();
-                operationManagerProxy.SetupChannel(criteria.Sources, criteria.RunSettings);
+                taskList.Add(Task.Factory.StartNew(
+                    () =>
+                    {
+                        var operationManagerProxy = this.proxyCreator();
+                        operationManagerProxy.SetupChannel(criteria.Sources, criteria.RunSettings);
 
-                TestRunnerPool.Instance.AddProxy(session, operationManagerProxy);
+                        TestRunnerPool.Instance.AddProxy(session, operationManagerProxy);
+                    }));
             }
+
+            Task.WaitAll(taskList.ToArray());
 
             eventsHandler.HandleStartTestRunnerComplete(session);
         }
