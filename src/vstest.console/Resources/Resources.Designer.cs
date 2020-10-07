@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("vstest.console.Resources.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -505,6 +505,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         internal static string EnableLoggersArgumentHelp {
             get {
                 return ResourceManager.GetString("EnableLoggersArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
+        ///      Sets the value of an environment variable. Creates the variable if it does not exist, overrides if it does. This will imply /InIsolation switch and force the tests to be run in an isolated process.
+        ///      
+        ///      This argument can be specified multiple times to provide multiple variables.
+        ///
+        ///      Example: -e:VARIABLE1=VALUE1
+        ///               -e:ANOTHER_VARIABLE=&quot;VALUE WITH SPACES&quot;
+        ///               -e:ANOTHER_VARIABLE=&quot;VALUE;seperated with;semicolons&quot;.
+        /// </summary>
+        internal static string EnvironmentArgumentHelp {
+            get {
+                return ResourceManager.GetString("EnvironmentArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Environment variable &apos;{0}&apos; was already defined, but it&apos;s overridden by -Environment argument..
+        /// </summary>
+        internal static string EnvironmentVariableXIsOverriden {
+            get {
+                return ResourceManager.GetString("EnvironmentVariableXIsOverriden", resourceCulture);
             }
         }
         

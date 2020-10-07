@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
-#if NET451
+#if NETFRAMEWORK
     using System.Threading;
 #endif
     using System;
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.LogExtensions();
             }
-#if NET451
+#if NETFRAMEWORK
             catch (ThreadAbortException)
             {
                 // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread

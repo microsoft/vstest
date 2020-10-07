@@ -245,7 +245,7 @@
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
- <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\es\vstest.console.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\vstest.console.resources.dll" />
 	<file src="net451\$Runtime$\es\SettingsMigrator.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\es\SettingsMigrator.resources.dll" />
@@ -404,7 +404,7 @@
     <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
-<file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\tr\vstest.console.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\vstest.console.resources.dll" />
 	<file src="net451\$Runtime$\tr\SettingsMigrator.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\tr\SettingsMigrator.resources.dll" />
@@ -489,6 +489,17 @@
     <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
 
     <!-- External dependencies-->
-    <file src="$FakesPackageDir$\net451\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
+    <file src="$FakesPackageDir$\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
+
+    <file src="$FakesPackageDir$\DataCollector\Microsoft.VisualStudio.Fakes.DataCollector.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Fakes.DataCollector.dll" />
+    <file src="$FakesPackageDir$\DataCollector\Microsoft.Cci.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.Cci.dll" />
+
+    <file src="$FakesPackageDir$\Instrumentation\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" />
+    <file src="$FakesPackageDir$\Instrumentation\x86\FakesInstrumentationProfiler_x86.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x86\FakesInstrumentationProfiler_x86.config" />
+    <file src="$FakesPackageDir$\Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" />
+    <file src="$FakesPackageDir$\Instrumentation\x64\FakesInstrumentationProfiler_x64.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Fakes\x64\FakesInstrumentationProfiler_x64.config" />
+
+    <file src="$FakesPackageDir$\MicrosoftInstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll"	target="tools\net451\Common7\IDE\CommonExtensions\Platform\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
+    <file src="$FakesPackageDir$\MicrosoftInstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll"	target="tools\net451\Common7\IDE\CommonExtensions\Platform\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
   </files>
 </package>

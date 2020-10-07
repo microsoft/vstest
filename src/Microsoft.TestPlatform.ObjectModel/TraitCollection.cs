@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     /// Class that holds collection of traits
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public class TraitCollection : IEnumerable<Trait>
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #pragma warning restore 618
             typeof(TestObject));
 
-#if NET451
+#if NETFRAMEWORK
         [NonSerialized]
 #endif
         private readonly TestObject testObject;

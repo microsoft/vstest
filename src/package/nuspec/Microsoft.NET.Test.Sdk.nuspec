@@ -22,6 +22,10 @@
         <!-- TestHost gets shipped as ExtensionSDKs with name TestPlatform.Universal. -->
         <!-- Currently code coverage not supported for uap10.0. -->
       </group>
+      <group targetFramework="netcoreapp1.0">
+        <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
+        <dependency id="Microsoft.CodeCoverage" version="$Version$" />
+      </group>
       <group targetFramework="netcoreapp2.1">
         <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
         <dependency id="Microsoft.CodeCoverage" version="$Version$" />
@@ -33,10 +37,12 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="netcoreapp\*" target="build\netcoreapp1.0\" />
     <file src="netcoreapp\*" target="build\netcoreapp2.1\" />
     <file src="netfx\*" target="build\net40\" />
 
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp1.0\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp2.1\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\net40\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\uap10.0\" />

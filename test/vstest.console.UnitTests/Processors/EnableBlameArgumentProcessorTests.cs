@@ -25,7 +25,14 @@ namespace vstest.console.UnitTests.Processors
         private Mock<IOutput> mockOutput;
         private TestableRunSettingsProvider settingsProvider;
         private EnableBlameArgumentExecutor executor;
-        private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors ></DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration><ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory></RunConfiguration>\r\n  </RunSettings>";
+        private string DefaultRunSettings = string.Join(Environment.NewLine,
+            "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+            "<RunSettings>",
+            "  <DataCollectionRunSettings>",
+            "    <DataCollectors ></DataCollectors>",
+            "  </DataCollectionRunSettings>",
+            "  <RunConfiguration><ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory></RunConfiguration>",
+            "  </RunSettings>");
 
         public EnableBlameArgumentProcessorTests()
         {
@@ -78,7 +85,28 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"
+                ), this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -86,13 +114,56 @@ namespace vstest.console.UnitTests.Processors
         {
             var runsettingsString = string.Format(DefaultRunSettings, "");
             var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"mini\" CollectAlways=\"false\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>");
+            runsettings.LoadSettingsXml(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <CollectDump DumpType=\"mini\" CollectAlways=\"false\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"));
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
             this.executor.Initialize("CollectDump;DumpType=full;CollectAlways=true");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"full\" CollectAlways=\"true\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <CollectDump DumpType=\"full\" CollectAlways=\"true\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -105,7 +176,6 @@ namespace vstest.console.UnitTests.Processors
 
             var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
             {
-                Tuple.Create(PlatformOperatingSystem.Unix, PlatformArchitecture.X64),
                 Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM),
                 Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64)
             };
@@ -119,7 +189,28 @@ namespace vstest.console.UnitTests.Processors
                 this.mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameCollectDumpNotSupportedForPlatform, OutputLevel.Warning));
 
                 Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-                Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+                Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
             }
         }
 
@@ -141,7 +232,28 @@ namespace vstest.console.UnitTests.Processors
             this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, invalidParameter), OutputLevel.Warning));
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -163,7 +275,28 @@ namespace vstest.console.UnitTests.Processors
             this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, invalidString), OutputLevel.Warning));
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -182,7 +315,29 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("CollectDump");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"Full\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <CollectDump DumpType=\"Full\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -201,7 +356,29 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("CollectDump;DumpType=full;CollectAlways=true");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"full\" CollectAlways=\"true\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <CollectDump DumpType=\"full\" CollectAlways=\"true\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -220,7 +397,71 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("CollectHangDump");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDumpOnTestSessionHang TestTimeout=\"3600000\" HangDumpType=\"Full\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(
+                string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <CollectDumpOnTestSessionHang TestTimeout=\"3600000\" HangDumpType=\"Full\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldCreateEntryForBlameAlongWithCollectHangDumpParametersIfEnabled()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(DefaultRunSettings);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.mockEnvronment.Setup(x => x.OperatingSystem)
+                               .Returns(PlatformOperatingSystem.Windows);
+            this.mockEnvronment.Setup(x => x.Architecture)
+                               .Returns(PlatformArchitecture.X64);
+
+            this.executor.Initialize("CollectHangDump;TestTimeout=10min;HangDumpType=Mini");
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"blame\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "          <CollectDumpOnTestSessionHang TestTimeout=\"10min\" HangDumpType=\"Mini\" />",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "  <RunConfiguration>",
+                "    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>",
+                "  </RunConfiguration>",
+                "  <LoggerRunSettings>",
+                "    <Loggers>",
+                "      <Logger friendlyName=\"blame\" enabled=\"True\" />",
+                "    </Loggers>",
+                "  </LoggerRunSettings>",
+                "</RunSettings>"),
+                this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         internal class TestableEnableBlameArgumentExecutor : EnableBlameArgumentExecutor

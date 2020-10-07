@@ -12,15 +12,16 @@ function Unzip
 function Verify-Nuget-Packages($packageDirectory)
 {
     Write-Log "Starting Verify-Nuget-Packages."
-    $expectedNumOfFiles = @{"Microsoft.CodeCoverage" = 29;
-                     "Microsoft.NET.Test.Sdk" = 13;
-                     "Microsoft.TestPlatform" = 469;
+    $expectedNumOfFiles = @{
+                     "Microsoft.CodeCoverage" = 29;
+                     "Microsoft.NET.Test.Sdk" = 18;
+                     "Microsoft.TestPlatform" = 477;
                      "Microsoft.TestPlatform.Build" = 19;
                      "Microsoft.TestPlatform.CLI" = 350;
                      "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
-                     "Microsoft.TestPlatform.ObjectModel" = 62;
+                     "Microsoft.TestPlatform.ObjectModel" = 91;
                      "Microsoft.TestPlatform.Portable" = 566;
-                     "Microsoft.TestPlatform.TestHost" = 145;
+                     "Microsoft.TestPlatform.TestHost" = 197;
                      "Microsoft.TestPlatform.TranslationLayer" = 121}
 
     $nugetPackages = Get-ChildItem -Filter "*.nupkg" $packageDirectory | % { $_.FullName}

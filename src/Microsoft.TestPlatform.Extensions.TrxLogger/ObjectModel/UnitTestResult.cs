@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
     using System;
+    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
     /// <summary>
     /// Class for unit test result.
@@ -19,6 +20,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             string computerName,
             TestOutcome outcome,
             TestType testType,
-            TestListCategoryId testCategoryId) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId) { }
+            TestListCategoryId testCategoryId,
+            TrxFileHelper trxFileHelper
+            ) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId, trxFileHelper) { }
     }
 }

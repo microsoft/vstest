@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
-#if NET451
+#if NETFRAMEWORK
     using System.Collections.Generic;
 #endif
     using System.Diagnostics;
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.fileHelper = fileHelper;
         }
 
-#if NET451
+#if NETFRAMEWORK
 
         /// <summary>
         /// TODO: Remove the #if when project is targeted to netstandard2.0

@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
-#if NET451
+#if NETFRAMEWORK
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
@@ -242,8 +242,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             try
             {
-                Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
-                var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
+                Assembly assembly = Assembly.Load(new AssemblyName(FakesConfiguratorAssembly));
+                var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false, false);
                 var method = type?.GetMethod(CrossPlatformConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
                 if (method != null)
                 {

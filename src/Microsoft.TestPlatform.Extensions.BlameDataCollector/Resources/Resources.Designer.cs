@@ -61,7 +61,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):.
+        ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly. Please inspect the call stack above, if available, to get more information about where the exception originated from.
+        ///The test running when the crash occurred: 
+        ///{0}
+        ///This test may, or may not be the source of the crash..
         /// </summary>
         internal static string AbortedTestRun {
             get {
@@ -97,11 +100,47 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process..
+        ///   Looks up a localized string similar to Dumping {0} - {1}.
+        /// </summary>
+        internal static string Dumping {
+            get {
+                return ResourceManager.GetString("Dumping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dumping this process tree (from bottom).
+        /// </summary>
+        internal static string DumpingTree {
+            get {
+                return ResourceManager.GetString("DumpingTree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified inactivity time of {0} {1} has elapsed. Collecting hang dumps from testhost and its child processes.
         /// </summary>
         internal static string InactivityTimeout {
             get {
                 return ResourceManager.GetString("InactivityTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minutes.
+        /// </summary>
+        internal static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All tests finished running, Sequence file will not be generated.
+        /// </summary>
+        internal static string NotGeneratingSequenceFile {
+            get {
+                return ResourceManager.GetString("NotGeneratingSequenceFile", resourceCulture);
             }
         }
         
@@ -129,6 +168,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         internal static string ProcDumpNotGenerated {
             get {
                 return ResourceManager.GetString("ProcDumpNotGenerated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seconds.
+        /// </summary>
+        internal static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
         
