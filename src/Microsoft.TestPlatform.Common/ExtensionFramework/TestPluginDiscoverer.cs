@@ -165,24 +165,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-            IEnumerable<Type> types;
+            List<Type> types = new List<Type>();
 
             try
-            {
-                var customAttribute = assembly.GetCustomAttributes(typeof(InterestingTypesAttribute), false).OfType<InterestingTypesAttribute>().FirstOrDefault();
+            {           
+                var customAttribute = CustomAttributeExtensions.GetCustomAttribute(assembly, typeof(InterestingTypesAttribute)) as InterestingTypesAttribute;
                 if (customAttribute != null)
                 {
                     var interestingTypes = customAttribute.Types;
-                    var list = new List<Type>();
                     foreach(string type in interestingTypes)
                     {
-                        list.Add(assembly.GetType(type));          
+                        types.Add(assembly.GetType(type));          
                     }
-                    types = list;
                 }
                 else
                 {
-                    types = assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract);
+                    types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract).ToList();
                 }
             }
             catch (ReflectionTypeLoadException e)
@@ -203,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 foreach (var type in types)
                 {
-                    this.GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
+                    GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
                 }
             }
         }
