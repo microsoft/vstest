@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             try
             {
-                /*var customAttribute = assembly.GetCustomAttributes(typeof(InterestingTypesAttribute), false).OfType<InterestingTypesAttribute>().FirstOrDefault();
+                var customAttribute = assembly.GetCustomAttributes(typeof(InterestingTypesAttribute), false).OfType<InterestingTypesAttribute>().FirstOrDefault();
                 if (customAttribute != null)
                 {
                     var interestingTypes = customAttribute.Types;
@@ -183,8 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 else
                 {
                     types = assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract);
-                }*/
-                types = assembly.GetTypes();
+                }
             }
             catch (ReflectionTypeLoadException e)
             {
