@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.BlameDataCollector")]
 [assembly: AssemblyTrademark("")]
-[assembly: InterestingTypes("Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameLogger")]
+[assembly: InterestingTypes("Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameLogger", "Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameCollector")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
