@@ -14,14 +14,21 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <dependencies>
+      <group targetFramework="netcoreapp1.0">
+        <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
+        <dependency id="System.Diagnostics.StackTrace" version="[4.3.0, )"/>
+        <dependency id="System.Diagnostics.TraceSource" version="[4.3.0, )"/>
+      </group>
+
       <group targetFramework="netcoreapp2.1">
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
       </group>
 
       <group targetFramework="uap10.0">
-        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="System.Xml.ReaderWriter" version="4.0.11" />
       </group>
     </dependencies>
@@ -32,7 +39,24 @@
     <file src="ThirdPartyNotices.txt" target="" />
     <file src="_._" target="lib\net45\" />
 
-    <!-- NetCore -->
+    <!-- netcoreapp1.0 -->
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.Utilities.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.deps.json" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x86\msdia140.dll" target="lib\netcoreapp1.0\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x64\msdia140.dll" target="lib\netcoreapp1.0\x64\" />
+    
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.dll" target="build\netcoreapp1.0\x64" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.exe" target="build\netcoreapp1.0\x64" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.dll" target="build\netcoreapp1.0\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.exe" target="build\netcoreapp1.0\x86\" />
+
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp1.0\" />
+
+    <!-- netcoreapp2.1 -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netcoreapp2.1\" />
@@ -146,8 +170,51 @@
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\tr" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\zh-Hans" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" target="build\uap10.0\zh-Hant" />
+    
+    <!-- Add localized resources netcoreapp1.0 -->
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\cs" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\de" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\es" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\fr" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\it" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\ja" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\ko" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\pl" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\pt-BR" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\ru" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\tr" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\zh-Hans" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp1.0\zh-Hant" />
 
-    <!-- Add localized resources -->
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\cs" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\de" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\es" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\fr" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\it" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\ja" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\ko" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\pl" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\pt-BR" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\ru" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\tr" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\zh-Hans" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" target="lib\netcoreapp1.0\zh-Hant" />
+
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\cs" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\de" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\es" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\fr" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\it" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\ja" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\ko" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\pl" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\pt-BR" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\ru" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\tr" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\zh-Hans" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp1.0\zh-Hant" />
+
+    <!-- Add localized resources netcoreapp2.1 -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp2.1\cs" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp2.1\de" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netcoreapp2.1\es" />
@@ -189,6 +256,5 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp2.1\tr" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp2.1\zh-Hans" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\netcoreapp2.1\zh-Hant" />
-
   </files>
 </package>

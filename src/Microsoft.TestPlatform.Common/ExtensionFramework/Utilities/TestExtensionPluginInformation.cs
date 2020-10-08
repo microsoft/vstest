@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
             if (EqtTrace.IsErrorEnabled && string.IsNullOrEmpty(extensionUri))
             {
-                EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.Module.Name);
+                EqtTrace.Error("The type \"{0}\" defined in \"{1}\" does not have ExtensionUri attribute.", testLoggerType.ToString(), testLoggerType.GetTypeInfo().Module.Name);
             }
 
             return extensionUri;
