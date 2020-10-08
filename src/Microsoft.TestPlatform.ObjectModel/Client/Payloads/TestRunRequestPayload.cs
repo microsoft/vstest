@@ -63,6 +63,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Gets or sets the session.
         /// </summary>
         [DataMember]
-        public Session Session { get; set; }
+        public TestSessionInfo TestSessionInfo { get; set; }
     }
 }

@@ -41,6 +41,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <returns>RunRequest object</returns>
         ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options);
 
-        void CreateStartTestRunnerRequest(IRequestData requestData, StartTestRunnerCriteria criteria, IStartTestRunnerEventsHandler eventsHandler);
+        void CreateStartTestSessionRequest(IRequestData requestData, StartTestSessionCriteria criteria, IStartTestSessionEventsHandler eventsHandler);
     }
 }

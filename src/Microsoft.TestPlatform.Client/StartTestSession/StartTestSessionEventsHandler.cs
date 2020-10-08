@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner
+namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner
     /// <summary>
     /// 
     /// </summary>
-    public class StartTestRunnerEventsHandler : IStartTestRunnerEventsHandler
+    public class StartTestSessionEventsHandler : IStartTestSessionEventsHandler
     {
         private readonly ICommunicationManager communicationManager;
 
@@ -20,20 +20,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner
         /// 
         /// </summary>
         /// <param name="communicationManager"></param>
-        public StartTestRunnerEventsHandler(ICommunicationManager communicationManager)
+        public StartTestSessionEventsHandler(ICommunicationManager communicationManager)
         {
             this.communicationManager = communicationManager;
         }
 
         /// <inheritdoc />
-        public void HandleStartTestRunnerComplete(Session session)
+        public void HandleStartTestSessionComplete(TestSessionInfo testSessionInfo)
         {
-            var ackPayload = new StartTestRunnerAckPayload()
+            var ackPayload = new StartTestSessionAckPayload()
             {
-                Session = session
+                TestSessionInfo = testSessionInfo
             };
 
-            this.communicationManager.SendMessage(MessageType.StartTestRunnerCallback, ackPayload);
+            this.communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);
         }
 
         /// <inheritdoc />

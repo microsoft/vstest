@@ -170,33 +170,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }
 
-        public void CreateStartTestRunnerRequest(IRequestData requestData, StartTestRunnerCriteria startTestRunnerCriteria, IStartTestRunnerEventsHandler eventsHandler)
+        public void CreateStartTestSessionRequest(IRequestData requestData, StartTestSessionCriteria testSessionCriteria, IStartTestSessionEventsHandler eventsHandler)
         {
-            if (startTestRunnerCriteria == null)
+            if (testSessionCriteria == null)
             {
-                throw new ArgumentNullException(nameof(startTestRunnerCriteria));
+                throw new ArgumentNullException(nameof(testSessionCriteria));
             }
 
             // Initialize loggers
             var loggerManager = this.TestEngine.GetLoggerManager(requestData);
-            loggerManager.Initialize(startTestRunnerCriteria.RunSettings);
+            loggerManager.Initialize(testSessionCriteria.RunSettings);
 
-            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(startTestRunnerCriteria.RunSettings);
-            ThrowExceptionIfTestHostManagerIsNull(testHostManager, startTestRunnerCriteria.RunSettings);
+            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testSessionCriteria.RunSettings);
 
-            testHostManager.Initialize(TestSessionMessageLogger.Instance, startTestRunnerCriteria.RunSettings);
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
 
-            if (startTestRunnerCriteria.TestHostLauncher != null)
+            if (testSessionCriteria.TestHostLauncher != null)
             {
-                testHostManager.SetCustomLauncher(startTestRunnerCriteria.TestHostLauncher);
+                testHostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
             }
 
-            var startTestRunnerManager = this.TestEngine.GetStartTestRunnerManager(requestData, testHostManager, startTestRunnerCriteria);
+            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testHostManager, testSessionCriteria);
 
             // TODO: What should happen on initialization ?
-            startTestRunnerManager.Initialize(false);
+            testSessionManager.Initialize(false);
 
-            startTestRunnerManager.StartTestRunner(startTestRunnerCriteria, eventsHandler);
+            testSessionManager.StartTestSession(testSessionCriteria, eventsHandler);
         }
 
         /// <summary>

@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner;
+    using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="payload"></param>
         /// <param name="eventsHandler"></param>
         /// <param name="protocolConfig"></param>
-        void StartTestRunner(StartTestRunnerPayload payload, IStartTestRunnerEventsHandler eventsHandler, ProtocolConfig protocolConfig);
+        void StartTestSession(StartTestSessionPayload payload, IStartTestSessionEventsHandler eventsHandler, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request

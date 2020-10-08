@@ -280,14 +280,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
             this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId);
         }
 
-        public void StartTestRunnerStart()
+        public void StartTestSessionStart()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestRunnerStartEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestSessionStartEventId);
         }
 
-        public void StartTestRunnerStop()
+        public void StartTestSessionStop()
         {
-            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestRunnerStopEventId);
+            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestSessionStopEventId);
         }
     }
 }

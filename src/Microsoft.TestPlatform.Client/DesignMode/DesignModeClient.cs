@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -27,7 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
     using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
-    using Microsoft.VisualStudio.TestPlatform.Client.StartTestRunner;
 
     /// <summary>
     /// The design mode client.
@@ -184,10 +184,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
-                        case MessageType.StartTestRunner:
+                        case MessageType.StartTestSession:
                             {
-                                var testRunnerPayload = this.communicationManager.DeserializePayload<StartTestRunnerPayload>(message);
-                                this.StartTestRunner(testRunnerPayload, testRequestManager);
+                                var testSessionPayload = this.communicationManager.DeserializePayload<StartTestSessionPayload>(message);
+                                this.StartTestSession(testSessionPayload, testRequestManager);
                                 break;
                             }
 
@@ -522,25 +522,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// 
         /// </summary>
         /// <param name="payload"></param>
-        /// <param name="testRequestManager"></param>
-        private void StartTestRunner(StartTestRunnerPayload payload, ITestRequestManager testRequestManager)
+        /// <param name="requestManager"></param>
+        private void StartTestSession(StartTestSessionPayload payload, ITestRequestManager requestManager)
         {
             Task.Run(
                 delegate
                 {
-                    var eventsHandler = new StartTestRunnerEventsHandler(this.communicationManager);
+                    var eventsHandler = new StartTestSessionEventsHandler(this.communicationManager);
 
                     try
                     {
-                        testRequestManager.ResetOptions();
-                        testRequestManager.StartTestRunner(payload, eventsHandler, this.protocolConfig);
+                        requestManager.ResetOptions();
+                        requestManager.StartTestSession(payload, eventsHandler, this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
-                        EqtTrace.Error("DesignModeClient: Exception in StartTestRunner: " + ex);
+                        EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
 
                         // TODO: Better signal the error.
-                        eventsHandler.HandleStartTestRunnerComplete(null);
+                        eventsHandler.HandleStartTestSessionComplete(null);
 
                         /*var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);

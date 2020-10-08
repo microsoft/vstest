@@ -10,12 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     /// 
     /// </summary>
     [DataContract]
-    public class Session : IEquatable<Session>, IDisposable
+    public class TestSessionInfo : IEquatable<TestSessionInfo>
     {
         /// <summary>
         /// 
         /// </summary>
-        public Session()
+        public TestSessionInfo()
         {
             this.Id = Guid.NewGuid();
         }
@@ -25,15 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public Guid Id { get; private set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-            // Should dispose the testhosts from the map and must send that info to vstest.console.
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// 
@@ -51,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as Session);
+            return this.Equals(obj as TestSessionInfo);
         }
 
         /// <summary>
@@ -59,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(Session other)
+        public bool Equals(TestSessionInfo other)
         {
             return other != null && this.Id == other.Id;
         }

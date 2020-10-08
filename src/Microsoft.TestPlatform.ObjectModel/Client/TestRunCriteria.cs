@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             ITestHostLauncher testHostLauncher,
             string testCaseFilter,
             FilterOptions filterOptions,
-            Session session)
+            TestSessionInfo testSessionInfo)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
             var testSources = sources as IList<string> ?? sources.ToList();
@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.TestCaseFilter = testCaseFilter;
             this.FilterOptions = filterOptions;
 
-            this.Session = session;
+            this.TestSessionInfo = testSessionInfo;
         }
 
         /// <summary>
@@ -375,14 +375,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             string testSettings,
             TimeSpan runStatsChangeEventTimeout,
             ITestHostLauncher testHostLauncher,
-            Session session)
+            TestSessionInfo testSessionInfo)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
             ValidateArg.NotNullOrEmpty(testCases, "tests");
 
             this.Tests = testCases;
-            this.Session = session;
+            this.TestSessionInfo = testSessionInfo;
         }
 
         /// <summary>
@@ -460,7 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             }
         }
 
-        public Session Session { get; set; }
+        public TestSessionInfo TestSessionInfo { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether run criteria is based on specific tests.

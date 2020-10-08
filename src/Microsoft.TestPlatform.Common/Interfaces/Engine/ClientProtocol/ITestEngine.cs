@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <returns>ITestExecutionManager object that can do execution</returns>
         IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria);
 
-        IProxyStartTestRunnerManager GetStartTestRunnerManager(IRequestData requestData, ITestRuntimeProvider testHostManager, StartTestRunnerCriteria testRunCriteria);
+        IProxyTestSessionManager GetTestSessionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, StartTestSessionCriteria testSessionCriteria);
 
         /// <summary>
         /// Fetches the extension manager for this engine. This manager would provide extensibility

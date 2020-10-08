@@ -288,7 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher,
                                   testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
                                   testRunRequestPayload.TestPlatformOptions?.FilterOptions,
-                                  testRunRequestPayload.Session);
+                                  testRunRequestPayload.TestSessionInfo);
             }
             else
             {
@@ -299,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher,
-                                  testRunRequestPayload.Session);
+                                  testRunRequestPayload.TestSessionInfo);
             }
 
             // Run tests
@@ -356,11 +356,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        public void StartTestRunner(StartTestRunnerPayload runnerPayload, IStartTestRunnerEventsHandler eventsHandler, ProtocolConfig protocolConfig)
+        public void StartTestSession(StartTestSessionPayload payload, IStartTestSessionEventsHandler eventsHandler, ProtocolConfig protocolConfig)
         {
-            EqtTrace.Info("TestRequestManager.StartTestRunner: Starting test runner.");
+            EqtTrace.Info("TestRequestManager.StartTestSession: Starting test session.");
 
-            this.telemetryOptedIn = runnerPayload.CollectMetrics;
+            this.telemetryOptedIn = payload.CollectMetrics;
             var requestData = this.GetRequestData(protocolConfig);
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe.
@@ -370,18 +370,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 try
                 {
                     EqtTrace.Info("TestRequestManager.StartTestRunner: Synchronization context taken.");
-                    this.testPlatformEventSource.StartTestRunnerStart();
+                    this.testPlatformEventSource.StartTestSessionStart();
 
                     //this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
-                    StartTestRunnerCriteria criteria = new StartTestRunnerCriteria()
+                    var criteria = new StartTestSessionCriteria()
                     {
-                        Sources = runnerPayload.Sources,
-                        RunSettings = runnerPayload.RunSettings,
+                        Sources = payload.Sources,
+                        RunSettings = payload.RunSettings,
                         // TODO: This should be set for profiling.
                         TestHostLauncher = null
                     };
 
-                    this.testPlatform.CreateStartTestRunnerRequest(requestData, criteria, eventsHandler);
+                    this.testPlatform.CreateStartTestSessionRequest(requestData, criteria, eventsHandler);
 
                     /*var testhostManager = ((Microsoft.VisualStudio.TestPlatform.Client.TestPlatform)this.testPlatform)
                         .TestHostProviderManager.GetTestHostManagerByRunConfiguration(runnerPayload.RunSettings);
@@ -404,11 +404,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         this.currentAttachmentsProcessingCancellationTokenSource = null;
                     }*/
 
-                    EqtTrace.Info("TestRequestManager.StartTestRunner: Starting test runner completed.");
-                    this.testPlatformEventSource.StartTestRunnerStop();
+                    EqtTrace.Info("TestRequestManager.StartTestSession: Starting test session completed.");
+                    this.testPlatformEventSource.StartTestSessionStop();
 
                     // Post the attachments processing complete event
-                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.StartTestRunnerCompleteEvent, requestData.MetricsCollection.Metrics);
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.StartTestSessionCompleteEvent, requestData.MetricsCollection.Metrics);
                 }
             }
         }

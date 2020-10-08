@@ -191,11 +191,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// <summary>
         /// The start test runner request start event id.
         /// </summary>
-        public const int StartTestRunnerStartEventId = 0x46;
+        public const int StartTestSessionStartEventId = 0x46;
 
         /// <summary>
         /// The start test runner request stop event id.
         /// </summary>
-        public const int StartTestRunnerStopEventId = 0x47;
+        public const int StartTestSessionStopEventId = 0x47;
     }
 }

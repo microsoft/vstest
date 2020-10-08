@@ -47,11 +47,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #region Constructor
 
-        public VsTestConsoleRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, TestPlatformEventSource.Instance)
+        public VsTestConsoleRequestSender()
+            : this(
+                  new SocketCommunicationManager(),
+                  JsonDataSerializer.Instance,
+                  TestPlatformEventSource.Instance)
         {
         }
 
-        internal VsTestConsoleRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ITestPlatformEventSource testPlatformEventSource)
+        internal VsTestConsoleRequestSender(
+            ICommunicationManager communicationManager,
+            IDataSerializer dataSerializer,
+            ITestPlatformEventSource testPlatformEventSource)
         {
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
@@ -161,7 +168,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void DiscoverTests(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 eventHandler)
+        public void DiscoverTests(
+            IEnumerable<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestDiscoveryEventsHandler2 eventHandler)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -173,7 +184,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Asynchronous equivalent of <see cref="DiscoverTests"/>.
         /// </summary>
-        public async Task DiscoverTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 eventHandler)
+        public async Task DiscoverTestsAsync(
+            IEnumerable<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestDiscoveryEventsHandler2 eventHandler)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -187,7 +202,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
-            Session session,
+            TestSessionInfo testSessionInfo,
             ITestRunEventsHandler runEventsHandler)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -197,13 +212,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestPlatformOptions = options, Session = session },
+                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestPlatformOptions = options, TestSessionInfo = testSessionInfo },
                 runEventsHandler,
                 null);
         }
 
         /// <inheritdoc/>
-        public async Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
+        public async Task StartTestRunAsync(
+            IEnumerable<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestRunEventsHandler runEventsHandler)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -217,7 +236,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, Session session, ITestRunEventsHandler runEventsHandler)
+        public void StartTestRun(
+            IEnumerable<TestCase> testCases,
+            string runSettings,
+            TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
+            ITestRunEventsHandler runEventsHandler)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -225,13 +249,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings, TestPlatformOptions = options, Session = session },
+                new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings, TestPlatformOptions = options, TestSessionInfo = testSessionInfo },
                 runEventsHandler,
                 null);
         }
 
         /// <inheritdoc/>
-        public async Task StartTestRunAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
+        public async Task StartTestRunAsync(
+            IEnumerable<TestCase> testCases,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestRunEventsHandler runEventsHandler)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -250,7 +278,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
-            Session session,
+            TestSessionInfo testSessionInfo,
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
@@ -267,7 +295,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     RunSettings = runSettings,
                     DebuggingEnabled = customHostLauncher.IsDebug,
                     TestPlatformOptions = options,
-                    Session = session
+                    TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
                 customHostLauncher);
@@ -304,7 +332,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
-            Session session,
+            TestSessionInfo testSessionInfo,
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
@@ -321,14 +349,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     RunSettings = runSettings,
                     DebuggingEnabled = customHostLauncher.IsDebug,
                     TestPlatformOptions = options,
-                    Session = session
+                    TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
                 customHostLauncher);
         }
 
         /// <inheritdoc/>
-        public async Task StartTestRunWithCustomHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customHostLauncher)
+        public async Task StartTestRunWithCustomHostAsync(
+            IEnumerable<TestCase> testCases,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestRunEventsHandler runEventsHandler,
+            ITestHostLauncher customHostLauncher)
         {
             if (EqtTrace.IsInfoEnabled)
             {
@@ -349,9 +382,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public Session StartTestRunner(IList<string> sources, string runSettings, IStartTestRunnerEventsHandler eventsHandler)
+        public TestSessionInfo StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            IStartTestSessionEventsHandler eventsHandler)
         {
-            return this.SendMessageAndListenAndReportStartTestRunner(sources, runSettings, eventsHandler);
+            return this.SendMessageAndListenAndReportStartTestSession(sources, runSettings, eventsHandler);
         }
 
         /// <inheritdoc/>
@@ -405,9 +441,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public Task ProcessTestRunAttachmentsAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler, CancellationToken cancellationToken)
+        public Task ProcessTestRunAttachmentsAsync(
+            IEnumerable<AttachmentSet> attachments,
+            bool collectMetrics,
+            ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
+            CancellationToken cancellationToken)
         {
-            return this.SendMessageAndListenAndReportAttachmentsProcessingResultAsync(attachments, collectMetrics, testSessionEventsHandler, cancellationToken);
+            return this.SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
+                attachments,
+                collectMetrics,
+                testSessionEventsHandler,
+                cancellationToken);
         }
 
         /// <summary>
@@ -484,7 +528,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return success;
         }
 
-        private void SendMessageAndListenAndReportTestCases(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 eventHandler)
+        private void SendMessageAndListenAndReportTestCases(
+            IEnumerable<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
             {
@@ -550,7 +598,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerDiscoveryStop();
         }
 
-        private async Task SendMessageAndListenAndReportTestCasesAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 eventHandler)
+        private async Task SendMessageAndListenAndReportTestCasesAsync(
+            IEnumerable<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
             {
@@ -618,7 +670,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerDiscoveryStop();
         }
 
-        private void SendMessageAndListenAndReportTestResults(string messageType, object payload, ITestRunEventsHandler eventHandler, ITestHostLauncher customHostLauncher)
+        private void SendMessageAndListenAndReportTestResults(
+            string messageType,
+            object payload,
+            ITestRunEventsHandler eventHandler,
+            ITestHostLauncher customHostLauncher)
         {
             try
             {
@@ -685,7 +741,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private async Task SendMessageAndListenAndReportTestResultsAsync(string messageType, object payload, ITestRunEventsHandler eventHandler, ITestHostLauncher customHostLauncher)
+        private async Task SendMessageAndListenAndReportTestResultsAsync(
+            string messageType,
+            object payload,
+            ITestRunEventsHandler eventHandler,
+            ITestHostLauncher customHostLauncher)
         {
             try
             {
@@ -752,26 +812,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
-        private Session SendMessageAndListenAndReportStartTestRunner(IList<string> sources, string runSettings, IStartTestRunnerEventsHandler eventHandler)
+        private TestSessionInfo SendMessageAndListenAndReportStartTestSession(
+            IList<string> sources,
+            string runSettings,
+            IStartTestSessionEventsHandler eventHandler)
         {
             try
             {
-                var payload = new StartTestRunnerPayload
+                var payload = new StartTestSessionPayload
                 {
                     Sources = sources,
                     RunSettings = runSettings
                 };
 
-                this.communicationManager.SendMessage(MessageType.StartTestRunner, payload, this.protocolVersion);
+                this.communicationManager.SendMessage(MessageType.StartTestSession, payload, this.protocolVersion);
                 while (true)
                 {
                     var message = this.TryReceiveMessage();
 
-                    if (string.Equals(MessageType.StartTestRunnerCallback, message.MessageType))
+                    if (string.Equals(MessageType.StartTestSessionCallback, message.MessageType))
                     {
-                        var ackPayload = this.dataSerializer.DeserializePayload<StartTestRunnerAckPayload>(message);
-                        eventHandler.HandleStartTestRunnerComplete(ackPayload.Session);
-                        return ackPayload.Session;
+                        var ackPayload = this.dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
+                        eventHandler.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
+                        return ackPayload.TestSessionInfo;
                     }
                 }
             }
@@ -781,7 +844,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
 
                 // Should signal the error better with an invalid session.
-                eventHandler.HandleStartTestRunnerComplete(null);
+                eventHandler.HandleStartTestSessionComplete(null);
             }
 
             // TODO: Add event trace writing for start/stop operation.
@@ -789,7 +852,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return null;
         }
 
-        private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(IEnumerable<AttachmentSet> attachments, bool collectMetrics, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+        private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
+            IEnumerable<AttachmentSet> attachments,
+            bool collectMetrics,
+            ITestRunAttachmentsProcessingEventsHandler eventHandler,
+            CancellationToken cancellationToken)
         {
             try
             {

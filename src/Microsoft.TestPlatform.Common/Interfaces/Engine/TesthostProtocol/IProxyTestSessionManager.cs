@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostP
     /// <summary>
     /// 
     /// </summary>
-    public interface IProxyStartTestRunnerManager
+    public interface IProxyTestSessionManager
     {
         /// <summary>
         /// 
@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostP
         /// </summary>
         /// <param name="criteria"></param>
         /// <param name="eventsHandler"></param>
-        void StartTestRunner(StartTestRunnerCriteria criteria, IStartTestRunnerEventsHandler eventsHandler);
+        void StartTestSession(StartTestSessionCriteria criteria, IStartTestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// 

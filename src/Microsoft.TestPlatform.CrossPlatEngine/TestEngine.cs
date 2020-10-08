@@ -135,10 +135,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
 
-                if (testRunCriteria.Session != null)
+                if (testRunCriteria.TestSessionInfo != null)
                 {
                     // TODO: Take care of proxy with data collection as bellow.
-                    return new ProxyExecutionManager(testRunCriteria.Session);
+                    return new ProxyExecutionManager(testRunCriteria.TestSessionInfo);
                 }
 
                 return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings, GetSourcesFromTestRunCriteria(testRunCriteria)))
@@ -156,23 +156,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
         }
 
-        public IProxyStartTestRunnerManager GetStartTestRunnerManager(IRequestData requestData, ITestRuntimeProvider testHostManager, StartTestRunnerCriteria testRunCriteria)
+        public IProxyTestSessionManager GetTestSessionManager(
+            IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
+            StartTestSessionCriteria testSessionCriteria)
         {
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testRunCriteria.Sources.Count, testRunCriteria.RunSettings);
+            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testSessionCriteria.Sources.Count, testSessionCriteria.RunSettings);
 
-            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringStartTestRunner, parallelLevel > 1 ? "True" : "False");
+            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringStartTestSession, parallelLevel > 1 ? "True" : "False");
 
             //var requestSender = new TestRequestSender(requestData.ProtocolConfig, testHostManager);
             //var testRunnerProxy = new ProxyStartTestRunnerManager(requestData, requestSender, testHostManager);
 
             Func<ProxyOperationManager> proxyCreator = delegate
             {
-                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.RunSettings);
-                hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.RunSettings);
+                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
 
-                if (testRunCriteria.TestHostLauncher != null)
+                if (testSessionCriteria.TestHostLauncher != null)
                 {
-                    hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
+                    hostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
                 }
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
@@ -180,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return new ProxyOperationManager(requestData, requestSender, hostManager);
             };
 
-            if (this.ShouldRunInNoIsolation(testRunCriteria.RunSettings, parallelLevel > 1, false))
+            if (this.ShouldRunInNoIsolation(testSessionCriteria.RunSettings, parallelLevel > 1, false))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
                 var newRequestData = this.GetRequestData(isTelemetryOptedIn);
@@ -189,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 //return testRunnerProxy;
             }
 
-            return new ProxyStartTestRunnerManager(proxyCreator, parallelLevel);
+            return new ProxyTestSessionManager(proxyCreator, parallelLevel);
         }
 
         /// <summary>

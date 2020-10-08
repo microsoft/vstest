@@ -12,11 +12,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
         private static object lockObject = new object();
         private static volatile TestRunnerPool instance;
 
-        private Dictionary<Session, IList<ProxyOperationManager>> runnerPool;
+        private Dictionary<TestSessionInfo, IList<ProxyOperationManager>> runnerPool;
 
         private TestRunnerPool()
         {
-            this.runnerPool = new Dictionary<Session, IList<ProxyOperationManager>>();
+            this.runnerPool = new Dictionary<TestSessionInfo, IList<ProxyOperationManager>>();
         }
 
         public static TestRunnerPool Instance
@@ -38,31 +38,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
             }
         }
 
-        public void AddProxy(Session session, ProxyOperationManager proxyManager)
+        public void AddProxy(TestSessionInfo testSessionInfo, ProxyOperationManager proxyManager)
         {
-            if (!this.runnerPool.ContainsKey(session))
+            if (!this.runnerPool.ContainsKey(testSessionInfo))
             {
-                this.runnerPool.Add(session, new List<ProxyOperationManager>());
+                this.runnerPool.Add(testSessionInfo, new List<ProxyOperationManager>());
             }
 
-            this.runnerPool[session].Add(proxyManager);
+            this.runnerPool[testSessionInfo].Add(proxyManager);
         }
 
-        public ProxyOperationManager GetFirstProxy(Session session)
+        public ProxyOperationManager GetFirstProxy(TestSessionInfo testSessionInfo)
         {
-            return this.runnerPool[session][0];
+            return this.runnerPool[testSessionInfo][0];
         }
 
-        public void RemoveFirstProxy(Session session)
+        public void RemoveFirstProxy(TestSessionInfo testSessionInfo)
         {
             // TODO: Don't remove, instead re-use the testhosts.
-            this.runnerPool[session].RemoveAt(0);
+            this.runnerPool[testSessionInfo].RemoveAt(0);
         }
 
-        public ProxyOperationManager GetAndRemoveFirstProxy(Session session)
+        public ProxyOperationManager GetAndRemoveFirstProxy(TestSessionInfo testSessionInfo)
         {
-            var proxy = this.GetFirstProxy(session);
-            this.RemoveFirstProxy(session);
+            var proxy = this.GetFirstProxy(testSessionInfo);
+            this.RemoveFirstProxy(testSessionInfo);
 
             return proxy;
         }

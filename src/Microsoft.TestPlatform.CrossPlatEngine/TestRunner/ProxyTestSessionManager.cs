@@ -13,12 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
     /// <summary>
     /// 
     /// </summary>
-    public class ProxyStartTestRunnerManager : IProxyStartTestRunnerManager
+    public class ProxyTestSessionManager : IProxyTestSessionManager
     {
         private Func<ProxyOperationManager> proxyCreator;
         private int parallelLevel;
 
-        public ProxyStartTestRunnerManager(Func<ProxyOperationManager> proxyCreator, int parallelLevel)
+        public ProxyTestSessionManager(Func<ProxyOperationManager> proxyCreator, int parallelLevel)
         {
             this.proxyCreator = proxyCreator;
             this.parallelLevel = parallelLevel;
@@ -39,9 +39,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
             //throw new NotImplementedException();
         }
 
-        public void StartTestRunner(StartTestRunnerCriteria criteria, IStartTestRunnerEventsHandler eventsHandler)
+        public void StartTestSession(StartTestSessionCriteria criteria, IStartTestSessionEventsHandler eventsHandler)
         {
-            var session = new Session();
+            var testSessionInfo = new TestSessionInfo();
 
             var taskList = new List<Task>();
             while (parallelLevel-- > 0)
@@ -52,13 +52,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
                         var operationManagerProxy = this.proxyCreator();
                         operationManagerProxy.SetupChannel(criteria.Sources, criteria.RunSettings);
 
-                        TestRunnerPool.Instance.AddProxy(session, operationManagerProxy);
+                        TestRunnerPool.Instance.AddProxy(testSessionInfo, operationManagerProxy);
                     }));
             }
 
             Task.WaitAll(taskList.ToArray());
 
-            eventsHandler.HandleStartTestRunnerComplete(session);
+            eventsHandler.HandleStartTestSessionComplete(testSessionInfo);
         }
     }
 }

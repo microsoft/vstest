@@ -6,9 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    public class StartTestRunnerAckPayload
+    public class StartTestSessionAckPayload
     {
         [DataMember]
-        public Session Session { get; set; }
+        public TestSessionInfo TestSessionInfo { get; set; }
     }
 }

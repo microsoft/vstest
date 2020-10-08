@@ -43,10 +43,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #region Constructors
 
-        public ProxyExecutionManager(Session session)
+        public ProxyExecutionManager(TestSessionInfo testSessionInfo)
         {
             // TODO: Proxy choice should be thread safe.
-            this.ProxyOperationManager = TestRunnerPool.Instance.GetAndRemoveFirstProxy(session);
+            this.ProxyOperationManager = TestRunnerPool.Instance.GetAndRemoveFirstProxy(testSessionInfo);
             this.testHostManager = this.ProxyOperationManager.TestHostManager;
             this.dataSerializer = JsonDataSerializer.Instance;
             this.isCommunicationEstablished = false;

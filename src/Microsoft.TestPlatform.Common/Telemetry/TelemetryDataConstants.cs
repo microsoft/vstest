@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled";
 
-        public static string ParallelEnabledDuringStartTestRunner = "VS.StartTestRunner.ParallelEnabled";
+        public static string ParallelEnabledDuringStartTestSession = "VS.StartTestSession.ParallelEnabled";
 
         // All the times are in sec
         public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";
@@ -107,6 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TestAttachmentsProcessingCompleteEvent = "vs/testplatform/testattachmentsprocessingsession";
 
-        public static string StartTestRunnerCompleteEvent = "vs/testplatform/starttestrunnersession";
+        public static string StartTestSessionCompleteEvent = "vs/testplatform/starttestsession";
     }
 }
