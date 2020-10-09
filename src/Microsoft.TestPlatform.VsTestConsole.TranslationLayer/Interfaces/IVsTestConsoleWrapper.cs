@@ -241,12 +241,35 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// <param name="sources"></param>
         /// <param name="runSettings"></param>
-        /// <param name="eventHandler"></param>
+        /// <param name="eventsHandler"></param>
         /// <returns></returns>
         TestSessionInfo StartTestSession(
             IList<string> sources,
             string runSettings,
-            IStartTestSessionEventsHandler eventHandler);
+            ITestSessionEventsHandler eventsHandler);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="runSettings"></param>
+        /// <param name="eventsHandler"></param>
+        /// <param name="testHostLauncher"></param>
+        /// <returns></returns>
+        TestSessionInfo StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            ITestSessionEventsHandler eventsHandler,
+            ITestHostLauncher testHostLauncher);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="testSessionInfo"></param>
+        /// <param name="eventsHandler"></param>
+        void StopTestSession(
+            TestSessionInfo testSessionInfo,
+            ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Cancel the last test run.

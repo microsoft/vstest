@@ -28,5 +28,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads
         /// </summary>
         [DataMember]
         public bool CollectMetrics { get; set; }
+
+        /// <summary>
+        /// Is Debugging enabled
+        /// </summary>
+        [DataMember]
+        public bool DebuggingEnabled { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public bool CustomLauncher { get; set; }
     }
 }

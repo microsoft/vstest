@@ -66,6 +66,16 @@
         <target state="translated">활성 테스트 실행 첨부 파일 처리가 중단되었습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedStartTestSession">
+        <source>The Start Test Session operation was aborted.</source>
+        <target state="new">The Start Test Session operation was aborted.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AbortedStopTestSession">
+        <source>The Stop Test Session operation was aborted.</source>
+        <target state="new">The Stop Test Session operation was aborted.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -385,9 +385,93 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public TestSessionInfo StartTestSession(
             IList<string> sources,
             string runSettings,
-            IStartTestSessionEventsHandler eventsHandler)
+            ITestSessionEventsHandler eventsHandler,
+            ITestHostLauncher testHostLauncher)
         {
-            return this.SendMessageAndListenAndReportStartTestSession(sources, runSettings, eventsHandler);
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
+            }
+
+            try
+            {
+                var payload = new StartTestSessionPayload
+                {
+                    // TODO: Custom testhost launcher for discovery should be set on false !
+                    // TODO2: Should add TestPlatform options ?
+                    Sources = sources,
+                    RunSettings = runSettings,
+                    CustomLauncher = (testHostLauncher != null),
+                    DebuggingEnabled = (testHostLauncher != null) ? testHostLauncher.IsDebug : false,
+                };
+
+                this.communicationManager.SendMessage(MessageType.StartTestSession, payload, this.protocolVersion);
+                while (true)
+                {
+                    var message = this.TryReceiveMessage();
+
+                    if (string.Equals(MessageType.StartTestSessionCallback, message.MessageType))
+                    {
+                        var ackPayload = this.dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
+                        eventsHandler.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
+                        return ackPayload.TestSessionInfo;
+                    }
+                    else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
+                    {
+                        this.HandleCustomHostLaunch(testHostLauncher, message);
+                    }
+                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
+                    {
+                        this.AttachDebuggerToProcess(testHostLauncher, message);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting StartTestSession operation due to error: {0}", exception);
+                eventsHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedStartTestSession);
+
+                eventsHandler.HandleStartTestSessionComplete(null);
+            }
+
+            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public void StopTestSession(
+            TestSessionInfo testSessionInfo,
+            ITestSessionEventsHandler eventsHandler)
+        {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
+            }
+
+            try
+            {
+                this.communicationManager.SendMessage(MessageType.StopTestSession, testSessionInfo, this.protocolVersion);
+                while (true)
+                {
+                    var message = this.TryReceiveMessage();
+
+                    if (string.Equals(MessageType.StopTestSessionCallback, message.MessageType))
+                    {
+                        var ack = this.dataSerializer.DeserializePayload<bool>(message);
+                        eventsHandler.HandleStopTestSessionComplete(ack);
+                        return;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting StopTestSession operation for id {0} due to error: {1}", testSessionInfo?.Id, exception);
+                eventsHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedStopTestSession);
+
+                eventsHandler.HandleStopTestSessionComplete(false);
+            }
+
+            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
         }
 
         /// <inheritdoc/>
@@ -810,46 +894,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
-        }
-
-        private TestSessionInfo SendMessageAndListenAndReportStartTestSession(
-            IList<string> sources,
-            string runSettings,
-            IStartTestSessionEventsHandler eventHandler)
-        {
-            try
-            {
-                var payload = new StartTestSessionPayload
-                {
-                    Sources = sources,
-                    RunSettings = runSettings
-                };
-
-                this.communicationManager.SendMessage(MessageType.StartTestSession, payload, this.protocolVersion);
-                while (true)
-                {
-                    var message = this.TryReceiveMessage();
-
-                    if (string.Equals(MessageType.StartTestSessionCallback, message.MessageType))
-                    {
-                        var ackPayload = this.dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
-                        eventHandler.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
-                        return ackPayload.TestSessionInfo;
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
-
-                // Should signal the error better with an invalid session.
-                eventHandler.HandleStartTestSessionComplete(null);
-            }
-
-            // TODO: Add event trace writing for start/stop operation.
-
-            return null;
         }
 
         private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(

@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
             //throw new NotImplementedException();
         }
 
-        public void StartTestSession(StartTestSessionCriteria criteria, IStartTestSessionEventsHandler eventsHandler)
+        public void StartTestSession(StartTestSessionCriteria criteria, ITestSessionEventsHandler eventsHandler)
         {
             var testSessionInfo = new TestSessionInfo();
 

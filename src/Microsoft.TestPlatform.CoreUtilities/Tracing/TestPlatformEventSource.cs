@@ -280,14 +280,60 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
             this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId);
         }
 
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StartTestSessionStartEventId)]
         public void StartTestSessionStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.StartTestSessionStartEventId);
         }
 
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StartTestSessionStopEventId)]
         public void StartTestSessionStop()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.StartTestSessionStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStartEventId)]
+        public void TranslationLayerStartTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStopEventId)]
+        public void TranslationLayerStartTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StopTestSessionStartEventId)]
+        public void StopTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StopTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StopTestSessionStopEventId)]
+        public void StopTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StopTestSessionStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStartEventId)]
+        public void TranslationLayerStopTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStopEventId)]
+        public void TranslationLayerStopTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStopEventId);
         }
     }
 }

@@ -356,7 +356,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        public void StartTestSession(StartTestSessionPayload payload, IStartTestSessionEventsHandler eventsHandler, ProtocolConfig protocolConfig)
+        /// <inheritdoc/>
+        public void StartTestSession(
+            StartTestSessionPayload payload,
+            ITestHostLauncher testHostLauncher,
+            ITestSessionEventsHandler eventsHandler,
+            ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.StartTestSession: Starting test session.");
 
@@ -377,8 +382,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     {
                         Sources = payload.Sources,
                         RunSettings = payload.RunSettings,
-                        // TODO: This should be set for profiling.
-                        TestHostLauncher = null
+                        TestHostLauncher = testHostLauncher
                     };
 
                     this.testPlatform.CreateStartTestSessionRequest(requestData, criteria, eventsHandler);

@@ -194,14 +194,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string DataCollectionMessage = "DataCollection.SendMessage";
 
         /// <summary>
-        /// StartTestRunner message.
+        /// StartTestSession message.
         /// </summary>
         public const string StartTestSession = "TestSession.StartTestSession";
 
         /// <summary>
-        /// StartTestRunner callback message.
+        /// StartTestSession callback message.
         /// </summary>
         public const string StartTestSessionCallback = "TestSession.StartTestSessionCallback";
+
+        /// <summary>
+        /// StopTestSession message.
+        /// </summary>
+        public const string StopTestSession = "TestSession.StopTestSession";
+
+        /// <summary>
+        /// StopTestSession callback message.
+        /// </summary>
+        public const string StopTestSessionCallback = "TestSession.StopTestSessionCallback";
 
         #region DataCollector messages
 

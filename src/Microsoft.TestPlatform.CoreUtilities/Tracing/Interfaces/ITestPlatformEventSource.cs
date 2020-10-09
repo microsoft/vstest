@@ -219,8 +219,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// </summary>
         void TranslationLayerTestRunAttachmentsProcessingStop();
 
+        /// <summary>
+        /// 
+        /// </summary>
         void StartTestSessionStart();
 
+        /// <summary>
+        /// 
+        /// </summary>
         void StartTestSessionStop();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void TranslationLayerStartTestSessionStart();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void TranslationLayerStartTestSessionStop();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void StopTestSessionStart();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void StopTestSessionStop();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void TranslationLayerStopTestSessionStart();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void TranslationLayerStopTestSessionStop();
     }
 }

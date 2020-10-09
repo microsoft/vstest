@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }
 
-        public void CreateStartTestSessionRequest(IRequestData requestData, StartTestSessionCriteria testSessionCriteria, IStartTestSessionEventsHandler eventsHandler)
+        public void CreateStartTestSessionRequest(IRequestData requestData, StartTestSessionCriteria testSessionCriteria, ITestSessionEventsHandler eventsHandler)
         {
             if (testSessionCriteria == null)
             {

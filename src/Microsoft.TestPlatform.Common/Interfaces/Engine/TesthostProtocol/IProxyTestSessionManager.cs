@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostP
         /// </summary>
         /// <param name="criteria"></param>
         /// <param name="eventsHandler"></param>
-        void StartTestSession(StartTestSessionCriteria criteria, IStartTestSessionEventsHandler eventsHandler);
+        void StartTestSession(StartTestSessionCriteria criteria, ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// 

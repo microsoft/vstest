@@ -189,13 +189,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         public const int TranslationLayerTestRunAttachmentsProcessingStopEventId = 0x45;
 
         /// <summary>
-        /// The start test runner request start event id.
+        /// The start test session start event id.
         /// </summary>
         public const int StartTestSessionStartEventId = 0x46;
 
         /// <summary>
-        /// The start test runner request stop event id.
+        /// The start test session stop event id.
         /// </summary>
         public const int StartTestSessionStopEventId = 0x47;
+
+        /// <summary>
+        /// The translation layer start test session start event id.
+        /// </summary>
+        public const int TranslationLayerStartTestSessionStartEventId = 0x48;
+
+        /// <summary>
+        /// The translation layer start test session stop event id.
+        /// </summary>
+        public const int TranslationLayerStartTestSessionStopEventId = 0x49;
+
+        /// <summary>
+        /// The stop test session start event id.
+        /// </summary>
+        public const int StopTestSessionStartEventId = 0x50;
+
+        /// <summary>
+        /// The stop test session stop event id.
+        /// </summary>
+        public const int StopTestSessionStopEventId = 0x51;
+
+        /// <summary>
+        /// The translation layer stop test session start event id.
+        /// </summary>
+        public const int TranslationLayerStopTestSessionStartEventId = 0x52;
+
+        /// <summary>
+        /// The translation layer stop test session stop event id.
+        /// </summary>
+        public const int TranslationLayerStopTestSessionStopEventId = 0x53;
     }
 }

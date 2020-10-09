@@ -191,6 +191,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.StopTestSession:
+                            {
+                                var testSessionInfo = this.communicationManager.DeserializePayload<TestSessionInfo>(message);
+                                this.StopTestSession(testSessionInfo);
+                                break;
+                            }
+
                         case MessageType.StartDiscovery:
                             {
                                 var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
@@ -439,7 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     testRequestManager.ResetOptions();
 
                     var customLauncher = skipTestHostLaunch ?
-                        DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
+                        DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload.DebuggingEnabled) : null;
 
                     testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                 }
@@ -528,12 +535,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
                 delegate
                 {
-                    var eventsHandler = new StartTestSessionEventsHandler(this.communicationManager);
+                    var eventsHandler = new TestSessionEventsHandler(this.communicationManager);
 
                     try
                     {
+                        var customLauncher = payload.CustomLauncher
+                            ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.DebuggingEnabled)
+                            : null;
+
                         requestManager.ResetOptions();
-                        requestManager.StartTestSession(payload, eventsHandler, this.protocolConfig);
+                        requestManager.StartTestSession(payload, customLauncher, eventsHandler, this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
@@ -558,6 +569,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
 
             // Here we do the work of initializing the runner.
+        }
+
+        private void StopTestSession(TestSessionInfo testSessionInfo)
+        {
+
         }
 
         #region IDisposable Support

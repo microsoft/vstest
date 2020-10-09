@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     /// <summary>
     /// 
     /// </summary>
-    public class StartTestSessionEventsHandler : IStartTestSessionEventsHandler
+    public class TestSessionEventsHandler : ITestSessionEventsHandler
     {
         private readonly ICommunicationManager communicationManager;
 
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// 
         /// </summary>
         /// <param name="communicationManager"></param>
-        public StartTestSessionEventsHandler(ICommunicationManager communicationManager)
+        public TestSessionEventsHandler(ICommunicationManager communicationManager)
         {
             this.communicationManager = communicationManager;
         }
@@ -34,6 +34,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             };
 
             this.communicationManager.SendMessage(MessageType.StartTestSessionCallback, ackPayload);
+        }
+
+        /// <inheritdoc />
+        public void HandleStopTestSessionComplete(bool stopped)
+        {
+            // TODO: Add implementation.
         }
 
         /// <inheritdoc />

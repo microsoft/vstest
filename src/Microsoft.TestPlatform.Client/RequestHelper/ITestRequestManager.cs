@@ -21,7 +21,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to Additional extensions</param>
         /// <param name="skipExtensionFilters">Skip extension filtering by name (if true)</param>
-        void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters);
+        void InitializeExtensions(
+            IEnumerable<string> pathToAdditionalExtensions,
+            bool skipExtensionFilters);
 
         /// <summary>
         /// Resets Vstest.console.exe Options
@@ -34,7 +36,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="discoveryPayload">Discovery payload</param>
         /// <param name="disoveryEventsRegistrar">Discovery events registrar - registers and unregisters discovery events</param>
         /// <param name="protocolConfig">Protocol related information</param>
-        void DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar disoveryEventsRegistrar, ProtocolConfig protocolConfig);
+        void DiscoverTests(
+            DiscoveryRequestPayload discoveryPayload,
+            ITestDiscoveryEventsRegistrar disoveryEventsRegistrar,
+            ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Run Tests with given a test of sources
@@ -43,22 +48,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="customTestHostLauncher">Custom testHostLauncher for the run</param>
         /// <param name="testRunEventsRegistrar">RunEvents registrar</param>
         /// <param name="protocolConfig">Protocol related information</param>
-        void RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig);
+        void RunTests(
+            TestRunRequestPayload testRunRequestPayLoad,
+            ITestHostLauncher customTestHostLauncher,
+            ITestRunEventsRegistrar testRunEventsRegistrar,
+            ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Processes test run attachments
         /// </summary>
         /// <param name="testRunAttachmentsProcessingPayload">Test run attachments processing payload</param>
         /// <param name="testRunAttachmentsProcessingEventsHandler">Test run attachments processing events handler</param>
-        void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload testRunAttachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler, ProtocolConfig protocolConfig);
+        void ProcessTestRunAttachments(
+            TestRunAttachmentsProcessingPayload testRunAttachmentsProcessingPayload,
+            ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingEventsHandler,
+            ProtocolConfig protocolConfig);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="payload"></param>
+        /// <param name="testHostLauncher"></param>
         /// <param name="eventsHandler"></param>
         /// <param name="protocolConfig"></param>
-        void StartTestSession(StartTestSessionPayload payload, IStartTestSessionEventsHandler eventsHandler, ProtocolConfig protocolConfig);
+        void StartTestSession(
+            StartTestSessionPayload payload,
+            ITestHostLauncher testHostLauncher,
+            ITestSessionEventsHandler eventsHandler,
+            ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request

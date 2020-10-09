@@ -439,12 +439,33 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public TestSessionInfo StartTestSession(
             IList<string> sources,
             string runSettings,
-            IStartTestSessionEventsHandler eventsHandler)
+            ITestSessionEventsHandler eventsHandler)
         {
-            var sourceList = sources.ToList();
+            return this.StartTestSession(sources, runSettings, eventsHandler, testHostLauncher: null);
+        }
+
+        /// <inheritdoc/>
+        public TestSessionInfo StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            ITestSessionEventsHandler eventsHandler,
+            ITestHostLauncher testHostLauncher)
+        {
+            this.testPlatformEventSource.TranslationLayerStartTestSessionStart();
 
             this.EnsureInitialized();
-            return requestSender.StartTestSession(sources, runSettings, eventsHandler);
+            return this.requestSender.StartTestSession(sources, runSettings, eventsHandler, testHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public void StopTestSession(
+            TestSessionInfo testSessionInfo,
+            ITestSessionEventsHandler eventsHandler)
+        {
+            this.testPlatformEventSource.TranslationLayerStopTestSessionStart();
+
+            this.EnsureInitialized();
+            this.requestSender.StopTestSession(testSessionInfo, eventsHandler);
         }
 
         /// <inheritdoc/>
