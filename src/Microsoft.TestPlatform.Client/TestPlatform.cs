@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     /// <summary>
     /// Implementation for TestPlatform
     /// </summary>
-    public class TestPlatform : ITestPlatform
+    internal class TestPlatform : ITestPlatform
     {
         private readonly TestRuntimeProviderManager testHostProviderManager;
 
