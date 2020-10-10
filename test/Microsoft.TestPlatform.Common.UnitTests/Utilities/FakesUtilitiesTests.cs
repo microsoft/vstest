@@ -30,7 +30,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void FakesSettingsShouldBeNotGeneratedIfFakeConfiguratorAssemblyIsNotPresent()
         {
-            string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration ></RunSettings>";
+            string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var generatedRunSettings = FakesUtilities.GenerateFakesSettingsForRunConfiguration(new string[] {@"C:\temp\UT.dll" }, runSettingsXml);
             Assert.AreEqual(generatedRunSettings, runSettingsXml);
         }
@@ -38,7 +38,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void FakesDataCollectorSettingsShouldBeOverridden()
         {
-            string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration ></RunSettings>";
+            string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var doc = new XmlDocument();
             using (var xmlReader = XmlReader.Create(
                 new StringReader(runSettingsXml),
@@ -74,7 +74,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void FakesDataCollectorSettingsShouldBeInserted()
         {
-            string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration ></RunSettings>";
+            string runSettingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var doc = new XmlDocument();
             using (var xmlReader = XmlReader.Create(
                 new StringReader(runSettingsXml),
@@ -98,7 +98,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void OtherRunsettingsShouldNotBeChanged()
         {
-            string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>FrameworkCore10</TargetFrameworkVersion></RunConfiguration ></RunSettings>";
+            string runSettingsXml = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>FrameworkCore10</TargetFrameworkVersion></RunConfiguration></RunSettings>";
             var doc = new XmlDocument();
             using (var xmlReader = XmlReader.Create(
                 new StringReader(runSettingsXml),
