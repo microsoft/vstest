@@ -3,8 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+#if !NETSTANDARD1_0
     using NuGet.Frameworks;
     using static NuGet.Frameworks.FrameworkConstants;
+#endif
 
     /// <summary>
     /// Class for target Framework for the test container
@@ -13,6 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
 #if NETFRAMEWORK
         private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.0");
+#elif NETSTANDARD1_0
+        private static readonly Framework Default = null;
 #else
         private static readonly Framework Default = Framework.FromString(".NETCoreApp,Version=v1.0");
 #endif
@@ -43,12 +47,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>A framework object</returns>
         public static Framework FromString(string frameworkString)
         {
+#if NETSTANDARD1_0
+            var CommonFrameworks = new
+            {
+                Net35 = new { DotNetFrameworkName = Constants.DotNetFramework35, Version = "3.5.0.0" },
+                Net4 = new { DotNetFrameworkName = Constants.DotNetFramework40, Version = "4.0.0.0" },
+                Net45 = new { DotNetFrameworkName = Constants.DotNetFramework45, Version = "4.5.0.0" },
+                NetCoreApp10 = new { DotNetFrameworkName = Constants.DotNetFrameworkCore10, Version = "1.0.0.0" },
+                UAP10 = new { DotNetFrameworkName = Constants.DotNetFrameworkUap10, Version = "10.0.0.0" },
+            };
+#endif
+
             if (string.IsNullOrWhiteSpace(frameworkString))
             {
                 return null;
             }
 
-            NuGetFramework nugetFramework;
+            string name, version;
             try
             {
                 // IDE always sends framework in form of ENUM, which always throws exception
@@ -56,25 +71,43 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 switch (frameworkString.Trim().ToLower())
                 {
                     case "framework35":
-                        nugetFramework = CommonFrameworks.Net35;
+                        name = CommonFrameworks.Net35.DotNetFrameworkName;
+                        version = CommonFrameworks.Net35.Version.ToString();
                         break;
+
                     case "framework40":
-                        nugetFramework = CommonFrameworks.Net4;
+                        name = CommonFrameworks.Net4.DotNetFrameworkName;
+                        version = CommonFrameworks.Net4.Version.ToString();
                         break;
+
                     case "framework45":
-                        nugetFramework = CommonFrameworks.Net45;
+                        name = CommonFrameworks.Net45.DotNetFrameworkName;
+                        version = CommonFrameworks.Net45.Version.ToString();
                         break;
+
                     case "frameworkcore10":
-                        nugetFramework = CommonFrameworks.NetCoreApp10;
+                        name = CommonFrameworks.NetCoreApp10.DotNetFrameworkName;
+                        version = CommonFrameworks.Net35.Version.ToString();
                         break;
+
                     case "frameworkuap10":
-                        nugetFramework = CommonFrameworks.UAP10;
+                        name = CommonFrameworks.UAP10.DotNetFrameworkName;
+                        version = CommonFrameworks.UAP10.Version.ToString();
                         break;
+
                     default:
-                        nugetFramework = NuGetFramework.Parse(frameworkString);
+#if NETSTANDARD1_0
+                        return null;
+#else
+                        var nugetFramework = NuGetFramework.Parse(frameworkString);
                         if (nugetFramework.IsUnsupported)
                             return null;
+
+                        name = nugetFramework.DotNetFrameworkName;
+                        version = nugetFramework.Version.ToString();
+
                         break;
+#endif
                 }
             }
             catch
@@ -82,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return null;
             }
 
-            return new Framework() { Name = nugetFramework.DotNetFrameworkName, Version = nugetFramework.Version.ToString() };
+            return new Framework() { Name = name, Version = version };
         }
 
         /// <summary>

@@ -12,13 +12,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
     /// </summary>
     public interface IFileHelper
     {
+#if !NETSTANDARD1_0 
         /// <summary>
         /// Creates a directory.
         /// </summary>
         /// <param name="path">Path of the directory.</param>
         /// <returns><see cref="DirectoryInfo"/> for the created directory.</returns>
         DirectoryInfo CreateDirectory(string path);
-
+#endif
         /// <summary>
         /// Gets the current directory
         /// </summary>
