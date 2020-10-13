@@ -220,7 +220,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (isNetCoreRunner)
             {
-                args.Insert(0, vstestConsolePath);
+                args.Insert(0, GetEscapeSequencedPath(vstestConsolePath));
             }
 
             return args.ToArray();
@@ -228,7 +228,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private string GetConsoleRunner()
         {
-            return isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : vstestConsolePath;
+            var runnerPath = isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : this.vstestConsolePath;
+
+            return GetEscapeSequencedPath(runnerPath);
+        }
+
+        private string GetEscapeSequencedPath(string path)
+        {
+            if (path == null || (path.StartsWith("\"") && path.EndsWith("\"")))
+            {
+                // The path is already escape sequenced. 
+                return path;
+            }
+
+            return $"\"{path}\"";
         }
     }
 }
