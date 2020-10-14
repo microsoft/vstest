@@ -6,25 +6,40 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.CoreUtilities</AssemblyName>
-    <TargetFrameworks>netstandard2.0;netstandard1.3;netstandard1.0;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard1.3;netstandard1.0;net451;net45;uap10.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3;netstandard1.0</TargetFrameworks>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
+
+    <!-- On non windows environment, make UAP behave like desktop .NET framework -->
+    <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <PackageReference Include="Microsoft.Internal.Dia.Interop">
-      <Version>14.0.0</Version>
-    </PackageReference>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR  '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="14.0.0" />
+    
     <Reference Include="System.Configuration" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net451' AND '$(TargetFramework)' != 'netstandard1.0' ">
-    <PackageReference Include="System.Diagnostics.FileVersionInfo">
-      <Version>4.0.0</Version>
-    </PackageReference>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net451' AND '$(TargetFramework)' != 'net45' AND '$(TargetFramework)' != 'netstandard1.0' ">
+    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.0.0" />
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
