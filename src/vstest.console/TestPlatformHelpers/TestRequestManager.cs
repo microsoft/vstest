@@ -267,8 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             // get Fakes data collector settings
-            var skipFakesEnvVar = Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION");
-            if (string.IsNullOrEmpty(skipFakesEnvVar) || !string.Equals(skipFakesEnvVar, "1"))
+            if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
             {
                 // The commandline Options do not have sources in design time mode,
                 // and so we fall back to using sources instead
