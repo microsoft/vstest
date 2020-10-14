@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -140,7 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             out IEnumerable<LazyExtension<IExtension, Dictionary<string, object>>> unfiltered,
             out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {
+            Stopwatch sw = Stopwatch.StartNew();
             var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, IExtension>(endsWithPattern);
+            double stop = sw.Elapsed.TotalMilliseconds;
             this.GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
         }
 

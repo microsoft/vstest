@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 // General Information about an assembly is controlled through the following
@@ -13,7 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.TrxLogger")]
 [assembly: AssemblyTrademark("")]
-[assembly: InterestingTypes("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.TrxLogger")]
+[assembly: TypesToLoad(typeof(TrxLogger))]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible

@@ -17,8 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using CommonResources = Resources.Resources;
 
     /// <summary>
@@ -165,18 +163,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-            List<Type> types = new List<Type>();
+            IEnumerable<Type> types;
 
             try
             {           
-                var customAttribute = CustomAttributeExtensions.GetCustomAttribute(assembly, typeof(InterestingTypesAttribute)) as InterestingTypesAttribute;
+                var customAttribute = CustomAttributeExtensions.GetCustomAttribute(assembly, typeof(TypesToLoadAttribute)) as TypesToLoadAttribute;
                 if (customAttribute != null)
                 {
-                    var interestingTypes = customAttribute.Types;
-                    foreach(string type in interestingTypes)
-                    {
-                        types.Add(assembly.GetType(type));          
-                    }
+                    types = customAttribute.Types; 
                 }
                 else
                 {

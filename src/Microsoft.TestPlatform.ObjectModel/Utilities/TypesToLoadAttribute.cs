@@ -4,19 +4,20 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Custom Attribute to specify the exact types which should be loaded from assembly
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
     [CLSCompliant(false)]
-    public sealed class InterestingTypesAttribute : Attribute
+    public sealed class TypesToLoadAttribute : Attribute
     {
-        public InterestingTypesAttribute(params string[] types)
+        public TypesToLoadAttribute(params Type[] types)
         {
             Types = types;
         }
 
-        public string[] Types { get; }
+        public IEnumerable<Type> Types { get; }
     }
 }
