@@ -6,8 +6,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
-    <TargetFrameworks>net45;net451;netcoreapp2.1;uap10.0;netstandard2.0;netstandard1.0;netstandard1.3</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.0;netstandard1.3;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net45;net451;netcoreapp2.1;uap10.0;netstandard1.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.0;netstandard1.3;netcoreapp2.1</TargetFrameworks>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
@@ -19,7 +19,7 @@
     <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
 
     <!-- On non windows environment, make UAP behave like desktop .NET framework -->
@@ -47,7 +47,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="5.1.0" />
     
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.0.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
   
   <PropertyGroup Label="Configuration">

@@ -98,7 +98,7 @@ $TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework472 = "net472"
 $TPB_TargetFrameworkCore10 = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.1"
-$TPB_TargetFrameworkUap = "uap10.0"
+$TPB_TargetFrameworkUap100 = "uap10.0"
 $TPB_TargetFrameworkNS10 = "netstandard1.0"
 $TPB_TargetFrameworkNS13 = "netstandard1.3"
 $TPB_TargetFrameworkNS20 = "netstandard2.0"
@@ -321,7 +321,7 @@ function Publish-Package
     $testhostCore10PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X64_Runtime")
     $testhostCore10PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X86_Runtime")
     
-    $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
+    $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $settingsMigratorProject = Join-Path $env:TP_ROOT_DIR "src\SettingsMigrator\SettingsMigrator.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
@@ -409,32 +409,32 @@ function Publish-Package
                 $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
                 $TPB_TargetFrameworkNS10   = $netstandard10PackageDir      # netstandard1_0
                 $TPB_TargetFrameworkNS13   = $netstandard13PackageDir      # netstandard1_3
-                $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
-                $TPB_TargetFrameworkUap    = $testhostUapPackageDir        # uap10.0
+              # $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
+                $TPB_TargetFrameworkUap100 = $testhostUapPackageDir        # uap10.0
               }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.CoreUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
               -files @{
-                $TPB_TargetFramework45   = $fullCLRPackage45Dir           # net45
-                $TPB_TargetFramework451  = $fullCLRPackage451Dir          # net451
-                $TPB_TargetFrameworkNS10 = $netstandard10PackageDir       # netstandard1_0
-                $TPB_TargetFrameworkNS13 = $netstandard13PackageDir       # netstandard1_3
-                $TPB_TargetFrameworkNS20 = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap  = $testhostUapPackageDir         # uap10.0
+                $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
+                $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
+                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
+                $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
+              # $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
 
     ################################################################################
     # Publish Microsoft.TestPlatform.ObjectModel
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
               -files @{
-                $TPB_TargetFramework45   = $fullCLRPackage45Dir           # net45
-                $TPB_TargetFramework451  = $fullCLRPackage451Dir          # net451
-                $TPB_TargetFrameworkNS10 = $netstandard10PackageDir       # netstandard1_0
-                $TPB_TargetFrameworkNS13 = $netstandard13PackageDir       # netstandard1_3
-                $TPB_TargetFrameworkNS20 = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap  = $testhostUapPackageDir         # uap10.0
+                $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
+                $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
+                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
+                $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
+              # $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
 
     ################################################################################
@@ -778,7 +778,7 @@ function Create-NugetPackages
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
 
     #Copy Uap target, & props
-    $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
+    $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.props -Force
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.targets -Force
     

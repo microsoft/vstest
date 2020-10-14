@@ -6,8 +6,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
-    <TargetFrameworks>net45;net451;netstandard2.0;netstandard1.3;netstandard1.0;uap10.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>net45;net451;netstandard1.3;netstandard1.0;uap10.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.3;netstandard1.0</TargetFrameworks>
     <PackageId>Microsoft.TestPlatform.ObjectModel</PackageId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
@@ -17,7 +17,7 @@
     <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
 
     <!-- On non windows environment, make UAP behave like desktop .NET framework -->
@@ -76,9 +76,10 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.0.0" />
-    <PackageReference Include="System.Xml.XPath" Version="4.0.0" />
-    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.0.0" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
     
     <PackageReference Include="NuGet.Frameworks" Version="4.6.4" />
   </ItemGroup>
