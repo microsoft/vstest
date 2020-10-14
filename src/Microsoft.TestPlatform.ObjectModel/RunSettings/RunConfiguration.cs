@@ -75,6 +75,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool inIsolation;
 
         /// <summary>
+        /// Specify to run tests in process
+        /// </summary>
+        private bool inProcess;
+
+        /// <summary>
         /// False indicates that the test adapter should not collect source information for discovered tests
         /// </summary>
         private bool shouldCollectSourceInformation;
@@ -220,6 +225,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set
             {
                 this.inIsolation = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to run tests in isolation or not.
+        /// </summary>
+        public bool InProcess
+        {
+            get
+            {
+                return this.inProcess;
+            }
+
+            set
+            {
+                this.inProcess = value;
             }
         }
 
@@ -732,6 +753,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inIsolationValueString, elementName));
                             }
                             runConfiguration.InIsolation = inIsolation;
+                            break;
+
+                        case "InProcess":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string inProcessValueString = reader.ReadElementContentAsString();
+                            bool inProcess;
+                            if (!bool.TryParse(inProcessValueString, out inProcess))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inProcessValueString, elementName));
+                            }
+                            runConfiguration.InProcess = inProcess;
                             break;
 
                         case "DisableAppDomain":

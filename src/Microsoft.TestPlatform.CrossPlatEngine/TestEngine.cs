@@ -244,6 +244,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
 
+            if (runConfiguration.InProcess)
+            {
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in process");
+                }
+                
+                return true;
+            }
+
+
             if (runConfiguration.InIsolation)
             {
                 if (EqtTrace.IsInfoEnabled)
