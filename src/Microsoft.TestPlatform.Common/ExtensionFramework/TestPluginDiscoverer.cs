@@ -164,6 +164,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
             IEnumerable<Type> types;
+            Type extension = typeof(TExtension);
+            TypeInfo extensionTypeInfo = extension.GetTypeInfo();
 
             try
             {           
@@ -174,7 +176,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 else
                 {
-                    types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract).ToList();
+                    types = from type in assembly.GetTypes()
+                            let typeInfo = type.GetTypeInfo()
+                            where typeInfo.IsClass && !typeInfo.IsAbstract && extensionTypeInfo.IsAssignableFrom(typeInfo)
+                            select type;
                 }
             }
             catch (ReflectionTypeLoadException e)
@@ -195,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 foreach (var type in types)
                 {
-                    GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
+                    GetTestExtensionFromType(type, pluginInfos);
                 }
             }
         }
@@ -217,38 +222,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </param>
         private void GetTestExtensionFromType<TPluginInfo>(
             Type type,
-            Type extensionType,
             Dictionary<string, TPluginInfo> extensionCollection)
             where TPluginInfo : TestPluginInformation
-        {
-            if (extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
-            {
-                var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
-                var pluginInfo = (TPluginInfo)rawPluginInfo;
+        {         
+            var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
+            var pluginInfo = (TPluginInfo)rawPluginInfo;
 
-                if (pluginInfo == null || pluginInfo.IdentifierData == null)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
+            if (pluginInfo == null || pluginInfo.IdentifierData == null)
+            {
+                 if (EqtTrace.IsErrorEnabled)
+                 {
                         EqtTrace.Error(
                         "TryGetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
-                    }
-
-                    return;
-                }
-
-                if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
-                {
-                    EqtTrace.Warning(
-                        "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}'; keeping the first one.",
-                        pluginInfo.IdentifierData);
-                }
-                else
-                {
-                    extensionCollection.Add(pluginInfo.IdentifierData, pluginInfo);
-                }
+                 }
+                 return;
             }
-        }
+
+            if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
+            {
+                 EqtTrace.Warning(
+                 "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}'; keeping the first one.",
+                         pluginInfo.IdentifierData);
+            }
+            else
+            {
+                 extensionCollection.Add(pluginInfo.IdentifierData, pluginInfo);
+            }   
+      }
 
         #endregion
     }
