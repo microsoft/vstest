@@ -175,10 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 else
                 {
-                    types = from type in assembly.GetTypes()
-                            let typeInfo = type.GetTypeInfo()
-                            where typeInfo.IsClass && !typeInfo.IsAbstract
-                            select type;
+                    types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract);
                 }
             }
             catch (ReflectionTypeLoadException e)
