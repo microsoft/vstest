@@ -22,9 +22,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
-    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = CoreUtilities.Constants;
+    using ObjectModelConstants = ObjectModel.Constants;
 
     /// <summary>
     /// The design mode client.
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
-        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
+        private ProtocolConfig protocolConfig = ObjectModelConstants.DefaultProtocolConfig;
         private IEnvironment platformEnvironment;
         private TestSessionMessageLogger testSessionMessageLogger;
         private object lockObject = new object();
@@ -413,39 +413,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool skipTestHostLaunch)
         {
             Task.Run(
-            delegate
-            {
-                try
+                () =>
                 {
-                    testRequestManager.ResetOptions();
-
-                    var customLauncher = skipTestHostLaunch ?
-                        DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
-
-                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
-                }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
-
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                    this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-                    var runCompletePayload = new TestRunCompletePayload()
+                    try
                     {
-                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
-                        LastRunTests = null
-                    };
+                        testRequestManager.ResetOptions();
 
-                    // Send run complete to translation layer
-                    this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
-                }
-            });
+                        var customLauncher = skipTestHostLaunch ?
+                            DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
+
+                        testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                        var runCompletePayload = new TestRunCompletePayload()
+                        {
+                            TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
+                            LastRunTests = null
+                        };
+
+                        // Send run complete to translation layer
+                        this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+                    }
+                });
         }
 
         private void StartDiscovery(DiscoveryRequestPayload discoveryRequestPayload, ITestRequestManager testRequestManager)
         {
             Task.Run(
-                delegate
+                () =>
                 {
                     try
                     {
@@ -475,7 +475,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private void StartTestRunAttachmentsProcessing(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRequestManager testRequestManager)
         {
             Task.Run(
-                delegate
+                () =>
                 {
                     try
                     {
