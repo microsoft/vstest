@@ -53,8 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
 
-            int expectedNumberOfAttachments = testEnvironment.RunnerFramework.Equals(IntegrationTestBase.CoreRunnerFramework) &&
-                testEnvironment.TargetFramework.Equals(IntegrationTestBase.CoreRunnerFramework) ? 2 : 1;
+            int expectedNumberOfAttachments = 1;
             Assert.AreEqual(expectedNumberOfAttachments, this.runEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.runEventHandler.Attachments);
@@ -74,7 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(1, this.runEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.runEventHandler.Attachments);
         }
@@ -99,7 +98,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
+            Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -121,7 +120,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual("Completed", testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
             Assert.AreEqual(2L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1L : 2L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
+            Assert.AreEqual(1L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
@@ -148,7 +147,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 2, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
+            Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -195,7 +194,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1 : 3, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
+            Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.testRunAttachmentsProcessingEventHandler.Attachments);
 
@@ -217,7 +216,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual("Completed", testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
             Assert.AreEqual(3L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
-            Assert.AreEqual(testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 1L : 3L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
+            Assert.AreEqual(1L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
@@ -271,7 +270,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
-            Assert.IsTrue((testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework) ? 3 : 0) <= testRunAttachmentsProcessingEventHandler.ProgressArgs.Count);
+            Assert.IsTrue(0 <= testRunAttachmentsProcessingEventHandler.ProgressArgs.Count);
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];

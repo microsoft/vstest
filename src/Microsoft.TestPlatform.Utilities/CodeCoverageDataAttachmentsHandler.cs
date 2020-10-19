@@ -16,6 +16,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
+#if NETSTANDARD2_0
+    using Microsoft.VisualStudio.Coverage.CoreLib.Net;
+#endif
+
     public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProcessor
     {
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
@@ -58,11 +62,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
-            if(files.Count == 1)
+            if (files.Count == 1)
             {
                 return files[0];
             }
 
+#if NETSTANDARD2_0
+            var coverageUtility = new CoverageFileUtility();
+
+            var coverageData = coverageUtility.MergeCoverageFilesAsync(files, cancellationToken).Result;
+            coverageUtility.WriteCoverageFile(files[0], coverageData);
+
+            return files[0];
+#else
             string tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
             string outputfileName = files[0];
 
@@ -72,11 +84,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
                 Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
                 var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
 
                 var methodInfo = type?.GetMethod(MergeMethodName);
-
                 if (methodInfo != null)
                 {
                     IList<string> filesToDelete = new List<string>(files.Count) { tempFileName };
@@ -122,6 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return string.Empty;
+#endif
         }
     }
 }

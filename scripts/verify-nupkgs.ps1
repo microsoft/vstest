@@ -17,7 +17,7 @@ function Verify-Nuget-Packages($packageDirectory)
                      "Microsoft.NET.Test.Sdk" = 18;
                      "Microsoft.TestPlatform" = 477;
                      "Microsoft.TestPlatform.Build" = 19;
-                     "Microsoft.TestPlatform.CLI" = 350;
+                     "Microsoft.TestPlatform.CLI" = 351;
                      "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
                      "Microsoft.TestPlatform.ObjectModel" = 91;
                      "Microsoft.TestPlatform.Portable" = 566;
