@@ -9,6 +9,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using System.Xml;
+
     /// <summary>
     /// Base class for Eqt Collections.
     /// Fast collection, default implementations (Add/Remove/etc) do not allow null items and ignore duplicates.
@@ -52,12 +54,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             public void Dispose()
             {
+                
             }
         }
         #endregion
 
         #region Fields
-        protected Hashtable container;
+        protected Dictionary<T,object> container;
 
         private string childElementName;
         #endregion
@@ -65,16 +68,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         #region Constructors
         protected EqtBaseCollection()
         {
-            this.container = new Hashtable();
+            this.container = new Dictionary<T,object>();
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="comparer">For case insensitive comparison use StringComparer.InvariantCultureIgnoreCase.</param>
-        protected EqtBaseCollection(IEqualityComparer comparer)
+        protected EqtBaseCollection(IEqualityComparer<T> comparer)
         {
-            this.container = new Hashtable(0, comparer);   // Ad default Hashtable() constructor creates table with 0 items.
+            this.container = new Dictionary<T, object>(0, comparer);   // Ad default Hashtable() constructor creates table with 0 items.
         }
 
         /// <summary>
@@ -84,7 +87,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         protected EqtBaseCollection(EqtBaseCollection<T> other)
         {
             EqtAssert.ParameterNotNull(other, "other");
-            this.container = new Hashtable(other.container);
+            this.container = new Dictionary<T, object>(other.container);
         }
         #endregion
 
@@ -94,7 +97,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         {
             EqtAssert.ParameterNotNull(item, "item");
 
-            if (!this.container.Contains(item))
+            if (!this.container.ContainsKey(item))
             {
                 this.container.Add(item, null);    // Do not want to xml-persist the value.
             }
@@ -107,7 +110,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 return false;
             }
 
-            return this.container.Contains(item);
+            return this.container.ContainsKey(item);
         }
 
         /// <summary>
@@ -118,13 +121,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public virtual bool Remove(T item)
         {
             EqtAssert.ParameterNotNull(item, "item");   // This is to be consistent with Add...
-
-            if (this.container.Contains(item))
-            {
-                this.container.Remove(item);
-                return true;
-            }
-            return false;
+            return this.container.Remove(item);
         }
 
         public virtual void Clear()
@@ -179,11 +176,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// Default behavior is to create child elements with name same as name of type T.
         /// Does not respect IXmlTestStoreCustom.
         /// </summary>
-        public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+        public virtual void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence h = new XmlPersistence();
-            h.SaveHashtable(this.container, element, ".", ".", null, ChildElementName, parameters);
+            XmlPersistence xmlPersistence = new XmlPersistence();
+            xmlPersistence.SaveHashtable(container, element, ".", ".", null, ChildElementName, parameters);
         }
+
         #endregion
 
         #region Private
