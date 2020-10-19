@@ -212,6 +212,40 @@
       <file src="$NetStandard13Framework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\netstandard1.3\zh-Hant" />
     <!-- /netstandard 1.3 -->
 
+    <!-- netstandard 2.0 -->	
+      <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard2.0\" />	
+      <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netstandard2.0\" />	
+      <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netstandard2.0\" />	
+
+      <!-- Add localized resources -->	
+      <file src="$NetCoreTargetFramework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\cs" />	
+      <file src="$NetCoreTargetFramework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\de" />	
+      <file src="$NetCoreTargetFramework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\es" />	
+      <file src="$NetCoreTargetFramework$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\fr" />	
+      <file src="$NetCoreTargetFramework$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\it" />	
+      <file src="$NetCoreTargetFramework$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\ja" />	
+      <file src="$NetCoreTargetFramework$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\ko" />	
+      <file src="$NetCoreTargetFramework$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\pl" />	
+      <file src="$NetCoreTargetFramework$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"   target="lib\netstandard2.0\pt-BR" />	
+      <file src="$NetCoreTargetFramework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\ru" />	
+      <file src="$NetCoreTargetFramework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\tr" />	
+      <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hans" />	
+      <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hant" />	
+      <file src="$NetCoreTargetFramework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\cs" />	
+      <file src="$NetCoreTargetFramework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\de" />	
+      <file src="$NetCoreTargetFramework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\es" />	
+      <file src="$NetCoreTargetFramework$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\fr" />	
+      <file src="$NetCoreTargetFramework$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\it" />	
+      <file src="$NetCoreTargetFramework$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\ja" />	
+      <file src="$NetCoreTargetFramework$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\ko" />	
+      <file src="$NetCoreTargetFramework$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\pl" />	
+      <file src="$NetCoreTargetFramework$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll"               target="lib\netstandard2.0\pt-BR" />	
+      <file src="$NetCoreTargetFramework$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\ru" />	
+      <file src="$NetCoreTargetFramework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\tr" />	
+      <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\netstandard2.0\zh-Hans" />	
+      <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll"             target="lib\netstandard2.0\zh-Hant" />	
+    <!-- /netstandard 2.0 -->	
+
     <!-- uap10.0 -->
       <file src="$Uap10Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\uap10.0\" />
       <file src="$Uap10Framework$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\uap10.0\" />
