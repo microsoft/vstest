@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                     case "frameworkcore10":
                         name = CommonFrameworks.NetCoreApp10.DotNetFrameworkName;
-                        version = CommonFrameworks.Net35.Version.ToString();
+                        version = CommonFrameworks.NetCoreApp10.Version.ToString();
                         break;
 
                     case "frameworkuap10":
