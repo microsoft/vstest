@@ -227,11 +227,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         private string GetConsoleRunner()
-        {
-            var runnerPath = isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : GetEscapeSequencedPath(this.vstestConsolePath);
-
-            return runnerPath;
-        }
+            => isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : GetEscapeSequencedPath(this.vstestConsolePath);
 
         private string GetEscapeSequencedPath(string path)
         {
