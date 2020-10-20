@@ -16,7 +16,7 @@
     <ArtifactsBaseDirectory Condition="'$(ArtifactsBaseDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\</ArtifactsBaseDirectory>
 
     <!-- Directory with .NET binaries -->
-    <ArtifactsFw45Directory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)net45\$(TargetRuntime)\</ArtifactsDirectory>
+    <ArtifactsFw45Directory Condition="'$(ArtifactsFw45Directory)' == ''">$(ArtifactsBaseDirectory)net45\$(TargetRuntime)\</ArtifactsFw45Directory>
 
     <!-- Directory with .NET binaries -->
     <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
