@@ -409,7 +409,7 @@ function Publish-Package
                 $TPB_TargetFrameworkCore20 = $coreCLR20PackageDir          # netcoreapp2.1
                 $TPB_TargetFrameworkNS10   = $netstandard10PackageDir      # netstandard1_0
                 $TPB_TargetFrameworkNS13   = $netstandard13PackageDir      # netstandard1_3
-              # $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
+                $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
                 $TPB_TargetFrameworkUap100 = $testhostUapPackageDir        # uap10.0
               }
 
@@ -421,7 +421,7 @@ function Publish-Package
                 $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
-              # $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
 
@@ -433,7 +433,7 @@ function Publish-Package
                 $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
-              # $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
 
