@@ -338,7 +338,7 @@
 
       <!-- Third Party assemblies to sign -->
       <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)Newtonsoft.Json.dll" />
-      <ThirdPartyAssembliesToSign Include="$(ArtifactsNS20Directory)Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.Build -->
