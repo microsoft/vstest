@@ -338,7 +338,6 @@
 
       <!-- Third Party assemblies to sign -->
       <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)Newtonsoft.Json.dll" />
-      <ThirdPartyAssembliesToSign Include="$(ArtifactsNS13Directory)Newtonsoft.Json.dll" />
       <ThirdPartyAssembliesToSign Include="$(ArtifactsNS20Directory)Newtonsoft.Json.dll" />
     </ItemGroup>
 
