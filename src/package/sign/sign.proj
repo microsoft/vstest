@@ -172,6 +172,8 @@
         <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
       -->
 
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -205,7 +207,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.x86.exe" />
-	  <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
 
       <!-- NetFullExtensions -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
@@ -217,6 +219,9 @@
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\%(ResxLang.Identity)\*.*" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Intellitrace -->
@@ -337,6 +342,10 @@
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.Build -->
@@ -427,6 +436,12 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\%(ResxLang.Identity)\*.*" />
+      
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <ItemGroup>
@@ -474,9 +489,19 @@
         <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
+
+      <ThirdPartyAssembliesToSign>
+        <Authenticode>3PartySHA2</Authenticode>
+      </ThirdPartyAssembliesToSign>
     </ItemGroup>
 
-    <Message Text="Signing using authenticode certificate NetStandard10AssembliesToSign:'%(NetStandard10AssembliesToSign.Authenticode)' for @(NetStandard10AssembliesToSign)"/>
+    <Message Text="Signing 3rd party assemblies using authenticode certificate '%(ThirdPartyAssembliesToSign.Authenticode)' for @(ThirdPartyAssembliesToSign)"/>
+    <SignFiles Files="@(ThirdPartyAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(NetStandard10AssembliesToSign.Authenticode)' for @(NetStandard10AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard10AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS10Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
