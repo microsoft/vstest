@@ -15,7 +15,10 @@
     <PackagesDirectory Condition="'$(PackagesDirectory)' == ''">$(RootDirectory)packages\</PackagesDirectory>
     <ArtifactsBaseDirectory Condition="'$(ArtifactsBaseDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\</ArtifactsBaseDirectory>
 
-    <!-- Directory with .NET 4.6 binaries -->
+    <!-- Directory with .NET binaries -->
+    <ArtifactsFw45Directory Condition="'$(ArtifactsFw45Directory)' == ''">$(ArtifactsBaseDirectory)net45\$(TargetRuntime)\</ArtifactsFw45Directory>
+
+    <!-- Directory with .NET binaries -->
     <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
 
     <!-- Directory with .NETCore binaries -->
@@ -176,6 +179,16 @@
       <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
     </ItemGroup>
 
+    <!-- Sign .Net 4.5 assemblies -->
+    <ItemGroup>
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      
+      <!-- Localized resources -->
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)%(ResxLang.Identity)\*.*" />
+    </ItemGroup>
+
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
     <ItemGroup>
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
@@ -319,7 +332,9 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.net48.x86.exe" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\datacollector.exe" />
 
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
 
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
@@ -338,6 +353,7 @@
 
       <!-- Localized resources -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
@@ -465,6 +481,11 @@
         <StrongName>StrongName</StrongName>
       </AssembliesToSign>
 
+      <Fw45AssembliesToSign>
+        <Authenticode>Microsoft402400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </Fw45AssembliesToSign>
+
       <CoreAssembliesToSign>
         <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
@@ -516,6 +537,12 @@
     <Message Text="Signing using authenticode certificate NetStandard20AssembliesToSign:'%(NetStandard20AssembliesToSign.Authenticode)' for @(NetStandard20AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard20AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS20Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate Fw45AssembliesToSign:'%(Fw45AssembliesToSign.Authenticode)' for @(Fw45AssembliesToSign)"/>
+    <SignFiles Files="@(Fw45AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsFw45Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
