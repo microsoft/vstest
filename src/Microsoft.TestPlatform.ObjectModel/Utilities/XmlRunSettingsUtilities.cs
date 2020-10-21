@@ -9,7 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Globalization;
     using System.IO;
     using System.Xml;
+
+#if !NETSTANDARD1_0
     using System.Xml.XPath;
+#endif 
 
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using ObjectModelResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
@@ -51,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Examines the given XPathNavigable representation of a runsettings file and determines if it has a configuration node
         /// for the data collector (used for Fakes and CodeCoverage)
@@ -142,6 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             navigator.AppendChild(dataCollectorNode);
         }
+#endif
 
         /// <summary>
         /// Returns RunConfiguration from settingsXml.
@@ -178,6 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             return nodeValue;
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Create a default run settings
         /// </summary>
@@ -336,6 +342,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
         }
 
+#endif
+
         /// <summary>
         /// Get logger run settings from the settings XML.
         /// </summary>
@@ -426,6 +434,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             return default(T);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Moves the given runsettings file navigator to the DataCollectors node in the runsettings xml.
         /// Throws XmlException if it was unable to find the DataCollectors node.
@@ -451,5 +460,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 runSettingsNavigator.MoveToChild("DataCollectors", string.Empty);
             }
         }
+#endif
     }
 }

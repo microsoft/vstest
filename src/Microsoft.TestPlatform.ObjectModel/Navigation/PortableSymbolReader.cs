@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     }
                     catch (FileNotFoundException)
                     {
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_3 && !WINDOWS_UWP
                         // fallback when the assembly is not loaded
                         asm = Assembly.LoadFile(binaryPath);
 #else
