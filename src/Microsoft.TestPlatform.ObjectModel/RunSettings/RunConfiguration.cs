@@ -3,14 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Xml;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test settings.
@@ -316,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                switch(this.framework?.Name)
+                switch (this.framework?.Name)
                 {
                     case Constants.DotNetFramework35:
                         return FrameworkVersion.Framework35;
@@ -498,6 +498,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion
 
+#if !NETSTANDARD1_0
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
@@ -596,6 +597,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return root;
         }
+#endif
 
         /// <summary>
         /// Loads RunConfiguration from XmlReader.
@@ -623,7 +625,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
 
                             string resultsDir = reader.ReadElementContentAsString();
-                            if(string.IsNullOrEmpty(resultsDir))
+                            if (string.IsNullOrEmpty(resultsDir))
                             {
                                 throw new SettingsException(
                                    string.Format(
@@ -847,8 +849,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "SolutionDirectory":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             string solutionDirectory = reader.ReadElementContentAsString();
+
+#if !NETSTANDARD1_0
                             solutionDirectory = Environment.ExpandEnvironmentVariables(solutionDirectory);
-                            if (string.IsNullOrEmpty(solutionDirectory) || !Directory.Exists(solutionDirectory))
+#endif
+
+                            if (string.IsNullOrEmpty(solutionDirectory)
+#if !NETSTANDARD1_0
+                                || !Directory.Exists(solutionDirectory)
+#endif
+                            )
                             {
                                 if (EqtTrace.IsErrorEnabled)
                                 {
@@ -894,7 +904,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TestCaseFilter = reader.ReadElementContentAsString();
                             break;
-                            
+
                         case "DotNetHostPath":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();

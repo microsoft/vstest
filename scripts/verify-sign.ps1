@@ -54,15 +54,15 @@ function Verify-Assemblies
                     elseif ($signature.SignerCertificate.Thumbprint -eq "5EAD300DC7E4D637948ECB0ED829A072BD152E17") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
-		            # For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.
+                    # For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.
                     elseif ($signature.SignerCertificate.Thumbprint -eq "67B1757863E3EFF760EA9EBB02849AF07D3A8080") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
-		            # For some dlls e.g. "Microsoft.VisualStudio.ArchitectureTools.PEReader.dll", sign certificate is different signature. Skip such binaries.
+                    # For some dlls e.g. "Microsoft.VisualStudio.ArchitectureTools.PEReader.dll", sign certificate is different signature. Skip such binaries.
                     elseif ($signature.SignerCertificate.Thumbprint -eq "9DC17888B5CFAD98B3CB35C1994E96227F061675") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
-		            # For some dlls sign certificate is different signature. Skip such binaries.
+                    # For some dlls sign certificate is different signature. Skip such binaries.
                     elseif ($signature.SignerCertificate.Thumbprint -eq "62009AAABDAE749FD47D19150958329BF6FF4B34") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
@@ -99,9 +99,9 @@ function Verify-NugetPackages
         Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/v4.6.1/nuget.exe -OutFile $nugetInstallPath
     }
     
-	Write-Log "Using nuget.exe installed at $nugetInstallPath"
+    Write-Log "Using nuget.exe installed at $nugetInstallPath"
 
-	$artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+    $artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packagesDirectory = Join-Path $artifactsDirectory "packages"
     Get-ChildItem -Filter *.nupkg  $packagesDirectory | % {
     & $nugetInstallPath verify -signature -CertificateFingerprint 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE $_.FullName
