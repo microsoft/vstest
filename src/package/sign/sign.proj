@@ -272,27 +272,27 @@
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
       
       <!-- Skip StrongName signing for the following -->
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Profiler.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\1033\Microsoft.IntelliTrace.Profilerui.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\concrt140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\Microsoft.IntelliTrace.ProfilerProxy.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\msvcp140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\vccorlib140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\vcruntime140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\concrt140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\Microsoft.IntelliTrace.ProfilerProxy.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\msvcp140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\vccorlib140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\vcruntime140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\Microsoft.IntelliTrace.Profiler.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\1033\Microsoft.IntelliTrace.Profilerui.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\covrun32.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\msdia140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />>
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Profiler.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\1033\Microsoft.IntelliTrace.Profilerui.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\concrt140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\Microsoft.IntelliTrace.ProfilerProxy.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\msvcp140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\vccorlib140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\vcruntime140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\concrt140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\Microsoft.IntelliTrace.ProfilerProxy.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\msvcp140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\vccorlib140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\x86\vcruntime140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\Microsoft.IntelliTrace.Profiler.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\x64\1033\Microsoft.IntelliTrace.Profilerui.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\covrun32.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\msdia140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
@@ -382,12 +382,12 @@
       <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
 
       <!-- Skip StrongName signing for the following -->
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" />>
-      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" />>
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" />
+      <BinariesWithoutStrongNameToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.TestHost -->
