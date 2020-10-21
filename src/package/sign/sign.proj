@@ -486,7 +486,6 @@
 
       <ThirdPartyAssembliesToSign>
         <Authenticode>3PartySHA2</Authenticode>
-        <StrongName>StrongName</StrongName>
       </ThirdPartyAssembliesToSign>
     </ItemGroup>
 
