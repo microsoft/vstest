@@ -155,6 +155,9 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -200,6 +203,9 @@
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\%(ResxLang.Identity)\*.*" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Intellitrace -->
@@ -308,6 +314,10 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.Build -->
@@ -384,6 +394,11 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\%(ResxLang.Identity)\*.*" />
+      
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <ItemGroup>
@@ -416,7 +431,17 @@
         <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
+
+      <ThirdPartyAssembliesToSign>
+        <Authenticode>3PartySHA2</Authenticode>
+      </ThirdPartyAssembliesToSign>
     </ItemGroup>
+
+    <Message Text="Signing 3rd party assemblies using authenticode certificate '%(ThirdPartyAssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <SignFiles Files="@(ThirdPartyAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
 
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
     <SignFiles Files="@(AssembliesToSign)"
