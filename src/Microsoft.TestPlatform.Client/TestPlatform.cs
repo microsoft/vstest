@@ -177,6 +177,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testSessionCriteria));
             }
 
+            this.AddExtensionAssemblies(testSessionCriteria.RunSettings);
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
+
+            // Update extension assemblies from source when design mode is false.
+            if (!runConfiguration.DesignMode)
+            {
+                // TODO: Nothing to do if we're not in design mode ? This code shouldn't even be executed.
+                return;
+            }
+
             // Initialize loggers
             var loggerManager = this.TestEngine.GetLoggerManager(requestData);
             loggerManager.Initialize(testSessionCriteria.RunSettings);

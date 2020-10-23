@@ -368,6 +368,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.telemetryOptedIn = payload.CollectMetrics;
             var requestData = this.GetRequestData(protocolConfig);
 
+            if (this.UpdateRunSettingsIfRequired(payload.RunSettings, payload.Sources, null, out string updatedRunsettings))
+            {
+                payload.RunSettings = updatedRunsettings;
+            }
+
+            if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(payload.RunSettings))
+            {
+                throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, payload.RunSettings));
+            }
+
+            // TODO: Collect metrics ?
+
             // Make sure to run the run request inside a lock as the below section is not thread-safe.
             // There can be only one discovery, execution or attachments processing request at a given point in time.
             lock (this.syncObject)
@@ -489,7 +501,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, IBaseTestEventsRegistrar registrar, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, IList<string> sources, IBaseTestEventsRegistrar registrar, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -613,7 +625,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture, out Architecture chosenPlatform)
+        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, IList<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture, out Architecture chosenPlatform)
         {
             // Get platform from sources
             var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms, defaultArchitecture);
@@ -631,7 +643,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updatePlatform;
         }
 
-        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar, out Framework chosenFramework)
+        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, IList<string> sources, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar, out Framework chosenFramework)
         {
             // Get framework from sources
             var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);

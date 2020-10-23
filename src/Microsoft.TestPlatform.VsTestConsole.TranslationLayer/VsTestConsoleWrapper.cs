@@ -18,6 +18,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
@@ -436,7 +437,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public TestSessionInfo StartTestSession(
+        public ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler)
@@ -445,7 +446,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public TestSessionInfo StartTestSession(
+        public ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler,
@@ -454,7 +455,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerStartTestSessionStart();
 
             this.EnsureInitialized();
-            return this.requestSender.StartTestSession(sources, runSettings, eventsHandler, testHostLauncher);
+            return new TestSession(
+                this.requestSender.StartTestSession(sources, runSettings, eventsHandler, testHostLauncher),
+                this);
         }
 
         /// <inheritdoc/>

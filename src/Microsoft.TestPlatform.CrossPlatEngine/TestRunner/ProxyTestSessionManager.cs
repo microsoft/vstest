@@ -17,6 +17,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
     {
         private Func<ProxyOperationManager> proxyCreator;
         private int parallelLevel;
+        private bool skipDefaultAdapters;
+
+        public IList<ProxyOperationManager> OperationManagers { get; set; }
 
         public ProxyTestSessionManager(Func<ProxyOperationManager> proxyCreator, int parallelLevel)
         {
@@ -31,12 +34,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
 
         public void Close()
         {
+            // TODO: This should be called by StopTestSession to dispose of all the testhosts.
             throw new NotImplementedException();
         }
 
         public void Initialize(bool skipDefaultAdapters)
         {
-            //throw new NotImplementedException();
+            this.skipDefaultAdapters = skipDefaultAdapters;
         }
 
         public void StartTestSession(StartTestSessionCriteria criteria, ITestSessionEventsHandler eventsHandler)
@@ -50,9 +54,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner
                     () =>
                     {
                         var operationManagerProxy = this.proxyCreator();
-                        operationManagerProxy.SetupChannel(criteria.Sources, criteria.RunSettings);
+                        operationManagerProxy.Initialize(this.skipDefaultAdapters);
+                        operationManagerProxy.SetupChannel(criteria.Sources, criteria.RunSettings, eventsHandler);
 
-                        TestRunnerPool.Instance.AddProxy(testSessionInfo, operationManagerProxy);
+                        // TODO: Instead of adding the ProxyOperationManager to a list in TestRunnerPool, keep the list
+                        // in the TestSessionManager (i.e. here) and add THIS object to the mapping.
+                        TestRunnerPool.Instance.AddProxy(testSessionInfo, this);
                     }));
             }
 

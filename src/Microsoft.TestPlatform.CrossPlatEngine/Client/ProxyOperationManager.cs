@@ -84,6 +84,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         #region IProxyOperationManager implementation.
+        public virtual void Initialize(bool skipDefaultAdapters)
+        {
+            // No-op.
+        }
+
+        public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings, ITestMessageEventHandler eventHandler)
+        {
+            return this.SetupChannel(sources, runSettings);
+        }
 
         /// <summary>
         /// Ensure that the engine is ready for test operations.

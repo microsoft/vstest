@@ -111,7 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, parallelLevel > 1 ? "True" : "False");
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
-
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
@@ -124,6 +123,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
             {
+                if (testRunCriteria.TestSessionInfo != null)
+                {
+                    // Data collection was taken care of when creating the test session earlier.
+                    return new ProxyExecutionManager(testRunCriteria.TestSessionInfo);
+                }
+
                 // Create a new HostManager, to be associated with individual ProxyExecutionManager(&POM)
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
@@ -135,20 +140,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
 
-                if (testRunCriteria.TestSessionInfo != null)
-                {
-                    // TODO: Take care of proxy with data collection as bellow.
-                    return new ProxyExecutionManager(testRunCriteria.TestSessionInfo);
-                }
-
-                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings, GetSourcesFromTestRunCriteria(testRunCriteria)))
-                                                : new ProxyExecutionManager(requestData, requestSender, hostManager);
+                return isDataCollectorEnabled
+                    ? new ProxyExecutionManagerWithDataCollection(
+                        requestData,
+                        requestSender,
+                        hostManager,
+                        new ProxyDataCollectionManager(
+                            requestData,
+                            testRunCriteria.TestRunSettings,
+                            GetSourcesFromTestRunCriteria(testRunCriteria)))
+                    : new ProxyExecutionManager(
+                        requestData,
+                        requestSender,
+                        hostManager);
             };
 
             // parallelLevel = 1 for desktop should go via else route.
             if (parallelLevel > 1 || !testHostManager.Shared)
             {
-                return new ParallelProxyExecutionManager(requestData, proxyExecutionManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared);
+                return new ParallelProxyExecutionManager(
+                    requestData,
+                    proxyExecutionManagerCreator,
+                    parallelLevel,
+                    sharedHosts: testHostManager.Shared);
             }
             else
             {
@@ -165,8 +179,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringStartTestSession, parallelLevel > 1 ? "True" : "False");
 
-            //var requestSender = new TestRequestSender(requestData.ProtocolConfig, testHostManager);
-            //var testRunnerProxy = new ProxyStartTestRunnerManager(requestData, requestSender, testHostManager);
+            var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testSessionCriteria.RunSettings);
+            var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testSessionCriteria.RunSettings);
+
+            if (this.ShouldRunInNoIsolation(testSessionCriteria.RunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
+            {
+                var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
+                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
+                // TODO: What should happen here ? In process doesn't necessarily mean only one testhost.
+
+                //return testRunnerProxy;
+            }
 
             Func<ProxyOperationManager> proxyCreator = delegate
             {
@@ -180,17 +203,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
 
-                return new ProxyOperationManager(requestData, requestSender, hostManager);
+                return isDataCollectorEnabled
+                    ? new ProxyOperationManagerWithDataCollection(
+                        requestData,
+                        requestSender,
+                        hostManager,
+                        new ProxyDataCollectionManager(
+                            requestData,
+                            testSessionCriteria.RunSettings,
+                            testSessionCriteria.Sources))
+                    : new ProxyOperationManager(
+                        requestData,
+                        requestSender,
+                        hostManager);
             };
-
-            if (this.ShouldRunInNoIsolation(testSessionCriteria.RunSettings, parallelLevel > 1, false))
-            {
-                var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
-                // TODO: What should happen here ? In process doesn't necessarily mean only one testhost.
-
-                //return testRunnerProxy;
-            }
 
             return new ProxyTestSessionManager(proxyCreator, parallelLevel);
         }

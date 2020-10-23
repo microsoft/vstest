@@ -38,8 +38,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestData">
         /// The request data for providing execution services and data.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager)
-            : base(requestData, requestSender, testHostManager)
+        public ProxyExecutionManagerWithDataCollection(
+            IRequestData requestData,
+            ITestRequestSender requestSender,
+            ITestRuntimeProvider testHostManager,
+            IProxyDataCollectionManager proxyDataCollectionManager)
+            : base(
+                  requestData,
+                  requestSender,
+                  testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
@@ -49,7 +56,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             testHostManager.HostLaunched += this.TestHostLaunchedHandler;
         }
 
-        public ProxyExecutionManagerWithDataCollection(TestSessionInfo testSessionInfo, IProxyDataCollectionManager proxyDataCollectionManager) : base(testSessionInfo)
+        public ProxyExecutionManagerWithDataCollection(TestSessionInfo testSessionInfo, IProxyDataCollectionManager proxyDataCollectionManager)
+            : base(testSessionInfo)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();

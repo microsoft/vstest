@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
     /// <summary>
     /// Controller for various test operations on the test runner.
@@ -243,7 +244,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="runSettings"></param>
         /// <param name="eventsHandler"></param>
         /// <returns></returns>
-        TestSessionInfo StartTestSession(
+        ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler);
@@ -256,7 +257,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="eventsHandler"></param>
         /// <param name="testHostLauncher"></param>
         /// <returns></returns>
-        TestSessionInfo StartTestSession(
+        ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler,
