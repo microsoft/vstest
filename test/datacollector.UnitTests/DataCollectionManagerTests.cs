@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Xml;
 
@@ -456,11 +457,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
     internal class TestableDataCollectionManager : DataCollectionManager
     {
-        DataCollector dataCollector;
+        DataCollector[] dataCollectors;
 
-        public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector) : this(datacollectionAttachmentManager, messageSink)
+        public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, params DataCollector[] dataCollectors) : this(datacollectionAttachmentManager, messageSink)
         {
-            this.dataCollector = dataCollector;
+            this.dataCollectors = dataCollectors;
         }
 
         internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink) : base(datacollectionAttachmentManager, messageSink)
@@ -479,27 +480,66 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                 dataCollectorUri = string.Empty;
                 return false;
             }
+
+            //    foreach (var dataCollector in dataCollectors)
+            //{
+            //    var fnAttribute = dataCollector.GetType().GetCustomAttributes(typeof(DataCollectorFriendlyNameAttribute), true).FirstOrDefault() as DataCollectorFriendlyNameAttribute;
+            //    if (fnAttribute != null && fnAttribute.FriendlyName.Equals(friendlyName))
+            //    {
+            //        var uriAttribute = dataCollector.GetType().GetCustomAttributes(typeof(DataCollectorTypeUriAttribute), true).FirstOrDefault() as DataCollectorTypeUriAttribute;
+            //        if (uriAttribute != null)
+            //        {
+            //            dataCollectorUri = uriAttribute.TypeUri;
+            //            return true;
+            //        }
+            //    }
+            //}
+
+            //dataCollectorUri = string.Empty;
+            //return false;
         }
 
         protected override bool IsUriValid(string uri)
         {
-            if (uri.Equals("my://custom/datacollector"))
+            if (uri != null && uri.Equals("my://custom/datacollector"))
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
+
+            //foreach (var dataCollector in dataCollectors)
+            //{
+            //    var uriAttribute = dataCollector.GetType().GetCustomAttributes(typeof(DataCollectorTypeUriAttribute), true).FirstOrDefault() as DataCollectorTypeUriAttribute;
+            //    if (uriAttribute != null)
+            //    {
+            //        if(uriAttribute.TypeUri.Equals(uri)) return true;
+            //    }
+            //}
+
+            //return false;
         }
 
         protected override DataCollector TryGetTestExtension(string extensionUri)
         {
-            if (extensionUri.Equals("my://custom/datacollector"))
+
+            if (extensionUri != null && extensionUri.Equals("my://custom/datacollector"))
             {
-                return dataCollector;
+                return dataCollectors[0];
             }
+
             return null;
+
+            //foreach (var dataCollector in dataCollectors)
+            //{
+            //    var uriAttribute = dataCollector.GetType().GetCustomAttributes(typeof(DataCollectorTypeUriAttribute), false).FirstOrDefault() as DataCollectorTypeUriAttribute;
+            //    if (uriAttribute != null)
+            //    {
+            //        if (uriAttribute.TypeUri.Equals(extensionUri)) return dataCollector;
+            //    }
+            //}
+
+            //return null;
         }
     }
 
