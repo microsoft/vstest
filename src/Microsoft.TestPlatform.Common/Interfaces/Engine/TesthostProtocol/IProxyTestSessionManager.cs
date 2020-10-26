@@ -21,16 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostP
         /// </summary>
         /// <param name="criteria"></param>
         /// <param name="eventsHandler"></param>
-        void StartTestSession(StartTestSessionCriteria criteria, ITestSessionEventsHandler eventsHandler);
+        void StartSession(StartTestSessionCriteria criteria, ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// 
         /// </summary>
-        void Abort();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        void Close();
+        void StopSession();
     }
 }

@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -218,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         hostManager);
             };
 
-            return new ProxyTestSessionManager(proxyCreator, parallelLevel);
+            return new ProxyTestSessionManager(parallelLevel, proxyCreator);
         }
 
         /// <summary>

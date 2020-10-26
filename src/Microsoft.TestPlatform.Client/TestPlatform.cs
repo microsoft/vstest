@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             // TODO: What should happen on initialization ?
             testSessionManager.Initialize(false);
 
-            testSessionManager.StartTestSession(testSessionCriteria, eventsHandler);
+            testSessionManager.StartSession(testSessionCriteria, eventsHandler);
         }
 
         /// <summary>

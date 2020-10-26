@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunner;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -31,12 +31,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class ProxyExecutionManager : IProxyExecutionManager, ITestRunEventsHandler2
     {
         private readonly ITestRuntimeProvider testHostManager;
-        private IDataSerializer dataSerializer;
+        private readonly IFileHelper fileHelper;
+
         private bool isCommunicationEstablished;
+        private bool skipDefaultAdapters;
+        private IDataSerializer dataSerializer;
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
-        private bool skipDefaultAdapters;
-        private readonly IFileHelper fileHelper;
+        private TestSessionInfo testSessionInfo = null;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -45,8 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         public ProxyExecutionManager(TestSessionInfo testSessionInfo)
         {
-            // TODO: Proxy choice should be thread safe.
-            this.ProxyOperationManager = TestRunnerPool.Instance.GetAndRemoveFirstProxy(testSessionInfo);
+            this.testSessionInfo = testSessionInfo;
+            this.ProxyOperationManager = TestSessionPool.Instance.TakeProxy(this.testSessionInfo);
             this.testHostManager = this.ProxyOperationManager.TestHostManager;
             this.dataSerializer = JsonDataSerializer.Instance;
             this.isCommunicationEstablished = false;
@@ -238,6 +240,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
+            if (this.testSessionInfo != null)
+            {
+                // TODO: Does returning the proxy to the pool here suffice ? Should we return it in
+                // some other places as well ?
+                TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.ProxyOperationManager.Id);
+            }
+
             this.baseTestRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
         }
 

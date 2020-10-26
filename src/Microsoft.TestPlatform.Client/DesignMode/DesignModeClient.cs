@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
     using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
     /// <summary>
     /// The design mode client.
@@ -37,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
-        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
+        private ProtocolConfig protocolConfig = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.DefaultProtocolConfig;
         private IEnvironment platformEnvironment;
         private TestSessionMessageLogger testSessionMessageLogger;
         private object lockObject = new object();
@@ -532,48 +533,57 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="requestManager"></param>
         private void StartTestSession(StartTestSessionPayload payload, ITestRequestManager requestManager)
         {
-            Task.Run(
-                delegate
+            Task.Run(() =>
+            {
+                var eventsHandler = new TestSessionEventsHandler(this.communicationManager);
+
+                try
                 {
-                    var eventsHandler = new TestSessionEventsHandler(this.communicationManager);
+                    var customLauncher = payload.CustomLauncher
+                        ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.DebuggingEnabled)
+                        : null;
 
-                    try
+                    requestManager.ResetOptions();
+                    requestManager.StartTestSession(payload, customLauncher, eventsHandler, this.protocolConfig);
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
+
+                    // TODO: Better signal the error.
+                    eventsHandler.HandleStartTestSessionComplete(null);
+
+                    /*var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                    this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                    var payload = new DiscoveryCompletePayload()
                     {
-                        var customLauncher = payload.CustomLauncher
-                            ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.DebuggingEnabled)
-                            : null;
+                        IsAborted = true,
+                        LastDiscoveredTests = null,
+                        TotalTests = -1
+                    };
 
-                        requestManager.ResetOptions();
-                        requestManager.StartTestSession(payload, customLauncher, eventsHandler, this.protocolConfig);
-                    }
-                    catch (Exception ex)
-                    {
-                        EqtTrace.Error("DesignModeClient: Exception in StartTestSession: " + ex);
-
-                        // TODO: Better signal the error.
-                        eventsHandler.HandleStartTestSessionComplete(null);
-
-                        /*var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-
-                        var payload = new DiscoveryCompletePayload()
-                        {
-                            IsAborted = true,
-                            LastDiscoveredTests = null,
-                            TotalTests = -1
-                        };
-
-                        // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);*/
-                    }
-                });
+                    // Send run complete to translation layer
+                    this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);*/
+                }
+            });
 
             // Here we do the work of initializing the runner.
         }
 
         private void StopTestSession(TestSessionInfo testSessionInfo)
         {
-
+            Task.Run(() =>
+            {
+                try
+                {
+                    TestSessionPool.Instance.RemoveSession(testSessionInfo);
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
+                }
+            });
         }
 
         #region IDisposable Support

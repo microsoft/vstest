@@ -38,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool makeRunsettingsCompatible;
         private bool makeRunsettingsCompatibleSet;
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
+        private readonly Guid id = Guid.NewGuid();
 
         private int testHostProcessId;
         private bool initialized;
@@ -67,6 +68,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         #region Properties
+        /// <summary>
+        /// 
+        /// </summary>
         public IRequestData RequestData { get; set; }
 
         /// <summary>
@@ -74,12 +78,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public ITestRequestSender RequestSender { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ITestRuntimeProvider TestHostManager { get; set; }
 
         /// <summary>
         /// Gets or sets the cancellation token source.
         /// </summary>
         public CancellationTokenSource CancellationTokenSource { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Guid Id
+        {
+            get
+            {
+                return this.id;
+            }
+        }
 
         #endregion
 
