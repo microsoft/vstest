@@ -348,7 +348,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                         break;
 
+                    // allow HangDumpType attribute to be used on the hang dump this is the prefered way
                     case XmlAttribute attribute when string.Equals(attribute.Name, Constants.HangDumpTypeKey, StringComparison.OrdinalIgnoreCase):
+
+                        if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                        }
+                        else
+                        {
+                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                        }
+
+                        break;
+
+                    // allow DumpType attribute to be used on the hang dump for backwards compatibility
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
 
                         if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
                         {
@@ -454,7 +469,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     try
                     {
-                        var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                        var dumpFiles = this.processDumpUtility.GetDumpFiles(warnOnNoDumpFiles: this.collectDumpAlways);
                         foreach (var dumpFile in dumpFiles)
                         {
                             if (!string.IsNullOrEmpty(dumpFile))

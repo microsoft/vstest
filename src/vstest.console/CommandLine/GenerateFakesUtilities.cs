@@ -14,7 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         internal static void GenerateFakesSettings(CommandLineOptions commandLineOptions, IEnumerable<string> sources, ref string runSettingsXml)
         {
             // dynamically compute the fakes datacollector settings
-            if (!commandLineOptions.DisableAutoFakes)
+            // This runs with or without design mode.
+            if (commandLineOptions == null || !commandLineOptions.DisableAutoFakes)
             {
                 runSettingsXml = FakesUtilities.GenerateFakesSettingsForRunConfiguration(sources.ToArray(), runSettingsXml);
             }
