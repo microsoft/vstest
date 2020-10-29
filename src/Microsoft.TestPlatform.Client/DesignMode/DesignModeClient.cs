@@ -212,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 var testRunPayload =
                                     this.communicationManager.DeserializePayload<TestRunRequestPayload>(
                                         message);
-                                this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: true);
+                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true);
                                 break;
                             }
 
@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 var testRunPayload =
                                     this.communicationManager.DeserializePayload<TestRunRequestPayload>(
                                         message);
-                                this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: false);
+                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
                                 break;
                             }
 
@@ -437,7 +437,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             }
         }
 
-        private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool skipTestHostLaunch)
+        private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool shouldLaunchTesthost)
         {
             Task.Run(
             delegate
@@ -446,8 +446,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     testRequestManager.ResetOptions();
 
-                    var customLauncher = skipTestHostLaunch ?
-                        DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload.DebuggingEnabled) : null;
+                    // We must avoid re-launching the test host if the test run payload already
+                    // contains test session info. Test session info being present is an indicative
+                    // of an already running test host spawned by a start test session call.
+                    var customLauncher =
+                        shouldLaunchTesthost && testRunPayload.TestSessionInfo == null
+                            ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(
+                                this,
+                                testRunPayload.DebuggingEnabled)
+                            : null;
 
                     testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                 }

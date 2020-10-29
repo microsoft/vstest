@@ -30,8 +30,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of run stats event
         /// </param>
-        public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent)
-            : this(sources, frequencyOfRunStatsChangeEvent, true)
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent)
+            : this(
+                  sources,
+                  frequencyOfRunStatsChangeEvent,
+                  true)
         {
         }
 
@@ -47,8 +52,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="keepAlive">
         /// Whether the execution process should be kept alive after the run is finished or not.
         /// </param>
-        public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent, bool keepAlive)
-            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, string.Empty)
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive)
+            : this(
+                  sources,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  string.Empty)
         {
         }
 
@@ -67,8 +79,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testSettings">
         /// Settings used for this run.
         /// </param>
-        public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings)
-            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, TimeSpan.MaxValue)
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings)
+            : this(
+                  sources,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  TimeSpan.MaxValue)
         {
         }
 
@@ -90,8 +111,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="runStatsChangeEventTimeout">
         /// Timeout that triggers sending results regardless of cache size.
         /// </param>
-        public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout)
-            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, null)
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout)
+            : this(
+                  sources,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  null)
         {
         }
 
@@ -123,7 +155,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             string testSettings,
             TimeSpan runStatsChangeEventTimeout,
             ITestHostLauncher testHostLauncher)
-            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher, null, null)
+            : this(
+                  sources,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  testHostLauncher,
+                  null,
+                  null)
         {
         }
 
@@ -163,10 +203,33 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             ITestHostLauncher testHostLauncher,
             string testCaseFilter,
             FilterOptions filterOptions)
-            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher, testCaseFilter, filterOptions, null)
+            : this(
+                  sources,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  testHostLauncher,
+                  testCaseFilter,
+                  filterOptions,
+                  testSessionInfo: null,
+                  debugEnabledForTestSession: false)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="frequencyOfRunStatsChangeEvent"></param>
+        /// <param name="keepAlive"></param>
+        /// <param name="testSettings"></param>
+        /// <param name="runStatsChangeEventTimeout"></param>
+        /// <param name="testHostLauncher"></param>
+        /// <param name="testCaseFilter"></param>
+        /// <param name="filterOptions"></param>
+        /// <param name="testSessionInfo"></param>
+        /// <param name="debugEnabledForTestSession"></param>
         public TestRunCriteria(
             IEnumerable<string> sources,
             long frequencyOfRunStatsChangeEvent,
@@ -176,8 +239,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             ITestHostLauncher testHostLauncher,
             string testCaseFilter,
             FilterOptions filterOptions,
-            TestSessionInfo testSessionInfo)
-            : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
+            TestSessionInfo testSessionInfo,
+            bool debugEnabledForTestSession)
+            : base(
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  testHostLauncher)
         {
             var testSources = sources as IList<string> ?? sources.ToList();
             ValidateArg.NotNullOrEmpty(testSources, "sources");
@@ -189,6 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.FilterOptions = filterOptions;
 
             this.TestSessionInfo = testSessionInfo;
+            this.DebugEnabledForTestSession = debugEnabledForTestSession;
         }
 
         /// <summary>
@@ -201,7 +271,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testRunCriteria">
         /// The TestRunCriteria
         /// </param>
-        public TestRunCriteria(IEnumerable<string> sources, TestRunCriteria testRunCriteria)
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            TestRunCriteria testRunCriteria)
             : base(testRunCriteria)
         {
             var testSources = sources as IList<string> ?? sources.ToArray();
@@ -243,7 +315,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             string testSettings,
             TimeSpan runStatsChangeEventTimeout,
             ITestHostLauncher testHostLauncher)
-            : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
+            : base(
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  testHostLauncher)
         {
             ValidateArg.NotNullOrEmpty(adapterSourceMap, "adapterSourceMap");
 
@@ -259,8 +336,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of run stats event
         /// </param>
-        public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent)
-            : this(tests, frequencyOfRunStatsChangeEvent, false)
+        public TestRunCriteria(
+            IEnumerable<TestCase> tests,
+            long frequencyOfRunStatsChangeEvent)
+            : this(
+                  tests,
+                  frequencyOfRunStatsChangeEvent,
+                  false)
         {
         }
 
@@ -276,8 +358,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="keepAlive">
         /// Whether or not to keep the test executor process alive after run completion
         /// </param>
-        public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive)
-            : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, string.Empty)
+        public TestRunCriteria(
+            IEnumerable<TestCase> tests,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive)
+            : this(
+                  tests,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  string.Empty)
         {
         }
 
@@ -296,8 +385,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testSettings">
         /// Settings used for this run.
         /// </param>
-        public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings)
-            : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, TimeSpan.MaxValue)
+        public TestRunCriteria(
+            IEnumerable<TestCase> tests,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings)
+            : this(
+                  tests,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  TimeSpan.MaxValue)
         {
         }
 
@@ -319,8 +417,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="runStatsChangeEventTimeout">
         /// Timeout that triggers sending results regardless of cache size.
         /// </param>
-        public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout)
-            : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, null)
+        public TestRunCriteria(
+            IEnumerable<TestCase> tests,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout)
+            : this(
+                  tests,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  null)
         {
         }
 
@@ -363,11 +472,36 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testHostLauncher">
         /// Test host launcher. If null then default will be used.
         /// </param>
-        public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout, ITestHostLauncher testHostLauncher)
-            : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher, null)
+        public TestRunCriteria(
+            IEnumerable<TestCase> tests,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout,
+            ITestHostLauncher testHostLauncher)
+            : this(
+                  tests,
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  testHostLauncher,
+                  testSessionInfo: null,
+                  debugEnabledForTestSession: false)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tests"></param>
+        /// <param name="frequencyOfRunStatsChangeEvent"></param>
+        /// <param name="keepAlive"></param>
+        /// <param name="testSettings"></param>
+        /// <param name="runStatsChangeEventTimeout"></param>
+        /// <param name="testHostLauncher"></param>
+        /// <param name="testSessionInfo"></param>
+        /// <param name="debugEnabledForTestSession"></param>
         public TestRunCriteria(
             IEnumerable<TestCase> tests,
             long frequencyOfRunStatsChangeEvent,
@@ -375,14 +509,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             string testSettings,
             TimeSpan runStatsChangeEventTimeout,
             ITestHostLauncher testHostLauncher,
-            TestSessionInfo testSessionInfo)
-            : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
+            TestSessionInfo testSessionInfo,
+            bool debugEnabledForTestSession)
+            : base(
+                  frequencyOfRunStatsChangeEvent,
+                  keepAlive,
+                  testSettings,
+                  runStatsChangeEventTimeout,
+                  testHostLauncher)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
             ValidateArg.NotNullOrEmpty(testCases, "tests");
 
             this.Tests = testCases;
             this.TestSessionInfo = testSessionInfo;
+            this.DebugEnabledForTestSession = debugEnabledForTestSession;
         }
 
         /// <summary>
@@ -460,7 +601,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public TestSessionInfo TestSessionInfo { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool DebugEnabledForTestSession { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether run criteria is based on specific tests.

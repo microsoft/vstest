@@ -228,7 +228,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="testRunEventsRegistrar">event registrar for run events</param>
         /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if successful</returns>
-        public void RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
+        public void RunTests(
+            TestRunRequestPayload testRunRequestPayload,
+            ITestHostLauncher testHostLauncher,
+            ITestRunEventsRegistrar testRunEventsRegistrar,
+            ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
@@ -288,7 +292,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher,
                                   testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
                                   testRunRequestPayload.TestPlatformOptions?.FilterOptions,
-                                  testRunRequestPayload.TestSessionInfo);
+                                  testRunRequestPayload.TestSessionInfo,
+                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null && testRunRequestPayload.DebuggingEnabled);
             }
             else
             {
@@ -299,7 +304,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher,
-                                  testRunRequestPayload.TestSessionInfo);
+                                  testRunRequestPayload.TestSessionInfo,
+                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null && testRunRequestPayload.DebuggingEnabled);
             }
 
             // Run tests

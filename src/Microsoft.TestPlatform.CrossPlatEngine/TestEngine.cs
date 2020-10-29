@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
             }
 
-            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
+            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
@@ -89,7 +89,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return new ProxyDiscoveryManager(requestData, new TestRequestSender(requestData.ProtocolConfig, hostManager), hostManager);
             };
 
-            return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(requestData, proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
+            return !testHostManager.Shared
+                ? new ParallelProxyDiscoveryManager(
+                    requestData,
+                    proxyDiscoveryManagerCreator,
+                    parallelLevel,
+                    sharedHosts: testHostManager.Shared)
+                : proxyDiscoveryManagerCreator();
         }
 
         /// <summary>
@@ -120,12 +126,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
-            Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
+            Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
             {
                 if (testRunCriteria.TestSessionInfo != null)
                 {
-                    // Data collection was taken care of when creating the test session earlier.
-                    return new ProxyExecutionManager(testRunCriteria.TestSessionInfo);
+                    // In case we have an active test session, data collection needs were already
+                    // taken care of when first creating the session. As a consequence we always
+                    // return this proxy instead of choosing between the vanilla execution proxy
+                    // and the one with data collection enabled.
+                    return new ProxyExecutionManager(testRunCriteria.TestSessionInfo, testRunCriteria.DebugEnabledForTestSession);
                 }
 
                 // Create a new HostManager, to be associated with individual ProxyExecutionManager(&POM)
@@ -155,18 +164,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             };
 
             // parallelLevel = 1 for desktop should go via else route.
-            if (parallelLevel > 1 || !testHostManager.Shared)
-            {
-                return new ParallelProxyExecutionManager(
+            return (parallelLevel > 1 || !testHostManager.Shared)
+                ? new ParallelProxyExecutionManager(
                     requestData,
                     proxyExecutionManagerCreator,
                     parallelLevel,
-                    sharedHosts: testHostManager.Shared);
-            }
-            else
-            {
-                return proxyExecutionManagerCreator();
-            }
+                    sharedHosts: testHostManager.Shared)
+                : proxyExecutionManagerCreator();
         }
 
         public IProxyTestSessionManager GetTestSessionManager(
@@ -183,14 +187,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(testSessionCriteria.RunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
-                var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
-                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
-                // TODO: What should happen here ? In process doesn't necessarily mean only one testhost.
-
-                //return testRunnerProxy;
+                // This condition is the equivalent of the in-process proxy execution manager case.
+                // In this case all tests will be run in the vstest.console process, so there's no
+                // test host to be started. As a consequence there'll be no session info.
+                return null;
             }
 
-            Func<ProxyOperationManager> proxyCreator = delegate
+            Func<ProxyOperationManager> proxyCreator = () =>
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);

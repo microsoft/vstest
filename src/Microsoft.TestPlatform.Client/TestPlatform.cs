@@ -159,6 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
+            // NOTE: This should not be set when we have test session info available.
             if (testRunCriteria.TestHostLauncher != null)
             {
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
@@ -182,9 +183,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
 
             // Update extension assemblies from source when design mode is false.
+            // TODO: Is it possible for this code to run if we're not in design mode ?
             if (!runConfiguration.DesignMode)
             {
-                // TODO: Nothing to do if we're not in design mode ? This code shouldn't even be executed.
                 return;
             }
 
@@ -203,10 +204,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testHostManager, testSessionCriteria);
+            if (testSessionManager == null)
+            {
+                // The test session manager is null because the combination of runsettings and
+                // sources tells us we should run in-process (i.e. in vstest.console). Because
+                // of this no session will be created because there's no testhost to be launched.
+                // Expecting a subsequent call to execute tests with the same set of parameters.
+                eventsHandler.HandleStartTestSessionComplete(null);
+                return;
+            }
 
-            // TODO: What should happen on initialization ?
             testSessionManager.Initialize(false);
-
             testSessionManager.StartSession(testSessionCriteria, eventsHandler);
         }
 

@@ -413,7 +413,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     if (string.Equals(MessageType.StartTestSessionCallback, message.MessageType))
                     {
                         var ackPayload = this.dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
-                        eventsHandler.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
+                        eventsHandler?.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
                         return ackPayload.TestSessionInfo;
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
@@ -429,9 +429,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting StartTestSession operation due to error: {0}", exception);
-                eventsHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedStartTestSession);
+                eventsHandler?.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedStartTestSession);
 
-                eventsHandler.HandleStartTestSessionComplete(null);
+                eventsHandler?.HandleStartTestSessionComplete(null);
             }
 
             this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
@@ -446,6 +446,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
+            }
+
+            // Due to various considertaions it is possible to end up with a null test session
+            // after doing the start test session call. However, we should filter out requests
+            // to stop such a session at the request sender level.
+            // We do this here instead of on the wrapper level in order to benefit of the
+            // testplatform events being fired still.
+            if (testSessionInfo == null)
+            {
+                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+                return;
             }
 
             try

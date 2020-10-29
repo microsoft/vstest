@@ -56,17 +56,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             testHostManager.HostLaunched += this.TestHostLaunchedHandler;
         }
 
-        public ProxyExecutionManagerWithDataCollection(TestSessionInfo testSessionInfo, IProxyDataCollectionManager proxyDataCollectionManager)
-            : base(testSessionInfo)
-        {
-            this.ProxyDataCollectionManager = proxyDataCollectionManager;
-            this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
-            this.requestData = this.ProxyOperationManager.RequestData;
-            this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
-
-            this.ProxyOperationManager.TestHostManager.HostLaunched += this.TestHostLaunchedHandler;
-        }
-
         private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
         {
             this.ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);

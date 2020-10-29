@@ -39,16 +39,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
         private TestSessionInfo testSessionInfo = null;
+        private bool debugEnabledForTestSession = false;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
 
         #region Constructors
 
-        public ProxyExecutionManager(TestSessionInfo testSessionInfo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="testSessionInfo"></param>
+        /// <param name="debugEnabledForTestSession"></param>
+        public ProxyExecutionManager(TestSessionInfo testSessionInfo, bool debugEnabledForTestSession)
         {
+            // Filling in test session info and proxy information.
             this.testSessionInfo = testSessionInfo;
             this.ProxyOperationManager = TestSessionPool.Instance.TakeProxy(this.testSessionInfo);
+            // This should be set to enable debugging when we have test session info available.
+            this.debugEnabledForTestSession = debugEnabledForTestSession;
+
             this.testHostManager = this.ProxyOperationManager.TestHostManager;
             this.dataSerializer = JsonDataSerializer.Instance;
             this.isCommunicationEstablished = false;
@@ -140,12 +150,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         isDataCollectionEnabled: false,
                         areTestCaseLevelEventsRequired: false,
                         hasTestRun: true,
-                        isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
+                        isDebug:
+                            (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug)
+                            || this.debugEnabledForTestSession,
                         testCaseFilter: testRunCriteria.TestCaseFilter,
                         filterOptions: testRunCriteria.FilterOptions);
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
-                    var runsettings = this.ProxyOperationManager.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message); });
+                    var runsettings = this.ProxyOperationManager.RemoveNodesFromRunsettingsIfRequired(
+                        testRunCriteria.TestRunSettings,
+                        (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message); });
 
                     if (testRunCriteria.HasSpecificSources)
                     {

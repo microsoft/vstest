@@ -98,7 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 return this.id;
             }
         }
-
         #endregion
 
         #region IProxyOperationManager implementation.
@@ -128,100 +127,101 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
-            if (!this.initialized)
+            if (this.initialized)
             {
-                var connTimeout = EnvironmentHelper.GetConnectionTimeout();
-
-                this.testHostProcessStdError = string.Empty;
-                TestHostConnectionInfo testHostConnectionInfo = this.TestHostManager.GetTestHostConnectionInfo();
-                
-                var portNumber = 0;
-
-                if (testHostConnectionInfo.Role == ConnectionRole.Client)
-                {
-                    portNumber = this.RequestSender.InitializeCommunication();
-                    testHostConnectionInfo.Endpoint += portNumber;
-                }
-
-                var processId = this.processHelper.GetCurrentProcessId();
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), TraceLevel = (int)EqtTrace.TraceLevel };
-
-                // Subscribe to TestHost Event
-                this.TestHostManager.HostLaunched += this.TestHostManagerHostLaunched;
-                this.TestHostManager.HostExited += this.TestHostManagerHostExited;
-
-                // Get envVars from run settings
-                var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
-
-                // Get the test process start info
-                var testHostStartInfo = this.UpdateTestProcessStartInfo(this.TestHostManager.GetTestHostProcessStartInfo(sources, envVars, connectionInfo));
-                try
-                {
-                    // Launch the test host.
-                    var hostLaunchedTask = this.TestHostManager.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
-                    this.testHostLaunched = hostLaunchedTask.Result;
-
-                    if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
-                    {
-                        // If test runtime is service host, try to poll for connection as client
-                        this.RequestSender.InitializeCommunication();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
-
-                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
-                }
-
-                // Warn the user that execution will wait for debugger attach.
-                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
-
-                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
-                    new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-                    !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
-                    ConsoleOutput.Instance.WriteLine(
-                        string.Format("Process Id: {0}, Name: {1}", this.testHostProcessId, this.processHelper.GetProcessName(this.testHostProcessId)),
-                        OutputLevel.Information);
-
-                    // Increase connection timeout when debugging is enabled.
-                    connTimeout *= 5;
-                }
-
-                // If TestHost does not launch then throw exception
-                // If Testhost launches, wait for connection.
-                if (!this.testHostLaunched ||
-                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
-                {
-                    EqtTrace.Verbose($"Test host failed to start Test host launched:{testHostLaunched} test host exited: {testHostExited.IsSet}");
-                    // Throw a test platform exception with the appropriate message if user requested cancellation
-                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
-
-                    // Throw a test platform exception along with the error messages from the test if the test host exited unexpectedly
-                    // before communication was established
-                    this.ThrowOnTestHostExited(this.testHostExited.IsSet);
-
-                    // Throw a test platform exception stating the connection to test could not be established even after waiting
-                    // for the configure timeout period
-                    this.ThrowExceptionOnConnectionFailure(connTimeout);
-                }
-
-                // Handling special case for dotnet core projects with older test hosts
-                // Older test hosts are not aware of protocol version check
-                // Hence we should not be sending VersionCheck message to these test hosts
-                this.CompatIssueWithVersionCheckAndRunsettings();
-
-                if (this.versionCheckRequired)
-                {
-                    this.RequestSender.CheckVersionWithTestHost();
-                }
-
-                this.initialized = true;
+                return true;
             }
+
+            var connTimeout = EnvironmentHelper.GetConnectionTimeout();
+
+            this.testHostProcessStdError = string.Empty;
+            TestHostConnectionInfo testHostConnectionInfo = this.TestHostManager.GetTestHostConnectionInfo();
+                
+            var portNumber = 0;
+            if (testHostConnectionInfo.Role == ConnectionRole.Client)
+            {
+                portNumber = this.RequestSender.InitializeCommunication();
+                testHostConnectionInfo.Endpoint += portNumber;
+            }
+
+            var processId = this.processHelper.GetCurrentProcessId();
+            var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), TraceLevel = (int)EqtTrace.TraceLevel };
+
+            // Subscribe to TestHost Event
+            this.TestHostManager.HostLaunched += this.TestHostManagerHostLaunched;
+            this.TestHostManager.HostExited += this.TestHostManagerHostExited;
+
+            // Get envVars from run settings
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
+
+            // Get the test process start info
+            var testHostStartInfo = this.UpdateTestProcessStartInfo(this.TestHostManager.GetTestHostProcessStartInfo(sources, envVars, connectionInfo));
+            try
+            {
+                // Launch the test host.
+                var hostLaunchedTask = this.TestHostManager.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
+                this.testHostLaunched = hostLaunchedTask.Result;
+
+                if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
+                {
+                    // If test runtime is service host, try to poll for connection as client
+                    this.RequestSender.InitializeCommunication();
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
+
+                this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
+            }
+
+            // Warn the user that execution will wait for debugger attach.
+            var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+            var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
+
+            if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
+                new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
+                ConsoleOutput.Instance.WriteLine(
+                    string.Format("Process Id: {0}, Name: {1}", this.testHostProcessId, this.processHelper.GetProcessName(this.testHostProcessId)),
+                    OutputLevel.Information);
+
+                // Increase connection timeout when debugging is enabled.
+                connTimeout *= 5;
+            }
+
+            // If TestHost does not launch then throw exception
+            // If Testhost launches, wait for connection.
+            if (!this.testHostLaunched ||
+                !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
+            {
+                EqtTrace.Verbose($"Test host failed to start Test host launched:{testHostLaunched} test host exited: {testHostExited.IsSet}");
+                // Throw a test platform exception with the appropriate message if user requested cancellation
+                this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+
+                // Throw a test platform exception along with the error messages from the test if the test host exited unexpectedly
+                // before communication was established
+                this.ThrowOnTestHostExited(this.testHostExited.IsSet);
+
+                // Throw a test platform exception stating the connection to test could not be established even after waiting
+                // for the configure timeout period
+                this.ThrowExceptionOnConnectionFailure(connTimeout);
+            }
+
+            // Handling special case for dotnet core projects with older test hosts
+            // Older test hosts are not aware of protocol version check
+            // Hence we should not be sending VersionCheck message to these test hosts
+            this.CompatIssueWithVersionCheckAndRunsettings();
+
+            if (this.versionCheckRequired)
+            {
+                this.RequestSender.CheckVersionWithTestHost();
+            }
+
+            this.initialized = true;
 
             return true;
         }
