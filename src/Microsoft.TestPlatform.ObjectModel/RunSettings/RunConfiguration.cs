@@ -84,6 +84,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private string targetDevice;
 
+        /// <summary>
+        /// Defines if Test Platform should return non-zero value if no tests found and executed
+        /// </summary>
+        private bool failWhenNoTestsFound;
+
         #endregion
 
         #region Constructor
@@ -305,6 +310,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.framework = value;
                 this.TargetFrameworkSet = true;
+            }
+        }
+
+        public bool FailWhenNoTestsFound
+        {
+            get
+            {
+                return failWhenNoTestsFound;
+            }
+            set
+            {
+                this.failWhenNoTestsFound = value;
             }
         }
 
@@ -594,6 +611,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 root.AppendChild(dotnetHostPath);
             }
 
+            if (this.FailWhenNoTestsFound)
+            {
+                XmlElement treatAsError = doc.CreateElement(nameof(FailWhenNoTestsFound));
+                treatAsError.InnerText = this.FailWhenNoTestsFound.ToString();
+                root.AppendChild(treatAsError);
+            }
+
             return root;
         }
 
@@ -754,7 +778,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             bool disableParallelizationCheck;
                             if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))
                             {
-                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableParallelizationValueString, elementName));
                             }
                             runConfiguration.DisableParallelization = disableParallelizationCheck;
@@ -898,6 +922,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "DotNetHostPath":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
+                            break;
+                        case "FailWhenNoTestsFound":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            string failWhenNoTestsFoundValueString = reader.ReadElementContentAsString();
+                            bool failWhenNoTestsFound;
+                            if (!bool.TryParse(failWhenNoTestsFoundValueString, out failWhenNoTestsFound))
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, failWhenNoTestsFoundValueString, elementName));
+                            }
+                            runConfiguration.FailWhenNoTestsFound = failWhenNoTestsFound;
                             break;
 
                         default:

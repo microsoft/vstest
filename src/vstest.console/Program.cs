@@ -4,7 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -24,22 +26,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
 
-                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                var currentProcess = Process.GetCurrentProcess();
                 ConsoleOutput.Instance.WriteLine(
                     string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
                     OutputLevel.Information);
 
-                while (!System.Diagnostics.Debugger.IsAttached)
+                while (!Debugger.IsAttached)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                 }
 
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             }
 
             SetCultureSpecifiedByUser();
-
-            return new Executor(ConsoleOutput.Instance).Execute(args);
+            int exitCode = new Executor(ConsoleOutput.Instance).Execute(args);
+            ConsoleOutput.Instance.WriteLine(string.Format("ExitCode {0}", exitCode), OutputLevel.Information);
+            return exitCode;
         }
 
         private static void SetCultureSpecifiedByUser()

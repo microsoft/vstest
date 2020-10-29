@@ -130,6 +130,46 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             return cpuCount;
         }
+        /// <summary>
+        /// Gets the value of FailWhenNoTestsFound parameter from runsettings file
+        /// </summary>
+        /// <param name="runSettings">Runsetting string value</param>
+        /// <returns>The value of FailWhenNoTestsFound</returns>
+        public static bool GetFailWhenNoTestsFound(string runSettings)
+        {
+            bool failWhenNoTestFound = false;
+
+            if (runSettings != null)
+            {
+                try
+                {
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+                    failWhenNoTestFound = GetFailWhenNoTestsFound(runConfiguration);
+                }
+                catch (SettingsException se)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("RunSpecificTestsArgumentProcessor.GetFailWhenNoTestsFound: Unable to get the value of FailWhenNoTestsFound from runsettings: Error {0}", se);
+                    }
+                }
+            }
+
+            return failWhenNoTestFound;
+        }
+
+        private static bool GetFailWhenNoTestsFound(RunConfiguration runConfiguration)
+        {
+            bool failWhenNoTestsFound = false;
+
+            if (runConfiguration != null)
+            {
+                failWhenNoTestsFound = runConfiguration.FailWhenNoTestsFound;
+            }
+
+            return failWhenNoTestsFound;
+        }
+
 
         /// <summary>
         /// Gets the test adapters path from the run configuration
