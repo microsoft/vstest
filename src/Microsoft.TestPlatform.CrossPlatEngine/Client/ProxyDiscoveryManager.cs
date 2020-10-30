@@ -67,11 +67,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Constructor with dependency injection. Used for unit testing.
         /// </remarks>
         /// 
+        /// <param name="requestData">
+        /// The request data for providing discovery services and data.
+        /// </param>
         /// <param name="requestSender">The request sender.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="dataSerializer">The data serializer.</param>
         /// <param name="fileHelper">The file helper.</param>
-        internal ProxyDiscoveryManager(IRequestData requestData,
+        internal ProxyDiscoveryManager(
+            IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
