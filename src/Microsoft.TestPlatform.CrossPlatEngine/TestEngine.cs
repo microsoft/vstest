@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -52,21 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         #region ITestEngine implementation
 
-        /// <summary>
-        /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
-        /// </summary>
-        /// <param name="requestData">
-        /// The request data for providing discovery services and data.
-        /// </param>
-        /// <param name="testHostManager">
-        ///     Test host manager
-        /// </param>
-        /// <param name="discoveryCriteria">
-        ///     The discovery Criteria.
-        /// </param>
-        /// <returns>
-        /// ITestDiscoveryManager object that can do discovery
-        /// </returns>
+        /// <inheritdoc/>
         public IProxyDiscoveryManager GetDiscoveryManager(IRequestData requestData, ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria)
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
@@ -98,15 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 : proxyDiscoveryManagerCreator();
         }
 
-        /// <summary>
-        /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
-        /// </summary>
-        /// <param name="requestData">The request data for providing execution services and data</param>
-        /// <param name="testHostManager">Test host manager.</param>
-        /// <param name="testRunCriteria">Test run criterion.</param>
-        /// <returns>
-        /// ITestExecutionManager object that can do execution
-        /// </returns>
+        /// <inheritdoc/>
         public IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria)
         {
             var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
@@ -173,6 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 : proxyExecutionManagerCreator();
         }
 
+        /// <inheritdoc/>
         public IProxyTestSessionManager GetTestSessionManager(
             IRequestData requestData,
             ITestRuntimeProvider testHostManager,
@@ -223,20 +201,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return new ProxyTestSessionManager(parallelLevel, proxyCreator);
         }
 
-        /// <summary>
-        /// Fetches the extension manager for this engine. This manager would provide extensibility features that this engine supports.
-        /// </summary>
-        /// <returns>ITestExtensionManager object that helps with extensibility</returns>
+        /// <inheritdoc/>
         public ITestExtensionManager GetExtensionManager()
         {
             return this.testExtensionManager ?? (this.testExtensionManager = new TestExtensionManager());
         }
 
-        /// <summary>
-        /// Fetches the logger manager for this engine. This manager will provide logger extensibility features that this engine supports.
-        /// </summary>
-        /// <param name="requestData">The request data for providing common execution services and data</param>
-        /// <returns>ITestLoggerManager object that helps with logger extensibility.</returns>
+        /// <inheritdoc/>
         public ITestLoggerManager GetLoggerManager(IRequestData requestData)
         {
             return new TestLoggerManager(

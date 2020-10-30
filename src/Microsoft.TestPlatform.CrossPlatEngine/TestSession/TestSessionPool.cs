@@ -66,7 +66,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         public bool RemoveSession(TestSessionInfo testSessionInfo)
         {
-            // TODO (copoiena): What happens if the session is running ?
+            // TODO (copoiena): What happens if some request is running for the current session ?
+            // Should we stop the request as well ? Probably yes.
             ProxyTestSessionManager proxyManager = null;
 
             lock (this.lockObject)

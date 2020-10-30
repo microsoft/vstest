@@ -6,14 +6,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// 
     /// </summary>
-    public class ProxyTestSessionManager : IProxyTestSessionManager
+    internal class ProxyTestSessionManager : IProxyTestSessionManager
     {
         private readonly object lockObject = new object();
         private int parallelLevel;
@@ -22,6 +22,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private Queue<Guid> availableProxyQueue;
         private IDictionary<Guid, ProxyOperationManagerContainer> proxyMap;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="parallelLevel"></param>
+        /// <param name="proxyCreator"></param>
         public ProxyTestSessionManager(int parallelLevel, Func<ProxyOperationManager> proxyCreator)
         {
             this.parallelLevel = parallelLevel;
@@ -30,11 +36,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             this.proxyMap = new Dictionary<Guid, ProxyOperationManagerContainer>();
         }
 
+        /// <inheritdoc/>
         public void Initialize(bool skipDefaultAdapters)
         {
             this.skipDefaultAdapters = skipDefaultAdapters;
         }
 
+        /// <inheritdoc/>
         public void StartSession(StartTestSessionCriteria criteria, ITestSessionEventsHandler eventsHandler)
         {
             var testSessionInfo = new TestSessionInfo();
@@ -56,19 +64,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             eventsHandler.HandleStartTestSessionComplete(testSessionInfo);
         }
 
+        /// <inheritdoc/>
         public void StopSession()
         {
             foreach (var kvp in this.proxyMap)
             {
-                // TODO: Do nothing for now because in the current implementation the testhosts are
-                // disposed of right after the test run is done. However, when we'll decide to
-                // re-use the testhosts for discovery & execution we'll perform some changes for
-                // keeping them alive indefinetely, so the responsability for killing testhosts
-                // will be with the users of the vstest.console wrapper. Then we'll need to be able
-                // to dispose of the testhosts here.
+                // TODO (copoiena): Do nothing for now because in the current implementation the
+                // testhosts are disposed of right after the test run is done. However, when we'll
+                // decide to re-use the testhosts for discovery & execution we'll perform some
+                // changes for keeping them alive indefinetely, so the responsability for killing
+                // testhosts will be with the users of the vstest.console wrapper. Then we'll need
+                // to be able to dispose of the testhosts here.
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <returns></returns>
         public ProxyOperationManager DequeueProxy()
         {
             ProxyOperationManagerContainer proxyContainer = null;
@@ -89,6 +103,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return proxyContainer.Proxy;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /// <param name="proxyId"></param>
         public void EnqueueProxy(Guid proxyId)
         {
             lock (this.lockObject)
@@ -131,6 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// 
         /// </summary>
+        /// 
         /// <param name="proxy"></param>
         /// <param name="available"></param>
         public ProxyOperationManagerContainer(ProxyOperationManager proxy, bool available)
