@@ -5,9 +5,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
     using System;
     using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class TestSessionPool
     {
         private static object instanceLockObject = new object();
@@ -16,11 +20,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private object lockObject = new object();
         private Dictionary<TestSessionInfo, ProxyTestSessionManager> sessionPool;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private TestSessionPool()
         {
             this.sessionPool = new Dictionary<TestSessionInfo, ProxyTestSessionManager>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static TestSessionPool Instance
         {
             get
@@ -40,28 +50,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
         }
 
-        public void AddSession(TestSessionInfo testSessionInfo, ProxyTestSessionManager proxyManager)
+        public bool AddSession(TestSessionInfo testSessionInfo, ProxyTestSessionManager proxyManager)
         {
             lock (this.lockObject)
             {
                 if (this.sessionPool.ContainsKey(testSessionInfo))
                 {
-                    throw new ArgumentException("");
+                    return false;
                 }
 
                 this.sessionPool.Add(testSessionInfo, proxyManager);
+                return true;
             }
         }
 
-        public void RemoveSession(TestSessionInfo testSessionInfo)
+        public bool RemoveSession(TestSessionInfo testSessionInfo)
         {
+            // TODO (copoiena): What happens if the session is running ?
             ProxyTestSessionManager proxyManager = null;
 
             lock (this.lockObject)
             {
                 if (!this.sessionPool.ContainsKey(testSessionInfo))
                 {
-                    throw new ArgumentException("");
+                    return false;
                 }
 
                 proxyManager = this.sessionPool[testSessionInfo];
@@ -69,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             proxyManager.StopSession();
+            return true;
         }
 
         public ProxyOperationManager TakeProxy(TestSessionInfo testSessionInfo)

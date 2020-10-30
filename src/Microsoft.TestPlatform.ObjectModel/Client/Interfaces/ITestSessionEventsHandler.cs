@@ -11,13 +11,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Dispatch StartTestSession complete event to listeners.
         /// </summary>
+        /// 
         /// <param name="testSessionInfo">The test session info.</param>
         void HandleStartTestSessionComplete(TestSessionInfo testSessionInfo);
 
         /// <summary>
-        /// 
+        /// Dispatch StopTestSession complete event to listeners.
         /// </summary>
-        /// <param name="stopped"></param>
+        /// 
+        /// <param name="stopped">
+        /// True if the session was successfully stopped, false otherwise.
+        /// </param>
         void HandleStopTestSessionComplete(bool stopped);
     }
 }

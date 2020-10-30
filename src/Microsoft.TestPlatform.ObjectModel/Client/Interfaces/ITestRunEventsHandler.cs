@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     }
 
     /// <summary>
-    /// Interface for handling generic message events during test discovery or execution
+    /// Interface for handling generic message events during various operations
     /// </summary>
     public interface ITestMessageEventHandler
     {

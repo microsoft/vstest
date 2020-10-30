@@ -133,7 +133,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// <param name="testSessionInfo"></param>
         /// <param name="eventsHandler"></param>
-        void StopTestSession(
+        bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler);
 

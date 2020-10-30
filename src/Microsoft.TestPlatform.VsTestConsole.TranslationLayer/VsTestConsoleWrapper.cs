@@ -461,14 +461,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void StopTestSession(
+        public bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
         {
             this.testPlatformEventSource.TranslationLayerStopTestSessionStart();
 
             this.EnsureInitialized();
-            this.requestSender.StopTestSession(testSessionInfo, eventsHandler);
+            return this.requestSender.StopTestSession(testSessionInfo, eventsHandler);
         }
 
         /// <inheritdoc/>

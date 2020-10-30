@@ -397,8 +397,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 var payload = new StartTestSessionPayload
                 {
-                    // TODO: Custom testhost launcher for discovery should be set on false !
-                    // TODO2: Should add TestPlatform options ?
+                    // TODO (copoiena): Custom testhost launcher for discovery should be set on false !
+                    // TODO (copoiena): Should add TestPlatform options ?
                     Sources = sources,
                     RunSettings = runSettings,
                     CustomLauncher = (testHostLauncher != null),
@@ -410,19 +410,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     var message = this.TryReceiveMessage();
 
-                    if (string.Equals(MessageType.StartTestSessionCallback, message.MessageType))
+                    switch (message.MessageType)
                     {
-                        var ackPayload = this.dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
-                        eventsHandler?.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
-                        return ackPayload.TestSessionInfo;
-                    }
-                    else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
-                    {
-                        this.HandleCustomHostLaunch(testHostLauncher, message);
-                    }
-                    else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
-                    {
-                        this.AttachDebuggerToProcess(testHostLauncher, message);
+                        case MessageType.StartTestSessionCallback:
+                            var ackPayload = this.dataSerializer.DeserializePayload<StartTestSessionAckPayload>(message);
+                            eventsHandler?.HandleStartTestSessionComplete(ackPayload.TestSessionInfo);
+                            return ackPayload.TestSessionInfo;
+
+                        case MessageType.CustomTestHostLaunch:
+                            this.HandleCustomHostLaunch(testHostLauncher, message);
+                            break;
+
+                        case MessageType.EditorAttachDebugger:
+                            this.AttachDebuggerToProcess(testHostLauncher, message);
+                            break;
+
+                        case MessageType.TestMessage:
+                            var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                            eventsHandler?.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                            break;
+
+                        default:
+                            EqtTrace.Warning(
+                                "VsTestConsoleRequestSender.StartTestSession: Unexpected message received: {0}",
+                                message.MessageType);
+                            break;
                     }
                 }
             }
@@ -439,7 +451,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void StopTestSession(
+        public bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
         {
@@ -450,13 +462,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             // Due to various considertaions it is possible to end up with a null test session
             // after doing the start test session call. However, we should filter out requests
-            // to stop such a session at the request sender level.
+            // to stop such a session as soon as possible, at the request sender level.
+            //
             // We do this here instead of on the wrapper level in order to benefit of the
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
                 this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
-                return;
+                return true;
             }
 
             try
@@ -466,11 +479,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     var message = this.TryReceiveMessage();
 
-                    if (string.Equals(MessageType.StopTestSessionCallback, message.MessageType))
+                    switch (message.MessageType)
                     {
-                        var ack = this.dataSerializer.DeserializePayload<bool>(message);
-                        eventsHandler.HandleStopTestSessionComplete(ack);
-                        return;
+                        case MessageType.StopTestSessionCallback:
+                            var stopped = this.dataSerializer.DeserializePayload<bool>(message);
+                            eventsHandler?.HandleStopTestSessionComplete(stopped);
+                            return stopped;
+
+                        case MessageType.TestMessage:
+                            var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                            eventsHandler?.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                            break;
+
+                        default:
+                            EqtTrace.Warning(
+                                "VsTestConsoleRequestSender.StopTestSession: Unexpected message received: {0}",
+                                message.MessageType);
+                            break;
                     }
                 }
             }
@@ -483,6 +508,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 
             this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            return false;
         }
 
         /// <inheritdoc/>

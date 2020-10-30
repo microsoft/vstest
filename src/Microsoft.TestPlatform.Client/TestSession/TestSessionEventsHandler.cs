@@ -10,16 +10,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// 
+    /// Defines the way in which test session events should be handled.
     /// </summary>
-    public class TestSessionEventsHandler : ITestSessionEventsHandler
+    internal class TestSessionEventsHandler : ITestSessionEventsHandler
     {
         private readonly ICommunicationManager communicationManager;
 
         /// <summary>
-        /// 
+        /// Creates an instance of the current class.
         /// </summary>
-        /// <param name="communicationManager"></param>
+        /// 
+        /// <param name="communicationManager">
+        /// The communication manager used for passing messages around.
+        /// </param>
         public TestSessionEventsHandler(ICommunicationManager communicationManager)
         {
             this.communicationManager = communicationManager;
@@ -39,13 +42,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <inheritdoc />
         public void HandleStopTestSessionComplete(bool stopped)
         {
-            // TODO: Add implementation.
+            this.communicationManager.SendMessage(MessageType.StopTestSessionCallback, stopped);
         }
 
         /// <inheritdoc />
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            // No-op.
+            var messagePayload = new TestMessagePayload()
+            {
+                MessageLevel = level,
+                Message = message
+            };
+
+            this.communicationManager.SendMessage(MessageType.TestMessage, messagePayload);
         }
 
         /// <inheritdoc />
