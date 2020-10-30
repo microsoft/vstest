@@ -263,5 +263,79 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.StdOutputContains(expectedWarningContains);
             }
         }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldReturnOneWhenFailWhenNoTestsFoundParameterSetToTrueAndNoTestAvailableWithFilter(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            
+            // Setting /TestCaseFilter to random test name, which does not exists
+            arguments = string.Concat(arguments, " /TestCaseFilter:SomeRandomTestName");
+
+            // set FailWhenNoTestsFound to true
+            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=true");
+            this.InvokeVsTest(arguments);
+
+            this.ExitCodeEquals(1);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldReturnZeroWhenFailWhenNoTestsFoundParameterSetToTrueAndNoTestAvailableWithFilter(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            
+            // Setting /TestCaseFilter to random test name, which does not exists
+            arguments = string.Concat(arguments, " /TestCaseFilter:SomeRandomTestName");
+
+            // set FailWhenNoTestsFound to true
+            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=false");
+            this.InvokeVsTest(arguments);
+
+            this.ExitCodeEquals(0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldNotDependOnFailWhenNoTestsFoundTrueValueWhenTestsAreAvailable(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            // set FailWhenNoTestsFound to true
+            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=true");
+            this.InvokeVsTest(arguments);
+
+            this.ExitCodeEquals(1);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldNotDependOnFailWhenNoTestsFoundFalseValueWhenTestsAreAvailable(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            // set FailWhenNoTestsFound to true
+            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=true");
+            this.InvokeVsTest(arguments);
+
+            this.ExitCodeEquals(1);
+        }
     }
 }

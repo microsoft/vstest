@@ -40,9 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             SetCultureSpecifiedByUser();
-            int exitCode = new Executor(ConsoleOutput.Instance).Execute(args);
-            ConsoleOutput.Instance.WriteLine(string.Format("ExitCode {0}", exitCode), OutputLevel.Information);
-            return exitCode;
+            return new Executor(ConsoleOutput.Instance).Execute(args);
         }
 
         private static void SetCultureSpecifiedByUser()
