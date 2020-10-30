@@ -442,13 +442,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string runSettings,
             ITestSessionEventsHandler eventsHandler)
         {
-            return this.StartTestSession(sources, runSettings, eventsHandler, testHostLauncher: null);
+            return this.StartTestSession(sources, runSettings, options: null, eventsHandler);
         }
 
         /// <inheritdoc/>
         public ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
+            TestPlatformOptions options,
+            ITestSessionEventsHandler eventsHandler)
+        {
+            return this.StartTestSession(sources, runSettings, options, eventsHandler, testHostLauncher: null);
+        }
+
+        /// <inheritdoc/>
+        public ITestSession StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
             ITestSessionEventsHandler eventsHandler,
             ITestHostLauncher testHostLauncher)
         {
@@ -456,7 +467,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             this.EnsureInitialized();
             return new TestSession(
-                this.requestSender.StartTestSession(sources, runSettings, eventsHandler, testHostLauncher),
+                this.requestSender.StartTestSession(sources, runSettings, options, eventsHandler, testHostLauncher),
                 this);
         }
 

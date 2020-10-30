@@ -533,8 +533,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 try
                 {
-                    var customLauncher = payload.CustomLauncher
-                        ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.DebuggingEnabled)
+                    var customLauncher = payload.HasCustomHostLauncher
+                        ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.IsDebuggingEnabled)
                         : null;
 
                     requestManager.ResetOptions();

@@ -30,13 +30,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public FilterOptions FilterOptions { get; set; }
 
         /// <summary>
-        ///  Gets or sets whether Metrics should be collected or not.
+        /// Gets or sets whether Metrics should be collected or not.
         /// </summary>
         [DataMember]
         public bool CollectMetrics { get; set; }
 
         /// <summary>
-        ///  Gets or sets whether default adapters should be skipped or not.
+        /// Gets or sets whether default adapters should be skipped or not.
         /// </summary>
         [DataMember]
         public bool SkipDefaultAdapters { get; set; }

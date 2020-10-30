@@ -385,6 +385,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public TestSessionInfo StartTestSession(
             IList<string> sources,
             string runSettings,
+            TestPlatformOptions options,
             ITestSessionEventsHandler eventsHandler,
             ITestHostLauncher testHostLauncher)
         {
@@ -397,12 +398,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 var payload = new StartTestSessionPayload
                 {
-                    // TODO (copoiena): Custom testhost launcher for discovery should be set on false !
-                    // TODO (copoiena): Should add TestPlatform options ?
+                    // TODO (copoiena): When sharing the test host between test discovery and test
+                    // execution, should we use the test host launcher to launch it ? What side
+                    // effects does this have ?
+                    //
+                    // This is useful for profiling and maybe for launching hosts other than the
+                    // ones managed by us (i.e., the default host and the dotnet host), examples
+                    // including UWP and other hosts that don't implement the ITestRuntimeProvider2
+                    // interface and/or are not aware of the possibility of attaching to an already
+                    // running process.
                     Sources = sources,
                     RunSettings = runSettings,
-                    CustomLauncher = (testHostLauncher != null),
-                    DebuggingEnabled = (testHostLauncher != null) ? testHostLauncher.IsDebug : false,
+                    HasCustomHostLauncher = testHostLauncher != null,
+                    IsDebuggingEnabled = (testHostLauncher != null) ? testHostLauncher.IsDebug : false,
+                    TestPlatformOptions = options
                 };
 
                 this.communicationManager.SendMessage(MessageType.StartTestSession, payload, this.protocolVersion);

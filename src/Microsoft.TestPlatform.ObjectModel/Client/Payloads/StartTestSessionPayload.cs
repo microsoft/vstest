@@ -7,38 +7,39 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Class used to define the StartTestSessionPayload sent by the vstest.console translation layers into design mode.
+    /// Class used to define the start test session payload sent by the vstest.console translation
+    /// layers into design mode.
     /// </summary>
     public class StartTestSessionPayload
     {
         /// <summary>
-        /// RunSettings used for starting the test session.
+        /// Gets or sets the sources used for starting the test session.
         /// </summary>
         [DataMember]
         public IList<string> Sources { get; set; }
 
         /// <summary>
-        /// RunSettings used for starting the test session.
+        /// Gets or sets the run settings used for starting the test session.
         /// </summary>
         [DataMember]
         public string RunSettings { get; set; }
 
         /// <summary>
-        /// Should metrics collection be enabled ?
+        /// Gets or sets a flag indicating if debugging is enabled.
         /// </summary>
         [DataMember]
-        public bool CollectMetrics { get; set; }
+        public bool IsDebuggingEnabled { get; set; }
 
         /// <summary>
-        /// Is Debugging enabled
+        /// Gets or sets a flag indicating if a custom host launcher should be used.
         /// </summary>
         [DataMember]
-        public bool DebuggingEnabled { get; set; }
+        public bool HasCustomHostLauncher { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the test platform options.
         /// </summary>
         [DataMember]
-        public bool CustomLauncher { get; set; }
+        public TestPlatformOptions TestPlatformOptions { get; set; }
     }
 }

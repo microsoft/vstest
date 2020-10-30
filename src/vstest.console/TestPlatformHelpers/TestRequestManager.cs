@@ -379,7 +379,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.StartTestSession: Starting test session.");
 
-            this.telemetryOptedIn = payload.CollectMetrics;
+            if (payload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = payload.TestPlatformOptions.CollectMetrics;
+            }
+
             var requestData = this.GetRequestData(protocolConfig);
 
             if (this.UpdateRunSettingsIfRequired(payload.RunSettings, payload.Sources, null, out string updatedRunsettings))
@@ -392,7 +396,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, payload.RunSettings));
             }
 
-            // TODO: Collect metrics ?
+            // TODO (copoiena): Collect metrics ?
 
             // Make sure to run the run request inside a lock as the below section is not thread-safe.
             // There can be only one discovery, execution or attachments processing request at a given point in time.

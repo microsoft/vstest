@@ -254,12 +254,28 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// <param name="sources"></param>
         /// <param name="runSettings"></param>
+        /// <param name="options"></param>
+        /// <param name="eventsHandler"></param>
+        /// <returns></returns>
+        ITestSession StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestSessionEventsHandler eventsHandler);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="runSettings"></param>
+        /// <param name="options"></param>
         /// <param name="eventsHandler"></param>
         /// <param name="testHostLauncher"></param>
         /// <returns></returns>
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
+            TestPlatformOptions options,
             ITestSessionEventsHandler eventsHandler,
             ITestHostLauncher testHostLauncher);
 
