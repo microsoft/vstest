@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     /// <summary>
     /// 
     /// </summary>
-    internal class ProxyTestSessionManager : IProxyTestSessionManager
+    public class ProxyTestSessionManager : IProxyTestSessionManager
     {
         private readonly object lockObject = new object();
         private int parallelLevel;

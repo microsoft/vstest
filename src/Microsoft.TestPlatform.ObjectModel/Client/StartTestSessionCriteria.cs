@@ -8,32 +8,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// 
+    /// Class used to define the start test session criteria.
     /// </summary>
     [DataContract]
     public class StartTestSessionCriteria
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public StartTestSessionCriteria()
-        {
-        }
-
-        /// <summary>
-        /// 
+        /// Gets or sets the sources used for starting the test session.
         /// </summary>
         [DataMember]
         public IList<string> Sources { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the run settings used for starting the test session.
         /// </summary>
         [DataMember]
         public string RunSettings { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the test host launcher used for starting the test session.
         /// </summary>
         [DataMember]
         public ITestHostLauncher TestHostLauncher { get; set; }

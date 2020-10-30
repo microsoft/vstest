@@ -14,8 +14,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     public class TestSession : ITestSession
     {
-        //private string runSettings;
-        //private IList<string> sources;
         private TestSessionInfo testSessionInfo;
         private VsTestConsoleWrapper consoleWrapper;
 
@@ -26,8 +24,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="consoleWrapper"></param>
         public TestSession(TestSessionInfo testSessionInfo, VsTestConsoleWrapper consoleWrapper)
         {
-            //this.runSettings = "";
-            //this.sources = null;
             this.testSessionInfo = testSessionInfo;
             this.consoleWrapper = consoleWrapper;
         }
