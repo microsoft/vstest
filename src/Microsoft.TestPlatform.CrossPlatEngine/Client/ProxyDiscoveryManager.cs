@@ -39,27 +39,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
-        /// <param name="requestData">The Request Data for providing discovery services and data.</param>
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing discovery services and data.
+        /// </param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, new FileHelper())
+        public ProxyDiscoveryManager(
+            IRequestData requestData,
+            ITestRequestSender testRequestSender,
+            ITestRuntimeProvider testHostManager)
+            : this(
+                  requestData,
+                  testRequestSender,
+                  testHostManager,
+                  JsonDataSerializer.Instance,
+                  new FileHelper())
         {
             this.testHostManager = testHostManager;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
-        /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
-        /// <param name="requestData"></param>
-        /// <param name="requestSender">
-        ///     The request Sender.
-        /// </param>
-        /// <param name="testHostManager">
-        ///     Test host Manager instance
-        /// </param>
-        /// <param name="dataSerializer"></param>
+        /// 
+        /// <remarks>
+        /// Constructor with dependency injection. Used for unit testing.
+        /// </remarks>
+        /// 
+        /// <param name="requestSender">The request sender.</param>
+        /// <param name="testHostManager">Test host manager instance.</param>
+        /// <param name="dataSerializer">The data serializer.</param>
+        /// <param name="fileHelper">The file helper.</param>
         internal ProxyDiscoveryManager(IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
@@ -71,6 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
             this.fileHelper = fileHelper;
+
+            // Create a new proxy operation manager.
             this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager);
         }
 
@@ -78,20 +91,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #region IProxyDiscoveryManager implementation.
 
-        /// <summary>
-        /// Ensure that the discovery component of engine is ready for discovery usually by loading extensions.
-        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
-        /// </summary>
+        /// <inheritdoc/>
         public void Initialize(bool skipDefaultAdapters)
         {
             this.skipDefaultAdapters = skipDefaultAdapters;
         }
 
-        /// <summary>
-        /// Discovers tests
-        /// </summary>
-        /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
-        /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
+        /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             this.baseTestDiscoveryEventsHandler = eventHandler;
@@ -142,6 +148,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Cancel fast, try to stop testhost deployment/launch
             this.proxyOperationManager.CancellationTokenSource.Cancel();
             this.Close();
+        }
+
+        /// <inheritdoc/>
+        public void Close()
+        {
+            this.proxyOperationManager.Close();
         }
 
         /// <inheritdoc/>
@@ -206,11 +218,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             // Log to vstest.console layer.
             this.HandleLogMessage(testMessageLevel, message);
-        }
-
-        public void Close()
-        {
-            this.proxyOperationManager.Close();
         }
     }
 }
