@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private readonly int WaitTimeout = 2000;
 
-        private int protocolVersion = 3;
+        private int protocolVersion = 4;
         private IDataSerializer serializer = JsonDataSerializer.Instance;
 
         public VsTestConsoleRequestSenderTests()
