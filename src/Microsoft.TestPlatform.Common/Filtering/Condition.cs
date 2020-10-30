@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// Evaluate this condition for testObject.
         /// </summary>
-        internal bool Evaluate(Func<string, Object> propertyValueProvider)
+        internal bool Evaluate(Func<string, object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
             var result = false;
@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// Check if condition validates any property in properties.
         /// </summary>
-        internal bool ValidForProperties(IEnumerable<String> properties, Func<string, TestProperty> propertyProvider)
+        internal bool ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty> propertyProvider)
         {
             bool valid = false;
 

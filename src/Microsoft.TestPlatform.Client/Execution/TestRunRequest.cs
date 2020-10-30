@@ -194,8 +194,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             }
 
             string message = string.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
-            var testMessagePayload = new CommunicationObjectModel.TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
-            var rawMessage = this.dataSerializer.SerializePayload(CommunicationObjectModel.MessageType.TestMessage, testMessagePayload);
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 
             this.HandleLogMessage(TestMessageLevel.Error, message);
             this.HandleRawMessage(rawMessage);

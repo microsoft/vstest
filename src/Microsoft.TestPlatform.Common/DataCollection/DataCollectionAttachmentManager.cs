@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Initializes a new instance of the <see cref="DataCollectionAttachmentManager"/> class.
         /// </summary>
         public DataCollectionAttachmentManager()
-            : this(new Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper())
+            : this(new TestPlatform.Utilities.Helpers.FileHelper())
         {
         }
 
@@ -336,10 +336,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                             }
                         }
 
-                        if (sendFileCompletedCallback != null)
-                        {
-                            sendFileCompletedCallback(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
-                        }
+                        sendFileCompletedCallback?.Invoke(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
                     }
                     catch (Exception e)
                     {
