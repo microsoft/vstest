@@ -160,6 +160,13 @@
         <target state="translated">'{0}' ホストが見つかりませんでした。'{0}' がコンピューターにインストールされており、PATH 環境変数で使用できることを確認してください。</target>
         <note />
       </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="new">'{0}.{1}' is not implemented on this platform!</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

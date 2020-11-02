@@ -26,7 +26,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Resources.resx;Resources\CommonResources.resx" />
+    <EmbeddedResource Include="Resources\Resources.resx;Resources\CommonResources.resx;Resources\FullyQualifiedNameMessages.resx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CommonResources.tt">
@@ -95,6 +95,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>CommonResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\FullyQualifiedNameMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FullyQualifiedNameMessages.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -106,6 +111,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <DependentUpon>Resources\CommonResources.tt</DependentUpon>
       <LastGenOutput>CommonResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\FullyQualifiedNameMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FullyQualifiedNameMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

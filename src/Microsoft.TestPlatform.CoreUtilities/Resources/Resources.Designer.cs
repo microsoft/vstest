@@ -206,5 +206,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources {
                 return ResourceManager.GetString("NoDotnetExeFound", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}.{1}&apos; is not implemented on this platform!.
+        /// </summary>
+        internal static string MethodNotImplementedOnPlatform
+        {
+            get
+            {
+                return ResourceManager.GetString("MethodNotImplementedOnPlatform", resourceCulture);
+            }
+        }
     }
 }

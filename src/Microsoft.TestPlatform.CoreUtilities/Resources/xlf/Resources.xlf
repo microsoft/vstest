@@ -67,6 +67,13 @@
         <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="new">'{0}.{1}' is not implemented on this platform!</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
