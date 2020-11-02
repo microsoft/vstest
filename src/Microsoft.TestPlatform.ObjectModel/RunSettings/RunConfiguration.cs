@@ -84,11 +84,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private string targetDevice;
 
-        /// <summary>
-        /// Defines if Test Platform should return non-zero value if no tests found and executed
-        /// </summary>
-        private bool failWhenNoTestsFound;
-
         #endregion
 
         #region Constructor
@@ -312,17 +307,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.TargetFrameworkSet = true;
             }
         }
-
-        public bool FailWhenNoTestsFound
-        {
-            get
-            {
-                return failWhenNoTestsFound;
-            }
-            set
-            {
-                this.failWhenNoTestsFound = value;
-            }
+        /// <summary>
+        /// Gets or sets value indicating exit code when no tests are discovered or executed
+        /// </summary>
+        public bool TreatNoTestsAsError 
+        { 
+            get; 
+            set; 
         }
 
         /// <summary>
@@ -611,10 +602,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 root.AppendChild(dotnetHostPath);
             }
 
-            if (this.FailWhenNoTestsFound)
+            if (this.TreatNoTestsAsError)
             {
-                XmlElement treatAsError = doc.CreateElement(nameof(FailWhenNoTestsFound));
-                treatAsError.InnerText = this.FailWhenNoTestsFound.ToString();
+                XmlElement treatAsError = doc.CreateElement(nameof(TreatNoTestsAsError));
+                treatAsError.InnerText = this.TreatNoTestsAsError.ToString();
                 root.AppendChild(treatAsError);
             }
 
@@ -923,16 +914,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
                             break;
-                        case "FailWhenNoTestsFound":
+                        case "TreatNoTestsAsError":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                            string failWhenNoTestsFoundValueString = reader.ReadElementContentAsString();
-                            bool failWhenNoTestsFound;
-                            if (!bool.TryParse(failWhenNoTestsFoundValueString, out failWhenNoTestsFound))
+                            string treatNoTestsAsErrorValueString = reader.ReadElementContentAsString();
+                            bool treatNoTestsAsError;
+                            if (!bool.TryParse(treatNoTestsAsErrorValueString, out treatNoTestsAsError))
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, failWhenNoTestsFoundValueString, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, treatNoTestsAsErrorValueString, elementName));
                             }
-                            runConfiguration.FailWhenNoTestsFound = failWhenNoTestsFound;
+                            runConfiguration.TreatNoTestsAsError = treatNoTestsAsError;
                             break;
 
                         default:

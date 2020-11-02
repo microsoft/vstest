@@ -219,10 +219,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Now that tests are discovered and filtered, we run only those selected tests.
             this.ExecuteSelectedTests();
 
-            bool failWhenNoTestsFound = RunSettingsUtilities.GetFailWhenNoTestsFound(effectiveRunSettings);
+            bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(effectiveRunSettings);
 
-            // If no tests found and FailWhenNoTestsFound parameter set to `true` then return fail
-            if (failWhenNoTestsFound && this.selectedTestCases.Count == 0)
+            if (treatNoTestsAsError && this.selectedTestCases.Count == 0)
             {
                 return ArgumentProcessorResult.Fail;
             }

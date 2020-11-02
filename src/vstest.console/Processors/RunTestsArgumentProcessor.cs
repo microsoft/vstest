@@ -180,10 +180,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.RunTests(runSettings);
             }
 
-            bool failWhenNoTestsFound = RunSettingsUtilities.GetFailWhenNoTestsFound(runSettings);
+            bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
 
-            // If no tests found and FailWhenNoTestsFound parameter set to `true` then return fail
-            if (failWhenNoTestsFound && numberOfExecutedTests == 0)
+            if (treatNoTestsAsError && numberOfExecutedTests == 0)
             {
                 return ArgumentProcessorResult.Fail;
             }

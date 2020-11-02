@@ -135,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         /// <param name="runSettings">Runsetting string value</param>
         /// <returns>The value of FailWhenNoTestsFound</returns>
-        public static bool GetFailWhenNoTestsFound(string runSettings)
+        public static bool GetTreatNoTestsAsError(string runSettings)
         {
             bool failWhenNoTestFound = false;
 
@@ -144,13 +144,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 try
                 {
                     RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-                    failWhenNoTestFound = GetFailWhenNoTestsFound(runConfiguration);
+                    failWhenNoTestFound = GetTreatNoTestsAsError(runConfiguration);
                 }
                 catch (SettingsException se)
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("RunSpecificTestsArgumentProcessor.GetFailWhenNoTestsFound: Unable to get the value of FailWhenNoTestsFound from runsettings: Error {0}", se);
+                        EqtTrace.Error("RunSettingsUtilities.GetTreatNoTestsAsError: Unable to get the value of TreatNoTestsAsError from runsettings: Error {0}", se);
                     }
                 }
             }
@@ -158,16 +158,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return failWhenNoTestFound;
         }
 
-        private static bool GetFailWhenNoTestsFound(RunConfiguration runConfiguration)
+        private static bool GetTreatNoTestsAsError(RunConfiguration runConfiguration)
         {
-            bool failWhenNoTestsFound = false;
+            bool treatNoTestsAsError = false;
 
             if (runConfiguration != null)
             {
-                failWhenNoTestsFound = runConfiguration.FailWhenNoTestsFound;
+                treatNoTestsAsError = runConfiguration.TreatNoTestsAsError;
             }
 
-            return failWhenNoTestsFound;
+            return treatNoTestsAsError;
         }
 
 

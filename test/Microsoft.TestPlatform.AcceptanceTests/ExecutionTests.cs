@@ -266,7 +266,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void ExitCodeShouldReturnOneWhenFailWhenNoTestsFoundParameterSetToTrueAndNoTestAvailableWithFilter(RunnerInfo runnerInfo)
+        public void ExitCodeShouldReturnOneWhenTreatNoTestsAsErrorParameterSetToTrueAndNoTestMatchesFilter(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -274,11 +274,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             
-            // Setting /TestCaseFilter to random test name, which does not exists
-            arguments = string.Concat(arguments, " /TestCaseFilter:SomeRandomTestName");
+            // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
 
-            // set FailWhenNoTestsFound to true
-            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=true");
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=true");
             this.InvokeVsTest(arguments);
 
             this.ExitCodeEquals(1);
@@ -286,19 +285,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void ExitCodeShouldReturnZeroWhenFailWhenNoTestsFoundParameterSetToTrueAndNoTestAvailableWithFilter(RunnerInfo runnerInfo)
+        public void ExitCodeShouldReturnZeroWhenTreatNoTestsAsErrorParameterSetToFalseAndNoTestMatchesFilter(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            
-            // Setting /TestCaseFilter to random test name, which does not exists
-            arguments = string.Concat(arguments, " /TestCaseFilter:SomeRandomTestName");
 
-            // set FailWhenNoTestsFound to true
-            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=false");
+            // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
+
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
             this.InvokeVsTest(arguments);
 
             this.ExitCodeEquals(0);
@@ -306,7 +304,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void ExitCodeShouldNotDependOnFailWhenNoTestsFoundTrueValueWhenTestsAreAvailable(RunnerInfo runnerInfo)
+        public void ExitCodeShouldNotDependOnTreatNoTestsAsErrorTrueValueWhenThereAreAnyTestsToRun(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -314,16 +312,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
 
-            // set FailWhenNoTestsFound to true
-            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=true");
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=true");
             this.InvokeVsTest(arguments);
 
+            // Returning 1 because of failing test in test assembly (SimpleTestProject2.dll)
             this.ExitCodeEquals(1);
         }
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void ExitCodeShouldNotDependOnFailWhenNoTestsFoundFalseValueWhenTestsAreAvailable(RunnerInfo runnerInfo)
+        public void ExitCodeShouldNotDependOnFailTreatNoTestsAsErrorFalseValueWhenTestsAreAvailable(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -331,10 +329,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
 
-            // set FailWhenNoTestsFound to true
-            arguments = string.Concat(arguments, " -- RunConfiguration.FailWhenNoTestsFound=true");
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
             this.InvokeVsTest(arguments);
 
+            // Returning 1 because of failing test in test assembly (SimpleTestProject2.dll)
             this.ExitCodeEquals(1);
         }
     }
