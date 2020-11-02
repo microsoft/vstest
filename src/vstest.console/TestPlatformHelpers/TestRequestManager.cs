@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
@@ -37,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
     /// <summary>
-    /// Defines the TestRequestManger which can fire off discovery and test run requests
+    /// Defines the test request manger which can fire off discovery and test run requests.
     /// </summary>
     internal class TestRequestManager : ITestRequestManager
     {
@@ -59,25 +60,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
         /// <summary>
-        /// Maintains the current active execution request
-        /// Assumption : There can only be one active execution request.
+        /// Maintains the current active execution request.
+        /// Assumption: There can only be one active execution request.
         /// </summary>
         private ITestRunRequest currentTestRunRequest;
 
         /// <summary>
-        /// Maintains the current active discovery request
-        /// Assumption : There can only be one active discovery request.
+        /// Maintains the current active discovery request.
+        /// Assumption: There can only be one active discovery request.
         /// </summary>
         private IDiscoveryRequest currentDiscoveryRequest;
 
         /// <summary>
-        /// Maintains the current active test run attachments processing cancellation token source
-        /// Assumption : There can only be one active attachments processing request.
+        /// Maintains the current active test run attachments processing cancellation token source.
+        /// Assumption: There can only be one active attachments processing request.
         /// </summary>
         private CancellationTokenSource currentAttachmentsProcessingCancellationTokenSource;
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestRequestManager"/> class.
+        /// </summary>
         public TestRequestManager()
             : this(
                   CommandLineOptions.Instance,
@@ -85,13 +89,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
                   new InferHelper(AssemblyMetadataProvider.Instance),
-                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
+                  MetricsPublisherFactory.GetMetricsPublisher(
+                      IsTelemetryOptedIn(),
+                      CommandLineOptions.Instance.IsDesignMode),
                   new ProcessHelper(),
-                  new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler()))
+                  new TestRunAttachmentsProcessingManager(
+                      TestPlatformEventSource.Instance,
+                      new CodeCoverageDataAttachmentsHandler()))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper, ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
+        internal TestRequestManager(
+            CommandLineOptions commandLineOptions,
+            ITestPlatform testPlatform,
+            TestRunResultAggregator testRunResultAggregator,
+            ITestPlatformEventSource testPlatformEventSource,
+            InferHelper inferHelper,
+            Task<IMetricsPublisher> metricsPublisher,
+            IProcessHelper processHelper,
+            ITestRunAttachmentsProcessingManager attachmentsProcessingManager)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
@@ -105,6 +121,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #endregion
 
+        /// <summary>
+        /// Gets the test request manager instance.
+        /// </summary>
         public static ITestRequestManager Instance
         {
             get
@@ -121,33 +140,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         #region ITestRequestManager
 
         /// <inheritdoc />
-        public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
+        public void InitializeExtensions(
+            IEnumerable<string> pathToAdditionalExtensions,
+            bool skipExtensionFilters)
         {
-            // It is possible for an Editor/IDE to keep running the runner in design mode for long duration.
-            // We clear the extensions cache to ensure the extensions don't get reused across discovery/run
-            // requests.
+            // It is possible for an Editor/IDE to keep running the runner in design mode for long
+            // duration. We clear the extensions cache to ensure the extensions don't get reused
+            // across discovery/run requests.
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
             this.testPlatform.ClearExtensions();
             this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
-        /// <summary>
-        /// Resets the command options
-        /// </summary>
+        /// <inheritdoc />
         public void ResetOptions()
         {
             this.commandLineOptions.Reset();
         }
 
-        /// <summary>
-        /// Discover Tests given a list of sources, run settings.
-        /// </summary>
-        /// <param name="discoveryPayload">Discovery payload</param>
-        /// <param name="discoveryEventsRegistrar">EventHandler for discovered tests</param>
-        /// <param name="protocolConfig">Protocol related information</param>
-        /// <returns>True, if successful</returns>
-        public void DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar, ProtocolConfig protocolConfig)
+        /// <inheritdoc />
+        public void DiscoverTests(
+            DiscoveryRequestPayload discoveryPayload,
+            ITestDiscoveryEventsRegistrar discoveryEventsRegistrar,
+            ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
@@ -159,7 +175,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), discoveryEventsRegistrar, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(
+                runsettings,
+                discoveryPayload.Sources?.ToList(),
+                discoveryEventsRegistrar,
+                out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -170,34 +190,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (requestData.IsTelemetryOptedIn)
             {
-                // Collect Metrics
+                // Collect metrics.
                 this.CollectMetrics(requestData, runConfiguration);
 
-                // Collect Commands
+                // Collect commands.
                 this.LogCommandsTelemetryPoints(requestData);
             }
 
-            // create discovery request
-            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
+            // Create discovery request.
+            var criteria = new DiscoveryCriteria(
+                discoveryPayload.Sources,
+                batchSize,
+                this.commandLineOptions.TestStatsEventTimeout,
+                runsettings)
             {
-                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue ?? testCaseFilterFromRunsettings
+                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
+                    ?? testCaseFilterFromRunsettings
             };
 
-            // Make sure to run the run request inside a lock as the below section is not thread-safe
-            // There can be only one discovery or execution request at a given point in time
+            // Make sure to run the run request inside a lock as the below section is not thread-safe.
+            // There can be only one discovery or execution request at a given point in time.
             lock (this.syncObject)
             {
                 try
                 {
                     EqtTrace.Info("TestRequestManager.DiscoverTests: Synchronization context taken");
 
-                    this.currentDiscoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, discoveryPayload.TestPlatformOptions);
+                    this.currentDiscoveryRequest = this.testPlatform.CreateDiscoveryRequest(
+                        requestData,
+                        criteria,
+                        discoveryPayload.TestPlatformOptions);
                     discoveryEventsRegistrar?.RegisterDiscoveryEvents(this.currentDiscoveryRequest);
 
-                    // Notify start of discovery start
+                    // Notify start of discovery start.
                     this.testPlatformEventSource.DiscoveryRequestStart();
 
-                    // Start the discovery of tests and wait for completion
+                    // Start the discovery of tests and wait for completion.
                     this.currentDiscoveryRequest.DiscoverAsync();
                     this.currentDiscoveryRequest.WaitForCompletion();
                 }
@@ -205,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 {
                     if (this.currentDiscoveryRequest != null)
                     {
-                        // Dispose the discovery request and unregister for events
+                        // Dispose the discovery request and unregister for events.
                         discoveryEventsRegistrar?.UnregisterDiscoveryEvents(currentDiscoveryRequest);
                         this.currentDiscoveryRequest.Dispose();
                         this.currentDiscoveryRequest = null;
@@ -214,20 +242,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
                     this.testPlatformEventSource.DiscoveryRequestStop();
 
-                    // Posts the Discovery Complete event.
-                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+                    // Posts the discovery complete event.
+                    this.metricsPublisher.Result.PublishMetrics(
+                        TelemetryDataConstants.TestDiscoveryCompleteEvent,
+                        requestData.MetricsCollection.Metrics);
                 }
             }
         }
 
-        /// <summary>
-        /// Run Tests with given a set of test cases.
-        /// </summary>
-        /// <param name="testRunRequestPayload">TestRun request Payload</param>
-        /// <param name="testHostLauncher">TestHost Launcher for the run</param>
-        /// <param name="testRunEventsRegistrar">event registrar for run events</param>
-        /// <param name="protocolConfig">Protocol related information</param>
-        /// <returns>True, if successful</returns>
+        /// <inheritdoc />
         public void RunTests(
             TestRunRequestPayload testRunRequestPayload,
             ITestHostLauncher testHostLauncher,
@@ -249,14 +272,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, sources, testRunEventsRegistrar, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(
+                runsettings,
+                sources,
+                testRunEventsRegistrar,
+                out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
 
             if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(runsettings))
             {
-                throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
+                throw new SettingsException(
+                    string.Format(
+                        Resources.RunsettingsWithDCErrorMessage,
+                        runsettings));
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
@@ -264,28 +294,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (requestData.IsTelemetryOptedIn)
             {
-                // Collect Metrics
+                // Collect metrics.
                 this.CollectMetrics(requestData, runConfiguration);
 
-                // Collect Commands
+                // Collect commands.
                 this.LogCommandsTelemetryPoints(requestData);
 
-                // Collect data for Legacy Settings
+                // Collect data for legacy settings.
                 this.LogTelemetryForLegacySettings(requestData, runsettings);
             }
 
-            // get Fakes data collector settings
+            // Get Fakes data collector settings.
             if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
             {
-                // The commandline Options do not have sources in design time mode,
-                // and so we fall back to using sources instead
+                // The commandline options do not have sources in design time mode,
+                // and so we fall back to using sources instead.
                 if (this.commandLineOptions.Sources.Any())
                 {
-                    GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
+                    GenerateFakesUtilities.GenerateFakesSettings(
+                        this.commandLineOptions,
+                        this.commandLineOptions.Sources.ToList(),
+                        ref runsettings);
                 }
                 else if (sources.Any())
                 {
-                    GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, sources, ref runsettings);
+                    GenerateFakesUtilities.GenerateFakesSettings(
+                        this.commandLineOptions,
+                        sources,
+                        ref runsettings);
                 }
             }
 
@@ -301,7 +337,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
                                   testRunRequestPayload.TestPlatformOptions?.FilterOptions,
                                   testRunRequestPayload.TestSessionInfo,
-                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null && testRunRequestPayload.DebuggingEnabled);
+                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
+                                      && testRunRequestPayload.DebuggingEnabled);
             }
             else
             {
@@ -313,13 +350,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher,
                                   testRunRequestPayload.TestSessionInfo,
-                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null && testRunRequestPayload.DebuggingEnabled);
+                                  debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
+                                      && testRunRequestPayload.DebuggingEnabled);
             }
 
-            // Run tests
+            // Run tests.
             try
             {
-                this.RunTests(requestData, runCriteria, testRunEventsRegistrar, testRunRequestPayload.TestPlatformOptions);
+                this.RunTests(
+                    requestData,
+                    runCriteria,
+                    testRunEventsRegistrar,
+                    testRunRequestPayload.TestPlatformOptions);
                 EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
             }
             finally
@@ -327,20 +369,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 this.testPlatformEventSource.ExecutionRequestStop();
 
                 // Post the run complete event
-                this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+                this.metricsPublisher.Result.PublishMetrics(
+                    TelemetryDataConstants.TestExecutionCompleteEvent,
+                    requestData.MetricsCollection.Metrics);
             }
         }
 
         /// <inheritdoc/>
-        public void ProcessTestRunAttachments(TestRunAttachmentsProcessingPayload attachmentsProcessingPayload, ITestRunAttachmentsProcessingEventsHandler attachmentsProcessingEventsHandler, ProtocolConfig protocolConfig)
+        public void ProcessTestRunAttachments(
+            TestRunAttachmentsProcessingPayload attachmentsProcessingPayload,
+            ITestRunAttachmentsProcessingEventsHandler attachmentsProcessingEventsHandler,
+            ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing started.");
 
             this.telemetryOptedIn = attachmentsProcessingPayload.CollectMetrics;
             var requestData = this.GetRequestData(protocolConfig);
 
-            // Make sure to run the run request inside a lock as the below section is not thread-safe
-            // There can be only one discovery, execution or attachments processing request at a given point in time
+            // Make sure to run the run request inside a lock as the below section is not thread-safe.
+            // There can be only one discovery, execution or attachments processing request at a given
+            // point in time.
             lock (this.syncObject)
             {
                 try
@@ -350,7 +398,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
-                    Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, attachmentsProcessingPayload.Attachments, attachmentsProcessingEventsHandler, this.currentAttachmentsProcessingCancellationTokenSource.Token);
+                    Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(
+                        requestData,
+                        attachmentsProcessingPayload.Attachments,
+                        attachmentsProcessingEventsHandler,
+                        this.currentAttachmentsProcessingCancellationTokenSource.Token);
                     task.Wait();
                 }
                 finally
@@ -364,8 +416,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     EqtTrace.Info("TestRequestManager.ProcessTestRunAttachments: Test run attachments processing completed.");
                     this.testPlatformEventSource.TestRunAttachmentsProcessingRequestStop();
 
-                    // Post the attachments processing complete event
-                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent, requestData.MetricsCollection.Metrics);
+                    // Post the attachments processing complete event.
+                    this.metricsPublisher.Result.PublishMetrics(
+                        TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
+                        requestData.MetricsCollection.Metrics);
                 }
             }
         }
@@ -386,20 +440,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             var requestData = this.GetRequestData(protocolConfig);
 
-            if (this.UpdateRunSettingsIfRequired(payload.RunSettings, payload.Sources, null, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(
+                payload.RunSettings,
+                payload.Sources,
+                null,
+                out string updatedRunsettings))
             {
                 payload.RunSettings = updatedRunsettings;
             }
 
             if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(payload.RunSettings))
             {
-                throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, payload.RunSettings));
+                throw new SettingsException(
+                    string.Format(
+                        Resources.RunsettingsWithDCErrorMessage,
+                        payload.RunSettings));
             }
 
             // TODO (copoiena): Collect metrics ?
 
-            // Make sure to run the run request inside a lock as the below section is not thread-safe.
-            // There can be only one discovery, execution or attachments processing request at a given point in time.
             lock (this.syncObject)
             {
                 try
@@ -407,7 +466,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     EqtTrace.Info("TestRequestManager.StartTestRunner: Synchronization context taken.");
                     this.testPlatformEventSource.StartTestSessionStart();
 
-                    //this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
                     var criteria = new StartTestSessionCriteria()
                     {
                         Sources = payload.Sources,
@@ -416,72 +474,58 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     };
 
                     this.testPlatform.CreateStartTestSessionRequest(requestData, criteria, eventsHandler);
-
-                    /*var testhostManager = ((Microsoft.VisualStudio.TestPlatform.Client.TestPlatform)this.testPlatform)
-                        .TestHostProviderManager.GetTestHostManagerByRunConfiguration(runnerPayload.RunSettings);
-
-                    testhostManager.Initialize(TestSessionMessageLogger.Instance, runnerPayload.RunSettings);
-
-                    TestRunnerPool.Instance.CreateAndStartProxy(
-                        runnerPayload.RunSettings,
-                        runnerPayload.Sources,
-                        requestData,
-                        new TestRequestSender(protocolConfig, testhostManager),
-                        testhostManager
-                    );*/
                 }
                 finally
                 {
-                    /*if (this.currentAttachmentsProcessingCancellationTokenSource != null)
-                    {
-                        this.currentAttachmentsProcessingCancellationTokenSource.Dispose();
-                        this.currentAttachmentsProcessingCancellationTokenSource = null;
-                    }*/
-
                     EqtTrace.Info("TestRequestManager.StartTestSession: Starting test session completed.");
                     this.testPlatformEventSource.StartTestSessionStop();
 
-                    // Post the attachments processing complete event
-                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.StartTestSessionCompleteEvent, requestData.MetricsCollection.Metrics);
+                    // Post the attachments processing complete event.
+                    this.metricsPublisher.Result.PublishMetrics(
+                        TelemetryDataConstants.StartTestSessionCompleteEvent,
+                        requestData.MetricsCollection.Metrics);
                 }
             }
         }
 
         private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
         {
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.TestSettingsUsed,
+                InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
 
-            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsTelemetry))
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(
+                runsettings,
+                out Dictionary<string, string> legacySettingsTelemetry))
             {
                 foreach (var ciData in legacySettingsTelemetry)
                 {
                     // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
-                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingPrefix, ciData.Key), ciData.Value);
+                    requestData.MetricsCollection.Add(
+                        string.Format(
+                            "{0}.{1}",
+                            TelemetryDataConstants.LegacySettingPrefix,
+                            ciData.Key),
+                        ciData.Value);
                 }
             }
         }
 
-        /// <summary>
-        /// Cancel the test run.
-        /// </summary>
+        /// <inheritdoc />
         public void CancelTestRun()
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
             this.currentTestRunRequest?.CancelAsync();
         }
 
-        /// <summary>
-        /// Cancel the test discovery.
-        /// </summary>
+        /// <inheritdoc />
         public void CancelDiscovery()
         {
             EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
             this.currentDiscoveryRequest?.Abort();
         }
 
-        /// <summary>
-        /// Aborts the test run.
-        /// </summary>
+        /// <inheritdoc />
         public void AbortTestRun()
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
@@ -519,28 +563,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, IList<string> sources, IBaseTestEventsRegistrar registrar, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(
+            string runsettingsXml,
+            IList<string> sources,
+            IBaseTestEventsRegistrar registrar,
+            out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
-            IDictionary<string, Architecture> sourcePlatforms = new Dictionary<string, Architecture>();
-            IDictionary<string, Framework> sourceFrameworks = new Dictionary<string, Framework>();
+            var sourcePlatforms = new Dictionary<string, Architecture>();
+            var sourceFrameworks = new Dictionary<string, Framework>();
 
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
                 // TargetFramework is full CLR. Set DesignMode based on current context.
                 using (var stream = new StringReader(runsettingsXml))
-                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                using (var reader = XmlReader.Create(
+                    stream,
+                    XmlRunSettingsUtilities.ReaderSettings))
                 {
                     var document = new XmlDocument();
                     document.Load(reader);
                     var navigator = document.CreateNavigator();
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                    var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
+                    var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
+                        ?? new LoggerRunSettings();
 
-                    settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
+                    settingsUpdated |= this.UpdateFramework(
+                        document,
+                        navigator,
+                        sources,
+                        sourceFrameworks,
+                        registrar,
+                        out Framework chosenFramework);
 
-                    // Choose default architecture based on the framework
+                    // Choose default architecture based on the framework.
                     // For .NET core, the default platform architecture should be based on the process.	
                     Architecture defaultArchitecture = Architecture.X86;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
@@ -548,22 +605,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
 #if NETCOREAPP
-                        // We are running in vstest.console that is either started via dotnet.exe or via vstest.console.exe .NET Core 
-                        // executable. For AnyCPU dlls this should resolve 32-bit SDK when running from 32-bit dotnet process and 
+                        // We are running in vstest.console that is either started via dotnet.exe
+                        // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
+                        // should resolve 32-bit SDK when running from 32-bit dotnet process and 
                         // 64-bit SDK when running from 64-bit dotnet process.
                         defaultArchitecture = Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86;
 #else
-                        // We are running in vstest.console.exe that was built against .NET Framework. This console prefers 32-bit
-                        // because it needs to run as 32-bit to be compatible with QTAgent. It runs as 32-bit both under VS and 
-                        // in Developer console. Set the default architecture based on the OS architecture, to find 64-bit dotnet SDK
-                        // when running AnyCPU dll on 64-bit system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
+                        // We are running in vstest.console.exe that was built against .NET
+                        // Framework. This console prefers 32-bit because it needs to run as 32-bit
+                        // to be compatible with QTAgent. It runs as 32-bit both under VS and in
+                        // Developer console. Set the default architecture based on the OS
+                        // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
+                        // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
                         // We want to find 64-bit SDK because it is more likely to be installed.
                         defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
 #endif
                     }
 
-                    settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
-                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, defaultArchitecture, sourcePlatforms, sourceFrameworks, registrar);
+                    settingsUpdated |= this.UpdatePlatform(
+                        document,
+                        navigator,
+                        sources,
+                        sourcePlatforms,
+                        defaultArchitecture,
+                        out Architecture chosenPlatform);
+                    this.CheckSourcesForCompatibility(
+                        chosenFramework,
+                        chosenPlatform,
+                        defaultArchitecture,
+                        sourcePlatforms,
+                        sourceFrameworks,
+                        registrar);
                     settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
                     settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
                     settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
@@ -576,23 +648,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
-        private bool AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, LoggerRunSettings loggerRunSettings)
+        private bool AddOrUpdateConsoleLogger(
+            XmlDocument document,
+            RunConfiguration runConfiguration,
+            LoggerRunSettings loggerRunSettings)
         {
-            // Update console logger settings
+            // Update console logger settings.
             bool consoleLoggerUpdated = this.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
             // In case of CLI, add console logger if not already present.
-            bool designMode = runConfiguration.DesignModeSet ? runConfiguration.DesignMode : this.commandLineOptions.IsDesignMode;
+            bool designMode = runConfiguration.DesignModeSet
+                ? runConfiguration.DesignMode
+                : this.commandLineOptions.IsDesignMode;
             if (!designMode && !consoleLoggerUpdated)
             {
                 this.AddConsoleLogger(document, loggerRunSettings);
             }
 
-            // Update is required 1) in case of CLI 2) in case of design mode if console logger is present in runsettings.
+            // Update is required:
+            //     1) in case of CLI;
+            //     2) in case of design mode if console logger is present in runsettings.
             return !designMode || consoleLoggerUpdated;
         }
 
-        private bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
+        private bool UpdateTargetDevice(
+            XPathNavigator navigator,
+            XmlDocument document,
+            RunConfiguration runConfiguration)
         {
             bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
             if (updateRequired)
@@ -602,12 +684,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private bool UpdateCollectSourceInformation(XmlDocument document, RunConfiguration runConfiguration)
+        private bool UpdateCollectSourceInformation(
+            XmlDocument document,
+            RunConfiguration runConfiguration)
         {
             bool updateRequired = !runConfiguration.CollectSourceInformationSet;
             if (updateRequired)
             {
-                InferRunSettingsHelper.UpdateCollectSourceInformation(document, this.commandLineOptions.ShouldCollectSourceInformation);
+                InferRunSettingsHelper.UpdateCollectSourceInformation(
+                    document,
+                    this.commandLineOptions.ShouldCollectSourceInformation);
             }
             return updateRequired;
         }
@@ -618,15 +704,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             bool updateRequired = !runConfiguration.DesignModeSet;
             if (updateRequired)
             {
-                InferRunSettingsHelper.UpdateDesignMode(document, this.commandLineOptions.IsDesignMode);
+                InferRunSettingsHelper.UpdateDesignMode(
+                    document,
+                    this.commandLineOptions.IsDesignMode);
             }
             return updateRequired;
         }
 
-        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, Architecture defaultArchitecture, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
+        private void CheckSourcesForCompatibility(
+            Framework chosenFramework,
+            Architecture chosenPlatform,
+            Architecture defaultArchitecture,
+            IDictionary<string, Architecture> sourcePlatforms,
+            IDictionary<string, Framework> sourceFrameworks,
+            IBaseTestEventsRegistrar registrar)
         {
-            // Find compatible sources
-            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, defaultArchitecture, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+            // Find compatible sources.
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(
+                chosenPlatform,
+                defaultArchitecture,
+                chosenFramework,
+                sourcePlatforms,
+                sourceFrameworks,
+                out var incompatibleSettingWarning);
 
             // Raise warnings for incompatible sources
             if (!string.IsNullOrEmpty(incompatibleSettingWarning))
@@ -643,36 +743,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, IList<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture, out Architecture chosenPlatform)
+        private bool UpdatePlatform(
+            XmlDocument document,
+            XPathNavigator navigator,
+            IList<string> sources,
+            IDictionary<string, Architecture> sourcePlatforms,
+            Architecture defaultArchitecture,
+            out Architecture chosenPlatform)
         {
-            // Get platform from sources
-            var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms, defaultArchitecture);
+            // Get platform from sources.
+            var inferedPlatform = inferHelper.AutoDetectArchitecture(
+                sources,
+                sourcePlatforms,
+                defaultArchitecture);
 
-            // Get platform from runsettings
+            // Get platform from runsettings.
             bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
-            // Update platform if required. For command line scenario update happens in ArgumentProcessor.
+            // Update platform if required. For command line scenario update happens in
+            // ArgumentProcessor.
             if (updatePlatform)
             {
-                InferRunSettingsHelper.UpdateTargetPlatform(document, inferedPlatform.ToString(), overwrite: true);
+                InferRunSettingsHelper.UpdateTargetPlatform(
+                    document,
+                    inferedPlatform.ToString(),
+                    overwrite: true);
                 chosenPlatform = inferedPlatform;
             }
 
             return updatePlatform;
         }
 
-        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, IList<string> sources, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar, out Framework chosenFramework)
+        private bool UpdateFramework(
+            XmlDocument document,
+            XPathNavigator navigator,
+            IList<string> sources,
+            IDictionary<string, Framework> sourceFrameworks,
+            IBaseTestEventsRegistrar registrar,
+            out Framework chosenFramework)
         {
-            // Get framework from sources
+            // Get framework from sources.
             var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
 
             // Get framework from runsettings.
             bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
 
-            // Update framework if required. For command line scenario update happens in ArgumentProcessor.
+            // Update framework if required. For command line scenario update happens in
+            // ArgumentProcessor.
             if (updateFramework)
             {
-                InferRunSettingsHelper.UpdateTargetFramework(document, inferedFramework?.ToString(), overwrite: true);
+                InferRunSettingsHelper.UpdateTargetFramework(
+                    document,
+                    inferedFramework?.ToString(),
+                    overwrite: true);
                 chosenFramework = inferedFramework;
             }
 
@@ -703,7 +826,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             };
 
             loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
-            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
+                document,
+                Constants.LoggerRunSettingsName,
+                loggerRunSettings.ToXml().InnerXml);
         }
 
         /// <summary>
@@ -712,7 +838,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="document">Runsettings document.</param>
         /// <param name="loggerRunSettings">Logger run settings.</param>
         /// <returns>True if updated console logger in runsettings successfully.</returns>
-        private bool UpdateConsoleLoggerIfExists(XmlDocument document, LoggerRunSettings loggerRunSettings)
+        private bool UpdateConsoleLoggerIfExists(
+            XmlDocument document,
+            LoggerRunSettings loggerRunSettings)
         {
             var defaultConsoleLogger = new LoggerSettings
             {
@@ -728,24 +856,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 var consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
                 consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
                 consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
-                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(
+                    document,
+                    Constants.LoggerRunSettingsName,
+                    loggerRunSettings.ToXml().InnerXml);
+
                 return true;
             }
 
             return false;
         }
 
-        private void RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, TestPlatformOptions options)
+        private void RunTests(
+            IRequestData requestData,
+            TestRunCriteria testRunCriteria,
+            ITestRunEventsRegistrar testRunEventsRegistrar,
+            TestPlatformOptions options)
         {
-            // Make sure to run the run request inside a lock as the below section is not thread-safe
-            // TranslationLayer can process faster as it directly gets the raw un-serialized messages whereas 
-            // below logic needs to deserialize and do some cleanup
-            // While this section is cleaning up, TranslationLayer can trigger run causing multiple threads to run the below section at the same time
+            // Make sure to run the run request inside a lock as the below section is not thread-safe.
+            // TranslationLayer can process faster as it directly gets the raw un-serialized messages
+            // whereas below logic needs to deserialize and do some cleanup.
+            // While this section is cleaning up, TranslationLayer can trigger run causing multiple
+            // threads to run the below section at the same time.
             lock (this.syncObject)
             {
                 try
                 {
-                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria, options);
+                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(
+                        requestData,
+                        testRunCriteria,
+                        options);
 
                     this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
@@ -777,21 +917,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator, out Framework chosenFramework)
+        private bool IsAutoFrameworkDetectRequired(
+            XPathNavigator navigator,
+            out Framework chosenFramework)
         {
             bool required = true;
             chosenFramework = null;
             if (commandLineOptions.IsDesignMode)
             {
                 bool isValidFx =
-                    InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
+                    InferRunSettingsHelper.TryGetFrameworkXml(
+                        navigator,
+                        out var frameworkFromrunsettingsXml);
                 required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
                 if (!required)
                 {
                     chosenFramework = Framework.FromString(frameworkFromrunsettingsXml);
                 }
             }
-            else if (!commandLineOptions.IsDesignMode && commandLineOptions.FrameworkVersionSpecified)
+            else if (!commandLineOptions.IsDesignMode
+                && commandLineOptions.FrameworkVersionSpecified)
             {
                 required = false;
                 chosenFramework = commandLineOptions.TargetFrameworkVersion;
@@ -800,17 +945,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return required;
         }
 
-        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator, out Architecture chosenPlatform)
+        private bool IsAutoPlatformDetectRequired(
+            XPathNavigator navigator,
+            out Architecture chosenPlatform)
         {
             bool required = true;
             chosenPlatform = Architecture.Default;
             if (commandLineOptions.IsDesignMode)
             {
-                bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
+                bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(
+                    navigator,
+                    out var platformXml);
+
                 required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
                 if (!required)
                 {
-                    chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml, true);
+                    chosenPlatform = (Architecture)Enum.Parse(
+                        typeof(Architecture),
+                        platformXml, true);
                 }
             }
             else if (!commandLineOptions.IsDesignMode && commandLineOptions.ArchitectureSpecified)
@@ -823,45 +975,65 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
-        /// Collect Metrics
+        /// Collect metrics.
         /// </summary>
-        /// <param name="requestData">Request Data for common Discovery/Execution Services</param>
-        /// <param name="runConfiguration">RunConfiguration</param>
+        /// <param name="requestData">Request data for common Discovery/Execution services.</param>
+        /// <param name="runConfiguration">Run configuration.</param>
         private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
         {
             // Collecting Target Framework.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFramework.Name);
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.TargetFramework,
+                runConfiguration.TargetFramework.Name);
 
             // Collecting Target Platform.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform.ToString());
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.TargetPlatform,
+                runConfiguration.TargetPlatform.ToString());
 
             // Collecting Max CPU count.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.MaxCPUcount, runConfiguration.MaxCpuCount);
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.MaxCPUcount,
+                runConfiguration.MaxCpuCount);
 
-            // Collecting Target Device. Here, it will be updated run settings so, target device will be under run configuration only.
+            // Collecting Target Device. Here, it will be updated run settings so, target device
+            // will be under run configuration only.
             var targetDevice = runConfiguration.TargetDevice;
             if (string.IsNullOrEmpty(targetDevice))
             {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Local Machine");
+                requestData.MetricsCollection.Add(
+                    TelemetryDataConstants.TargetDevice,
+                    "Local Machine");
             }
-            else if (targetDevice.Equals("Device", StringComparison.Ordinal) || targetDevice.Contains("Emulator"))
+            else if (targetDevice.Equals("Device", StringComparison.Ordinal)
+                || targetDevice.Contains("Emulator"))
             {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, targetDevice);
+                requestData.MetricsCollection.Add(
+                    TelemetryDataConstants.TargetDevice,
+                    targetDevice);
             }
             else
             {
-                // For IOT scenarios
-                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Other");
+                // For IOT scenarios.
+                requestData.MetricsCollection.Add(
+                    TelemetryDataConstants.TargetDevice,
+                    "Other");
             }
 
-            // Collecting TestPlatform Version
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+            // Collecting TestPlatform version.
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.TestPlatformVersion,
+                Product.Version);
 
-            // Collecting TargetOS
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
+            // Collecting TargetOS.
+            requestData.MetricsCollection.Add(
+               TelemetryDataConstants.TargetOS,
+               new PlatformEnvironment().OperatingSystemVersion);
 
-            //Collecting DisableAppDomain
-            requestData.MetricsCollection.Add(TelemetryDataConstants.DisableAppDomain, runConfiguration.DisableAppDomain);
+            //Collecting DisableAppDomain.
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.DisableAppDomain,
+                runConfiguration.DisableAppDomain);
 
         }
 
@@ -873,7 +1045,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private static bool IsTelemetryOptedIn()
         {
             var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
-            return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
+            return !string.IsNullOrEmpty(telemetryStatus)
+                && telemetryStatus.Equals("1", StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -942,14 +1115,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
             }
 
-            requestData.MetricsCollection.Add(TelemetryDataConstants.CommandLineSwitches, string.Join(",", commandsUsed.ToArray()));
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.CommandLineSwitches,
+                string.Join(",", commandsUsed.ToArray()));
         }
 
         /// <summary>
-        /// Gets Request Data
+        /// Gets request data.
         /// </summary>
-        /// <param name="protocolConfig">Protocol Config</param>
-        /// <returns></returns>
+        /// <param name="protocolConfig">Protocol config.</param>
+        /// <returns>Request data.</returns>
         private IRequestData GetRequestData(ProtocolConfig protocolConfig)
         {
             return new RequestData
@@ -966,11 +1141,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
         {
             List<string> sources = new List<string>();
-            if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Count > 0)
+            if (testRunRequestPayload.Sources != null
+                && testRunRequestPayload.Sources.Count > 0)
             {
                 sources = testRunRequestPayload.Sources;
             }
-            else if (testRunRequestPayload.TestCases != null && testRunRequestPayload.TestCases.Count > 0)
+            else if (testRunRequestPayload.TestCases != null
+                && testRunRequestPayload.TestCases.Count > 0)
             {
                 ISet<string> sourcesSet = new HashSet<string>();
                 foreach (var testCase in testRunRequestPayload.TestCases)
