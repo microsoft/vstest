@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Internal.CodeCoverage">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>$(CodeCoverageExternalsVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
