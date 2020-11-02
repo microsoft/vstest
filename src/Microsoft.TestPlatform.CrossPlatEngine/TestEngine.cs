@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
-    /// Cross Platform test engine entry point for the client.
+    /// Cross platform test engine entry point for the client.
     /// </summary>
     public class TestEngine : ITestEngine
     {
@@ -43,7 +43,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
         }
 
-        protected TestEngine(TestRuntimeProviderManager testHostProviderManager, IProcessHelper processHelper)
+        protected TestEngine(
+            TestRuntimeProviderManager testHostProviderManager,
+            IProcessHelper processHelper)
         {
             this.testHostProviderManager = testHostProviderManager;
             this.processHelper = processHelper;
@@ -52,18 +54,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         #region ITestEngine implementation
 
         /// <inheritdoc/>
-        public IProxyDiscoveryManager GetDiscoveryManager(IRequestData requestData, ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria)
+        public IProxyDiscoveryManager GetDiscoveryManager(
+            IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
+            DiscoveryCriteria discoveryCriteria)
         {
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
+            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
+                discoveryCriteria.Sources.Count(),
+                discoveryCriteria.RunSettings);
 
-            // Collecting IsParallel Enabled
-            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringDiscovery, parallelLevel > 1 ? "True" : "False");
+            // Collecting IsParallel enabled.
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.ParallelEnabledDuringDiscovery,
+                parallelLevel > 1 ? "True" : "False");
 
             if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
                 var newRequestData = this.GetRequestData(isTelemetryOptedIn);
-                return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
+                return new InProcessProxyDiscoveryManager(
+                    testHostManager,
+                    new TestHostManagerFactory(newRequestData));
             }
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
@@ -71,7 +82,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-                return new ProxyDiscoveryManager(requestData, new TestRequestSender(requestData.ProtocolConfig, hostManager), hostManager);
+                return new ProxyDiscoveryManager(
+                    requestData,
+                    new TestRequestSender(requestData.ProtocolConfig, hostManager),
+                    hostManager);
             };
 
             return !testHostManager.Shared
@@ -84,37 +98,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <inheritdoc/>
-        public IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria)
+        public IProxyExecutionManager GetExecutionManager(
+            IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
+            TestRunCriteria testRunCriteria)
         {
             var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
+            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
+                distinctSources,
+                testRunCriteria.TestRunSettings);
 
-            // Collecting IsParallel Enabled
-            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, parallelLevel > 1 ? "True" : "False");
+            // Collecting IsParallel enabled.
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.ParallelEnabledDuringExecution,
+                parallelLevel > 1 ? "True" : "False");
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
+            if (this.ShouldRunInNoIsolation(
+                testRunCriteria.TestRunSettings,
+                parallelLevel > 1,
+                isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
                 var newRequestData = this.GetRequestData(isTelemetryOptedIn);
-                return new InProcessProxyExecutionManager(testHostManager, new TestHostManagerFactory(newRequestData));
+                return new InProcessProxyExecutionManager(
+                    testHostManager,
+                    new TestHostManagerFactory(newRequestData));
             }
 
-            // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
+            // SetupChannel ProxyExecutionManager with data collection if data collectors are
+            // specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
             {
                 if (testRunCriteria.TestSessionInfo != null)
                 {
-                    // In case we have an active test session, data collection needs were already
-                    // taken care of when first creating the session. As a consequence we always
-                    // return this proxy instead of choosing between the vanilla execution proxy
-                    // and the one with data collection enabled.
-                    return new ProxyExecutionManager(testRunCriteria.TestSessionInfo, testRunCriteria.DebugEnabledForTestSession);
+                    try
+                    {
+                        // In case we have an active test session, data collection needs were
+                        // already taken care of when first creating the session. As a consequence
+                        // we always return this proxy instead of choosing between the vanilla
+                        // execution proxy and the one with data collection enabled.
+                        return new ProxyExecutionManager(
+                            testRunCriteria.TestSessionInfo,
+                            testRunCriteria.DebugEnabledForTestSession);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        // If the proxy creation proces based on test session info failed, then
+                        // we'll proceed with the normal creation process as if no test session
+                        // info was passed in in the first place.
+                        // 
+                        // WARNING: This should not normally happen and it raises questions
+                        // regarding the test session pool operation and consistency.
+                        EqtTrace.Warning("ProxyExecutionManager failed: {0}", ex.ToString());
+                    }
                 }
 
-                // Create a new HostManager, to be associated with individual ProxyExecutionManager(&POM)
+                // Create a new host manager, to be associated with individual
+                // ProxyExecutionManager(&POM)
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
@@ -156,14 +199,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             ITestRuntimeProvider testHostManager,
             StartTestSessionCriteria testSessionCriteria)
         {
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testSessionCriteria.Sources.Count, testSessionCriteria.RunSettings);
+            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
+                testSessionCriteria.Sources.Count,
+                testSessionCriteria.RunSettings);
 
-            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringStartTestSession, parallelLevel > 1 ? "True" : "False");
+            requestData.MetricsCollection.Add(
+                TelemetryDataConstants.ParallelEnabledDuringStartTestSession,
+                parallelLevel > 1 ? "True" : "False");
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testSessionCriteria.RunSettings);
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testSessionCriteria.RunSettings);
 
-            if (this.ShouldRunInNoIsolation(testSessionCriteria.RunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
+            if (this.ShouldRunInNoIsolation(
+                testSessionCriteria.RunSettings,
+                parallelLevel > 1,
+                isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
                 // This condition is the equivalent of the in-process proxy execution manager case.
                 // In this case all tests will be run in the vstest.console process, so there's no
@@ -204,7 +254,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public ITestExtensionManager GetExtensionManager()
         {
-            return this.testExtensionManager ?? (this.testExtensionManager = new TestExtensionManager());
+            return this.testExtensionManager
+                ?? (this.testExtensionManager = new TestExtensionManager());
         }
 
         /// <inheritdoc/>
@@ -220,7 +271,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)
         {
-            // No point in creating more processes if number of sources is less than what user configured for
+            // No point in creating more processes if number of sources is less than what the user
+            // configured for.
             int numSources = 1;
             if (testRunCriteria.HasSpecificTests)
             {
@@ -236,48 +288,56 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// Verifies Parallel Setting and returns parallel level to use based on the run criteria
+        /// Verifies parallel setting and returns parallel level to use based on the run criteria.
         /// </summary>
-        /// <param name="sourceCount">
-        /// The source Count.
-        /// </param>
-        /// <param name="runSettings">
-        /// The run Settings.
-        /// </param>
-        /// <returns>
-        /// Parallel Level to use
-        /// </returns>
-        private int VerifyParallelSettingAndCalculateParallelLevel(int sourceCount, string runSettings)
+        /// 
+        /// <param name="sourceCount">The source count.</param>
+        /// <param name="runSettings">The run settings.</param>
+        /// 
+        /// <returns>The parallel level to use.</returns>
+        private int VerifyParallelSettingAndCalculateParallelLevel(
+            int sourceCount,
+            string runSettings)
         {
-            // Default is 1
+            // Default is 1.
             int parallelLevelToUse = 1;
             try
             {
-                // Check the User Parallel Setting
+                // Check the user parallel setting.
                 int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(runSettings);
-                parallelLevelToUse = userParallelSetting == 0 ? Environment.ProcessorCount : userParallelSetting;
+                parallelLevelToUse = userParallelSetting == 0
+                    ? Environment.ProcessorCount
+                    : userParallelSetting;
                 var enableParallel = parallelLevelToUse > 1;
 
-                EqtTrace.Verbose("TestEngine: Initializing Parallel Execution as MaxCpuCount is set to: {0}", parallelLevelToUse);
+                EqtTrace.Verbose(
+                    "TestEngine: Initializing Parallel Execution as MaxCpuCount is set to: {0}",
+                    parallelLevelToUse);
 
-                // Verify if the number of Sources is less than user setting of parallel
-                // we should use number of sources as the parallel level, if sources count is less than parallel level
+                // Verify if the number of sources is less than user setting of parallel.
+                // We should use number of sources as the parallel level, if sources count is less
+                // than parallel level.
                 if (enableParallel)
                 {
                     parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
 
-                    // If only one source, no need to use parallel service client
+                    // If only one source, no need to use parallel service client.
                     enableParallel = parallelLevelToUse > 1;
 
                     if (EqtTrace.IsInfoEnabled)
                     {
-                        EqtTrace.Verbose("TestEngine: ParallelExecution set to '{0}' as the parallel level is adjusted to '{1}' based on number of sources", enableParallel, parallelLevelToUse);
+                        EqtTrace.Verbose(
+                            "TestEngine: ParallelExecution set to '{0}' as the parallel level is adjusted to '{1}' based on number of sources",
+                            enableParallel,
+                            parallelLevelToUse);
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("TestEngine: Error occurred while initializing ParallelExecution: {0}", ex);
+                EqtTrace.Error(
+                    "TestEngine: Error occurred while initializing ParallelExecution: {0}",
+                    ex);
                 EqtTrace.Warning("TestEngine: Defaulting to Sequential Execution");
 
                 parallelLevelToUse = 1;
@@ -286,7 +346,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return parallelLevelToUse;
         }
 
-        private bool ShouldRunInNoIsolation(string runsettings, bool isParallelEnabled, bool isDataCollectorEnabled)
+        private bool ShouldRunInNoIsolation(
+            string runsettings,
+            bool isParallelEnabled,
+            bool isDataCollectorEnabled)
         {
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
 
@@ -307,7 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
-            // If running with the dotnet executable, then don't run in InProcess
+            // If running with the dotnet executable, then don't run in in process.
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
@@ -315,12 +378,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             // Return true if
-            // 1) Not running in parallel
-            // 2) Data collector is not enabled
-            // 3) Target framework is x86 or anyCpu
-            // 4) DisableAppDomain is false
-            // 5) Not running in design mode
-            // 6) target framework is NETFramework (Desktop test)
+            // 1) Not running in parallel;
+            // 2) Data collector is not enabled;
+            // 3) Target framework is x86 or anyCpu;
+            // 4) DisableAppDomain is false;
+            // 5) Not running in design mode;
+            // 6) target framework is NETFramework (Desktop test);
             if (!isParallelEnabled &&
                 !isDataCollectorEnabled &&
                 (runConfiguration.TargetPlatform == Architecture.X86 || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
@@ -339,28 +402,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// Get Request Data on basis of Telemetry OptedIn or not
+        /// Get request data on basis of telemetry opted in or not.
         /// </summary>
-        /// <param name="isTelemetryOptedIn"></param>
-        /// <returns></returns>
+        /// 
+        /// <param name="isTelemetryOptedIn">A flag indicating if telemetry is opted in.</param>
+        /// 
+        /// <returns>The request data.</returns>
         private IRequestData GetRequestData(bool isTelemetryOptedIn)
         {
             return new RequestData
-                       {
-                           MetricsCollection = isTelemetryOptedIn
-                                                   ? (IMetricsCollection)new MetricsCollection()
-                                                   : new NoOpMetricsCollection(),
-                           IsTelemetryOptedIn = isTelemetryOptedIn
-                       };
+                {
+                    MetricsCollection = isTelemetryOptedIn
+                        ? (IMetricsCollection)new MetricsCollection()
+                        : new NoOpMetricsCollection(),
+                    IsTelemetryOptedIn = isTelemetryOptedIn
+                };
         }
 
         /// <summary>
-        /// Gets test sources from test run criteria
+        /// Gets test sources from test run criteria.
         /// </summary>
-        /// <returns>test sources</returns>
+        /// 
+        /// <returns>The test sources.</returns>
         private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
         {
-            return testRunCriteria.HasSpecificTests ? TestSourcesUtility.GetSources(testRunCriteria.Tests) : testRunCriteria.Sources;
+            return testRunCriteria.HasSpecificTests
+                ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
+                : testRunCriteria.Sources;
         }
     }
 }

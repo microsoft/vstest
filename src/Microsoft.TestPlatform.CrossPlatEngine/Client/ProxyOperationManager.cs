@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-    using CoreUtilities.Helpers;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
@@ -21,6 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CoreUtilities.Helpers;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
@@ -329,22 +331,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return testProcessStartInfo;
         }
 
-        public string GetTimestampedLogFile(string logFile)
-        {
-            if (string.IsNullOrWhiteSpace(logFile))
-            {
-                return null;
-            }
-
-            return Path.ChangeExtension(
-                logFile,
-                string.Format(
-                    "host.{0}_{1}{2}",
-                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
-                    new PlatformEnvironment().GetCurrentManagedThreadId(),
-                    Path.GetExtension(logFile))).AddDoubleQuote();
-        }
-
         /// <summary>
         /// This function will remove the unknown run settings nodes from the run settings strings.
         /// This is necessary because older test hosts may throw exceptions when encountering
@@ -369,6 +355,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             return updatedRunSettingsXml;
+        }
+
+        private string GetTimestampedLogFile(string logFile)
+        {
+            if (string.IsNullOrWhiteSpace(logFile))
+            {
+                return null;
+            }
+
+            return Path.ChangeExtension(
+                logFile,
+                string.Format(
+                    "host.{0}_{1}{2}",
+                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    new PlatformEnvironment().GetCurrentManagedThreadId(),
+                    Path.GetExtension(logFile))).AddDoubleQuote();
         }
 
         private void CompatIssueWithVersionCheckAndRunsettings()

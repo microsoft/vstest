@@ -217,6 +217,21 @@
         <target state="translated">{0} Odmowa dostępu podczas próby utworzenia folderu „TestResults” w określonej lokalizacji. Widzisz ten wyjątek, ponieważ program vstest.console.exe został uruchomiony z folderu wymagającego dostępu do zapisu. Aby rozwiązać ten problem: uruchom program vstest.console.exe z folderu, w którym masz uprawnienia do zapisu.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoAvailableProxyForDeque">
+        <source>Could not find an available proxy to deque.</source>
+        <target state="new">Could not find an available proxy to deque.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuchProxyId">
+        <source>Proxy with id {0} is not managed by the current session manager.</source>
+        <target state="new">Proxy with id {0} is not managed by the current session manager.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProxyIsAlreadyAvailable">
+        <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
+        <target state="new">Proxy with id {0} is already available and cannot be re-enqueued.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

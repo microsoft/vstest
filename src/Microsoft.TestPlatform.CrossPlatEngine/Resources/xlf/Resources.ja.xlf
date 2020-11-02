@@ -217,6 +217,21 @@
         <target state="translated">{0} 記載した場所に "TestResults" フォルダーを作成しようとしたときにアクセスが拒否されました。書き込みアクセスを必要とするフォルダーから vstest.console.exe を実行しているため、この例外が発生しています。この問題を解決するには、書き込み特権のあるフォルダーから vstest.console.exe を実行してください。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoAvailableProxyForDeque">
+        <source>Could not find an available proxy to deque.</source>
+        <target state="new">Could not find an available proxy to deque.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuchProxyId">
+        <source>Proxy with id {0} is not managed by the current session manager.</source>
+        <target state="new">Proxy with id {0} is not managed by the current session manager.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProxyIsAlreadyAvailable">
+        <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
+        <target state="new">Proxy with id {0} is already available and cannot be re-enqueued.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
