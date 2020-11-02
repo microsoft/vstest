@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     }
                     catch (InvalidOperationException ex)
                     {
-                        // If the proxy creation proces based on test session info failed, then
+                        // If the proxy creation process based on test session info failed, then
                         // we'll proceed with the normal creation process as if no test session
                         // info was passed in in the first place.
                         // 
