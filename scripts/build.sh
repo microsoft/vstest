@@ -184,14 +184,16 @@ function install_cli()
             return 1
         fi
         chmod u+x $install_script
+        # Get netcoreapp1.1 shared components
+        $install_script  --runtime dotnet --version "2.1.0" --channel "release/2.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "3.1.0" --channel "release/3.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
 
         log "install_cli: Get the latest dotnet cli toolset..."
         $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_CLI_VERSION
 
-        # Get netcoreapp1.1 shared components
-        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "release/2.1.0" --version "2.1.0" --runtime dotnet
-        #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-        #$install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --runtime dotnet
+
+        log " ---- dotnet x64"
+        "$TP_DOTNET_DIR/dotnet" --info
     fi
 
     local dotnet_path=$(_get_dotnet_path)
