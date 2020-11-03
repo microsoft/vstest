@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
@@ -14,11 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class RunTestsArgumentProcessor : IArgumentProcessor
     {
@@ -110,6 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// Registers and Unregisters for test run events before and after test run
         /// </summary>
         private ITestRunEventsRegistrar testRunEventsRegistrar;
+        
+        /// <summary>
+        /// Shows the number of tests which were executed
+        /// </summary>
+        private static long numberOfExecutedTests;
 
         #endregion
 
@@ -168,23 +173,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
+            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
+
             if (this.commandLineOptions.Sources.Any())
             {
-                this.RunTests(this.commandLineOptions.Sources);
+                this.RunTests(runSettings);
+            }
+
+            bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
+
+            if (treatNoTestsAsError && numberOfExecutedTests == 0)
+            {
+                return ArgumentProcessorResult.Fail;
             }
 
             return ArgumentProcessorResult.Success;
         }
 
-        private void RunTests(IEnumerable<string> sources)
+        private void RunTests(string runSettings)
         {
             // create/start test run
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
             }
-
-            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -241,6 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
                 if (!e.IsAborted && !e.IsCanceled)
                 {
+                    numberOfExecutedTests = e.TestRunStatistics.ExecutedTests;
                     var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
 
                     // Indicate the user to use test adapter path command if there are no tests found
