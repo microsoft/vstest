@@ -464,15 +464,6 @@
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\vcruntime140_1.dll" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\VanguardInstrumentationProfiler_x64.config" target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\" />
     
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.config"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.config" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\covrun32.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\covrun32.dll" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\msdia140.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\msdia140.dll" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" />
-    <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />
-    
     <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
     <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
