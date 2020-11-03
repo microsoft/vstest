@@ -62,7 +62,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.CUIT">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>16.8.0-preview-4040788</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
