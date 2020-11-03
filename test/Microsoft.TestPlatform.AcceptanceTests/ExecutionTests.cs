@@ -321,7 +321,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void ExitCodeShouldNotDependOnFailTreatNoTestsAsErrorFalseValueWhenTestsAreAvailable(RunnerInfo runnerInfo)
+        public void ExitCodeShouldNotDependOnFailTreatNoTestsAsErrorFalseValueWhenThereAreAnyTestsToRun(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
 
