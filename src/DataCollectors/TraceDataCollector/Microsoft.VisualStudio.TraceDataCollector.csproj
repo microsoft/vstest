@@ -18,9 +18,7 @@
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Internal.CodeCoverage">
-      <Version>$(CodeCoverageExternalsVersion)</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(CodeCoverageExternalsVersion)" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VanguardCollector\DefaultCodeCoverageConfig.xml" />
