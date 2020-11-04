@@ -1,10 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
+
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;net451</TargetFrameworks>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+  
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>

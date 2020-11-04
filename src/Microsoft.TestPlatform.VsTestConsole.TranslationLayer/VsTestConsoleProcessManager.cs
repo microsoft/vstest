@@ -150,7 +150,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void ShutdownProcess()
         {
             // Ideally process should die by itself
-            if(!processExitedEvent.WaitOne(ENDSESSIONTIMEOUT) && IsProcessInitialized())
+            if (!processExitedEvent.WaitOne(ENDSESSIONTIMEOUT) && IsProcessInitialized())
             {
                 EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {ENDSESSIONTIMEOUT} milliseconds.");
                 vstestConsoleExited = true;
@@ -220,15 +220,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (isNetCoreRunner)
             {
-                args.Insert(0, vstestConsolePath);
+                args.Insert(0, GetEscapeSequencedPath(vstestConsolePath));
             }
 
             return args.ToArray();
         }
 
         private string GetConsoleRunner()
-        {
-            return isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : vstestConsolePath;
-        }
+            => isNetCoreRunner ? (string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : GetEscapeSequencedPath(this.vstestConsolePath);
+
+        private string GetEscapeSequencedPath(string path)
+            => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
     }
 }
