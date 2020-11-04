@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     internal class DataCollectionManager : IDataCollectionManager
     {
         private static object syncObject = new object();
+        private const string CodeCoverageFriendlyName = "Code Coverage";
 
         /// <summary>
         /// Value indicating whether data collection is currently enabled.
@@ -591,7 +592,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var failedCollectors = new List<DataCollectorInformation>();
             unloadedAnyCollector = false;
             var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
-            foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
+
+            // Ordering here is temporary to enable Fakes + Code Coverage integration in scenarios when Fakes decides to instrument code using
+            // CLR Instrumentation Engine. This code will be cleaned when both Fakes and Code Coverage will fully switch to CLR Instrumentation Engine.
+            foreach (var dataCollectorInfo in this.RunDataCollectors.Values.
+                OrderBy(rdc => rdc.DataCollectorConfig.FriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase) ? 1 : 0))
             {
                 try
                 {
@@ -649,16 +654,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         else
                         {
                             // Data collector is overriding an already requested variable, possibly an error.
-                            dataCollectionWrapper.Logger.LogError(
-                                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
-                                string.Format(
+                            var message = string.Format(
                                     CultureInfo.CurrentUICulture,
                                     Resources.Resources.DataCollectorRequestedDuplicateEnvironmentVariable,
                                     collectorFriendlyName,
                                     namevaluepair.Key,
                                     namevaluepair.Value,
                                     alreadyRequestedVariable.FirstDataCollectorThatRequested,
-                                    alreadyRequestedVariable.Value));
+                                    alreadyRequestedVariable.Value);
+            
+                            if(collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios 
+                                EqtTrace.Info(message);
+                            }
+                            else
+                            {
+                                dataCollectionWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
+                            }                            
                         }
                     }
                     else
