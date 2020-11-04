@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies host is using version 1.
         private int protocolVersion = 1;
 
-        private int highestSupportedVersion = 3;
+        private int highestSupportedVersion = 4;
 
         private TestHostConnectionInfo connectionInfo;
 

@@ -4,23 +4,23 @@
 namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System.Collections.Generic;
-
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
-    /// Defines a test session that can be used to make calls to the vstest.console
+    /// Defines a test session that can be used to make async calls to the vstest.console
     /// process.
     /// </summary>
-    public interface ITestSession : ITestSessionAsync
+    public interface ITestSessionAsync
     {
         /// <summary>
         /// Starts test discovery.
         /// </summary>
         /// 
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
+        Task DiscoverTestsAsync(
             ITestDiscoveryEventsHandler discoveryEventsHandler);
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// </summary>
         /// 
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
+        Task DiscoverTestsAsync(
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// 
         /// <param name="options">The test platform options.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
+        Task DiscoverTestsAsync(
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler discoveryEventsHandler);
 
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// 
         /// <param name="options">The test platform options.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
+        Task DiscoverTestsAsync(
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
@@ -58,7 +58,8 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="sources">The list of source assemblies for the discovery.</param>
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
+        /// <returns></returns>
+        Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
             ITestDiscoveryEventsHandler discoveryEventsHandler);
@@ -71,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
+        Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
@@ -80,14 +81,14 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Cancels the last discovery request.
         /// </summary>
-        new void CancelDiscovery();
+        void CancelDiscovery();
 
         /// <summary>
         /// Starts a test run.
         /// </summary>
         /// 
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// 
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler);
 
@@ -107,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler);
@@ -120,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -132,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             ITestRunEventsHandler testRunEventsHandler);
 
@@ -143,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler);
@@ -155,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler);
@@ -168,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
+        Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
@@ -180,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// 
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher);
 
@@ -191,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher);
@@ -204,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler,
@@ -219,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -233,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher);
@@ -246,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler,
@@ -260,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler,
@@ -275,7 +276,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
+        Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
@@ -289,16 +290,17 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="eventsHandler">The session event handler.</param>
         /// 
         /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
-        bool StopTestSession(ITestSessionEventsHandler eventsHandler);
+        Task<bool> StopTestSessionAsync(
+            ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Cancels the last test run.
         /// </summary>
-        new void CancelTestRun();
+        void CancelTestRun();
 
         /// <summary>
         /// Aborts the last test run.
         /// </summary>
-        new void AbortTestRun();
+        void AbortTestRun();
     }
 }

@@ -20,29 +20,33 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void StartSession();
 
         /// <summary>
-        /// Initialize the TestPlatform with Paths to extensions like adapters, loggers and any other extensions
+        /// Initializes the test platform with paths to extensions like adapters, loggers and any
+        /// other extensions.
         /// </summary>
-        /// <param name="pathToAdditionalExtensions">Full Paths to extension DLLs</param>
+        /// 
+        /// <param name="pathToAdditionalExtensions">Full paths to extension DLLs.</param>
         void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions);
 
         /// <summary>
-        /// Start Discover Tests for the given sources and discovery settings.
+        /// Starts test discovery.
         /// </summary>
-        /// <param name="sources">List of source assemblies, files to discover tests</param>
-        /// <param name="discoverySettings">Settings XML for test discovery</param>
-        /// <param name="discoveryEventsHandler">EventHandler to receive discovery events</param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the discovery.</param>
+        /// <param name="discoverySettings">The run settings for the discovery.</param>
+        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
         void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
             ITestDiscoveryEventsHandler discoveryEventsHandler);
 
         /// <summary>
-        /// Start Discover Tests for the given sources and discovery settings.
+        /// Starts test discovery.
         /// </summary>
-        /// <param name="sources">List of source assemblies, files to discover tests</param>
-        /// <param name="discoverySettings">Settings XML for test discovery</param>
-        /// <param name="options">Options to be passed into the platform.</param>
-        /// <param name="discoveryEventsHandler">EventHandler to receive discovery events</param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the discovery.</param>
+        /// <param name="discoverySettings">The run settings for the discovery.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
         void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -50,13 +54,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
-        /// 
+        /// Starts test discovery.
         /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="discoverySettings"></param>
-        /// <param name="options"></param>
-        /// <param name="testSessionInfo"></param>
-        /// <param name="discoveryEventsHandler"></param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the discovery.</param>
+        /// <param name="discoverySettings">The run settings for the discovery.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
         void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -70,23 +75,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         new void CancelDiscovery();
 
         /// <summary>
-        /// Starts a test run given a list of sources.
+        /// Starts a test run.
         /// </summary>
-        /// <param name="sources">Sources to Run tests on</param>
-        /// <param name="runSettings">RunSettings XML to run the tests</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
         void RunTests(
             IEnumerable<string> sources,
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// Starts a test run given a list of sources.
+        /// Starts a test run.
         /// </summary>
-        /// <param name="sources">Sources to Run tests on</param>
-        /// <param name="runSettings">RunSettings XML to run the tests</param>
-        /// <param name="options">Options to be passed into the platform.</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
         void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -94,13 +101,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// 
+        /// Starts a test run.
         /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="options"></param>
-        /// <param name="testSessionInfo"></param>
-        /// <param name="testRunEventsHandler"></param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
         void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -109,23 +117,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// Starts a test run given a list of test cases
+        /// Starts a test run.
         /// </summary>
-        /// <param name="testCases">TestCases to run</param>
-        /// <param name="runSettings">RunSettings XML to run the tests</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
+        /// 
+        /// <param name="testCases">The list of test cases for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
         void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// Starts a test run given a list of test cases
+        /// Starts a test run.
         /// </summary>
-        /// <param name="testCases">TestCases to run</param>
-        /// <param name="runSettings">RunSettings XML to run the tests</param>
-        /// <param name="options">Options to be passed into the platform.</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
+        /// 
+        /// <param name="testCases">The list of test cases for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
         void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -133,13 +143,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// 
+        /// Starts a test run.
         /// </summary>
-        /// <param name="testCases"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="options"></param>
-        /// <param name="testSessionInfo"></param>
-        /// <param name="testRunEventsHandler"></param>
+        /// 
+        /// <param name="testCases">The list of test cases for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
         void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -148,12 +159,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// Starts a test run given a list of sources by giving caller an option to start their own test host.
+        /// Starts a test run.
         /// </summary>
-        /// <param name="sources">Sources to Run tests on</param>
-        /// <param name="runSettings">RunSettings XML to run the tests</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
-        /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
+        /// <param name="customTestHostLauncher">The custom host launcher.</param>
         void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -161,13 +173,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// Starts a test run given a list of sources by giving caller an option to start their own test host.
+        /// Starts a test run.
         /// </summary>
-        /// <param name="sources">Sources to Run tests on</param>
-        /// <param name="runSettings">RunSettings XML to run the tests</param>
-        /// <param name="options">Options to be passed into the platform.</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
-        /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
+        /// <param name="customTestHostLauncher">The custom host launcher.</param>
         void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -176,14 +189,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// 
+        /// Starts a test run.
         /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="options"></param>
-        /// <param name="testSessionInfo"></param>
-        /// <param name="testRunEventsHandler"></param>
-        /// <param name="customTestHostLauncher"></param>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
+        /// <param name="customTestHostLauncher">The custom host launcher.</param>
         void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -193,12 +207,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// Starts a test run given a list of test cases by giving caller an option to start their own test host
+        /// Starts a test run.
         /// </summary>
-        /// <param name="testCases">TestCases to run.</param>
-        /// <param name="runSettings">RunSettings XML to run the tests.</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events.</param>
-        /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
+        /// 
+        /// <param name="testCases">The list of test cases for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
+        /// <param name="customTestHostLauncher">The custom host launcher.</param>
         void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -206,13 +221,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// Starts a test run given a list of test cases by giving caller an option to start their own test host
+        /// Starts a test run.
         /// </summary>
-        /// <param name="testCases">TestCases to run.</param>
-        /// <param name="runSettings">RunSettings XML to run the tests.</param>
-        /// <param name="options">Options to be passed into the platform.</param>
-        /// <param name="testRunEventsHandler">EventHandler to receive test run events.</param>
-        /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
+        /// 
+        /// <param name="testCases">The list of test cases for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
+        /// <param name="customTestHostLauncher">The custom host launcher.</param>
         void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -221,14 +237,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// 
+        /// Starts a test run.
         /// </summary>
-        /// <param name="testCases"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="options"></param>
-        /// <param name="testSessionInfo"></param>
-        /// <param name="testRunEventsHandler"></param>
-        /// <param name="customTestHostLauncher"></param>
+        /// 
+        /// <param name="testCases">The list of test cases for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="testRunEventsHandler">The run event handler.</param>
+        /// <param name="customTestHostLauncher">The custom host launcher.</param>
         void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -238,25 +255,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// 
+        /// Starts a new test session.
         /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="eventsHandler"></param>
-        /// <returns></returns>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        /// 
+        /// <returns>A test session info object.</returns>
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
-        /// 
+        /// Starts a new test session.
         /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="options"></param>
-        /// <param name="eventsHandler"></param>
-        /// <returns></returns>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        /// 
+        /// <returns>A test session info object.</returns>
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -264,14 +285,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
-        /// 
+        /// Starts a new test session.
         /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="options"></param>
-        /// <param name="eventsHandler"></param>
-        /// <param name="testHostLauncher"></param>
-        /// <returns></returns>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        /// <param name="testHostLauncher">The custom host launcher.</param>
+        /// 
+        /// <returns>A test session info object.</returns>
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -280,21 +303,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher testHostLauncher);
 
         /// <summary>
-        /// 
+        /// Stops the test session.
         /// </summary>
-        /// <param name="testSessionInfo"></param>
-        /// <param name="eventsHandler"></param>
+        /// 
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        /// 
+        /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
         bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
-        /// Cancel the last test run.
+        /// Cancels the last test run.
         /// </summary>
         new void CancelTestRun();
 
         /// <summary>
-        /// Abort the last test run.
+        /// Aborts the last test run.
         /// </summary>
         new void AbortTestRun();
 
