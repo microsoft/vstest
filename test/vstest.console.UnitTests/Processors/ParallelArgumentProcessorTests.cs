@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ParallelArgumentProcessorCapabilities();
             Assert.AreEqual("/Parallel", capabilities.CommandName);
-            Assert.AreEqual("--Parallel|/Parallel" + Environment.NewLine + "      Specifies that the tests be executed in parallel. By default up" + Environment.NewLine + "      to all available cores on the machine may be used." + Environment.NewLine + "      The number of cores to use may be configured using a settings file.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Parallel|/Parallel\r\n      Specifies that the tests be executed in parallel. By default up\r\n      to all available cores on the machine may be used.\r\n      The number of cores to use may be configured using a settings file.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ParallelArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsFalse(capabilities.IsAction);
