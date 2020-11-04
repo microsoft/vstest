@@ -78,17 +78,17 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private DataCollectionContext context;
 
-        private IVanguardLocationProvider vanguardLocationProvider;
+        private IProfilersLocationProvider vanguardLocationProvider;
 
         private IVanguardCommandBuilder vanguardCommandBuilder;
 
         public Vanguard()
-            : this(new VanguardLocationProvider(), new VanguardCommandBuilder(), new ProcessJobObject())
+            : this(new ProfilersLocationProvider(), new VanguardCommandBuilder(), new ProcessJobObject())
         {
         }
 
         internal Vanguard(
-            IVanguardLocationProvider vanguardLocationProvider,
+            IProfilersLocationProvider vanguardLocationProvider,
             IVanguardCommandBuilder commandBuilder,
             IProcessJobObject processJobObject)
         {
