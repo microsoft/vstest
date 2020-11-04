@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Gets or sets the fully specified method name metadata format.
         /// </summary>
         /// <example>
-        ///     <code>MethodName`2(ParamTypeA,ParamTypeB,…)</code>
+        ///     <code>MethodName`2(ParamTypeA,ParamTypeB,ï¿½)</code>
         /// </example>
         [DataMember]
         public string ManagedMethod { 
@@ -215,12 +215,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if(string.IsNullOrEmpty(this.displayName))
                 {
-                    if(string.IsNullOrWhiteSpace(managedType) || string.IsNullOrWhiteSpace(managedMethod))
+                    if (this.HasManagedMethodAndType)
                     {
-                        return this.FullyQualifiedName;
+                        return $"{managedType}.{ManagedMethod}";
                     }
 
-                    return $"{managedType}.{ManagedMethod}";
+                    return this.FullyQualifiedName;
                 }
 
                 return this.displayName;
@@ -288,16 +288,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        /// <summary>
+        /// Returns <c>true</c> if both <see cref="ManagedType"/> and <see cref="ManagedMethod"/> are not null or whitespace.
+        /// </summary>
+        public bool HasManagedMethodAndType => !string.IsNullOrWhiteSpace(ManagedType) && !string.IsNullOrWhiteSpace(ManagedMethod);
+
         /// <inheritdoc/>
         public override string ToString()
         {
-            if (string.IsNullOrWhiteSpace(ManagedType) || string.IsNullOrWhiteSpace(ManagedMethod))
+            if (this.HasManagedMethodAndType)
             {
-                return this.FullyQualifiedName;
+                return $"{ManagedType}.{ManagedMethod}";
             }
             else
             {
-                return $"{ManagedType}.{ManagedMethod}";
+                return this.FullyQualifiedName;
             }
         }
 
@@ -336,13 +341,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             var testcaseFullName = this.ExecutorUri + source; 
             
             // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
-            if( string.IsNullOrWhiteSpace(managedType) || string.IsNullOrWhiteSpace(managedMethod))
+            if (this.HasManagedMethodAndType)
             {
-                testcaseFullName += this.FullyQualifiedName;
+                testcaseFullName += $"{managedType}.{managedMethod}";
             }
             else
             {
-                testcaseFullName += $"{managedType}.{managedMethod}";
+                testcaseFullName += this.FullyQualifiedName;
             }
             
             return EqtHash.GuidFromString(testcaseFullName);

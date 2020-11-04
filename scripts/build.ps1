@@ -32,15 +32,15 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("noloc")]
-    [Switch] $DisableLocalizedBuild = $false,
+    [Switch] $DisableLocalizedBuild,
 
     [Parameter(Mandatory=$false)]
     [Alias("ci")]
-    [Switch] $CIBuild = $false,
+    [Switch] $CIBuild,
 
     [Parameter(Mandatory=$false)]
     [Alias("pt")]
-    [Switch] $PublishTestArtifacts = $false,
+    [Switch] $PublishTestArtifacts,
 
     # Build specific projects
     [Parameter(Mandatory=$false)]
@@ -225,6 +225,36 @@ function Restore-Package
     Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
     & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
+
+    # Fixing a problem with procdump package
+    # $procdumpFolder = "$env:TP_PACKAGES_DIR\procdump\0.0.1"
+    # if (-not (Test-Path "$procdumpFolder\bin") -and -not $CIBuild)
+    # {
+    #     Add-Type -AssemblyName System.IO.Compression.FileSystem
+        
+    #     $zip = $null
+    #     try {
+    #         $zip = [System.IO.Compression.ZipFile]::Open("$procdumpFolder\procdump.0.0.1.nupkg", 0)    
+    #         $zip.Entries | Where-Object { $_.FullName.StartsWith("bin/") } | ForEach-Object {
+    #             $file = "$procdumpFolder\$($_.FullName)"
+    #             $fi = [System.IO.Path]::GetDirectoryName($file)
+    #             if (-not (Test-Path $fi)) {
+    #                 New-Item -Type Directory -Path $fi -Force
+    #             }
+
+    #             if (-not (Test-Path $file)) {
+    #                 [System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, $file, $true)
+    #             }
+    #         }
+    #     }
+    #     finally 
+    #     {
+    #         if ($null -ne $zip)
+    #         {
+    #             $zip.Dispose()
+    #         }
+    #     }
+    # }
 
     Set-ScriptFailedOnError
 
