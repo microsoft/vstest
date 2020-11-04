@@ -94,7 +94,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             Assert.AreEqual("TestResults", runConfiguration.ResultsDirectory);
 
-            var expectedSolutionPath = Environment.ExpandEnvironmentVariables("%temp%");
+            var expectedSolutionPath = Environment.GetEnvironmentVariable("temp");
             Assert.AreEqual(expectedSolutionPath, runConfiguration.SolutionDirectory);
 
             Assert.IsTrue(runConfiguration.TreatTestAdapterErrorsAsWarnings);

@@ -13,6 +13,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
+    <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
