@@ -2,7 +2,7 @@
   <!-- Package dependency versions -->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
-    <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
