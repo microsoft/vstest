@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         private string sessionName;
         private string configFileName;
         private Mock<IDataCollectionLogger> dataCollectionLoggerMock;
-        private Mock<IVanguardLocationProvider> vanguardLocationProviderMock;
+        private Mock<IProfilersLocationProvider> vanguardLocationProviderMock;
         private string outputFileName;
         private string outputDir;
         private DataCollectionContext dataCollectionContext;
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.processJobObject = new ProcessJobObject();
             this.vanguardCommandBuilderMock = new Mock<IVanguardCommandBuilder>();
-            this.vanguardLocationProviderMock = new Mock<IVanguardLocationProvider>();
+            this.vanguardLocationProviderMock = new Mock<IProfilersLocationProvider>();
 
             this.vanguard = new Vanguard(this.vanguardLocationProviderMock.Object, this.vanguardCommandBuilderMock.Object, this.processJobObject);
             this.sessionName = Guid.NewGuid().ToString();
