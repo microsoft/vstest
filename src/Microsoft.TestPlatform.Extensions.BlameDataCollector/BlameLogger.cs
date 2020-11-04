@@ -112,15 +112,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
-            this.output.Error(false, Resources.Resources.AbortedTestRun);
-
             StringBuilder sb = new StringBuilder();
             foreach (var tcn in testCaseNames)
             {
                 sb.Append(tcn).Append(Environment.NewLine);
             }
 
-            this.output.Error(false, sb.ToString());
+            this.output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
         }
 
         #endregion
@@ -152,8 +150,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         var testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
                         if (testCaseList.Count > 0)
                         {
-                            var testcase = testCaseList.Last();
-                            faultyTestCaseNames.Add(testcase.FullyQualifiedName);
+                            var testcases = testCaseList.Where(t => !t.IsCompleted).Select(t => t.FullyQualifiedName).ToList();
+                            faultyTestCaseNames.AddRange(testcases);
                         }
                     }
                 }

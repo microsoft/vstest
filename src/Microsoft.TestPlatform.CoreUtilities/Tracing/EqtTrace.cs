@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         private static IPlatformEqtTrace traceImpl = new PlatformEqtTrace();
 
-#if NET451
+#if NETFRAMEWORK
         public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
             traceImpl.SetupRemoteEqtTraceListeners(childDomain);
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 #endif
 
-#if NETSTANDARD2_0
+#if NETSTANDARD
         public static PlatformTraceLevel TraceLevel
         {
             get
@@ -174,8 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [Conditional("TRACE")]
         public static void Fail(string message)
         {
-            Error(message);
-            Debug.Fail(message);
+            Fail(message, null);
         }
 
         /// <summary>
@@ -188,10 +187,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static void Fail(string format, params object[] args)
         {
             string message = string.Format(CultureInfo.InvariantCulture, format, args);
+
             Error(message);
-#if DEBUG
-            Debug.Fail(message);
-#endif
+            FailDebugger(message);
         }
 
         /// <summary>
@@ -328,7 +326,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(format != null, "format != null");
             var message = string.Format(CultureInfo.InvariantCulture, format, args);
             Error(message);
-            Debug.Fail(message);
+            FailDebugger(message);
         }
 
         /// <summary>
@@ -806,7 +804,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Verbose(message);
                     break;
                 default:
-                    Debug.Fail("We should never get here!");
+                    FailDebugger("We should never get here!");
                     break;
             }
         }
@@ -815,6 +813,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             Debug.Assert(format != null, "format != null");
             WriteAtLevel(level, string.Format(CultureInfo.InvariantCulture, format, args));
+        }
+
+        private static void FailDebugger(string message)
+        {
+#if DEBUG
+#if NETSTANDARD1_0
+            Debug.Assert(false, message);
+#else
+            Debug.Fail(message);
+#endif
+#endif
         }
     }
 }

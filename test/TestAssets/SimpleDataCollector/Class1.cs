@@ -39,7 +39,7 @@ namespace SimpleDataCollector
         {
             Console.WriteLine(testSessionStartArgs.Configuration);
             File.WriteAllText(this.fileName, "TestSessionStart : " + testSessionStartArgs.Configuration + "\r\n");
-#if NET451
+#if NETFRAMEWORK
             var appDomainFilePath = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
             File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: "+ AppDomain.CurrentDomain.FriendlyName);
 #endif

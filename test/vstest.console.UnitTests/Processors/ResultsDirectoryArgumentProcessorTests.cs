@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 folder,
                 "The filename, directory name, or volume label syntax is incorrect : \'c:\\som>\\illegal\\path\\\'");
 
-#if NET451
+#if NETFRAMEWORK
             message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
                 "The directory name is invalid : \'c:\\path\\to\\in:valid\'");
-#if NET451
+#if NETFRAMEWORK
             message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,

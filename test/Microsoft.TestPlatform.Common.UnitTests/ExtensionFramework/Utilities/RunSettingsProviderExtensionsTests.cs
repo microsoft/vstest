@@ -152,19 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateTestRunParameterSettingsNodeShouldAddNewKeyIfNotPresent()
         {
-            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")");
-            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + Environment.NewLine 
- + "<RunSettings>" + Environment.NewLine 
- + "  <TestRunParameters>" + Environment.NewLine 
- + "    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />" + Environment.NewLine 
- + "  </TestRunParameters>" + Environment.NewLine 
- + "</RunSettings>";
-
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>" + Environment.NewLine 
- + "  </RunSettings>");
-            this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
-
-            Assert.AreEqual(runSettingsWithTestRunParameters, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+            this.CheckRunSettingsAreUpdated("weburl", @"http://localhost//abc");
         }
 
         [TestMethod]
@@ -188,6 +176,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
             Assert.AreEqual(runSettingsWithTestRunParametersOverrode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void TestRunParameterSettingsNodeCanContainSpecialCharacters()
+        {
+            this.CheckRunSettingsAreUpdated("weburl:name", @"http://localhost//abc");
+        }
+
+        [TestMethod]
+        public void TestRunParameterSettingsNodeCanBeJustASingleCharacter()
+        {
+            this.CheckRunSettingsAreUpdated("a", @"http://localhost//abc");
+        }
+
+        [TestMethod]
+        public void TestRunParameterSettingsNodeCanMixSpecialCharacters()
+        {
+            this.CheckRunSettingsAreUpdated("___this_Should:be-valid.2", @"http://localhost//abc");
         }
 
         [TestMethod]
@@ -262,6 +268,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <TargetPlatform>x86</TargetPlatform></RunConfiguration>  </RunSettings>");
             Assert.AreEqual("x86", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.TargetPlatform"));
+        }
+
+        private void CheckRunSettingsAreUpdated(string parameterName, string parameterValue)
+        {
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch(
+                $@"TestRunParameters.Parameter(name=""{parameterName}"",value=""{parameterValue}"")");
+            var runSettingsWithTestRunParameters = string.Join(
+                Environment.NewLine,
+                $@"<?xml version=""1.0"" encoding=""utf-16""?>",
+                $@"<RunSettings>",
+                $@"  <TestRunParameters>",
+                $@"    <Parameter name=""{parameterName}"" value=""{parameterValue}"" />",
+                $@"  </TestRunParameters>",
+                $@"</RunSettings>");
+
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  </RunSettings>");
+            this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
+
+            Assert.AreEqual(runSettingsWithTestRunParameters, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         private class TestableRunSettingsProvider : IRunSettingsProvider

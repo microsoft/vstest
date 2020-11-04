@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="args">Arguments provided on the command line.</param>
         /// <returns>0 if everything was successful and 1 otherwise.</returns>
         public static int Main(string[] args)
-        {
+        {            
             var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_RUNNER_DEBUG");
             if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
             {

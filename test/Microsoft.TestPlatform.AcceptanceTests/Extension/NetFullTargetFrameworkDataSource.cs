@@ -48,10 +48,34 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
+        /// </summary>
+        /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
+        public NetFullTargetFrameworkDataSource(string[] targetFrameworks, bool inIsolation = true, bool inProcess = false)
+        {
+            if (inIsolation)
+            {
+                foreach (var fmw in targetFrameworks)
+                {
+                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });
+                }
+            }
+
+            if (inProcess)
+            {
+                foreach (var fmw in targetFrameworks)
+                {
+                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw) });
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the data rows.
         /// </summary>
-        private List<object[]> dataRows;
+        private List<object[]> dataRows = new List<object[]>();
 
         public IEnumerable<object[]> GetData(MethodInfo methodInfo)
         {

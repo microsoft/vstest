@@ -496,7 +496,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var projectName = "ProjectFileRunSettingsTestProject.csproj";
             var projectPath = this.GetProjectFullPath(projectName);
-            this.InvokeDotnetTest(projectPath);
+            this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
             this.ValidateSummaryStatus(0, 1, 0);
 
             // make sure that we can revert the project settings back by providing a config from command line
@@ -504,7 +504,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // are honored by dotnet test, instead of just using the default, which would produce the same
             // result
             var settingsPath = this.GetProjectAssetFullPath(projectName, "inconclusive.runsettings");
-            this.InvokeDotnetTest($"{projectPath} --settings {settingsPath}");
+            this.InvokeDotnetTest($@"{projectPath} --settings {settingsPath} --logger:""Console;Verbosity=normal""");
             this.ValidateSummaryStatus(0, 0, 1);
         }
 

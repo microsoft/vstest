@@ -33,6 +33,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         private const string TestSummaryStatusMessageFormat = "Total tests: {0} Passed: {1} Failed: {2} Skipped: {3}";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
+        private string standardTestOutputWithWhiteSpace = string.Empty;
+        private string standardTestErrorWithWhiteSpace = string.Empty;
         private int runnerExitCode = -1;
 
         private string arguments = string.Empty;
@@ -55,8 +57,10 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         public string StdOut => this.standardTestOutput;
+        public string StdOutWithWhiteSpace => this.standardTestOutputWithWhiteSpace;
 
         public string StdErr => this.standardTestError;
+        public string StdErrWithWhiteSpace => this.standardTestErrorWithWhiteSpace;
 
         /// <summary>
         /// Prepare arguments for <c>vstest.console.exe</c>.
@@ -82,6 +86,12 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Append run settings
                 arguments = string.Concat(arguments, " /settings:", runSettings.AddDoubleQuote());
+            }
+
+            if (!string.IsNullOrWhiteSpace(framework))
+            {
+                // Append run settings
+                arguments = string.Concat(arguments, " /framework:", framework.AddDoubleQuote());
             }
 
             arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
@@ -568,10 +578,10 @@ namespace Microsoft.TestPlatform.TestUtilities
                 var stderrBuffer = new StringBuilder();
                 process.OutputDataReceived += (sender, eventArgs) =>
                 {
-                    stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                    stdoutBuffer.AppendLine(eventArgs.Data);
                 };
 
-                process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
 
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
@@ -609,7 +619,10 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private void FormatStandardOutCome()
         {
+            this.standardTestErrorWithWhiteSpace = this.standardTestError;
             this.standardTestError = Regex.Replace(this.standardTestError, @"\s+", " ");
+
+            this.standardTestOutputWithWhiteSpace = this.standardTestOutput;
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"\s+", " ");
         }
 

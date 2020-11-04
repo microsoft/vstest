@@ -10,15 +10,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
     {
@@ -218,6 +219,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Now that tests are discovered and filtered, we run only those selected tests.
             this.ExecuteSelectedTests();
 
+            bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(effectiveRunSettings);
+
+            if (treatNoTestsAsError && this.selectedTestCases.Count == 0)
+            {
+                return ArgumentProcessorResult.Fail;
+            }
+
             return ArgumentProcessorResult.Success;
         }
 
@@ -284,6 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Warning(false, warningMessage);
             }
         }
+
 
         /// <summary>
         /// Filter discovered tests and find matching tests from given search strings.

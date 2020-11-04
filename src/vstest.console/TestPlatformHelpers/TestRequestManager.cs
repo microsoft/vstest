@@ -3,21 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
-    using System;
-    using System.Xml;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.XPath;
-    using System.Threading;
-    using System.Reflection;
-    using System.Globalization;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -34,7 +25,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Xml;
+    using System.Xml.XPath;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -173,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 // Collect Commands
                 this.LogCommandsTelemetryPoints(requestData);
             }
-           
+
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
             {
@@ -267,11 +266,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 this.LogTelemetryForLegacySettings(requestData, runsettings);
             }
 
-            if (!commandLineOptions.IsDesignMode)
+            // get Fakes data collector settings
+            if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
             {
-                // Generate fakes settings only for command line scenarios. In case of
-                // Editors/IDEs, this responsibility is with the caller.
-                GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
+                // The commandline Options do not have sources in design time mode,
+                // and so we fall back to using sources instead
+                if (this.commandLineOptions.Sources.Any())
+                {
+                    GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
+                }
+                else if (sources.Any())
+                {
+                    GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, sources, ref runsettings);
+                }
             }
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
@@ -332,7 +339,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
                     Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, attachmentsProcessingPayload.Attachments, attachmentsProcessingEventsHandler, this.currentAttachmentsProcessingCancellationTokenSource.Token);
-                    task.Wait();                   
+                    task.Wait();
                 }
                 finally
                 {
@@ -357,7 +364,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsTelemetry))
             {
-                foreach( var ciData in legacySettingsTelemetry)
+                foreach (var ciData in legacySettingsTelemetry)
                 {
                     // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
                     requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingPrefix, ciData.Key), ciData.Value);
@@ -444,8 +451,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
 
-                    // Set default architecture as X86
+                    // Choose default architecture based on the framework
+                    // For .NET core, the default platform architecture should be based on the process.	
                     Architecture defaultArchitecture = Architecture.X86;
+                    if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                        || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+                        || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+#if NETCOREAPP
+                        // We are running in vstest.console that is either started via dotnet.exe or via vstest.console.exe .NET Core 
+                        // executable. For AnyCPU dlls this should resolve 32-bit SDK when running from 32-bit dotnet process and 
+                        // 64-bit SDK when running from 64-bit dotnet process.
+                        defaultArchitecture = Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86;
+#else
+                        // We are running in vstest.console.exe that was built against .NET Framework. This console prefers 32-bit
+                        // because it needs to run as 32-bit to be compatible with QTAgent. It runs as 32-bit both under VS and 
+                        // in Developer console. Set the default architecture based on the OS architecture, to find 64-bit dotnet SDK
+                        // when running AnyCPU dll on 64-bit system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
+                        // We want to find 64-bit SDK because it is more likely to be installed.
+                        defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
+#endif
+                    }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
                     this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, defaultArchitecture, sourcePlatforms, sourceFrameworks, registrar);
@@ -455,7 +481,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
-                }              
+                }
             }
 
             return settingsUpdated;

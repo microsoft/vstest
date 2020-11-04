@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.IO;
     using System.Reflection;
     using System.Xml;
-
+    using System.Xml.XPath;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -81,7 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // Since there are no FrameworkVersion values for .Net Core 2.0 +, we check TargetFramework instead
             // and default to FrameworkCore10 for .Net Core 
             if (targetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                targetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                targetFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return FrameworkVersion.FrameworkCore10;
             }
@@ -103,12 +104,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             IEnumerable<string> sources,
             FrameworkVersion framework)
         {
-            // If user provided fakes settings don't do anything
-            if (XmlRunSettingsUtilities.ContainsDataCollector(runSettings.CreateNavigator(), FakesMetadata.DataCollectorUri))
-            {
-                return false;
-            }
-
             // A new Fakes Congigurator API makes the decision to add the right datacollector uri to the configuration
             // There now exist two data collector URIs to support two different scenarios. The new scenario involves 
             // using the CLRIE profiler, and the old involves using the Intellitrace profiler (which isn't supported in 
@@ -119,17 +114,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 var sourceTFMMap = CreateDictionary(sources, framework);
                 var fakesSettings = crossPlatformConfigurator(sourceTFMMap);
+
                 // if no fakes, return settings unchanged
                 if (fakesSettings == null)
                 {
                     return false;
                 }
 
-                XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), fakesSettings);
+                InsertOrReplaceFakesDataCollectorNode(runSettings, fakesSettings);
                 return true;
             }
 
             return AddFallbackFakesSettings(runSettings, sources, framework);
+        }
+
+        internal static void InsertOrReplaceFakesDataCollectorNode(XmlDocument runSettings, DataCollectorSettings settings)
+        {
+            // override current settings
+            var navigator = runSettings.CreateNavigator();
+            var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+
+            foreach (XPathNavigator dataCollectorNavigator in nodes)
+            {
+                var uri = dataCollectorNavigator.GetAttribute("uri", string.Empty);
+                // We assume that only one uri can exist in a given runsettings
+                if (string.Equals(FakesMetadata.DataCollectorUriV1, uri, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(FakesMetadata.DataCollectorUriV2, uri, StringComparison.OrdinalIgnoreCase))
+                {
+                    dataCollectorNavigator.ReplaceSelf(settings.ToXml().CreateNavigator());
+                    return;
+                }
+            }
+
+            // insert new node
+            XmlRunSettingsUtilities.InsertDataCollectorsNode(runSettings.CreateNavigator(), settings);
         }
 
         private static IDictionary<string, FrameworkVersion> CreateDictionary(IEnumerable<string> sources, FrameworkVersion framework)
@@ -215,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static Func<IEnumerable<string>, string> TryGetNetFrameworkFakesDataCollectorConfigurator()
         {
-#if NET451
+#if NETFRAMEWORK
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
@@ -241,8 +259,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             try
             {
-                Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
-                var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
+                Assembly assembly = Assembly.Load(new AssemblyName(FakesConfiguratorAssembly));
+                var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false, false);
                 var method = type?.GetMethod(CrossPlatformConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
                 if (method != null)
                 {
@@ -274,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 AssemblyQualifiedName = FakesMetadata.DataCollectorAssemblyQualifiedName,
                 FriendlyName = FakesMetadata.FriendlyName,
                 IsEnabled = true,
-                Uri = new Uri(FakesMetadata.DataCollectorUri)
+                Uri = new Uri(FakesMetadata.DataCollectorUriV1)
             };
             return settings;
         }
@@ -289,7 +307,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             /// <summary>
             /// Gets the URI of the data collector
             /// </summary>
-            public const string DataCollectorUri = "datacollector://microsoft/unittestisolation/1.0";
+            public const string DataCollectorUriV1 = "datacollector://microsoft/unittestisolation/1.0";
+
+            /// <summary>
+            /// Gets the URI of the data collector
+            /// </summary>
+            public const string DataCollectorUriV2 = "datacollector://microsoft/unittestisolation/2.0";
 
             /// <summary>
             /// Gets the assembly qualified name of the data collector type

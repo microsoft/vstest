@@ -183,7 +183,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Default results directory.
         /// </summary>
-        public static readonly string DefaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
+        public static readonly string DefaultResultsDirectory =
+#if NETSTANDARD1_0
+            Path.Combine(".", ResultsDirectoryName);
+#else
+            Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
+#endif
 
         /// <summary>
         /// Default treatment of error from test adapters.
@@ -194,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The default execution thread apartment state.
         /// </summary>
         [CLSCompliant(false)]
-#if NET451
+#if NETFRAMEWORK
         // Keeping default STA thread for desktop tests for UI/Functional test scenarios
         public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.STA;
 #else
