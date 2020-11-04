@@ -85,16 +85,17 @@ namespace Microsoft.VisualStudio.TraceCollector
                 return Path.Combine(installationPath, fileName);
             }
 
-            var currentAssemblyLocation =
-                Path.GetDirectoryName(typeof(ProfilersLocationProvider).GetTypeInfo().Assembly.Location);
-            return Path.Combine(currentAssemblyLocation, "InstrumentationEngine", arch, fileName);
+            return Path.Combine(this.GetCurrentAssemblyLocation(), "InstrumentationEngine", arch, fileName);
         }
 
         private string GetVanguardDirectory()
         {
-            var currentAssemblyLocation =
-                Path.GetDirectoryName(typeof(ProfilersLocationProvider).GetTypeInfo().Assembly.Location);
-            return Path.Combine(currentAssemblyLocation, "CodeCoverage");
+            return Path.Combine(this.GetCurrentAssemblyLocation(), "CodeCoverage");
+        }
+
+        private string GetCurrentAssemblyLocation()
+        {
+            return Path.GetDirectoryName(typeof(ProfilersLocationProvider).GetTypeInfo().Assembly.Location);
         }
     }
 }
