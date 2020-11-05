@@ -76,7 +76,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             // TODO (copoiena): Hook into the wrapper and pass session info here.
-            throw new System.NotImplementedException();
+            this.consoleWrapper.DiscoverTests(
+                sources,
+                discoverySettings,
+                options,
+                discoveryEventsHandler);
         }
 
         /// <inheritdoc/>
@@ -223,14 +227,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public Task DiscoverTestsAsync(
+        public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             // TODO (copoiena): Hook into the wrapper and pass session info here.
-            throw new System.NotImplementedException();
+            await this.consoleWrapper.DiscoverTestsAsync(
+                sources,
+                discoverySettings,
+                options,
+                discoveryEventsHandler);
         }
 
         /// <inheritdoc/>
