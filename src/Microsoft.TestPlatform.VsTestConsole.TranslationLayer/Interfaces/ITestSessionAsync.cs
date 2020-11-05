@@ -19,42 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// Starts test discovery.
         /// </summary>
         /// 
-        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        Task DiscoverTestsAsync(
-            ITestDiscoveryEventsHandler discoveryEventsHandler);
-
-        /// <summary>
-        /// Starts test discovery.
-        /// </summary>
-        /// 
-        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        Task DiscoverTestsAsync(
-            ITestDiscoveryEventsHandler2 discoveryEventsHandler);
-
-        /// <summary>
-        /// Starts test discovery.
-        /// </summary>
-        /// 
-        /// <param name="options">The test platform options.</param>
-        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        Task DiscoverTestsAsync(
-            TestPlatformOptions options,
-            ITestDiscoveryEventsHandler discoveryEventsHandler);
-
-        /// <summary>
-        /// Starts test discovery.
-        /// </summary>
-        /// 
-        /// <param name="options">The test platform options.</param>
-        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        Task DiscoverTestsAsync(
-            TestPlatformOptions options,
-            ITestDiscoveryEventsHandler2 discoveryEventsHandler);
-
-        /// <summary>
-        /// Starts test discovery.
-        /// </summary>
-        /// 
         /// <param name="sources">The list of source assemblies for the discovery.</param>
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
@@ -87,24 +51,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// Starts a test run.
         /// </summary>
         /// 
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        Task RunTestsAsync(
-            ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        Task RunTestsAsync(
-            TestPlatformOptions options,
-            ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -132,28 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// </summary>
         /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        Task RunTestsAsync(
-            IEnumerable<TestCase> testCases,
-            ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testCases">The list of test cases for the test run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        Task RunTestsAsync(
-            IEnumerable<TestCase> testCases,
-            TestPlatformOptions options,
-            ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         Task RunTestsAsync(
@@ -174,28 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             string runSettings,
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        Task RunTestsWithCustomTestHostAsync(
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestHostLauncher customTestHostLauncher);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        Task RunTestsWithCustomTestHostAsync(
-            TestPlatformOptions options,
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// Starts a test run.
@@ -223,32 +125,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
-            TestPlatformOptions options,
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestHostLauncher customTestHostLauncher);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testCases">The list of test cases for the test run.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        Task RunTestsWithCustomTestHostAsync(
-            IEnumerable<TestCase> testCases,
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestHostLauncher customTestHostLauncher);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testCases">The list of test cases for the test run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        Task RunTestsWithCustomTestHostAsync(
-            IEnumerable<TestCase> testCases,
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher);
