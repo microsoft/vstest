@@ -500,9 +500,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     options,
                     eventsHandler,
                     testHostLauncher),
-                this,
-                sources,
-                runSettings);
+                this);
         }
 
         /// <inheritdoc/>
@@ -897,9 +895,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     options,
                     eventsHandler,
                     testHostLauncher),
-                this,
-                sources,
-                runSettings);
+                this);
         }
 
         /// <inheritdoc/>
