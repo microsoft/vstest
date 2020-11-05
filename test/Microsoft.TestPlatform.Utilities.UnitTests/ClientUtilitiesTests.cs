@@ -216,7 +216,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
             }
             finally { 
-                Environment.SetEnvironmentVariable("TEST_TEMP", null)    
+                Environment.SetEnvironmentVariable("TEST_TEMP", null);    
             }
         }
     }
