@@ -189,29 +189,35 @@ namespace Microsoft.TestPlatform.Utilities.Tests
         [TestMethod]
         public void FixRelativePathsInRunSettingsShouldExpandEnvironmentVariable()
         {
-            // using HOME because TMP or TEMP is not defined on Linux / WSL2. 
-            // Using \\ instead of platform specifc path separator does not matter, because the paths are not interpreted by the OS.
-            var runSettingsXML = "<RunSettings><RunConfiguration><ResultsDirectory>%HOME%\\results</ResultsDirectory></RunConfiguration></RunSettings>";
+            try {
+                Environment.SetEnvironmentVariable("TEST_TEMP", Path.GetTempPath());
+                // using TEST_TEMP because TMP or TEMP, or HOME are not defined across all tested OSes
+                // Using \\ instead of platform specifc path separator does not matter, because the paths are not interpreted by the OS.
+                var runSettingsXML = "<RunSettings><RunConfiguration><ResultsDirectory>%TEST_TEMP%\\results</ResultsDirectory></RunConfiguration></RunSettings>";
 
-            var doc = new XmlDocument();
-            doc.LoadXml(runSettingsXML);
+                var doc = new XmlDocument();
+                doc.LoadXml(runSettingsXML);
 
-            var currentAssemblyLocation = typeof(ClientUtilitiesTests).GetTypeInfo().Assembly.Location;
+                var currentAssemblyLocation = typeof(ClientUtilitiesTests).GetTypeInfo().Assembly.Location;
 
-            ClientUtilities.FixRelativePathsInRunSettings(doc, currentAssemblyLocation);
+                ClientUtilities.FixRelativePathsInRunSettings(doc, currentAssemblyLocation);
 
-            var finalSettingsXml = doc.OuterXml;
+                var finalSettingsXml = doc.OuterXml;
 
-            var expectedPath = $"{Environment.GetEnvironmentVariable("HOME")}\\results";
+                var expectedPath = $"{Environment.GetEnvironmentVariable("TEST_TEMP")}\\results";
+                
+                var expectedSettingsXml = string.Concat(
+                    "<RunSettings><RunConfiguration><ResultsDirectory>",
+                    expectedPath,
+                    "</ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
+                    Path.GetDirectoryName(currentAssemblyLocation),
+                    "</RunSettingsDirectory></RunSettings>");
 
-            var expectedSettingsXml = string.Concat(
-                "<RunSettings><RunConfiguration><ResultsDirectory>",
-                expectedPath,
-                "</ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
-                Path.GetDirectoryName(currentAssemblyLocation),
-                "</RunSettingsDirectory></RunSettings>");
-
-            Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
+                Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
+            }
+            finally { 
+                Environment.SetEnvironmentVariable("TEST_TEMP", null)    
+            }
         }
     }
 }
