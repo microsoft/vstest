@@ -403,32 +403,32 @@
 
     <ItemGroup>
       <AssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </AssembliesToSign>
 
       <CoreAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CoreAssembliesToSign>
 
       <BuildAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </BuildAssembliesToSign>
 
       <TestHostCoreAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </TestHostCoreAssembliesToSign>
 
       <IntellitraceAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </IntellitraceAssembliesToSign>
 
       <CodeCoverageAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
 
