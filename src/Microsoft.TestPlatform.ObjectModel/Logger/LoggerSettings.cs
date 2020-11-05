@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             catch (UriFormatException)
                             {
                                 throw new SettingsException(
-                                    String.Format(
+                                    string.Format(
                                         CultureInfo.CurrentCulture,
                                         Resources.Resources.InvalidUriInSettings,
                                         reader.Value,

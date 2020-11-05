@@ -658,20 +658,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 throw new ObjectDisposedException(typeof(TestLoggerManager).FullName);
             }
         }
-
-        /// <summary>
-        /// Check and raise warning if disposed.
-        /// </summary>
-        /// <param name="warning">Warning message.</param>
-        /// <returns>TestLoggerManager disposed flag.</returns>
-        private bool CheckAndRaiseWarningIfDisposed(string warning)
-        {
-            if (this.isDisposed)
-            {
-                EqtTrace.Warning("{0}: Ignoring as the object is disposed.", warning);
-            }
-
-            return this.isDisposed;
-        }
     }
 }

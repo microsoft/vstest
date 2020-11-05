@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 EqtTrace.Verbose("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Done loading tests for {0}",
                         discoverer.Value.GetType().FullName);
 
-                var discovererFromDeprecatedLocations = DiscovererEnumerator.IsDiscovererFromDeprecatedLocations(discoverer);
+                var discovererFromDeprecatedLocations = IsDiscovererFromDeprecatedLocations(discoverer);
                 if (discovererFromDeprecatedLocations)
                 {
                     logger.SendMessage(TestMessageLevel.Warning,
