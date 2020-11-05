@@ -3,21 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
-    using System;
-    using System.Xml;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.XPath;
-    using System.Threading;
-    using System.Reflection;
-    using System.Globalization;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -34,7 +25,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Xml;
+    using System.Xml.XPath;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -267,11 +266,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 this.LogTelemetryForLegacySettings(requestData, runsettings);
             }
 
-            if (!commandLineOptions.IsDesignMode)
+            // get Fakes data collector settings
+            if (!string.Equals(Environment.GetEnvironmentVariable("VSTEST_SKIP_FAKES_CONFIGURATION"), "1"))
             {
-                // Generate fakes settings only for command line scenarios. In case of
-                // Editors/IDEs, this responsibility is with the caller.
-                GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
+                // The commandline Options do not have sources in design time mode,
+                // and so we fall back to using sources instead
+                if (this.commandLineOptions.Sources.Any())
+                {
+                    GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
+                }
+                else if (sources.Any())
+                {
+                    GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, sources, ref runsettings);
+                }
             }
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
