@@ -31,8 +31,7 @@
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
         <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
-        <target state="new">La serie de pruebas usará archivos DLL compilados para el marco {0} y la plataforma {1}. Los siguientes archivos DLL no formarán parte de la ejecución: {2}Vaya a {3} para obtener más información sobre cómo administrar esta configuración.
-</target>
+        <target state="translated">La serie de pruebas detectó archivos DLL que se compilaron para diferentes versiones de marco de trabajo y plataforma. Los siguientes archivos DLL no coinciden con la configuración actual, que es el marco de trabajo {0} y la plataforma {1}. {2}Vaya a {3} para obtener más información sobre cómo administrar esta configuración.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testlauf verwendet DLLs für Framework {0} und {1}-Plattform integriert. Folgende DLLs nicht Teil ausführen: {2} zur {3} Einzelheiten auf diese Einstellungen.</target>
