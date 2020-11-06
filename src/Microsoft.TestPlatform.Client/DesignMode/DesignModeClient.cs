@@ -23,8 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = CoreUtilities.Constants;
-    using ObjectModelConstants = ObjectModel.Constants;
 
     /// <summary>
     /// The design mode client.
@@ -34,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
-        private ProtocolConfig protocolConfig = ObjectModelConstants.DefaultProtocolConfig;
+        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
         private IEnvironment platformEnvironment;
         private TestSessionMessageLogger testSessionMessageLogger;
         private object lockObject = new object();
@@ -114,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
-                        CoreUtilitiesConstants.VstestConsoleProcessName,
+                        CoreUtilities.Constants.VstestConsoleProcessName,
                         "translation layer",
                         connectionTimeoutInSecs,
                         EnvironmentHelper.VstestConnectionTimeout)
@@ -324,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
             // request failed.
-            if (this.protocolConfig.Version < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+            if (this.protocolConfig.Version < Constants.MinimumProtocolVersionWithDebugSupport)
             {
                 return false;
             }

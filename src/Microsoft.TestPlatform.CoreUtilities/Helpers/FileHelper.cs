@@ -117,7 +117,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             try
             {
-                if (Directory.Exists(dirPath) && Directory.EnumerateFileSystemEntries(dirPath).Count() == 0)                   
+                if (Directory.Exists(dirPath)
+                    && Directory.EnumerateFileSystemEntries(dirPath).Count() == 0)                   
                 {
                     Directory.Delete(dirPath, true);
                 }

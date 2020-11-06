@@ -361,12 +361,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             this.SaveSimpleField(xml, location, guid.ToString(), EmptyGuidString);
         }
 
-        public void SaveHashtable<T>(Dictionary<T,object> dictionary, XmlElement element, string location, string keyLocation, string valueLocation, string itemElementName, XmlTestStoreParameters parameters)
+        public void SaveHashtable(Hashtable ht, XmlElement element, string location, string keyLocation, string valueLocation, string itemElementName, XmlTestStoreParameters parameters)
         {
-            if (dictionary != null && dictionary.Count > 0)
+            if (ht != null && ht.Count > 0)
             {
                 XmlElement dictionaryElement = (XmlElement)this.EnsureLocationExists(element, location);
-                foreach (var de in dictionary)
+                foreach (DictionaryEntry de in ht)
                 {
                     XmlElement itemXml = this.CreateElement(dictionaryElement, itemElementName);
 
