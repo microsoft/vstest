@@ -363,7 +363,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
             this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = $@"C:\packages\microsoft.testplatform.testhost{Path.DirectorySeparatorChar}15.0.0-Dev\lib{Path.DirectorySeparatorChar}netstandard1.5/testhost.dll";
+            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
             this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
