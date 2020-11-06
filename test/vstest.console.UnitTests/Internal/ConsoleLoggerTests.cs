@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.IO;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 {
     using System;
@@ -942,7 +944,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
             CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
-            string testFilePath = "C:\\DummyTestFile.dll";
+            string testFilePath = Path.Combine(Path.GetTempPath(), "DmmyTestFile.dll");
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
@@ -951,7 +953,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             parameters.Add("verbosity", "normal");
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
-            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
+            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
             loggerEvents.WaitForEventCompletion();
 
@@ -968,9 +970,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
             CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
-            string testFilePath = "C:\\DummyTestFile.dll";
+            var temp = Path.GetTempPath();
+            string testFilePath = Path.Combine(temp, "DummyTestFile.dll");
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
-            string testFilePath2 = "C:\\DummyTestFile2.dll";
+            string testFilePath2 = Path.Combine(temp, "DummyTestFile2.dll");
             fileHelper.Setup(fh => fh.Exists(testFilePath2)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
@@ -980,13 +983,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             parameters.Add("verbosity", "detailed");
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
-            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
+            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
             loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile.dll", OutputLevel.Information), Times.Once);
-            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile2.dll", OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Once);
         }
 
         [TestMethod]
@@ -999,9 +1002,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
             CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
-            string testFilePath = "C:\\DummyTestFile.dll";
+            var temp = Path.GetTempPath();
+            string testFilePath = Path.Combine(temp, "DummyTestFile.dll");
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
-            string testFilePath2 = "C:\\DummyTestFile2.dll";
+            string testFilePath2 = Path.Combine(temp, "DummyTestFile2.dll");
             fileHelper.Setup(fh => fh.Exists(testFilePath2)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
@@ -1011,13 +1015,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             parameters.Add("verbosity", "normal");
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
-            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
+            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
             loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile.dll", OutputLevel.Information), Times.Never);
-            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile2.dll", OutputLevel.Information), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine(testFilePath, OutputLevel.Information), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine(testFilePath2, OutputLevel.Information), Times.Never);
         }
 
         [TestMethod]

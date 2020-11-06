@@ -1,6 +1,9 @@
 ﻿// Copyright(c) Microsoft Corporation.All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+
 namespace vstest.console.UnitTests.Internal
 {
     using Microsoft.Extensions.FileSystemGlobbing;
@@ -32,11 +35,11 @@ namespace vstest.console.UnitTests.Internal
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"C:\Users\vanidhi\Desktop\a\c\*bc.dll");
+            this.filePatternParser.GetMatchingFiles(TranslatePath(@"C:\Users\vanidhi\Desktop\a\c\*bc.dll"));
 
             // Assert
-            this.mockMatcherHelper.Verify(x => x.AddInclude(@"*bc.dll"));
-            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"C:\Users\vanidhi\Desktop\a\c"))));
+            this.mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"*bc.dll")));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"C:\Users\vanidhi\Desktop\a\c")))));
         }
 
         [TestMethod]
@@ -44,11 +47,11 @@ namespace vstest.console.UnitTests.Internal
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"C:\Users\vanidhi\**\c\*bc.txt");
+            this.filePatternParser.GetMatchingFiles(TranslatePath(@"C:\Users\vanidhi\**\c\*bc.txt"));
 
             // Assert
-            this.mockMatcherHelper.Verify(x => x.AddInclude(@"**\c\*bc.txt"));
-            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"C:\Users\vanidhi"))));
+            this.mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"**\c\*bc.txt")));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"C:\Users\vanidhi")))));
         }
 
         [TestMethod]
@@ -56,11 +59,11 @@ namespace vstest.console.UnitTests.Internal
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\tests\**.Tests\**\*.Tests.dll");
+            this.filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\**.Tests\**\*.Tests.dll"));
 
             // Assert
-            this.mockMatcherHelper.Verify(x => x.AddInclude(@"**.Tests\**\*.Tests.dll"));
-            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"E:\path\to\project\tests"))));
+            this.mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"**.Tests\**\*.Tests.dll")));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"E:\path\to\project\tests")))));
         }
 
         [TestMethod]
@@ -68,11 +71,11 @@ namespace vstest.console.UnitTests.Internal
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\tests\Tests*.Blame*.dll");
+            this.filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Tests*.Blame*.dll"));
 
             // Assert
-            this.mockMatcherHelper.Verify(x => x.AddInclude(@"Tests*.Blame*.dll"));
-            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"E:\path\to\project\tests"))));
+            this.mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"Tests*.Blame*.dll")));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"E:\path\to\project\tests")))));
         }
 
         [TestMethod]
@@ -80,34 +83,42 @@ namespace vstest.console.UnitTests.Internal
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\*tests\Tests*.Blame*.dll");
+            this.filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\*tests\Tests*.Blame*.dll"));
 
             // Assert
-            this.mockMatcherHelper.Verify(x => x.AddInclude(@"*tests\Tests*.Blame*.dll"));
-            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"E:\path\to\project"))));
+            this.mockMatcherHelper.Verify(x => x.AddInclude(TranslatePath(@"*tests\Tests*.Blame*.dll")));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(TranslatePath(@"E:\path\to\project")))));
         }
 
         [TestMethod]
         public void FilePatternParserShouldCheckIfFileExistsIfFullPathGiven()
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
-            this.mockFileHelper.Setup(x => x.Exists(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")).Returns(true);
+            this.mockFileHelper.Setup(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"))).Returns(true);
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            var matchingFiles = this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll");
+            var matchingFiles = this.filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
 
             // Assert
-            this.mockFileHelper.Verify(x => x.Exists(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
-            Assert.IsTrue(matchingFiles.Contains(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
+            this.mockFileHelper.Verify(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
+            Assert.IsTrue(matchingFiles.Contains(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
         }
 
         [TestMethod]
         public void FilePatternParserShouldThrowCommandLineExceptionIfFileDoesNotExist()
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
-            this.mockFileHelper.Setup(x => x.Exists(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")).Returns(false);
+            this.mockFileHelper.Setup(x => x.Exists(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"))).Returns(false);
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
 
-            Assert.ThrowsException<TestSourceException>(() => this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll"));
+            Assert.ThrowsException<TestSourceException>(() => this.filePatternParser.GetMatchingFiles(TranslatePath(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll")));
+        }
+
+        private string TranslatePath(string path)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return path;
+            
+            return Regex.Replace(path.Replace("\\", "/"), @"(\w)\:/", @"/mnt/$1/");
         }
     }
 }

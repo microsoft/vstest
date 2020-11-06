@@ -174,6 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldMergeTestAdapterPathsInRunSettings()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -192,6 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldMergeTestAdapterPathsInRunSettingsIgnoringDuplicatePaths()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;c:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -210,6 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldMergeMultipleTestAdapterPathsWithPathsInRunSettings()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -228,6 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldHonorEnvironmentVariablesInTestAdapterPaths()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>%temp%\\adapters1</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -248,6 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldAddRightAdapterPathInErrorMessage()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -282,6 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldTrimTrailingAndLeadingDoubleQuotes()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";

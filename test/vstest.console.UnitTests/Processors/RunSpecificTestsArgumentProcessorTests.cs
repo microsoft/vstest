@@ -95,8 +95,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunSpecificTestsArgumentProcessorCapabilities capabilities = new RunSpecificTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/Tests", capabilities.CommandName);
-            StringAssert.Contains(capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace(), 
-                "/Tests:<Test Names>\r\n      Run tests with names that match the provided values.".NormalizeLineEndings().ShowWhiteSpace());
+            StringAssert.Contains(capabilities.HelpContentResourceName.NormalizeLineEndings(), 
+                "/Tests:<Test Names>\r\n      Run tests with names that match the provided values.".NormalizeLineEndings());
 
             Assert.AreEqual(HelpContentPriority.RunSpecificTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsTrue(capabilities.IsAction);

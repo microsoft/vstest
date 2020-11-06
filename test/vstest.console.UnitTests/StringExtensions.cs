@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         {
             return text.Replace("\r\n", "\n");
         }
-        
+
         /// <summary>
         /// Replace whitespace with printable characters (and still keep \r newlines for easy readability)
         /// </summary>
@@ -25,9 +25,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         {
             // use mongolian vowel separator as placeholder for the newline that we add for formatting
             var placeholder = "\u180E";
-            if (text.Contains(placeholder)) 
-                throw new InvalidOperationException("The text contains mongolian vowel separator character that we use as a placeholder.");
-            
+            if (text.Contains(placeholder))
+                throw new InvalidOperationException(
+                    "The text contains mongolian vowel separator character that we use as a placeholder.");
+
             var whiteSpaced = text
                 .Replace("\r\n", "\\r\\n\u180E")
                 .Replace("\r", "\\r")

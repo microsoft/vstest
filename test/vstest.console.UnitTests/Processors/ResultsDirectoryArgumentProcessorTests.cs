@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -85,41 +88,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldThrowIfGivenPathisIllegal()
+        public void InitializeShouldThrowIfGivenPathIsIllegal()
         {
-            var folder = @"c:\som>\illegal\path\";
-            string message;
-
-            message = string.Format(
-                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-                folder,
-                "The filename, directory name, or volume label syntax is incorrect : \'c:\\som>\\illegal\\path\\\'");
-
-#if NETFRAMEWORK
-            message = string.Format(
-                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-                folder,
-                "Illegal characters in path.");
-#endif
-            this.InitializeExceptionTestTemplate(folder, message);
-        }
-
-        [TestMethod]
-        public void InitializeShouldThrowIfPathIsNotSupported()
-        {
-
-            var folder = @"c:\path\to\in:valid";
-            string message;
-            message = string.Format(
-                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-                folder,
-                "The directory name is invalid : \'c:\\path\\to\\in:valid\'");
-#if NETFRAMEWORK
-            message = string.Format(
-                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-                folder,
-                "The given path's format is not supported.");
-#endif
+            // the internal code uses IsPathRooted which does not consider this rooted on Linux
+            // so we need to convert the path, and use char that is invalid on the current platform
+            var invalidChar = Path.GetInvalidPathChars()[0];
+            
+            var folder = TranslatePath($@"c:\som{invalidChar}\illegal\path\");
+            // The error varies based on the runtime and OS, just checking that we detect 
+            // incorrect path should be enough and not so flaky
+            // you might get
+            // - The filename, directory name, or volume label syntax is incorrect
+            // - Illegal characters in path.
+            // - etc.
+            
+            var message = $"The path '{folder}' specified in the 'ResultsDirectory' is invalid. Error:";
+            
             this.InitializeExceptionTestTemplate(folder, message);
         }
 
@@ -134,17 +118,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             catch (Exception ex)
             {
                 isExceptionThrown = true;
-                Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual(message, ex.Message);
+                Assert.IsTrue(ex is CommandLineException, "ex is CommandLineException");
+                StringAssert.StartsWith( ex.Message, message);
             }
 
-            Assert.IsTrue(isExceptionThrown);
+            Assert.IsTrue(isExceptionThrown, "isExceptionThrown");
         }
 
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
         {
-            var relativePath = @".\relative\path";
+            var relativePath = TranslatePath(@".\relative\path");
             var absolutePath = Path.GetFullPath(relativePath);
             this.executor.Initialize(relativePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
@@ -154,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
-            var absolutePath = @"c:\random\someone\testresults";
+            var absolutePath = TranslatePath(@"c:\random\someone\testresults");
             this.executor.Initialize(absolutePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
             Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
@@ -171,5 +155,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         #endregion
+        
+        private string TranslatePath(string path)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return path;
+            
+            var prefix = Path.GetTempPath();
+
+            return Regex.Replace(path.Replace("\\", "/"), @"(\w)\:/", $@"{prefix}$1/");
+        }
     }
 }
