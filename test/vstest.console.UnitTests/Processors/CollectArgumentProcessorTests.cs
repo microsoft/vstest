@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
+
 namespace vstest.console.UnitTests.Processors
 {
     using System;
@@ -50,7 +52,8 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CollectArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Collect", capabilities.CommandName);
-            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\r\n      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
+            var expected = "--Collect|/Collect:<DataCollector FriendlyName>\r\n      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect";
+            Assert.AreEqual(expected.NormalizeLineEndings().ShowWhiteSpace(), capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace());
 
             Assert.AreEqual(HelpContentPriority.CollectArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsFalse(capabilities.IsAction);

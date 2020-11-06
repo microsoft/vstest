@@ -59,7 +59,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new TestAdapterPathArgumentProcessorCapabilities();
             Assert.AreEqual("/TestAdapterPath", capabilities.CommandName);
-            Assert.AreEqual("--TestAdapterPath|/TestAdapterPath\r\n      This makes vstest.console.exe process use custom test adapters\r\n      from a given path (if any) in the test run. \r\n      Example  /TestAdapterPath:<pathToCustomAdapters>", capabilities.HelpContentResourceName);
+            var expected = "--TestAdapterPath|/TestAdapterPath\r\n      This makes vstest.console.exe process use custom test adapters\r\n      from a given path (if any) in the test run. \r\n      Example  /TestAdapterPath:<pathToCustomAdapters>";
+            Assert.AreEqual(expected: expected.NormalizeLineEndings().ShowWhiteSpace(), capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace());
 
             Assert.AreEqual(HelpContentPriority.TestAdapterPathArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsFalse(capabilities.IsAction);

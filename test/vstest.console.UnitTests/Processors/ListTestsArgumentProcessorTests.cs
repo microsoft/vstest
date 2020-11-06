@@ -109,7 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var capabilities = new ListTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/ListTests", capabilities.CommandName);
             Assert.AreEqual("/lt", capabilities.ShortCommandName);
-            Assert.AreEqual("-lt|--ListTests|/lt|/ListTests:<File Name>\r\n      Lists all discovered tests from the given test container.", capabilities.HelpContentResourceName);
+            var expected = "-lt|--ListTests|/lt|/ListTests:<File Name>\r\n      Lists all discovered tests from the given test container.";
+            Assert.AreEqual(expected.NormalizeLineEndings().ShowWhiteSpace(), capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace());
 
             Assert.AreEqual(HelpContentPriority.ListTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsTrue(capabilities.IsAction);
