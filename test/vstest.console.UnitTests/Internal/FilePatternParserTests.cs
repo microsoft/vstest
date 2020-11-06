@@ -1,7 +1,7 @@
 ﻿// Copyright(c) Microsoft Corporation.All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Runtime.InteropServices;
+using System;
 using System.Text.RegularExpressions;
 
 namespace vstest.console.UnitTests.Internal
@@ -115,7 +115,8 @@ namespace vstest.console.UnitTests.Internal
 
         private string TranslatePath(string path)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // RuntimeInformation has conflict when used
+            if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
                 return path;
             
             return Regex.Replace(path.Replace("\\", "/"), @"(\w)\:/", @"/mnt/$1/");

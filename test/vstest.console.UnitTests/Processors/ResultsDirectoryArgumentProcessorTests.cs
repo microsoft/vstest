@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
@@ -158,9 +157,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         
         private string TranslatePath(string path)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // RuntimeInformation has conflict when used
+            if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
                 return path;
-            
+
             var prefix = Path.GetTempPath();
 
             return Regex.Replace(path.Replace("\\", "/"), @"(\w)\:/", $@"{prefix}$1/");
