@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using TraceCollector;
 
     [TestClass]
+    [TestCategory("Windows")]
     public class ProfilersLocationProviderTests
     {
         private ProfilersLocationProvider vanguardLocationProvider;
