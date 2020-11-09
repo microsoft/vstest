@@ -22,6 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     /// The blame collector tests.
     /// </summary>
     [TestClass]
+    [TestCategory("Windows")]
     public class BlameCollectorTests
     {
         private DataCollectionEnvironmentContext context;

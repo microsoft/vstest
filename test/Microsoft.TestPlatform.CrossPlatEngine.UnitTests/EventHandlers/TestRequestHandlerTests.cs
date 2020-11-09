@@ -85,6 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeCommunicationShouldThrowIfServerIsNotAccessible()
         {
             var connectionInfo = new TestHostConnectionInfo

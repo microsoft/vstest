@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldAddSourceForValidSource()
         {
-            string testFilePath = "C:\\DummyTestFile.txt";
+            string testFilePath = Path.Combine(Path.GetTempPath(), "DummyTestFile.txt");
             this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
