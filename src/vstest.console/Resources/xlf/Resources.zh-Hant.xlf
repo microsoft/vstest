@@ -227,8 +227,7 @@
 
       變更主控台記錄器的診斷等級前置詞，如下所示
       範例: /logger:console;prefix=&lt;預設為 "false"&gt;
-      主控台記錄器詳細資訊於此: https://aka.ms/console-logger
-</target>
+      主控台記錄器詳細資訊於此: https://aka.ms/console-logger</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Protokollierung | / Logger: &lt; Logger Uri/FriendlyName &gt;
@@ -1671,17 +1670,17 @@
       </trans-unit>
       <trans-unit id="TestRunSummary">
         <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
-        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <target state="translated">{0} - 失敗: {1}，通過: {2}，略過: {3}，總計: {4}，持續時間: {5}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="None">
         <source>None</source>
-        <target state="new">None</target>
+        <target state="translated">無</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryAssemblyAndFramework">
         <source> - {0} {1}</source>
-        <target state="new">- {0} {1}</target>
+        <target state="translated"> - {0} {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EnvironmentArgumentHelp">
@@ -1693,17 +1692,19 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="new">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
-      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+        <target state="translated">-e|--Environment|/e|/Environment: &lt;NAME&gt;=&lt;VALUE&gt;
+      設定環境變數的值。若變數不存在，則加以建立；若有則予以覆寫。這表示 /InIsolation 會在隔離流程中將測試切換並強制執行。
+      
+      此引數可供多次指定，以提供多項變數。
 
-      Example: -e:VARIABLE1=VALUE1
+      範例: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
-               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</target>
+               -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EnvironmentVariableXIsOverriden">
         <source>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</source>
-        <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
+        <target state="translated">已定義環境變數 '{0}'，但其已由 -Environment 引數覆寫。</target>
         <note></note>
       </trans-unit>
     </body>
