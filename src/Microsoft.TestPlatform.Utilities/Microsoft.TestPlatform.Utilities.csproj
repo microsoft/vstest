@@ -37,7 +37,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.VisualStudio.Coverage.CoreLib.Net">
-      <Version>16.9.0-beta.20509.1</Version>
+      <Version>16.9.0-beta.20559.1</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Label="Configuration">
