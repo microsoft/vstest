@@ -121,7 +121,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public virtual bool Remove(T item)
         {
             EqtAssert.ParameterNotNull(item, "item");   // This is to be consistent with Add...
-            
             if (this.container.Contains(item))
             {
                 this.container.Remove(item);
