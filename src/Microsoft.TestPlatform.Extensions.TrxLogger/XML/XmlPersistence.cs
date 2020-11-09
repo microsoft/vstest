@@ -19,8 +19,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxObjectModel = ObjectModel;
+    using System.Text;
 
     /// <summary>
     /// The xml persistence class.
@@ -92,23 +92,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         private static readonly Type BoolType = typeof(bool);
         private static readonly Type ByteArrayType = typeof(byte[]);
         private static readonly Type DateTimeType = typeof(DateTime);
-        private static readonly Type TimeSpanType = typeof(TimeSpan);
-        private static readonly Type UriType = typeof(Uri);
-        private static readonly Type GuidType = typeof(Guid);
-        private static readonly Type TestElementType = typeof(TrxObjectModel.UnitTestElement);
-        private static readonly Type TestResultType = typeof(TrxObjectModel.UnitTestResult);
 
         /// <summary>
         /// this is the top level cache: Type->field information
         /// </summary>
         private static Dictionary<Type, IEnumerable<FieldPersistenceInfo>> typeToPersistenceInfoCache =
             new Dictionary<Type, IEnumerable<FieldPersistenceInfo>>();
-
-        /// <summary>
-        /// cache for type->persistence string mapping
-        /// </summary>
-        private static Dictionary<Type, string> typeToPersistenceString = new Dictionary<Type, string>();
-
 
         /// <summary>
         /// Optimization: avoid re-parsing same query multiple times
@@ -676,7 +665,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             }
 
             // Remove invalid char if any
-            valueToSave = XmlPersistence.RemoveInvalidXmlChar(valueToSave);
+            valueToSave = RemoveInvalidXmlChar(valueToSave);
             XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
             if (elementToSaveAt != null)
             {
@@ -713,7 +702,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
         {
             char x = match.Value[0];
-            return String.Format(@"\u{0:x4}", (ushort)x);
+            return string.Format(@"\u{0:x4}", (ushort)x);
 
         }
 
@@ -858,26 +847,27 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             // fix the empty namespaces to a temp prefix, so xpath query can understand them
             string[] parts = queryIn.Split(new char[] { '/' }, StringSplitOptions.None);
 
-            string query = string.Empty;
+            StringBuilder query = new StringBuilder();
 
             foreach (string part in parts)
             {
                 if (query.Length > 0 || queryIn.StartsWith("/", StringComparison.Ordinal))
                 {
-                    query += '/';
+                    query.Append('/');
                 }
 
                 if (part != "." && part != ".." && !part.Contains(":") && (part.Length > 0) && (!part.StartsWith("@", StringComparison.Ordinal)))
                 {
-                    query += DefaultNamespacePrefixEquivalent + ":";
+                    query.Append(DefaultNamespacePrefixEquivalent + ":");
                 }
 
-                query += part;
+                query.Append(part);
             }
 
-            queryCache[queryIn] = query;
+            string queryString = query.ToString();
+            queryCache[queryIn] = queryString;
 
-            return query;
+            return queryString;
         }
 
         #endregion Utilities

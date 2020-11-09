@@ -208,8 +208,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must not fail on crash in loading settings.")]
         private void LoadSection(XmlReader reader, SettingsProviderExtensionManager settingsExtensionManager)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
-            ValidateArg.NotNull<SettingsProviderExtensionManager>(settingsExtensionManager, "settingsExtensionManager");
+            ValidateArg.NotNull(reader, "reader");
+            ValidateArg.NotNull(settingsExtensionManager, "settingsExtensionManager");
 
             // Check for duplicate settings
             if (this.settings.ContainsKey(reader.Name))
