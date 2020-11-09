@@ -119,6 +119,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
         {

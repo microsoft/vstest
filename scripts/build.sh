@@ -417,7 +417,7 @@ log "Test platform build variables: "
 
 if [ -z "$PROJECT_NAME_PATTERNS" ]
 then
-    install_cli && restore_package && invoke_build && publish_package && create_package
+    install_cli && restore_package && invoke_build # && publish_package && create_package
 else
     invoke_build
 fi

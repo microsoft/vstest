@@ -139,13 +139,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 this.runEventHandler);
 
             var errorMessage = runnerInfo.TargetFramework == "net451"
-                ? "The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.\r\n"
-                : "The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.\r\n";
+                ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
+                : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 
             Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
         [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
         public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)

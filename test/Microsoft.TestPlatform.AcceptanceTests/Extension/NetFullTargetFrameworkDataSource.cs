@@ -29,12 +29,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             this.dataRows = new List<object[]>();
 
-            if (useCoreRunner)
+            var isWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+            if (useCoreRunner && isWindows)
             {
                 this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
             }
 
-            if (useDesktopRunner)
+            if (useDesktopRunner && isWindows)
             {
                 if (inIsolation)
                 {

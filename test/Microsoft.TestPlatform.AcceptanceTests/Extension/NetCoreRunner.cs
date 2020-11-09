@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
     using TestUtilities;
     using VisualStudio.TestTools.UnitTesting;
@@ -24,7 +25,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
         public NetCoreRunner(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
         {
-            foreach (var fmw in targetFrameworks.Split(';'))
+            var isWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+            // on non-windows we want to filter down only to netcoreapp runner, and net5.0 and newer.
+            Func<string, bool> filter = tfm => isWindows ? true : !tfm.StartsWith("net4");
+            foreach (var fmw in targetFrameworks.Split(';').Where(filter))
             {
                 this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, fmw) });
             }

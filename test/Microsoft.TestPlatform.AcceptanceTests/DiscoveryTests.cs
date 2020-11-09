@@ -49,6 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {

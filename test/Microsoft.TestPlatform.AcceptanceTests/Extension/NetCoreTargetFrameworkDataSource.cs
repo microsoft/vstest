@@ -34,7 +34,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // all tests to avoid changing all acceptance tests right now
             bool useNetCore31Target = false)
         {
-            if (useDesktopRunner)
+            var isWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+            if (useDesktopRunner && isWindows)
             {
                 var runnerFramework = IntegrationTestBase.DesktopRunnerFramework;
                 if (useNetCore21Target)

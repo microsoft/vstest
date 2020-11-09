@@ -274,6 +274,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #region LegacySettings Tests
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
         {
@@ -303,6 +304,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
         {
@@ -353,6 +355,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
         {
@@ -387,6 +390,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
         {
@@ -411,6 +415,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
         {

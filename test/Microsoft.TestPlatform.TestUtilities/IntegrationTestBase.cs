@@ -41,10 +41,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected readonly IntegrationTestEnvironment testEnvironment;
 
-        private const string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common";
-        private const string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build";
-        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
-        private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
+        private readonly string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+        private readonly string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
+        private readonly string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+        private readonly string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
+
+        private readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
 
         public enum UnitTestFramework
         {
@@ -416,7 +418,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected bool IsNetCoreRunner()
         {
-            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;               
+            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
         }
 
         /// <summary>
@@ -435,7 +437,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (this.IsNetCoreRunner())
             {
-                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+                var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, executablePath);
             }
             else
             {
@@ -485,8 +488,15 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 consoleRunnerPath = this.GetConsoleRunnerPath();
             }
+            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+            var dotnetPath = Path.Combine(this.testEnvironment.ToolsDirectory, executablePath);
 
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe"), new ConsoleParameters() { LogFilePath = logFilePath });
+            if (!File.Exists(dotnetPath))
+            {
+                throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
+            }
+
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
@@ -533,11 +543,13 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="exitCode"></param>
         private void ExecutePatchedDotnet(string command, string args, out string stdOut, out string stdError, out int exitCode)
         {
-            var environmentVariables = new Dictionary<string, string> {
+            var environmentVariables = new Dictionary<string, string>
+            {
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
 
-            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, @"dotnet\dotnet.exe");
+            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet/dotnet";
+            var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, executablePath);
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
@@ -562,9 +574,12 @@ namespace Microsoft.TestPlatform.TestUtilities
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
                 process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
-                if (environmentVariables != null) {
-                    foreach (var variable in environmentVariables) {
-                        if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key)) {
+                if (environmentVariables != null)
+                {
+                    foreach (var variable in environmentVariables)
+                    {
+                        if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key))
+                        {
                             process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
                         }
                         else
