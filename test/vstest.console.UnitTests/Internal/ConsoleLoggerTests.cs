@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.IO;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using Microsoft.Extensions.FileSystemGlobbing;

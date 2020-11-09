@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.IO;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
-
 namespace vstest.console.UnitTests.Processors
 {
     using System;
+    using System.IO;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
     using Moq;
+
     using static Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.CollectArgumentExecutor;
 
     [TestClass]

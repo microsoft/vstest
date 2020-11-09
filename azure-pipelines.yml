@@ -63,7 +63,7 @@ jobs:
       testResultsFormat: VSTest
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
-
+    
 - job:
   workspace:
     clean: all

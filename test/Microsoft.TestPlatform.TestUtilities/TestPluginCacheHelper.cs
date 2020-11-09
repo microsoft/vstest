@@ -1,49 +1,16 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Microsoft.TestPlatform.TestUtilities
 {
-    #region Testable implementation
-
-    public class TestableTestPluginCache : TestPluginCache
-    {
-        public Action Action;
-        public TestableTestPluginCache(List<string> extensionsPath)
-        {
-            TestDiscoveryExtensionManager.Destroy();
-            TestExecutorExtensionManager.Destroy();
-            SettingsProviderExtensionManager.Destroy();
-            this.UpdateExtensions(extensionsPath, skipExtensionFilters: false);
-        }
-
-        public TestableTestPluginCache() : this(new List<string>())
-        {
-        }
-
-        protected override IEnumerable<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
-        {
-            this.Action?.Invoke();
-            return extensions;
-        }
-
-        new public void SetupAssemblyResolver(string extensionAssembly)
-        {
-            base.SetupAssemblyResolver(extensionAssembly);
-        }
-    }
-
-    #endregion
-
     public static class TestPluginCacheHelper
     {
         public static TestableTestPluginCache SetupMockAdditionalPathExtensions(Type callingTest)
