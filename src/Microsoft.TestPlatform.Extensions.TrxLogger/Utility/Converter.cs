@@ -473,6 +473,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 }
 
                 string sourceFile = uriDataAttachment.Uri.LocalPath;
+                
+                var rooted = (Path.GetFullPath(sourceFile) == sourceFile);
                 Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
 
                 // copy the source file to the target location

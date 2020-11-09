@@ -19,7 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class EnvironmentArgumentProcessorTests
     {
-        private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?><RunSettings></RunSettings>";
+        private const string DefaultRunSettings =
+            "<?xml version=\"1.0\" encoding=\"utf-16\"?><RunSettings></RunSettings>";
 
         private TestableRunSettingsProvider settingsProvider;
         private Mock<IOutput> mockOutput;
@@ -65,7 +66,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize("VARIABLE=VALUE");
 
             // Assert
-            var (environmentVariables, inIsolation) = ParseSettingsXML(this.settingsProvider);
+            var result = ParseSettingsXML(this.settingsProvider);
+            var environmentVariables = result.variables;
+            var inIsolation = result.inIsolation;
             var variables = environmentVariables?.Elements()?.ToArray();
 
             Assert.IsNotNull(environmentVariables, "Environment variable cannot found in RunSettings.xml.");
@@ -82,7 +85,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void AppendsMultipleEnvironmentVariablesToRunSettings()
         {
             // Arrange
-            var (executor1, executor2, executor3) = (GetExecutor(), GetExecutor(), GetExecutor());
+            var executor1 = GetExecutor(); 
+            var executor2 = GetExecutor(); 
+            var executor3 = GetExecutor(); 
 
             // Act
             executor1.Initialize("VARIABLE_ONE=VALUE");
@@ -90,7 +95,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor3.Initialize("VARIABLE_THREE=VALUE WITH SPACE;AND SEMICOLON");
 
             // Assert
-            var (environmentVariables, inIsolation) = ParseSettingsXML(this.settingsProvider);
+            var result = ParseSettingsXML(this.settingsProvider);
+            var environmentVariables = result.variables;
+            var inIsolation = result.inIsolation;
             var variables = environmentVariables?.Elements()?.ToArray();
 
             Assert.IsNotNull(environmentVariables, "Environment variable cannot found in RunSettings.xml.");
@@ -121,7 +128,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize("VARIABLE=VALUE");
 
             // Assert
-            var (environmentVariables, inIsolation) = ParseSettingsXML(this.settingsProvider);
+            var result = ParseSettingsXML(this.settingsProvider);
+            var environmentVariables = result.variables;
+            var inIsolation = result.inIsolation;
             var variables = environmentVariables?.Elements()?.ToArray();
 
             Assert.IsNotNull(environmentVariables, "Environment variable cannot found in RunSettings.xml.");
@@ -138,7 +147,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ShoudWarnWhenAValueIsOverriden()
         {
             // Arrange
-            this.settingsProvider.UpdateRunSettingsNode("RunConfiguration.EnvironmentVariables.VARIABLE", "Initial value");
+            this.settingsProvider.UpdateRunSettingsNode("RunConfiguration.EnvironmentVariables.VARIABLE",
+                "Initial value");
             var warningMessage = String.Format(CommandLineResources.CommandLineWarning,
                     String.Format(CommandLineResources.EnvironmentVariableXIsOverriden, "VARIABLE")
                 );
@@ -157,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockOutput.VerifyAll();
         }
 
-        private (XElement variables, XElement inIsolation) ParseSettingsXML(IRunSettingsProvider provider)
+        private XmlParseResult ParseSettingsXML(IRunSettingsProvider provider)
         {
             var document = XDocument.Parse(provider.ActiveRunSettings.SettingsXml);
 
@@ -168,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var variables = runConfiguration?.Element("EnvironmentVariables");
             var inIsolation = runConfiguration?.Element("InIsolation");
 
-            return (variables, inIsolation);
+            return new XmlParseResult(variables, inIsolation);
         }
 
         private IArgumentExecutor GetExecutor()
@@ -178,6 +188,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                this.settingsProvider,
                mockOutput.Object
             );
+        }
+
+        private class XmlParseResult
+        {
+            public XmlParseResult(XElement variables, XElement inIsolation)
+            {
+                this.variables = variables;
+                this.inIsolation = inIsolation;
+            }
+
+            internal XElement variables;
+            internal XElement inIsolation;
         }
     }
 }

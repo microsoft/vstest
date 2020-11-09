@@ -8,7 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -20,8 +20,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -61,7 +59,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             TestPluginCache.Instance = new TestableTestPluginCache();
 
             this.discoveryManager.Initialize(
-                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location }, mockLogger.Object);
+                new string[] { typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location }, mockLogger.Object);
 
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
@@ -112,7 +110,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void DiscoverTestsShouldLogIfTheSameSourceIsSpecifiedTwice()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -139,7 +137,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void DiscoverTestsShouldDiscoverTestsInTheSpecifiedSource()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -167,7 +165,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
 
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -206,7 +204,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -231,7 +229,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             var assemblyLocation = typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location;
             var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { assemblyLocation },
                 () => { });
 
