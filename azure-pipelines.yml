@@ -35,7 +35,7 @@ jobs:
 
   - task: PublishPipelineArtifact@1
     inputs:
-      targetPath: '$(Pipeline.Workspace)\artifacts\testArtifacts\packages'
+      targetPath: '$(Build.SourcesDirectory)\artifacts\testArtifacts\packages'
       artifact: 'testArtifacts'
       publishLocation: 'pipeline'
 
@@ -51,7 +51,7 @@ jobs:
     inputs:
       buildType: 'current'
       artifactName: 'testArtifacts'
-      targetPath: '$(Pipeline.Workspace)\artifacts\testArtifacts\packages)'
+      targetPath: '$(Build.SourcesDirectory)\artifacts\testArtifacts\packages)'
   - task: BatchScript@1
     displayName: 'Run Acceptance Tests'
     inputs:
