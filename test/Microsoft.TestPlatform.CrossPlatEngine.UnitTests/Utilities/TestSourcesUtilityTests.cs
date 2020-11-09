@@ -4,6 +4,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
@@ -13,6 +14,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
     [TestClass]
     public class TestSourcesUtilityTests
     {
+        private static string temp = Path.GetTempPath();
+
         [TestMethod]
         public void GetSourcesShouldAggregateSourcesIfMultiplePresentInAdapterSourceMap()
         {
@@ -31,9 +34,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void GetSourcesShouldGetDistinctSourcesFromTestCases()
         {
-            var tests = new List<TestCase>() { new TestCase("test1", new Uri("e://d"), "source1.dll"),
-                                               new TestCase("test2", new Uri("e://d"), "source2.dll"),
-                                               new TestCase("test3", new Uri("e://d"), "source1.dll")};
+            var path = Path.Combine(temp, "d");
+            var tests = new List<TestCase>() { new TestCase("test1", new Uri(path), "source1.dll"),
+                                               new TestCase("test2", new Uri(path), "source2.dll"),
+                                               new TestCase("test3", new Uri(path), "source1.dll")};
 
             var sources = TestSourcesUtility.GetSources(tests);
             Assert.AreEqual(2, sources.Count());
@@ -63,19 +67,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void GetDefaultCodeBasePathShouldReturnDefaultDirectoryPathForAdapterSourceMap()
         {
             var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("adapter1", new List<string>() { "c:\\folder1\\source1.dll", "c:\\folder2\\source2.dll" });
+            adapterSourceMap.Add("adapter1", new List<string>() { Path.Combine(temp, "folder1", "source1.dll"), Path.Combine(temp, "folder2", "source2.dll") });
 
             var defaultCodeBase = TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap);
-            Assert.AreEqual("c:\\folder1", defaultCodeBase);
+            Assert.AreEqual(Path.Combine(temp, "folder1"), defaultCodeBase);
         }
 
         [TestMethod]
         public void GetDefaultCodeBasePathShouldReturnDefaultDirectoryPathForTestCaseList()
         {
-            var tests = new List<TestCase>() { new TestCase("test1", new Uri("e://d"), "c:\\folder1\\source1.dll") };
+            var tests = new List<TestCase>() { new TestCase("test1", new Uri(Path.Combine(temp, "d")), Path.Combine(temp, "folder1", "source1.dll")) };
 
             var defaultCodeBase = TestSourcesUtility.GetDefaultCodebasePath(tests);
-            Assert.AreEqual("c:\\folder1", defaultCodeBase);
+            Assert.AreEqual(Path.Combine(temp, "folder1"), defaultCodeBase);
         }
     }
 }

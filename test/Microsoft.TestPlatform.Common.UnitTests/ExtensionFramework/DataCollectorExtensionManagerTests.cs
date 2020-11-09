@@ -5,8 +5,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.ExtensionFramework
 {
     using System;
 
-    using global::TestPlatform.Common.UnitTests.ExtensionFramework;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,7 +16,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.ExtensionFramework
         [TestInitialize]
         public void Initialize()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(DataCollectorExtensionManagerTests));
         }
 
         [TestMethod]

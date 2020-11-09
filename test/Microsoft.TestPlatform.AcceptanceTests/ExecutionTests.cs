@@ -263,5 +263,77 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.StdOutputContains(expectedWarningContains);
             }
         }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldReturnOneWhenTreatNoTestsAsErrorParameterSetToTrueAndNoTestMatchesFilter(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            
+            // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
+
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=true");
+            this.InvokeVsTest(arguments);
+
+            this.ExitCodeEquals(1);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldReturnZeroWhenTreatNoTestsAsErrorParameterSetToFalseAndNoTestMatchesFilter(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
+
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
+            this.InvokeVsTest(arguments);
+
+            this.ExitCodeEquals(0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldNotDependOnTreatNoTestsAsErrorTrueValueWhenThereAreAnyTestsToRun(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=true");
+            this.InvokeVsTest(arguments);
+
+            // Returning 1 because of failing test in test assembly (SimpleTestProject2.dll)
+            this.ExitCodeEquals(1);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void ExitCodeShouldNotDependOnFailTreatNoTestsAsErrorFalseValueWhenThereAreAnyTestsToRun(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
+            this.InvokeVsTest(arguments);
+
+            // Returning 1 because of failing test in test assembly (SimpleTestProject2.dll)
+            this.ExitCodeEquals(1);
+        }
     }
 }

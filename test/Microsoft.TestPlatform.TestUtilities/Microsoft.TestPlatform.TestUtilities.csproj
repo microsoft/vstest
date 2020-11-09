@@ -10,6 +10,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
       <FromP2P>true</FromP2P>
@@ -17,6 +18,7 @@
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Moq" Version="4.7.63" />
     <PackageReference Include="MSTest.TestFramework">
       <Version>$(MSTestFrameworkVersion)</Version>
     </PackageReference>

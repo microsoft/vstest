@@ -232,6 +232,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestPlatformExtensionsShouldIncludeOutputDirectoryExtensionsIfTestAdapterPathIsNotSet()
         {
             List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
@@ -260,6 +261,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestPlatformExtensionsShouldReturnPathTheHigherVersionedFileExtensions()
         {
             List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
@@ -285,6 +287,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestPlatformExtensionsShouldReturnPathToSingleFileExtensionOfATypeIfVersionsAreSame()
         {
             List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
@@ -395,6 +398,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
         {
             var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
@@ -404,6 +408,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
         {
             var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");

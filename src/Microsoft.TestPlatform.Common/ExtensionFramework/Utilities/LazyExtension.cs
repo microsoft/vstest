@@ -36,12 +36,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance"); ;
+                throw new ArgumentNullException("instance");
             }
 
             if (metadata == null)
             {
-                throw new ArgumentNullException("instance"); ;
+                throw new ArgumentNullException("instance");
             }
 
             this.extension = instance;
@@ -58,12 +58,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (pluginInfo == null)
             {
-                throw new ArgumentNullException("pluginInfo"); ;
+                throw new ArgumentNullException("pluginInfo");
             }
 
             if (metadataType == null)
             {
-                throw new ArgumentNullException("metadataType"); ;
+                throw new ArgumentNullException("metadataType");
             }
 
             this.testPluginInfo = pluginInfo;
@@ -80,12 +80,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (pluginInfo == null)
             {
-                throw new ArgumentNullException("pluginInfo"); ;
+                throw new ArgumentNullException("pluginInfo");
             }
 
             if (metadata == null)
             {
-                throw new ArgumentNullException("metadata"); ;
+                throw new ArgumentNullException("metadata");
             }
 
             this.testPluginInfo = pluginInfo;
@@ -102,12 +102,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             if (creator == null)
             {
-                throw new ArgumentNullException("creator"); ;
+                throw new ArgumentNullException("creator");
             }
 
             if (metadata == null)
             {
-                throw new ArgumentNullException("metadata"); ;
+                throw new ArgumentNullException("metadata");
             }
 
             this.extensionCreator = creator;

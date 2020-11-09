@@ -6,7 +6,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
-    <TargetFrameworks>net45;net451;netstandard2.0;netstandard1.3;netstandard1.0;uap10.0</TargetFrameworks>
+    <TargetFrameworks>net45;net451;netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3;netstandard1.0</TargetFrameworks>
     <PackageId>Microsoft.TestPlatform.ObjectModel</PackageId>
   </PropertyGroup>

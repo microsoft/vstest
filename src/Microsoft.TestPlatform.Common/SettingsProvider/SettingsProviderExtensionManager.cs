@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <param name="shouldThrowOnError"> Indicates whether this method should throw on error. </param>
         public static void LoadAndInitializeAllExtensions(bool shouldThrowOnError)
         {
-            var extensionManager = SettingsProviderExtensionManager.Create();
+            var extensionManager = Create();
 
             try
             {

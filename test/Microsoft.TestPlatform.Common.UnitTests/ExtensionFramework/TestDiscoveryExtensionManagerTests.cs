@@ -6,7 +6,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.Common;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,7 +24,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void CreateShouldDiscoverDiscovererExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestDiscoveryExtensionManagerTests));
 
             var extensionManager = TestDiscoveryExtensionManager.Create();
 
@@ -34,7 +35,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void CreateShouldCacheDiscoveredExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions(() => { });
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestDiscoveryExtensionManagerTests), () => { });
 
             var extensionManager = TestDiscoveryExtensionManager.Create();
             TestDiscoveryExtensionManager.Create();
@@ -59,7 +60,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void LoadAndInitializeShouldInitializeAllExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestDiscoveryExtensionManagerTests));
 
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
 
