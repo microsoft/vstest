@@ -9,6 +9,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using System.Xml;
+
     /// <summary>
     /// Base class for Eqt Collections.
     /// Fast collection, default implementations (Add/Remove/etc) do not allow null items and ignore duplicates.
@@ -52,6 +54,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             public void Dispose()
             {
+                
             }
         }
         #endregion
@@ -118,12 +121,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public virtual bool Remove(T item)
         {
             EqtAssert.ParameterNotNull(item, "item");   // This is to be consistent with Add...
-
             if (this.container.Contains(item))
             {
                 this.container.Remove(item);
                 return true;
             }
+
             return false;
         }
 
@@ -179,11 +182,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// Default behavior is to create child elements with name same as name of type T.
         /// Does not respect IXmlTestStoreCustom.
         /// </summary>
-        public virtual void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
+        public virtual void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            XmlPersistence h = new XmlPersistence();
-            h.SaveHashtable(this.container, element, ".", ".", null, ChildElementName, parameters);
+            XmlPersistence xmlPersistence = new XmlPersistence();
+            xmlPersistence.SaveHashtable(this.container, element, ".", ".", null, ChildElementName, parameters);
         }
+
         #endregion
 
         #region Private

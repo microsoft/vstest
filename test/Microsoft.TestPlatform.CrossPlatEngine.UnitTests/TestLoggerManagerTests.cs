@@ -9,7 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading;
-    using global::TestPlatform.Common.UnitTests.ExtensionFramework;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -35,7 +35,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestInitialize]
         public void Initialize()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location },
                 () => { });
         }
@@ -43,7 +43,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestCleanup]
         public void TestCleanup()
         {
-            TestPluginCacheTests.ResetExtensionsCache();
+            TestPluginCacheHelper.ResetExtensionsCache();
         }
 
         [TestMethod]

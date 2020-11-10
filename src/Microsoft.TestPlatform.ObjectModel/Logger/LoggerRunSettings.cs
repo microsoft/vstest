@@ -39,6 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             private set;
         }
 
+#if !NETSTANDARD1_0
         public override XmlElement ToXml()
         {
             var doc = new XmlDocument();
@@ -54,6 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return root;
         }
+#endif
 
         /// <summary>
         /// The from xml.

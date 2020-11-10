@@ -7,7 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -25,8 +25,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Moq;
 
     using TestableImplementations;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class RunTestsWithSourcesTests
@@ -60,7 +58,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -72,7 +70,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void TestCleanup()
         {
             RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = null;
-            TestPluginCacheTests.ResetExtensionsCache();
+            TestPluginCacheHelper.ResetExtensionsCache();
         }
 
         [TestMethod]

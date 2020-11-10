@@ -7,7 +7,7 @@ namespace TestPlatform.Common.UnitTests.Logging
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -15,8 +15,6 @@ namespace TestPlatform.Common.UnitTests.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     /// <summary>
     /// Tests the behaviors of the TestLoggerManager class.
@@ -26,7 +24,7 @@ namespace TestPlatform.Common.UnitTests.Logging
     {
         public TestHostProviderManagerTests()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestHostProviderManagerTests));
         }
 
         [TestMethod]

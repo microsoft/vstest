@@ -9,8 +9,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Linq;
     using System.Reflection;
 
-    using Common.UnitTests.ExtensionFramework;
-
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -34,6 +32,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
 
     using Moq;
+    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -96,14 +95,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new PlatformThread(),
                 this.mockDataSerializer.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
         }
 
         [TestCleanup]
         public void Cleanup()
         {
             TestExecutorExtensionManager.Destroy();
-            TestPluginCacheTests.ResetExtensionsCache();
+            TestPluginCacheHelper.ResetExtensionsCache();
         }
 
         #region Constructor tests
@@ -849,7 +848,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockThread.Object,
                 this.mockDataSerializer.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
             {

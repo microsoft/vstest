@@ -1,15 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if !NETSTANDARD1_0
+
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// The file helper.
@@ -115,8 +117,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             try
             {
-                if (Directory.Exists(dirPath) && Directory.GetFiles(dirPath).Length == 0
-                    && Directory.GetDirectories(dirPath).Length == 0)
+                if (Directory.Exists(dirPath)
+                    && Directory.EnumerateFileSystemEntries(dirPath).Count() == 0)
                 {
                     Directory.Delete(dirPath, true);
                 }
@@ -140,3 +142,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
     }
 }
+
+#endif

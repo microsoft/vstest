@@ -395,8 +395,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         {
             // Note: Deserialize rawMessage only if required.
 
-            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
-                    this.dataSerializer.DeserializeMessage(rawMessage) : null;
+            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn 
+                          ? this.dataSerializer.DeserializeMessage(rawMessage) 
+                          : null;
 
             if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
             {

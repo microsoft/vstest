@@ -11,6 +11,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
     using System.Xml;
     using ExtensionFramework;
     using System.Collections.Generic;
+    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class RunSettingsUtilitiesTests
@@ -34,11 +35,11 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void CreateRunSettingsShouldReturnValidRunSettings()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsUtilitiesTests));
             string runsettings = @"<RunSettings><RunConfiguration><ResultsDirectory>.\TestResults</ResultsDirectory></RunConfiguration ><DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest></RunSettings>";
             var result= RunSettingsUtilities.CreateAndInitializeRunSettings(runsettings);
             Assert.AreEqual("<DummyMSTest><FORCEDLEGACYMODE>true</FORCEDLEGACYMODE></DummyMSTest>", DummyMsTestSetingsProvider.StringToVerify);
-            TestPluginCacheTests.ResetExtensionsCache();
+            TestPluginCacheHelper.ResetExtensionsCache();
         }
 
         [TestMethod]
