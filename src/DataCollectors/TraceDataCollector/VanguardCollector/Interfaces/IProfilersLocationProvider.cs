@@ -49,5 +49,11 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
         /// </summary>
         /// <returns>x64 CLR IE Path</returns>
         string GetClrInstrumentationEngineX64Path();
+
+        /// <summary>
+        /// Get path to Microsoft.VisualStudio.CodeCoverage.Shim library
+        /// </summary>
+        /// <returns>Path to Microsoft.VisualStudio.CodeCoverage.Shim library</returns>
+        string GetCodeCoverageShimPath();
     }
 }

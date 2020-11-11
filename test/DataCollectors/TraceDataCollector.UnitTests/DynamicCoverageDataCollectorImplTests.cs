@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using Coverage.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using TestPlatform.ObjectModel.DataCollection;
     using TraceCollector;
     using TraceCollector.Interfaces;
@@ -36,6 +38,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         private Mock<IDataCollectionLogger> dataCollectionLoggerMock;
         private Mock<IDirectoryHelper> directoryHelperMock;
         private Mock<IFileHelper> fileHelperMock;
+        private Mock<IProfilersLocationProvider> profilersLocationProviderMock;
 
         private string aConfigFileName;
         private string atempDirectory;
@@ -48,8 +51,9 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.directoryHelperMock = new Mock<IDirectoryHelper>();
             this.fileHelperMock = new Mock<IFileHelper>();
+            this.profilersLocationProviderMock = new Mock<IProfilersLocationProvider>();
             this.tempSessionDir = null;
-            this.collectorImpl = new DynamicCoverageDataCollectorImpl(this.vanguardMock.Object, this.directoryHelperMock.Object, this.fileHelperMock.Object);
+            this.collectorImpl = new DynamicCoverageDataCollectorImpl(this.vanguardMock.Object, this.directoryHelperMock.Object, this.fileHelperMock.Object, this.profilersLocationProviderMock.Object);
             this.SetupForInitialize();
             this.collectorImpl.Initialize(DynamicCoverageDataCollectorImplTests.sampleConfigurationElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
         }
@@ -81,6 +85,48 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
             StringAssert.Contains(this.aConfigFileName, Path.GetTempPath());
             this.CompareWithDefaultConfig();
+        }
+
+        [TestMethod]
+        public void InitializeShouldGenerateCodeCoverageDepsJsonFile()
+        {
+            this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>()))
+                .Callback<string>((path) => Directory.CreateDirectory(path));
+
+            this.fileHelperMock.Setup(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((path, content) => { File.WriteAllText(path, content); });
+
+            this.profilersLocationProviderMock.Setup(lp => lp.GetCodeCoverageShimPath()).Returns(@"C:\aaa\bbb\Microsoft.VisualStudio.CodeCoverage.Shim.dll");
+
+            this.collectorImpl.Initialize(null, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
+
+            var obj = JObject.Parse(File.ReadAllText(this.collectorImpl.CodeCoverageDepsJsonFilePath));
+
+            var expected = @"
+{
+  ""runtimeTarget"": {
+    ""name"": ""codecoverage"",
+    ""signature"": """"
+  },
+  ""targets"": {
+    ""codecoverage"": {
+      ""Microsoft.VisualStudio.CodeCoverage.Shim/15.0.0.0"": {
+        ""runtime"": {
+          ""C:/aaa/bbb/Microsoft.VisualStudio.CodeCoverage.Shim.dll"": { }
+        }
+      }
+    }
+  },
+  ""libraries"": {
+    ""Microsoft.VisualStudio.CodeCoverage.Shim/15.0.0.0"": {
+      ""type"": ""reference"",
+      ""serviceable"": false,
+      ""sha512"": """"
+    }
+  }
+}";
+
+            Assert.AreEqual(expected.Trim(), File.ReadAllText(this.collectorImpl.CodeCoverageDepsJsonFilePath).Trim());
         }
 
         [TestMethod]

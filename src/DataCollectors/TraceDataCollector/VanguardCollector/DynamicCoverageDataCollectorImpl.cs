@@ -34,9 +34,54 @@ namespace Microsoft.VisualStudio.Coverage
         private const string VanguardConfigFileName = "CodeCoverage.config";
 
         /// <summary>
+        /// File name of deps.json file with reference to Microsoft.VisualStudio.CodeCoverage.Shim.dll.
+        /// </summary>
+        private const string CodeCoverageDepsJsonFileName = "CodeCoverage.deps.json";
+
+        /// <summary>
         /// Name of element for custom coverage filename.
         /// </summary>
         private const string CoverageFileSettingName = "CoverageFileName";
+
+        private const string CodeCoverageDepsJsonTemplate = @"
+{{
+  ""runtimeTarget"": {{
+    ""name"": ""codecoverage"",
+    ""signature"": """"
+  }},
+  ""targets"": {{
+    ""codecoverage"": {{
+      ""Microsoft.VisualStudio.CodeCoverage.Shim/15.0.0.0"": {{
+        ""runtime"": {{
+          ""{0}"": {{ }}
+        }}
+      }}
+    }}
+  }},
+  ""libraries"": {{
+    ""Microsoft.VisualStudio.CodeCoverage.Shim/15.0.0.0"": {{
+      ""type"": ""reference"",
+      ""serviceable"": false,
+      ""sha512"": """"
+    }}
+  }}
+}}
+";
+
+        /// <summary>
+        /// Directory helper
+        /// </summary>
+        private readonly IDirectoryHelper directoryHelper;
+
+        /// <summary>
+        /// Profilers location provider
+        /// </summary>
+        private readonly IProfilersLocationProvider profilersLocationProvider;
+
+        /// <summary>
+        /// File helper
+        /// </summary>
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Coverage file name
@@ -54,16 +99,6 @@ namespace Microsoft.VisualStudio.Coverage
         private TraceCollector.IDataCollectionSink dataSink;
 
         /// <summary>
-        /// Directory helper
-        /// </summary>
-        private IDirectoryHelper directoryHelper;
-
-        /// <summary>
-        /// File helper
-        /// </summary>
-        private IFileHelper fileHelper;
-
-        /// <summary>
         /// Folder to store temporary files
         /// </summary>
         private string sessionDirectory;
@@ -71,16 +106,22 @@ namespace Microsoft.VisualStudio.Coverage
         private string coverageFilePath;
 
         public DynamicCoverageDataCollectorImpl()
-        : this(new Vanguard(), new DirectoryHelper(), new FileHelper())
+        : this(new Vanguard(), new DirectoryHelper(), new FileHelper(), new ProfilersLocationProvider())
         {
         }
 
-        internal DynamicCoverageDataCollectorImpl(IVanguard vanguard, IDirectoryHelper directoryHelper, IFileHelper fileHelper)
+        internal DynamicCoverageDataCollectorImpl(IVanguard vanguard, IDirectoryHelper directoryHelper, IFileHelper fileHelper, IProfilersLocationProvider profilersLocationProvider)
         {
             this.Vanguard = vanguard;
             this.directoryHelper = directoryHelper;
             this.fileHelper = fileHelper;
+            this.profilersLocationProvider = profilersLocationProvider;
         }
+
+        /// <summary>
+        /// Gets path to deps.json file with reference to Microsoft.VisualStudio.CodeCoverage.Shim.dll.
+        /// </summary>
+        public string CodeCoverageDepsJsonFilePath { get; private set; }
 
         /// <summary>
         /// Gets or sets session name
@@ -295,8 +336,11 @@ namespace Microsoft.VisualStudio.Coverage
                                 ?? DynamicCoverageDataCollectorImpl.GetDefaultConfiguration()[ConfigCodeCoverageElementName];
 
             string configurationFileName = Path.Combine(this.sessionDirectory, VanguardConfigFileName);
-
             this.fileHelper.WriteAllText(configurationFileName, config.OuterXml);
+
+            this.CodeCoverageDepsJsonFilePath = Path.Combine(this.sessionDirectory, CodeCoverageDepsJsonFileName);
+            var codeCoverageDepsJsonContent = this.profilersLocationProvider.GetCodeCoverageShimPath()?.Replace(@"\", "/");
+            this.fileHelper.WriteAllText(this.CodeCoverageDepsJsonFilePath, string.Format(CodeCoverageDepsJsonTemplate, codeCoverageDepsJsonContent));
 
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.PrepareVanguardProcess: Initializing  with config: {0}.", config.OuterXml);
             this.Vanguard.Initialize(this.SessionName, configurationFileName, this.logger);

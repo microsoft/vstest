@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 <TargetPlatform>x64</TargetPlatform>
                 <CLRIEInstrumentationNetCore>true</CLRIEInstrumentationNetCore>
                 <CLRIEInstrumentationNetFramework>false</CLRIEInstrumentationNetFramework>
+                <InjectDotnetAdditionalDeps>false</InjectDotnetAdditionalDeps>
             </Configuration>";
 
         private const string ConfigWithClrIeEnabled =
@@ -37,6 +38,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 <TargetPlatform>x64</TargetPlatform>
                 <CLRIEInstrumentationNetCore>true</CLRIEInstrumentationNetCore>
                 <CLRIEInstrumentationNetFramework>true</CLRIEInstrumentationNetFramework>
+                <InjectDotnetAdditionalDeps>true</InjectDotnetAdditionalDeps>
             </Configuration>";
 
         private TestableDynamicCoverageDataCollector collector;
@@ -65,6 +67,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.vanguardLocationProviderMock.Setup(u => u.GetVanguardProfilerConfigX64Path()).Returns(@"config64");
             this.vanguardLocationProviderMock.Setup(u => u.GetClrInstrumentationEngineX86Path()).Returns(@"clrie86");
             this.vanguardLocationProviderMock.Setup(u => u.GetClrInstrumentationEngineX64Path()).Returns(@"clrie64");
+
+            this.implMock.Setup(i => i.CodeCoverageDepsJsonFilePath).Returns(@"C:\temp\codecoverage.deps.json");
 
             this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
             var configElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(DynamicCoverageDataCollectorTests.DefaultConfig);
@@ -189,7 +193,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 { "COR_ENABLE_PROFILING", "1" },
                 { "COR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}" },
                 { "MicrosoftInstrumentationEngine_ConfigPath32_VanguardInstrumentationProfiler", "config86" },
-                { "MicrosoftInstrumentationEngine_ConfigPath64_VanguardInstrumentationProfiler", "config64" }
+                { "MicrosoftInstrumentationEngine_ConfigPath64_VanguardInstrumentationProfiler", "config64" },
+                { "VANGUARD_DOTNET_ADDITIONAL_DEPS", @"C:\temp\codecoverage.deps.json" },
             };
 
             this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
@@ -222,6 +227,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 { "MicrosoftInstrumentationEngine_LogLevel_{2A1F2A34-8192-44AC-A9D8-4FCC03DCBAA8}", "Errors" },
                 { "MicrosoftInstrumentationEngine_DisableCodeSignatureValidation", "1" },
                 { "MicrosoftInstrumentationEngine_FileLogPath", @"GENERATED" },
+                { "VANGUARD_DOTNET_ADDITIONAL_DEPS", @"C:\temp\codecoverage.deps.json" }
             };
 
             this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
@@ -257,6 +263,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 { "MicrosoftInstrumentationEngine_LogLevel_{2A1F2A34-8192-44AC-A9D8-4FCC03DCBAA8}", "Errors" },
                 { "MicrosoftInstrumentationEngine_DisableCodeSignatureValidation", "1" },
                 { "MicrosoftInstrumentationEngine_FileLogPath", @"GENERATED" },
+                { "VANGUARD_DOTNET_ADDITIONAL_DEPS", @"C:\temp\codecoverage.deps.json" }
             };
 
             this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
@@ -288,7 +295,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 { "MicrosoftInstrumentationEngine_LogLevel", "Errors" },
                 { "MicrosoftInstrumentationEngine_LogLevel_{2A1F2A34-8192-44AC-A9D8-4FCC03DCBAA8}", "Errors" },
                 { "MicrosoftInstrumentationEngine_DisableCodeSignatureValidation", "1" },
-                { "MicrosoftInstrumentationEngine_FileLogPath", @"GENERATED" },
+                { "MicrosoftInstrumentationEngine_FileLogPath", @"GENERATED" }
             };
 
             this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
@@ -324,6 +331,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 { "MicrosoftInstrumentationEngine_LogLevel_{2A1F2A34-8192-44AC-A9D8-4FCC03DCBAA8}", "Errors" },
                 { "MicrosoftInstrumentationEngine_DisableCodeSignatureValidation", "1" },
                 { "MicrosoftInstrumentationEngine_FileLogPath", @"GENERATED" },
+                { "VANGUARD_DOTNET_ADDITIONAL_DEPS", @"C:\temp\codecoverage.deps.json" }
             };
 
             this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
