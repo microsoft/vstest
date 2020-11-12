@@ -68,6 +68,14 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
+        public void GetCodeCoverageShimPathShouldReturnRightDirectory()
+        {
+            var actualPath = this.vanguardLocationProvider.GetCodeCoverageShimPath();
+
+            Assert.AreEqual(Path.Join(this.GetCurrentAssemblyLocation(), @"CodeCoverage\coreclr\Microsoft.VisualStudio.CodeCoverage.Shim.dll"), actualPath);
+        }
+
+        [TestMethod]
         public void GetClrInstrumentationEngineX86PathShouldReturnRightDirectory()
         {
             var actualDir = this.vanguardLocationProvider.GetClrInstrumentationEngineX86Path();
