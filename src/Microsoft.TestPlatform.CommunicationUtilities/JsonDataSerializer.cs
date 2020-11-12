@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
+    using System;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -210,7 +211,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private JsonSerializer GetPayloadSerializer(int? version)
         {
-            return version == 2 ? payloadSerializer2 : payloadSerializer;
+            if (version == null)
+            {
+                version = 1;
+            }
+
+            switch (version)
+            {
+                case 1:
+                    return payloadSerializer;
+                case 2:
+                case 3:
+                    return payloadSerializer2;
+                default:
+                    throw new NotSupportedException($"Protocol version {version} is not supported. " +
+                        "Ensure it is compatible with the latest serializer or add a new one.");
+            }
         }
     }
 }
