@@ -70,6 +70,10 @@ function Verify-Assemblies
                     elseif ($signature.SignerCertificate.Thumbprint -eq "899FA016DEE8E665FF2A315A1151C43FB96C430B") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
+                    # Microsoft 3rd Party Application Component
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "709133ECC53CBF386F4A5ECB782AEEF499F0F8CA") {
+                        Write-Log "Valid (Prod Signed): $($_.FullName)."
+                    }
                     else {
                         Write-FailLog "Incorrect certificate. File: $($_.FullName). Certificate: $($signature.SignerCertificate.Thumbprint)."
                     }
