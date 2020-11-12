@@ -23,20 +23,20 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
         private static DateTimeOffset startTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 0, DateTimeKind.Utc));
         private static TestResult testResult = new TestResult(testCase)
-                                                   {
-                                                       // Attachments = ?
-                                                       // Messages = ?
-                                                       Outcome = TestOutcome.Passed,
-                                                       ErrorMessage = "sampleError",
-                                                       ErrorStackTrace = "sampleStackTrace",
-                                                       DisplayName = "sampleTestResult",
-                                                       ComputerName = "sampleComputerName",
-                                                       Duration = TimeSpan.MaxValue,
-                                                       StartTime = startTime,
-                                                       EndTime = DateTimeOffset.MaxValue
-                                                   };
+        {
+            // Attachments = ?
+            // Messages = ?
+            Outcome = TestOutcome.Passed,
+            ErrorMessage = "sampleError",
+            ErrorStackTrace = "sampleStackTrace",
+            DisplayName = "sampleTestResult",
+            ComputerName = "sampleComputerName",
+            Duration = TimeSpan.MaxValue,
+            StartTime = startTime,
+            EndTime = DateTimeOffset.MaxValue
+        };
 
-        #region v1 tests
+        #region v1 serializer tests
 
         [TestMethod]
         public void TestResultJsonShouldContainAllPropertiesOnSerialization()
@@ -168,12 +168,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
         #endregion
 
-        #region v2 Tests
+        #region v2 serializer Tests (used with protocol 2 and 3)
 
         [TestMethod]
-        public void TestResultJsonShouldContainAllPropertiesOnSerializationV2()
+        [DataRow(2)]
+        [DataRow(3)]
+        public void TestResultJsonShouldContainAllPropertiesOnSerializationV2(int version)
         {
-            var json = Serialize(testResult, 2);
+            var json = Serialize(testResult, version);
 
             // Use raw deserialization to validate basic properties
             dynamic data = JObject.Parse(json);
@@ -191,11 +193,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         }
 
         [TestMethod]
-        public void TestResultObjectShouldContainAllPropertiesOnDeserializationV2()
+        [DataRow(2)]
+        [DataRow(3)]
+        public void TestResultObjectShouldContainAllPropertiesOnDeserializationV2(int version)
         {
             var json = "{\"TestCase\":{\"Id\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\",\"FullyQualifiedName\":\"sampleTestClass.sampleTestCase\",\"DisplayName\":\"sampleTestClass.sampleTestCase\",\"ExecutorUri\":\"executor://sampleTestExecutor\",\"Source\":\"sampleTest.dll\",\"CodeFilePath\":null,\"LineNumber\":-1,\"Properties\":[]},\"Attachments\":[],\"Outcome\":1,\"ErrorMessage\":\"sampleError\",\"ErrorStackTrace\":\"sampleStackTrace\",\"DisplayName\":\"sampleTestResult\",\"Messages\":[],\"ComputerName\":\"sampleComputerName\",\"Duration\":\"10675199.02:48:05.4775807\",\"StartTime\":\"2007-03-10T00:00:00+00:00\",\"EndTime\":\"9999-12-31T23:59:59.9999999+00:00\",\"Properties\":[]}";
 
-            var test = Deserialize<TestResult>(json, 2);
+            var test = Deserialize<TestResult>(json, version);
 
             Assert.AreEqual(testResult.TestCase.Id, test.TestCase.Id);
             Assert.AreEqual(testResult.Attachments.Count, test.Attachments.Count);
@@ -212,7 +216,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         }
 
         [TestMethod]
-        public void TestResultObjectShouldSerializeAttachmentsV2()
+        [DataRow(2)]
+        [DataRow(3)]
+        public void TestResultObjectShouldSerializeAttachmentsV2(int version)
         {
             var result = new TestResult(testCase);
             result.StartTime = default(DateTimeOffset);
@@ -220,17 +226,19 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             result.Attachments.Add(new AttachmentSet(new Uri("http://dummyUri"), "sampleAttachment"));
             var expectedJson = "{\"TestCase\":{\"Id\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\",\"FullyQualifiedName\":\"sampleTestClass.sampleTestCase\",\"DisplayName\":\"sampleTestClass.sampleTestCase\",\"ExecutorUri\":\"executor://sampleTestExecutor\",\"Source\":\"sampleTest.dll\",\"CodeFilePath\":null,\"LineNumber\":-1,\"Properties\":[]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Outcome\":0,\"ErrorMessage\":null,\"ErrorStackTrace\":null,\"DisplayName\":null,\"Messages\":[],\"ComputerName\":null,\"Duration\":\"00:00:00\",\"StartTime\":\"0001-01-01T00:00:00+00:00\",\"EndTime\":\"0001-01-01T00:00:00+00:00\",\"Properties\":[]}";
 
-            var json = Serialize(result, 2);
+            var json = Serialize(result, version);
 
             Assert.AreEqual(expectedJson, json);
         }
 
         [TestMethod]
-        public void TestResultObjectShouldDeserializeAttachmentsV2()
+        [DataRow(2)]
+        [DataRow(3)]
+        public void TestResultObjectShouldDeserializeAttachmentsV2(int version)
         {
             var json = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
 
-            var result = Deserialize<TestResult>(json, 2);
+            var result = Deserialize<TestResult>(json, version);
 
             Assert.AreEqual(1, result.Attachments.Count);
             Assert.AreEqual(new Uri("http://dummyUri"), result.Attachments[0].Uri);
@@ -238,15 +246,32 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         }
 
         [TestMethod]
-        public void TestResultPropertiesShouldGetRegisteredAsPartOfDeserializationV2()
+        [DataRow(2)]
+        [DataRow(3)]
+        public void TestResultPropertiesShouldGetRegisteredAsPartOfDeserializationV2(int version)
         {
             TestProperty.TryUnregister("DummyProperty", out var property);
             var json = "{\"TestCase\":{\"Id\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\",\"FullyQualifiedName\":\"sampleTestClass.sampleTestCase\",\"DisplayName\":\"sampleTestClass.sampleTestCase\",\"ExecutorUri\":\"executor://sampleTestExecutor\",\"Source\":\"sampleTest.dll\",\"CodeFilePath\":null,\"LineNumber\":-1,\"Properties\":[]},\"Attachments\":[],\"Outcome\":1,\"ErrorMessage\":\"sampleError\",\"ErrorStackTrace\":\"sampleStackTrace\",\"DisplayName\":\"sampleTestResult\",\"Messages\":[],\"ComputerName\":\"sampleComputerName\",\"Duration\":\"10675199.02:48:05.4775807\",\"StartTime\":\"2007-03-10T00:00:00+00:00\",\"EndTime\":\"9999-12-31T23:59:59.9999999+00:00\"," +
                 "\"Properties\":[{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},]}";
 
-            var test = Deserialize<TestResult>(json, 2);
+            var test = Deserialize<TestResult>(json, version);
 
             this.VerifyDummyPropertyIsRegistered();
+        }
+
+        #endregion
+
+        #region future
+
+        [TestMethod]
+        public void TestResultSerializationShouldThrowWhenAVersionOfProtocolThatDoesNotExistYetIsProvided()
+        {
+            // this is to ensure that introducing a new version is a conscious choice and
+            // and that we don't fallback to version 1 as it happened with version 3, because the serializer
+            // only checked for version 2
+            var version = int.MaxValue;
+
+            Assert.ThrowsException<NotSupportedException>(() => Serialize(testResult, version));
         }
 
         #endregion
