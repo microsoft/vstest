@@ -223,7 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case 1:
                 // Protocol version 3 was accidentally used with serializer v1 and not
                 // serializer v2, we downgrade to protocol 2 when 3 would be negotiated
-                // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE 
+                // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
                 // env variable.
                 case 3:
                     return payloadSerializer;
