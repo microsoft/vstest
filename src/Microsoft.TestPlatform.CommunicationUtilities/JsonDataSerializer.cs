@@ -218,6 +218,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             switch (version)
             {
+                // 0 is used during negotiation
+                case 0:
                 case 1:
                     return payloadSerializer;
                 case 2:
