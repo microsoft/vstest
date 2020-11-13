@@ -51,9 +51,13 @@ namespace Microsoft.VisualStudio.Coverage
         private const string ClrIeDisableCodeSignatureValidationVariable = @"MicrosoftInstrumentationEngine_DisableCodeSignatureValidation";
         private const string ClrieFileLogPathVariable = @"MicrosoftInstrumentationEngine_FileLogPath";
 
+        private const string InjectDotnetAdditionalDepsSettingName = "InjectDotnetAdditionalDeps";
+        private const string VanguardDotnetAdditionalDepsVariable = "VANGUARD_DOTNET_ADDITIONAL_DEPS";
+
         private readonly IEnvironment environment;
         private bool useClrIeInstrumentationForNetCore;
         private bool useClrIeInstrumentationForNetFramework;
+        private bool injectDotnetAdditionalDeps;
 
         /// <summary>
         /// Data collector implementation
@@ -116,6 +120,7 @@ namespace Microsoft.VisualStudio.Coverage
             {
                 this.useClrIeInstrumentationForNetCore = IsClrInstrumentationEnabled(configurationElement, ClrIeInstrumentationForNetCoreSettingName, ClrIeInstrumentationForNetCoreVariable);
                 this.useClrIeInstrumentationForNetFramework = IsClrInstrumentationEnabled(configurationElement, ClrIeInstrumentationForNetFrameworkSettingName, ClrIeInstrumentationForNetFrameworkVariable);
+                this.injectDotnetAdditionalDeps = GetConfigurationValue(configurationElement, InjectDotnetAdditionalDepsSettingName) ?? true;
 
                 this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
                 this.Events.SessionStart += this.SessionStart;
@@ -177,6 +182,11 @@ namespace Microsoft.VisualStudio.Coverage
                 envVaribles.Add(new KeyValuePair<string, string>(ClrieFileLogPathVariable, Path.Combine(Path.GetTempPath(), this.implementation.GetSessionName(), Guid.NewGuid() + ".log")));
             }
 
+            if (this.injectDotnetAdditionalDeps && !string.IsNullOrEmpty(this.implementation.CodeCoverageDepsJsonFilePath))
+            {
+                envVaribles.Add(new KeyValuePair<string, string>(VanguardDotnetAdditionalDepsVariable, this.implementation.CodeCoverageDepsJsonFilePath));
+            }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("DynamicCoverageDataCollector.GetEnvironmentVariables: Returning following environment variables: {0}", string.Join(",", envVaribles));
@@ -194,10 +204,9 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>If CLR IE should be enabled</returns>
         private static bool IsClrInstrumentationEnabled(XmlElement configurationElement, string configurationSettingName, string environmentVariableName)
         {
-            XmlElement configurationSetting = configurationElement != null ? configurationElement[configurationSettingName] : null;
-            string configurationSettingValue = configurationSetting != null ? configurationSetting.InnerText : null;
+            var clrInstrumentationEnabledByConfiguration = GetConfigurationValue(configurationElement, configurationSettingName);
 
-            if (bool.TryParse(configurationSettingValue, out var clrInstrumentationEnabled) && clrInstrumentationEnabled)
+            if (clrInstrumentationEnabledByConfiguration == true)
             {
                 return true;
             }
@@ -209,6 +218,22 @@ namespace Microsoft.VisualStudio.Coverage
             }
 
             return int.TryParse(environmentVariableValue, out var environmentVariableIntValue) && environmentVariableIntValue > 0;
+        }
+
+        /// <summary>
+        /// Check flag in configuration
+        /// </summary>
+        /// <param name="configurationElement">Configuration</param>
+        /// <param name="configurationSettingName">Configuration setting name</param>
+        /// <returns>Flag value in configuration. Null if not present.</returns>
+        private static bool? GetConfigurationValue(XmlElement configurationElement, string configurationSettingName)
+        {
+            if (bool.TryParse(configurationElement?[configurationSettingName]?.InnerText, out var settingValue))
+            {
+                return settingValue;
+            }
+
+            return null;
         }
 
         /// <summary>
