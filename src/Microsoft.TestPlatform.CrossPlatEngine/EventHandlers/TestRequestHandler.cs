@@ -286,7 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         var dowgradeIsDisabled = flagIsEnabled;
                         if (dowgradeIsDisabled)
                         {
-                            this.protocolVersion = 3;
+                            this.protocolVersion = 4;
                         }
                         else
                         {
