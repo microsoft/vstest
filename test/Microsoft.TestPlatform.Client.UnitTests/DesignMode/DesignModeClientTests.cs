@@ -131,6 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         [TestMethod]
         public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
+        { 
         
             var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 4 };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
