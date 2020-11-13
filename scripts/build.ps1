@@ -375,20 +375,26 @@ function Publish-Package
 
     # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
     New-Item -ItemType directory -Path $testhostCore20PackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX64Dir -Force
+    
     New-Item -ItemType directory -Path $testhostCore20PackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -recurse
+    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX86Dir -Force
  
     New-Item -ItemType directory -Path $testhostCore10PackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -recurse
+    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX64Dir -Force
+
     New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -recurse
+    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore10PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX86Dir -Force
     
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -Recurse
 
     Set-ScriptFailedOnError
 
@@ -396,7 +402,7 @@ function Publish-Package
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackage451Dir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -recurse
+    Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -Recurse
 
     Set-ScriptFailedOnError
 

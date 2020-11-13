@@ -21,7 +21,7 @@ function Verify-Nuget-Packages($packageDirectory)
                      "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
                      "Microsoft.TestPlatform.ObjectModel" = 178;
                      "Microsoft.TestPlatform.Portable" = 566;
-                     "Microsoft.TestPlatform.TestHost" = 197;
+                     "Microsoft.TestPlatform.TestHost" = 210;
                      "Microsoft.TestPlatform.TranslationLayer" = 121}
 
     $nugetPackages = Get-ChildItem -Filter "*.nupkg" $packageDirectory | % { $_.FullName}
