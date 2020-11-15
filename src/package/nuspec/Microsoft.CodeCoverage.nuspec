@@ -32,6 +32,8 @@
     <file src="Microsoft.CodeCoverage\CodeCoverage\vcruntime140.dll" target="build\netstandard1.0\CodeCoverage\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\VanguardInstrumentationProfiler_x86.config" target="build\netstandard1.0\CodeCoverage\" />
     
+    <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="build\netstandard1.0\CodeCoverage\coreclr\" />
+    
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\CodeCoverage.exe" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />

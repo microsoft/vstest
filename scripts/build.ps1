@@ -226,36 +226,6 @@ function Restore-Package
     & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
 
-    # Fixing a problem with procdump package
-    # $procdumpFolder = "$env:TP_PACKAGES_DIR\procdump\0.0.1"
-    # if (-not (Test-Path "$procdumpFolder\bin") -and -not $CIBuild)
-    # {
-    #     Add-Type -AssemblyName System.IO.Compression.FileSystem
-        
-    #     $zip = $null
-    #     try {
-    #         $zip = [System.IO.Compression.ZipFile]::Open("$procdumpFolder\procdump.0.0.1.nupkg", 0)    
-    #         $zip.Entries | Where-Object { $_.FullName.StartsWith("bin/") } | ForEach-Object {
-    #             $file = "$procdumpFolder\$($_.FullName)"
-    #             $fi = [System.IO.Path]::GetDirectoryName($file)
-    #             if (-not (Test-Path $fi)) {
-    #                 New-Item -Type Directory -Path $fi -Force
-    #             }
-
-    #             if (-not (Test-Path $file)) {
-    #                 [System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, $file, $true)
-    #             }
-    #         }
-    #     }
-    #     finally 
-    #     {
-    #         if ($null -ne $zip)
-    #         {
-    #             $zip.Dispose()
-    #         }
-    #     }
-    # }
-
     Set-ScriptFailedOnError
 
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
@@ -404,20 +374,26 @@ function Publish-Package
 
     # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
     New-Item -ItemType directory -Path $testhostCore20PackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX64Dir -Force
+    
     New-Item -ItemType directory -Path $testhostCore20PackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -recurse
+    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX86Dir -Force
  
     New-Item -ItemType directory -Path $testhostCore10PackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -recurse
+    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX64Dir -Force
+
     New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -recurse
+    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore10PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX86Dir -Force
     
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -Recurse
 
     Set-ScriptFailedOnError
 
@@ -425,7 +401,7 @@ function Publish-Package
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackage451Dir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -recurse
+    Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -Recurse
 
     Set-ScriptFailedOnError
 

@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities
 {
     using System;
-
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,8 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
     [TestClass]
     public class RunSettingsProviderExtensionsTests
     {
-        private const string DefaultRunSettingsTemplate =
-            "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>%ResultsDirectory%</ResultsDirectory>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>%DefaultFramework%</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
         private IRunSettingsProvider runSettingsProvider;
 
         [TestInitialize]
@@ -29,7 +26,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateRunSettingsShouldUpdateGivenSettingsXml()
         {
-            const string runSettingsXml = "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>";
+            string runSettingsXml = string.Join(Environment.NewLine,
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TargetPlatform>X86</TargetPlatform>",
+                "  </RunConfiguration>",
+                "</RunSettings>");
 
             this.runSettingsProvider.UpdateRunSettings(runSettingsXml);
 
@@ -62,7 +64,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             this.runSettingsProvider.AddDefaultRunSettings();
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+            var runConfiguration =
+                XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
             Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
             Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
@@ -71,11 +74,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void AddDefaultRunSettingsShouldAddUnspecifiedSettings()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(string.Join(Environment.NewLine,
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TargetPlatform>X86</TargetPlatform>",
+                "  </RunConfiguration>",
+                "</RunSettings>"));
 
             this.runSettingsProvider.AddDefaultRunSettings();
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+            var runConfiguration =
+                XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
             Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
         }
@@ -83,49 +92,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void AddDefaultRunSettingsShouldNotChangeSpecifiedSettings()
         {
-
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(string.Join(Environment.NewLine,
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TargetPlatform>X64</TargetPlatform> </RunConfiguration>",
+                "</RunSettings>"));
 
             this.runSettingsProvider.AddDefaultRunSettings();
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+            var runConfiguration =
+                XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.TargetPlatform, Architecture.X64);
         }
 
         [TestMethod]
         public void AddDefaultRunSettingsShouldThrowExceptionIfArgumentIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => RunSettingsProviderExtensions.AddDefaultRunSettings(null));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                RunSettingsProviderExtensions.AddDefaultRunSettings(null));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeShouldThrowExceptionIfKeyIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNode(null, "data"));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                this.runSettingsProvider.UpdateRunSettingsNode(null, "data"));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeShouldThrowExceptionIfKeyIsEmptyOrWhiteSpace()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNode("  ", "data"));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                this.runSettingsProvider.UpdateRunSettingsNode("  ", "data"));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeShouldThrowExceptionIfDataIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNode("Key", null));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                this.runSettingsProvider.UpdateRunSettingsNode("Key", null));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeShouldThrowExceptionIfRunSettingsProviderIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => RunSettingsProviderExtensions.UpdateRunSettingsNode(null, "Key", "data"));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                RunSettingsProviderExtensions.UpdateRunSettingsNode(null, "Key", "data"));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeShouldAddNewKeyIfNotPresent()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> </RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(
+                "<RunSettings>  <RunConfiguration> </RunConfiguration>  </RunSettings>");
             this.runSettingsProvider.UpdateRunSettingsNode("Key.Path", "data");
 
             Assert.AreEqual("data", this.runSettingsProvider.QueryRunSettingsNode("Key.Path"));
@@ -140,14 +159,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateTetsRunParameterSettingsNodeShouldOverrideValueIfKeyIsAlreadyPresent()
         {
-            var runSettingsWithTestRunParameters = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
-            var runSettingsWithTestRunParametersOverrode = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//def\" />\r\n  </TestRunParameters>\r\n</RunSettings>";
+            var runSettingsWithTestRunParameters = string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <TestRunParameters>",
+                "    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />",
+                "  </TestRunParameters>",
+                "</RunSettings>");
+            var runSettingsWithTestRunParametersOverrode = string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <TestRunParameters>",
+                "    <Parameter name=\"weburl\" value=\"http://localhost//def\" />",
+                "  </TestRunParameters>",
+                "</RunSettings>");
 
             this.runSettingsProvider.UpdateRunSettings(runSettingsWithTestRunParameters);
-            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch("TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//def\")");
+            var match = this.runSettingsProvider.GetTestRunParameterNodeMatch(
+                "TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//def\")");
             this.runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
 
-            Assert.AreEqual(runSettingsWithTestRunParametersOverrode, this.runSettingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runSettingsWithTestRunParametersOverrode,
+                this.runSettingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -171,7 +204,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateRunSettingsNodeShouldUpdateKeyIfAlreadyPresent()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(
+                "<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
             this.runSettingsProvider.UpdateRunSettingsNode("RunConfiguration.MaxCpuCount", "0");
             Assert.AreEqual("0", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.MaxCpuCount"));
         }
@@ -179,31 +213,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfKeyIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNodeInnerXml(null, "<myxml/>"));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                this.runSettingsProvider.UpdateRunSettingsNodeInnerXml(null, "<myxml/>"));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfKeyIsEmptyOrWhiteSpace()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("  ", "<myxml/>"));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("  ", "<myxml/>"));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfXmlIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key", null));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key", null));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfRunSettingsProviderIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => RunSettingsProviderExtensions.UpdateRunSettingsNodeInnerXml(null, "Key", "<myxml/>"));
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                RunSettingsProviderExtensions.UpdateRunSettingsNodeInnerXml(null, "Key", "<myxml/>"));
         }
 
         [TestMethod]
         public void UpdateRunSettingsNodeInnerXmlShouldAddNewKeyIfNotPresent()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> </RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(
+                "<RunSettings>  <RunConfiguration> </RunConfiguration>  </RunSettings>");
             this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key.Path", "<myxml>myxml</myxml>");
 
             Assert.AreEqual("myxml", this.runSettingsProvider.QueryRunSettingsNode("Key.Path"));
@@ -212,7 +251,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void UpdateRunSettingsNodeInnerXmlShouldUpdateKeyIfAlreadyPresent()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(
+                "<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
             this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("RunConfiguration", "<MaxCpuCount>0</MaxCpuCount>");
             Assert.AreEqual("0", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.MaxCpuCount"));
         }
@@ -238,7 +278,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void QueryRunSettingsNodeShouldReturnCorrectValue()
         {
-            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <TargetPlatform>x86</TargetPlatform></RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettings(
+                "<RunSettings>  <RunConfiguration> <TargetPlatform>x86</TargetPlatform></RunConfiguration>  </RunSettings>");
             Assert.AreEqual("x86", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.TargetPlatform"));
         }
 
@@ -263,11 +304,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
 
         private class TestableRunSettingsProvider : IRunSettingsProvider
         {
-            public RunSettings ActiveRunSettings
-            {
-                get;
-                set;
-            }
+            public RunSettings ActiveRunSettings { get; set; }
+
             public void SetActiveRunSettings(RunSettings runSettings)
             {
                 this.ActiveRunSettings = runSettings;

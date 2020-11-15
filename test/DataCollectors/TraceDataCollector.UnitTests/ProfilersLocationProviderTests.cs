@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using TraceCollector;
 
     [TestClass]
+    [TestCategory("Windows")]
     public class ProfilersLocationProviderTests
     {
         private ProfilersLocationProvider vanguardLocationProvider;
@@ -64,6 +65,14 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             var actualPath = this.vanguardLocationProvider.GetVanguardProfilerConfigX64Path();
 
             Assert.AreEqual(Path.Join(this.GetCurrentAssemblyLocation(), @"CodeCoverage\amd64\VanguardInstrumentationProfiler_x64.config"), actualPath);
+        }
+
+        [TestMethod]
+        public void GetCodeCoverageShimPathShouldReturnRightDirectory()
+        {
+            var actualPath = this.vanguardLocationProvider.GetCodeCoverageShimPath();
+
+            Assert.AreEqual(Path.Join(this.GetCurrentAssemblyLocation(), @"CodeCoverage\coreclr\Microsoft.VisualStudio.CodeCoverage.Shim.dll"), actualPath);
         }
 
         [TestMethod]

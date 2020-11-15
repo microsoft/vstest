@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
             }
 
-            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
+            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
-            Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
+            Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
             {
                 // Create a new HostManager, to be associated with individual ProxyExecutionManager(&POM)
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
@@ -178,8 +178,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             int numSources = 1;
             if (testRunCriteria.HasSpecificTests)
             {
-                numSources = new System.Collections.Generic.HashSet<string>(
-                    testRunCriteria.Tests.Select((testCase) => testCase.Source)).Count;
+                numSources = new HashSet<string>(
+                             testRunCriteria.Tests.Select(testCase => testCase.Source)).Count;
             }
             else
             {
