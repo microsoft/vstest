@@ -34,4 +34,11 @@
       <Visible>False</Visible>
     </Content>
   </ItemGroup>
+  <ItemGroup Condition=" '$(OS)' != 'Windows_NT'" >
+    <Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.PlatformAbstractions.dll">
+      <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+  </ItemGroup>
 </Project>
