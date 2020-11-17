@@ -20,7 +20,7 @@ function Verify-Nuget-Packages($packageDirectory)
                      "Microsoft.TestPlatform.CLI" = 353;
                      "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
                      "Microsoft.TestPlatform.ObjectModel" = 178;
-                     "Microsoft.TestPlatform.Portable" = 566;
+                     "Microsoft.TestPlatform.Portable" = 568;
                      "Microsoft.TestPlatform.TestHost" = 210;
                      "Microsoft.TestPlatform.TranslationLayer" = 121}
 
