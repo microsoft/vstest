@@ -83,7 +83,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     ex.ToString());
             }
 
-            
             return files[0];
         }
 

@@ -16,7 +16,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <PackageReference Include="Microsoft.VisualStudio.Coverage.CoreLib.Net">
-	    <Version>16.9.0-beta.20560.1</Version>
+      <Version>$(CoverageCoreLibVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net451' ">

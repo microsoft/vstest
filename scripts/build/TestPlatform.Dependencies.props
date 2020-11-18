@@ -41,6 +41,7 @@
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
+    <CoverageCoreLibVersion>16.9.0-beta.20560.1</CoverageCoreLibVersion>
   </PropertyGroup>
 
   <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
