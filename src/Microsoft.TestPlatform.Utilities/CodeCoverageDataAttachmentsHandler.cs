@@ -33,28 +33,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             yield return CodeCoverageDataCollectorUri;
         }    
 
-        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
             if (attachments != null && attachments.Any())
             {
                 var codeCoverageFiles = attachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
-                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles, progressReporter, cancellationToken);
+                var outputFile = await this.MergeCodeCoverageFiles(codeCoverageFiles, progressReporter, cancellationToken);
                 var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
                 if (!string.IsNullOrEmpty(outputFile))
                 {
                     attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
-                    return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet> { attachmentSet });
+                    return new Collection<AttachmentSet> { attachmentSet };
                 }
 
                 // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
-                return Task.FromResult(attachments);
+                return attachments;
             }
 
-            return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet>());
+            return new Collection<AttachmentSet>();
         }
 
-        private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
+        private async Task<string> MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
             if (files.Count == 1)
             {
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
                 // resolved, this method call will throw an exception that will be caught and
                 // absorbed here.
-                this.MergeCodeCoverageFiles(files, cancellationToken);
+                await this.MergeCodeCoverageFiles(files, cancellationToken);
                 progressReporter?.Report(100);
             }
             catch (OperationCanceledException)
@@ -86,15 +86,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return files[0];
         }
 
-        private void MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
+        private async Task MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
         {
             var coverageUtility = new CoverageFileUtility();
 
-            var coverageData = Task.Run(
-                async () => await coverageUtility.MergeCoverageFilesAsync(
+            var coverageData = await coverageUtility.MergeCoverageFilesAsync(
                     files,
-                    cancellationToken))
-                .GetAwaiter().GetResult();
+                    cancellationToken);
 
             coverageUtility.WriteCoverageFile(files[0], coverageData);
         }
