@@ -270,7 +270,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
             Assert.IsNull(testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
 
-            Assert.IsTrue(0 <= testRunAttachmentsProcessingEventHandler.ProgressArgs.Count);
+            Assert.IsTrue(3 <= testRunAttachmentsProcessingEventHandler.ProgressArgs.Count);
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
