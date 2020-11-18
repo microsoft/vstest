@@ -24,10 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string CoverageFileExtension = ".coverage";
         private const string CoverageFriendlyName = "Code Coverage";
 
-        private const string CodeCoverageAnalysisAssemblyName = "Microsoft.VisualStudio.Coverage.Analysis";
-        private const string MergeMethodName = "MergeCoverageFiles";
-        private const string CoverageInfoTypeName = "CoverageInfo";
-
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
 
         public bool SupportsIncrementalProcessing => true;
@@ -65,6 +61,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return files[0];
             }
 
+            try
+            {
+                // Warning: Don't remove this method call.
+                //
+                // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
+                // resolved, this method call will throw an exception that will be caught and
+                // absorbed here.
+                this.MergeCodeCoverageFiles(files, cancellationToken);
+                progressReporter?.Report(100);
+            }
+            catch (OperationCanceledException)
+            {
+                // Occurs due to cancellation, ok to re-throw.
+                throw;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(
+                    "CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector. Error: {0}",
+                    ex.ToString());
+            }
+
+            
+            return files[0];
+        }
+
+        private void MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
+        {
             var coverageUtility = new CoverageFileUtility();
 
             var coverageData = Task.Run(
@@ -74,8 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 .GetAwaiter().GetResult();
 
             coverageUtility.WriteCoverageFile(files[0], coverageData);
-
-            return files[0];
         }
     }
 }
