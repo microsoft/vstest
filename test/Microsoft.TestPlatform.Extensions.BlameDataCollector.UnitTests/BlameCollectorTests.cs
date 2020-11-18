@@ -476,7 +476,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>()));
+            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false));
         }
 
         /// <summary>
@@ -497,7 +497,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>()));
+            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>(), false));
         }
 
         /// <summary>
@@ -526,7 +526,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>()));
+            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), true, It.IsAny<string>(), false));
         }
 
         /// <summary>
@@ -646,7 +646,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var tpex = new TestPlatformException("env var exception");
-            this.mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>()))
+            this.mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false))
                                        .Throws(tpex);
 
             // Raise TestHostLaunched
@@ -672,7 +672,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var ex = new Exception("start process failed");
-            this.mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>()))
+            this.mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), false, It.IsAny<string>(), false))
                                        .Throws(ex);
 
             // Raise TestHostLaunched
@@ -709,9 +709,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             if (collectDumpOnExit)
             {
-                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
-                fulldumpAttribute.Value = "true";
-                node.Attributes.Append(fulldumpAttribute);
+                var collectDumpOnExitAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
+                collectDumpOnExitAttribute.Value = "true";
+                node.Attributes.Append(collectDumpOnExitAttribute);
             }
 
             if (colectDumpOnHang)
