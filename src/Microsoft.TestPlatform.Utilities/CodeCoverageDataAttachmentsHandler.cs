@@ -11,6 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.Coverage.CoreLib.Net;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -58,70 +60,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
-            if(files.Count == 1)
+            if (files.Count == 1)
             {
                 return files[0];
             }
 
-            string tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
-            string outputfileName = files[0];
+            var coverageUtility = new CoverageFileUtility();
 
-            File.Create(tempFileName).Dispose();
-            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageAnalysisAssemblyName + ".dll");
+            var coverageData = Task.Run(
+                async () => await coverageUtility.MergeCoverageFilesAsync(
+                    files,
+                    cancellationToken))
+                .GetAwaiter().GetResult();
 
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
-                var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
+            coverageUtility.WriteCoverageFile(files[0], coverageData);
 
-                var methodInfo = type?.GetMethod(MergeMethodName);
-
-                if (methodInfo != null)
-                {
-                    IList<string> filesToDelete = new List<string>(files.Count) { tempFileName };
-
-                    for (int i = 1; i < files.Count; i++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        progressReporter?.Report(100 * i / files.Count);
-
-                        cancellationToken.ThrowIfCancellationRequested();
-                        methodInfo.Invoke(null, new object[] { files[i], outputfileName, tempFileName, true });
-
-                        cancellationToken.ThrowIfCancellationRequested();
-                        File.Copy(tempFileName, outputfileName, true);
-
-                        filesToDelete.Add(files[i]);
-                    }
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                    foreach (string fileName in filesToDelete)
-                    {
-                        File.Delete(fileName);
-                    }
-                }
-
-                progressReporter?.Report(100);
-                return outputfileName;
-            }
-            catch (OperationCanceledException)
-            {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("CodeCoverageDataCollectorAttachmentsHandler: operation was cancelled.");
-                }
-                throw;
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector of type : {0} from location : {1}. Error : {2}", CodeCoverageAnalysisAssemblyName, assemblyPath, ex.ToString());
-                }
-            }
-
-            return string.Empty;
+            return files[0];
         }
     }
 }
