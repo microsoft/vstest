@@ -71,7 +71,7 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.deps.json" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x86\msdia140.dll" target="lib\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x64\msdia140.dll" target="lib\netcoreapp2.1\x64\" />
-
+    
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.dll" target="build\netcoreapp2.1\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.exe" target="build\netcoreapp2.1\x64\" />
