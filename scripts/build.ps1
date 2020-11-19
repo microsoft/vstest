@@ -737,7 +737,7 @@ function Create-NugetPackages
 
     # Verifies that expected number of files gets shipped in nuget packages.
     # Few nuspec uses wildcard characters.
-    Verify-Nuget-Packages $packageOutputDir
+    Verify-Nuget-Packages $packageOutputDir $TPB_Version
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
 }

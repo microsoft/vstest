@@ -32,7 +32,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="targetFramework">
         /// The target framework of the process
         /// </param>
-        void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework);
+        /// <param name="collectAlways">
+        /// Collect the dump on process exit even if there is no exception
+        /// </param>
+        void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways);
 
         /// <summary>
         /// Launch proc dump process to capture dump in case of a testhost hang and wait for it to exit
