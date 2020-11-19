@@ -79,7 +79,6 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
-<<<<<<< HEAD
             var expectedSettingsXml = string.Join(Environment.NewLine, 
                 "<RunSettings>",
                 "  <MSTest>",
@@ -89,19 +88,6 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 "  <RunConfiguration></RunConfiguration>",
                 "</RunSettings>"
             );
-||||||| 95cb80f7
-            var expectedSettingsXml =
-                "<RunSettings>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <RunConfiguration></RunConfiguration>\r\n</RunSettings>";
-=======
-            var expectedSettingsXml =
-                "<RunSettings>\r\n" +
-                "  <MSTest>\r\n" +
-                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
-                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
-                "  </MSTest>\r\n" +
-                "  <RunConfiguration></RunConfiguration>\r\n" +
-                "</RunSettings>";
->>>>>>> fix-blame-collect-always
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
@@ -118,7 +104,6 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
-<<<<<<< HEAD
             var expectedSettingsXml = string.Join(Environment.NewLine,
                 "<RunSettings>",
                 "  <RunConfiguration />",
@@ -128,19 +113,6 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 "  </MSTest>",
                 "</RunSettings>"
             );
-||||||| 95cb80f7
-            var expectedSettingsXml =
-                "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n</RunSettings>";
-=======
-            var expectedSettingsXml =
-                "<RunSettings>\r\n" +
-                "  <RunConfiguration />\r\n" +
-                "  <MSTest>\r\n" +
-                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
-                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
-                "  </MSTest>\r\n" +
-                "</RunSettings>";
->>>>>>> fix-blame-collect-always
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }

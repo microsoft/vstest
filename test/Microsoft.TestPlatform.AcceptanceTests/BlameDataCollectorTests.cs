@@ -7,13 +7,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-<<<<<<< HEAD
     using System.Linq;
     using System.Text;
-||||||| 95cb80f7
-=======
     using System.Text.RegularExpressions;
->>>>>>> fix-blame-collect-always
     using System.Xml;
 
     [TestClass]
@@ -109,7 +105,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             StringAssert.Matches(this.StdOut, new Regex(@"\.dmp"), "it should collect dump, even if nothing crashed");
         }
 
-<<<<<<< HEAD
         [TestMethod]
         [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         // should make no difference, keeping for easy debug 
@@ -286,12 +281,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private void VaildateOutput(bool validateDumpFile = false)
-||||||| 95cb80f7
-        private void VaildateOutput(bool validateDumpFile = false)
-=======
         private void VaildateOutput(string testName, bool validateDumpFile = false)
->>>>>>> fix-blame-collect-always
         {
             bool isSequenceAttachmentReceived = false;
             bool isDumpAttachmentReceived = false;
