@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TraceCollector
         private const string VanguardX64ProfilerPath = @"amd64\covrun64.dll";
         private const string VanguardX86ProfilerConfigPath = @"VanguardInstrumentationProfiler_x86.config";
         private const string VanguardX64ProfilerConfigPath = @"amd64\VanguardInstrumentationProfiler_x64.config";
+        private const string VanguardShimPath = @"coreclr\Microsoft.VisualStudio.CodeCoverage.Shim.dll";
 
         /// <summary>
         /// Vanguard executable name
@@ -74,6 +75,12 @@ namespace Microsoft.VisualStudio.TraceCollector
         public string GetClrInstrumentationEngineX64Path()
         {
             return this.GetClrInstrumentationEnginePath("x64", ClrIeX64FileName, ClrIeX64InstallDirVariable);
+        }
+
+        /// <inheritdoc />
+        public string GetCodeCoverageShimPath()
+        {
+            return Path.Combine(this.GetVanguardDirectory(), VanguardShimPath);
         }
 
         private string GetClrInstrumentationEnginePath(string arch, string fileName, string environmentVariableName)

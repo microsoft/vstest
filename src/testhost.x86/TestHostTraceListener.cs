@@ -43,8 +43,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     // Debug.Assert fails. This method is internal, but the class is on purpose keeping the 
                     // callback settable so tests can set the callback
                     var field = typeof(Debug).GetField("s_ShowDialog", BindingFlags.Static | BindingFlags.NonPublic);
-                    var value = field.GetValue(null);
-                    field.SetValue(null, (Action<string, string, string, string>)ShowDialog);
+                    if (field != null)
+                    {
+                        var value = field.GetValue(null);
+                        field.SetValue(null, (Action<string, string, string, string>)ShowDialog);
+                    }
                 }
                 catch (Exception ex)
                 {
