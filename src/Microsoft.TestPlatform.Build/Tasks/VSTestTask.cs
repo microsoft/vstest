@@ -163,6 +163,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
             Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
 
+<<<<<<< HEAD
             var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_BUILD_DEBUG");
             if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
             {
@@ -184,6 +185,31 @@ namespace Microsoft.TestPlatform.Build.Tasks
             var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
             allowfailureWithoutError?.SetValue(BuildEngine, true);
 
+||||||| 95cb80f7
+=======
+            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_BUILD_DEBUG");
+            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                Console.WriteLine("Waiting for debugger attach...");
+
+                var currentProcess = Process.GetCurrentProcess();
+                Console.WriteLine(string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName));
+
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                Debugger.Break();
+            }
+
+            // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
+            // write MSBuild error. https://github.com/dotnet/msbuild/blob/51a1071f8871e0c93afbaf1b2ac2c9e59c7b6491/src/Framework/IBuildEngine7.cs#L12
+            var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
+            // setting this to false because the switch is implemented backwards and it won't be fixed till next release
+            allowfailureWithoutError?.SetValue(BuildEngine, false);
+
+>>>>>>> fix-blame-collect-always
             vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {

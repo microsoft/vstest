@@ -143,6 +143,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Sqm.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.OLE.Interop.dll" />
+<<<<<<< HEAD
       
       <!-- These are already signed, trying to sign them again causes warnings in the build pipeline.
         <AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" />
@@ -187,6 +188,62 @@
       
       <!-- Localized resources -->
       <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)%(ResxLang.Identity)\*.*" />
+||||||| 95cb80f7
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITesting.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+=======
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITesting.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
+>>>>>>> fix-blame-collect-always
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -456,12 +513,21 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\%(ResxLang.Identity)\*.*" />
+<<<<<<< HEAD
       
       <!-- Third Party assemblies to sign -->
       <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Newtonsoft.Json.dll" />
       <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Newtonsoft.Json.dll" />
       <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Newtonsoft.Json.dll" />
       <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Newtonsoft.Json.dll" />
+||||||| 95cb80f7
+=======
+      
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Newtonsoft.Json.dll" />
+>>>>>>> fix-blame-collect-always
     </ItemGroup>
 
     <ItemGroup>
@@ -520,6 +586,7 @@
       </ThirdPartyAssembliesToSign>
     </ItemGroup>
 
+<<<<<<< HEAD
     <Message Text="Signing 3rd party assemblies using authenticode certificate '%(ThirdPartyAssembliesToSign.Authenticode)' for @(ThirdPartyAssembliesToSign)"/>
     <SignFiles Files="@(ThirdPartyAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)"
@@ -551,6 +618,17 @@
                Type="$(SignType)" />
 
     <Message Text="Signing using authenticode certificate AssembliesToSign:'%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
+||||||| 95cb80f7
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
+=======
+    <Message Text="Signing 3rd party assemblies using authenticode certificate '%(ThirdPartyAssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <SignFiles Files="@(ThirdPartyAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
+>>>>>>> fix-blame-collect-always
     <SignFiles Files="@(AssembliesToSign)"
                BinariesDirectory="$(ArtifactsDirectory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"

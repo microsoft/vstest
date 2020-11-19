@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType)
+        public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways)
         {
             var process = Process.GetProcessById(processId);
             var outputFile = Path.Combine(outputDirectory, $"{process.ProcessName}_{process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_crashdump.dmp");
@@ -96,7 +96,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 processId,
                 this.dumpFileName,
                 ProcDumpExceptionsList,
-                isFullDump: dumpType == DumpTypeOption.Full);
+                isFullDump: dumpType == DumpTypeOption.Full,
+                collectAlways: collectAlways);
 
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: Running ProcDump with arguments: '{procDumpArgs}'.");
             this.procDumpProcess = this.processHelper.LaunchProcess(
