@@ -32,7 +32,7 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.9.0-preview-4189539</TestPlatformExternalsVersion>
-    <CodeCoverageExternalsVersion>16.9.0-beta.20563.1</CodeCoverageExternalsVersion>
+    <CodeCoverageExternalsVersion>16.9.0-beta.20568.1</CodeCoverageExternalsVersion>
     <MicrosoftFakesVersion>16.8.0-beta.20420.2</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
@@ -41,7 +41,6 @@
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
-    <CoverageCoreLibVersion>16.9.0-beta.20560.1</CoverageCoreLibVersion>
   </PropertyGroup>
 
   <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />

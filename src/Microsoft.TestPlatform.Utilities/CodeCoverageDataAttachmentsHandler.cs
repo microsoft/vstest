@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             if (attachments != null && attachments.Any())
             {
                 var codeCoverageFiles = attachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
-                var outputFile = await this.MergeCodeCoverageFiles(codeCoverageFiles, progressReporter, cancellationToken);
+                var outputFile = await this.MergeCodeCoverageFilesAsync(codeCoverageFiles, progressReporter, cancellationToken).ConfigureAwait(false);
                 var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
                 if (!string.IsNullOrEmpty(outputFile))
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return new Collection<AttachmentSet>();
         }
 
-        private async Task<string> MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
+        private async Task<string> MergeCodeCoverageFilesAsync(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
             if (files.Count == 1)
             {
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
                 // resolved, this method call will throw an exception that will be caught and
                 // absorbed here.
-                await this.MergeCodeCoverageFiles(files, cancellationToken);
+                await this.MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
                 progressReporter?.Report(100);
             }
             catch (OperationCanceledException)
@@ -86,13 +86,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return files[0];
         }
 
-        private async Task MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
+        private async Task MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
         {
             var coverageUtility = new CoverageFileUtility();
 
             var coverageData = await coverageUtility.MergeCoverageFilesAsync(
                     files,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
 
             coverageUtility.WriteCoverageFile(files[0], coverageData);
         }
