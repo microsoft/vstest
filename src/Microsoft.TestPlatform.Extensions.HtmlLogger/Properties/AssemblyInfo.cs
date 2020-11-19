@@ -3,7 +3,7 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
+using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 // General Information about an assembly is controlled through the following
@@ -12,9 +12,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft Corporation")]
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
-[assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.TrxLogger")]
+[assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.HtmlLogger")]
 [assembly: AssemblyTrademark("")]
-[assembly: TypesToLoad(typeof(TrxLogger))]
+[assembly: TypesToLoad(typeof(HtmlLogger))]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -22,5 +22,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("60d876ee-f278-4bf8-bc8a-15b356895c6f")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM.
+
+[assembly: Guid("1f26e9c7-5018-4091-a22a-89280f2f98a9")]
