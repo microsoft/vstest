@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
     using System;
     using System.Reflection;
 
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,14 +23,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class FullyQualifiedNameMessages {
+    internal class ManagedNameMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal FullyQualifiedNameMessages() {
+        internal ManagedNameMessages() {
         }
         
         /// <summary>
@@ -39,8 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.FullyQualifiedNameMessages", 
-                        typeof(FullyQualifiedNameMessages).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.ManagedNameMessages", typeof(ManagedNameMessages).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,11 +62,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FullyQualifiedName is incomplete.
+        ///   Looks up a localized string similar to ManagedName is incomplete.
         /// </summary>
-        internal static string ErrorIncompleteFullyQualifiedName {
+        internal static string ErrorIncompleteManagedName {
             get {
-                return ResourceManager.GetString("ErrorIncompleteFullyQualifiedName", resourceCulture);
+                return ResourceManager.GetString("ErrorIncompleteManagedName", resourceCulture);
             }
         }
         
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected characters after the end of the FullyQualifiedName (pos: {0}).
+        ///   Looks up a localized string similar to Unexpected characters after the end of the ManagedName (pos: {0}).
         /// </summary>
         internal static string ErrorUnexpectedCharactersAtEnd {
             get {
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Whitespace is not valid in a FullyQualifiedName (pos: {0}).
+        ///   Looks up a localized string similar to Whitespace is not valid in a ManagedName (pos: {0}).
         /// </summary>
         internal static string ErrorWhitespaceNotValid {
             get {

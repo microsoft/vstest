@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTests
+namespace Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests
 {
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using System.IO;
@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTes
 
     [TestClass]
     [DeploymentItem("TestClasses.cs")]
-    public partial class FullyQualifiedNameRoundTripTests
+    public partial class ManagedNameRoundTripTests
     {
         private const BindingFlags PrivateBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private Compilation _compilation;
@@ -839,13 +839,13 @@ namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTes
             string expectedFullMethodName)
         {
             // Generate the fqn for the Reflection MethodInfo
-            FullyQualifiedNameHelper.GetFullyQualifiedName(methodInfo, out var fullTypeName, out var fullMethodName);
+            ManagedNameHelper.GetManagedName(methodInfo, out var fullTypeName, out var fullMethodName);
 
             Assert.AreEqual(expectedFullTypeName, fullTypeName);
             Assert.AreEqual(expectedFullMethodName, fullMethodName);
 
             // Lookup the Reflection MethodInfo using fullTypeName and fullMethodName
-            var roundTrippedMethodInfo = FullyQualifiedNameHelper.GetMethodFromFullyQualifiedName(
+            var roundTrippedMethodInfo = ManagedNameHelper.GetManagedName(
                 Assembly.GetExecutingAssembly(),
                 fullTypeName,
                 fullMethodName);
@@ -859,7 +859,7 @@ namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTes
             MethodInfo expectedMethodInfo)
         {
             // Lookup the Reflection MethodInfo using fullTypeName and fullMethodName
-            var methodInfo = FullyQualifiedNameHelper.GetMethodFromFullyQualifiedName(
+            var methodInfo = ManagedNameHelper.GetManagedName(
                 Assembly.GetExecutingAssembly(),
                 fullTypeName,
                 fullMethodName);
@@ -867,7 +867,7 @@ namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTes
             Assert.AreEqual(expectedMethodInfo.MetadataToken, methodInfo.MetadataToken);
 
             // Generate the fqn for the Reflection MethodInfo
-            FullyQualifiedNameHelper.GetFullyQualifiedName(
+            ManagedNameHelper.GetManagedName(
                 methodInfo,
                 out var roundTrippedFullTypeName,
                 out var roundTrippedFullMethodName);

@@ -1,35 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../FullyQualifiedNameMessages.resx">
+  <file datatype="xml" source-language="en" original="../ManagedNameMessages.resx">
     <body>
-      <trans-unit id="ErrorIncompleteFullyQualifiedName">
-        <source>FullyQualifiedName is incomplete</source>
-        <target state="translated">FullyQualifiedName이 불완전합니다.</target>
+      <trans-unit id="ErrorIncompleteManagedName">
+        <source>ManagedName is incomplete</source>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
         <source>Method arity must be numeric</source>
-        <target state="translated">메서드 인자 수는 숫자여야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>
-        <target state="translated">'{0}' 메서드를 '{1}' 형식에서 찾을 수 없습니다.</target>
         <note>{0} is the method name, {1} is the full type name.</note>
       </trans-unit>
       <trans-unit id="ErrorTypeNotFound">
         <source>Type '{0}' not found</source>
-        <target state="translated">'{0}' 형식을 찾을 수 없습니다.</target>
         <note>{0} is the full type name.</note>
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
-        <source>Unexpected characters after the end of the FullyQualifiedName (pos: {0})</source>
-        <target state="translated">FullyQualifiedName의 끝 다음에 예기치 않은 문자가 있습니다(pos: {0}).</target>
+        <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
         <note>{0} is the position of unexpected characters</note>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">
-        <source>Whitespace is not valid in a FullyQualifiedName (pos: {0})</source>
-        <target state="translated">FullyQualifiedName에서 공백은 유효하지 않습니다(pos: {0}).</target>
+        <source>Whitespace is not valid in a ManagedName (pos: {0})</source>
         <note>{0} is the position of invalid whitespace</note>
       </trans-unit>
     </body>

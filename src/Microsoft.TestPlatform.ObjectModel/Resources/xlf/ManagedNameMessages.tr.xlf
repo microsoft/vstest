@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="tr" original="../FullyQualifiedNameMessages.resx">
+  <file datatype="xml" source-language="en" target-language="tr" original="../ManagedNameMessages.resx">
     <body>
-      <trans-unit id="ErrorIncompleteFullyQualifiedName">
-        <source>FullyQualifiedName is incomplete</source>
-        <target state="translated">FullyQualifiedName eksik</target>
+      <trans-unit id="ErrorIncompleteManagedName">
+        <source>ManagedName is incomplete</source>
+        <target state="translated">ManagedName eksik</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
@@ -23,13 +23,13 @@
         <note>{0} is the full type name.</note>
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
-        <source>Unexpected characters after the end of the FullyQualifiedName (pos: {0})</source>
-        <target state="translated">FullyQualifiedName’den sonra beklenmeyen karakterler (konum: {0})</target>
+        <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
+        <target state="translated">ManagedName’den sonra beklenmeyen karakterler (konum: {0})</target>
         <note>{0} is the position of unexpected characters</note>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">
-        <source>Whitespace is not valid in a FullyQualifiedName (pos: {0})</source>
-        <target state="translated">FullyQualifiedName’de boşluk geçersizdir (konum: {0})</target>
+        <source>Whitespace is not valid in a ManagedName (pos: {0})</source>
+        <target state="translated">ManagedName’de boşluk geçersizdir (konum: {0})</target>
         <note>{0} is the position of invalid whitespace</note>
       </trans-unit>
     </body>

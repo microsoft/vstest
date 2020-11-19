@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(method, nameof(method));
 
-            FullyQualifiedNameUtilities.FullyQualifiedNameHelper.GetFullyQualifiedName(method, out var managedType, out var managedMethod);
+            ManagedNameUtilities.ManagedNameHelper.GetManagedName(method, out var managedType, out var managedMethod);
 
             ManagedType = managedType;
             ManagedMethod = managedMethod;
@@ -338,6 +338,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // do nothing
             }
 
+            // We still need to handle parameters in the case of a Theory or TestGroup of test cases that are only
+            // distinguished by parameters.
             var testcaseFullName = this.ExecutorUri + source; 
             
             // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.

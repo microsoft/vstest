@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorIncompleteFullyQualifiedName" xml:space="preserve">
-    <value>FullyQualifiedName is incomplete</value>
+  <data name="ErrorIncompleteManagedName" xml:space="preserve">
+    <value>ManagedName is incomplete</value>
   </data>
   <data name="ErrorMethodArityMustBeNumeric" xml:space="preserve">
     <value>Method arity must be numeric</value>
@@ -132,11 +132,11 @@
     <comment>{0} is the full type name.</comment>
   </data>
   <data name="ErrorUnexpectedCharactersAtEnd" xml:space="preserve">
-    <value>Unexpected characters after the end of the FullyQualifiedName (pos: {0})</value>
+    <value>Unexpected characters after the end of the ManagedName (pos: {0})</value>
     <comment>{0} is the position of unexpected characters</comment>
   </data>
   <data name="ErrorWhitespaceNotValid" xml:space="preserve">
-    <value>Whitespace is not valid in a FullyQualifiedName (pos: {0})</value>
+    <value>Whitespace is not valid in a ManagedName (pos: {0})</value>
     <comment>{0} is the position of invalid whitespace</comment>
   </data>
 </root>

@@ -159,7 +159,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Exte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coverlet.collector", "test\coverlet.collector\coverlet.collector.csproj", "{074F5BD6-DC05-460B-B78F-044D125FD787}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTests", "test\Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTests\Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTests.csproj", "{DCD0C39E-C78C-4A44-B0BD-7325254A2E97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests", "test\Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests\Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests.csproj", "{DCD0C39E-C78C-4A44-B0BD-7325254A2E97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

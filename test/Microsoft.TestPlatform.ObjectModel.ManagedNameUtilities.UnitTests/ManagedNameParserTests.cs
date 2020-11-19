@@ -1,20 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTests
+namespace Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class FullyQualifiedNameParserTests
+    public class ManagedNameParserTests
     {
         [TestMethod]
         public void ParseTypeName()
         {
             (string, string) Parse(string fullTypeName)
             {
-                FullyQualifiedNameParser.ParseTypeName(fullTypeName, out var namespaceName, out var typeName);
+                ManagedNameParser.ParseTypeName(fullTypeName, out var namespaceName, out var typeName);
                 return (namespaceName, typeName);
             };
 
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTes
         {
             (string, int, string[]) Parse(string methodName)
             {
-                FullyQualifiedNameParser.ParseMethodName(methodName, out var method, out var arity, out var parameterTypes);
+                ManagedNameParser.ParseMethodName(methodName, out var method, out var arity, out var parameterTypes);
                 return (method, arity, parameterTypes);
             }
 
@@ -58,17 +58,17 @@ namespace Microsoft.TestPlatform.ObjectModel.FullyQualifiedNameUtilities.UnitTes
         {
             (string, int, string[]) Parse(string methodName)
             {
-                FullyQualifiedNameParser.ParseMethodName(methodName, out var method, out var arity, out var parameterTypes);
+                ManagedNameParser.ParseMethodName(methodName, out var method, out var arity, out var parameterTypes);
                 return (method, arity, parameterTypes);
             }
 
-            Assert.ThrowsException<InvalidQualifiedNameException>(() => Parse(" Method"), "Whitespace is not valid in a FullyQualifiedName (pos: 0)");
-            Assert.ThrowsException<InvalidQualifiedNameException>(() => Parse("Method( List)"), "Whitespace is not valid in a FullyQualifiedName (pos: 7)");
+            Assert.ThrowsException<InvalidManagedNameException>(() => Parse(" Method"), "Whitespace is not valid in a ManagedName (pos: 0)");
+            Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method( List)"), "Whitespace is not valid in a ManagedName (pos: 7)");
 
-            Assert.ThrowsException<InvalidQualifiedNameException>(() => Parse("Method(List)xa"), "Unexpected characters after the end of the FullyQualifiedName (pos: 7)");
+            Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method(List)xa"), "Unexpected characters after the end of the ManagedName (pos: 7)");
 
-            Assert.ThrowsException<InvalidQualifiedNameException>(() => Parse("Method("), "FullyQualifiedName is incomplete");
-            Assert.ThrowsException<InvalidQualifiedNameException>(() => Parse("Method`4a"), "Method arity must be numeric");
+            Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method("), "ManagedName is incomplete");
+            Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method`4a"), "Method arity must be numeric");
         }
 
     }

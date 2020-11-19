@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtilities
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Extensions;
@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtil
     using System.Reflection;
     using System.Text;
 
-    public static partial class FullyQualifiedNameHelper
+    public static partial class ManagedNameHelper
     {
         /// <summary>
         /// Gets fully qualified type and method name from given MethodBase instance.
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtil
         /// <exception cref="NotImplementedException">
         /// Required functionality on <paramref name="method"/> is missing on the current platform.
         /// </exception>
-        public static void GetFullyQualifiedName(MethodBase method, out string fullTypeName, out string fullMethodName)
+        public static void GetManagedName(MethodBase method, out string fullTypeName, out string fullMethodName)
         {
             if (method == null)
             {
@@ -116,11 +116,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtil
         /// <returns>
         /// A <see cref="MethodBase" /> object that represents specified parameters, throws if null.
         /// </returns>
-        /// <exception cref="InvalidQualifiedNameException">
+        /// <exception cref="InvalidManagedNameException">
         /// Values specified with <paramref name="fullTypeName"/> and <paramref name="fullMethodName"/> 
         /// does not correspond to a method in the <paramref name="assembly"/> instance, or malformed.
         /// </exception>
-        public static MethodBase GetMethodFromFullyQualifiedName(Assembly assembly, string fullTypeName, string fullMethodName)
+        public static MethodBase GetManagedName(Assembly assembly, string fullTypeName, string fullMethodName)
         {
             Type type;
 
@@ -139,12 +139,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtil
 
             if (type == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, FullyQualifiedNameMessages.ErrorTypeNotFound, fullTypeName);
-                throw new InvalidQualifiedNameException(message);
+                string message = String.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorTypeNotFound, fullTypeName);
+                throw new InvalidManagedNameException(message);
             }
 
             MethodInfo method = null;
-            FullyQualifiedNameParser.ParseMethodName(fullMethodName, out var methodName, out var methodArity, out var parameterTypes);
+            ManagedNameParser.ParseMethodName(fullMethodName, out var methodName, out var methodArity, out var parameterTypes);
             if (!string.IsNullOrWhiteSpace(methodName))
             {
                 method = FindMethod(type, methodName, methodArity, parameterTypes);
@@ -152,8 +152,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.FullyQualifiedNameUtil
 
             if (method == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, FullyQualifiedNameMessages.ErrorMethodNotFound, methodName, fullTypeName);
-                throw new InvalidQualifiedNameException(message);
+                string message = String.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorMethodNotFound, methodName, fullTypeName);
+                throw new InvalidManagedNameException(message);
             }
 
             return method;
