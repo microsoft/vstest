@@ -192,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 return;
             }
 
-            if (types != null && types.Count() > 0)
+            if (types != null && types.Any())
             {
                 foreach (var type in types)
                 {

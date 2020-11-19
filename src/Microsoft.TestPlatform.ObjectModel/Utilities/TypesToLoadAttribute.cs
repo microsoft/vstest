@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
     using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Custom Attribute to specify the exact types which should be loaded from assembly
@@ -18,6 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             Types = types;
         }
 
-        public IEnumerable<Type> Types { get; }
+        public Type[] Types { get; }
     }
 }
