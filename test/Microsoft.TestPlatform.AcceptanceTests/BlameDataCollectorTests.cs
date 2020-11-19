@@ -9,7 +9,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.IO;
     using System.Linq;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Xml;
 
     [TestClass]
@@ -83,8 +82,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
             this.InvokeVsTest(arguments);
-
-            StringAssert.DoesNotMatch(this.StdOut, new Regex( @"\.dmp"), "it should not collect a dump, because nothing crashed");
+            
+            Assert.IsFalse(this.StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
         }
 
         [TestMethod]
@@ -102,7 +101,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
             this.InvokeVsTest(arguments);
 
-            StringAssert.Matches(this.StdOut, new Regex(@"\.dmp"), "it should collect dump, even if nothing crashed");
+            Assert.IsTrue(this.StdOut.Contains(".dmp"), "it should collect dump, even if nothing crashed");
         }
 
         [TestMethod]
