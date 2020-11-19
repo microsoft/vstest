@@ -75,5 +75,11 @@
     <MicrosoftSourceLinkVersion>1.0.0-beta2-19554-01</MicrosoftSourceLinkVersion>
     <MicrosoftDotNetSwaggerGeneratorMSBuildVersion>1.0.0-beta.20567.6</MicrosoftDotNetSwaggerGeneratorMSBuildVersion>
     <XliffTasksVersion>1.0.0-beta.20055.1</XliffTasksVersion>
+    
+    <!-- Roslyn -->
+    <!-- WARNING: Depending on Roslyn in code that also supports unmanaged scenarios (e.g. C++,
+         JS etc.) is risky. This can break setup authoring and cause runtime failures in workloads
+         where Rolsyn is not installed. -->
+    <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
   </PropertyGroup>
 </Project>

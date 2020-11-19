@@ -19,6 +19,13 @@
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="System.Diagnostics.StackTrace" version="[4.3.0, )"/>
         <dependency id="System.Diagnostics.TraceSource" version="[4.3.0, )"/>
+
+        <dependency id="System.Threading.Thread" version="[4.0.0, )" />
+        <dependency id="System.Diagnostics.Process" version="[4.1.0, )" />
+        <dependency id="System.Diagnostics.TextWriterTraceListener" version="[4.0.0, )" />
+        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
+        <dependency id="System.Runtime.Loader" version="[4.0.0, )" />
+
       </group>
 
       <group targetFramework="netcoreapp2.1">
@@ -54,7 +61,6 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.dll" target="build\netcoreapp1.0\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.exe" target="build\netcoreapp1.0\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp1.0\x86\" />
-
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp1.0\" />
 

@@ -8,7 +8,6 @@ function Unzip
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
-
 function Verify-Nuget-Packages($packageDirectory)
 {
     Write-Log "Starting Verify-Nuget-Packages."

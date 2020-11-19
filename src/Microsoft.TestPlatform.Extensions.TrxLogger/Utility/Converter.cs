@@ -70,8 +70,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return testElement;
         }
 
-
-
         /// <summary>
         /// Converts the rockSteady result to unit test result
         /// </summary>
