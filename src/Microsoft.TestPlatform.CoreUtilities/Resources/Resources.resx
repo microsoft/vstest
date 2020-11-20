@@ -165,4 +165,10 @@
   <data name="Utility_ProcessNameWhenCannotGetIt" xml:space="preserve">
     <value>Error getting process name.</value>
   </data>
+  <data name="MethodNotImplementedOnPlatform" xml:space="preserve">
+    <value>'{0}.{1}' is not implemented on this platform!</value>
+    <comment>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</comment>
+  </data>
 </root>

@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -92,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 while (!IsDebuggerPresent())
                 {
-                    System.Threading.Tasks.Task.Delay(1000).Wait();
+                    Task.Delay(1000).Wait();
                 }
 
                 DebugBreak();
@@ -106,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     while (!Debugger.IsAttached)
                     {
-                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                        Task.Delay(1000).Wait();
                     }
 
                     Debugger.Break();

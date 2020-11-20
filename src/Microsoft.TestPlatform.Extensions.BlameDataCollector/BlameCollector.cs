@@ -462,7 +462,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
                 else
                 {
-                    this.logger.LogWarning(this.context.SessionDataCollectionContext, Resources.Resources.NotGeneratingSequenceFile);
+                    if (this.collectProcessDumpOnTestHostHang)
+                    {
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, Resources.Resources.NotGeneratingSequenceFile);
+                    }
                 }
 
                 if (this.uploadDumpFiles)
@@ -528,7 +531,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             try
             {
                 var dumpDirectory = this.GetDumpDirectory();
-                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework);
+                this.processDumpUtility.StartTriggerBasedProcessDump(args.TestHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework, this.collectDumpAlways);
             }
             catch (TestPlatformException e)
             {
@@ -585,7 +588,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             if (string.IsNullOrWhiteSpace(this.tempDirectory))
             {
-                this.tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                // DUMP_TEMP_PATH will be used as temporary storage location
+                // for the dumps, this won't affect the dump uploads. Just the place where
+                // we store them before moving them to the final folder.
+
+                // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path
+                // that is cleaned up after every job. This is preferable to use over
+                // just the normal temp.
+                var temp = Environment.GetEnvironmentVariable("VSTEST_DUMP_TEMP_PATH") ?? Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
+                this.tempDirectory = Path.Combine(temp, Guid.NewGuid().ToString());
                 Directory.CreateDirectory(this.tempDirectory);
                 return this.tempDirectory;
             }

@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             ValidateArg.NotNull(data, nameof(data));
 
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
-            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(xmlDocument, key, data);
+            UpdateRunSettingsXmlDocument(xmlDocument, key, data);
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             ValidateArg.NotNull(xml, nameof(xml));
 
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
-            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
+            UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         internal static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
         {
-            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
+            var node = GetXmlNode(xmlDocument, key) ?? CreateNode(xmlDocument, key);
             node.InnerText = data;
         }
 

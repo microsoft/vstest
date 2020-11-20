@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         internal void RaiseEvent(DataCollectionEventArgs e)
         {
-            ValidateArg.NotNull<DataCollectionEventArgs>(e, "DataCollectionEventArgs");
+            ValidateArg.NotNull(e, "DataCollectionEventArgs");
 
             EventInvoker onEvent;
 

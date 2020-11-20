@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+    using ClientResources = Resources.Resources;
 
     /// <summary>
     /// Implementation for TestPlatform
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
             // Update extension assemblies from source when design mode is false.
-            if (runConfiguration.DesignMode == false)
+            if (!runConfiguration.DesignMode)
             {
                 this.AddExtensionAssembliesFromSource(testRunCriteria);
             }
@@ -176,8 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="skipExtensionFilters">Skips filtering by name (if true).</param>
         public void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
-            this.TestEngine.GetExtensionManager()
-                   .UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
+            this.TestEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
         }
 
         /// <summary>
@@ -192,11 +191,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             if (testHostManager == null)
             {
-                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(settingXml);
-                var framework = config.TargetFramework;
-
                 EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
-                throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
             }
         }
 

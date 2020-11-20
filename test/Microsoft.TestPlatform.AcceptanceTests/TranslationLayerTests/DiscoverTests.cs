@@ -172,7 +172,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource]
+        // flaky on the desktop runner, desktop framework combo
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
         [NetCoreTargetFrameworkDataSource]
         public void CancelTestDiscovery(RunnerInfo runnerInfo)
         {
