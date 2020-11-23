@@ -34,6 +34,7 @@
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\net451\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net451\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net451\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll"	target="tools\net451\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll" />
     <file src="net451\$Runtime$\msdia140typelib_clr0200.dll"	target="tools\net451\msdia140typelib_clr0200.dll" />
     <file src="net451\$Runtime$\Newtonsoft.Json.dll"	target="tools\net451\Newtonsoft.Json.dll" />
     <file src="net451\$Runtime$\System.Collections.Immutable.dll"	target="tools\net451\System.Collections.Immutable.dll" />
@@ -286,6 +287,7 @@
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+    <file src="netcoreapp2.1\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll" />
     <file src="netcoreapp2.1\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\package.deps.json"	target="tools\netcoreapp2.1\package.deps.json" />
     <file src="netcoreapp2.1\vstest.console.deps.json"	target="tools\netcoreapp2.1\vstest.console.deps.json" />
