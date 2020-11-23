@@ -64,8 +64,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
-
-            Directory.Delete(this.resultsDirectory, true);
         }
 
         public override string GetConsoleRunnerPath()
