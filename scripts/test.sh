@@ -15,7 +15,7 @@ NOCOLOR='\033[0m'
 # Parse options
 #
 CONFIGURATION="Debug"
-TARGET_RUNTIME="ubuntu.16.04-x64"
+TARGET_RUNTIME="ubuntu.18.04-x64"
 FAIL_FAST=false
 VERBOSE=false
 
@@ -111,7 +111,7 @@ function invoke_test()
     local dotnet=$(_get_dotnet_path)
     local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel --testcasefilter:"TestCategory!=Windows"
+    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet  $vstest --parallel --testcasefilter:"TestCategory!=Windows"
 }
 
 #

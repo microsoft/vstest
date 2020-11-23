@@ -10,6 +10,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
     using System;
+    using System.Reflection;
     
     
     /// <summary>
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.ManagedNameMessages", typeof(ManagedNameMessages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.ManagedNameMessages", typeof(ManagedNameMessages).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
