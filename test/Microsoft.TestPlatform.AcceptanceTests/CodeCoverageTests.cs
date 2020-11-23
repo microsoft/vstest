@@ -283,37 +283,5 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             Assert.IsTrue(found);
         }
-
-        private static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
-        {
-            Assert.IsTrue(File.Exists(trxFilePath), "Trx file not found: {0}", trxFilePath);
-            XmlDocument doc = new XmlDocument();
-            using (var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read))
-            {
-                doc.Load(trxStream);
-                var deploymentElements = doc.GetElementsByTagName("Deployment");
-                Assert.IsTrue(deploymentElements.Count == 1,
-                    "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
-                var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
-                Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
-                    "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
-                var collectors = doc.GetElementsByTagName("Collector");
-
-                string fileName = string.Empty;
-                for (int i = 0; i < collectors.Count; i++)
-                {
-                    if (string.Equals(collectors[i].Attributes.GetNamedItem("collectorDisplayName").Value,
-                        "Code Coverage", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fileName = collectors[i].FirstChild?.FirstChild?.FirstChild?.Attributes.GetNamedItem("href")
-                            ?.Value;
-                    }
-                }
-
-                Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}",
-                    trxFilePath);
-                return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
-            }
-        }
     }
 }
