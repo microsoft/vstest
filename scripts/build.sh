@@ -111,7 +111,7 @@ VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/Te
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="5.0.100-rc.1.20453.7"
+DOTNET_CLI_VERSION="5.0.100"
 #DOTNET_RUNTIME_VERSION="LATEST"
 
 #
@@ -417,7 +417,7 @@ log "Test platform build variables: "
 
 if [ -z "$PROJECT_NAME_PATTERNS" ]
 then
-    install_cli && restore_package && invoke_build # && publish_package && create_package
+    install_cli && restore_package && invoke_build && publish_package && create_package
 else
     invoke_build
 fi
