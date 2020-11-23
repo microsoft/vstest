@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            //Directory.Delete(nugetPackageFolder, true);
+            Directory.Delete(nugetPackageFolder, true);
         }
 
         [TestInitialize]
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCleanup]
         public void CleanUp()
         {
-            //Directory.Delete(resultsDirectory, true);
+            Directory.Delete(resultsDirectory, true);
         }
 
         [TestMethod]
