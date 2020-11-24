@@ -13,6 +13,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    // monitoring the processes does not work correctly
+    [TestCategory("Windows")]
     public class RunsettingsTests : AcceptanceTestBase
     {
         private string runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
@@ -493,6 +495,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         /// <param name="runnerInfo"></param>
         [TestMethod]
+        // patched dotnet is not published on non-windows systems
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)

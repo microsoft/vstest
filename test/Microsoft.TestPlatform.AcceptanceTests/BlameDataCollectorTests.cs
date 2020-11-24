@@ -12,6 +12,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Xml;
 
     [TestClass]
+    // this whole thing is complicated and depends on versions of OS and the target runtime
+    // keeping this for later
+    [TestCategory("Windows")]
     public class BlameDataCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
@@ -36,6 +39,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
@@ -51,6 +56,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
@@ -69,6 +76,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
@@ -87,6 +96,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
@@ -162,7 +173,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
         // should make no difference, keeping for easy debug 
-        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
@@ -179,7 +190,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetCoreRunner(NET50)]
         // should make no difference, keeping for easy debug 
-        [NetFrameworkRunner(NET50)]
+        // [NetFrameworkRunner(NET50)]
         public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

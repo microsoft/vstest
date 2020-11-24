@@ -6,6 +6,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    // this is tested only on .NET Framework
+    [TestCategory("Windows")]
     public class ListExtensionsTests : AcceptanceTestBase
     {
         [TestMethod]

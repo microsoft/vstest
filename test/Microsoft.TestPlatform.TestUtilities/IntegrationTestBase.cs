@@ -41,12 +41,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected readonly IntegrationTestEnvironment testEnvironment;
 
-        private readonly string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
+        private readonly string TestAdapterRelativePath = @"mstest.testadapter\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
         private readonly string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build".Replace('\\', Path.DirectorySeparatorChar);
         private readonly string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
         private readonly string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
 
-        private readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        protected readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
 
         public enum UnitTestFramework
         {
@@ -548,7 +548,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
             };
 
-            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet/dotnet";
+            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
             var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, executablePath);
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
