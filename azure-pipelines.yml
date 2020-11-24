@@ -81,7 +81,9 @@ jobs:
       buildConfiguration: 'Release'
   steps:
   - script: ./build.sh -c $(buildConfiguration)
-    displayName: './build.sh -c $(buildConfiguration)'
-  - script: ./test.sh -c $(buildConfiguration)
-    displayName: './test.sh -c $(buildConfiguration)'   
+    displayName: 'Build'
+  - script: ./test.sh -c $(buildConfiguration) -p Unit
+    displayName: 'Unit tests'
+  - script: ./test.sh -c $(buildConfiguration) -p Acceptance
+    displayName: 'Acceptance tests'   
    
