@@ -4,7 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -29,12 +31,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
                     OutputLevel.Information);
 
-                while (!System.Diagnostics.Debugger.IsAttached)
+                while (!Debugger.IsAttached)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                 }
 
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             }
 
             SetCultureSpecifiedByUser();

@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc />
-        public override ICollection<Object> Metadata
+        public override ICollection<object> Metadata
         {
             get
             {
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             // If any attribute constructor on the type throws, the exception will bubble up through
             // the "GetCustomAttributes" method.
-            return dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, true).ToArray<object>();
+            return dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, true).ToArray();
         }
     }
 }

@@ -15,11 +15,12 @@ NOCOLOR='\033[0m'
 # Parse options
 #
 CONFIGURATION="Debug"
-TARGET_RUNTIME="ubuntu.16.04-x64"
+TARGET_RUNTIME="ubuntu.18.04-x64"
 FAIL_FAST=false
 VERBOSE=false
 
-while [ $# -gt 0 ]; do
+while [ $# -gt 0 ]
+do
     lowerI="$(echo ${1:-} | awk '{print tolower($0)}')"
     case $lowerI in
         -h | --help)
@@ -28,27 +29,35 @@ while [ $# -gt 0 ]; do
             ;;
         -c)
             CONFIGURATION=$2
+            shift
+            shift
             ;;
         -r)
             TARGET_RUNTIME=$2
+            shift
+            shift
             ;;
         -p)
             PROJECT_NAME_PATTERNS=$2
+            shift
+            shift
             ;;
         -verbose)
             VERBOSE=$2
+            shift
+            shift
             ;;
         *)
-            break
+            echo Unknown parameter $key
+            shift
             ;;
    esac
-   shift
 done
 
 #
 # Variables
 #
-PROJECT_NAME_PATTERNS=**Unit*bin*$CONFIGURATION*netcoreapp1.0*UnitTests*dll
+PROJECT_NAME_PATTERNS=**$PROJECT_NAME_PATTERNS*bin*$CONFIGURATION*netcoreapp2.1*${PROJECT_NAME_PATTERNS}Tests*dll
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
 TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"
@@ -67,7 +76,7 @@ DOTNET_CLI_VERSION="latest"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
-TPB_TargetFrameworkCore="netcoreapp2.0"
+TPB_TargetFrameworkCore="netcoreapp2.1"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
 TPB_Verbose=$VERBOSE
@@ -111,7 +120,7 @@ function invoke_test()
     local dotnet=$(_get_dotnet_path)
     local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs --verbose $dotnet $vstest --parallel
+    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet  $vstest --parallel --testcasefilter:"TestCategory!=Windows"
 }
 
 #
@@ -119,7 +128,7 @@ function invoke_test()
 #
 _get_dotnet_path()
 {
-    echo "$TP_TOOLS_DIR/dotnet/dotnet"
+    echo "$TP_TOOLS_DIR/dotnet-linux/dotnet"
 }
 
 invoke_test

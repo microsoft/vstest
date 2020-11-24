@@ -305,7 +305,7 @@ Fehlerdetails: {1}: {2}</target>
       </trans-unit>
       <trans-unit id="Common_CannotGetNextTimestampFileName">
         <source>Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</source>
-        <target state="new">Cannot get find an available filename for {0} using timestamp format '{2}' at {1}.</target>
+        <target state="translated">{1} でタイムスタンプ形式 '{2}' を使用して {0} の使用可能なファイル名を取得できません。</target>
         <note></note>
       </trans-unit>
     </body>

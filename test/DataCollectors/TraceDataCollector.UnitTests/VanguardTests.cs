@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using TraceCollector.Interfaces;
 
     [TestClass]
+    [TestCategory("Windows")]
     public class VanguardTests
     {
         private const string CodeCoverageExeFileName = "CodeCoverage";

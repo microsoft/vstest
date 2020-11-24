@@ -7,7 +7,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
@@ -80,7 +80,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void CreateShouldDiscoverSettingsProviderExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(SettingsProviderExtensionManagerTests));
 
             var extensionManager = SettingsProviderExtensionManager.Create();
 
@@ -91,7 +91,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void CreateShouldCacheDiscoveredExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions(() => { });
+            TestPluginCacheHelper.SetupMockExtensions(typeof(SettingsProviderExtensionManagerTests), () => { });
 
             var extensionManager = SettingsProviderExtensionManager.Create();
             SettingsProviderExtensionManager.Create();
@@ -107,7 +107,7 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void LoadAndInitializeShouldInitializeAllExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(SettingsProviderExtensionManagerTests));
 
             SettingsProviderExtensionManager.LoadAndInitializeAllExtensions(false);
 

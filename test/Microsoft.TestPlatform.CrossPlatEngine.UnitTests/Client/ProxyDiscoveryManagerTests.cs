@@ -9,7 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -23,7 +23,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
@@ -183,7 +182,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 var extensions = new[] { "c:\\e1.dll", "c:\\e2.dll" };
 
                 // Setup Mocks.
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
+                TestPluginCacheHelper.SetupMockAdditionalPathExtensions(extensions);
                 this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "c:\\e1.dll", "c:\\e2.dll" });
@@ -205,7 +204,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var inputExtensions = new[] { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" };
             var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
 
-            TestPluginCacheTests.SetupMockAdditionalPathExtensions(inputExtensions);
+            TestPluginCacheHelper.SetupMockAdditionalPathExtensions(inputExtensions);
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) =>
             {
@@ -232,7 +231,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance = null;
             try
             {
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
+                TestPluginCacheHelper.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
                 this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });

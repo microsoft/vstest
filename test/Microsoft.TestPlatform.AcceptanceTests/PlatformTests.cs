@@ -10,6 +10,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    // monitoring the processes does not work correctly
+    [TestCategory("Windows")]
     public class PlatformTests : AcceptanceTestBase
     {
         /// <summary>

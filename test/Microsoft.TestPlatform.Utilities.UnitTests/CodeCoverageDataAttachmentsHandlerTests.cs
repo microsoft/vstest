@@ -78,31 +78,5 @@
 
             mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
         }
-
-        [TestMethod]
-        public async Task HandleDataCollectionAttachmentSetsShouldReturnExistingAttachmentsIfFailedToLoadLibrary()
-        {
-            var attachmentSet1 = new AttachmentSet(new Uri("//badrui//"), string.Empty);
-            attachmentSet1.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
-
-            var attachmentSet2 = new AttachmentSet(new Uri("//badruj//"), string.Empty);
-            attachmentSet2.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\ab"), "coverage"));
-
-            CancellationTokenSource cts = new CancellationTokenSource();
-
-            Collection<AttachmentSet> attachment = new Collection<AttachmentSet>
-            {
-                attachmentSet1,
-                attachmentSet2
-            };
-
-            var result = await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, cts.Token);
-
-            Assert.AreEqual(2, result.Count);
-            Assert.IsTrue(result.Contains(attachmentSet1));
-            Assert.IsTrue(result.Contains(attachmentSet2));
-
-            mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
-        }
     }
 }

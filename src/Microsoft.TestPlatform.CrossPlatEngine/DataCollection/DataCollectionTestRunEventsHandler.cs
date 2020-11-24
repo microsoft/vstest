@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
             {
-                runContextAttachments = DataCollectionTestRunEventsHandler.GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
+                runContextAttachments = GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
             }
 
             this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);

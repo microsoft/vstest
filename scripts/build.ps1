@@ -32,15 +32,15 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("noloc")]
-    [Switch] $DisableLocalizedBuild = $false,
+    [Switch] $DisableLocalizedBuild,
 
     [Parameter(Mandatory=$false)]
     [Alias("ci")]
-    [Switch] $CIBuild = $false,
+    [Switch] $CIBuild,
 
     [Parameter(Mandatory=$false)]
     [Alias("pt")]
-    [Switch] $PublishTestArtifacts = $false,
+    [Switch] $PublishTestArtifacts,
 
     # Build specific projects
     [Parameter(Mandatory=$false)]
@@ -82,7 +82,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "5.0.100-rc.1.20453.7"
+$env:DOTNET_CLI_VERSION = "5.0.100"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -119,7 +119,7 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
-Import-Module "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
+Import-Module -Name "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1" -Scope Local
 
 # Update the version in the dependencies props to be the TPB_version version, this is not ideal but because changing how this is resolved would 
 # mean that we need to change the whole build process this is a solution with the least amount of impact, that does not require us to keep track of 
@@ -253,7 +253,6 @@ function Invoke-TestAssetsBuild
     Write-Log "Invoke-TestAssetsBuild: Start test assets build."
     $dotnetExe = Get-DotNetPath
 
-    
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
@@ -375,20 +374,26 @@ function Publish-Package
 
     # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
     New-Item -ItemType directory -Path $testhostCore20PackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX64Dir -Force
+    
     New-Item -ItemType directory -Path $testhostCore20PackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -recurse
+    Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX86Dir -Force
  
     New-Item -ItemType directory -Path $testhostCore10PackageX64Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -recurse
+    Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX64Dir -Force
+
     New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -recurse
+    Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore10PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX86Dir -Force
     
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -Recurse
 
     Set-ScriptFailedOnError
 
@@ -396,7 +401,7 @@ function Publish-Package
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackage451Dir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -recurse
+    Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -Recurse
 
     Set-ScriptFailedOnError
 
@@ -813,7 +818,7 @@ function Create-NugetPackages
 
     # Verifies that expected number of files gets shipped in nuget packages.
     # Few nuspec uses wildcard characters.
-    Verify-Nuget-Packages $packageOutputDir
+    Verify-Nuget-Packages $packageOutputDir $TPB_Version
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -1021,7 +1026,7 @@ function Generate-Manifest
     Write-Log "Generate-Manifest: Started."
 
     $sdkTaskPath = Join-Path $env:TP_ROOT_DIR "eng\common\sdk-task.ps1"
-    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest\manifest.xml /p:ManifestBuildData="Location=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest\manifest.xml /p:ManifestBuildData="Location=https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
 
     Write-Log "Generate-Manifest: Completed."
 }

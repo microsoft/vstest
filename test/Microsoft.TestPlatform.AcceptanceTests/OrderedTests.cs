@@ -16,6 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Ordered Tests created using earlier versions of Visual Studio(i.e. before VS2017) should work fine.
         /// </summary>
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {

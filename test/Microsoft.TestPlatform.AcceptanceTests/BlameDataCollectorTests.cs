@@ -12,6 +12,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Xml;
 
     [TestClass]
+    // this whole thing is complicated and depends on versions of OS and the target runtime
+    // keeping this for later
+    [TestCategory("Windows")]
     public class BlameDataCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
@@ -36,6 +39,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
@@ -47,30 +52,73 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput();
+            this.VaildateOutput("BlameUnitTestProject.UnitTest1.TestMethod2");
         }
 
         [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
 
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);            
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput(true);
+            this.VaildateOutput("SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
         }
 
         [TestMethod]
-        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /Blame:CollectDump");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
+            this.InvokeVsTest(arguments);
+            
+            Assert.IsFalse(this.StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
+        }
+
+        [TestMethod]
+        // netcoreapp2.1 dump is not supported on Linux
+        [TestCategory("Windows")]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
+            this.InvokeVsTest(arguments);
+
+            Assert.IsTrue(this.StdOut.Contains(".dmp"), "it should collect dump, even if nothing crashed");
+        }
+
+        [TestMethod]
+        [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
         // should make no difference, keeping for easy debug 
-        // [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void HangDumpOnTimeout(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
@@ -85,10 +133,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        // net5.0 does not suppord dump on exit
-        [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+        // net5.0 does not suppord dump on exit        
+        [NetCoreRunner("net452;net472;netcoreapp3.1")]
         // should make no difference, keeping for easy debug 
-        // [NetCoreRunner("net452;net472;netcoreapp3.1")]
+        // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+
         public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
@@ -104,9 +153,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // net5.0 does not suppord dump on exit
-        [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+        [NetCoreRunner("net452;net472;netcoreapp3.1")]
         // should make no difference, keeping for easy debug 
-        // [NetCoreRunner("net452;net472;netcoreapp3.1")]
+        // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
+
         public void CrashDumpOnExit(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
@@ -121,9 +171,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
         // should make no difference, keeping for easy debug 
-        // [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
@@ -138,9 +188,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [NetFrameworkRunner(NET50)]
+        [NetCoreRunner(NET50)]
         // should make no difference, keeping for easy debug 
-        // [NetCoreRunner(NET50)]
+        // [NetFrameworkRunner(NET50)]
         public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -153,9 +203,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
+        [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
         // should make no difference, keeping for easy debug 
-        // [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
+        // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void HangDumpChildProcesses(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -243,12 +293,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private void VaildateOutput(bool validateDumpFile = false)
+        private void VaildateOutput(string testName, bool validateDumpFile = false)
         {
             bool isSequenceAttachmentReceived = false;
             bool isDumpAttachmentReceived = false;
             bool isValid = false;
-            this.StdErrorContains("BlameUnitTestProject.UnitTest1.TestMethod2");
+            this.StdErrorContains(testName);
             this.StdOutputContains("Sequence_");
             var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
 

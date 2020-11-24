@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
     using System;
+    using System.Text;
 
     /// <summary>
     /// Exception utilities.
@@ -22,15 +23,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return string.Empty;
             }
 
-            var exceptionString = exception.Message;
+            var exceptionString = new StringBuilder(exception.Message);
             var inner = exception.InnerException;
             while (inner != null)
             {
-                exceptionString += Environment.NewLine + inner.Message;
+                exceptionString.Append(Environment.NewLine);
+                exceptionString.Append(inner.Message);
                 inner = inner.InnerException;
             }
 
-            return exceptionString;
+            return exceptionString.ToString();
         }
     }
 }

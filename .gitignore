@@ -132,3 +132,8 @@ src/package/sign/sign.nuget.targets
 # Vscode files
 # ===========================
 .vscode/
+
+# ===========================
+# diag log files
+# ===========================
+logs/

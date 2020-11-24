@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     public interface ICrashDumper
     {
-        void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType);
+        void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways);
 
         void WaitForDumpToFinish();
 

@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockHangDumperFactory.Object,
                 this.mockCrashDumperFactory.Object);
 
-            processDumpUtility.StartTriggerBasedProcessDump(processId, testResultsDirectory, false, ".NETCoreApp,Version=v5.0");
+            processDumpUtility.StartTriggerBasedProcessDump(processId, testResultsDirectory, false, ".NETCoreApp,Version=v5.0", false);
 
             var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFiles());
             Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);

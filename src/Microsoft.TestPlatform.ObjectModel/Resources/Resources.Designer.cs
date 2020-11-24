@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -278,6 +278,33 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to Create msdia Session COM HResult &apos;{0}&apos;..
+        /// </summary>
+        internal static string FailedToCreateDiaSession {
+            get {
+                return ResourceManager.GetString("FailedToCreateDiaSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load msdia.
+        /// </summary>
+        internal static string FailedToLoadMsDia {
+            get {
+                return ResourceManager.GetString("FailedToLoadMsDia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid URI in data collector settings &apos;{0}&apos;..
+        /// </summary>
+        internal static string InvalidDataCollectorUriInSettings {
+            get {
+                return ResourceManager.GetString("InvalidDataCollectorUriInSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The root node of the run settings must be named &apos;RunSettings&apos;..
         /// </summary>
         internal static string InvalidRunSettingsRootNode {
@@ -312,29 +339,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("InvalidSettingsXmlElement", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid URI in data collector settings &apos;{0}&apos;..
-        /// </summary>
-        internal static string InvalidDataCollectorUriInSettings
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidDataCollectorUriInSettings", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Invalid URI &apos;{0}&apos; in settings &apos;{1}&apos;..
         /// </summary>
-        internal static string InvalidUriInSettings
-        {
-            get
-            {
+        internal static string InvalidUriInSettings {
+            get {
                 return ResourceManager.GetString("InvalidUriInSettings", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Invalid data collector settings. Expected attribute &apos;{0}&apos; is missing.  A typical data collector setting would look like &lt;DataCollector uri=&quot;dataCollector://Samples/SampleCollector/1.0&quot; assemblyQualifiedName=&quot;Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111&quot; friendlyName=&quot;sampleCollector&quot;&gt;..
         /// </summary>
@@ -343,18 +357,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("MissingDataCollectorAttributes", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Invalid settings &apos;{0}&apos;. Expected atleast one of the XmlAttribute among friendlyName, uri and assemblyQualifiedName..
         /// </summary>
-        internal static string MissingLoggerAttributes
-        {
-            get
-            {
+        internal static string MissingLoggerAttributes {
+            get {
                 return ResourceManager.GetString("MissingLoggerAttributes", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources..
         /// </summary>
@@ -397,6 +409,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         internal static string SolutionDirectoryNotExists {
             get {
                 return ResourceManager.GetString("SolutionDirectoryNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter string &apos;{0}&apos; includes unrecognized escape sequence..
+        /// </summary>
+        internal static string TestCaseFilterEscapeException {
+            get {
+                return ResourceManager.GetString("TestCaseFilterEscapeException", resourceCulture);
             }
         }
         
@@ -652,39 +673,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         internal static string UnexpectedTypeOfProperty {
             get {
                 return ResourceManager.GetString("UnexpectedTypeOfProperty", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The test property type &apos;{0}&apos; of property &apos;{1}&apos; is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. .
-        /// </summary>
-        internal static string FailedToLoadMsDia
-        {
-            get
-            {
-                return ResourceManager.GetString("FailedToLoadMsDia", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The test property type &apos;{0}&apos; of property &apos;{1}&apos; is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. .
-        /// </summary>
-        internal static string FailedToCreateDiaSession
-        {
-            get
-            {
-                return ResourceManager.GetString("FailedToCreateDiaSession", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Filter string &apos;{0}&apos; includes unrecognized escape sequence..
-        /// </summary>
-        internal static string TestCaseFilterEscapeException
-        {
-            get
-            {
-                return ResourceManager.GetString("TestCaseFilterEscapeException", resourceCulture);
             }
         }
     }

@@ -1670,17 +1670,17 @@
       </trans-unit>
       <trans-unit id="TestRunSummary">
         <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
-        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <target state="translated">{0} - échec : {1}, réussite : {2}, ignorée(s) : {3}, total : {4}, durée : {5}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="None">
         <source>None</source>
-        <target state="new">None</target>
+        <target state="translated">Aucun(e)</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryAssemblyAndFramework">
         <source> - {0} {1}</source>
-        <target state="new">- {0} {1}</target>
+        <target state="translated"> - {0} {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EnvironmentArgumentHelp">
@@ -1692,17 +1692,19 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="new">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
-      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NOM&gt;=&lt;VALEUR&gt;
+      Définit la valeur d'une variable d'environnement. Crée la variable si elle n'existe pas, et la remplace si elle existe. Cela implique l'utilisation du commutateur /InIsolation et l'exécution forcée des tests dans un processus isolé.
+      
+      Vous pouvez spécifier cet argument plusieurs fois pour fournir plusieurs variables.
 
-      Example: -e:VARIABLE1=VALUE1
-               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
-               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</target>
+      Exemple : -e:VARIABLE1=VALEUR1
+               -e:AUTRE_VARIABLE="VALEUR AVEC ESPACES"
+               -e:AUTRE_VARIABLE="VALEUR;séparée;par;des;points-virgules"</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EnvironmentVariableXIsOverriden">
         <source>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</source>
-        <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
+        <target state="translated">La variable d'environnement '{0}' est déjà définie, mais elle est substituée par l'argument -Environment.</target>
         <note></note>
       </trans-unit>
     </body>

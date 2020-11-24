@@ -3,6 +3,8 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.TestPlatform.Extensions.EventLogCollector;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
@@ -12,6 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.EventLogCollector")]
 [assembly: AssemblyTrademark("")]
+[assembly: TypesToLoad(typeof(EventLogDataCollector))]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
