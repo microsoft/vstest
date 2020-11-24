@@ -72,8 +72,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             this.converter = new Converter(new FileHelper(), trxFileHelper);
             List<CollectorDataEntry> collectorDataEntries = this.converter.ToCollectionEntries(attachmentSets, testRun, testResultsDirectory);
 
-            Assert.AreEqual($@"{Environment.MachineName}\123.coverage", ((ObjectModel.UriDataAttachment) collectorDataEntries[0].Attachments[0]).Uri.OriginalString);
-            Assert.AreEqual($@"{Environment.MachineName}\123[1].coverage", ((ObjectModel.UriDataAttachment)collectorDataEntries[0].Attachments[1]).Uri.OriginalString);
+            Assert.AreEqual(2, collectorDataEntries[0].Attachments.Count);
+            Assert.AreEqual($@"{Environment.MachineName}{Path.DirectorySeparatorChar}123.coverage", ((ObjectModel.UriDataAttachment) collectorDataEntries[0].Attachments[0]).Uri.OriginalString);
+            Assert.AreEqual($@"{Environment.MachineName}{Path.DirectorySeparatorChar}123[1].coverage", ((ObjectModel.UriDataAttachment)collectorDataEntries[0].Attachments[1]).Uri.OriginalString);
 
             Directory.Delete(tempDir, true);
         }
@@ -207,9 +208,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             ConverterTests.CreateTempCoverageFiles(out tempDir, out var coverageFilePath1, out var coverageFilePath2);
 
             UriDataAttachment uriDataAttachment1 =
-                new UriDataAttachment(new Uri($"file:///{coverageFilePath1}"), "Description 1");
+                new UriDataAttachment(new Uri(new Uri("file://"), coverageFilePath1), "Description 1");
             UriDataAttachment uriDataAttachment2 =
-                new UriDataAttachment(new Uri($"file:///{coverageFilePath2}"), "Description 2");
+                new UriDataAttachment(new Uri(new Uri("file://"), coverageFilePath2), "Description 2");
             attachmentSets = new List<AttachmentSet>
             {
                 new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), "Code Coverage")

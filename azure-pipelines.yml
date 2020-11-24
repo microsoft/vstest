@@ -63,13 +63,25 @@ jobs:
       testResultsFormat: VSTest
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
-
-# - job: Linux
-#   pool:
-#     vmImage: 'ubuntu-18.04'
-#   variables:
-#       buildConfiguration: 'Release'
-#   steps:
-#   - script: ./build.sh -c $(buildConfiguration)
-#     displayName: './build.sh -c $(buildConfiguration)'
+    
+- job:
+  workspace:
+    clean: all
+  strategy:
+    matrix:
+      Ubuntu_18_04:
+        vmImage: ubuntu-18.04
+        pwsh: true
+      macOS_10_15_Catalina:
+        vmImage: macOS-10.15
+        pwsh: true
+  pool:
+    vmImage: $[ variables['vmImage'] ]
+  variables:
+      buildConfiguration: 'Release'
+  steps:
+  - script: ./build.sh -c $(buildConfiguration)
+    displayName: './build.sh -c $(buildConfiguration)'
+  - script: ./test.sh -c $(buildConfiguration)
+    displayName: './test.sh -c $(buildConfiguration)'   
    

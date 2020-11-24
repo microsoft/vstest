@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Linq;
     using System.Reflection;
     using System.Threading;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -23,8 +24,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class DiscovererEnumeratorTests
@@ -50,7 +49,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockAssemblyProperties.Object, this.cancellationTokenSource.Token);
             this.runSettingsMock = new Mock<IRunSettings>();
             this.messageLoggerMock = new Mock<IMessageLogger>();
-            TestPluginCacheTests.SetupMockExtensions( new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+            TestPluginCacheHelper.SetupMockExtensions( new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
             TestDiscoveryExtensionManager.Destroy();
         }
@@ -67,7 +66,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldReportWarningOnNoDiscoverers()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(TestPluginCache).GetTypeInfo().Assembly.Location },
                 () => { });
             var sources = new List<string> { typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location };
@@ -89,7 +88,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldNotCallIntoDiscoverersIfNoneMatchesSources()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
             var sources = new List<string> { "temp.jpeg" };
@@ -106,7 +105,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallOnlyNativeDiscovererIfNativeAssembliesPassed()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -134,7 +133,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallOnlyManagedDiscovererIfManagedAssembliesPassed()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -162,7 +161,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallBothNativeAndManagedDiscoverersWithCorrectSources()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -197,7 +196,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallIntoADiscovererThatMatchesTheSources()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -227,7 +226,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallIntoMultipleDiscoverersThatMatchesTheSources()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -273,7 +272,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallIntoOtherDiscoverersWhenCreatingOneFails()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -306,7 +305,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldCallIntoOtherDiscoverersEvenIfDiscoveryInOneFails()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -352,7 +351,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -387,7 +386,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             // Setup
             string[] extensions = new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location };
-            TestPluginCacheTests.SetupMockExtensions(extensions, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(extensions, () => { });
 
             var dllsources = new List<string>
                               {
@@ -469,7 +468,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void LoadTestsShouldIterateOverAllExtensionsInTheMapAndDiscoverTests()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -573,7 +572,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
         private void InvokeLoadTestWithMockSetup()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                     new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                     () => { });
 

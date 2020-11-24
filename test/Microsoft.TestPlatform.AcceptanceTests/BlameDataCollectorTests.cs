@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput();
+            this.VaildateOutput("BlameUnitTestProject.UnitTest1.TestMethod2");
         }
 
         [TestMethod]
@@ -57,14 +57,51 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
 
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);            
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput(true);
+            this.VaildateOutput("SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /Blame:CollectDump");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
+            this.InvokeVsTest(arguments);
+            
+            Assert.IsFalse(this.StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
+            this.InvokeVsTest(arguments);
+
+            Assert.IsTrue(this.StdOut.Contains(".dmp"), "it should collect dump, even if nothing crashed");
         }
 
         [TestMethod]
@@ -243,12 +280,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private void VaildateOutput(bool validateDumpFile = false)
+        private void VaildateOutput(string testName, bool validateDumpFile = false)
         {
             bool isSequenceAttachmentReceived = false;
             bool isDumpAttachmentReceived = false;
             bool isValid = false;
-            this.StdErrorContains("BlameUnitTestProject.UnitTest1.TestMethod2");
+            this.StdErrorContains(testName);
             this.StdOutputContains("Sequence_");
             var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
 

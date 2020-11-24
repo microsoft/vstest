@@ -1670,17 +1670,17 @@
       </trans-unit>
       <trans-unit id="TestRunSummary">
         <source>{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</source>
-        <target state="new">{0} - Failed: {1}, Passed: {2}, Skipped: {3}, Total: {4}, Duration: {5}</target>
+        <target state="translated">{0} - Neúspěšné: {1}, Úspěšné: {2}, Přeskočeno: {3}, Celkem: {4}, Doba trvání: {5}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="None">
         <source>None</source>
-        <target state="new">None</target>
+        <target state="translated">Žádné</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryAssemblyAndFramework">
         <source> - {0} {1}</source>
-        <target state="new">- {0} {1}</target>
+        <target state="translated"> - {0} {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EnvironmentArgumentHelp">
@@ -1692,17 +1692,19 @@
       Example: -e:VARIABLE1=VALUE1
                -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
                -e:ANOTHER_VARIABLE="VALUE;seperated with;semicolons"</source>
-        <target state="new">-e|--Environment|/e|/Environment:&lt;NAME&gt;=&lt;VALUE&gt;
-      Sets the value of an environment variable. Creates the variable if one with the requested name does not exist.
+        <target state="translated">-e|--Environment|/e|/Environment:&lt;NÁZEV&gt;=&lt;HODNOTA&gt;
+      Nastaví hodnotu proměnné prostředí. Pokud proměnná neexistuje, vytvoří ji, a pokud existuje, přepíše ji. Tato možnost bude znamenat, že se použije přepínač /InIsolation a vynutí se spuštění testů v izolovaném procesu.
+      
+      Tento argument se dá zadat vícekrát, může se tak poskytnout více proměnných.
 
-      Example: -e:VARIABLE1=VALUE1
-               -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
-               -e:ANOTHER_VARIABLE="VALUE;seperated with;semi-columns"</target>
+      Příklad: -e:PROMENNA1=HODNOTA1
+               -e:JINA_PROMENNA="HODNOTA S MEZERAMI"
+               -e:JINA_PROMENNA="HODNOTA;oddělená;středníky"</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EnvironmentVariableXIsOverriden">
         <source>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</source>
-        <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
+        <target state="translated">Proměnná prostředí {0} se už definovala, ale přepsal ji argument -Environment.</target>
         <note></note>
       </trans-unit>
     </body>

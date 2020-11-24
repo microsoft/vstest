@@ -4,46 +4,33 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+  
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using CommonResources = Resources.Resources;
 
     /// <summary>
     /// Discovers test extensions in a directory.
     /// </summary>
     internal class TestPluginDiscoverer
     {
-        private IFileHelper fileHelper;
-
-        private static List<string> UnloadableFiles = new List<string>();
+        private static HashSet<string> UnloadableFiles = new HashSet<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
         /// </summary>
-        public TestPluginDiscoverer() : this(new FileHelper())
+        public TestPluginDiscoverer()
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
-        /// </summary>
-        /// <param name="fileHelper">
-        /// The file Helper.
-        /// </param>
-        internal TestPluginDiscoverer(IFileHelper fileHelper)
-        {
-            this.fileHelper = fileHelper;
         }
 
         #region Fields
@@ -176,11 +163,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-            Type[] types;
+            IEnumerable<Type> types;
+            Type extension = typeof(TExtension);
 
             try
-            {
-                types = assembly.GetTypes();
+            {           
+                var customAttribute = CustomAttributeExtensions.GetCustomAttribute(assembly, typeof(TypesToLoadAttribute)) as TypesToLoadAttribute;
+                if (customAttribute != null)
+                {
+                    types = customAttribute.Types; 
+                }
+                else
+                {
+                    types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract);
+                }
             }
             catch (ReflectionTypeLoadException e)
             {
@@ -196,14 +192,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 return;
             }
 
-            if ((types != null) && (types.Length > 0))
+            if (types != null && types.Any())
             {
                 foreach (var type in types)
                 {
-                    if (type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract)
-                    {
-                        this.GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
-                    }
+                    GetTestExtensionFromType(type, extension, pluginInfos);
                 }
             }
         }
@@ -241,15 +234,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         EqtTrace.Error(
                         "TryGetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
                     }
-
                     return;
                 }
 
                 if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
                 {
                     EqtTrace.Warning(
-                        "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}'; keeping the first one.",
-                        pluginInfo.IdentifierData);
+                    "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}'; keeping the first one.",
+                            pluginInfo.IdentifierData);
                 }
                 else
                 {

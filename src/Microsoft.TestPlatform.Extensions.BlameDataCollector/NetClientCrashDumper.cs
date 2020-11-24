@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     internal class NetClientCrashDumper : ICrashDumper
     {
-        public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType)
+        public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways)
         {
             // we don't need to do anything directly here, we setup the env variables
             // in the dumper configuration, including the path

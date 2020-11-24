@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The default protocol version
         /// </summary>
-        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 3 };
+        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 4 };
 
         /// <summary>
         /// The minimum protocol version that has debug support
@@ -183,7 +183,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Default results directory.
         /// </summary>
-        public static readonly string DefaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
+        public static readonly string DefaultResultsDirectory =
+#if NETSTANDARD1_0
+            Path.Combine(".", ResultsDirectoryName);
+#else
+            Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
+#endif
 
         /// <summary>
         /// Default treatment of error from test adapters.

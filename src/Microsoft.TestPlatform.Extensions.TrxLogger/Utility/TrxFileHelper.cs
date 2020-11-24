@@ -21,8 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     {
         private const string RelativeDirectorySeparator = "..";
 
-        private static readonly Dictionary<char, object> InvalidFileNameChars;
-        private static readonly Dictionary<char, object> AdditionalInvalidFileNameChars;
+        private static readonly HashSet<char> InvalidFileNameChars;
         private static readonly Regex ReservedFileNamesRegex = new Regex(@"(?i:^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]|CLOCK\$)(\..*)?)$");
         private readonly Func<DateTime> TimeProvider;
 
@@ -36,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // See https://github.com/dotnet/coreclr/blob/8e99cd8031b2f568ea69116e7cf96d55e32cb7f5/src/mscorlib/shared/System/IO/Path.Windows.cs#L12-L19
             // These are manually listed here to avoid characters that may be valid on Linux but would make a filename invalid when copying the file to Windows.
             // Path.GetInvalidFileNameChars on Linux only contains { \0, / }
-            var invalidCharsArray = new char[]
+            InvalidFileNameChars = new HashSet<char>
             {
                 '\"', '<', '>', '|', '\0',
                 (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9, (char)10,
@@ -45,23 +44,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 (char)31, ':', '*', '?', '\\', '/'
             };
 
-            InvalidFileNameChars = new Dictionary<char, object>(invalidCharsArray.Length);
-            foreach (char c in invalidCharsArray)
-            {
-                InvalidFileNameChars.Add(c, null);
-            }
-
             // Needed because when kicking off qtsetup.bat cmd.exe is used.  '@' is a special character
             // for cmd so must be removed from the path to the bat file
-            AdditionalInvalidFileNameChars = new Dictionary<char, object>(5);
-            AdditionalInvalidFileNameChars.Add('@', null);
-            AdditionalInvalidFileNameChars.Add('(', null);
-            AdditionalInvalidFileNameChars.Add(')', null);
-            AdditionalInvalidFileNameChars.Add('^', null);
+            InvalidFileNameChars.Add('@');
+            InvalidFileNameChars.Add('(');
+            InvalidFileNameChars.Add(')');
+            InvalidFileNameChars.Add('^');
 
             // Replace white space with underscore from folder/file name to make it command line friendly
             // Related issues https://github.com/Microsoft/vstest/issues/244 & https://devdiv.visualstudio.com/DevDiv/_workitems?id=507982&_a=edit
-            AdditionalInvalidFileNameChars.Add(' ', null);
+            InvalidFileNameChars.Add(' ');
         }
 
         public TrxFileHelper() : this(() => DateTime.Now) { }
@@ -90,8 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // Replace each invalid char with replacement char.
             for (int i = 0; i < fileName.Length; ++i)
             {
-                if (InvalidFileNameChars.ContainsKey(fileName[i]) ||
-                    AdditionalInvalidFileNameChars.ContainsKey(fileName[i]))
+                if (InvalidFileNameChars.Contains(fileName[i]))
                 {
                     result[i] = replacementChar;
                 }
@@ -167,6 +158,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 var tryMe = fileNamePrefix + iterationStamp.ToString(timestampFormat, DateTimeFormatInfo.InvariantInfo) + extension;
 
                 string tryMePath = Path.Combine(directoryName, tryMe);
+
                 if (!File.Exists(tryMePath))
                 {
                     return tryMePath;
@@ -404,6 +396,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             internal override bool IsValidIteration(string path)
             {
                 Debug.Assert(!string.IsNullOrEmpty(path), "path is null");
+
                 if (File.Exists(path) || Directory.Exists(path))
                 {
                     return false;

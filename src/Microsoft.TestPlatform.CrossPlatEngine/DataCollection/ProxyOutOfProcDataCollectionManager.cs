@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Sync object for ensuring that only run is active at a time
         /// </summary>
-        private Object syncObject = new Object();
+        private object syncObject = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOutOfProcDataCollectionManager"/> class.
