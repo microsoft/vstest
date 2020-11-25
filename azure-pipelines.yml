@@ -53,6 +53,14 @@ jobs:
       artifactName: 'testArtifacts'
       targetPath: '$(Build.SourcesDirectory)\artifacts)'
   - task: BatchScript@1
+    displayName: 'Run script build.cmd'
+    inputs:
+      filename: build.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, PrepareAcceptanceTests"'
+      modifyEnvironment: false
+      failOnStandardError: true
+
+  - task: BatchScript@1
     displayName: 'Run Acceptance Tests'
     inputs:
       filename: test.cmd
@@ -109,9 +117,6 @@ jobs:
       buildType: 'current'
       artifactName: 'testArtifacts'
       targetPath: '$(Build.SourcesDirectory)/artifacts'
-  - script: ls $(Build.SourcesDirectory)/artifacts
-  - script: ls $(Build.SourcesDirectory)/artifacts/testArtifacts
-  - script: ls $(Build.SourcesDirectory)/artifacts/testArtifacts/packages
   - script: ./tools/dotnet-linux/dotnet build -c $(buildConfiguration) ./test/TestAssets/TestAssets.sln
     displayName: 'Build test assets'
   - script: ./test.sh -c $(buildConfiguration) -p Acceptance

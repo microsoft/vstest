@@ -45,7 +45,13 @@ Param(
     # Build specific projects
     [Parameter(Mandatory=$false)]
     [Alias("p")]
-    [System.String[]] $ProjectNamePatterns = @()
+    [System.String[]] $ProjectNamePatterns = @(),
+
+    [Alias("f")]
+    [Switch] $Force, 
+
+    [Alias("s")]
+    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests")
 )
 
 $ErrorActionPreference = "Stop"
@@ -1103,19 +1109,37 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
-Clear-Package
-Restore-Package
-Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Create-VsixPackage
-Create-NugetPackages
-Generate-Manifest
-Publish-PatchedDotnet
-Copy-PackageIntoStaticDirectory
-Invoke-TestAssetsBuild
-Publish-Tests
+
+if ($Force -or $Steps -contains "InstallDotnet") {
+    Install-DotNetCli
+}
+
+if ($Force -or $Steps -contains "Restore") {
+    Clear-Package
+    Restore-Package    
+}
+
+if ($Force -or $Steps -contains "UpdateLocalization") {
+    Update-LocalizedResources
+}
+
+if ($Force -or $Steps -contains "Build") {
+    Invoke-Build
+}
+
+if ($Force -or $Steps -contains "Publish") {
+    Publish-Package
+    Create-VsixPackage
+    Create-NugetPackages
+    Generate-Manifest
+}
+
+if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
+    Publish-PatchedDotnet
+    Copy-PackageIntoStaticDirectory
+    Invoke-TestAssetsBuild
+    Publish-Tests
+}
  
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
