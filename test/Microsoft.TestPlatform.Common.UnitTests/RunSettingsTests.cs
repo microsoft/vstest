@@ -7,7 +7,7 @@ namespace TestPlatform.Common.UnitTests
     using System.Xml;
 
     using ExtensionFramework;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -21,7 +21,7 @@ namespace TestPlatform.Common.UnitTests
         [TestCleanup]
         public void TestCleanup()
         {
-            TestPluginCacheTests.ResetExtensionsCache();
+            TestPluginCacheHelper.ResetExtensionsCache();
             TestSessionMessageLogger.Instance = null;
         }
 
@@ -53,8 +53,8 @@ namespace TestPlatform.Common.UnitTests
             // So they do not exactly match.
             // Assert.AreEqual(emptyRunSettings, runSettings.SettingsXml);
 
-            var expectedRunSettings = @"<RunSettings>
-</RunSettings>";
+            var expectedRunSettings = "<RunSettings>" + Environment.NewLine 
+                                      + "</RunSettings>";
             StringAssert.Contains(runSettings.SettingsXml, expectedRunSettings);
         }
 
@@ -93,7 +93,7 @@ namespace TestPlatform.Common.UnitTests
         [TestMethod]
         public void InitializeSettingsProvidersShouldThrowIfNodeInRunSettingsDoesNotHaveAProvider()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
             var runSettings = new RunSettings();
             runSettings.InitializeSettingsProviders(this.GetRunSettingsWithUndefinedSettingsNodes());
@@ -110,7 +110,7 @@ namespace TestPlatform.Common.UnitTests
         [TestMethod]
         public void InitializeSettingsProvidersShouldThrowIfSettingsProviderLoadThrows()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
             var runSettings = new RunSettings();
             runSettings.InitializeSettingsProviders(this.GetRunSettingsWithBadSettingsNodes());
@@ -146,7 +146,7 @@ namespace TestPlatform.Common.UnitTests
         [TestMethod]
         public void InitializeSettingsProvidersShouldLoadSettingsIntoASettingsProvider()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
             var runSettings = new RunSettings();
             runSettings.InitializeSettingsProviders(this.GetRunSettingsWithRunConfigurationNode());
@@ -165,7 +165,7 @@ namespace TestPlatform.Common.UnitTests
         [TestMethod]
         public void InitializeSettingsProvidersShouldLoadSettingsIntoMultipleSettingsProviders()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
 
             var runSettings = new RunSettings();
             runSettings.InitializeSettingsProviders(this.GetRunSettingsWithRunConfigurationAndMSTestNode());
@@ -191,7 +191,7 @@ namespace TestPlatform.Common.UnitTests
         {
             string receivedWarningMessage = null;
 
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(RunSettingsTests));
             TestSessionMessageLogger.Instance.TestRunMessage += (object sender, TestRunMessageEventArgs e) =>
             {
                 receivedWarningMessage = e.Message;

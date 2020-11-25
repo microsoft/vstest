@@ -581,7 +581,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             try
             {
                 if (string.IsNullOrEmpty(extensionAssembly)
-                    || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
+                    || string.Equals(extensionAssembly, Constants.UnspecifiedAdapterPath))
                 {
                     // full execution. Since the extension manager is cached this can be created multiple times without harming performance.
                     return TestExecutorExtensionManager.Create();
@@ -729,7 +729,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             foreach (var testResult in testResults)
             {
-                var updatedTestResult = this.dataSerializer.Clone<TestResult>(testResult);
+                var updatedTestResult = this.dataSerializer.Clone(testResult);
                 updatedTestResult.TestCase.Source = package;
                 updatedTestResults.Add(updatedTestResult);
             }
@@ -747,7 +747,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ICollection<TestCase> updatedTestCases = new List<TestCase>();
             foreach (var inProgressTestCase in inProgressTestCases)
             {
-                var updatedTestCase = this.dataSerializer.Clone<TestCase>(inProgressTestCase);
+                var updatedTestCase = this.dataSerializer.Clone(inProgressTestCase);
                 updatedTestCase.Source = package;
                 updatedTestCases.Add(updatedTestCase);
             }

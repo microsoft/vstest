@@ -276,8 +276,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             int numSources = 1;
             if (testRunCriteria.HasSpecificTests)
             {
-                numSources = new System.Collections.Generic.HashSet<string>(
-                    testRunCriteria.Tests.Select((testCase) => testCase.Source)).Count;
+                numSources = new HashSet<string>(
+                             testRunCriteria.Tests.Select(testCase => testCase.Source)).Count;
             }
             else
             {

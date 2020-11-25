@@ -79,14 +79,15 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
-            var expectedSettingsXml =
-                "<RunSettings>\r\n" +
-                "  <MSTest>\r\n" +
-                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
-                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
-                "  </MSTest>\r\n" +
-                "  <RunConfiguration></RunConfiguration>\r\n" +
-                "</RunSettings>";
+            var expectedSettingsXml = string.Join(Environment.NewLine, 
+                "<RunSettings>",
+                "  <MSTest>",
+                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>",
+                "    <ForcedLegacyMode>true</ForcedLegacyMode>",
+                "  </MSTest>",
+                "  <RunConfiguration></RunConfiguration>",
+                "</RunSettings>"
+            );
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
@@ -103,14 +104,15 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = finalxPath.CreateNavigator().OuterXml;
 
-            var expectedSettingsXml =
-                "<RunSettings>\r\n" +
-                "  <RunConfiguration />\r\n" +
-                "  <MSTest>\r\n" +
-                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n" +
-                "    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n" +
-                "  </MSTest>\r\n" +
-                "</RunSettings>";
+            var expectedSettingsXml = string.Join(Environment.NewLine,
+                "<RunSettings>",
+                "  <RunConfiguration />",
+                "  <MSTest>",
+                "    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>",
+                "    <ForcedLegacyMode>true</ForcedLegacyMode>",
+                "  </MSTest>",
+                "</RunSettings>"
+            );
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }

@@ -5,7 +5,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -26,7 +26,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         public TestExtensionManagerTests()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestExtensionManagerTests));
             messageLogger = TestSessionMessageLogger.Instance;
             TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
                 (TestPlatformConstants.TestLoggerEndsWithPattern, out unfilteredTestExtensions, out filteredTestExtensions);
@@ -63,7 +63,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void TryGetTestExtensionShouldThrowExceptionWithNullUri()
         {
             testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
-            TestPluginCacheTests.SetupMockAdditionalPathExtensions();
+            TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestExtensionManagerTests));
             Assert.ThrowsException<ArgumentNullException>(() =>
                     {
                         var result = testExtensionManager.TryGetTestExtension(default(Uri));

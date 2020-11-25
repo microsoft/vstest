@@ -9,6 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using System.Reflection;
 
     using Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -20,8 +21,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class TestEngineTests
@@ -35,7 +34,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
         public TestEngineTests()
         {
-            TestPluginCacheTests.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(true);
             this.mockRequestData = new Mock<IRequestData>();

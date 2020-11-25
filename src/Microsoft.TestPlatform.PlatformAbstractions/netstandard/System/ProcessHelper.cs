@@ -103,6 +103,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             throw new NotImplementedException();
         }
+
+        public object GetProcessById(int processId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

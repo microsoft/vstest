@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;

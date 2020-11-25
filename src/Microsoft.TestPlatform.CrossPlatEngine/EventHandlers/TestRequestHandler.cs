@@ -24,6 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public class TestRequestHandler : ITestRequestHandler
     {
         private int protocolVersion = 1;
+        
+        // Also check TestRequestSender.
         private int highestSupportedVersion = 4;
 
         private readonly IDataSerializer dataSerializer;
@@ -261,7 +263,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 case MessageType.VersionCheck:
                     var version = this.dataSerializer.DeserializePayload<int>(message);
-                    this.protocolVersion = Math.Min(version, highestSupportedVersion);
+                    // choose the highest version that we both support
+                    var negotiatedVersion = Math.Min(version, highestSupportedVersion);
+                    // BUT don't choose 3, because protocol version 3 has performance problems in 16.7.1-16.8. Those problems are caused
+                    // by choosing payloadSerializer instead of payloadSerializer2 for protocol version 3.
+                    //
+                    // We cannot just update the code to choose the new serializer, because then that change would apply only to testhost.
+                    // Testhost is is delivered by Microsoft.NET.Test.SDK nuget package, and can be used with an older vstest.console.
+                    // An older vstest.console, that supports protocol version 3, would serialize its messages using payloadSerializer,
+                    // but the fixed testhost would serialize it using payloadSerializer2, resulting in incompatible messages.
+                    //
+                    // Instead we must downgrade to protocol version 2 when 3 would be negotiated. Or higher when higher version
+                    // would be negotiated.
+                    if (negotiatedVersion != 3)
+                    {
+                        this.protocolVersion = negotiatedVersion;
+                    }
+                    else
+                    {
+                        var flag = Environment.GetEnvironmentVariable("VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE");
+                        var flagIsEnabled = flag != null && flag != "0";
+                        var dowgradeIsDisabled = flagIsEnabled;
+                        if (dowgradeIsDisabled)
+                        {
+                            this.protocolVersion = negotiatedVersion;
+                        }
+                        else
+                        {
+                            this.protocolVersion = 2;
+                        }
+                    }
 
                     // Send the negotiated protocol to request sender
                     this.channel.Send(this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.protocolVersion));

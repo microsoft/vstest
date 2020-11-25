@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     /// </summary>
     internal interface IDynamicCoverageDataCollectorImpl : IDisposable
     {
+        string CodeCoverageDepsJsonFilePath { get; }
+
         string GetSessionName();
 
         void Initialize(
