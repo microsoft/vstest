@@ -130,7 +130,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)QTDCAgent32.exe" />
 
       <!-- DataCollector related dlls -->
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.IntelliTrace.Core.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.IntelliTrace.Core.dll" />      
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Coverage.CoreLib.Net.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
