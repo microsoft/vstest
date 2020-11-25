@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private readonly ICommunicationManager communicationManager;
         private readonly IDataSerializer dataSerializer;
 
-        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
+        private ProtocolConfig protocolConfig = ObjectModel.Constants.DefaultProtocolConfig;
         private IEnvironment platformEnvironment;
         private TestSessionMessageLogger testSessionMessageLogger;
         private object lockObject = new object();
@@ -341,7 +341,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
             // request failed.
-            if (this.protocolConfig.Version < Constants.MinimumProtocolVersionWithDebugSupport)
+            if (this.protocolConfig.Version < ObjectModel.Constants.MinimumProtocolVersionWithDebugSupport)
             {
                 return false;
             }
