@@ -12,26 +12,26 @@ jobs:
     displayName: 'Run script build.cmd'
     inputs:
       filename: build.cmd
-      arguments: '-verbose -configuration $(buildConfiguration)'
+      arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, UpdateLocalization, Build, Publish"'
       modifyEnvironment: false
       failOnStandardError: true
 
-  - task: CmdLine@1
-    displayName: 'Delete stale pdb files'
-    inputs:
-      filename: del
-      arguments: '/S /F *.pdb'
-      workingFolder: '$(SystemRoot)'
-    continueOnError: true
-    condition: always()
+  # - task: CmdLine@1
+  #   displayName: 'Delete stale pdb files'
+  #   inputs:
+  #     filename: del
+  #     arguments: '/S /F *.pdb'
+  #     workingFolder: '$(SystemRoot)'
+  #   continueOnError: true
+  #   condition: always()
 
-  - task: BatchScript@1
-    displayName: 'Run Unit Tests'
-    inputs:
-      filename: test.cmd
-      arguments: '-verbose -configuration $(buildConfiguration)'
-      modifyEnvironment: false
-      failOnStandardError: true
+  # - task: BatchScript@1
+  #   displayName: 'Run Unit Tests'
+  #   inputs:
+  #     filename: test.cmd
+  #     arguments: '-verbose -configuration $(buildConfiguration)'
+  #     modifyEnvironment: false
+  #     failOnStandardError: true
 
   - task: PublishPipelineArtifact@1
     inputs:
