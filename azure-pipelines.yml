@@ -52,6 +52,11 @@ jobs:
       buildType: 'current'
       artifactName: 'testArtifacts'
       targetPath: '$(Build.SourcesDirectory)\artifacts)'
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages)"'
+
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
     inputs:
@@ -62,6 +67,11 @@ jobs:
       arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Build, PrepareAcceptanceTests"'
       modifyEnvironment: false
       failOnStandardError: true
+      
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages)"'
 
   - task: BatchScript@1
     displayName: 'Run Acceptance Tests'
