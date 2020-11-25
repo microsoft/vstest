@@ -55,7 +55,7 @@ jobs:
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
-      script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages)"'
+      script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages"'
 
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
@@ -71,7 +71,7 @@ jobs:
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
-      script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages)"'
+      script: 'ls "$(Build.SourcesDirectory)\artifacts\Release\packages"'
 
   - task: BatchScript@1
     displayName: 'Run Acceptance Tests'
