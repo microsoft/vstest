@@ -51,7 +51,8 @@ jobs:
     inputs:
       buildType: 'current'
       artifactName: 'testArtifacts'
-      targetPath: '$(Build.SourcesDirectory)\artifacts)'
+      targetPath: '$(Build.SourcesDirectory)\artifacts'
+
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
