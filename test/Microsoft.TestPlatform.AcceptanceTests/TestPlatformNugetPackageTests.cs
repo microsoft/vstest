@@ -48,6 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
         [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
         public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
