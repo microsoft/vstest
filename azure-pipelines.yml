@@ -112,7 +112,7 @@ jobs:
   - script: ls $(Build.SourcesDirectory)/artifacts
   - script: ls $(Build.SourcesDirectory)/artifacts/testArtifacts
   - script: ls $(Build.SourcesDirectory)/artifacts/testArtifacts/packages
-  - script: ./tools/dotnet-linux/dotnet build ./test/TestAssets/TestAssets.sln
+  - script: ./tools/dotnet-linux/dotnet build -c $(buildConfiguration) ./test/TestAssets/TestAssets.sln
     displayName: 'Build test assets'
   - script: ./test.sh -c $(buildConfiguration) -p Acceptance
     displayName: 'Acceptance tests'   
