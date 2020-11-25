@@ -108,7 +108,10 @@ jobs:
     inputs:
       buildType: 'current'
       artifactName: 'testArtifacts'
-      targetPath: '$(Build.SourcesDirectory)/artifacts)'
+      targetPath: '$(Build.SourcesDirectory)/artifacts'
+  - script: ls $(Build.SourcesDirectory)/artifacts
+  - script: ls $(Build.SourcesDirectory)/artifacts/testArtifacts
+  - script: ls $(Build.SourcesDirectory)/artifacts/testArtifacts/packages
   - script: ./tools/dotnet-linux/dotnet build ./test/TestAssets/TestAssets.sln
     displayName: 'Build test assets'
   - script: ./test.sh -c $(buildConfiguration) -p Acceptance
