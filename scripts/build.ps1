@@ -1132,11 +1132,11 @@ if ($Force -or $Steps -contains "Publish") {
     Create-VsixPackage
     Create-NugetPackages
     Generate-Manifest
+    Copy-PackageIntoStaticDirectory
 }
 
 if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
     Publish-PatchedDotnet
-    Copy-PackageIntoStaticDirectory
     Invoke-TestAssetsBuild
     Publish-Tests
 }
