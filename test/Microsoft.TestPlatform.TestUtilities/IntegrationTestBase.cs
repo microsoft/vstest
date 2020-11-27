@@ -606,8 +606,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 process.Start();
                 process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                if (!process.WaitForExit(80 * 1000))
+                process.BeginErrorReadLine(); 
+                if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
                 {
                     Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
                     process.Kill();
