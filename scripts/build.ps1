@@ -276,6 +276,7 @@ function Copy-PackageIntoStaticDirectory {
     # need to put them in folder that is not changing it's name based on config
     $tpPackagesPath = "$env:TP_OUT_DIR\$TPB_Configuration\packages\"
     $tpPackagesDestination = "$env:TP_TESTARTIFACTS"
+    New-Item -ItemType Directory -Force $tpPackagesDestination | Out-Null
     Copy-Item $tpPackagesPath $tpPackagesDestination -Force -Filter *.nupkg -Verbose -Recurse
 }
 
