@@ -24,9 +24,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
     using CoreUtilities.Helpers;
 
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using CrossPlatEngineResources = Resources.Resources;
+    using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = CoreUtilities.Constants;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -38,7 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly Guid id = Guid.NewGuid();
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
         private readonly IProcessHelper processHelper;
-        
+
+        private IBaseProxy baseProxy;
         private bool versionCheckRequired = true;
         private bool makeRunsettingsCompatible;
         private bool makeRunsettingsCompatibleSet;
@@ -48,7 +49,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private string testHostProcessStdError;
 
         #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
         /// </summary>
@@ -60,10 +60,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager)
+            : this(
+                  requestData,
+                  requestSender,
+                  testHostManager,
+                  null)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
+        /// </summary>
+        /// 
+        /// <param name="requestData">Request data instance.</param>
+        /// <param name="requestSender">Request sender instance.</param>
+        /// <param name="testHostManager">Test host manager instance.</param>
+        /// <param name="baseProxy">The base proxy.</param>
+        public ProxyOperationManager(
+            IRequestData requestData,
+            ITestRequestSender requestSender,
+            ITestRuntimeProvider testHostManager,
+            IBaseProxy baseProxy)
         {
             this.RequestData = requestData;
             this.RequestSender = requestSender;
             this.TestHostManager = testHostManager;
+            this.baseProxy = baseProxy;
 
             this.initialized = false;
             this.testHostLaunched = false;
@@ -325,10 +346,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
-            // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-            var telemetryOptedIn = this.RequestData.IsTelemetryOptedIn ? "true" : "false";
-            testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
-            return testProcessStartInfo;
+            if (this.baseProxy == null)
+            {
+                // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
+                var telemetryOptedIn = this.RequestData.IsTelemetryOptedIn ? "true" : "false";
+                testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
+                return testProcessStartInfo;
+            }
+
+            return this.baseProxy.UpdateTestProcessStartInfo(testProcessStartInfo);
         }
 
         /// <summary>

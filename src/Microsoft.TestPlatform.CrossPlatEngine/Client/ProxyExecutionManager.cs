@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
     /// </summary>
-    internal class ProxyExecutionManager : IProxyExecutionManager, ITestRunEventsHandler2
+    internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
     {
         private readonly ITestRuntimeProvider testHostManager;
         private readonly IFileHelper fileHelper;
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.fileHelper = fileHelper;
 
             // Create a new proxy operation manager.
-            this.ProxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager);
+            this.ProxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
         }
 
         #endregion
@@ -338,6 +338,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #endregion
 
+        #region IBaseProxy implementation.
+        /// <inheritdoc/>
+        public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        {
+            // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
+            var telemetryOptedIn = this.ProxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
+            testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
+            return testProcessStartInfo;
+        }
+        #endregion
+
         /// <summary>
         /// Ensures that the engine is ready for test operations. Usually includes starting up the
         /// test host process.
@@ -384,11 +395,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.ProxyOperationManager.RequestSender.InitializeExecution(platformExtensions);
             }
-        }
-
-        protected virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
-        {
-            return this.ProxyOperationManager.UpdateTestProcessStartInfo(testProcessStartInfo);
         }
     }
 }

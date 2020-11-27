@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc />
-        protected override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             if (testProcessStartInfo.EnvironmentVariables == null)
             {

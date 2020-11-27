@@ -224,7 +224,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             return this.UpdateTestProcessStartInfo(testProcessStartInfo);
         }
 
-        protected override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        public override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             return base.UpdateTestProcessStartInfo(testProcessStartInfo);
         }

@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
     /// </summary>
-    public class ProxyDiscoveryManager : IProxyDiscoveryManager, ITestDiscoveryEventsHandler2
+    public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
     {
         private ProxyOperationManager proxyOperationManager;
         private readonly ITestRuntimeProvider testHostManager;
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.fileHelper = fileHelper;
 
             // Create a new proxy operation manager.
-            this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager);
+            this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
         }
 
         #endregion
@@ -190,6 +190,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler.HandleLogMessage(level, message);
         }
 
+        #endregion
+
+        #region IBaseProxy implementation.
+        /// <inheritdoc/>
+        public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        {
+            // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
+            var telemetryOptedIn = this.proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
+            testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
+            return testProcessStartInfo;
+        }
         #endregion
 
         private void InitializeExtensions(IEnumerable<string> sources)
