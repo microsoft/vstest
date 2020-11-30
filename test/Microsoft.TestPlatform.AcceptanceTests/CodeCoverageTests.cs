@@ -37,6 +37,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     }
 
     [TestClass]
+    //Code coverage only supported on windows (based on the message in output)
+    [TestCategory("Windows-Review")]
     public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         private readonly string resultsDirectory;
@@ -133,7 +135,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 TargetPlatform = "x86",
                 RunSettingsPath = Path.Combine(
                     IntegrationTestEnvironment.TestPlatformRootDirectory,
-                    @"scripts\vstest-codecoverage2.runsettings"),
+                    @"scripts", "vstest-codecoverage2.runsettings"),
                 RunSettingsType = TestParameters.SettingsType.Custom,
                 ExpectedPassedTests = 3,
                 ExpectedSkippedTests = 0,
@@ -155,7 +157,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 TargetPlatform = "x64",
                 RunSettingsPath = Path.Combine(
                     IntegrationTestEnvironment.TestPlatformRootDirectory,
-                    @"scripts\vstest-codecoverage2.runsettings"),
+                    @"scripts", "vstest-codecoverage2.runsettings"),
                 RunSettingsType = TestParameters.SettingsType.Custom,
                 ExpectedPassedTests = 3,
                 ExpectedSkippedTests = 0,
@@ -202,7 +204,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
-                $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
+                "src", "DataCollectors", "TraceDataCollector", "bin", IntegrationTestEnvironment.BuildConfiguration, "netstandard2.0");
 
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
@@ -216,7 +218,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var defaultRunSettingsPath = Path.Combine(
                 IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"scripts\vstest-codecoverage.runsettings");
+                @"scripts", "vstest-codecoverage.runsettings");
 
             var runSettings = string.Empty;
             switch (testParameters.RunSettingsType)

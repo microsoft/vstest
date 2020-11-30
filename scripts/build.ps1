@@ -45,7 +45,13 @@ Param(
     # Build specific projects
     [Parameter(Mandatory=$false)]
     [Alias("p")]
-    [System.String[]] $ProjectNamePatterns = @()
+    [System.String[]] $ProjectNamePatterns = @(),
+
+    [Alias("f")]
+    [Switch] $Force, 
+
+    [Alias("s")]
+    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests")
 )
 
 $ErrorActionPreference = "Stop"
@@ -82,7 +88,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "5.0.100-rc.1.20453.7"
+$env:DOTNET_CLI_VERSION = "5.0.100"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -270,6 +276,7 @@ function Copy-PackageIntoStaticDirectory {
     # need to put them in folder that is not changing it's name based on config
     $tpPackagesPath = "$env:TP_OUT_DIR\$TPB_Configuration\packages\"
     $tpPackagesDestination = "$env:TP_TESTARTIFACTS"
+    New-Item -ItemType Directory -Force $tpPackagesDestination | Out-Null
     Copy-Item $tpPackagesPath $tpPackagesDestination -Force -Filter *.nupkg -Verbose -Recurse
 }
 
@@ -1103,19 +1110,37 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
-Clear-Package
-Restore-Package
-Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Create-VsixPackage
-Create-NugetPackages
-Generate-Manifest
-Publish-PatchedDotnet
-Copy-PackageIntoStaticDirectory
-Invoke-TestAssetsBuild
-Publish-Tests
+
+if ($Force -or $Steps -contains "InstallDotnet") {
+    Install-DotNetCli
+}
+
+if ($Force -or $Steps -contains "Restore") {
+    Clear-Package
+    Restore-Package    
+}
+
+if ($Force -or $Steps -contains "UpdateLocalization") {
+    Update-LocalizedResources
+}
+
+if ($Force -or $Steps -contains "Build") {
+    Invoke-Build
+}
+
+if ($Force -or $Steps -contains "Publish") {
+    Publish-Package
+    Create-VsixPackage
+    Create-NugetPackages
+    Generate-Manifest
+    Copy-PackageIntoStaticDirectory
+}
+
+if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
+    Publish-PatchedDotnet
+    Invoke-TestAssetsBuild
+    Publish-Tests
+}
  
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
