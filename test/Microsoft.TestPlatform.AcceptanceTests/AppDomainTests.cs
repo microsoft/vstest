@@ -14,11 +14,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class AppDomainTests : AcceptanceTestBase
     {
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
         {

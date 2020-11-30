@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     [TestClass]
     // monitoring the processes does not work correctly
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class PlatformTests : AcceptanceTestBase
     {
         /// <summary>

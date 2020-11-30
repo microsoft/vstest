@@ -30,12 +30,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestCleanup]
         public void Cleanup()
         {
-            try {
             this.vstestConsoleWrapper?.EndSession();
-            }
-            catch {
-
-            }
         }
 
 
@@ -78,7 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         [TestMethod]
         // there are logs in the diagnostic log, it is failing with NullReferenceException because path is null
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
@@ -126,7 +121,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
         {

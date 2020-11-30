@@ -146,7 +146,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
         [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
         public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)

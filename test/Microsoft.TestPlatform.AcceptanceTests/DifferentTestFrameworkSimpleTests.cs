@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         [TestMethod]
@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void CPPRunAllTestExecutionPlatformx64(RunnerInfo runnerInfo)
         {
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
         {

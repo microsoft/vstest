@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     [TestClass]
     //Code coverage only supported on windows (based on the message in output)
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         private readonly string resultsDirectory;

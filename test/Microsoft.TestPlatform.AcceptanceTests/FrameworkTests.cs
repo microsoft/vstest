@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // framework runner not available on Linux
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)

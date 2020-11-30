@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
 
     [TestClass]
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class EventLogCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
         [Ignore]
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
         {

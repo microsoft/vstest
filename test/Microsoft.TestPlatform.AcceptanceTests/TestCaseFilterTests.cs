@@ -155,7 +155,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Discover tests using mstest v1 adapter with test case filters.
         /// </summary>
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnerInfo runnerInfo)
         {
@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Discover tests using tmi adapter with test case filters.
         /// </summary>
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {

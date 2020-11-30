@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     {
         [TestMethod]

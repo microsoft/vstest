@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     [TestClass]
     // monitoring the processes does not work correctly
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class RunsettingsTests : AcceptanceTestBase
     {
         private string runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
@@ -276,7 +276,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #region LegacySettings Tests
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
         {
@@ -306,7 +306,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
         {
@@ -357,7 +357,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
         {
@@ -417,7 +417,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
         {
@@ -496,7 +496,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="runnerInfo"></param>
         [TestMethod]
         // patched dotnet is not published on non-windows systems
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)

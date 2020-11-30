@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     // this whole thing is complicated and depends on versions of OS and the target runtime
     // keeping this for later
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class BlameDataCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // netcoreapp2.1 dump is not supported on Linux
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // netcoreapp2.1 dump is not supported on Linux
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
@@ -77,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // netcoreapp2.1 dump is not supported on Linux
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // netcoreapp2.1 dump is not supported on Linux
-        [TestCategory("Windows")]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)

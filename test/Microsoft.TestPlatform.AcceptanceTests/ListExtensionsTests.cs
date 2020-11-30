@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     [TestClass]
     // this is tested only on .NET Framework
-    [TestCategory("Windows")]
+    [TestCategory("Windows-Review")]
     public class ListExtensionsTests : AcceptanceTestBase
     {
         [TestMethod]
