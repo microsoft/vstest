@@ -569,6 +569,17 @@ function Publish-Package
 
     Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
     
+    # Copy Microsoft.VisualStudio.TraceDataCollector
+    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+    $traceDataCollectorSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib"
+    $traceDataCollectorTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.VisualStudio.TraceDataCollector"
+
+    if (-not (Test-Path $traceDataCollectorTargetDirectory)) {
+        New-Item $traceDataCollectorTargetDirectory -Type Directory -Force | Out-Null
+    }
+
+    Copy-Item -Recurse $traceDataCollectorSourceDirectory\* $traceDataCollectorTargetDirectory -Force
+
     # Copy Microsoft.VisualStudio.Telemetry APIs
     $testPlatformDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace\Common7\IDE\Extensions\TestPlatform"
     
@@ -685,6 +696,11 @@ function Create-VsixPackage
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
+    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+
+    # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
+    $traceDataCollectorSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\net472"
+    Copy-Item $traceDataCollectorSourceDirectory\Microsoft.VisualStudio.TraceDataCollector.dll $extensionsPackageDir -Force
 
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion\contentFiles\any\any"
