@@ -40,9 +40,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <inheritdoc />
-        public void HandleStopTestSessionComplete(bool stopped)
+        public void HandleStopTestSessionComplete(TestSessionInfo testSessionInfo, bool stopped)
         {
-            this.communicationManager.SendMessage(MessageType.StopTestSessionCallback, stopped);
+            var ackPayload = new StopTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo,
+                IsStopped = stopped
+            };
+
+            this.communicationManager.SendMessage(MessageType.StopTestSessionCallback, ackPayload);
         }
 
         /// <inheritdoc />

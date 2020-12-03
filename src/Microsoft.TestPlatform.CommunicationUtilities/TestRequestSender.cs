@@ -52,7 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies host is using version 1.
         private int protocolVersion = 1;
 
-        // Also check TestRequestHandler.
+        // Must be in sync with the highest supported version in
+        // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
         private int highestSupportedVersion = 4;
 
         private TestHostConnectionInfo connectionInfo;

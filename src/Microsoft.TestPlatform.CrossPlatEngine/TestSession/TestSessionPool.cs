@@ -80,13 +80,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// Removes a session from the pool.
+        /// Kills and removes a session from the pool.
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info object.</param>
         /// 
         /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public bool RemoveSession(TestSessionInfo testSessionInfo)
+        public bool KillSession(TestSessionInfo testSessionInfo)
         {
             // TODO (copoiena): What happens if some request is running for the current session ?
             // Should we stop the request as well ? Probably yes.

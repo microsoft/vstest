@@ -565,7 +565,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 while (true)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
 
                     switch (message.MessageType)
                     {
@@ -650,9 +650,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     switch (message.MessageType)
                     {
                         case MessageType.StopTestSessionCallback:
-                            var stopped = this.dataSerializer.DeserializePayload<bool>(message);
-                            eventsHandler?.HandleStopTestSessionComplete(stopped);
-                            return stopped;
+                            var payload = this.dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                            eventsHandler?.HandleStopTestSessionComplete(payload.TestSessionInfo, payload.IsStopped);
+                            return payload.IsStopped;
 
                         case MessageType.TestMessage:
                             var testMessagePayload = this.dataSerializer
@@ -676,11 +676,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     "Aborting StopTestSession operation for id {0} due to error: {1}",
                     testSessionInfo?.Id,
                     exception);
-                eventsHandler.HandleLogMessage(
+                eventsHandler?.HandleLogMessage(
                     TestMessageLevel.Error,
                     TranslationLayerResources.AbortedStopTestSession);
 
-                eventsHandler.HandleStopTestSessionComplete(false);
+                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
             }
 
             this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
@@ -718,14 +718,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 while (true)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
 
                     switch (message.MessageType)
                     {
                         case MessageType.StopTestSessionCallback:
-                            var stopped = this.dataSerializer.DeserializePayload<bool>(message);
-                            eventsHandler?.HandleStopTestSessionComplete(stopped);
-                            return stopped;
+                            var payload = this.dataSerializer.DeserializePayload<StopTestSessionAckPayload>(message);
+                            eventsHandler?.HandleStopTestSessionComplete(payload.TestSessionInfo, payload.IsStopped);
+                            return payload.IsStopped;
 
                         case MessageType.TestMessage:
                             var testMessagePayload = this.dataSerializer
@@ -749,11 +749,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     "Aborting StopTestSession operation for id {0} due to error: {1}",
                     testSessionInfo?.Id,
                     exception);
-                eventsHandler.HandleLogMessage(
+                eventsHandler?.HandleLogMessage(
                     TestMessageLevel.Error,
                     TranslationLayerResources.AbortedStopTestSession);
 
-                eventsHandler.HandleStopTestSessionComplete(false);
+                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
             }
 
             this.testPlatformEventSource.TranslationLayerStopTestSessionStop();

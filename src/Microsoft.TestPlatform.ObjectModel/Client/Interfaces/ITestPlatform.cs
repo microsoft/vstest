@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             TestPlatformOptions options);
 
         /// <summary>
-        /// Creates a start test session request.
+        /// Starts a test session.
         /// </summary>
         /// 
         /// <param name="requestData">
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </param>
         /// <param name="criteria">Specifies the start test session criteria.</param>
         /// <param name="eventsHandler">Events handler for handling session events.</param>
-        void CreateStartTestSessionRequest(
+        void StartTestSession(
             IRequestData requestData,
             StartTestSessionCriteria criteria,
             ITestSessionEventsHandler eventsHandler);

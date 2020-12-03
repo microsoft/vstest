@@ -88,13 +88,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     hostManager);
             };
 
-            return !testHostManager.Shared
-                ? new ParallelProxyDiscoveryManager(
+            return testHostManager.Shared
+                ? proxyDiscoveryManagerCreator()
+                : new ParallelProxyDiscoveryManager(
                     requestData,
                     proxyDiscoveryManagerCreator,
                     parallelLevel,
-                    sharedHosts: testHostManager.Shared)
-                : proxyDiscoveryManagerCreator();
+                    sharedHosts: testHostManager.Shared);
         }
 
         /// <inheritdoc/>

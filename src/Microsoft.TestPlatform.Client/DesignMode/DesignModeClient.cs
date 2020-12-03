@@ -556,16 +556,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 try
                 {
-                    var stopped = TestSessionPool.Instance.RemoveSession(testSessionInfo);
+                    var stopped = TestSessionPool.Instance.KillSession(testSessionInfo);
 
-                    eventsHandler.HandleStopTestSessionComplete(stopped);
+                    eventsHandler.HandleStopTestSessionComplete(testSessionInfo, stopped);
                 }
                 catch (Exception ex)
                 {
                     EqtTrace.Error("DesignModeClient: Exception in StopTestSession: " + ex);
 
                     eventsHandler.HandleLogMessage(TestMessageLevel.Error, ex.ToString());
-                    eventsHandler.HandleStopTestSessionComplete(false);
+                    eventsHandler.HandleStopTestSessionComplete(testSessionInfo, false);
                 }
             });
         }

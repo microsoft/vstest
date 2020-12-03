@@ -87,15 +87,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public void StopSession()
         {
-            foreach (var kvp in this.proxyMap)
-            {
-                // TODO (copoiena): Do nothing for now because in the current implementation the
-                // testhosts are disposed of right after the test run is done. However, when we'll
-                // decide to re-use the testhosts for discovery & execution we'll perform some
-                // changes for keeping them alive indefinetely, so the responsability for killing
-                // testhosts will be with the users of the vstest.console wrapper. Then we'll need
-                // to be able to dispose of the testhosts here.
-            }
+            // TODO (copoiena): Do nothing for now because in the current implementation the
+            // testhosts are disposed of right after the test run is done. However, when we'll
+            // decide to re-use the testhosts for discovery & execution we'll perform some
+            // changes for keeping them alive indefinetely, so the responsability for killing
+            // testhosts will be with the users of the vstest.console wrapper. Then we'll need
+            // to be able to dispose of the testhosts here.
+
+            // foreach (var kvp in this.proxyMap)
+            // {
+            // }
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 proxyContainer = this.proxyMap[proxyId];
 
                 // Mark the proxy as unavailable.
-                proxyContainer.Available = false;
+                proxyContainer.IsAvailable = false;
             }
 
             return proxyContainer.Proxy;
@@ -152,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 // Get the actual proxy.
                 var proxyContainer = this.proxyMap[proxyId];
-                if (proxyContainer.Available)
+                if (proxyContainer.IsAvailable)
                 {
                     throw new InvalidOperationException(
                         string.Format(
@@ -162,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 }
 
                 // Mark the proxy as available.
-                proxyContainer.Available = true;
+                proxyContainer.IsAvailable = true;
 
                 // Re-enqueue the proxy in the available queue.
                 this.availableProxyQueue.Enqueue(proxyId);
@@ -201,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         public ProxyOperationManagerContainer(ProxyOperationManager proxy, bool available)
         {
             this.Proxy = proxy;
-            this.Available = available;
+            this.IsAvailable = available;
         }
 
         /// <summary>
@@ -212,6 +213,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Gets or sets a flag indicating if the proxy is available to do work.
         /// </summary>
-        public bool Available { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

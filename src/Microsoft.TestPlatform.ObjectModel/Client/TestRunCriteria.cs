@@ -493,7 +493,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             get
             {
                 IEnumerable<string> sources = new List<string>();
-                return this.AdapterSourceMap?.Values.Aggregate(
+                return this.AdapterSourceMap?.Values?.Aggregate(
                     sources,
                     (current, enumerable) => current.Concat(enumerable));
             }

@@ -211,21 +211,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// <summary>
         /// The stop test session start event id.
         /// </summary>
-        public const int StopTestSessionStartEventId = 0x50;
+        public const int StopTestSessionStartEventId = 0x4A;
 
         /// <summary>
         /// The stop test session stop event id.
         /// </summary>
-        public const int StopTestSessionStopEventId = 0x51;
+        public const int StopTestSessionStopEventId = 0x4B;
 
         /// <summary>
         /// The translation layer stop test session start event id.
         /// </summary>
-        public const int TranslationLayerStopTestSessionStartEventId = 0x52;
+        public const int TranslationLayerStopTestSessionStartEventId = 0x4C;
 
         /// <summary>
         /// The translation layer stop test session stop event id.
         /// </summary>
-        public const int TranslationLayerStopTestSessionStopEventId = 0x53;
+        public const int TranslationLayerStopTestSessionStopEventId = 0x4D;
     }
 }

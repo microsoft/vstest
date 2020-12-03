@@ -281,7 +281,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(runsettings))
+            if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(runsettings))
             {
                 throw new SettingsException(
                     string.Format(
@@ -449,7 +449,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 payload.RunSettings = updatedRunsettings;
             }
 
-            if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(payload.RunSettings))
+            if (InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(payload.RunSettings))
             {
                 throw new SettingsException(
                     string.Format(
@@ -473,7 +473,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         TestHostLauncher = testHostLauncher
                     };
 
-                    this.testPlatform.CreateStartTestSessionRequest(requestData, criteria, eventsHandler);
+                    this.testPlatform.StartTestSession(requestData, criteria, eventsHandler);
                 }
                 finally
                 {
