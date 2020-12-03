@@ -103,7 +103,7 @@ See the release notes [here](https://github.com/microsoft/vstest-docs/blob/maste
 
 ## $v
 
-### Issue Fixed
+### Issues Fixed
 $($issues -join "`n")
 
 See full log [here]($repoUrl/compare/$start...$tag)
