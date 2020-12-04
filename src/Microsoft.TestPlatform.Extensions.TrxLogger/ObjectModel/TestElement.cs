@@ -30,6 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected TestExecId executionId;
         protected TestExecId parentExecutionId;
         protected TestCategoryItemCollection testCategories;
+        protected WorkitemCollection workitems;
         protected TestListCategoryId catId;
 
         public TestElement(Guid id, string name, string adapter)
@@ -162,6 +163,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets the work items.
+        /// </summary>
+        public WorkitemCollection Workitems
+        {
+            get { return this.workitems; }
+
+            set
+            {
+                EqtAssert.ParameterNotNull(value, "value");
+                this.workitems = value;
+            }
+        }
+
+        /// <summary>
         /// Gets the adapter name.
         /// </summary>
         public string Adapter
@@ -230,6 +245,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             if (this.parentExecutionId != null)
                 h.SaveGuid(element, "Execution/@parentId", this.parentExecutionId.Id);
 
+            h.SaveObject(this.workitems, element, "Workitems", parameters);
+
             XmlTestStoreParameters testIdParameters = XmlTestStoreParameters.GetParameters();
             testIdParameters[TestId.IdLocationKey] = "@id";
             h.SaveObject(this.id, element, testIdParameters);
@@ -245,6 +262,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             this.executionId = TestExecId.Empty;
             this.parentExecutionId = TestExecId.Empty;
             this.testCategories = new TestCategoryItemCollection();
+            this.workitems = new WorkitemCollection();
             this.isRunnable = true;
             this.catId = TestListCategoryId.Uncategorized;
         }

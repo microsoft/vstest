@@ -736,13 +736,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue), this.testableTrxLogger.trxFile, "Wrong Trx file name");
         }
 
-
-
         /// <summary>
         /// Unit test for reading TestCategories from the TestCase which is part of test result.
         /// </summary>
         [TestMethod]
-        public void GetCustomPropertyValueFromTestCaseShouldReadCategoyrAttributesFromTestCase()
+        public void GetCustomPropertyValueFromTestCaseShouldReadCategoryAttributesFromTestCase()
         {
             ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
             TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
@@ -757,6 +755,24 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             listCategoriesExpected.Add("AsmLevel");
 
             CollectionAssert.AreEqual(listCategoriesExpected, listCategoriesActual);
+        }
+
+        [TestMethod]
+        public void GetCustomPropertyValueFromTestCaseShouldReadWorkitemAttributesFromTestCase()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+            TestProperty testProperty = TestProperty.Register("WorkItemIds", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
+
+            testCase1.SetPropertyValue(testProperty, new[] { "99999", "0" });
+
+            var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
+            List<string> listWorkitemsActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
+
+            List<string> listWorkitemsExpected = new List<string>();
+            listWorkitemsExpected.Add("99999");
+            listWorkitemsExpected.Add("0");
+
+            CollectionAssert.AreEqual(listWorkitemsExpected, listWorkitemsActual);
         }
 
         [TestMethod]

@@ -98,6 +98,22 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x.ToString()).ToArray());
         }
 
+        [TestMethod]
+        public void ToTestElementShouldAssignWorkitemOfUnitTestElement()
+        {
+            TestPlatformObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
+            TestProperty testProperty = TestProperty.Register("WorkItemIds", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
+
+            testCase.SetPropertyValue(testProperty, new[] { "3", "99999", "0" });
+
+            var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+
+            int[] expected = new[] { 0, 3, 99999 };
+
+            CollectionAssert.AreEquivalent(expected, unitTestElement.Workitems.ToArray());
+        }
+
         /// <summary>
         /// Unit test for regression when there's no test categories.
         /// </summary>
