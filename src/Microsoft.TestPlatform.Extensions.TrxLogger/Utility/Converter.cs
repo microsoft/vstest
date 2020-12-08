@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 .Select(workItem => int.Parse(workItem));
             foreach (int workItem in workItems)
             {
-                testElement.Workitems.Add(workItem);
+                testElement.WorkItems.Add(workItem);
             }
 
             return testElement;

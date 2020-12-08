@@ -6,15 +6,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System;
     using System.Globalization;
     using System.Text;
-
+    using System.Xml;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
-    #region Workitem
+    #region WorkItem
     /// <summary>
     /// Stores an int which represents a workitem
     /// </summary>
-    internal sealed class Workitem : IXmlTestStore
+    internal sealed class WorkItem : IXmlTestStore
     {
         #region Fields
         [StoreXmlField(Location = ".")]
@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// Create a new item with the workitem set
         /// </summary>
         /// <param name="workitemId">The workitem.</param>
-        public Workitem(int workitemId)
+        public WorkItem(int workitemId)
         {
             this.id = workitemId;
         }
@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         #region Properties/Methods
         /// <summary>
-        /// Gets the id for this Workitem
+        /// Gets the id for this WorkItem
         /// </summary>
         public int Id
         {
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>True if the values are the same and false otherwise.</returns>
         public override bool Equals(object other)
         {
-            Workitem otherItem = other as Workitem;
+            WorkItem otherItem = other as WorkItem;
             if (otherItem == null)
             {
                 return false;
@@ -99,30 +99,30 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     }
     #endregion
 
-    #region WorkitemCollection
+    #region WorkItemCollection
     /// <summary>
     /// A collection of ints represent the workitems
     /// </summary>
-    internal sealed class WorkitemCollection : EqtBaseCollection<Workitem>
+    internal sealed class WorkItemCollection : EqtBaseCollection<WorkItem>
     {
         #region Constructors
         /// <summary>
-        /// Creates an empty WorkitemCollection.
+        /// Creates an empty WorkItemCollection.
         /// </summary>
-        public WorkitemCollection()
+        public WorkItemCollection()
         {
         }
 
         /// <summary>
-        /// Create a new WorkitemCollection based on the int array.
+        /// Create a new WorkItemCollection based on the int array.
         /// </summary>
         /// <param name="items">Add these items to the collection.</param>
-        public WorkitemCollection(int[] items)
+        public WorkItemCollection(int[] items)
         {
             EqtAssert.ParameterNotNull(items, "items");
             foreach (int i in items)
             {
-                this.Add(new Workitem(i));
+                this.Add(new WorkItem(i));
             }
         }
 
@@ -132,24 +132,24 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Adds the workitem.
         /// </summary>
-        /// <param name="item">Workitem to be added.</param>
+        /// <param name="item">WorkItem to be added.</param>
         public void Add(int item)
         {
-            this.Add(new Workitem(item));
+            this.Add(new WorkItem(item));
         }
 
         /// <summary>
         /// Adds the workitem.
         /// </summary>
-        /// <param name="item">Workitem to be added.</param>
-        public override void Add(Workitem item)
+        /// <param name="item">WorkItem to be added.</param>
+        public override void Add(WorkItem item)
         {
             EqtAssert.ParameterNotNull(item, "item");
             base.Add(item);
         }
 
         /// <summary>
-        /// Convert the WorkitemCollection to a string.
+        /// Convert the WorkItemCollection to a string.
         /// each item is separated by a comma (,)
         /// </summary>
         /// <returns></returns>
@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             if (this.Count > 0)
             {
                 returnString.Append(",");
-                foreach (Workitem item in this)
+                foreach (WorkItem item in this)
                 {
                     returnString.Append(item);
                     returnString.Append(",");
@@ -170,7 +170,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         }
 
         /// <summary>
-        /// Convert the WorkitemCollection to an array of ints.
+        /// Convert the WorkItemCollection to an array of ints.
         /// </summary>
         /// <returns>Array of ints containing the workitems.</returns>
         public int[] ToArray()
@@ -178,7 +178,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             int[] result = new int[this.Count];
 
             int i = 0;
-            foreach (Workitem item in this)
+            foreach (WorkItem item in this)
             {
                 result[i++] = item.Id;
             }
@@ -193,7 +193,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>true if the collections contain the same items</returns>
         public override bool Equals(object obj)
         {
-            WorkitemCollection other = obj as WorkitemCollection;
+            WorkItemCollection other = obj as WorkItemCollection;
             bool result = false;
 
             if (other == null)
@@ -210,7 +210,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             }
             else
             {
-                foreach (Workitem item in this)
+                foreach (WorkItem item in this)
                 {
                     if (!other.Contains(item))
                     {
@@ -230,6 +230,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        public override void Save(XmlElement element, XmlTestStoreParameters parameters)
+        {
+            XmlPersistence xmlPersistence = new XmlPersistence();
+            xmlPersistence.SaveHashtable(this.container, element, ".", ".", null, "Workitem", parameters);
         }
         #endregion
     }

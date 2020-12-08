@@ -758,7 +758,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
-        public void GetCustomPropertyValueFromTestCaseShouldReadWorkitemAttributesFromTestCase()
+        public void GetCustomPropertyValueFromTestCaseShouldReadWorkItemAttributesFromTestCase()
         {
             ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
             TestProperty testProperty = TestProperty.Register("WorkItemIds", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
@@ -766,13 +766,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             testCase1.SetPropertyValue(testProperty, new[] { "99999", "0" });
 
             var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
-            List<string> listWorkitemsActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
+            List<string> listWorkItemsActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
 
-            List<string> listWorkitemsExpected = new List<string>();
-            listWorkitemsExpected.Add("99999");
-            listWorkitemsExpected.Add("0");
+            List<string> listWorkItemsExpected = new List<string>();
+            listWorkItemsExpected.Add("99999");
+            listWorkItemsExpected.Add("0");
 
-            CollectionAssert.AreEqual(listWorkitemsExpected, listWorkitemsActual);
+            CollectionAssert.AreEqual(listWorkItemsExpected, listWorkItemsActual);
         }
 
         [TestMethod]

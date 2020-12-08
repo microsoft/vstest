@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
 
             int[] expected = new[] { 0, 3, 99999 };
 
-            CollectionAssert.AreEquivalent(expected, unitTestElement.Workitems.ToArray());
+            CollectionAssert.AreEquivalent(expected, unitTestElement.WorkItems.ToArray());
         }
 
         /// <summary>
