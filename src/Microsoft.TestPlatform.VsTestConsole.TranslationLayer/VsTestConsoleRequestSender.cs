@@ -29,6 +29,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
+        /// <summary>
+        /// The minimum protocol version that has test session support.
+        /// </summary>
+        private const int MinimumProtocolVersionWithTestSessionSupport = 5;
+
         private readonly ICommunicationManager communicationManager;
 
         private readonly IDataSerializer dataSerializer;
@@ -38,7 +43,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 4;
+        private int protocolVersion = 5;
 
         /// <summary>
         /// Used to cancel blocking tasks associated with the vstest.console process.
@@ -440,6 +445,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestSessionEventsHandler eventsHandler,
             ITestHostLauncher testHostLauncher)
         {
+            // Make sure vstest.console knows how to handle start/stop test session messages.
+            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+            // that will never come.
+            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            {
+                eventsHandler?.HandleStartTestSessionComplete(null);
+                return null;
+            }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
@@ -533,6 +547,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestSessionEventsHandler eventsHandler,
             ITestHostLauncher testHostLauncher)
         {
+            // Make sure vstest.console knows how to handle start/stop test session messages.
+            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+            // that will never come.
+            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            {
+                eventsHandler?.HandleStartTestSessionComplete(null);
+                return await Task.FromResult((TestSessionInfo)null);
+            }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("VsTestConsoleRequestSender.StartTestSession: Starting test session.");
@@ -619,6 +642,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
         {
+            // Make sure vstest.console knows how to handle start/stop test session messages.
+            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+            // that will never come.
+            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            {
+                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
+                return false;
+            }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
@@ -692,6 +724,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
         {
+            // Make sure vstest.console knows how to handle start/stop test session messages.
+            // Bail out if it doesn't, otherwise we'll hang waiting for a reply from the console
+            // that will never come.
+            if (this.protocolVersion < MinimumProtocolVersionWithTestSessionSupport)
+            {
+                eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
+                return await Task.FromResult(false);
+            }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("VsTestConsoleRequestSender.StopTestSession: Stop test session.");
