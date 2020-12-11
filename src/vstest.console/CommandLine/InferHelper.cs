@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Architecture from sources.
         /// </summary>
-        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture)
+        public Architecture AutoDetectArchitecture(IList<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture)
         {
             var architecture = defaultArchitecture;
             try
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Framework from sources.
         /// </summary>
-        public Framework AutoDetectFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
+        public Framework AutoDetectFramework(IList<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
         {
             Framework framework = Framework.DefaultFramework;
             try

@@ -62,6 +62,24 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Start Test Session operation was aborted..
+        /// </summary>
+        public static string AbortedStartTestSession {
+            get {
+                return ResourceManager.GetString("AbortedStartTestSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Stop Test Session operation was aborted..
+        /// </summary>
+        public static string AbortedStopTestSession {
+            get {
+                return ResourceManager.GetString("AbortedStopTestSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The active Test Run Attachments Processing was aborted..
         /// </summary>
         public static string AbortedTestRunAttachmentsProcessing {

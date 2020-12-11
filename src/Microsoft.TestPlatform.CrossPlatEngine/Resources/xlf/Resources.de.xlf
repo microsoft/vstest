@@ -217,6 +217,21 @@
         <target state="translated">{0} Beim Erstellen des Ordners "TestResults" am angegebenen Speicherort wurde der Zugriff verweigert. Sie erhalten diese Ausnahme, weil Sie "vstest.console.exe" in einem Ordner ausführen, für den Schreibzugriff erforderlich ist. So beheben Sie das Problem: Führen Sie "vstest.console.exe" in einem Ordner aus, für den Sie Schreibberechtigungen besitzen.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoAvailableProxyForDeque">
+        <source>Could not find an available proxy to deque.</source>
+        <target state="new">Could not find an available proxy to deque.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuchProxyId">
+        <source>Proxy with id {0} is not managed by the current session manager.</source>
+        <target state="new">Proxy with id {0} is not managed by the current session manager.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProxyIsAlreadyAvailable">
+        <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
+        <target state="new">Proxy with id {0} is already available and cannot be re-enqueued.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

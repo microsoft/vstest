@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         private readonly DesignModeClient designModeClient;
 
-        private readonly int protocolVersion = 4;
+        private readonly int protocolVersion = 5;
 
         private readonly AutoResetEvent complateEvent;
 
@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
         { 
         
-            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 4 };
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 5 };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);

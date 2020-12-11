@@ -66,6 +66,16 @@
         <target state="translated">Die Verarbeitung aktiver Testlaufanlagen wurde abgebrochen.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortedStartTestSession">
+        <source>The Start Test Session operation was aborted.</source>
+        <target state="new">The Start Test Session operation was aborted.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AbortedStopTestSession">
+        <source>The Stop Test Session operation was aborted.</source>
+        <target state="new">The Stop Test Session operation was aborted.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
