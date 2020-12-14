@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using CommonResources = Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     /// <summary>
     /// Discovers test extensions in a directory.
@@ -108,8 +109,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="pluginInfos">
         /// Test plugins collection to add to.
         /// </param>
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We would like to continue discovering all plugins even if some dll in Extensions folder is not able to be load properly")]
         private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
             string[] files,
             Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
@@ -167,13 +166,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             Type extension = typeof(TExtension);
 
             try
-            {           
-                var customAttribute = CustomAttributeExtensions.GetCustomAttribute(assembly, typeof(TypesToLoadAttribute)) as TypesToLoadAttribute;
-                if (customAttribute != null)
-                {
-                    types = customAttribute.Types; 
-                }
-                else
+            {
+                types = TypesToLoadUtilities.GetTypesToLoad(assembly);
+
+                if (!types.Any())
                 {
                     types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract);
                 }

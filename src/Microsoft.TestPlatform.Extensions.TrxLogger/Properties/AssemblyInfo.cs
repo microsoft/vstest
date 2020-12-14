@@ -14,7 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.TrxLogger")]
 [assembly: AssemblyTrademark("")]
-[assembly: TypesToLoad(typeof(TrxLogger))]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible
