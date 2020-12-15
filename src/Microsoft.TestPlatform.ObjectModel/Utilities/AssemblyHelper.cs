@@ -346,11 +346,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             ValidateArg.NotNull(assembly, nameof(assembly));
             ValidateArg.NotNullOrWhiteSpace(fullyQualifiedName, nameof(fullyQualifiedName));
 
-            var attributes = assembly
+            if(assembly.GetType(fullyQualifiedName) is Type attribute)
+            {
+                return assembly.GetCustomAttributes(attribute);
+            }
+
+            return assembly
                 .GetCustomAttributes()
                 .Where(i => i.GetType().FullName == fullyQualifiedName);
-
-            return attributes;
         }
     }
 }
