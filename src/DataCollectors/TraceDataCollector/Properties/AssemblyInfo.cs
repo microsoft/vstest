@@ -4,6 +4,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+using Microsoft.VisualStudio.Coverage;
+using Microsoft.VisualStudio.TestPlatform;
+
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
@@ -20,3 +23,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("b06e12a5-025f-42aa-8f09-c6666c65ece7")]
+
+[assembly: TestExtensionTypes(typeof(DynamicCoverageDataCollector))]
