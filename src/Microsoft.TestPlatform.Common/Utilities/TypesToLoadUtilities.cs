@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
     internal static class TypesToLoadUtilities
     {
-        public const string TypesToLoadAttributeFullName = "Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities.TypesToLoadAttribute";
+        public const string TypesToLoadAttributeFullName = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesAttribute";
 
         internal static IEnumerable<Type> GetTypesToLoad(Assembly assembly)
         {
