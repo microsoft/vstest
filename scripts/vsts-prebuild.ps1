@@ -44,6 +44,6 @@ $microsoftFakesVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatf
 $FakesPackageDir = Join-Path $TP_ROOT_DIR "packages\Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$microsoftFakesVersion\contentFiles"
 Write-Host "##vso[task.setvariable variable=FakesPackageDir;]$FakesPackageDir"
 
-$codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
-$TraceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib"
+$codeCoverageExternalsVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+$TraceDataCollectorPackagesDir = Join-Path $TP_ROOT_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib"
 Write-Host "##vso[task.setvariable variable=TraceDataCollectorPackagesDir;]$TraceDataCollectorPackagesDir"
