@@ -44,8 +44,8 @@
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\vcruntime140_1.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\VanguardInstrumentationProfiler_x64.config" target="build\netstandard1.0\CodeCoverage\amd64\" />
 
-    <file src="$FakesPackageDir$\MicrosoftInstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll"	target="build\netstandard1.0\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
-    <file src="$FakesPackageDir$\MicrosoftInstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll"	target="build\netstandard1.0\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll"	target="build\netstandard1.0\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll"	target="build\netstandard1.0\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
     
     <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp1.0\" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net45\" />
