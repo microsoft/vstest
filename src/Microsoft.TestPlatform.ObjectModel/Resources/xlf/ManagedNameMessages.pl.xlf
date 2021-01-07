@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="ErrorIncompleteManagedName">
         <source>ManagedName is incomplete</source>
-        <target state="translated">Wartość ManagedName jest niepełna</target>
+        <target state="translated">Wartość ManagedName jest niekompletna</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
         <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
-        <target state="translated">Nieoczekiwane znaki za końcem wartości ManagedName (pozycja: {0})</target>
+        <target state="translated">Nieoczekiwane znaki po zakończeniu wartości ManagedName (pozycja: {0})</target>
         <note>{0} is the position of unexpected characters</note>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">

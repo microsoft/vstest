@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="ErrorIncompleteManagedName">
         <source>ManagedName is incomplete</source>
-        <target state="translated">ManagedName eksik</target>
+        <target state="translated">ManagedName tamamlanmadı</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
@@ -24,12 +24,12 @@
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
         <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
-        <target state="translated">ManagedName’den sonra beklenmeyen karakterler (konum: {0})</target>
+        <target state="translated">ManagedName'den sonra beklenmeyen karakterler var (konum: {0})</target>
         <note>{0} is the position of unexpected characters</note>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">
         <source>Whitespace is not valid in a ManagedName (pos: {0})</source>
-        <target state="translated">ManagedName’de boşluk geçersizdir (konum: {0})</target>
+        <target state="translated">ManagedName'de boşluk geçersiz (konum: {0})</target>
         <note>{0} is the position of invalid whitespace</note>
       </trans-unit>
     </body>

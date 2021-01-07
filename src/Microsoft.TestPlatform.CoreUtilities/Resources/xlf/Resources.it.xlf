@@ -162,7 +162,7 @@
       </trans-unit>
       <trans-unit id="MethodNotImplementedOnPlatform">
         <source>'{0}.{1}' is not implemented on this platform!</source>
-        <target state="new">'{0}.{1}' is not implemented on this platform!</target>
+        <target state="translated">'{0}.{1}' non è implementato in questa piattaforma.</target>
         <note>'{className}.{methodName}' is not implemented on this platform!
 
 Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>

@@ -219,17 +219,17 @@
       </trans-unit>
       <trans-unit id="NoAvailableProxyForDeque">
         <source>Could not find an available proxy to deque.</source>
-        <target state="new">Could not find an available proxy to deque.</target>
+        <target state="translated">Nepovedlo se najít dostupný proxy server, který se má odebrat z fronty.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoSuchProxyId">
         <source>Proxy with id {0} is not managed by the current session manager.</source>
-        <target state="new">Proxy with id {0} is not managed by the current session manager.</target>
+        <target state="translated">Aktuální správce relace nespravuje proxy s ID {0}.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProxyIsAlreadyAvailable">
         <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
-        <target state="new">Proxy with id {0} is already available and cannot be re-enqueued.</target>
+        <target state="translated">Proxy s ID {0} je už k dispozici a nedá se znovu zařadit do fronty.</target>
         <note></note>
       </trans-unit>
     </body>
