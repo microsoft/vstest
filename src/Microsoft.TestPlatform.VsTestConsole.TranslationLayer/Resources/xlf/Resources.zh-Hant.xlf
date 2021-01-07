@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-627307614">
+  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="-627307614">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">23</count>
@@ -68,12 +68,12 @@
       </trans-unit>
       <trans-unit id="AbortedStartTestSession">
         <source>The Start Test Session operation was aborted.</source>
-        <target state="new">The Start Test Session operation was aborted.</target>
+        <target state="translated">開始測試工作階段作業已中止。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="AbortedStopTestSession">
         <source>The Stop Test Session operation was aborted.</source>
-        <target state="new">The Stop Test Session operation was aborted.</target>
+        <target state="translated">停止測試工作階段作業已中止。</target>
         <note></note>
       </trans-unit>
     </body>

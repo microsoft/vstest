@@ -219,17 +219,17 @@
       </trans-unit>
       <trans-unit id="NoAvailableProxyForDeque">
         <source>Could not find an available proxy to deque.</source>
-        <target state="new">Could not find an available proxy to deque.</target>
+        <target state="translated">No se encontró ningún proxy disponible para quitar de la cola.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoSuchProxyId">
         <source>Proxy with id {0} is not managed by the current session manager.</source>
-        <target state="new">Proxy with id {0} is not managed by the current session manager.</target>
+        <target state="translated">El administrador de la sesión actual no administra el proxy con el identificador {0}.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProxyIsAlreadyAvailable">
         <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
-        <target state="new">Proxy with id {0} is already available and cannot be re-enqueued.</target>
+        <target state="translated">El proxy con el identificador {0} ya está disponible y no se puede volver a poner en cola.</target>
         <note></note>
       </trans-unit>
     </body>

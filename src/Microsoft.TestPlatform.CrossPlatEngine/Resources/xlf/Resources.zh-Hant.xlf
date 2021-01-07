@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-1605532954">
+  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="-1605532954">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">228</count>
@@ -219,17 +219,17 @@
       </trans-unit>
       <trans-unit id="NoAvailableProxyForDeque">
         <source>Could not find an available proxy to deque.</source>
-        <target state="new">Could not find an available proxy to deque.</target>
+        <target state="translated">找不到任何要排除於佇列外的 Proxy。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoSuchProxyId">
         <source>Proxy with id {0} is not managed by the current session manager.</source>
-        <target state="new">Proxy with id {0} is not managed by the current session manager.</target>
+        <target state="translated">識別碼為 {0} 的 Proxy 並非由目前的工作階段管理員所管理。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ProxyIsAlreadyAvailable">
         <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
-        <target state="new">Proxy with id {0} is already available and cannot be re-enqueued.</target>
+        <target state="translated">識別碼為 {0} 的 Proxy 已可供使用，但無法重新加入佇列。</target>
         <note></note>
       </trans-unit>
     </body>
