@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
             this.consoleWrapper.DiscoverTests(this.testSources, null, options, new Mock<ITestDiscoveryEventsHandler2>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, options, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, options, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
         }
 
         [TestMethod]
@@ -153,7 +153,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleWrapper.DiscoverTests(this.testSources, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
         }
 
         [TestMethod]
@@ -161,7 +161,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleWrapper.DiscoverTests(this.testSources, null, new Mock<ITestDiscoveryEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
         }
 
         [TestMethod]
@@ -172,7 +172,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var exception = Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
             Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", exception.Message);
-            this.mockRequestSender.Verify(rs => rs.DiscoverTests(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
+            this.mockRequestSender.Verify(rs => rs.DiscoverTests(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
         }
 
         [TestMethod]

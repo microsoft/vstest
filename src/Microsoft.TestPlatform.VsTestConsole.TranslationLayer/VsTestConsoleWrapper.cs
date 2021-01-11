@@ -220,11 +220,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.testPlatformEventSource.TranslationLayerDiscoveryStart();
             this.EnsureInitialized();
-            // TODO (copoiena): Add session info as a parameter.
             this.requestSender.DiscoverTests(
                 sources,
                 discoverySettings,
                 options,
+                testSessionInfo,
                 discoveryEventsHandler);
         }
 
@@ -625,7 +625,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 discoverySettings,
                 options,
-                // TODO(copoiena): Add session info as a parameter.
+                testSessionInfo,
                 discoveryEventsHandler);
         }
 

@@ -284,7 +284,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Close()
         {
-            this.ProxyOperationManager.Close();
+            if (this.testSessionInfo == null)
+            {
+                this.ProxyOperationManager.Close();
+                return;
+            }
+
+            TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.ProxyOperationManager.Id);
         }
 
         /// <inheritdoc/>
@@ -302,12 +308,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
-            if (this.testSessionInfo != null)
-            {
-                // TODO (copoiena): Is returning the proxy to the pool here enough ?
-                TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.ProxyOperationManager.Id);
-            }
-
             this.baseTestRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
         }
 

@@ -188,6 +188,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -199,6 +200,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
+                testSessionInfo,
                 eventHandler);
         }
 
@@ -207,6 +209,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -218,6 +221,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
+                testSessionInfo,
                 eventHandler);
         }
 
@@ -963,6 +967,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
@@ -973,7 +978,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         Sources = sources,
                         RunSettings = runSettings,
-                        TestPlatformOptions = options
+                        TestPlatformOptions = options,
+                        TestSessionInfo = testSessionInfo
                     },
                     this.protocolVersion);
                 var isDiscoveryComplete = false;
@@ -1052,6 +1058,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
@@ -1062,7 +1069,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         Sources = sources,
                         RunSettings = runSettings,
-                        TestPlatformOptions = options
+                        TestPlatformOptions = options,
+                        TestSessionInfo = testSessionInfo
                     },
                     this.protocolVersion);
                 var isDiscoveryComplete = false;

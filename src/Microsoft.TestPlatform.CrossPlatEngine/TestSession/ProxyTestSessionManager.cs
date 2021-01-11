@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             ITestSessionEventsHandler eventsHandler)
         {
             var testSessionInfo = new TestSessionInfo();
-            Task[] taskList = new Task[this.parallelLevel];
+            var taskList = new Task[this.parallelLevel];
 
             // Create all the proxies in parallel, one task per proxy.
             for (int i = 0; i < this.parallelLevel; ++i)
@@ -87,16 +87,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public void StopSession()
         {
-            // TODO (copoiena): Do nothing for now because in the current implementation the
-            // testhosts are disposed of right after the test run is done. However, when we'll
-            // decide to re-use the testhosts for discovery & execution we'll perform some
-            // changes for keeping them alive indefinetely, so the responsability for killing
-            // testhosts will be with the users of the vstest.console wrapper. Then we'll need
-            // to be able to dispose of the testhosts here.
+            int index = 0;
+            var taskList = new Task[this.proxyMap.Count];
 
-            // foreach (var kvp in this.proxyMap)
-            // {
-            // }
+            // Dispose of all the proxies in parallel, one task per proxy.
+            foreach (var kvp in this.proxyMap)
+            {
+                taskList[index++] = Task.Factory.StartNew(() =>
+                {
+                    // Initiate the end session handshake with the underlying testhost.
+                    kvp.Value.Proxy.Close();
+                });
+            }
+
+            // Wait for proxy disposal to be over.
+            Task.WaitAll(taskList);
         }
 
         /// <summary>
