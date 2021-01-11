@@ -37,10 +37,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testSettings">
         /// Test configuration provided by user.
         /// </param>
-        public DiscoveryCriteria(IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, string testSettings)
-            : this(sources, frequencyOfDiscoveredTestsEvent, TimeSpan.MaxValue, testSettings)
-        {
-        }
+        public DiscoveryCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfDiscoveredTestsEvent,
+            string testSettings)
+            : this(
+                  sources,
+                  frequencyOfDiscoveredTestsEvent,
+                  TimeSpan.MaxValue,
+                  testSettings)
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
@@ -57,7 +63,41 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="runSettings">
         /// Run Settings for the discovery.
         /// </param>
-        public DiscoveryCriteria(IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, TimeSpan discoveredTestEventTimeout, string runSettings)
+        public DiscoveryCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfDiscoveredTestsEvent,
+            TimeSpan discoveredTestEventTimeout,
+            string runSettings)
+            : this(
+                sources,
+                frequencyOfDiscoveredTestsEvent,
+                discoveredTestEventTimeout,
+                runSettings,
+                null)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
+        /// </summary>
+        /// <param name="sources">
+        /// Sources from which the tests should be discovered
+        /// </param>
+        /// <param name="frequencyOfDiscoveredTestsEvent">
+        /// Frequency of discovered test event. This is used for batching discovered tests.
+        /// </param>
+        /// <param name="discoveredTestEventTimeout">
+        /// Timeout that triggers the discovered test event regardless of cache size.
+        /// </param>
+        /// <param name="runSettings">
+        /// Run Settings for the discovery.
+        /// </param>
+        /// <param name="testSessionInfo">The test session info object.</param>
+        public DiscoveryCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfDiscoveredTestsEvent,
+            TimeSpan discoveredTestEventTimeout,
+            string runSettings,
+            TestSessionInfo testSessionInfo)
         {
             ValidateArg.NotNullOrEmpty(sources, "sources");
             if (frequencyOfDiscoveredTestsEvent <= 0)
@@ -78,6 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.DiscoveredTestEventTimeout = discoveredTestEventTimeout;
 
             this.RunSettings = runSettings;
+            this.TestSessionInfo = testSessionInfo;
         }
 
         /// <summary>
@@ -136,6 +177,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Gets or sets the criteria for filtering test cases.
         /// </summary>
         [DataMember]
-        public string TestCaseFilter {get; set;}
+        public string TestCaseFilter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the test session info object.
+        /// </summary>
+        public TestSessionInfo TestSessionInfo { get; set; }
     }
 }

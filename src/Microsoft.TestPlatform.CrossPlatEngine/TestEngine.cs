@@ -79,6 +79,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () =>
             {
+                if (discoveryCriteria.TestSessionInfo != null)
+                {
+                    try
+                    {
+                        // In case we have an active test session, we always prefer the already
+                        // created proxies instead of the ones that need to be created on the spot.
+                        return new ProxyDiscoveryManager(
+                            discoveryCriteria.TestSessionInfo);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        // If the proxy creation process based on test session info failed, then
+                        // we'll proceed with the normal creation process as if no test session
+                        // info was passed in in the first place.
+                        // 
+                        // WARNING: This should not normally happen and it raises questions
+                        // regarding the test session pool operation and consistency.
+                        EqtTrace.Warning("ProxyDiscoveryManager failed: {0}", ex.ToString());
+                    }
+                }
+
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 

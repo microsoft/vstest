@@ -25,16 +25,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
     {
-        private ProxyOperationManager proxyOperationManager;
         private readonly ITestRuntimeProvider testHostManager;
-        private IDataSerializer dataSerializer;
-        private bool isCommunicationEstablished;
-        private IRequestData requestData;
-        private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
-        private bool skipDefaultAdapters;
         private readonly IFileHelper fileHelper;
 
+        private IDataSerializer dataSerializer;
+        private IRequestData requestData;
+        private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
+        private TestSessionInfo testSessionInfo = null;
+        private ProxyOperationManager proxyOperationManager;
+        private bool isCommunicationEstablished;
+        private bool skipDefaultAdapters;
+
         #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// </summary>
+        /// 
+        /// <param name="testSessionInfo">The test session info.</param>
+        public ProxyDiscoveryManager(TestSessionInfo testSessionInfo)
+        {
+            // Filling in test session info and proxy information.
+            this.testSessionInfo = testSessionInfo;
+            this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(this.testSessionInfo);
+
+            this.testHostManager = this.proxyOperationManager.TestHostManager;
+            this.dataSerializer = JsonDataSerializer.Instance;
+            this.isCommunicationEstablished = false;
+            this.requestData = this.proxyOperationManager.RequestData;
+            this.fileHelper = new FileHelper();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
@@ -55,9 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                   testHostManager,
                   JsonDataSerializer.Instance,
                   new FileHelper())
-        {
-            this.testHostManager = testHostManager;
-        }
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
