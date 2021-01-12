@@ -15,7 +15,7 @@ jobs:
           github_token: "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}"
           ado_organization: "devdiv"
           ado_project: "DevDiv"
-          ado_area_path: "DevDiv\NET Developer Experience\Testing Platforms\TestPlatform"
+          ado_area_path: "DevDiv\NET Developer Experience\\Testing Platforms\\TestPlatform"
           ado_iteration_path: "DevDiv"
           ado_wit: "User Story"
           ado_new_state: "New"
