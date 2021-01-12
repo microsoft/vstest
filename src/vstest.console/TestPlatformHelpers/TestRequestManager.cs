@@ -202,7 +202,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 discoveryPayload.Sources,
                 batchSize,
                 this.commandLineOptions.TestStatsEventTimeout,
-                runsettings)
+                runsettings,
+                discoveryPayload.TestSessionInfo)
             {
                 TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
                     ?? testCaseFilterFromRunsettings

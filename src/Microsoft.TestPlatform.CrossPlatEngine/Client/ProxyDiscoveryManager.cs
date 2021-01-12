@@ -175,7 +175,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Close()
         {
-            this.proxyOperationManager.Close();
+            if (this.testSessionInfo == null)
+            {
+                this.proxyOperationManager.Close();
+                return;
+            }
+
+            TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.proxyOperationManager.Id);
         }
 
         /// <inheritdoc/>

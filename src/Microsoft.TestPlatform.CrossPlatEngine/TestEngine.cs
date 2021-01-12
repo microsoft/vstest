@@ -252,7 +252,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     hostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
                 }
 
-                var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
+                var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager)
+                {
+                    CloseConnectionOnOperationComplete = false
+                };
+
 
                 return isDataCollectorEnabled
                     ? new ProxyOperationManagerWithDataCollection(

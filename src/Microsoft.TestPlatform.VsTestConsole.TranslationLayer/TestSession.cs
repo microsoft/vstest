@@ -75,11 +75,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
-            // TODO (copoiena): Hook into the wrapper and pass session info here.
             this.consoleWrapper.DiscoverTests(
                 sources,
                 discoverySettings,
                 options,
+                this.testSessionInfo,
                 discoveryEventsHandler);
         }
 
@@ -233,11 +233,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
-            // TODO (copoiena): Hook into the wrapper and pass session info here.
             await this.consoleWrapper.DiscoverTestsAsync(
                 sources,
                 discoverySettings,
                 options,
+                this.testSessionInfo,
                 discoveryEventsHandler);
         }
 

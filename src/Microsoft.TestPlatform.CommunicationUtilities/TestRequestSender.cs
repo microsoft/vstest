@@ -127,6 +127,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
         }
 
+        public bool CloseConnectionOnOperationComplete { get; set; } = true;
+
         /// <inheritdoc />
         public int InitializeCommunication()
         {
@@ -703,6 +705,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void SetOperationComplete()
         {
+            if (!this.CloseConnectionOnOperationComplete)
+            {
+                return;
+            }
+
             // Complete the currently ongoing operation (Discovery/Execution)
             if (EqtTrace.IsVerboseEnabled)
             {

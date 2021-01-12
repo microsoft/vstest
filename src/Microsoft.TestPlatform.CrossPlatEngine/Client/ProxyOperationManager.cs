@@ -309,6 +309,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     var timeout = 100;
                     EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
                     this.testHostExited.Wait(timeout);
+
+                    // Closing the communication channel.
+                    this.RequestSender.Close();
                 }
             }
             catch (Exception ex)
