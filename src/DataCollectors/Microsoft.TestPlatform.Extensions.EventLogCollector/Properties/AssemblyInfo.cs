@@ -3,8 +3,9 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+
 using Microsoft.TestPlatform.Extensions.EventLogCollector;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
@@ -14,7 +15,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 [assembly: AssemblyCopyright("© Microsoft Corporation. All rights reserved.")]
 [assembly: AssemblyProduct("Microsoft.TestPlatform.Extensions.EventLogCollector")]
 [assembly: AssemblyTrademark("")]
-[assembly: TypesToLoad(typeof(EventLogDataCollector))]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -23,3 +23,5 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("4c1f0d81-67a9-4bf3-a006-615ab4a7fcd6")]
+
+[assembly: TestExtensionTypes(typeof(EventLogDataCollector))]

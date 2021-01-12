@@ -24,12 +24,12 @@
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
         <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
-        <target state="translated">Caractères inattendus après la fin du ManagedName (pos : {0})</target>
+        <target state="translated">Caractères inattendus après la fin de ManagedName (pos. : {0})</target>
         <note>{0} is the position of unexpected characters</note>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">
         <source>Whitespace is not valid in a ManagedName (pos: {0})</source>
-        <target state="translated">Les espaces blancs ne sont pas valides dans un ManagedName (pos : {0})</target>
+        <target state="translated">Les espaces blancs ne sont pas valides dans un ManagedName (pos. : {0})</target>
         <note>{0} is the position of invalid whitespace</note>
       </trans-unit>
     </body>

@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="ErrorIncompleteManagedName">
         <source>ManagedName is incomplete</source>
-        <target state="translated">ManagedName이 불완전합니다.</target>
+        <target state="translated">ManagedName이 불완전함</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">

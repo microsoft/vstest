@@ -40,10 +40,10 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Running in VS/IDE. Use artifacts directory as root.
                 // Get root directory from test assembly output directory
-                TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
+                TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
             }
 
-            this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
+            this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, $@"test{Path.DirectorySeparatorChar}TestAssets");
 
             // There is an assumption that integration tests will always run from a source enlistment.
             // Need to remove this assumption when we move to a CDP.
@@ -97,7 +97,6 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-               
                 // this used to switch to src\package\package\bin\based on whether 
                 // this is running in cli, but that's a bad idea, the console there does not have 
                 // a runtime config and will fail to start with error testhostpolicy.dll not found
@@ -116,6 +115,11 @@ namespace Microsoft.TestPlatform.TestUtilities
                 return publishDirectory;
             }
         }
+
+        /// <summary>
+        /// Gets the extensions directory for <c>vstest.console</c> package.
+        /// </summary>
+        public string ExtensionsDirectory => Path.Combine(PublishDirectory, "Extensions");
 
         /// <summary>
         /// Gets the target framework.
@@ -264,7 +268,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private static Dictionary<string, string> GetDependencies(string testPlatformRoot)
         {
-            var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props");
+            var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props".Replace('\\', Path.DirectorySeparatorChar));
             var dependencyProps = new Dictionary<string, string>();
             if (!File.Exists(dependencyPropsFile))
             {

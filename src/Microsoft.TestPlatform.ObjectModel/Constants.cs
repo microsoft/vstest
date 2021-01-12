@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The default protocol version
         /// </summary>
-        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 4 };
+        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 5 };
 
         /// <summary>
         /// The minimum protocol version that has debug support
