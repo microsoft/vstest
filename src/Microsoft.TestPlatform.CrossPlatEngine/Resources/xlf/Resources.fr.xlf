@@ -232,6 +232,11 @@
         <target state="translated">Le proxy ayant l'ID {0} est déjà disponible et ne peut pas être empilé à nouveau.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -170,32 +170,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             this.AddExtensionAssemblies(testSessionCriteria.RunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
-
-            // Update extension assemblies from source when design mode is false.
-            //
-            // TODO (copoiena): Is it possible for this code to run if we're not in design mode ?
-            // An use case for this would be when running tests with "dotnet test". Usually there's
-            // a build involved then.
             if (!runConfiguration.DesignMode)
             {
                 return;
             }
 
-            // Initialize loggers.
-            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
-            loggerManager.Initialize(testSessionCriteria.RunSettings);
-
-            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
-            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testSessionCriteria.RunSettings);
-
-            testHostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
-
-            if (testSessionCriteria.TestHostLauncher != null)
-            {
-                testHostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
-            }
-
-            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testHostManager, testSessionCriteria);
+            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
             if (testSessionManager == null)
             {
                 // The test session manager is null because the combination of runsettings and
@@ -234,11 +214,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
         private void ThrowExceptionIfTestHostManagerIsNull(
             ITestRuntimeProvider testHostManager,
-            string settingXml)
+            string settingsXml)
         {
             if (testHostManager == null)
             {
-                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
+                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingsXml);
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
             }
         }

@@ -213,4 +213,7 @@
   <data name="ProxyIsAlreadyAvailable" xml:space="preserve">
     <value>Proxy with id {0} is already available and cannot be re-enqueued.</value>
   </data>
+  <data name="NoTestHostProviderFound" xml:space="preserve">
+    <value>No suitable test runtime provider found for this run.</value>
+  </data>
 </root>

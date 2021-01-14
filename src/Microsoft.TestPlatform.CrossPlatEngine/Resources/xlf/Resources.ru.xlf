@@ -232,6 +232,11 @@
         <target state="translated">Прокси-сервер с идентификатором {0} уже доступен и не может быть повторно поставлен в очередь.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
@@ -60,17 +61,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             {
                 taskList[i] = Task.Factory.StartNew(() =>
                 {
-                    // Create the proxy.
-                    var operationManagerProxy = this.CreateProxy();
+                    try
+                    {
+                        // Create and cache the proxy.
+                        var operationManagerProxy = this.proxyCreator();
 
-                    // Initialize the proxy.
-                    operationManagerProxy.Initialize(this.skipDefaultAdapters);
+                        // Initialize the proxy.
+                        operationManagerProxy.Initialize(this.skipDefaultAdapters);
 
-                    // Start the test host associated to the proxy.
-                    operationManagerProxy.SetupChannel(
-                        criteria.Sources,
-                        criteria.RunSettings,
-                        eventsHandler);
+                        // Start the test host associated to the proxy.
+                        operationManagerProxy.SetupChannel(
+                            criteria.Sources,
+                            criteria.RunSettings,
+                            eventsHandler);
+
+                        this.EnqueueNewProxy(operationManagerProxy);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log & silently eat up the exception. It's a valid course of action to
+                        // just forfeit proxy creation. This means that anyone wishing to get a
+                        // proxy operation manager would have to create their own, on the spot,
+                        // instead of getting one already created, and this case is handled
+                        // gracefully already.
+                        EqtTrace.Error(
+                            "ProxyTestSessionManager.StartSession: Cannot create proxy. Error: {0}",
+                            ex.ToString());
+                        return;
+                    }
                 });
             }
 
@@ -175,21 +193,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
         }
 
-        private ProxyOperationManager CreateProxy()
+        private void EnqueueNewProxy(ProxyOperationManager operationManagerProxy)
         {
-            // Invoke the proxy creator.
-            var proxy = this.proxyCreator();
-
             lock (this.lockObject)
             {
                 // Add the proxy to the map.
-                this.proxyMap.Add(proxy.Id, new ProxyOperationManagerContainer(proxy, available: true));
+                this.proxyMap.Add(
+                    operationManagerProxy.Id,
+                    new ProxyOperationManagerContainer(
+                        operationManagerProxy,
+                        available: true));
 
                 // Enqueue the proxy id in the available queue.
-                this.availableProxyQueue.Enqueue(proxy.Id);
+                this.availableProxyQueue.Enqueue(operationManagerProxy.Id);
             }
-
-            return proxy;
         }
     }
 

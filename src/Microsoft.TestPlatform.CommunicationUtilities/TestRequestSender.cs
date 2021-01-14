@@ -705,6 +705,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void SetOperationComplete()
         {
+            // When sharing the testhost between discovery and execution we must keep the
+            // testhost alive after completing the operation it was spawned for. As such we
+            // suppress the test request sender channel close taking place here. This channel
+            // will be closed when the test session owner decides to dispose of the test session
+            // object.
             if (!this.CloseConnectionOnOperationComplete)
             {
                 return;

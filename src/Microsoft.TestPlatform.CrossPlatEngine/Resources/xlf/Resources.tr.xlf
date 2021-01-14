@@ -232,6 +232,11 @@
         <target state="translated">{0} kimliğine sahip ara sunucu zaten var ve yeniden kuyruğa alınamaz.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

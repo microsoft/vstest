@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -217,7 +218,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public IProxyTestSessionManager GetTestSessionManager(
             IRequestData requestData,
-            ITestRuntimeProvider testHostManager,
             StartTestSessionCriteria testSessionCriteria)
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
@@ -245,8 +245,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Func<ProxyOperationManager> proxyCreator = () =>
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
-                hostManager?.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
+                if (hostManager == null)
+                {
+                    throw new TestPlatformException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.Resources.NoTestHostProviderFound));
+                }
 
+                hostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
                 if (testSessionCriteria.TestHostLauncher != null)
                 {
                     hostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
@@ -257,7 +264,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     CloseConnectionOnOperationComplete = false
                 };
 
-
                 return isDataCollectorEnabled
                     ? new ProxyOperationManagerWithDataCollection(
                         requestData,
@@ -267,10 +273,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                             requestData,
                             testSessionCriteria.RunSettings,
                             testSessionCriteria.Sources))
+                        {
+                            CloseRequestSenderChannelOnProxyClose = true
+                        }
                     : new ProxyOperationManager(
                         requestData,
                         requestSender,
-                        hostManager);
+                        hostManager)
+                        {
+                            CloseRequestSenderChannelOnProxyClose = true
+                        };
             };
 
             return new ProxyTestSessionManager(parallelLevel, proxyCreator);

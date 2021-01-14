@@ -120,6 +120,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Gets or sets the cancellation token source.
         /// </summary>
         public CancellationTokenSource CancellationTokenSource { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating if the test request sender communication channel should
+        /// be closed when the proxy operation manager is closed.
+        /// </summary>
+        public bool CloseRequestSenderChannelOnProxyClose { get; set; } = false;
         #endregion
 
         #region IProxyOperationManager implementation.
@@ -310,8 +316,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
                     this.testHostExited.Wait(timeout);
 
-                    // Closing the communication channel.
-                    this.RequestSender.Close();
+                    // In compatibility mode (no test session used) we don't share the testhost
+                    // between test discovery and test run. The testhost is closed upon
+                    // successfully completing the operation it was spawned for, and so the test
+                    // request sender communication channel is closed then as well. As such, it's
+                    // not a good idea to double close the communication channel here.
+                    //
+                    // In contrast, the new workflow (using test sessions) means we should keep
+                    // the testhost alive until explicitly closed by the test session owner. For
+                    // this we supressed the normal test request sender close and we have to close
+                    // that communication channel here.
+                    if (this.CloseRequestSenderChannelOnProxyClose)
+                    {
+                        // Closing the communication channel.
+                        this.RequestSender.Close();
+                    }
                 }
             }
             catch (Exception ex)

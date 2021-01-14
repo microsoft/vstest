@@ -250,6 +250,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No suitable test runtime provider found for this run..
+        /// </summary>
+        internal static string NoTestHostProviderFound {
+            get {
+                return ResourceManager.GetString("NoTestHostProviderFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No test matches the given testcase filter `{0}` in {1}.
         /// </summary>
         internal static string NoTestsAvailableForGivenTestCaseFilter {
