@@ -57,6 +57,10 @@
       <Version>$(CodeCoverageExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Coverage.Interprocess">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>

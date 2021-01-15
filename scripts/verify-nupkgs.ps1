@@ -13,9 +13,9 @@ function Verify-Nuget-Packages($packageDirectory, $version)
 {
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-                     "Microsoft.CodeCoverage" = 44;
+                     "Microsoft.CodeCoverage" = 59;
                      "Microsoft.NET.Test.Sdk" = 18;
-                     "Microsoft.TestPlatform" = 499;
+                     "Microsoft.TestPlatform" = 513;
                      "Microsoft.TestPlatform.Build" = 19;
                      "Microsoft.TestPlatform.CLI" = 379;
                      "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
