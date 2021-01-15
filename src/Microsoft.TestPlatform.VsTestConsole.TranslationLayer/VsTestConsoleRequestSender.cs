@@ -538,8 +538,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStartTestSessionComplete(null);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
             return null;
         }
 
@@ -636,8 +639,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStartTestSessionComplete(null);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
             return null;
         }
 
@@ -664,7 +670,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // after doing the start test session call. However, we should filter out requests
             // to stop such a session as soon as possible, at the request sender level.
             //
-            // We do this here instead of on the wrapper level in order to benefit of the
+            // We do this here instead of on the wrapper level in order to benefit from the
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
@@ -718,8 +724,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
             return false;
         }
 
@@ -746,7 +755,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // after doing the start test session call. However, we should filter out requests
             // to stop such a session as soon as possible, at the request sender level.
             //
-            // We do this here instead of on the wrapper level in order to benefit of the
+            // We do this here instead of on the wrapper level in order to benefit from the
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
@@ -800,8 +809,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
             return false;
         }
 
