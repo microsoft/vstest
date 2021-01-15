@@ -6,7 +6,8 @@ on:
       [labeled] #, opened, edited, deleted, closed, reopened, labeled, unlabeled, assigned
 
 jobs:
-  alert:
+  updateAzDO:
+    if: github.event.label.name == 'sprint'
     runs-on: ubuntu-latest
     steps:
       - uses: danhellem/github-actions-issue-to-work-item@master
@@ -16,7 +17,7 @@ jobs:
           ado_organization: "devdiv"
           ado_project: "DevDiv"
           ado_area_path: "DevDiv\\NET Developer Experience\\Testing Platforms\\TestPlatform"
-          #ado_iteration_path: "DevDiv\\OneVS\\Cobalt [Co]\\Q1\\Sprint 182"
+          ado_iteration_path: "DevDiv\\OneVS\\Cobalt [Co]\\Q1\\Sprint 182"
           ado_wit: "User Story"
           ado_new_state: "Committed"
           ado_active_state: "In Progress"
