@@ -820,10 +820,6 @@ function Create-NugetPackages
     # Additional external dependency folders
     $microsoftFakesVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
     $FakesPackageDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$microsoftFakesVersion\contentFiles"
-    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
-    $TraceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib"
-    $CodeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.interprocess\$codeCoverageExternalsVersion\lib"
-    $CodeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib"
 
     # package them from stagingDir
     foreach ($file in $nuspecFiles) {
@@ -833,7 +829,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;TraceDataCollectorPackagesDir=$TraceDataCollectorPackagesDir`;CodeCoverageInterprocessPackagesDir=$CodeCoverageInterprocessPackagesDir`;CodeCoverageCoreLibPackagesDir=$CodeCoverageCoreLibPackagesDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir $additionalArgs
 
         Set-ScriptFailedOnError
     }
@@ -851,6 +847,8 @@ function Copy-CodeCoverage-Package-Artifacts
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
     $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
     $internalCodeCoveragePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\"
+    $codeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
 
     $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
 
@@ -858,6 +856,8 @@ function Copy-CodeCoverage-Package-Artifacts
 
     Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageCoreLibPackagesDir\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInterprocessPackagesDir\Microsoft.VisualStudio.Coverage.Interprocess.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\InstrumentationEngine $microsoftCodeCoveragePackageDir -Force -Recurse
     Copy-Item $internalCodeCoveragePackagesDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
@@ -865,6 +865,7 @@ function Copy-CodeCoverage-Package-Artifacts
     # Copy TraceDataCollector resource dlls
     if($TPB_LocalizedBuild) {
         Copy-Loc-Files $traceDataCollectorPackagesDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+        Copy-Loc-Files $codeCoverageCoreLibPackagesDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll"
     }
 }
 
