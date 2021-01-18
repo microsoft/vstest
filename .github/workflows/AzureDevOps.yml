@@ -22,4 +22,4 @@ jobs:
           ado_new_state: "Committed"
           ado_active_state: "In Progress"
           ado_close_state: "Completed"
-          ado_bypassrules: true
+          ado_bypassrules: false
