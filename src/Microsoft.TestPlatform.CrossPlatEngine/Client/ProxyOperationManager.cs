@@ -341,15 +341,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             finally
             {
-                this.initialized = false;
+                // Should only cleanup the testhost if we're in compatibility mode.
+                if (this.CloseRequestSenderChannelOnProxyClose)
+                {
+                    this.initialized = false;
 
-                EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
+                    EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
 
-                // Please clean up test host.
-                this.TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+                    // Please clean up test host.
+                    this.TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
 
-                this.TestHostManager.HostExited -= this.TestHostManagerHostExited;
-                this.TestHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
+                    this.TestHostManager.HostExited -= this.TestHostManagerHostExited;
+                    this.TestHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
+                }
             }
         }
 
