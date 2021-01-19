@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
     /// <summary>
     /// Controller for various test operations on the test runner.
@@ -18,6 +17,58 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Starts the test runner process and readies for requests.
         /// </summary>
         void StartSession();
+
+        /// <summary>
+        /// Starts a new test session.
+        /// </summary>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        void StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            ITestSessionEventsHandler eventsHandler);
+
+        /// <summary>
+        /// Starts a new test session.
+        /// </summary>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        void StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestSessionEventsHandler eventsHandler);
+
+        /// <summary>
+        /// Starts a new test session.
+        /// </summary>
+        /// 
+        /// <param name="sources">The list of source assemblies for the test run.</param>
+        /// <param name="runSettings">The run settings for the run.</param>
+        /// <param name="options">The test platform options.</param>
+        /// <param name="eventsHandler">The session event handler.</param>
+        /// <param name="testHostLauncher">The custom host launcher.</param>
+        void StartTestSession(
+            IList<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestSessionEventsHandler eventsHandler,
+            ITestHostLauncher testHostLauncher);
+
+        /// <summary>
+        /// Stops the test session.
+        /// </summary>
+        /// 
+        /// <param name="eventsHandler">The session event handler.</param>
+        /// 
+        /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+        bool StopTestSession(
+            ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Initializes the test platform with paths to extensions like adapters, loggers and any
@@ -51,22 +102,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
-            ITestDiscoveryEventsHandler2 discoveryEventsHandler);
-
-        /// <summary>
-        /// Starts test discovery.
-        /// </summary>
-        /// 
-        /// <param name="sources">The list of source assemblies for the discovery.</param>
-        /// <param name="discoverySettings">The run settings for the discovery.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="discoveryEventsHandler">The discovery event handler.</param>
-        void DiscoverTests(
-            IEnumerable<string> sources,
-            string discoverySettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
@@ -104,22 +139,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Starts a test run.
         /// </summary>
         /// 
-        /// <param name="sources">The list of source assemblies for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -140,22 +159,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
-            ITestRunEventsHandler testRunEventsHandler);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testCases">The list of test cases for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        void RunTests(
-            IEnumerable<TestCase> testCases,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
@@ -192,24 +195,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Starts a test run.
         /// </summary>
         /// 
-        /// <param name="sources">The list of source assemblies for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
-            IEnumerable<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestHostLauncher customTestHostLauncher);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -235,84 +220,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher);
-
-        /// <summary>
-        /// Starts a test run.
-        /// </summary>
-        /// 
-        /// <param name="testCases">The list of test cases for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="testRunEventsHandler">The run event handler.</param>
-        /// <param name="customTestHostLauncher">The custom host launcher.</param>
-        void RunTestsWithCustomTestHost(
-            IEnumerable<TestCase> testCases,
-            string runSettings,
-            TestPlatformOptions options,
-            TestSessionInfo testSessionInfo,
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestHostLauncher customTestHostLauncher);
-
-        /// <summary>
-        /// Starts a new test session.
-        /// </summary>
-        /// 
-        /// <param name="sources">The list of source assemblies for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="eventsHandler">The session event handler.</param>
-        /// 
-        /// <returns>A test session info object.</returns>
-        ITestSession StartTestSession(
-            IList<string> sources,
-            string runSettings,
-            ITestSessionEventsHandler eventsHandler);
-
-        /// <summary>
-        /// Starts a new test session.
-        /// </summary>
-        /// 
-        /// <param name="sources">The list of source assemblies for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="eventsHandler">The session event handler.</param>
-        /// 
-        /// <returns>A test session info object.</returns>
-        ITestSession StartTestSession(
-            IList<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestSessionEventsHandler eventsHandler);
-
-        /// <summary>
-        /// Starts a new test session.
-        /// </summary>
-        /// 
-        /// <param name="sources">The list of source assemblies for the test run.</param>
-        /// <param name="runSettings">The run settings for the run.</param>
-        /// <param name="options">The test platform options.</param>
-        /// <param name="eventsHandler">The session event handler.</param>
-        /// <param name="testHostLauncher">The custom host launcher.</param>
-        /// 
-        /// <returns>A test session info object.</returns>
-        ITestSession StartTestSession(
-            IList<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestSessionEventsHandler eventsHandler,
-            ITestHostLauncher testHostLauncher);
-
-        /// <summary>
-        /// Stops the test session.
-        /// </summary>
-        /// 
-        /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="eventsHandler">The session event handler.</param>
-        /// 
-        /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
-        bool StopTestSession(
-            TestSessionInfo testSessionInfo,
-            ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Cancels the last test run.

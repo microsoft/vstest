@@ -148,9 +148,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
                 var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
                 await Task.Run(() =>
-                    this.communicationManager.AcceptClientAsync(), timeoutSource.Token);
+                    this.communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
 
-                this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync();
+                this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
                 this.handShakeComplete.Set();
             }
             catch (Exception ex)
@@ -222,7 +222,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 runSettings,
                 options,
                 testSessionInfo,
-                eventHandler);
+                eventHandler).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -274,7 +274,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                null);
+                null).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -326,7 +326,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                null);
+                null).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -382,7 +382,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                customHostLauncher);
+                customHostLauncher).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -438,7 +438,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                customHostLauncher);
+                customHostLauncher).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -936,7 +936,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             var success = false;
             var message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
+                this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
             if (message.MessageType == MessageType.SessionConnected)
             {
@@ -945,7 +945,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     this.protocolVersion);
 
                 message = await this.communicationManager.ReceiveMessageAsync(
-                    this.processExitCancellationTokenSource.Token);
+                    this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
@@ -1094,7 +1094,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
@@ -1260,7 +1260,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -1442,7 +1442,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private async Task<Message> TryReceiveMessageAsync()
         {
             Message message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
+                this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
             if (message == null)
             {
