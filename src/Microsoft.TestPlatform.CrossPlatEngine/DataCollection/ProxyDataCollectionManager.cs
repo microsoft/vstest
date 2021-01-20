@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 
     /// <summary>
     /// Managed datacollector interaction from runner process.
@@ -147,15 +148,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </returns>
         public Collection<AttachmentSet> AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
         {
-            Collection<AttachmentSet> attachmentSet = null;
+            AfterTestRunEndResult afterTestRunEnd = null;
             this.InvokeDataCollectionServiceAction(
-           () =>
-           {
-               EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
-               attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
-           },
-                runEventsHandler);
-            return attachmentSet;
+            () =>
+            {
+                EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
+                afterTestRunEnd = this.dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
+            },
+            runEventsHandler);
+
+            if (requestData.IsTelemetryOptedIn && afterTestRunEnd?.Metrics != null)
+            {
+                foreach (var metric in afterTestRunEnd.Metrics)
+                {
+                    requestData.MetricsCollection.Add(metric.Key, metric.Value);
+                }
+            }
+
+            return afterTestRunEnd?.AttachmentSets;
         }
 
         /// <summary>

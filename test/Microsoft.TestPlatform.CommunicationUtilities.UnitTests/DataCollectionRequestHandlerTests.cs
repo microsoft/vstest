@@ -217,7 +217,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             // Verify AfterTestRun events.
             this.mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<Collection<AttachmentSet>>()), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<AfterTestRunEndResult>()), Times.Once);
         }
 
         [TestMethod]

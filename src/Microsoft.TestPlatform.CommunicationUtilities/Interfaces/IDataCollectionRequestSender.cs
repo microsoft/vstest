@@ -69,8 +69,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// The value to specify whether the test run is canceled or not.
         /// </param>
         /// <returns>
-        /// DataCollector attachments
+        /// AfterTestRunEndResult containing dataCollector attachments and metrics
         /// </returns>
-        Collection<AttachmentSet> SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled);
+        AfterTestRunEndResult SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled);
     }
 }

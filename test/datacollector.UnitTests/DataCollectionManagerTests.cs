@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private List<KeyValuePair<string, string>> envVarList;
         private List<KeyValuePair<string, string>> codeCoverageEnvVarList;
         private Mock<IDataCollectionAttachmentManager> mockDataCollectionAttachmentManager;
+        private Mock<IDataCollectionTelemetryManager> mockDataCollectionTelemetryManager;
+        private Mock<IRequestData> mockRequestData;
 
         public DataCollectionManagerTests()
         {
@@ -47,8 +50,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockMessageSink = new Mock<IMessageSink>();
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
+            this.mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockDataCollectionTelemetryManager.Setup(m => m.GetRequestData()).Returns(this.mockRequestData.Object);
 
-            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollector.Object, this.mockCodeCoverageDataCollector.Object);
+            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollector.Object, this.mockCodeCoverageDataCollector.Object, this.mockDataCollectionTelemetryManager.Object);
         }
 
         [TestMethod]
@@ -183,6 +189,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             Assert.AreEqual("value", result["key"]);
+
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.IsAny<DataCollectorInformation>(), "key", "value"));
         }
 
         [TestMethod]
@@ -223,14 +231,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             Assert.AreEqual("value", result["key"]);
+
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.IsAny<DataCollectorInformation>(), "key", "value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableConflict(It.IsAny<DataCollectorInformation>(), "key", "value"));
         }
 
         [TestMethod]
         public void InitializeDataCollectorsShouldReturnOtherThanCodeCoverageEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
         {
             this.envVarList.Add(new KeyValuePair<string, string>("cor_profiler", "clrie"));
+            this.envVarList.Add(new KeyValuePair<string, string>("same_key", "same_value"));
             this.codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("cor_profiler", "direct"));
             this.codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("clrie_profiler_vanguard", "path"));
+            this.codeCoverageEnvVarList.Add(new KeyValuePair<string, string>("same_key", "same_value"));
 
             this.dataCollectorSettings = string.Format(this.defaultRunSettings,
                 string.Format(this.defaultDataCollectionSettings, "Code Coverage", "my://custom/ccdatacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty) +
@@ -238,9 +251,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
            
             var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);           
 
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
             Assert.AreEqual("clrie", result["cor_profiler"]);
             Assert.AreEqual("path", result["clrie_profiler_vanguard"]);
+            Assert.AreEqual("same_value", result["same_key"]);
+
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "cor_profiler", "clrie"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "cor_profiler", "clrie"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "clrie_profiler_vanguard", "path"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "same_key", "same_value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "same_key", "same_value"));
         }
 
         [TestMethod]
@@ -334,9 +354,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var runSettings = string.Format(this.defaultRunSettings, string.Empty);
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
-            var result = this.dataCollectionManager.SessionEnded();
+            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(0, result.Count);
+            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
@@ -351,9 +372,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var sessionStartEventArgs = new SessionStartEventArgs();
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
-            var result = this.dataCollectionManager.SessionEnded();
+            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
 
             Assert.IsTrue(result[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
+            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
@@ -362,9 +384,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
-            var result = this.dataCollectionManager.SessionEnded();
+            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(0, result.Count);
+            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
@@ -388,9 +411,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var sessionStartEventArgs = new SessionStartEventArgs();
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
-            var result = this.dataCollectionManager.SessionEnded();
+            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
@@ -483,13 +507,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         DataCollector dataCollector;
         DataCollector ccDataCollector;
 
-        public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector, DataCollector ccDataCollector) : this(datacollectionAttachmentManager, messageSink)
+        public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector, DataCollector ccDataCollector, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : this(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
         {
             this.dataCollector = dataCollector;
             this.ccDataCollector = ccDataCollector;
         }
 
-        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink) : base(datacollectionAttachmentManager, messageSink)
+        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager) : base(datacollectionAttachmentManager, messageSink, dataCollectionTelemetryManager)
         {
         }
 

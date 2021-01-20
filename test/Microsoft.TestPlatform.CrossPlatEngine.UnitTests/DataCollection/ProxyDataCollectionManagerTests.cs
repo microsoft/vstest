@@ -219,15 +219,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
-        public void AfterTestRunEndShouldReturnAttachments()
+        [DataRow(false)]
+        [DataRow(true)]
+        public void AfterTestRunEndShouldReturnAttachments(bool telemetryOptedIn)
         {
             var attachments = new Collection<AttachmentSet>();
             var dispName = "MockAttachments";
             var uri = new Uri("Mock://Attachments");
             var attachmentSet = new AttachmentSet(uri, dispName);
             attachments.Add(attachmentSet);
+            this.mockRequestData.Setup(m => m.IsTelemetryOptedIn).Returns(telemetryOptedIn);
 
-            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(attachments);
+            var metrics = new Dictionary<string, object>() 
+            {
+                {"key", "value"}
+            };
+
+            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, metrics));
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
@@ -236,6 +244,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             Assert.IsNotNull(result[0]);
             Assert.AreEqual(dispName, result[0].DisplayName);
             Assert.AreEqual(uri, result[0].Uri);
+
+            if (telemetryOptedIn)
+            {
+                mockMetricsCollection.Verify(m => m.Add("key", "value"), Times.Once);
+            }
+            else
+            {
+                mockMetricsCollection.Verify(m => m.Add(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            }
         }
 
         [TestMethod]

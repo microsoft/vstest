@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -371,13 +372,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Error("DataCollectionRequestHandler.HandleAfterTestRunEnd : Error while processing event from testhost: {0}", ex.ToString());
             }
 
-            var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
+            (var attachmentsets, var requestData) = this.dataCollectionManager.SessionEnded(isCancelled);
+            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, requestData?.MetricsCollection?.Metrics);
 
             // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.
             this.dataCollectionManager?.Dispose();
 
-            this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachmentsets);
+            this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, afterTestRunEndResult);
             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
 
             this.Close();
