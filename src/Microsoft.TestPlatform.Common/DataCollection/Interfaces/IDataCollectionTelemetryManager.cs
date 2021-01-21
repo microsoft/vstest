@@ -44,6 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <returns>
         /// IRequestData object.
         /// </returns>
-        IRequestData GetRequestData();
+        IRequestData RequestData { get; }
     }
 }

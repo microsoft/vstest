@@ -224,18 +224,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public (Collection<AttachmentSet>, IRequestData) SessionEnded(bool isCancelled = false)
+        public Collection<AttachmentSet> SessionEnded(bool isCancelled = false)
         {
             // Return null if datacollection is not enabled.
             if (!this.isDataCollectionEnabled)
             {
-                return (new Collection<AttachmentSet>(), dataCollectionTelemetryManager.GetRequestData());
+                return new Collection<AttachmentSet>();
             }
 
             if (isCancelled)
             {
                 this.attachmentManager.Cancel();
-                return (new Collection<AttachmentSet>(), dataCollectionTelemetryManager.GetRequestData());
+                return new Collection<AttachmentSet>();
             }
 
             var endEvent = new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext);
@@ -253,7 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex);
                 }
 
-                return (new Collection<AttachmentSet>(result), dataCollectionTelemetryManager.GetRequestData());
+                return new Collection<AttachmentSet>(result);
             }
 
             if (EqtTrace.IsVerboseEnabled)
@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 this.LogAttachments(result);
             }
 
-            return (new Collection<AttachmentSet>(result), dataCollectionTelemetryManager.GetRequestData());
+            return new Collection<AttachmentSet>(result);
         }
 
         /// <inheritdoc/>
@@ -341,6 +341,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             return new Collection<AttachmentSet>(result);
         }
+
+        public IRequestData RequestData => this.dataCollectionTelemetryManager.RequestData;
 
         /// <summary>
         /// The dispose.

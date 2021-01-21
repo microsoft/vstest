@@ -53,10 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public IRequestData GetRequestData()
-        {
-            return requestData;
-        }
+        public IRequestData RequestData => requestData;
 
         private void AddProfilerMetricForNewVariable(string profilerVariable, string telemetryTemplateName, DataCollectorInformation dataCollectorInformation, string name, string value)
         {

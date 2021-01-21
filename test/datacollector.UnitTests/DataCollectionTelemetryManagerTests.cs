@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void GetRequestData_ShouldReturnCorrectObject()
         {
             // act
-            var result = this.telemetryManager.GetRequestData();
+            var result = this.telemetryManager.RequestData;
 
             // assert
             Assert.AreEqual(this.mockRequestData.Object, result);

@@ -372,8 +372,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Error("DataCollectionRequestHandler.HandleAfterTestRunEnd : Error while processing event from testhost: {0}", ex.ToString());
             }
 
-            (var attachmentsets, var requestData) = this.dataCollectionManager.SessionEnded(isCancelled);
-            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, requestData?.MetricsCollection?.Metrics);
+            var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
+            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, this.dataCollectionManager.RequestData?.MetricsCollection?.Metrics);
 
             // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.

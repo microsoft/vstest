@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
             this.mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockDataCollectionTelemetryManager.Setup(m => m.GetRequestData()).Returns(this.mockRequestData.Object);
+            this.mockDataCollectionTelemetryManager.Setup(m => m.RequestData).Returns(this.mockRequestData.Object);
 
             this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollector.Object, this.mockCodeCoverageDataCollector.Object, this.mockDataCollectionTelemetryManager.Object);
         }
@@ -354,10 +354,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var runSettings = string.Format(this.defaultRunSettings, string.Empty);
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
-            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
+            var result = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(0, result.Count);
-            Assert.AreEqual(requestData, this.mockRequestData.Object);
+        }
+
+        [TestMethod]
+        public void RequestDataShouldReturnCorrectReference()
+        {
+            var result = this.dataCollectionManager.RequestData;
+
+            Assert.AreEqual(mockRequestData.Object, result);
         }
 
         [TestMethod]
@@ -372,10 +379,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var sessionStartEventArgs = new SessionStartEventArgs();
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
-            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
+            var result = this.dataCollectionManager.SessionEnded();
 
             Assert.IsTrue(result[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
-            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
@@ -384,10 +390,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
-            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
+            var result = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(0, result.Count);
-            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
@@ -411,10 +416,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var sessionStartEventArgs = new SessionStartEventArgs();
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
-            (var result, var requestData) = this.dataCollectionManager.SessionEnded();
+            var result = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(requestData, this.mockRequestData.Object);
         }
 
         [TestMethod]
