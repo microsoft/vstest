@@ -4,7 +4,7 @@ The Visual Studio Test Platform is an open and extensible test platform that ena
 The Test Platform currently ships as part Visual Studio 2017, and in the .NET Core Tools Preview 3.
 
 ### Build status
-[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/Microsoft/vstest/TestPlatform.CI?branchName=master)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=935&branchName=master)
+[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/Microsoft/vstest/microsoft.vstest.ci?branchName=master)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=935&branchName=master)
 
 ### Contributing
 There are many ways to contribute to VSTest
