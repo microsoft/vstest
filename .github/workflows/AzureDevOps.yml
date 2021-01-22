@@ -10,14 +10,14 @@ jobs:
     if: github.event.label.name == 'sprint'
     runs-on: ubuntu-latest
     steps:
-      - uses: danhellem/github-actions-issue-to-work-item@master
+      - uses: pavelhorak/github-actions-issue-to-work-item@master
         env:
           ado_token: "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}"
           github_token: "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}"
-          ado_organization: "devdiv"
-          ado_project: "DevDiv"
-          ado_area_path: "DevDiv\\NET Developer Experience\\Testing Platforms\\TestPlatform"
-          ado_iteration_path: "DevDiv\\OneVS\\Cobalt [Co]\\Q1\\Sprint 182"
+          ado_organization: "${{ secrets.ADO_ORGANIZATION }}"
+          ado_project: "${{ secrets.ADO_PROJECT }}"
+          ado_area_path: "${{ secrets.ADO_AREA_PATH }}"
+          ado_iteration_path: "${{ secrets.ADO_ITERATION_PATH }}"
           ado_wit: "User Story"
           ado_new_state: "Committed"
           ado_active_state: "In Progress"

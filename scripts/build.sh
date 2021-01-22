@@ -111,7 +111,7 @@ VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/Te
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="5.0.100"
+DOTNET_CLI_VERSION="6.0.100-alpha.1.21067.8"
 #DOTNET_RUNTIME_VERSION="LATEST"
 
 #
@@ -187,6 +187,7 @@ function install_cli()
         # Get netcoreapp1.1 shared components
         $install_script  --runtime dotnet --version "2.1.0" --channel "release/2.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
         $install_script  --runtime dotnet --version "3.1.0" --channel "release/3.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "5.0.1" --channel "release/5.0.1" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
 
         log "install_cli: Get the latest dotnet cli toolset..."
         $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_CLI_VERSION

@@ -129,8 +129,25 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeDotnetTest(string arguments)
         {
-            this.ExecutePatchedDotnet("test", arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
-            this.FormatStandardOutCome();
+            var vstestConsolePath = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
+            var env = "VSTEST_CONSOLE_PATH";
+            var originalVstestConsolePath = Environment.GetEnvironmentVariable(env);
+
+            try
+            {
+                Environment.SetEnvironmentVariable(env, vstestConsolePath);
+                if (arguments.Contains(".csproj"))
+                {                   
+                    arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
+                }
+
+                this.ExecutePatchedDotnet("test", arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+                this.FormatStandardOutCome();
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(env, originalVstestConsolePath);
+            }
         }
 
         /// <summary>
