@@ -52,9 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             AddProfilerMetricForConflictedVariable(CoreClrProfilerVariable, CoreClrProfilerTelemetryTemplate, dataCollectorInformation, name, existingValue);
         }
 
-        /// <inheritdoc/>
-        public IRequestData RequestData => requestData;
-
         private void AddProfilerMetricForNewVariable(string profilerVariable, string telemetryTemplateName, DataCollectorInformation dataCollectorInformation, string name, string value)
         {
             if (!string.Equals(profilerVariable, name, StringComparison.Ordinal))

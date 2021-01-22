@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, ITestMessageEventHandler runEventsHandler)
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler runEventsHandler)
         {
             var isDataCollectionStarted = false;
             BeforeTestRunStartResult result = null;
@@ -120,7 +120,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             var payload = new BeforeTestRunStartPayload
             {
                 SettingsXml = settingsXml,
-                Sources = sources
+                Sources = sources,
+                IsTelemetryOptedIn = isTelemetryOptedIn
             };
 
             this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);

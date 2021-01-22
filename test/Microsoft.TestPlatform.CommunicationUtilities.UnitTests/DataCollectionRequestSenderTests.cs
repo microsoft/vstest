@@ -69,9 +69,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testSources = new List<string>() { "test1.dll" };
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
-            this.requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, null);
+            this.requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, true, null);
 
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.IsAny<BeforeTestRunStartPayload>()));
+            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.Is<BeforeTestRunStartPayload>(p => p.SettingsXml == string.Empty && p.IsTelemetryOptedIn)));
         }
     }
 }

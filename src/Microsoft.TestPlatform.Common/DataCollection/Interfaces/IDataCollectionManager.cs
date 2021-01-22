@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
@@ -67,13 +66,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// Collection of session attachmentSet.
         /// </returns>
         Collection<AttachmentSet> SessionEnded(bool isCancelled);
-
-        /// <summary>
-        /// Provides telemetry object.
-        /// </summary>
-        /// <returns>
-        /// IRequestData object.
-        /// </returns>
-        IRequestData RequestData { get; }
     }
 }

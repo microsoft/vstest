@@ -34,7 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private List<KeyValuePair<string, string>> codeCoverageEnvVarList;
         private Mock<IDataCollectionAttachmentManager> mockDataCollectionAttachmentManager;
         private Mock<IDataCollectionTelemetryManager> mockDataCollectionTelemetryManager;
-        private Mock<IRequestData> mockRequestData;
 
         public DataCollectionManagerTests()
         {
@@ -51,8 +50,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
             this.mockDataCollectionTelemetryManager = new Mock<IDataCollectionTelemetryManager>();
-            this.mockRequestData = new Mock<IRequestData>();
-            this.mockDataCollectionTelemetryManager.Setup(m => m.RequestData).Returns(this.mockRequestData.Object);
 
             this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollector.Object, this.mockCodeCoverageDataCollector.Object, this.mockDataCollectionTelemetryManager.Object);
         }
@@ -357,14 +354,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var result = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(0, result.Count);
-        }
-
-        [TestMethod]
-        public void RequestDataShouldReturnCorrectReference()
-        {
-            var result = this.dataCollectionManager.RequestData;
-
-            Assert.AreEqual(mockRequestData.Object, result);
         }
 
         [TestMethod]

@@ -45,16 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void GetRequestData_ShouldReturnCorrectObject()
-        {
-            // act
-            var result = this.telemetryManager.RequestData;
-
-            // assert
-            Assert.AreEqual(this.mockRequestData.Object, result);
-        }
-
-        [TestMethod]
         public void OnEnvironmentVariableAdded_ShouldDoNothing_IfNotProfilerVariable()
         {
             // act

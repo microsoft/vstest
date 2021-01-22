@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -135,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <returns>
         /// The <see cref="DataCollectionManager"/>.
         /// </returns>
-        public static DataCollectionManager Create(IMessageSink messageSink)
+        public static DataCollectionManager Create(IMessageSink messageSink, IRequestData requestData)
         {
             if (Instance == null)
             {
@@ -143,11 +142,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     if (Instance == null)
                     {
-                        var requestData = new RequestData
-                        {
-                            MetricsCollection = new MetricsCollection(),
-                            IsTelemetryOptedIn = true
-                        };
                         Instance = new DataCollectionManager(messageSink, requestData);
                     }
                 }
@@ -341,8 +335,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             return new Collection<AttachmentSet>(result);
         }
-
-        public IRequestData RequestData => this.dataCollectionTelemetryManager.RequestData;
 
         /// <summary>
         /// The dispose.
