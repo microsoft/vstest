@@ -656,7 +656,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))
                         {
                             alreadyRequestedVariable.AddRequestingDataCollector(collectorFriendlyName);
-                            dataCollectionTelemetryManager.OnEnvironmentVariableAdded(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
                         }
                         else
                         {
@@ -678,10 +677,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                             else
                             {
                                 dataCollectionWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
-                            }
-
-                            dataCollectionTelemetryManager.OnEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, alreadyRequestedVariable.Value);
+                            }                            
                         }
+
+                        dataCollectionTelemetryManager.RecordEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value, alreadyRequestedVariable.Value);
                     }
                     else
                     {
@@ -694,7 +693,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         dataCollectorEnvironmentVariables.Add(
                             namevaluepair.Key,
                             new DataCollectionEnvironmentVariable(namevaluepair, collectorFriendlyName));
-                        dataCollectionTelemetryManager.OnEnvironmentVariableAdded(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
+
+                        dataCollectionTelemetryManager.RecordEnvironmentVariableAddition(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
                     }
                 }
             }

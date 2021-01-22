@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -187,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             Assert.AreEqual("value", result["key"]);
 
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.IsAny<DataCollectorInformation>(), "key", "value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.IsAny<DataCollectorInformation>(), "key", "value"));
         }
 
         [TestMethod]
@@ -229,8 +228,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             Assert.AreEqual("value", result["key"]);
 
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.IsAny<DataCollectorInformation>(), "key", "value"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableConflict(It.IsAny<DataCollectorInformation>(), "key", "value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.IsAny<DataCollectorInformation>(), "key", "value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.IsAny<DataCollectorInformation>(), "key", "value1", "value"));
         }
 
         [TestMethod]
@@ -253,11 +252,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.AreEqual("path", result["clrie_profiler_vanguard"]);
             Assert.AreEqual("same_value", result["same_key"]);
 
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "cor_profiler", "clrie"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "cor_profiler", "clrie"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "clrie_profiler_vanguard", "path"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "same_key", "same_value"));
-            this.mockDataCollectionTelemetryManager.Verify(tm => tm.OnEnvironmentVariableAdded(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "same_key", "same_value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "cor_profiler", "clrie"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "cor_profiler", "direct", "clrie"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "clrie_profiler_vanguard", "path"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableAddition(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == this.friendlyName), "same_key", "same_value"));
+            this.mockDataCollectionTelemetryManager.Verify(tm => tm.RecordEnvironmentVariableConflict(It.Is<DataCollectorInformation>(i => i.DataCollectorConfig.FriendlyName == "Code Coverage"), "same_key", "same_value", "same_value"));
         }
 
         [TestMethod]

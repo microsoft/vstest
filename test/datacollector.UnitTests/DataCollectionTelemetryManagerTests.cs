@@ -45,20 +45,30 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void OnEnvironmentVariableAdded_ShouldDoNothing_IfNotProfilerVariable()
+        public void RecordEnvironmentVariableAddition_ShouldDoNothing_IfNotProfilerVariable()
         {
             // act
-            this.telemetryManager.OnEnvironmentVariableAdded(this.dataCollectorInformation, "key", "value");
+            this.telemetryManager.RecordEnvironmentVariableAddition(this.dataCollectorInformation, "key", "value");
 
             // assert
             this.mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 
         [TestMethod]
-        public void OnEnvironmentVariableConflict_ShouldDoNothing_IfNotProfilerVariable()
+        public void RecordEnvironmentVariableConflict_ShouldDoNothing_IfNotProfilerVariable_ValuesSame()
         {
             // act
-            this.telemetryManager.OnEnvironmentVariableConflict(this.dataCollectorInformation, "key", "value");
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "key", "value", "value");
+
+            // assert
+            this.mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void RecordEnvironmentVariableConflict_ShouldDoNothing_IfNotProfilerVariable_ValuesDifferent()
+        {
+            // act
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "key", "value", "othervalue");
 
             // assert
             this.mockMetricsCollection.Verify(c => c.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
@@ -72,10 +82,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
         [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
         [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
-        public void OnEnvironmentVariableAdded_ShouldCollectTelemetry_IfCorProfilerVariable(string profilerGuid, string profilerName)
+        public void RecordEnvironmentVariableAddition_ShouldCollectTelemetry_IfCorProfilerVariable(string profilerGuid, string profilerName)
         {
             // act
-            this.telemetryManager.OnEnvironmentVariableAdded(this.dataCollectorInformation, "COR_PROFILER", profilerGuid);
+            this.telemetryManager.RecordEnvironmentVariableAddition(this.dataCollectorInformation, "COR_PROFILER", profilerGuid);
 
             // assert
             this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CorProfiler", profilerName), Times.Once);
@@ -89,30 +99,47 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
         [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
         [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
-        public void OnEnvironmentVariableAdded_ShouldCollectTelemetry_IfCoreClrProfilerVariable(string profilerGuid, string profilerName)
+        public void RecordEnvironmentVariableAddition_ShouldCollectTelemetry_IfCoreClrProfilerVariable(string profilerGuid, string profilerName)
         {
             // act
-            this.telemetryManager.OnEnvironmentVariableAdded(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid);
+            this.telemetryManager.RecordEnvironmentVariableAddition(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid);
 
             // assert
             this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CoreClrProfiler", profilerName), Times.Once);
         }
 
         [TestMethod]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}")]
-        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}")]
-        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}")]
-        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}")]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}")]
-        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}")]
-        public void OnEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCorProfilerVariable(string profilerGuid)
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        public void RecordEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCorProfilerVariable(string existingProfilerGuid, string profilerGuid, string expectedOverwrittenProfiler)
         {
             // act
-            this.telemetryManager.OnEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid);
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, existingProfilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CorProfiler", "overwritten"), Times.Once);
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CorProfiler", $"overwritten({expectedOverwrittenProfiler})"), Times.Once);
+        }
+
+        [TestMethod]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        public void RecordEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCoreClrProfilerVariable(string existingProfilerGuid, string profilerGuid, string expectedOverwrittenProfiler)
+        {
+            // act
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, existingProfilerGuid);
+
+            // assert
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CoreClrProfiler", $"overwritten({expectedOverwrittenProfiler})"), Times.Once);
         }
 
         [TestMethod]
@@ -123,39 +150,70 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}")]
         [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}")]
         [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}")]
-        public void OnEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCoreClrProfilerVariable(string profilerGuid)
-        {
-            // act
-            this.telemetryManager.OnEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid);
-
-            // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CoreClrProfiler", "overwritten"), Times.Once);
-        }
-
-        [TestMethod]
-        public void OnEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCorProfilerVariableAndCollectorSpecifiesClrIeProfile()
+        public void RecordEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCorProfilerVariableAndCollectorSpecifiesClrIeProfile(string profilerGuid)
         {
             // arrange
             this.dataCollectorInformation.SetTestExecutionEnvironmentVariables();
 
             // act
-            this.telemetryManager.OnEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
 
             // assert
             this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CorProfiler", "clrie"), Times.Once);
         }
 
         [TestMethod]
-        public void OnEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCoreClrProfilerVariableAndCollectorSpecifiesClrIeProfile()
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}")]
+        public void RecordEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCoreClrProfilerVariableAndCollectorSpecifiesClrIeProfile(string profilerGuid)
         {
             // arrange
             this.dataCollectorInformation.SetTestExecutionEnvironmentVariables();
 
             // act
-            this.telemetryManager.OnEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
 
             // assert
             this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CoreClrProfiler", "clrie"), Times.Once);
+        }
+
+        [TestMethod]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCorProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
+        {
+            // act
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, profilerGuid.ToLower());
+
+            // assert
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CorProfiler", profilerName), Times.Once);
+        }
+
+        [TestMethod]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCoreClrProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
+        {
+            // act
+            this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, profilerGuid.ToUpper());
+
+            // assert
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.{dataCollectorInformation.DataCollectorConfig.TypeUri}.CoreClrProfiler", profilerName), Times.Once);
         }
     }
 }

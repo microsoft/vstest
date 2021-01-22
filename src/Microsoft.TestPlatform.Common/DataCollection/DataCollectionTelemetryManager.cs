@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private const string ClrIeInstrumentationMethodConfigurationPrefix32Variable = "MicrosoftInstrumentationEngine_ConfigPath32_";
         private const string ClrIeInstrumentationMethodConfigurationPrefix64Variable = "MicrosoftInstrumentationEngine_ConfigPath64_";
 
-        private const string VanguardProfilerGuid = "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}";
-        private const string ClrIeProfilerGuid = "{324F817A-7420-4E6D-B3C1-143FBED6D855}";
+        private const string VanguardProfilerGuid = "{e5f256dc-7959-4dd6-8e4f-c11150ab28e0}";
+        private const string ClrIeProfilerGuid = "{324f817a-7420-4e6d-b3c1-143fbed6d855}";
         private const string IntellitraceProfilerGuid = "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}";
 
         private const string VanguardProfilerName = "vanguard";
@@ -39,20 +39,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public void OnEnvironmentVariableAdded(DataCollectorInformation dataCollectorInformation, string name, string value)
+        public void RecordEnvironmentVariableAddition(DataCollectorInformation dataCollectorInformation, string name, string value)
         {
-            AddProfilerMetricForNewVariable(CorProfilerVariable, CorProfilerTelemetryTemplate, dataCollectorInformation, name, value);
-            AddProfilerMetricForNewVariable(CoreClrProfilerVariable, CoreClrProfilerTelemetryTemplate, dataCollectorInformation, name, value);
+            RecordProfilerMetricForNewVariable(CorProfilerVariable, CorProfilerTelemetryTemplate, dataCollectorInformation, name, value);
+            RecordProfilerMetricForNewVariable(CoreClrProfilerVariable, CoreClrProfilerTelemetryTemplate, dataCollectorInformation, name, value);
         }
 
         /// <inheritdoc/>
-        public void OnEnvironmentVariableConflict(DataCollectorInformation dataCollectorInformation, string name, string existingValue)
+        public void RecordEnvironmentVariableConflict(DataCollectorInformation dataCollectorInformation, string name, string value, string existingValue)
         {
-            AddProfilerMetricForConflictedVariable(CorProfilerVariable, CorProfilerTelemetryTemplate, dataCollectorInformation, name, existingValue);
-            AddProfilerMetricForConflictedVariable(CoreClrProfilerVariable, CoreClrProfilerTelemetryTemplate, dataCollectorInformation, name, existingValue);
+            RecordProfilerMetricForConflictedVariable(CorProfilerVariable, CorProfilerTelemetryTemplate, dataCollectorInformation, name, value, existingValue);
+            RecordProfilerMetricForConflictedVariable(CoreClrProfilerVariable, CoreClrProfilerTelemetryTemplate, dataCollectorInformation, name, value, existingValue);
         }
 
-        private void AddProfilerMetricForNewVariable(string profilerVariable, string telemetryTemplateName, DataCollectorInformation dataCollectorInformation, string name, string value)
+        private void RecordProfilerMetricForNewVariable(string profilerVariable, string telemetryTemplateName, DataCollectorInformation dataCollectorInformation, string name, string value)
         {
             if (!string.Equals(profilerVariable, name, StringComparison.Ordinal))
             {
@@ -62,8 +62,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             requestData.MetricsCollection.Add(string.Format(telemetryTemplateName, dataCollectorInformation.DataCollectorConfig?.TypeUri?.ToString()), GetProfilerName(value));
         }
 
-        private void AddProfilerMetricForConflictedVariable(string profilerVariable, string telemetryTemplateName, DataCollectorInformation dataCollectorInformation, string name, string existingValue)
+        private void RecordProfilerMetricForConflictedVariable(string profilerVariable, string telemetryTemplateName, DataCollectorInformation dataCollectorInformation, string name, string value, string existingValue)
         {
+            // If data collector is requesting same profiler record it same as new
+            if (string.Equals(value, existingValue, StringComparison.OrdinalIgnoreCase))
+            {
+                RecordProfilerMetricForNewVariable(profilerVariable, telemetryTemplateName, dataCollectorInformation, name, value);
+                return;
+            }
+
             if (!string.Equals(profilerVariable, name, StringComparison.Ordinal))
             {
                 return;
@@ -80,25 +87,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
             }
 
-            requestData.MetricsCollection.Add(string.Format(telemetryTemplateName, dataCollectorInformation.DataCollectorConfig?.TypeUri?.ToString()), OverwrittenProfilerName);
+            requestData.MetricsCollection.Add(string.Format(telemetryTemplateName, dataCollectorInformation.DataCollectorConfig?.TypeUri?.ToString()), $"{OverwrittenProfilerName}({GetProfilerName(value)})");
         }
 
         private static string GetProfilerName(string profilerGuid)
         {
-            if (string.Equals(profilerGuid, VanguardProfilerGuid, StringComparison.OrdinalIgnoreCase))
+            return profilerGuid.ToLower() switch
             {
-                return VanguardProfilerName;
-            }
-            else if (string.Equals(profilerGuid, ClrIeProfilerGuid, StringComparison.OrdinalIgnoreCase))
-            {
-                return ClrIeProfilerName;
-            }
-            else if (string.Equals(profilerGuid, IntellitraceProfilerGuid, StringComparison.OrdinalIgnoreCase))
-            {
-                return IntellitraceProfilerName;
-            }
-
-            return UnknownProfilerName;
+                VanguardProfilerGuid => VanguardProfilerName,
+                ClrIeProfilerGuid => ClrIeProfilerName,
+                IntellitraceProfilerGuid => IntellitraceProfilerName,
+                _ => UnknownProfilerName
+            };
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
     internal interface IDataCollectionTelemetryManager
     {
         /// <summary>
-        /// Stores telemetry regarding environment variable added.
+        /// Record telemetry regarding environment variable added.
         /// </summary>
         /// <param name="dataCollectorInformation">
         /// Data collector information which requested environment variable.
@@ -20,10 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <param name="value">
         /// Environment variable value.
         /// </param>
-        void OnEnvironmentVariableAdded(DataCollectorInformation dataCollectorInformation, string name, string value);
+        void RecordEnvironmentVariableAddition(DataCollectorInformation dataCollectorInformation, string name, string value);
 
         /// <summary>
-        /// Stores telemetry regarding environment variable is conflicting.
+        /// Record telemetry regarding environment variable is conflicting.
         /// </summary>
         /// <param name="dataCollectorInformation">
         /// Data collector information which requested environment variable.
@@ -31,9 +31,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <param name="name">
         /// Environment variable name.
         /// </param>
+        /// <param name="value">
+        /// Environment variable value.
+        /// </param>
         /// <param name="existingValue">
         /// Environment variable value that was requested previously.
         /// </param>
-        void OnEnvironmentVariableConflict(DataCollectorInformation dataCollectorInformation, string name, string existingValue);
+        void RecordEnvironmentVariableConflict(DataCollectorInformation dataCollectorInformation, string name, string value, string existingValue);
     }
 }
