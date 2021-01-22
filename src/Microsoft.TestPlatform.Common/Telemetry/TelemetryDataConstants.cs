@@ -26,6 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
+        public const string DataCollectorsCorProfiler = "VS.TestPlatform.DataCollector.CorProfiler";
+
+        public const string DataCollectorsCoreClrProfiler = "VS.TestPlatform.DataCollector.CoreClrProfiler";
+
         public static string RunState = "VS.TestRun.RunState";
 
         public static string NumberOfSourcesSentForRun = "VS.TestRun.NumberOfSources";

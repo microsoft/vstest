@@ -62,8 +62,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.runEventHandler.Attachments);
 
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.datacollector://microsoft/CodeCoverage/2.0.CorProfiler"]);
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.datacollector://microsoft/CodeCoverage/2.0.CoreClrProfiler"]);
+            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
@@ -86,8 +86,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.runEventHandler.Attachments);
 
-            Assert.AreEqual("clrie", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.datacollector://microsoft/CodeCoverage/2.0.CorProfiler"]);
-            Assert.AreEqual("clrie", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.datacollector://microsoft/CodeCoverage/2.0.CoreClrProfiler"]);
+            Assert.AreEqual("clrie", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("clrie", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
@@ -108,8 +108,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.runEventHandler.Attachments);
 
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.datacollector://microsoft/CodeCoverage/2.0.CorProfiler"]);
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.datacollector://microsoft/CodeCoverage/2.0.CoreClrProfiler"]);
+            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
