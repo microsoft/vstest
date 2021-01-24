@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions
 {
-    // using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Resources;
 
     using System;
 
@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions
         {
             if (obj == null)
             {
-                throw new NotImplementedException(string.Format("Resources.MethodNotImplementedOnPlatform", className, methodName));
+                throw new NotImplementedException(string.Format(ManagedNameMessages.MethodNotImplementedOnPlatform, className, methodName));
             }
         }
     }
