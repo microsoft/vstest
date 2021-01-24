@@ -148,8 +148,8 @@ jobs:
     displayName: 'Acceptance tests'   
   
   - task: PublishTestResults@2
-    displayName: 'Publish Test Results **\*.trx'
+    displayName: 'Publish Test Results **/*.trx'
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**\*.trx'
+      testResultsFiles: '**/*.trx'
     condition: succeededOrFailed()
