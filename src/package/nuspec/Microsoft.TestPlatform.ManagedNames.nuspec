@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>Microsoft.TestPlatform.ManagedNames</id>
+        <version>15.0.0</version>
+        <title>Microsoft.TestPlatform.ManagedNames</title>
+        <authors>Microsoft</authors>
+        <owners>Microsoft</owners>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>
+            Includes helpers for the Test Platform's modern functionality such as standardized fully qualified names and hierarchical test case names.
+        </description>
+        <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+        <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+        <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
+        <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+        <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
+
+        <dependencies>
+            <group targetFramework="netstandard1.0">
+                <dependency id="NETStandard.Library" version="[1.6.1, )" />
+            </group>
+            
+            <group targetFramework="uap10.0">
+                <dependency id="Microsoft.NETCore.UniversalWindowsPlatform" version="[5.1.0, )" />
+                <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.3.0, )" />
+                <dependency id="System.Diagnostics.FileVersionInfo" version="[4.3.0, )" />
+                <dependency id="Microsoft.Win32.Primitives" version="[4.3.0, )" />
+            </group>
+        </dependencies>
+    </metadata>
+
+    <files>
+        <file src="netstandard1.0\Microsoft.TestPlatform.ManagedNames.dll" target="lib\netstandard1.0" />
+        <file src="netstandard1.0\**\Microsoft.TestPlatform.ManagedNames.resources.dll" target="lib\netstandard1.0" />
+        
+        <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.ManagedNames.dll" target="lib\uap10.0" />
+        <file src="Microsoft.TestPlatform.TestHost\uap10.0\**\Microsoft.TestPlatform.ManagedNames.resources.dll" target="lib\uap10.0" />
+    </files>
+</package>
