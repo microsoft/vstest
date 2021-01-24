@@ -33,6 +33,13 @@ jobs:
       modifyEnvironment: false
       failOnStandardError: true
 
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **\*.trx'
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '**\*.trx'
+    condition: succeededOrFailed()
+
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Build.SourcesDirectory)\artifacts'
@@ -124,16 +131,25 @@ jobs:
   steps:
   - script: ./build.sh -c $(buildConfiguration)
     displayName: 'Build'
+
   - script: ./test.sh -c $(buildConfiguration) -p Unit
     displayName: 'Unit tests'  
+
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
       artifactName: 'testArtifacts'
       targetPath: '$(Build.SourcesDirectory)/artifacts'
+
   - script: ./tools/dotnet-linux/dotnet build -c $(buildConfiguration) ./test/TestAssets/TestAssets.sln
     displayName: 'Build test assets'
+
   - script: ./test.sh -c $(buildConfiguration) -p Acceptance
     displayName: 'Acceptance tests'   
-
-   
+  
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **\*.trx'
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '**\*.trx'
+    condition: succeededOrFailed()
