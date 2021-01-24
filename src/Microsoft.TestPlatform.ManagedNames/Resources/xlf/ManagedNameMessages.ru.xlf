@@ -1,36 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="it" original="../ManagedNameMessages.resx">
+  <file datatype="xml" source-language="en" target-language="ru" original="../ManagedNameMessages.resx">
     <body>
       <trans-unit id="ErrorIncompleteManagedName">
         <source>ManagedName is incomplete</source>
-        <target state="translated">L'elemento ManagedName è incompleto</target>
+        <target state="translated">ManagedName является неполным.</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
         <source>Method arity must be numeric</source>
-        <target state="translated">Il grado del metodo deve essere numerico</target>
+        <target state="translated">Арность метода должна быть числовым значением</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>
-        <target state="translated">Il metodo '{0}' non è stato trovato nel tipo '{1}'</target>
+        <target state="translated">Метод "{0}" не найден для типа "{1}"</target>
         <note>{0} is the method name, {1} is the full type name.</note>
       </trans-unit>
       <trans-unit id="ErrorTypeNotFound">
         <source>Type '{0}' not found</source>
-        <target state="translated">Il tipo '{0}' non è stato trovato</target>
+        <target state="translated">Тип "{0}" не найден</target>
         <note>{0} is the full type name.</note>
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
         <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
-        <target state="translated">Caratteri imprevisti dopo la fine dell'elemento ManagedName (pos.: {0})</target>
+        <target state="translated">Неожиданные символы после окончания ManagedName (позиция: {0}).</target>
         <note>{0} is the position of unexpected characters</note>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">
         <source>Whitespace is not valid in a ManagedName (pos: {0})</source>
-        <target state="translated">Gli spazi vuoti non sono validi in un elemento ManagedName (pos.: {0})</target>
+        <target state="translated">Пробел в ManagedName (позиция: {0}) не допускается.</target>
         <note>{0} is the position of invalid whitespace</note>
+      </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="translated">'{0}.{1}' bu platformda uygulanmıyor!</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
       </trans-unit>
     </body>
   </file>

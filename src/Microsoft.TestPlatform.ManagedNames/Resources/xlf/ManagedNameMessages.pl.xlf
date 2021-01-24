@@ -32,6 +32,13 @@
         <target state="translated">Biały znak jest niedozwolony w wartości ManagedName (pozycja: {0})</target>
         <note>{0} is the position of invalid whitespace</note>
       </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="translated">Element „{0}.{1}” nie jest zaimplementowany na tej platformie.</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

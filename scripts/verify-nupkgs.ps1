@@ -13,16 +13,17 @@ function Verify-Nuget-Packages($packageDirectory, $version)
 {
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-                     "Microsoft.CodeCoverage" = 59;
-                     "Microsoft.NET.Test.Sdk" = 18;
-                     "Microsoft.TestPlatform" = 513;
-                     "Microsoft.TestPlatform.Build" = 19;
-                     "Microsoft.TestPlatform.CLI" = 379;
-                     "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
-                     "Microsoft.TestPlatform.ObjectModel" = 178;
-                     "Microsoft.TestPlatform.Portable" = 568;
-                     "Microsoft.TestPlatform.TestHost" = 212;
-                     "Microsoft.TestPlatform.TranslationLayer" = 121}
+        "Microsoft.CodeCoverage" = 59;
+        "Microsoft.NET.Test.Sdk" = 18;
+        "Microsoft.TestPlatform" = 527;
+        "Microsoft.TestPlatform.Build" = 19;
+        "Microsoft.TestPlatform.CLI" = 409;
+        "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
+        "Microsoft.TestPlatform.ObjectModel" = 256;
+        "Microsoft.TestPlatform.Portable" = 610;
+        "Microsoft.TestPlatform.TestHost" = 371;
+        "Microsoft.TestPlatform.TranslationLayer" = 121
+    }
 
     $nugetPackages = Get-ChildItem -Filter "*$version*.nupkg" $packageDirectory | % { $_.FullName }
 

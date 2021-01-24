@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities
+namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Resources;
 
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities
 
     public class ManagedNameParser
     {
-        internal static void ParseTypeName(string fullTypeName, out string namespaceName, out string typeName)
+        public static void ParseTypeName(string fullTypeName, out string namespaceName, out string typeName)
         {
             int pos = fullTypeName.LastIndexOf('.');
             if (pos == -1)
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities
             }
         }
 
-        internal static void ParseMethodName(string fullMethodName, out string methodName, out int arity, out string[] parameterTypes)
+        public static void ParseMethodName(string fullMethodName, out string methodName, out int arity, out string[] parameterTypes)
         {
             int pos = ParseMethodName(fullMethodName, 0, out methodName, out arity);
             pos = ParseParameterTypeList(fullMethodName, pos, out parameterTypes);

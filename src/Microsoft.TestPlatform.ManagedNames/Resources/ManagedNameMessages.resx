@@ -139,4 +139,10 @@
     <value>Whitespace is not valid in a ManagedName (pos: {0})</value>
     <comment>{0} is the position of invalid whitespace</comment>
   </data>
+  <data name="MethodNotImplementedOnPlatform" xml:space="preserve">
+    <value>'{0}.{1}' is not implemented on this platform!</value>
+    <comment>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</comment>
+  </data>
 </root>

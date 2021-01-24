@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.ManagedNames\Microsoft.TestPlatform.ManagedNames.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net45' ">
@@ -78,7 +79,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
     <EmbeddedResource Include="Resources\CommonResources.resx" />
-    <EmbeddedResource Include="Resources\ManagedNameMessages.resx" />
 
     <None Include="Resources\CommonResources.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -91,11 +91,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>CommonResources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Resources\ManagedNameMessages.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ManagedNameMessages.resx</DependentUpon>
-    </Compile>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -107,10 +102,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <DependentUpon>Resources\CommonResources.tt</DependentUpon>
       <LastGenOutput>CommonResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ManagedNameMessages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ManagedNameMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

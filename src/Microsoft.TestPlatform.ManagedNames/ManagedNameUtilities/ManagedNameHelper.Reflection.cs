@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities
+namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Extensions;
 
     using System;
     using System.Globalization;

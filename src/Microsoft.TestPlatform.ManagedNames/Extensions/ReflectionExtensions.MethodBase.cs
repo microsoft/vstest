@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Extensions
+namespace Microsoft.VisualStudio.TestPlatform.Extensions
 {
     using System;
     using System.Reflection;
 
-    public static partial class ReflectionExtensions
+    internal static partial class ReflectionExtensions
     {
 #if NETSTANDARD1_0 || NETSTANDARD1_3 || WINDOWS_UWP
         private static readonly Type methodBase = typeof(MethodBase);

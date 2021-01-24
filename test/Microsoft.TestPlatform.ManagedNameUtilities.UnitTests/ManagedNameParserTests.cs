@@ -3,7 +3,7 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.ManagedNameUtilities;
+    using Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

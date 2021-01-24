@@ -76,8 +76,9 @@
     </frameworkAssemblies>
   </metadata>
   <files>	
-    <!-- net45 -->
+      <!-- net45 -->
       <file src="net45\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net45\" />
+      <file src="net45\$Runtime$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\net45\" />
       <file src="net45\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net45\" />
       <file src="net45\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\net45\" />
 
@@ -94,7 +95,20 @@
       <file src="net45\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\net45\ru" />
       <file src="net45\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\net45\tr" />
       <file src="net45\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net45\zh-Hans" />
-      <file src="net45\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net45\zh-Hant" />
+      <file src="net45\$Runtime$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\net45\zh-Hant" />
+      <file src="net45\$Runtime$\cs\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\cs" />
+      <file src="net45\$Runtime$\de\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\de" />
+      <file src="net45\$Runtime$\es\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\es" />
+      <file src="net45\$Runtime$\fr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\fr" />
+      <file src="net45\$Runtime$\it\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\it" />
+      <file src="net45\$Runtime$\ja\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\ja" />
+      <file src="net45\$Runtime$\ko\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\ko" />
+      <file src="net45\$Runtime$\pl\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\pl" />
+      <file src="net45\$Runtime$\pt-BR\Microsoft.TestPlatform.ManagedNames.*resources.dll"               target="lib\net45\pt-BR" />
+      <file src="net45\$Runtime$\ru\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\ru" />
+      <file src="net45\$Runtime$\tr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net45\tr" />
+      <file src="net45\$Runtime$\zh-Hans\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\net45\zh-Hans" />
+      <file src="net45\$Runtime$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\net45\zh-Hant" />
       <file src="net45\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\net45\cs" />
       <file src="net45\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\net45\de" />
       <file src="net45\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\net45\es" />
@@ -112,6 +126,7 @@
 
     <!-- net451 -->
       <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net451\" />
+      <file src="net451\$Runtime$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\net451\" />
       <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net451\" />
       <file src="net451\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\net451\" />
 
@@ -128,7 +143,20 @@
       <file src="net451\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\net451\ru" />
       <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\net451\tr" />
       <file src="net451\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hans" />
-      <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hant" />
+      <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\net451\zh-Hant" />
+      <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\cs" />
+      <file src="net451\$Runtime$\de\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\de" />
+      <file src="net451\$Runtime$\es\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\es" />
+      <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\fr" />
+      <file src="net451\$Runtime$\it\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\it" />
+      <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\ja" />
+      <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\ko" />
+      <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\pl" />
+      <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.ManagedNames.*resources.dll"               target="lib\net451\pt-BR" />
+      <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\ru" />
+      <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\net451\tr" />
+      <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\net451\zh-Hans" />
+      <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\net451\zh-Hant" />
       <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\net451\cs" />
       <file src="net451\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\net451\de" />
       <file src="net451\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\net451\es" />
@@ -146,6 +174,7 @@
 
     <!-- netstandard 1.0 -->
       <file src="$NetStandard10Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.0\" />
+      <file src="$NetStandard10Framework$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\netstandard1.0\" />
       <file src="$NetStandard10Framework$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netstandard1.0\" />
       <file src="$NetStandard10Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netstandard1.0\" />
 
@@ -162,7 +191,20 @@
       <file src="$NetStandard10Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard1.0\ru" />
       <file src="$NetStandard10Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard1.0\tr" />
       <file src="$NetStandard10Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.0\zh-Hans" />
-      <file src="$NetStandard10Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.0\zh-Hant" />
+      <file src="$NetStandard10Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard1.0\zh-Hant" />
+      <file src="$NetStandard10Framework$\cs\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\cs" />
+      <file src="$NetStandard10Framework$\de\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\de" />
+      <file src="$NetStandard10Framework$\es\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\es" />
+      <file src="$NetStandard10Framework$\fr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\fr" />
+      <file src="$NetStandard10Framework$\it\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\it" />
+      <file src="$NetStandard10Framework$\ja\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\ja" />
+      <file src="$NetStandard10Framework$\ko\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\ko" />
+      <file src="$NetStandard10Framework$\pl\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\pl" />
+      <file src="$NetStandard10Framework$\pt-BR\Microsoft.TestPlatform.ManagedNames.*resources.dll"               target="lib\netstandard1.0\pt-BR" />
+      <file src="$NetStandard10Framework$\ru\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\ru" />
+      <file src="$NetStandard10Framework$\tr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.0\tr" />
+      <file src="$NetStandard10Framework$\zh-Hans\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard1.0\zh-Hans" />
+      <file src="$NetStandard10Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard1.0\zh-Hant" />
       <file src="$NetStandard10Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard1.0\cs" />
       <file src="$NetStandard10Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard1.0\de" />
       <file src="$NetStandard10Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard1.0\es" />
@@ -180,6 +222,7 @@
 
     <!-- netstandard 1.3 -->
       <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.3\" />
+      <file src="$NetStandard13Framework$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\netstandard1.3\" />
       <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netstandard1.3\" />
       <file src="$NetStandard13Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netstandard1.3\" />
 
@@ -196,7 +239,20 @@
       <file src="$NetStandard13Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard1.3\ru" />
       <file src="$NetStandard13Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard1.3\tr" />
       <file src="$NetStandard13Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\zh-Hans" />
-      <file src="$NetStandard13Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\zh-Hant" />
+      <file src="$NetStandard13Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard1.3\zh-Hant" />
+      <file src="$NetStandard13Framework$\cs\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\cs" />
+      <file src="$NetStandard13Framework$\de\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\de" />
+      <file src="$NetStandard13Framework$\es\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\es" />
+      <file src="$NetStandard13Framework$\fr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\fr" />
+      <file src="$NetStandard13Framework$\it\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\it" />
+      <file src="$NetStandard13Framework$\ja\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\ja" />
+      <file src="$NetStandard13Framework$\ko\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\ko" />
+      <file src="$NetStandard13Framework$\pl\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\pl" />
+      <file src="$NetStandard13Framework$\pt-BR\Microsoft.TestPlatform.ManagedNames.*resources.dll"               target="lib\netstandard1.3\pt-BR" />
+      <file src="$NetStandard13Framework$\ru\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\ru" />
+      <file src="$NetStandard13Framework$\tr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard1.3\tr" />
+      <file src="$NetStandard13Framework$\zh-Hans\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard1.3\zh-Hans" />
+      <file src="$NetStandard13Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard1.3\zh-Hant" />
       <file src="$NetStandard13Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard1.3\cs" />
       <file src="$NetStandard13Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard1.3\de" />
       <file src="$NetStandard13Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard1.3\es" />
@@ -214,6 +270,7 @@
 
     <!-- netstandard 2.0 -->	
       <file src="$NetStandard20Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard2.0\" />	
+      <file src="$NetStandard20Framework$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\netstandard2.0\" />	
       <file src="$NetStandard20Framework$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\netstandard2.0\" />	
       <file src="$NetStandard20Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\netstandard2.0\" />	
 
@@ -230,7 +287,20 @@
       <file src="$NetStandard20Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\ru" />	
       <file src="$NetStandard20Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\netstandard2.0\tr" />	
       <file src="$NetStandard20Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hans" />	
-      <file src="$NetStandard20Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hant" />	
+      <file src="$NetStandard20Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard2.0\zh-Hant" />		
+      <file src="$NetStandard20Framework$\cs\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\cs" />	
+      <file src="$NetStandard20Framework$\de\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\de" />	
+      <file src="$NetStandard20Framework$\es\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\es" />	
+      <file src="$NetStandard20Framework$\fr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\fr" />	
+      <file src="$NetStandard20Framework$\it\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\it" />	
+      <file src="$NetStandard20Framework$\ja\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\ja" />	
+      <file src="$NetStandard20Framework$\ko\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\ko" />	
+      <file src="$NetStandard20Framework$\pl\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\pl" />	
+      <file src="$NetStandard20Framework$\pt-BR\Microsoft.TestPlatform.ManagedNames.*resources.dll"               target="lib\netstandard2.0\pt-BR" />	
+      <file src="$NetStandard20Framework$\ru\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\ru" />	
+      <file src="$NetStandard20Framework$\tr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\netstandard2.0\tr" />	
+      <file src="$NetStandard20Framework$\zh-Hans\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard2.0\zh-Hans" />	
+      <file src="$NetStandard20Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\netstandard2.0\zh-Hant" />	
       <file src="$NetStandard20Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\cs" />	
       <file src="$NetStandard20Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\de" />	
       <file src="$NetStandard20Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\netstandard2.0\es" />	
@@ -248,6 +318,7 @@
 
     <!-- uap10.0 -->
       <file src="$Uap10Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\uap10.0\" />
+      <file src="$Uap10Framework$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\uap10.0\" />
       <file src="$Uap10Framework$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\uap10.0\" />
       <file src="$Uap10Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll"     target="lib\uap10.0\" />
 
@@ -264,7 +335,20 @@
       <file src="$Uap10Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\uap10.0\ru" />
       <file src="$Uap10Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll"      target="lib\uap10.0\tr" />
       <file src="$Uap10Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\zh-Hans" />
-      <file src="$Uap10Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\zh-Hant" />
+      <file src="$Uap10Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\uap10.0\zh-Hant" />
+      <file src="$Uap10Framework$\cs\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\cs" />
+      <file src="$Uap10Framework$\de\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\de" />
+      <file src="$Uap10Framework$\es\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\es" />
+      <file src="$Uap10Framework$\fr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\fr" />
+      <file src="$Uap10Framework$\it\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\it" />
+      <file src="$Uap10Framework$\ja\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\ja" />
+      <file src="$Uap10Framework$\ko\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\ko" />
+      <file src="$Uap10Framework$\pl\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\pl" />
+      <file src="$Uap10Framework$\pt-BR\Microsoft.TestPlatform.ManagedNames.*resources.dll"               target="lib\uap10.0\pt-BR" />
+      <file src="$Uap10Framework$\ru\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\ru" />
+      <file src="$Uap10Framework$\tr\Microsoft.TestPlatform.ManagedNames.*resources.dll"                  target="lib\uap10.0\tr" />
+      <file src="$Uap10Framework$\zh-Hans\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\uap10.0\zh-Hans" />
+      <file src="$Uap10Framework$\zh-Hant\Microsoft.TestPlatform.ManagedNames.*resources.dll"             target="lib\uap10.0\zh-Hant" />
       <file src="$Uap10Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\uap10.0\cs" />
       <file src="$Uap10Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\uap10.0\de" />
       <file src="$Uap10Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll"                  target="lib\uap10.0\es" />

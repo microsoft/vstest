@@ -19,7 +19,11 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MicrosoftCodeAnalysisVersion)" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ManagedNames\Microsoft.TestPlatform.ManagedNames.csproj" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Compile Update="TestClasses.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
