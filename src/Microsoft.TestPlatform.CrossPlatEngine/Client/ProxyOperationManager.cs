@@ -219,10 +219,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 // Launch the test host.
-                var hostLaunchedTask = this.TestHostManager.LaunchTestHostAsync(
+                this.testHostLaunched = this.TestHostManager.LaunchTestHostAsync(
                     testHostStartInfo,
-                    this.CancellationTokenSource.Token);
-                this.testHostLaunched = hostLaunchedTask.Result;
+                    this.CancellationTokenSource.Token).Result;
 
                 if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                 {
@@ -245,9 +244,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
             var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
-            if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
-                new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
+            if ((!string.IsNullOrEmpty(hostDebugEnabled)
+                    && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+                || (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                    && !string.IsNullOrEmpty(nativeHostDebugEnabled)
+                    && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
             {
                 ConsoleOutput.Instance.WriteLine(
                     CrossPlatEngineResources.HostDebuggerWarning,
@@ -265,8 +266,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // If test host does not launch then throw exception, otherwise wait for connection.
-            if (!this.testHostLaunched ||
-                !this.RequestSender.WaitForRequestHandlerConnection(
+            if (!this.testHostLaunched
+                || !this.RequestSender.WaitForRequestHandlerConnection(
                     connTimeout * 1000,
                     this.CancellationTokenSource.Token))
             {
@@ -287,7 +288,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Older test hosts are not aware of protocol version check, hence we should not be
             // sending VersionCheck message to these test hosts.
             this.CompatIssueWithVersionCheckAndRunsettings();
-
             if (this.versionCheckRequired)
             {
                 this.RequestSender.CheckVersionWithTestHost();
@@ -372,6 +372,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
+            // TODO (copoiena): If called and testhost is already running, we should restart.
             if (this.baseProxy == null)
             {
                 // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
