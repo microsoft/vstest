@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             testSessionManager.Initialize(false);
-            testSessionManager.StartSession(testSessionCriteria, eventsHandler);
+            testSessionManager.StartSession(eventsHandler);
         }
 
         /// <summary>

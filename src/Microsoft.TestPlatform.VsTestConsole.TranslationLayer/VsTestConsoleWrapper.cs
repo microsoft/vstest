@@ -219,6 +219,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     options,
                     eventsHandler,
                     testHostLauncher),
+                eventsHandler,
                 this);
         }
 
@@ -621,6 +622,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     options,
                     eventsHandler,
                     testHostLauncher).ConfigureAwait(false),
+                eventsHandler,
                 this);
         }
 

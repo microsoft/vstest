@@ -87,7 +87,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         // In case we have an active test session, we always prefer the already
                         // created proxies instead of the ones that need to be created on the spot.
                         return new ProxyDiscoveryManager(
-                            discoveryCriteria.TestSessionInfo);
+                            discoveryCriteria.TestSessionInfo,
+                            discoveryCriteria.RunSettings);
                     }
                     catch (InvalidOperationException ex)
                     {
@@ -97,7 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         // 
                         // WARNING: This should not normally happen and it raises questions
                         // regarding the test session pool operation and consistency.
-                        EqtTrace.Warning("ProxyDiscoveryManager failed: {0}", ex.ToString());
+                        EqtTrace.Warning(
+                            "ProxyDiscoveryManager creation with test session failed: {0}",
+                            ex.ToString());
                     }
                 }
 
@@ -164,6 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         // execution proxy and the one with data collection enabled.
                         return new ProxyExecutionManager(
                             testRunCriteria.TestSessionInfo,
+                            testRunCriteria.TestRunSettings,
                             testRunCriteria.DebugEnabledForTestSession);
                     }
                     catch (InvalidOperationException ex)
@@ -174,7 +178,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         // 
                         // WARNING: This should not normally happen and it raises questions
                         // regarding the test session pool operation and consistency.
-                        EqtTrace.Warning("ProxyExecutionManager failed: {0}", ex.ToString());
+                        EqtTrace.Warning(
+                            "ProxyExecutionManager creation with test session failed: {0}",
+                            ex.ToString());
                     }
                 }
 
@@ -264,18 +270,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     CloseConnectionOnOperationComplete = false
                 };
 
+                // TODO (copoiena): For now we don't support data collection alongside test
+                // sessions.
+                // 
+                // The reason for this is that, in the case of Code Coverage for example, the
+                // data collector needs to pass some environment variables to the testhost process
+                // before the testhost process is started. This means that the data collector must
+                // be running when the testhost process is spawned, however the testhost process
+                // should be spawned during build, and it's problematic to have the data collector
+                // running during build because it must instrument the .dll files that don't exist
+                // yet.
                 return isDataCollectorEnabled
-                    ? new ProxyOperationManagerWithDataCollection(
-                        requestData,
-                        requestSender,
-                        hostManager,
-                        new ProxyDataCollectionManager(
-                            requestData,
-                            testSessionCriteria.RunSettings,
-                            testSessionCriteria.Sources))
-                        {
-                            CloseRequestSenderChannelOnProxyClose = true
-                        }
+                    ? null
+                    // ? new ProxyOperationManagerWithDataCollection(
+                    //     requestData,
+                    //     requestSender,
+                    //     hostManager,
+                    //     new ProxyDataCollectionManager(
+                    //         requestData,
+                    //         testSessionCriteria.RunSettings,
+                    //         testSessionCriteria.Sources))
+                    //     {
+                    //         CloseRequestSenderChannelOnProxyClose = true
+                    //     }
                     : new ProxyOperationManager(
                         requestData,
                         requestSender,
@@ -285,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         };
             };
 
-            return new ProxyTestSessionManager(parallelLevel, proxyCreator);
+            return new ProxyTestSessionManager(testSessionCriteria, parallelLevel, proxyCreator);
         }
 
         /// <inheritdoc/>

@@ -61,14 +61,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info.</param>
+        /// <param name="runSettings">The run settings.</param>
         /// <param name="debugEnabledForTestSession">
         /// A flag indicating if debugging should be enabled or not.
         /// </param>
-        public ProxyExecutionManager(TestSessionInfo testSessionInfo, bool debugEnabledForTestSession)
+        public ProxyExecutionManager(
+            TestSessionInfo testSessionInfo,
+            string runSettings,
+            bool debugEnabledForTestSession)
         {
             // Filling in test session info and proxy information.
             this.testSessionInfo = testSessionInfo;
-            this.ProxyOperationManager = TestSessionPool.Instance.TakeProxy(this.testSessionInfo);
+            this.ProxyOperationManager = TestSessionPool.Instance.TakeProxy(
+                this.testSessionInfo,
+                runSettings);
             // This should be set to enable debugging when we have test session info available.
             this.debugEnabledForTestSession = debugEnabledForTestSession;
 

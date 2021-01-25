@@ -22,13 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Starts the test session based on the test session criteria.
         /// </summary>
         /// 
-        /// <param name="criteria">The test session criteria.</param>
         /// <param name="eventsHandler">
         /// Event handler for handling events fired during test session management operations.
         /// </param>
-        void StartSession(
-            StartTestSessionCriteria criteria,
-            ITestSessionEventsHandler eventsHandler);
+        void StartSession(ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Stops the test session.

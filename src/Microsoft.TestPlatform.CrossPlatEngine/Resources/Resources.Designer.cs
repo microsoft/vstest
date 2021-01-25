@@ -241,6 +241,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find an available proxy to match the original run settings..
+        /// </summary>
+        internal static string NoProxyMatchesDescription {
+            get {
+                return ResourceManager.GetString("NoProxyMatchesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Proxy with id {0} is not managed by the current session manager..
         /// </summary>
         internal static string NoSuchProxyId {

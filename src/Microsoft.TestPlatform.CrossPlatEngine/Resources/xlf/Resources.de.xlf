@@ -237,6 +237,11 @@
         <target state="new">No suitable test runtime provider found for this run.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoProxyMatchesDescription">
+        <source>Could not find an available proxy to match the original run settings.</source>
+        <target state="new">Could not find an available proxy to match the original run settings.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -216,4 +216,7 @@
   <data name="NoTestHostProviderFound" xml:space="preserve">
     <value>No suitable test runtime provider found for this run.</value>
   </data>
+  <data name="NoProxyMatchesDescription" xml:space="preserve">
+    <value>Could not find an available proxy to match the original run settings.</value>
+  </data>
 </root>

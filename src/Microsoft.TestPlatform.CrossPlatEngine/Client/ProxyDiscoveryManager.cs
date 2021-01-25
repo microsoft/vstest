@@ -43,11 +43,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info.</param>
-        public ProxyDiscoveryManager(TestSessionInfo testSessionInfo)
+        /// <param name="runSettings">The run settings.</param>
+        public ProxyDiscoveryManager(TestSessionInfo testSessionInfo, string runSettings)
         {
             // Filling in test session info and proxy information.
             this.testSessionInfo = testSessionInfo;
-            this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(this.testSessionInfo);
+            this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
+                this.testSessionInfo,
+                runSettings);
 
             this.testHostManager = this.proxyOperationManager.TestHostManager;
             this.dataSerializer = JsonDataSerializer.Instance;

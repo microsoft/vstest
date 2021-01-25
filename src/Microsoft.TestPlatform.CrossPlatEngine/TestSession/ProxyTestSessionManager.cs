@@ -21,8 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     public class ProxyTestSessionManager : IProxyTestSessionManager
     {
         private readonly object lockObject = new object();
+        private StartTestSessionCriteria testSessionCriteria;
         private int parallelLevel;
         private bool skipDefaultAdapters;
+        private TestSessionInfo testSessionInfo;
         private Func<ProxyOperationManager> proxyCreator;
         private Queue<Guid> availableProxyQueue;
         private IDictionary<Guid, ProxyOperationManagerContainer> proxyMap;
@@ -31,10 +33,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
         /// </summary>
         /// 
+        /// <param name="criteria">The test session criteria.</param>
         /// <param name="parallelLevel">The parallel level.</param>
         /// <param name="proxyCreator">The proxy creator.</param>
-        public ProxyTestSessionManager(int parallelLevel, Func<ProxyOperationManager> proxyCreator)
+        public ProxyTestSessionManager(
+            StartTestSessionCriteria criteria,
+            int parallelLevel,
+            Func<ProxyOperationManager> proxyCreator)
         {
+            this.testSessionCriteria = criteria;
             this.parallelLevel = parallelLevel;
             this.proxyCreator = proxyCreator;
 
@@ -49,11 +56,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <inheritdoc/>
-        public void StartSession(
-            StartTestSessionCriteria criteria,
-            ITestSessionEventsHandler eventsHandler)
+        public void StartSession(ITestSessionEventsHandler eventsHandler)
         {
-            var testSessionInfo = new TestSessionInfo();
+            if (this.testSessionInfo != null)
+            {
+                return;
+            }
+
+            this.testSessionInfo = new TestSessionInfo();
+
             var taskList = new Task[this.parallelLevel];
 
             // Create all the proxies in parallel, one task per proxy.
@@ -71,8 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                         // Start the test host associated to the proxy.
                         operationManagerProxy.SetupChannel(
-                            criteria.Sources,
-                            criteria.RunSettings,
+                            this.testSessionCriteria.Sources,
+                            this.testSessionCriteria.RunSettings,
                             eventsHandler);
 
                         this.EnqueueNewProxy(operationManagerProxy);
@@ -105,6 +116,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public void StopSession()
         {
+            if (this.testSessionInfo == null)
+            {
+                return;
+            }
+
             int index = 0;
             var taskList = new Task[this.proxyMap.Count];
 
@@ -120,14 +136,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             // Wait for proxy disposal to be over.
             Task.WaitAll(taskList);
+
+            this.testSessionInfo = null;
         }
 
         /// <summary>
         /// Dequeues a proxy to be used either by discovery or execution.
         /// </summary>
         /// 
+        /// <param name="runSettings">The run settings.</param>
+        /// 
         /// <returns>The dequeued proxy.</returns>
-        public ProxyOperationManager DequeueProxy()
+        public ProxyOperationManager DequeueProxy(string runSettings)
         {
             ProxyOperationManagerContainer proxyContainer = null;
 
@@ -140,6 +160,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         string.Format(
                             CultureInfo.CurrentUICulture,
                             CrossPlatResources.NoAvailableProxyForDeque));
+                }
+
+                // We must ensure the current run settings match the run settings from when the
+                // testhost was started. If not, throw an exception to force the caller to create
+                // its own proxy instead.
+                //
+                // TODO (copoiena): This run settings match is rudimentary. We should refine the
+                // match criteria in the future.
+                if (!this.testSessionCriteria.RunSettings.Equals(runSettings))
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.CurrentUICulture,
+                            CrossPlatResources.NoProxyMatchesDescription));
                 }
 
                 // Get the proxy id from the available queue.

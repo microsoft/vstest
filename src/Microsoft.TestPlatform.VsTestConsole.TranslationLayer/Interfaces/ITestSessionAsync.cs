@@ -163,6 +163,13 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// Stops the test session.
         /// </summary>
         /// 
+        /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+        Task<bool> StopTestSessionAsync();
+
+        /// <summary>
+        /// Stops the test session.
+        /// </summary>
+        /// 
         /// <param name="eventsHandler">The session event handler.</param>
         /// 
         /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
