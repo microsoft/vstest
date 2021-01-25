@@ -1,5 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.	
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.	
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
@@ -11,22 +11,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
-    /// <summary>	
-    /// Defines a test session object that can be used to make calls to the vstest.console	
-    /// process.	
-    /// </summary>	
+    /// <summary>
+    /// Defines a test session object that can be used to make calls to the vstest.console
+    /// process.
+    /// </summary>
     public class TestSession : ITestSession
     {
         private TestSessionInfo testSessionInfo;
         private VsTestConsoleWrapper consoleWrapper;
 
-        #region Constructors	
-        /// <summary>	
-        /// Initializes a new instance of the <see cref="TestSession"/> class.	
-        /// </summary>	
-        /// 	
-        /// <param name="testSessionInfo">The test session info object.</param>	
-        /// <param name="consoleWrapper">The encapsulated console wrapper.</param>	
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestSession"/> class.
+        /// </summary>
+        ///
+        /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="consoleWrapper">The encapsulated console wrapper.</param>
         public TestSession(
             TestSessionInfo testSessionInfo,
             VsTestConsoleWrapper consoleWrapper)
@@ -36,26 +36,26 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
         #endregion
 
-        #region ITestSession	
-        /// <inheritdoc/>	
+        #region ITestSession
+        /// <inheritdoc/>
         public void AbortTestRun()
         {
             this.consoleWrapper.AbortTestRun();
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void CancelDiscovery()
         {
             this.consoleWrapper.CancelDiscovery();
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void CancelTestRun()
         {
             this.consoleWrapper.CancelTestRun();
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 discoveryEventsHandler: new DiscoveryEventsHandleConverter(discoveryEventsHandler));
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -83,7 +83,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 discoveryEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -124,7 +124,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -139,7 +139,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -154,7 +154,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -203,7 +203,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
         {
             return this.consoleWrapper.StopTestSession(
@@ -212,8 +212,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
         #endregion
 
-        #region ITestSessionAsync	
-        /// <inheritdoc/>	
+        #region ITestSessionAsync
+        /// <inheritdoc/>
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -226,7 +226,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 discoveryEventsHandler: new DiscoveryEventsHandleConverter(discoveryEventsHandler));
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -241,7 +241,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 discoveryEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -254,7 +254,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -269,7 +269,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -282,7 +282,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -297,7 +297,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testRunEventsHandler);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -312,7 +312,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -329,7 +329,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -344,7 +344,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -361,7 +361,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customTestHostLauncher);
         }
 
-        /// <inheritdoc/>	
+        /// <inheritdoc/>
         public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
         {
             return await this.consoleWrapper.StopTestSessionAsync(
