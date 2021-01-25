@@ -17,10 +17,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <summary>
         /// Initializes a new instance of the <see cref="AfterTestRunEndResult"/> class.
         /// </summary>
-        /// <param name="environmentVariables">
+        /// <param name="attachmentSets">
         /// The collection of attachment sets.
         /// </param>
-        /// <param name="dataCollectionEventsPort">
+        /// <param name="metrics">
         /// The metrics.
         /// </param>
         public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets, IDictionary<string, object> metrics)
@@ -29,15 +29,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
             this.Metrics = metrics;
         }
 
-        /// <summary>
-        /// Gets the environment variable dictionary.
-        /// </summary>
         [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
-        /// <summary>
-        /// Get the Metrics
-        /// </summary>
         [DataMember]
         public IDictionary<string, object> Metrics { get; private set; }
     }
