@@ -152,11 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 {
                     if (Instance == null)
                     {
-                        var requestData = new RequestData
-                        {
-                            MetricsCollection = new NoOpMetricsCollection(),
-                            IsTelemetryOptedIn = false
-                        };
+                        var requestData = new RequestData();
 
                         Instance = new DataCollectionRequestHandler(
                             communicationManager,
@@ -409,10 +405,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
         private void UpdateRequestData(bool isTelemetryOptedIn)
         {
-            if (isTelemetryOptedIn && !this.requestData.IsTelemetryOptedIn)
+            if (isTelemetryOptedIn != this.requestData.IsTelemetryOptedIn)
             {
-                this.requestData.MetricsCollection = new MetricsCollection();
-                this.requestData.IsTelemetryOptedIn = true;
+                this.requestData.MetricsCollection = isTelemetryOptedIn ? (IMetricsCollection)new MetricsCollection() : new NoOpMetricsCollection();
+                this.requestData.IsTelemetryOptedIn = isTelemetryOptedIn;
             }
         }
     }
