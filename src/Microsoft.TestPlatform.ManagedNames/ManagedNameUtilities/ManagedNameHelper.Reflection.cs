@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
 
             if (type == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorTypeNotFound, fullTypeName);
+                string message = String.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, fullTypeName);
                 throw new InvalidManagedNameException(message);
             }
 
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
 
             if (method == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorMethodNotFound, methodName, fullTypeName);
+                string message = String.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodNotFound, methodName, fullTypeName);
                 throw new InvalidManagedNameException(message);
             }
 

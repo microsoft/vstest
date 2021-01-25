@@ -37,15 +37,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ManagedNameMessages.resx" />
-    <Compile Update="Resources\ManagedNameMessages.Designer.cs">
+    <EmbeddedResource Include="Resources\Resources.resx" />
+    <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>ManagedNameMessages.resx</DependentUpon>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Update="Resources\ManagedNameMessages.resx">
+    <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ManagedNameMessages.Designer.cs</LastGenOutput>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

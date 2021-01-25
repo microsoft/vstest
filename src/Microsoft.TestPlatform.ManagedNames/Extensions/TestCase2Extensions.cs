@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions
         /// <summary>
         /// Returns <c>true</c> if both <see cref="ITestCase2.ManagedType" /> and <see cref="ITestCase2.ManagedMethod" /> are not null or whitespace.
         /// </summary>
-        public static bool HasManagedMethodAndType(this ITestCase2 testCase)
+        public static bool ContainsManagedMethodAndType(this ITestCase2 testCase)
         {
             return !string.IsNullOrWhiteSpace(testCase.ManagedMethod)
                 && !string.IsNullOrWhiteSpace(testCase.ManagedType);

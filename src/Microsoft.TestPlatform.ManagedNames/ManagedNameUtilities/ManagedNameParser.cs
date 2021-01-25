@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
             pos = ParseParameterTypeList(fullMethodName, pos, out parameterTypes);
             if (pos != fullMethodName.Length)
             {
-                string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorUnexpectedCharactersAtEnd, pos);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorUnexpectedCharactersAtEnd, pos);
                 throw new InvalidManagedNameException(message);
             }
         }
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
                 switch (fullMethodName[i])
                 {
                     case var w when char.IsWhiteSpace(w):
-                        string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorWhitespaceNotValid, i);
+                        string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
                     case '`':
                         methodName = Capture(fullMethodName, start, i);
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
             }
             if (!int.TryParse(Capture(fullMethodName, start + 1, i), out arity))
             {
-                string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorMethodArityMustBeNumeric);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodArityMustBeNumeric);
                 throw new InvalidManagedNameException(message);
             }
             return i;
@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
                 }
             }
 
-            string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorIncompleteManagedName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorIncompleteManagedName);
             throw new InvalidManagedNameException(message);
         }
 
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
                         parameterType = Capture(fullMethodName, start, i);
                         return i - 1;
                     case var w when char.IsWhiteSpace(w):
-                        string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorWhitespaceNotValid, i);
+                        string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
                 }
             }
@@ -155,12 +155,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
                     case ']':
                         return i;
                     case var w when char.IsWhiteSpace(w):
-                        string msg = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorWhitespaceNotValid, i);
+                        string msg = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(msg);
                 }
             }
 
-            string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorIncompleteManagedName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorIncompleteManagedName);
             throw new InvalidManagedNameException(message);
         }
 
@@ -176,12 +176,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
                     case '>':
                         return i;
                     case var w when char.IsWhiteSpace(w):
-                        string msg = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorWhitespaceNotValid, i);
+                        string msg = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(msg);
                 }
             }
 
-            string message = string.Format(CultureInfo.CurrentCulture, ManagedNameMessages.ErrorIncompleteManagedName);
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorIncompleteManagedName);
             throw new InvalidManagedNameException(message);
         }
     }

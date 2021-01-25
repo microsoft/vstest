@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions
         {
             if (obj == null)
             {
-                throw new NotImplementedException(string.Format(ManagedNameMessages.MethodNotImplementedOnPlatform, className, methodName));
+                throw new NotImplementedException(string.Format(Resources.MethodNotImplementedOnPlatform, className, methodName));
             }
         }
     }

@@ -349,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc />
         string ITestCase2.GetDisplayName()
         {
-            if (this.HasManagedMethodAndType())
+            if (this.ContainsManagedMethodAndType())
             {
                 return $"{this.ManagedType()}.{this.ManagedMethod()}";
             }
