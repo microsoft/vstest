@@ -57,6 +57,29 @@ Param(
 $ErrorActionPreference = "Stop"
 
 #
+# Git Branch
+#
+$TPB_BRANCH = "LOCALBRANCH"
+$TPB_COMMIT = "LOCALBUILD"
+
+try {
+    $TPB_BRANCH = $env:BUILD_SOURCEBRANCH -replace "^refs/heads/"  
+    if ([string]::IsNullOrWhiteSpace($TPB_BRANCH)) { 
+        $TPB_BRANCH = git -C "." rev-parse --abbrev-ref HEAD
+    }
+}
+catch { }
+
+try {
+    $TPB_COMMIT = $env:BUILD_SOURCEVERSION
+    if ([string]::IsNullOrWhiteSpace($TPB_COMMIT)) { 
+        $TPB_COMMIT = git -C "." rev-parse HEAD
+    }
+}
+catch { }
+
+
+#
 # Variables
 #
 Write-Verbose "Setup environment variables."
@@ -87,7 +110,7 @@ Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
-$env:NUGET_EXE_Version = "3.4.3"
+$env:NUGET_EXE_Version = "5.8.1"
 $env:DOTNET_CLI_VERSION = "6.0.100-alpha.1.21067.8"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
@@ -738,8 +761,7 @@ function Create-VsixPackage
     }
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
     
-    $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
-    Copy-Item $fileToCopy $packageDir -Force
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt") $packageDir -Force
 
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
@@ -773,6 +795,8 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = $TPB_PackageOutDir
+    
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
@@ -835,7 +859,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir`;BranchName=$TPB_BRANCH`;CommitId=$TPB_COMMIT $additionalArgs
 
         Set-ScriptFailedOnError
     }
