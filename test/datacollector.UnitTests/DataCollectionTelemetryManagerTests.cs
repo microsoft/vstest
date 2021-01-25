@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
@@ -75,13 +76,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
-        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
-        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
-        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
-        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("AAAAAAAAAAAAA", "00000000-0000-0000-0000-000000000000")]
         public void RecordEnvironmentVariableAddition_ShouldCollectTelemetry_IfCorProfilerVariable(string profilerGuid, string profilerName)
         {
             // act
@@ -92,13 +94,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
-        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
-        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
-        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
-        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("AAAAAAAAAAAAA", "00000000-0000-0000-0000-000000000000")]
         public void RecordEnvironmentVariableAddition_ShouldCollectTelemetry_IfCoreClrProfilerVariable(string profilerGuid, string profilerName)
         {
             // act
@@ -109,37 +112,39 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324F817A-7420-4E6D-B3C1-143FBED6D855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "AAAAAAAAAAAAA", "00000000-0000-0000-0000-000000000000")]
         public void RecordEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCorProfilerVariable(string existingProfilerGuid, string profilerGuid, string expectedOverwrittenProfiler)
         {
             // act
             this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, existingProfilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"overwritten({expectedOverwrittenProfiler})"), Times.Once);
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"{Guid.Parse(existingProfilerGuid)}(overwritten:{expectedOverwrittenProfiler})"), Times.Once);
         }
 
         [TestMethod]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
-        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324F817A-7420-4E6D-B3C1-143FBED6D855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{0f8fad5b-d9cb-469f-a165-70867728950e}", "{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "AAAAAAAAAAAAA", "00000000-0000-0000-0000-000000000000")]
         public void RecordEnvironmentVariableConflict_ShouldCollectOverwrittenTelemetry_IfCoreClrProfilerVariable(string existingProfilerGuid, string profilerGuid, string expectedOverwrittenProfiler)
         {
             // act
             this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, existingProfilerGuid);
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"overwritten({expectedOverwrittenProfiler})"), Times.Once);
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", $"{Guid.Parse(existingProfilerGuid)}(overwritten:{expectedOverwrittenProfiler})"), Times.Once);
         }
 
         [TestMethod]
@@ -150,6 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}")]
         [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}")]
         [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}")]
+        [DataRow("AAAAAAAAAAAAA")]
         public void RecordEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCorProfilerVariableAndCollectorSpecifiesClrIeProfile(string profilerGuid)
         {
             // arrange
@@ -159,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "COR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "clrie"), Times.Once);
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CorProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "324f817a-7420-4e6d-b3c1-143fbed6d855"), Times.Once);
         }
 
         [TestMethod]
@@ -170,6 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}")]
         [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}")]
         [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}")]
+        [DataRow("AAAAAAAAAAAAA")]
         public void RecordEnvironmentVariableConflict_ShouldCollectClrIeTelemetry_IfCoreClrProfilerVariableAndCollectorSpecifiesClrIeProfile(string profilerGuid)
         {
             // arrange
@@ -179,17 +186,18 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             this.telemetryManager.RecordEnvironmentVariableConflict(this.dataCollectorInformation, "CORECLR_PROFILER", profilerGuid, "{324F817A-7420-4E6D-B3C1-143FBED6D855}");
 
             // assert
-            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "clrie"), Times.Once);
+            this.mockMetricsCollection.Verify(c => c.Add($"VS.TestPlatform.DataCollector.CoreClrProfiler.{dataCollectorInformation.DataCollectorConfig.TypeUri}", "324f817a-7420-4e6d-b3c1-143fbed6d855"), Times.Once);
         }
 
         [TestMethod]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
-        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
-        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
-        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
-        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("AAAAAAAAAAAAA", "00000000-0000-0000-0000-000000000000")]
         public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCorProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
         {
             // act
@@ -200,13 +208,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "vanguard")]
-        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "clrie")]
-        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "intellitrace")]
-        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "unknown")]
-        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "vanguard")]
-        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "clrie")]
-        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "intellitrace")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324F817A-7420-4E6D-B3C1-143FBED6D855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317ae81-bcd8-47b7-aaa1-a28062e41c71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71}", "aaaaaaaa-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("{E5F256DC-7959-4DD6-8E4F-c11150AB28E0}", "e5f256dc-7959-4dd6-8e4f-c11150ab28e0")]
+        [DataRow("{324f817a-7420-4e6d-b3c1-143fbEd6d855}", "324f817a-7420-4e6d-b3c1-143fbed6d855")]
+        [DataRow("{9317AE81-bcd8-47b7-AAA1-A28062E41C71}", "9317ae81-bcd8-47b7-aaa1-a28062e41c71")]
+        [DataRow("AAAAAAAAAAAAA", "00000000-0000-0000-0000-000000000000")]
         public void RecordEnvironmentVariableConflict_ShouldCollectTelemetry_IfCoreClrProfilerVariableAndBothValuesSame(string profilerGuid, string profilerName)
         {
             // act

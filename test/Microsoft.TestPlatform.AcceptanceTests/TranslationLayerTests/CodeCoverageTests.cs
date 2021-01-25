@@ -62,8 +62,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.runEventHandler.Attachments);
 
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
@@ -86,8 +86,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.runEventHandler.Attachments);
 
-            Assert.AreEqual("clrie", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
-            Assert.AreEqual("clrie", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
@@ -108,8 +108,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             AssertCoverageResults(this.runEventHandler.Attachments);
 
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
-            Assert.AreEqual("vanguard", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]

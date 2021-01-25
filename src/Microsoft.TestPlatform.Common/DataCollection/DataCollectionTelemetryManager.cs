@@ -19,14 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private const string ClrIeInstrumentationMethodConfigurationPrefix32Variable = "MicrosoftInstrumentationEngine_ConfigPath32_";
         private const string ClrIeInstrumentationMethodConfigurationPrefix64Variable = "MicrosoftInstrumentationEngine_ConfigPath64_";
 
-        private const string VanguardProfilerGuid = "{e5f256dc-7959-4dd6-8e4f-c11150ab28e0}";
-        private const string ClrIeProfilerGuid = "{324f817a-7420-4e6d-b3c1-143fbed6d855}";
-        private const string IntellitraceProfilerGuid = "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}";
-
-        private const string VanguardProfilerName = "vanguard";
-        private const string ClrIeProfilerName = "clrie";
-        private const string IntellitraceProfilerName = "intellitrace";
-        private const string UnknownProfilerName = "unknown";
+        private static readonly Guid ClrIeProfilerGuid = Guid.Parse("{324f817a-7420-4e6d-b3c1-143fbed6d855}");
         private const string OverwrittenProfilerName = "overwritten";
 
         private readonly IRequestData requestData;
@@ -57,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            requestData.MetricsCollection.Add(GetTelemetryKey(telemetryPrefix, dataCollectorInformation), GetProfilerName(value));
+            requestData.MetricsCollection.Add(GetTelemetryKey(telemetryPrefix, dataCollectorInformation), GetProfilerGuid(value).ToString());
         }
 
         private void RecordProfilerMetricForConflictedVariable(string profilerVariable, string telemetryPrefix, DataCollectorInformation dataCollectorInformation, string name, string value, string existingValue)
@@ -74,29 +67,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            if (string.Equals(existingValue, ClrIeProfilerGuid, StringComparison.OrdinalIgnoreCase))
+            var existingProfilerGuid = GetProfilerGuid(existingValue);
+
+            if (ClrIeProfilerGuid == existingProfilerGuid)
             {
                 if (dataCollectorInformation.TestExecutionEnvironmentVariables != null &&
                     dataCollectorInformation.TestExecutionEnvironmentVariables.Any(pair => pair.Key.StartsWith(ClrIeInstrumentationMethodConfigurationPrefix32Variable)) &&
                     dataCollectorInformation.TestExecutionEnvironmentVariables.Any(pair => pair.Key.StartsWith(ClrIeInstrumentationMethodConfigurationPrefix64Variable)))
                 {
-                    requestData.MetricsCollection.Add(GetTelemetryKey(telemetryPrefix, dataCollectorInformation), ClrIeProfilerName);
+                    requestData.MetricsCollection.Add(GetTelemetryKey(telemetryPrefix, dataCollectorInformation), ClrIeProfilerGuid.ToString());
                     return;
                 }
             }
 
-            requestData.MetricsCollection.Add(GetTelemetryKey(telemetryPrefix, dataCollectorInformation), $"{OverwrittenProfilerName}({GetProfilerName(value)})");
+            requestData.MetricsCollection.Add(GetTelemetryKey(telemetryPrefix, dataCollectorInformation), $"{existingProfilerGuid}({OverwrittenProfilerName}:{GetProfilerGuid(value)})");
         }
 
-        private static string GetProfilerName(string profilerGuid)
+        private static Guid GetProfilerGuid(string profilerGuid)
         {
-            return profilerGuid.ToLower() switch
+            Guid guid;
+            if (Guid.TryParse(profilerGuid, out guid))
             {
-                VanguardProfilerGuid => VanguardProfilerName,
-                ClrIeProfilerGuid => ClrIeProfilerName,
-                IntellitraceProfilerGuid => IntellitraceProfilerName,
-                _ => UnknownProfilerName
-            };
+                return guid;
+            }
+
+            return Guid.Empty;
         }
 
         private static string GetTelemetryKey(string telemetryPrefix, DataCollectorInformation dataCollectorInformation)
