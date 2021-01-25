@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts test discovery.
         /// </summary>
-        ///
+        /// 
         /// <param name="sources">The list of source assemblies for the discovery.</param>
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts test discovery.
         /// </summary>
-        ///
+        /// 
         /// <param name="sources">The list of source assemblies for the discovery.</param>
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="options">The test platform options.</param>
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Starts a test run.
         /// </summary>
-        ///
+        /// 
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
@@ -162,9 +162,9 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Stops the test session.
         /// </summary>
-        ///
+        /// 
         /// <param name="eventsHandler">The session event handler.</param>
-        ///
+        /// 
         /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
         Task<bool> StopTestSessionAsync(
             ITestSessionEventsHandler eventsHandler);

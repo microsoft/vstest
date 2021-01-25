@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSession"/> class.
         /// </summary>
-        ///
+        /// 
         /// <param name="testSessionInfo">The test session info object.</param>
         /// <param name="consoleWrapper">The encapsulated console wrapper.</param>
         public TestSession(
