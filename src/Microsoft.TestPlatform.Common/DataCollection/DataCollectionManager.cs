@@ -8,12 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -62,12 +62,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private DataCollectorExtensionManager dataCollectorExtensionManager;
 
         /// <summary>
+        /// Request data
+        /// </summary>
+        private IDataCollectionTelemetryManager dataCollectionTelemetryManager;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink)
+        internal DataCollectionManager(IMessageSink messageSink, IRequestData requestData) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectionTelemetryManager(requestData))
         {
         }
 
@@ -83,13 +88,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <remarks>
         /// The constructor is not public because the factory method should be used to get instances of this class.
         /// </remarks>
-        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink)
+        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager)
         {
             this.attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
             this.events = new TestPlatformDataCollectionEvents();
             this.dataCollectorExtensionManager = null;
             this.RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
+            this.dataCollectionTelemetryManager = dataCollectionTelemetryManager;
         }
 
         /// <summary>
@@ -128,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <returns>
         /// The <see cref="DataCollectionManager"/>.
         /// </returns>
-        public static DataCollectionManager Create(IMessageSink messageSink)
+        public static DataCollectionManager Create(IMessageSink messageSink, IRequestData requestData)
         {
             if (Instance == null)
             {
@@ -136,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     if (Instance == null)
                     {
-                        Instance = new DataCollectionManager(messageSink);
+                        Instance = new DataCollectionManager(messageSink, requestData);
                     }
                 }
             }
@@ -673,6 +679,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                 dataCollectionWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
                             }                            
                         }
+
+                        dataCollectionTelemetryManager.RecordEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value, alreadyRequestedVariable.Value);
                     }
                     else
                     {
@@ -685,6 +693,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         dataCollectorEnvironmentVariables.Add(
                             namevaluepair.Key,
                             new DataCollectionEnvironmentVariable(namevaluepair, collectorFriendlyName));
+
+                        dataCollectionTelemetryManager.RecordEnvironmentVariableAddition(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
                     }
                 }
             }

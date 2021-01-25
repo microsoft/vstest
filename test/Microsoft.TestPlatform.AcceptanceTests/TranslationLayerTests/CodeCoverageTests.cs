@@ -18,7 +18,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Castle.Core.Internal;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
+    [TestClass]
+    //Code coverage only supported on windows (based on the message in output)
+    [TestCategory("Windows-Review")]
     public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
         private IVsTestConsoleWrapper vstestConsoleWrapper;
@@ -48,7 +52,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             // act
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
 
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
@@ -57,6 +61,33 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(expectedNumberOfAttachments, this.runEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.runEventHandler.Attachments);
+
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void TestRunWithCodeCoverageUsingClrIe(RunnerInfo runnerInfo)
+        {
+            // arrange
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
+
+            // act
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1, true), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
+
+            // assert
+            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+
+            int expectedNumberOfAttachments = 1;
+            Assert.AreEqual(expectedNumberOfAttachments, this.runEventHandler.Attachments.Count);
+
+            AssertCoverageResults(this.runEventHandler.Attachments);
+
+            Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("324f817a-7420-4e6d-b3c1-143fbed6d855", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
@@ -69,13 +100,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             // act
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(4), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(4), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
 
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.Attachments.Count);
 
             AssertCoverageResults(this.runEventHandler.Attachments);
+
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CorProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
+            Assert.AreEqual("e5f256dc-7959-4dd6-8e4f-c11150ab28e0", this.runEventHandler.Metrics["VS.TestPlatform.DataCollector.CoreClrProfiler.datacollector://microsoft/CodeCoverage/2.0"]);
         }
 
         [TestMethod]
@@ -124,7 +158,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
-            Assert.IsTrue(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath) != testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework));
+            Assert.IsTrue(!File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]
@@ -170,7 +204,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.IsNullOrEmpty());
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
-            Assert.IsTrue(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath) != testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework));
+            Assert.IsTrue(!File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]
@@ -220,76 +254,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
-            Assert.IsTrue(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath) != testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework));
-        }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
-        public async Task TestRunWithCodeCoverageAndAttachmentsProcessingCancelled(RunnerInfo runnerInfo)
-        {
-            // arrange
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
-
-            if (!testEnvironment.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework)) return;
-
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            Assert.AreEqual(3, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(1, this.runEventHandler.Attachments.Count);
-
-            List<AttachmentSet> attachments = Enumerable.Range(0, 1000).Select(i => this.runEventHandler.Attachments.First()).ToList();
-
-            CancellationTokenSource cts = new CancellationTokenSource();
-
-            Task attachmentsProcessing = this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(attachments, null, true, true, testRunAttachmentsProcessingEventHandler, cts.Token);
-
-            while (true)
-            {
-                try
-                {
-                    if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count >= 3)
-                        break;
-                }
-                catch
-                {
-                    // ignore
-                }
-                await Task.Delay(100);
-            }
-
-            // act
-            cts.Cancel();
-
-            // Assert
-            await attachmentsProcessing;
-            testRunAttachmentsProcessingEventHandler.EnsureSuccess();
-
-            Assert.AreEqual(1000, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
-
-            Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.IsCanceled);
-            Assert.IsNull(testRunAttachmentsProcessingEventHandler.CompleteArgs.Error);
-
-            Assert.IsTrue(3 <= testRunAttachmentsProcessingEventHandler.ProgressArgs.Count);
-            for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
-            {
-                VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
-                Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
-
-                if (i == 0)
-                {
-                    Assert.AreEqual(0, progressArgs.CurrentAttachmentProcessorProgress);
-                }
-            }
-
-            Assert.AreEqual("Canceled", testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.AttachmentsProcessingState]);
-            Assert.AreEqual(1000L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]);
-            Assert.AreEqual(1000L, testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing]);
-            Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
-
-            Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
+            Assert.IsTrue(!File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]
@@ -333,19 +298,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// Default RunSettings
         /// </summary>
         /// <returns></returns>
-        private string GetCodeCoverageRunSettings(int cpuCount)
+        private string GetCodeCoverageRunSettings(int cpuCount, bool useClrIeInstrumentationEngine = false)
         {
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
                                             <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                            <TestAdaptersPaths>{this.GetCodeCoveragePath()}</TestAdaptersPaths>
+                                            <TestAdaptersPaths>{this.GetNetStandardAdapterPath()}</TestAdaptersPaths>
                                             <MaxCpuCount>{cpuCount}</MaxCpuCount>
                                         </RunConfiguration>
                                         <DataCollectionRunSettings>
                                             <DataCollectors>
                                                 <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
                                                     <Configuration>
+                                                      <CLRIEInstrumentationNetCore>{useClrIeInstrumentationEngine}</CLRIEInstrumentationNetCore>
+                                                      <CLRIEInstrumentationNetFramework>{useClrIeInstrumentationEngine}</CLRIEInstrumentationNetFramework>
                                                       <CodeCoverage>
                                                         <ModulePaths>
                                                           <Exclude>

@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common
 {
     using System;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <inheritdoc />
@@ -22,6 +22,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// The protocol config.
         /// </summary>
         private ProtocolConfig protocolConfig;
+
+        /// <summary>
+        /// The default constructor for request data.
+        /// </summary>
+        public RequestData()
+        {
+            this.MetricsCollection = new NoOpMetricsCollection();
+            this.IsTelemetryOptedIn = false;
+        }
 
         /// <summary>
         /// Gets or sets the metrics collection.
