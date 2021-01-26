@@ -9,8 +9,8 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     
-    <AssemblyName>Microsoft.TestPlatform.ManagedNames</AssemblyName>
-    <RootNamespace>Microsoft.VisualStudio.TestPlatform</RootNamespace>
+    <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
+    <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">

@@ -161,9 +161,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Exte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coverlet.collector", "test\coverlet.collector\coverlet.collector.csproj", "{074F5BD6-DC05-460B-B78F-044D125FD787}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ManagedNameUtilities.UnitTests", "test\Microsoft.TestPlatform.ManagedNameUtilities.UnitTests\Microsoft.TestPlatform.ManagedNameUtilities.UnitTests.csproj", "{DCD0C39E-C78C-4A44-B0BD-7325254A2E97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.AdapterUtilities.UnitTests", "test\Microsoft.TestPlatform.AdapterUtilities.UnitTests\Microsoft.TestPlatform.AdapterUtilities.UnitTests.csproj", "{DCD0C39E-C78C-4A44-B0BD-7325254A2E97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ManagedNames", "src\Microsoft.TestPlatform.ManagedNames\Microsoft.TestPlatform.ManagedNames.csproj", "{2DE99835-A3A3-4922-82AD-6D10D284816D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.AdapterUtilities", "src\Microsoft.TestPlatform.AdapterUtilities\Microsoft.TestPlatform.AdapterUtilities.csproj", "{2DE99835-A3A3-4922-82AD-6D10D284816D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests
+namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
 {
-    using Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities;
+    using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

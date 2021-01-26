@@ -480,8 +480,8 @@ function Publish-Package
               }
 
     ################################################################################
-    # Publish Microsoft.TestPlatform.ManagedNames
-    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ManagedNames\bin\$TPB_Configuration") `
+    # Publish Microsoft.TestPlatform.AdapterUtilities
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
             -files @{
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
@@ -818,7 +818,7 @@ function Create-NugetPackages
     $nuspecFiles = @(
         "TestPlatform.TranslationLayer.nuspec",
         "TestPlatform.ObjectModel.nuspec",
-        "Microsoft.TestPlatform.ManagedNames.nuspec",
+        "Microsoft.TestPlatform.AdapterUtilities.nuspec",
         "TestPlatform.TestHost.nuspec",
         "TestPlatform.CLI.nuspec",
         "TestPlatform.Build.nuspec",

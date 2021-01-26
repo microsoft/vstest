@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ManagedNameUtilities
+namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 {
-    using Microsoft.VisualStudio.TestPlatform.Resources;
+    using Microsoft.TestPlatform.AdapterUtilities.Resources;
 
     using System.Collections.Generic;
     using System.Diagnostics;

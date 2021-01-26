@@ -8,7 +8,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
-    <AssemblyName>Microsoft.TestPlatform.ObjectModel.ManagedNameUtilities.UnitTests</AssemblyName>
+    <AssemblyName>Microsoft.TestPlatform.AdapterUtilities.UnitTests</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MicrosoftCodeAnalysisVersion Condition="$(MicrosoftCodeAnalysisVersion) == ''">3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
     <NoWarn>$(NoWarn);RS1024</NoWarn>
@@ -21,14 +21,14 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ManagedNames\Microsoft.TestPlatform.ManagedNames.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.AdapterUtilities\Microsoft.TestPlatform.AdapterUtilities.csproj" />
   </ItemGroup>
   
   <ItemGroup>
     <Compile Update="TestClasses.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-  </ItemGroup>  
-
+  </ItemGroup>
+  
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
