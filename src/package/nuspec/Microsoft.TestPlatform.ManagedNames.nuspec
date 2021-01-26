@@ -12,9 +12,14 @@
         </description>
         <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
         <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+        <icon>Icon.png</icon>
         <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
         <copyright>© Microsoft Corporation. All rights reserved.</copyright>
         <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
+        <repository type="git" 
+                    url="https://github.com/microsoft/vstest" 
+                    branch="$BranchName$" 
+                    commit="$CommitId$" />
 
         <dependencies>
             <group targetFramework="netstandard1.0">
@@ -31,6 +36,8 @@
     </metadata>
 
     <files>
+        <file src="Icon.png" target="" />
+
         <file src="netstandard1.0\Microsoft.TestPlatform.ManagedNames.dll" target="lib\netstandard1.0" />
         <file src="netstandard1.0\**\Microsoft.TestPlatform.ManagedNames.resources.dll" target="lib\netstandard1.0" />
         

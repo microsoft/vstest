@@ -17,7 +17,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestEnvironment
     {
-        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
+        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR")
+                                                      ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
         private static Dictionary<string, string> dependencyVersions;
 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Microsoft.TestPlatform.ObjectModel</id>
     <version>15.0.0</version>
@@ -10,9 +10,15 @@
     <description>The Microsoft Test Platform Object Model.</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
+    <repository type="git" 
+                url="https://github.com/microsoft/vstest" 
+                branch="$BranchName$" 
+                commit="$CommitId$" />
+                
     <dependencies>
       <group targetFramework="net45">
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
@@ -76,7 +82,9 @@
     </frameworkAssemblies>
   </metadata>
   <files>	
-      <!-- net45 -->
+    <file src="Icon.png" target="" />
+ 
+    <!-- net45 -->
       <file src="net45\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net45\" />
       <file src="net45\$Runtime$\Microsoft.TestPlatform.ManagedNames.dll"             target="lib\net45\" />
       <file src="net45\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net45\" />
