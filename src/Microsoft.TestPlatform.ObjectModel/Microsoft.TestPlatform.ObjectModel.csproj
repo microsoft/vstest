@@ -23,7 +23,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.ManagedNames\Microsoft.TestPlatform.ManagedNames.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net45' ">

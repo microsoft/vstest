@@ -370,8 +370,9 @@ function create_package()
     packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
     mkdir -p $packageOutputDir
 
-    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
-        "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
+    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
+        "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec"\
+        "Microsoft.CodeCoverage.nuspec" "Microsoft.TestPlatform.ManagedNames.nuspec" "TestPlatform.Extensions.TrxLogger.nuspec")
     projectFiles=("Microsoft.TestPlatform.CLI.csproj" "Microsoft.TestPlatform.Build.csproj")
     binDir="$TP_ROOT_DIR/bin/packages"
 

@@ -334,6 +334,7 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackage451Dir = Get-FullCLRPackageDirectory
     $fullCLRPackage45Dir = Get-FullCLRPackageDirectory45
+    $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
@@ -477,6 +478,15 @@ function Publish-Package
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
+
+    ################################################################################
+    # Publish Microsoft.TestPlatform.ManagedNames
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ManagedNames\bin\$TPB_Configuration") `
+            -files @{
+                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
+                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
+            }
 
     ################################################################################
     # Publish msdia

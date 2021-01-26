@@ -10,13 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Extensions;
 
     /// <summary>
     /// Stores information about a test case.
     /// </summary>
     [DataContract]
-    public sealed class TestCase : TestObject, ITestCase2
+    public sealed class TestCase : TestObject
     {
         /// <summary>
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
@@ -72,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
-        public Object LocalExtensionData
+        public object LocalExtensionData
         {
             get { return localExtensionData; }
             set { localExtensionData = value; }
@@ -194,9 +193,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return TestCaseProperties.Properties.Concat(base.Properties);
             }
         }
-
-        /// <inheritdoc/>
-        public override string ToString() => this.GetDisplayName();
 
         #endregion
 
@@ -330,34 +326,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion
 
-        #region ITestCase2 Implementation
+        #region ManagedName and ManagedType implementations
 
-        /// <inheritdoc />
-        string ITestCase2.ManagedType
+        private static readonly TestProperty ManagedTypeProperty = TestProperty.Register("TestCase.ManagedType", "ManagedType", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
+        private static readonly TestProperty ManagedMethodProperty = TestProperty.Register("TestCase.ManagedMethod", "ManagedMethod", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
+
+        private bool ContainsManagedMethodAndType => !string.IsNullOrWhiteSpace(ManagedMethod) && !string.IsNullOrWhiteSpace(ManagedType);
+
+        private string ManagedType
         {
-            get => GetPropertyValue<string>(TestCaseProperties.ManagedType, null);
-            set => SetPropertyAndResetId(TestCaseProperties.ManagedType, value);
+            get => GetPropertyValue<string>(ManagedTypeProperty, null);
+            set => SetPropertyAndResetId(ManagedTypeProperty, value);
         }
 
-        /// <inheritdoc />
-        string ITestCase2.ManagedMethod
+        private string ManagedMethod
         {
-            get => GetPropertyValue<string>(TestCaseProperties.ManagedMethod, null);
-            set => SetPropertyAndResetId(TestCaseProperties.ManagedMethod, value);
+            get => GetPropertyValue<string>(ManagedMethodProperty, null);
+            set => SetPropertyAndResetId(ManagedMethodProperty, value);
         }
 
-        /// <inheritdoc />
-        string ITestCase2.GetDisplayName()
-        {
-            if (this.ContainsManagedMethodAndType())
-            {
-                return $"{this.ManagedType()}.{this.ManagedMethod()}";
-            }
-
-            return FullyQualifiedName;
-        }
+        private string GetDisplayName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
 
         #endregion
+
+        /// <inheritdoc/>
+        public override string ToString() => this.GetDisplayName();
     }
 
     /// <summary>
@@ -383,8 +376,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static readonly TestProperty Id = TestProperty.Register("TestCase.Id", IdLabel, string.Empty, string.Empty, typeof(Guid), ValidateGuid, TestPropertyAttributes.Hidden, typeof(TestCase));
         public static readonly TestProperty FullyQualifiedName = TestProperty.Register("TestCase.FullyQualifiedName", FullyQualifiedNameLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));
-        public static readonly TestProperty ManagedType = TestProperty.Register(ManagedNameUtilities.Contants.ManagedTypePropertyId, ManagedNameUtilities.Contants.ManagedTypeLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));
-        public static readonly TestProperty ManagedMethod = TestProperty.Register(ManagedNameUtilities.Contants.ManagedMethodPropertyId, ManagedNameUtilities.Contants.ManagedMethodLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));
         public static readonly TestProperty DisplayName = TestProperty.Register("TestCase.DisplayName", NameLabel, string.Empty, string.Empty, typeof(string), ValidateDisplay, TestPropertyAttributes.None, typeof(TestCase));
         public static readonly TestProperty ExecutorUri = TestProperty.Register("TestCase.ExecutorUri", ExecutorUriLabel, string.Empty, string.Empty, typeof(Uri), ValidateExecutorUri, TestPropertyAttributes.Hidden, typeof(TestCase));
         public static readonly TestProperty Source = TestProperty.Register("TestCase.Source", SourceLabel, typeof(string), typeof(TestCase));
@@ -397,8 +388,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             DisplayName,
             ExecutorUri,
             FullyQualifiedName,
-            ManagedType,
-            ManagedMethod,
             Id,
             LineNumber,
             Source
