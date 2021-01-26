@@ -295,14 +295,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 // Get matching files from file pattern parser
                 matchingFiles = FilePatternParser.GetMatchingFiles(source);
             }
-            catch(TestSourceException)
+            catch(TestSourceException ex) when (source.StartsWith("-") || source.StartsWith("/"))
             {
-                if(source.StartsWith("-") || source.StartsWith("/"))
-                {
-                    throw new TestSourceException(
-                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
-                }
-                throw;
+                throw new TestSourceException(
+                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source), ex);
             }
             // Add the matching files to source list
             this.sources = this.sources.Union(matchingFiles).ToList();
