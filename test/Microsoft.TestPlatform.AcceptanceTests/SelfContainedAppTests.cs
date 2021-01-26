@@ -4,12 +4,13 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
+    using System.IO;
 
     [TestClass]
     public class SelfContainedAppTests : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows-Review")]
         // this is core 3.1 only, full framework and netcoreapp2.1 don't "publish" automatically during build
         // but if you run it on 2.1 it will pass because we execute the test normally
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useNetCore21Target: false, useNetCore31Target: true)]
@@ -22,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             // the app is published to win10-x64 because of the runtime identifier in the project
-            var assemblyPath = this.BuildMultipleAssemblyPath(@"win10-x64\SelfContainedAppTestProject.dll").Trim('\"');
+            var assemblyPath = this.BuildMultipleAssemblyPath($@"win10-x64{Path.DirectorySeparatorChar}SelfContainedAppTestProject.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
 

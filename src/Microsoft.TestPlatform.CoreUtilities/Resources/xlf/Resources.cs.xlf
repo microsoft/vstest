@@ -160,6 +160,13 @@
         <target state="translated">Hostitele {0} nešlo najít. Ujistěte se, jestli je {0} nainstalovaný na počítači a dostupný v cestě určené proměnnou prostředí PATH.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="translated">Metoda {0}.{1} není na této platformě implementována.</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

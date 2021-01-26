@@ -160,6 +160,13 @@
         <target state="translated">No se pudo encontrar el host "{0}". Asegúrese de que "{0}" está instalado en el equipo y está disponible en la variable de entorno PATH.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="translated">"{0}.{1}" no se ha implementado en esta plataforma.</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

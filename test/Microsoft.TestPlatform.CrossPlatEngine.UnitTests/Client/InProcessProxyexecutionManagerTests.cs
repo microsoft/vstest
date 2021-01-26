@@ -4,6 +4,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -57,9 +58,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartTestRunShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
         {
-            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\dummy.dll" });
+            var path = Path.Combine(Path.GetTempPath(), "dummy.dll");
+            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { path });
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
-            expectedResult.Add("C:\\dummy.dll");
+            expectedResult.Add(path);
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);

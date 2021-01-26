@@ -9,9 +9,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.IO;
 
     [TestClass]
+    [TestCategory("Windows")]
     public class DisableAppdomainTests : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         public void DisableAppdomainTest(RunnerInfo runnerInfo)
         {
@@ -24,6 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         public void NewtonSoftDependencyWithDisableAppdomainTest(RunnerInfo runnerInfo)
         {

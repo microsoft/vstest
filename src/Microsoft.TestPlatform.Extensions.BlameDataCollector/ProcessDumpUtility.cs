@@ -98,9 +98,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework)
+        public void StartTriggerBasedProcessDump(int processId, string testResultsDirectory, bool isFullDump, string targetFramework, bool collectAlways)
         {
-            this.CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework);
+            this.CrashDump(processId, testResultsDirectory, isFullDump ? DumpTypeOption.Full : DumpTypeOption.Mini, targetFramework, collectAlways);
         }
 
         /// <inheritdoc/>
@@ -109,7 +109,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.crashDumper?.DetachFromTargetProcess(targetProcessId);
         }
 
-        private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework)
+        private void CrashDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, bool collectAlways)
         {
             var processName = this.processHelper.GetProcessName(processId);
             EqtTrace.Info($"ProcessDumpUtility.CrashDump: Creating {dumpType.ToString().ToLowerInvariant()} dump of process {processName} ({processId}) into temporary path '{tempDirectory}'.");
@@ -117,7 +117,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.crashDumper = this.crashDumperFactory.Create(targetFramework);
             ConsoleOutput.Instance.Information(false, $"Blame: Attaching crash dump utility to process {processName} ({processId}).");
-            this.crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType);
+            this.crashDumper.AttachToTargetProcess(processId, tempDirectory, dumpType, collectAlways);
         }
 
         private void HangDump(int processId, string tempDirectory, DumpTypeOption dumpType, string targetFramework, Action<string> logWarning = null)

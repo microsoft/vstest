@@ -16,6 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         TestExecId ParentExecutionId { get; set; }
         TestListCategoryId CategoryId { get; set; }
         TestCategoryItemCollection TestCategories { get; }
+        WorkItemCollection WorkItems { get; set; }
         TestType TestType { get; }
     }
 }

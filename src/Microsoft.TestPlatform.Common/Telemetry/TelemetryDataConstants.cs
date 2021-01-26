@@ -26,6 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
+        internal const string DataCollectorsCorProfiler = "VS.TestPlatform.DataCollector.CorProfiler";
+
+        internal const string DataCollectorsCoreClrProfiler = "VS.TestPlatform.DataCollector.CoreClrProfiler";
+
         public static string RunState = "VS.TestRun.RunState";
 
         public static string NumberOfSourcesSentForRun = "VS.TestRun.NumberOfSources";
@@ -68,6 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled";
 
+        public static string ParallelEnabledDuringStartTestSession = "VS.StartTestSession.ParallelEnabled";
+
         // All the times are in sec
         public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";
 
@@ -104,5 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string TestExecutionCompleteEvent = "vs/testplatform/testrunsession";
 
         public static string TestAttachmentsProcessingCompleteEvent = "vs/testplatform/testattachmentsprocessingsession";
+
+        public static string StartTestSessionCompleteEvent = "vs/testplatform/starttestsession";
     }
 }

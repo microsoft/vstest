@@ -307,6 +307,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.TargetFrameworkSet = true;
             }
         }
+        /// <summary>
+        /// Gets or sets value indicating exit code when no tests are discovered or executed
+        /// </summary>
+        public bool TreatNoTestsAsError 
+        { 
+            get; 
+            set; 
+        }
 
         /// <summary>
         /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
@@ -595,6 +603,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 root.AppendChild(dotnetHostPath);
             }
 
+            if (this.TreatNoTestsAsError)
+            {
+                XmlElement treatAsError = doc.CreateElement(nameof(TreatNoTestsAsError));
+                treatAsError.InnerText = this.TreatNoTestsAsError.ToString();
+                root.AppendChild(treatAsError);
+            }
+
             return root;
         }
 #endif
@@ -756,7 +771,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             bool disableParallelizationCheck;
                             if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))
                             {
-                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableParallelizationValueString, elementName));
                             }
                             runConfiguration.DisableParallelization = disableParallelizationCheck;
@@ -908,6 +923,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "DotNetHostPath":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
+                            break;
+                        case "TreatNoTestsAsError":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            string treatNoTestsAsErrorValueString = reader.ReadElementContentAsString();
+                            bool treatNoTestsAsError;
+                            if (!bool.TryParse(treatNoTestsAsErrorValueString, out treatNoTestsAsError))
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, treatNoTestsAsErrorValueString, elementName));
+                            }
+                            runConfiguration.TreatNoTestsAsError = treatNoTestsAsError;
                             break;
 
                         default:

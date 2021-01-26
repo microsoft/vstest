@@ -160,6 +160,13 @@
         <target state="translated">Не удалось найти хост "{0}". Убедитесь, что "{0}" установлен на компьютере и доступен в переменной среды PATH.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MethodNotImplementedOnPlatform">
+        <source>'{0}.{1}' is not implemented on this platform!</source>
+        <target state="translated">Метод "{0}.{1}" не реализован на этой платформе.</target>
+        <note>'{className}.{methodName}' is not implemented on this platform!
+
+Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

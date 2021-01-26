@@ -14,11 +14,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -41,6 +44,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private TestableDataCollectionRequestHandler requestHandler;
         private Mock<IDataSerializer> mockDataSerializer;
         private Mock<IFileHelper> mockFileHelper;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
         private Message afterTestRunEnd = new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" };
         private Message beforeTestRunStart = new Message()
         {
@@ -57,7 +62,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler = new Mock<IDataCollectionTestCaseEventHandler>();
             this.mockDataCollectionTestCaseEventHandler.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockFileHelper = new Mock<IFileHelper>();
-            this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object, this.mockDataSerializer.Object, this.mockFileHelper.Object);
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(r => r.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object, this.mockDataSerializer.Object, this.mockFileHelper.Object, this.mockRequestData.Object);
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart).Returns(this.afterTestRunEnd);
 
@@ -216,7 +224,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             // Verify AfterTestRun events.
             this.mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<Collection<AttachmentSet>>()), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<AfterTestRunEndResult>()), Times.Once);
         }
 
         [TestMethod]
@@ -235,7 +243,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var testHostLaunchedPayload = new TestHostLaunchedPayload();
             testHostLaunchedPayload.ProcessId = 1234;
 
-            string runSettings = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            var temp = Path.GetTempPath();
+            string runSettings = "<RunSettings><RunConfiguration><TestAdaptersPaths></TestAdaptersPaths></RunConfiguration></RunSettings>";
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart)
                                                                                 .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
@@ -245,16 +254,25 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestHostLaunchedPayload>(It.Is<Message>(y => y.MessageType == MessageType.TestHostLaunched)))
                                    .Returns(testHostLaunchedPayload);
-            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = runSettings, Sources = new List<string> { @"E:\dir1\test1.dll", @"E:\dir2\test2.dll", @"E:\dir1\test2.dll" } };
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload
+            {
+                SettingsXml = runSettings,
+                Sources = new List<string>
+                {
+                    Path.Combine(temp, "dir1", "test1.dll"),
+                    Path.Combine(temp, "dir2", "test2.dll"),
+                    Path.Combine(temp, "dir3", "test3.dll")
+                }
+            };
             this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
                                    .Returns(beforeTestRunSTartPayload);
-            this.mockFileHelper.Setup(x => x.DirectoryExists(@"E:\dir1")).Returns(true);
-            this.mockFileHelper.Setup(x => x.EnumerateFiles("E:\\dir1", SearchOption.AllDirectories, @"Collector.dll")).Returns(new List<string> { @"E:\dir1\abc.datacollector.dll" });
+            this.mockFileHelper.Setup(x => x.DirectoryExists($@"{temp}dir1")).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles($@"{temp}dir1", SearchOption.AllDirectories, @"Collector.dll")).Returns(new List<string> { Path.Combine(temp, "dir1", "abc.DataCollector.dll") });
 
             this.requestHandler.ProcessRequests();
 
-            this.mockFileHelper.Verify(x => x.EnumerateFiles("E:\\dir1", SearchOption.AllDirectories, @"Collector.dll"), Times.Once);
-            Assert.IsTrue(TestPluginCache.Instance.GetExtensionPaths(@"Collector.dll").Contains(@"E:\dir1\abc.datacollector.dll"));
+            this.mockFileHelper.Verify(x => x.EnumerateFiles($@"{temp}dir1", SearchOption.AllDirectories, @"Collector.dll"), Times.Once);
+            Assert.IsTrue(TestPluginCache.Instance.GetExtensionPaths(@"Collector.dll").Contains(Path.Combine(temp, "dir1", "abc.DataCollector.dll")));
         }
 
         [TestMethod]
@@ -359,6 +377,51 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionManager.Verify(x => x.SessionStarted(It.Is<SessionStartEventArgs>(
                 y => y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test1.dll") &&
                 y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test2.dll"))));
+        }
+
+        [TestMethod]
+        public void ProcessRequestShouldEnableTelemetry()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll", "test2.dll" }, IsTelemetryOptedIn = true };
+            this.mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(false);
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockRequestData.VerifySet(r => r.IsTelemetryOptedIn = true);
+            this.mockRequestData.VerifySet(r => r.MetricsCollection = It.IsAny<MetricsCollection>());
+        }
+
+        [TestMethod]
+        public void ProcessRequestShouldNotEnableTelemetryIfTelemetryEnabled()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll", "test2.dll" }, IsTelemetryOptedIn = true };
+            this.mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(true);
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockRequestData.VerifySet(r => r.IsTelemetryOptedIn = It.IsAny<bool>(), Times.Never);
+            this.mockRequestData.VerifySet(r => r.MetricsCollection = It.IsAny<IMetricsCollection>(), Times.Never);
+        }
+
+        [TestMethod]
+        public void ProcessRequestShouldNotEnableTelemetryIfTelemetryEnablingNotRequested()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll", "test2.dll" }, IsTelemetryOptedIn = false };
+            this.mockRequestData.Setup(r => r.IsTelemetryOptedIn).Returns(false);
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockRequestData.VerifySet(r => r.IsTelemetryOptedIn = It.IsAny<bool>(), Times.Never);
+            this.mockRequestData.VerifySet(r => r.MetricsCollection = It.IsAny<IMetricsCollection>(), Times.Never);
         }
     }
 }

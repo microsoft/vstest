@@ -11,8 +11,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     using System;
     using System.Reflection;
-    
-    
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -206,6 +205,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find an available proxy to deque..
+        /// </summary>
+        internal static string NoAvailableProxyForDeque {
+            get {
+                return ResourceManager.GetString("NoAvailableProxyForDeque", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
         /// </summary>
         internal static string NoDotnetExeFound {
@@ -233,6 +241,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Proxy with id {0} is not managed by the current session manager..
+        /// </summary>
+        internal static string NoSuchProxyId {
+            get {
+                return ResourceManager.GetString("NoSuchProxyId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No test matches the given testcase filter `{0}` in {1}.
         /// </summary>
         internal static string NoTestsAvailableForGivenTestCaseFilter {
@@ -256,6 +273,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string OldTestHostIsGettingUsed {
             get {
                 return ResourceManager.GetString("OldTestHostIsGettingUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Proxy with id {0} is already available and cannot be re-enqueued..
+        /// </summary>
+        internal static string ProxyIsAlreadyAvailable {
+            get {
+                return ResourceManager.GetString("ProxyIsAlreadyAvailable", resourceCulture);
             }
         }
         

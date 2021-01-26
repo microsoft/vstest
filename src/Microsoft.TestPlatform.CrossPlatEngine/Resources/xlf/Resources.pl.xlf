@@ -194,7 +194,7 @@
       </trans-unit>
       <trans-unit id="DeprecatedAdapterPath">
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
-        <target state="translated">Wyszukiwanie adaptera jest zmieniane, zobacz https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmapw celu uzyskania dalszych szczegółów.</target>
+        <target state="translated">Wyszukiwanie adaptera jest zmieniane, zobacz https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap w celu uzyskania dalszych szczegółów.</target>
         <note />
       </trans-unit>
       <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
@@ -215,6 +215,21 @@
       <trans-unit id="AccessDenied">
         <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges.</source>
         <target state="translated">{0} Odmowa dostępu podczas próby utworzenia folderu „TestResults” w określonej lokalizacji. Widzisz ten wyjątek, ponieważ program vstest.console.exe został uruchomiony z folderu wymagającego dostępu do zapisu. Aby rozwiązać ten problem: uruchom program vstest.console.exe z folderu, w którym masz uprawnienia do zapisu.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoAvailableProxyForDeque">
+        <source>Could not find an available proxy to deque.</source>
+        <target state="translated">Nie można było znaleźć dostępnego serwera proxy do umieszczenia w kolejce dwukierunkowej.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuchProxyId">
+        <source>Proxy with id {0} is not managed by the current session manager.</source>
+        <target state="translated">Serwer proxy o identyfikatorze {0} nie jest zarządzany przez bieżącego menedżera sesji.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProxyIsAlreadyAvailable">
+        <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
+        <target state="translated">Serwer proxy o identyfikatorze {0} jest już dostępny i nie można go ponownie umieścić w kolejce.</target>
         <note></note>
       </trans-unit>
     </body>

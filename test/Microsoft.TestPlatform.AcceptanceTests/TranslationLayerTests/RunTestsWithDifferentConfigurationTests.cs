@@ -105,6 +105,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
         {

@@ -12,37 +12,76 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface ITestEngine
     {
         /// <summary>
-        /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
+        /// Fetches the DiscoveryManager for this engine. This manager would provide all
+        /// functionality required for discovery.
         /// </summary>
-        /// <param name="requestData">The Request Data for providing discovery services and data.</param>
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing discovery services and data.
+        /// </param>
         /// <param name="testHostManager">Test host manager for the current test discovery.</param>
-        /// <param name="discoveryCriteria">The discovery Criteria.</param>
-        /// <returns>
-        /// ITestDiscoveryManager object that can do discovery
-        /// </returns>
-        IProxyDiscoveryManager GetDiscoveryManager(IRequestData requestData, ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria);
+        /// <param name="discoveryCriteria">The discovery criteria.</param>
+        /// 
+        /// <returns>An IProxyDiscoveryManager object that can do discovery.</returns>
+        IProxyDiscoveryManager GetDiscoveryManager(
+            IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
+            DiscoveryCriteria discoveryCriteria);
 
         /// <summary>
-        /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
+        /// Fetches the ExecutionManager for this engine. This manager would provide all
+        /// functionality required for execution.
         /// </summary>
-        /// <param name="requestData">The request data for providing common execution services and data</param>
-        /// <param name="testHostManager">Test host manager for current test run.</param>
-        /// <param name="testRunCriteria">TestRunCriteria of the current test run</param>
-        /// <returns>ITestExecutionManager object that can do execution</returns>
-        IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria);
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing common execution services and data.
+        /// </param>
+        /// <param name="testHostManager">Test host manager for the current test run.</param>
+        /// <param name="testRunCriteria">Test run criteria of the current test run.</param>
+        /// 
+        /// <returns>An IProxyExecutionManager object that can do execution.</returns>
+        IProxyExecutionManager GetExecutionManager(
+            IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
+            TestRunCriteria testRunCriteria);
+
+        /// <summary>
+        /// Fetches the TestSessionManager for this engine. This manager would provide all
+        /// functionality required for test session management.
+        /// </summary>
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing test session services and data.
+        /// </param>
+        /// <param name="testHostManager">Test host manager for the current test session.</param>
+        /// <param name="testSessionCriteria">
+        /// Test session criteria of the current test session.
+        /// </param>
+        /// 
+        /// <returns>An IProxyTestSessionManager object that can manage test sessions.</returns>
+        IProxyTestSessionManager GetTestSessionManager(
+            IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
+            StartTestSessionCriteria testSessionCriteria);
 
         /// <summary>
         /// Fetches the extension manager for this engine. This manager would provide extensibility
         /// features that this engine supports.
         /// </summary>
-        /// <returns>ITestExtensionManager object that helps with extensibility</returns>
+        /// 
+        /// <returns>An ITestExtensionManager object that helps with extensibility.</returns>
         ITestExtensionManager GetExtensionManager();
 
         /// <summary>
-        /// Fetches the logger manager for this engine. This manager will provide logger extensibility features that this engine supports.
+        /// Fetches the logger manager for this engine. This manager will provide logger
+        /// extensibility features that this engine supports.
         /// </summary>
-        /// <param name="requestData">The request data for providing common execution services and data</param>
-        /// <returns>ITestLoggerManager object that helps with logger extensibility.</returns>
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing common execution services and data.
+        /// </param>
+        /// 
+        /// <returns>An ITestLoggerManager object that helps with logger extensibility.</returns>
         ITestLoggerManager GetLoggerManager(IRequestData requestData);
     }
 }

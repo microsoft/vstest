@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             return this.runLevelStdOut.ToString();
         }
 
-        internal List<TrxLoggerObjectModel.RunInfo> GetRunLevelErrorsAndWarnings()
+        internal List<RunInfo> GetRunLevelErrorsAndWarnings()
         {
             return this.runLevelErrorsAndWarnings;
         }
@@ -233,19 +233,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
 
-            TrxLoggerObjectModel.RunInfo runMessage;
+            RunInfo runMessage;
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
                     this.AddRunLevelInformationalMessage(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    runMessage = new TrxLoggerObjectModel.RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Warning);
+                    runMessage = new RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Warning);
                     this.runLevelErrorsAndWarnings.Add(runMessage);
                     break;
                 case TestMessageLevel.Error:
                     this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Failed;
-                    runMessage = new TrxLoggerObjectModel.RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
+                    runMessage = new RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
                     this.runLevelErrorsAndWarnings.Add(runMessage);
                     break;
                 default:
@@ -355,7 +355,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             List<TestListCategory> categories = new List<TestListCategory>();
             categories.Add(TestListCategory.UncategorizedResults);
             categories.Add(TestListCategory.AllResults);
-            helper.SaveList<TestListCategory>(categories, rootElement, "TestLists", ".", "TestList", parameters);
+            helper.SaveList(categories, rootElement, "TestLists", ".", "TestList", parameters);
 
             // Save summary
             if (this.testRunOutcome == TrxLoggerObjectModel.TestOutcome.Passed)
@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             List<string> errorMessages = new List<string>();
             List<CollectorDataEntry> collectorEntries = this.converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
-            IList<String> resultFiles = this.converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
+            IList<string> resultFiles = this.converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
 
             if (errorMessages.Count > 0)
             {
@@ -418,11 +418,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     }
                 }
 
-                String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
+                string resultsFileMessage = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
                 ConsoleOutput.Instance.Information(false, resultsFileMessage);
                 EqtTrace.Info(resultsFileMessage);
             }
-            catch (System.UnauthorizedAccessException fileWriteException)
+            catch (UnauthorizedAccessException fileWriteException)
             {
                 ConsoleOutput.Instance.Error(false, fileWriteException.Message);
             }
@@ -431,8 +431,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         // Initializes trx logger cache.
         private void InitializeInternal()
         {
-            this.results = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
-            this.innerResults = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
+            this.results = new ConcurrentDictionary<Guid, ITestResult>();
+            this.innerResults = new ConcurrentDictionary<Guid, ITestResult>();
             this.testElements = new ConcurrentDictionary<Guid, ITestElement>();
             this.entries = new ConcurrentDictionary<Guid, TestEntry>();
             this.innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
@@ -462,9 +462,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             Debug.Assert(rsTestResult.Outcome == ObjectModel.TestOutcome.Skipped, "Test Result should be skipped but it is " + rsTestResult.Outcome);
 
-            ObjectModel.TestCase testCase = rsTestResult.TestCase;
+            TestCase testCase = rsTestResult.TestCase;
             string testCaseName = !string.IsNullOrEmpty(testCase.DisplayName) ? testCase.DisplayName : testCase.FullyQualifiedName;
-            string message = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, testCaseName);
+            string message = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, testCaseName);
             this.AddRunLevelInformationalMessage(message);
         }
 
@@ -505,6 +505,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             var isLogFilePrefixParameterExists = parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue);
 
             string filePath = null;
+
             if (isLogFilePrefixParameterExists)
             {
                 if (parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
@@ -525,7 +526,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             filePath = filePath ?? this.SetDefaultTrxFilePath();
 
             var trxFileDirPath = Path.GetDirectoryName(filePath);
-            if (Directory.Exists(trxFileDirPath) == false)
+
+            if (!Directory.Exists(trxFileDirPath))
             {
                 Directory.CreateDirectory(trxFileDirPath);
             }

@@ -4,6 +4,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   
@@ -28,7 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.cuit">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>16.8.0-preview-4040788</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>

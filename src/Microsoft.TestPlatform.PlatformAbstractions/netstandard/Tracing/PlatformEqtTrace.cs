@@ -6,6 +6,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Wrapper class for tracing.
@@ -22,48 +23,53 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class PlatformEqtTrace : IPlatformEqtTrace
     {
+        private PlatformTraceLevel traceLevel = PlatformTraceLevel.Off;
+
         public static string ErrorOnInitialization { get; set; }
 
-        public bool DoNotInitialize
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
+        public bool DoNotInitialize { get; set; }
 
-        public void WriteLine(PlatformTraceLevel level, string message)
+        public void WriteLine(PlatformTraceLevel traceLevel, string message)
         {
-            throw new NotImplementedException();
+            if (!this.ShouldTrace(traceLevel))
+            {
+                return;
+            }
+
+            var level = Enum.GetName(typeof(PlatformTraceLevel), traceLevel);
+            Debug.WriteLine($"[{level}] {message}");
         }
 
         public bool InitializeVerboseTrace(string customLogFile)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
         {
-            throw new NotImplementedException();
+            this.traceLevel = traceLevel;
+
+            return false;
         }
 
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            throw new NotImplementedException();
+            if (this.DoNotInitialize)
+            {
+                return false;
+            }
+
+            return (int)this.traceLevel >= (int)traceLevel;
         }
 
-        public string GetLogFile()
-        {
-            throw new NotImplementedException();
-        }
+        public string GetLogFile() => string.Empty;
 
         public void SetTraceLevel(PlatformTraceLevel value)
         {
-            throw new NotImplementedException();
+            this.traceLevel = value;
         }
 
-        public PlatformTraceLevel GetTraceLevel()
-        {
-            throw new NotImplementedException();
-        }
+        public PlatformTraceLevel GetTraceLevel() => this.traceLevel;
     }
 }
 

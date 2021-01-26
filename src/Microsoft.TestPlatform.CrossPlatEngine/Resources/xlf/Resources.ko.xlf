@@ -217,6 +217,21 @@
         <target state="translated">{0} "TestResults" 폴더를 언급된 위치에 만드는 동안 액세스가 거부되었습니다. 쓰기 권한이 필요한 폴더에서 vstest.console.exe를 실행하고 있으므로 이 예외가 발생했습니다. 이 문제를 해결하려면 쓰기 권한이 있는 폴더에서 vstest.console.exe를 실행하세요.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoAvailableProxyForDeque">
+        <source>Could not find an available proxy to deque.</source>
+        <target state="translated">큐에서 제거하기 위해 사용할 수 있는 프록시를 찾을 수 없습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuchProxyId">
+        <source>Proxy with id {0} is not managed by the current session manager.</source>
+        <target state="translated">ID가 {0}인 프록시가 현재 세션 관리자에서 관리되지 않습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProxyIsAlreadyAvailable">
+        <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
+        <target state="translated">ID가 {0}인 프록시를 이미 사용할 수 있으며 큐에 다시 넣을 수 없습니다.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

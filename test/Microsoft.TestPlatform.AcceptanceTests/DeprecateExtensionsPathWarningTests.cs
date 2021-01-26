@@ -7,6 +7,7 @@
     using System.Reflection;
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     {
         private IList<string> adapterDependencies;

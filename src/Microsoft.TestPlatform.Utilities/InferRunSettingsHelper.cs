@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         /// <param name="runsettings">RunSettings used for the run</param>
         /// <returns>True if an incompatible collector is found</returns>
-        public static bool AreRunSettingsCollectorsInCompatibleWithTestSettings(string runsettings)
+        public static bool AreRunSettingsCollectorsIncompatibleWithTestSettings(string runsettings)
         {
             // If there's no embedded testsettings.. bail out
             if (!IsTestSettingsEnabled(runsettings))

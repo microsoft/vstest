@@ -45,8 +45,8 @@
         [TestMethod]
         public async Task HandleDataCollectionAttachmentSetsShouldReturnInputIfOnly1Attachment()
         {
-            var attachmentSet = new AttachmentSet(new Uri("//badrui//"), string.Empty);
-            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
+            var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.coverage"), "coverage"));
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
             ICollection<AttachmentSet> resultAttachmentSets = await
@@ -54,15 +54,53 @@
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 1);
+            Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
-            Assert.AreEqual("file:///C:/temp/aa", resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
+            Assert.AreEqual("file:///C:/temp/aa.coverage", resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
+        }
+
+        [TestMethod]
+        public async Task HandleDataCollectionAttachmentSetsShouldReturnInputIfOnly1LogsAttachment()
+        {
+            var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.logs"), "coverage"));
+
+            Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
+            ICollection<AttachmentSet> resultAttachmentSets = await
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+
+            Assert.IsNotNull(resultAttachmentSets);
+            Assert.IsTrue(resultAttachmentSets.Count == 1);
+            Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
+            Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
+            Assert.AreEqual("file:///C:/temp/aa.logs", resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
+        }
+
+        [TestMethod]
+        public async Task HandleDataCollectionAttachmentSetsShouldReturnInputIfOnlySeveralLogsAttachmentAnd1Report()
+        {
+            var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.coverage"), "coverage"));
+
+            var attachmentSet1 = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
+            attachmentSet1.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.logs"), "coverage"));
+            attachmentSet1.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\bb.logs"), "coverage"));
+
+            Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet, attachmentSet1 };
+            ICollection<AttachmentSet> resultAttachmentSets = await
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+
+            Assert.IsNotNull(resultAttachmentSets);
+            Assert.IsTrue(resultAttachmentSets.Count == 2);
+            Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
+            Assert.IsTrue(resultAttachmentSets.Last().Attachments.Count == 2);
         }
 
         [TestMethod]
         public async Task HandleDataCollectionAttachmentSetsShouldThrowIfCancellationRequested()
         {
             var attachmentSet = new AttachmentSet(new Uri("//badrui//"), string.Empty);
-            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.coverage"), "coverage"));
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.Cancel();
 
@@ -75,32 +113,6 @@
             await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, cts.Token));
 
             Assert.AreEqual(2, attachment.Count);
-
-            mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
-        }
-
-        [TestMethod]
-        public async Task HandleDataCollectionAttachmentSetsShouldReturnExistingAttachmentsIfFailedToLoadLibrary()
-        {
-            var attachmentSet1 = new AttachmentSet(new Uri("//badrui//"), string.Empty);
-            attachmentSet1.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa"), "coverage"));
-
-            var attachmentSet2 = new AttachmentSet(new Uri("//badruj//"), string.Empty);
-            attachmentSet2.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\ab"), "coverage"));
-
-            CancellationTokenSource cts = new CancellationTokenSource();
-
-            Collection<AttachmentSet> attachment = new Collection<AttachmentSet>
-            {
-                attachmentSet1,
-                attachmentSet2
-            };
-
-            var result = await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, cts.Token);
-
-            Assert.AreEqual(2, result.Count);
-            Assert.IsTrue(result.Contains(attachmentSet1));
-            Assert.IsTrue(result.Contains(attachmentSet2));
 
             mockProgressReporter.Verify(p => p.Report(It.IsAny<int>()), Times.Never);
         }

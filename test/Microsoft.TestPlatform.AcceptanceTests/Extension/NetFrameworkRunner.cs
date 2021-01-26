@@ -24,6 +24,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="targetFrameworks">To run tests with desktop runner(vstest.console.exe), use AcceptanceTestBase.Net452TargetFramework or alike values.</param>
         public NetFrameworkRunner(string targetFrameworks = AcceptanceTestBase.NETFX452_NET50)
         {
+            var isWindows = Environment.OSVersion.Platform.ToString().StartsWith("Win");
+            if (!isWindows) 
+            {
+                return;
+            }
+
             foreach (var fmw in targetFrameworks.Split(';'))
             {
                 this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, fmw, AcceptanceTestBase.InIsolation) });

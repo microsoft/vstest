@@ -22,6 +22,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
             var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg").ToList();
             portablePackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage[0]));
+            if (Directory.Exists(portablePackageFolder))
+            {
+                Directory.Delete(portablePackageFolder, recursive: true);
+            }
             ZipFile.ExtractToDirectory(nugetPackage[0], portablePackageFolder);
         }
 
@@ -70,7 +74,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             else if (this.IsNetCoreRunner())
             {
-                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+                var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
+                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, executablePath);
             }
             else
             {
