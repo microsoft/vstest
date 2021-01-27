@@ -334,6 +334,9 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackage451Dir = Get-FullCLRPackageDirectory
     $fullCLRPackage45Dir = Get-FullCLRPackageDirectory45
+    $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
+    $net20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net20");
+    $net35PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net35");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
@@ -477,6 +480,17 @@ function Publish-Package
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
+
+    ################################################################################
+    # Publish Microsoft.TestPlatform.AdapterUtilities
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
+            -files @{
+              # "net20"                     = $net20PackageDir               # net20 \ net20, and net35 isn't supported by the Test Platform
+              # "net35"                     = $net35PackageDir               # net35 / but this package supports, so adding targets.
+                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
+                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
+            }
 
     ################################################################################
     # Publish msdia
@@ -805,16 +819,19 @@ function Create-NugetPackages
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec",
-                     "TestPlatform.ObjectModel.nuspec",
-                     "TestPlatform.TestHost.nuspec",
-                     "TestPlatform.CLI.nuspec",
-                     "TestPlatform.Build.nuspec",
-                     "TestPlatform.Extensions.TrxLogger.nuspec", 
-                     "Microsoft.NET.Test.Sdk.nuspec",
-                     "Microsoft.TestPlatform.nuspec",
-                     "Microsoft.TestPlatform.Portable.nuspec",
-                     "Microsoft.CodeCoverage.nuspec")
+    $nuspecFiles = @(
+        "Microsoft.CodeCoverage.nuspec",
+        "Microsoft.NET.Test.Sdk.nuspec",
+        "Microsoft.TestPlatform.AdapterUtilities.nuspec",
+        "Microsoft.TestPlatform.nuspec",
+        "Microsoft.TestPlatform.Portable.nuspec",
+        "TestPlatform.Build.nuspec",
+        "TestPlatform.CLI.nuspec",
+        "TestPlatform.Extensions.TrxLogger.nuspec",
+        "TestPlatform.ObjectModel.nuspec",
+        "TestPlatform.TestHost.nuspec",
+        "TestPlatform.TranslationLayer.nuspec"
+    )
 
     $targetFiles = @("Microsoft.CodeCoverage.targets")
     $propFiles = @("Microsoft.NET.Test.Sdk.props", "Microsoft.CodeCoverage.props")

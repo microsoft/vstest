@@ -160,13 +160,6 @@
         <target state="translated">L'hôte '{0}' est introuvable. Vérifiez que '{0}' est installé sur la machine et qu'il est disponible dans la variable d'environnement PATH.</target>
         <note />
       </trans-unit>
-      <trans-unit id="MethodNotImplementedOnPlatform">
-        <source>'{0}.{1}' is not implemented on this platform!</source>
-        <target state="translated">'{0}.{1}' n'est pas implémenté sur cette plateforme !</target>
-        <note>'{className}.{methodName}' is not implemented on this platform!
-
-Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
-      </trans-unit>
     </body>
   </file>
 </xliff>
