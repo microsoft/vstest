@@ -32,6 +32,9 @@
     
     <!-- Directory with NetStandard2.0 binaries -->
     <ArtifactsNS20Directory Condition="'$(ArtifactsNS20Directory)' == ''">$(ArtifactsBaseDirectory)netstandard2.0\</ArtifactsNS20Directory>
+    
+    <!-- Directory with UAP10.0 binaries -->
+    <ArtifactsUAP100Directory Condition="'$(ArtifactsUAP100Directory)' == ''">$(ArtifactsBaseDirectory)uap10.0\</ArtifactsUAP100Directory>
 
     <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(ArtifactsBaseDirectory)obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
   </PropertyGroup>
@@ -332,6 +335,7 @@
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
 
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
@@ -340,6 +344,9 @@
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
+
+      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
@@ -353,6 +360,7 @@
       <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)%(ResxLang.Identity)\*.*" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
+      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
 
@@ -462,6 +470,11 @@
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </NetStandard20AssembliesToSign>
+      
+      <UAP100AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </UAP100AssembliesToSign>
 
       <AssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
@@ -524,6 +537,12 @@
     <Message Text="Signing using authenticode certificate NetStandard20AssembliesToSign:'%(NetStandard20AssembliesToSign.Authenticode)' for @(NetStandard20AssembliesToSign)"/>
     <SignFiles Files="@(NetStandard20AssembliesToSign)"
                BinariesDirectory="$(ArtifactsNS20Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate UAP100AssembliesToSign:'%(UAP100AssembliesToSign.Authenticode)' for @(UAP100AssembliesToSign)"/>
+    <SignFiles Files="@(UAP100AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsUAP100Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
