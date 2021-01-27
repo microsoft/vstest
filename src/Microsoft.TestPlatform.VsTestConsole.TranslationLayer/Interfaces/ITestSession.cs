@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
+    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -13,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
     /// Defines a test session that can be used to make calls to the vstest.console
     /// process.
     /// </summary>
-    public interface ITestSession : ITestSessionAsync
+    public interface ITestSession : IDisposable, ITestSessionAsync
     {
         /// <summary>
         /// Starts test discovery.

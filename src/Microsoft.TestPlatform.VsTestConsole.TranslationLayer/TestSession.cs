@@ -3,8 +3,10 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -17,9 +19,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     public class TestSession : ITestSession
     {
+        private bool disposed = false;
+
         private TestSessionInfo testSessionInfo;
-        private ITestSessionEventsHandler eventsHandler;
-        private IVsTestConsoleWrapper consoleWrapper;
+        private readonly ITestSessionEventsHandler eventsHandler;
+        private readonly IVsTestConsoleWrapper consoleWrapper;
 
         #region Constructors
         /// <summary>
@@ -37,6 +41,36 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testSessionInfo = testSessionInfo;
             this.eventsHandler = eventsHandler;
             this.consoleWrapper = consoleWrapper;
+        }
+
+        /// <summary>
+        /// Destroys the current instance of the <see cref="TestSession"/> class.
+        /// </summary>
+        ~TestSession() => this.Dispose(false);
+
+        /// <summary>
+        /// Disposes of the current instance of the <see cref="TestSession"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes of the current instance of the <see cref="TestSession"/> class.
+        /// </summary>
+        /// 
+        /// <param name="disposing">Indicates if managed resources should be disposed.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.StopTestSession();
+            this.disposed = true;
         }
         #endregion
 
@@ -210,17 +244,27 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public bool StopTestSession()
         {
-            return this.consoleWrapper.StopTestSession(
-                this.testSessionInfo,
-                this.eventsHandler);
+            return this.StopTestSession(this.eventsHandler);
         }
 
         /// <inheritdoc/>
         public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
         {
-            return this.consoleWrapper.StopTestSession(
-                this.testSessionInfo,
-                eventsHandler);
+            if (this.testSessionInfo == null)
+            {
+                return true;
+            }
+
+            try
+            {
+                return this.consoleWrapper.StopTestSession(
+                    this.testSessionInfo,
+                    eventsHandler);
+            }
+            finally
+            {
+                this.testSessionInfo = null;
+            }
         }
         #endregion
 
@@ -384,9 +428,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
         {
-            return await this.consoleWrapper.StopTestSessionAsync(
-                this.testSessionInfo,
-                eventsHandler).ConfigureAwait(false);
+            if (this.testSessionInfo == null)
+            {
+                return true;
+            }
+
+            try
+            {
+                return await this.consoleWrapper.StopTestSessionAsync(
+                    this.testSessionInfo,
+                    eventsHandler).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.testSessionInfo = null;
+            }
         }
         #endregion
     }
