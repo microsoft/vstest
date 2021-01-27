@@ -12,9 +12,9 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
         [TestMethod]
         public void ParseTypeName()
         {
-            (string, string) Parse(string fullTypeName)
+            (string, string) Parse(string managedTypeName)
             {
-                ManagedNameParser.ParseTypeName(fullTypeName, out var namespaceName, out var typeName);
+                ManagedNameParser.ParseManagedTypeName(managedTypeName, out var namespaceName, out var typeName);
                 return (namespaceName, typeName);
             };
 
@@ -29,9 +29,9 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
         [TestMethod]
         public void ParseMethodName()
         {
-            (string, int, string[]) Parse(string methodName)
+            (string, int, string[]) Parse(string managedMethodName)
             {
-                ManagedNameParser.ParseMethodName(methodName, out var method, out var arity, out var parameterTypes);
+                ManagedNameParser.ParseManagedMethodName(managedMethodName, out var method, out var arity, out var parameterTypes);
                 return (method, arity, parameterTypes);
             }
 
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
         {
             (string, int, string[]) Parse(string methodName)
             {
-                ManagedNameParser.ParseMethodName(methodName, out var method, out var arity, out var parameterTypes);
+                ManagedNameParser.ParseManagedMethodName(methodName, out var method, out var arity, out var parameterTypes);
                 return (method, arity, parameterTypes);
             }
 

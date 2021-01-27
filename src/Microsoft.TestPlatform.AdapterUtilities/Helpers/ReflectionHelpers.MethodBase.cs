@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.AdapterUtilities.Extensions
+namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
 {
     using System;
     using System.Reflection;
 
-    internal static partial class ReflectionExtensions
+    internal static partial class ReflectionHelpers
     {
 #if NETSTANDARD1_0 || NETSTANDARD1_3 || WINDOWS_UWP
         private static readonly Type methodBase = typeof(MethodBase);
@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Extensions
         private static readonly PropertyInfo methodHandleProperty = methodBase.GetRuntimeProperty(MethodHandlePropertyName);
 #endif
 
-        public static bool IsMethod(this MethodBase method)
+        public static bool IsMethod(MethodBase method)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return method.MemberType == MemberTypes.Method;
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Extensions
 #endif
         }
 
-        public static Type GetReflectedType(this MethodBase method)
+        public static Type GetReflectedType(MethodBase method)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return method.ReflectedType;
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Extensions
 #endif
         }
 
-        public static RuntimeMethodHandle GetMethodHandle(this MethodBase method)
+        public static RuntimeMethodHandle GetMethodHandle(MethodBase method)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return method.MethodHandle;

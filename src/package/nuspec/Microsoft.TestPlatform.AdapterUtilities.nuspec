@@ -32,9 +32,6 @@
             
             <group targetFramework="uap10.0">
                 <dependency id="Microsoft.NETCore.UniversalWindowsPlatform" version="[5.1.0, )" />
-                <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.3.0, )" />
-                <dependency id="System.Diagnostics.FileVersionInfo" version="[4.3.0, )" />
-                <dependency id="Microsoft.Win32.Primitives" version="[4.3.0, )" />
             </group>
         </dependencies>
     </metadata>

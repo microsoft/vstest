@@ -4,49 +4,62 @@
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 {
     using Microsoft.TestPlatform.AdapterUtilities.Resources;
-    using Microsoft.TestPlatform.AdapterUtilities.Extensions;
+    using Microsoft.TestPlatform.AdapterUtilities.Helpers;
 
     using System;
     using System.Globalization;
-    using System.Linq;
     using System.Reflection;
     using System.Text;
+
+#if !NET20
+    using System.Linq;
+#endif
 
     public static partial class ManagedNameHelper
     {
         /// <summary>
-        /// Gets fully qualified type and method name from given MethodBase instance.
+        /// Gets fully qualified managed type and method name from given <see href="MethodBase" /> instance.
         /// </summary>
         /// <param name="method">
-        /// A MethodBase instance to get fully qualified type and method name.
+        /// A <see cref="MethodBase" /> instance to get fully qualified managed type and method name.
         /// </param>
-        /// <param name="fullTypeName">
-        /// When this method returns, contains the fully qualified type name of the <paramref name="method"/>. 
+        /// <param name="managedTypeName">
+        /// When this method returns, contains the fully qualified managed type name of the <paramref name="method"/>. 
         /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedtype-property">the RFC</see>.
         /// </param>
-        /// <param name="fullMethodName">
-        /// When this method returns, contains the fully qualified method name of the <paramref name="method"/>. 
+        /// <param name="managedMethodName">
+        /// When this method returns, contains the fully qualified managed method name of the <paramref name="method"/>. 
         /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedmethod-property">the RFC</see>.
         /// </param>
-        /// <exception cref="ArgumentNullException"><paramref name="method"/> is null.</exception>
-        /// <exception cref="NotSupportedException"><paramref name="method"/> must describe a method.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="method"/> is null.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="method"/> must describe a method.
+        /// </exception>
         /// <exception cref="NotImplementedException">
         /// Required functionality on <paramref name="method"/> is missing on the current platform.
         /// </exception>
-        public static void GetManagedName(MethodBase method, out string fullTypeName, out string fullMethodName)
+        /// <remarks>
+        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in 
+        /// <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
+        /// </remarks>
+        public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            if (!method.IsMethod())
+            if (!ReflectionHelpers.IsMethod(method))
             {
                 throw new NotSupportedException(nameof(method));
             }
 
-            var semanticType = method.GetReflectedType();
-            if (semanticType.IsGenericType())
+            var semanticType = ReflectionHelpers.GetReflectedType(method);
+            if (ReflectionHelpers.IsGenericType(semanticType))
             {
                 // The type might have some of its generic parameters specified, so make
                 // sure we are working with the open form of the generic type.
@@ -56,7 +69,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 // declaration. Here we use the method handle (basically metadata token) to create
                 // a new method reference using the open form of the reflected type. The intent is
                 // to strip all generic type parameters.
-                var methodHandle = method.GetMethodHandle();
+                var methodHandle = ReflectionHelpers.GetMethodHandle(method);
                 method = MethodBase.GetMethodFromHandle(methodHandle, semanticType.TypeHandle);
             }
 
@@ -84,7 +97,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             // Type Parameters
             var paramList = method.GetParameters();
-            if (paramList.Any())
+            if (paramList.Length != 0)
             {
                 methodBuilder.Append('(');
                 foreach (var p in paramList)
@@ -96,40 +109,46 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 methodBuilder[methodBuilder.Length - 1] = ')';
             }
 
-            fullTypeName = typeBuilder.ToString();
-            fullMethodName = methodBuilder.ToString();
+            managedTypeName = typeBuilder.ToString();
+            managedMethodName = methodBuilder.ToString();
         }
 
         /// <summary>
-        /// Gets the <see cref="MethodBase"/> object with the specified <paramref name="fullTypeName"/> 
-        /// and <paramref name="fullMethodName"/> in the <paramref name="assembly"/> instance.
+        /// Gets the <see cref="MethodBase"/> object with the specified <paramref name="managedTypeName"/> 
+        /// and <paramref name="managedMethodName"/> in the <paramref name="assembly"/> instance.
         /// </summary>
         /// <param name="assembly">
         /// An <see cref="Assembly" /> instance to search in.
         /// </param>
-        /// <param name="fullTypeName">
-        /// The fully qualified name of the type.
+        /// <param name="managedTypeName">
+        /// The fully qualified managed name of the type.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedtype-property">the RFC</see>.
         /// </param>
-        /// <param name="fullMethodName">
-        /// The fully qualified name of the method.
+        /// <param name="managedMethodName">
+        /// The fully qualified managed name of the method.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedmethod-property">the RFC</see>.
         /// </param>
         /// <returns>
         /// A <see cref="MethodBase" /> object that represents specified parameters, throws if null.
         /// </returns>
         /// <exception cref="InvalidManagedNameException">
-        /// Values specified with <paramref name="fullTypeName"/> and <paramref name="fullMethodName"/> 
+        /// Values specified with <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> 
         /// does not correspond to a method in the <paramref name="assembly"/> instance, or malformed.
         /// </exception>
-        public static MethodBase GetManagedName(Assembly assembly, string fullTypeName, string fullMethodName)
+        /// <remarks>
+        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in 
+        /// <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
+        /// </remarks>
+        public static MethodBase GetMethod(Assembly assembly, string managedTypeName, string managedMethodName)
         {
             Type type;
 
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-            type = assembly.GetType(fullTypeName, throwOnError: false, ignoreCase: false);
+            type = assembly.GetType(managedTypeName, throwOnError: false, ignoreCase: false);
 #else
             try
             {
-                type = assembly.GetType(fullTypeName);
+                type = assembly.GetType(managedTypeName);
             }
             catch
             {
@@ -139,20 +158,25 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             if (type == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, fullTypeName);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, managedTypeName);
                 throw new InvalidManagedNameException(message);
             }
 
             MethodInfo method = null;
-            ManagedNameParser.ParseMethodName(fullMethodName, out var methodName, out var methodArity, out var parameterTypes);
+            ManagedNameParser.ParseManagedMethodName(managedMethodName, out var methodName, out var methodArity, out var parameterTypes);
+#if NET20 || NET35
+
+            if (!IsNullOrWhiteSpace(methodName))
+#else
             if (!string.IsNullOrWhiteSpace(methodName))
+#endif
             {
                 method = FindMethod(type, methodName, methodArity, parameterTypes);
             }
 
             if (method == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodNotFound, methodName, fullTypeName);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodNotFound, methodName, managedTypeName);
                 throw new InvalidManagedNameException(message);
             }
 
@@ -190,12 +214,20 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 return true;
             }
 
+            MemberInfo[] methods;
+
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-            var methods = type.FindMembers(MemberTypes.Method, bindingFlags, filter, null);
-            return (MethodInfo)methods.SingleOrDefault();
+            methods = type.FindMembers(MemberTypes.Method, bindingFlags, filter, null);
 #else
-            return type.GetRuntimeMethods().Where(m => filter(m, null)).SingleOrDefault();
+            methods = type.GetRuntimeMethods().Where(m => filter(m, null)).ToArray();
+#endif
+
+
+#if NET20
+            return (MethodInfo)SingleOrDefault(methods);
+#else
+            return (MethodInfo)methods.SingleOrDefault();
 #endif
         }
 
@@ -213,7 +245,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
             else if (type.IsGenericParameter)
             {
-                if (type.GetDeclaringMethod() != null)
+                if (ReflectionHelpers.GetDeclaringMethod(type) != null)
                 {
                     b.Append('!');
                 }
@@ -254,7 +286,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             genargs = type.GetTypeInfo().GenericTypeArguments;
 #endif
 
-            if (genargs.Any())
+            if (genargs.Length != 0)
             {
                 b.Append('<');
                 foreach (var argType in genargs)
@@ -273,5 +305,64 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             AppendTypeString(builder, type, closedType);
             return builder.ToString();
         }
+
+#if NET20
+
+        // the method is mostly copied from
+        // https://github.com/dotnet/runtime/blob/c0840723b382bcfa67b35839af8572fcd38f1d13/src/libraries/System.Linq/src/System/Linq/Single.cs#L86
+        public static TSource SingleOrDefault<TSource>(System.Collections.Generic.IEnumerable<TSource> source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (source is System.Collections.Generic.IList<TSource> list)
+            {
+                switch (list.Count)
+                {
+                    case 0:
+                        return default;
+                    case 1:
+                        return list[0];
+                }
+            }
+            else
+            {
+                using (System.Collections.Generic.IEnumerator<TSource> e = source.GetEnumerator())
+                {
+                    if (!e.MoveNext())
+                    {
+                        return default;
+                    }
+
+                    TSource result = e.Current;
+                    if (!e.MoveNext())
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            throw new InvalidOperationException("MoreThanOneElement");
+        }
+#endif
+
+#if NET20 || NET35
+        public static bool IsNullOrWhiteSpace(string value)
+        {
+            if (value is null) return true;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (!char.IsWhiteSpace(value[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+#endif
     }
 }

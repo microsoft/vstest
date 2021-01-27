@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (string.IsNullOrEmpty(this.displayName))
                 {
-                    return this.GetDisplayName();
+                    return this.GetFullyQualifiedName();
                 }
 
                 return this.displayName;
@@ -231,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             var testcaseFullName = this.ExecutorUri + source;
 
             // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
-            testcaseFullName += this.GetDisplayName();
+            testcaseFullName += this.GetFullyQualifiedName();
 
             return EqtHash.GuidFromString(testcaseFullName);
         }
@@ -345,12 +345,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set => SetPropertyAndResetId(ManagedMethodProperty, value);
         }
 
-        private string GetDisplayName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
+        private string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
 
         #endregion
 
         /// <inheritdoc/>
-        public override string ToString() => this.GetDisplayName();
+        public override string ToString() => this.GetFullyQualifiedName();
     }
 
     /// <summary>

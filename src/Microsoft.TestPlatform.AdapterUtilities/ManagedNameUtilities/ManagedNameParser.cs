@@ -8,75 +8,112 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using System.Linq;
 
     public class ManagedNameParser
     {
-        public static void ParseTypeName(string fullTypeName, out string namespaceName, out string typeName)
+        /// <summary>
+        /// Parses a given fully qualified managed type name into its namespace and type name.
+        /// </summary>
+        /// <param name="managedTypeName">
+        /// The fully qualified managed type name to parse.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedtype-property">the RFC</see>.
+        /// </param>
+        /// <param name="namespaceName">
+        /// When this method returns, contains the parsed namespace name of the <paramref name="managedTypeName"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// </param>
+        /// <param name="typeName">
+        /// When this method returns, contains the parsed type name of the <paramref name="managedTypeName"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// </param>
+        public static void ParseManagedTypeName(string managedTypeName, out string namespaceName, out string typeName)
         {
-            int pos = fullTypeName.LastIndexOf('.');
+            int pos = managedTypeName.LastIndexOf('.');
             if (pos == -1)
             {
                 namespaceName = string.Empty;
-                typeName = fullTypeName;
+                typeName = managedTypeName;
             }
             else
             {
-                namespaceName = fullTypeName.Substring(0, pos);
-                typeName = fullTypeName.Substring(pos + 1);
+                namespaceName = managedTypeName.Substring(0, pos);
+                typeName = managedTypeName.Substring(pos + 1);
             }
         }
 
-        public static void ParseMethodName(string fullMethodName, out string methodName, out int arity, out string[] parameterTypes)
+        /// <summary>
+        /// Parses a given fully qualified managed method name into its name, arity and parameter types.
+        /// </summary>
+        /// <param name="managedMethodName">
+        /// The fully qualified managed method name to parse.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedmethod-property">the RFC</see>.
+        /// </param>
+        /// <param name="methodName">
+        /// When this method returns, contains the parsed method name of the <paramref name="managedMethodName"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// </param>
+        /// <param name="arity">
+        /// When this method returns, contains the parsed arity of the <paramref name="managedMethodName"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// </param>
+        /// <param name="parameterTypes">
+        /// When this method returns, contains the parsed parameter types of the <paramref name="managedMethodName"/>. 
+        /// If there are no parameter types in <paramref name="managedMethodName"/>, <paramref name="parameterTypes"/> is set to <c>null</c>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// </param>
+        /// <exception cref="InvalidManagedNameException">
+        /// Thrown if <paramref name="managedMethodName"/> contains spaces, incomplete, or the arity isn't numeric.
+        /// </exception>
+        public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[] parameterTypes)
         {
-            int pos = ParseMethodName(fullMethodName, 0, out methodName, out arity);
-            pos = ParseParameterTypeList(fullMethodName, pos, out parameterTypes);
-            if (pos != fullMethodName.Length)
+            int pos = ParseMethodName(managedMethodName, 0, out methodName, out arity);
+            pos = ParseParameterTypeList(managedMethodName, pos, out parameterTypes);
+            if (pos != managedMethodName.Length)
             {
                 string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorUnexpectedCharactersAtEnd, pos);
                 throw new InvalidManagedNameException(message);
             }
         }
 
-        private static string Capture(string fullMethodName, int start, int end)
-            => fullMethodName.Substring(start, end - start);
+        private static string Capture(string managedMethodName, int start, int end)
+            => managedMethodName.Substring(start, end - start);
 
-        private static int ParseMethodName(string fullMethodName, int start, out string methodName, out int arity)
+        private static int ParseMethodName(string managedMethodName, int start, out string methodName, out int arity)
         {
             int i = start;
-            for (; i < fullMethodName.Length; i++)
+            for (; i < managedMethodName.Length; i++)
             {
-                switch (fullMethodName[i])
+                switch (managedMethodName[i])
                 {
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
                     case '`':
-                        methodName = Capture(fullMethodName, start, i);
-                        return ParseArity(fullMethodName, i, out arity);
+                        methodName = Capture(managedMethodName, start, i);
+                        return ParseArity(managedMethodName, i, out arity);
                     case '(':
-                        methodName = Capture(fullMethodName, start, i);
+                        methodName = Capture(managedMethodName, start, i);
                         arity = 0;
                         return i;
                 }
             }
-            methodName = Capture(fullMethodName, start, i);
+            methodName = Capture(managedMethodName, start, i);
             arity = 0;
             return i;
         }
 
         // parse arity in the form `nn where nn is an integer value.
-        private static int ParseArity(string fullMethodName, int start, out int arity)
+        private static int ParseArity(string managedMethodName, int start, out int arity)
         {
             arity = 0;
-            Debug.Assert(fullMethodName[start] == '`');
+            Debug.Assert(managedMethodName[start] == '`');
 
             int i = start + 1; // skip initial '`' char
-            for (; i < fullMethodName.Length; i++)
+            for (; i < managedMethodName.Length; i++)
             {
-                if (fullMethodName[i] == '(') break;
+                if (managedMethodName[i] == '(') break;
             }
-            if (!int.TryParse(Capture(fullMethodName, start + 1, i), out arity))
+            if (!int.TryParse(Capture(managedMethodName, start + 1, i), out arity))
             {
                 string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorMethodArityMustBeNumeric);
                 throw new InvalidManagedNameException(message);
@@ -84,24 +121,24 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             return i;
         }
 
-        private static int ParseParameterTypeList(string fullMethodName, int start, out string[] parameterTypes)
+        private static int ParseParameterTypeList(string managedMethodName, int start, out string[] parameterTypes)
         {
             parameterTypes = null;
-            if (start == fullMethodName.Length)
+            if (start == managedMethodName.Length)
             {
                 return start;
             }
-            Debug.Assert(fullMethodName[start] == '(');
+            Debug.Assert(managedMethodName[start] == '(');
 
             var types = new List<string>();
 
             int i = start + 1; // skip initial '(' char
-            for (; i < fullMethodName.Length; i++)
+            for (; i < managedMethodName.Length; i++)
             {
-                switch (fullMethodName[i])
+                switch (managedMethodName[i])
                 {
                     case ')':
-                        if (types.Any())
+                        if (types.Count != 0)
                         {
                             parameterTypes = types.ToArray();
                         }
@@ -109,7 +146,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                     case ',':
                         break;
                     default:
-                        i = ParseParameterType(fullMethodName, i, out var parameterType);
+                        i = ParseParameterType(managedMethodName, i, out var parameterType);
                         types.Add(parameterType);
                         break;
                 }
@@ -119,24 +156,24 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             throw new InvalidManagedNameException(message);
         }
 
-        private static int ParseParameterType(string fullMethodName, int start, out string parameterType)
+        private static int ParseParameterType(string managedMethodName, int start, out string parameterType)
         {
             parameterType = string.Empty;
 
             int i = start;
-            for (; i < fullMethodName.Length; i++)
+            for (; i < managedMethodName.Length; i++)
             {
-                switch (fullMethodName[i])
+                switch (managedMethodName[i])
                 {
                     case '<':
-                        i = ParseGenericBrackets(fullMethodName, i + 1);
+                        i = ParseGenericBrackets(managedMethodName, i + 1);
                         break;
                     case '[':
-                        i = ParseArrayBrackets(fullMethodName, i + 1);
+                        i = ParseArrayBrackets(managedMethodName, i + 1);
                         break;
                     case ',':
                     case ')':
-                        parameterType = Capture(fullMethodName, start, i);
+                        parameterType = Capture(managedMethodName, start, i);
                         return i - 1;
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
@@ -146,11 +183,11 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             return i;
         }
 
-        private static int ParseArrayBrackets(string fullMethodName, int start)
+        private static int ParseArrayBrackets(string managedMethodName, int start)
         {
-            for (int i = start; i < fullMethodName.Length; i++)
+            for (int i = start; i < managedMethodName.Length; i++)
             {
-                switch (fullMethodName[i])
+                switch (managedMethodName[i])
                 {
                     case ']':
                         return i;
@@ -164,14 +201,14 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             throw new InvalidManagedNameException(message);
         }
 
-        private static int ParseGenericBrackets(string fullMethodName, int start)
+        private static int ParseGenericBrackets(string managedMethodName, int start)
         {
-            for (int i = start; i < fullMethodName.Length; i++)
+            for (int i = start; i < managedMethodName.Length; i++)
             {
-                switch (fullMethodName[i])
+                switch (managedMethodName[i])
                 {
                     case '<':
-                        i = ParseGenericBrackets(fullMethodName, i + 1);
+                        i = ParseGenericBrackets(managedMethodName, i + 1);
                         break;
                     case '>':
                         return i;

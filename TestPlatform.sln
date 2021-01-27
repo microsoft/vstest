@@ -81,21 +81,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{DED1590A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{EE49F5DC-5835-4AE3-B3BA-8BDE0AD56330}"
 	ProjectSection(SolutionItems) = preProject
-		build.ps1 = build.ps1
-		build.sh = build.sh
-		key.snk = key.snk
-		PortableToFullPdb.ps1 = PortableToFullPdb.ps1
-		stylecop.json = stylecop.json
-		stylecop.ruleset = stylecop.ruleset
-		stylecop.test.ruleset = stylecop.test.ruleset
-		test.ps1 = test.ps1
-		test.sh = test.sh
-		verify-nupkgs.ps1 = verify-nupkgs.ps1
-		verify-sign.ps1 = verify-sign.ps1
-		vstest-codecoverage.runsettings = vstest-codecoverage.runsettings
-		vstest-codecoverage2.runsettings = vstest-codecoverage2.runsettings
-		vsts-prebuild.ps1 = vsts-prebuild.ps1
-		write-release-notes.ps1 = write-release-notes.ps1
+		scripts\build.ps1 = scripts\build.ps1
+		scripts\stylecop.json = scripts\stylecop.json
+		scripts\stylecop.ruleset = scripts\stylecop.ruleset
+		scripts\stylecop.test.ruleset = scripts\stylecop.test.ruleset
+		scripts\test.ps1 = scripts\test.ps1
+		scripts\verify-sign.ps1 = scripts\verify-sign.ps1
+		scripts\verify-nupkgs.ps1 = scripts\verify-nupkgs.ps1
+		scripts\PortableToFullPdb.ps1 = scripts\PortableToFullPdb.ps1
+		scripts\vsts-prebuild.ps1 = scripts\vsts-prebuild.ps1
+		scripts\write-release-notes.ps1 = scripts\write-release-notes.ps1
+		scripts\build.sh = scripts\build.sh
+		scripts\test.sh = scripts\test.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E344E0A2-7715-4C7F-BAF7-D64EA94CB19B}"

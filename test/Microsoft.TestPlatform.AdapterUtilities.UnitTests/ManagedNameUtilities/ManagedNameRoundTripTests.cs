@@ -35,8 +35,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer).GetMethod("Method0"),
                 containingTypeSymbol: outer,
                 methodSymbol: outer.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer",
-                fullMethodName: "Method0");
+                managedTypeName: "TestClasses.Outer",
+                managedMethodName: "Method0");
         }
 
         [TestMethod]
@@ -48,8 +48,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer).GetMethod("Method1"),
                 containingTypeSymbol: outer,
                 methodSymbol: outer.FindMethod("Method1"),
-                fullTypeName: "TestClasses.Outer",
-                fullMethodName: "Method1(System.Int32)");
+                managedTypeName: "TestClasses.Outer",
+                managedMethodName: "Method1(System.Int32)");
         }
 
         [TestMethod]
@@ -61,8 +61,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer).GetMethod("Method2"),
                 containingTypeSymbol: outer,
                 methodSymbol: outer.FindMethod("Method2"),
-                fullTypeName: "TestClasses.Outer",
-                fullMethodName: "Method2(System.Collections.Generic.List`1<System.String>)");
+                managedTypeName: "TestClasses.Outer",
+                managedMethodName: "Method2(System.Collections.Generic.List`1<System.String>)");
         }
 
         [TestMethod]
@@ -74,8 +74,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer).GetMethod("Method3"),
                 containingTypeSymbol: outer,
                 methodSymbol: outer.FindMethod("Method3"),
-                fullTypeName: "TestClasses.Outer",
-                fullMethodName: "Method3(System.String,System.Int32)");
+                managedTypeName: "TestClasses.Outer",
+                managedMethodName: "Method3(System.String,System.Int32)");
         }
 
         [TestMethod]
@@ -87,8 +87,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method0"),
                 containingTypeSymbol: outerInner,
                 methodSymbol: outerInner.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer+Inner",
-                fullMethodName: "Method0");
+                managedTypeName: "TestClasses.Outer+Inner",
+                managedMethodName: "Method0");
         }
 
         [TestMethod]
@@ -100,8 +100,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method1"),
                 containingTypeSymbol: outerInner,
                 methodSymbol: outerInner.FindMethod("Method1"),
-                fullTypeName: "TestClasses.Outer+Inner",
-                fullMethodName: "Method1(System.Int32)");
+                managedTypeName: "TestClasses.Outer+Inner",
+                managedMethodName: "Method1(System.Int32)");
         }
 
         [TestMethod]
@@ -113,8 +113,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method0"),
                 containingTypeSymbol: outerT,
                 methodSymbol: outerT.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method0");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method0");
         }
 
         [TestMethod]
@@ -126,8 +126,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method1"),
                 containingTypeSymbol: outerT,
                 methodSymbol: outerT.FindMethod("Method1"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method1(!0)");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method1(!0)");
         }
 
         [TestMethod]
@@ -139,8 +139,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method2"),
                 containingTypeSymbol: outerT,
                 methodSymbol: outerT.FindMethod("Method2"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method2`1(!!0[])");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method2`1(!!0[])");
         }
 
         [TestMethod]
@@ -152,8 +152,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>).GetMethod("Method3"),
                 containingTypeSymbol: outerT,
                 methodSymbol: outerT.FindMethod("Method3"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method3`1(!0,!!0)");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method3`1(!0,!!0)");
         }
 
         [TestMethod]
@@ -165,8 +165,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method0"),
                 containingTypeSymbol: outerTInnterV,
                 methodSymbol: outerTInnterV.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method0");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method0");
         }
 
         [TestMethod]
@@ -178,8 +178,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method1"),
                 containingTypeSymbol: outerTInnterV,
                 methodSymbol: outerTInnterV.FindMethod("Method1"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method1(!0)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method1(!0)");
         }
 
         [TestMethod]
@@ -191,8 +191,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method2"),
                 containingTypeSymbol: outerTInnterV,
                 methodSymbol: outerTInnterV.FindMethod("Method2"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method2(!1)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method2(!1)");
         }
 
         [TestMethod]
@@ -204,8 +204,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method3"),
                 containingTypeSymbol: outerTInnterV,
                 methodSymbol: outerTInnterV.FindMethod("Method3"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method3`1(!0,!!0,!1)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method3`1(!0,!!0,!1)");
         }
 
         [TestMethod]
@@ -217,8 +217,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>.Inner<>).GetMethod("Method4"),
                 containingTypeSymbol: outerTInnterV,
                 methodSymbol: outerTInnterV.FindMethod("Method4"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method4`2(!!1,!!0)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method4`2(!!1,!!0)");
         }
 
         [TestMethod]
@@ -230,8 +230,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<>.Inner<>.MoreInner<>).GetMethod("Method0"),
                 containingTypeSymbol: outerTInnerVMoreInnerI,
                 methodSymbol: outerTInnerVMoreInnerI.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1+MoreInner`1",
-                fullMethodName: "Method0`1(!0,!1,!2,!!0)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1+MoreInner`1",
+                managedMethodName: "Method0`1(!0,!1,!2,!!0)");
         }
 
         [TestMethod]
@@ -244,8 +244,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method0"),
                 containingTypeSymbol: outerTInt,
                 methodSymbol: outerTInt.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method0");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method0");
         }
 
         [TestMethod]
@@ -258,8 +258,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method1"),
                 containingTypeSymbol: outerTInt,
                 methodSymbol: outerTInt.FindMethod("Method1"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method1(!0)");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method1(!0)");
         }
 
         [TestMethod]
@@ -272,8 +272,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method2"),
                 containingTypeSymbol: outerTInt,
                 methodSymbol: outerTInt.FindMethod("Method2"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method2`1(!!0[])");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method2`1(!!0[])");
         }
 
         [TestMethod]
@@ -286,8 +286,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method3"),
                 containingTypeSymbol: outerTInt,
                 methodSymbol: outerTInt.FindMethod("Method3"),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method3`1(!0,!!0)");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method3`1(!0,!!0)");
         }
 
         [TestMethod]
@@ -302,8 +302,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method0"),
                 containingTypeSymbol: outerTIntInnerVString,
                 methodSymbol: outerTIntInnerVString.FindMethod("Method0"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method0");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method0");
         }
 
         [TestMethod]
@@ -318,8 +318,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method1"),
                 containingTypeSymbol: outerTIntInnerVString,
                 methodSymbol: outerTIntInnerVString.FindMethod("Method1"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method1(!0)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method1(!0)");
         }
 
         [TestMethod]
@@ -334,8 +334,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method2"),
                 containingTypeSymbol: outerTIntInnerVString,
                 methodSymbol: outerTIntInnerVString.FindMethod("Method2"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method2(!1)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method2(!1)");
         }
 
         [TestMethod]
@@ -350,8 +350,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method3"),
                 containingTypeSymbol: outerTIntInnerVString,
                 methodSymbol: outerTIntInnerVString.FindMethod("Method3"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method3`1(!0,!!0,!1)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method3`1(!0,!!0,!1)");
         }
 
         [TestMethod]
@@ -366,8 +366,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>.Inner<string>).GetMethod("Method4"),
                 containingTypeSymbol: outerTIntInnerVString,
                 methodSymbol: outerTIntInnerVString.FindMethod("Method4"),
-                fullTypeName: "TestClasses.Outer`1+Inner`1",
-                fullMethodName: "Method4`2(!!1,!!0)");
+                managedTypeName: "TestClasses.Outer`1+Inner`1",
+                managedMethodName: "Method4`2(!!1,!!0)");
         }
 
         [TestMethod]
@@ -381,8 +381,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer<int>).GetMethod("Method3").MakeGenericMethod(typeof(string)),
                 containingTypeSymbol: outerTInt,
                 methodSymbol: outerTInt.FindMethod("Method3").Construct(@string),
-                fullTypeName: "TestClasses.Outer`1",
-                fullMethodName: "Method3`1(!0,!!0)");
+                managedTypeName: "TestClasses.Outer`1",
+                managedMethodName: "Method3`1(!0,!!0)");
         }
 
         [TestMethod]
@@ -395,8 +395,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method2").MakeGenericMethod(typeof(int)),
                 containingTypeSymbol: outerInner,
                 methodSymbol: outerInner.FindMethod("Method2").Construct(@int),
-                fullTypeName: "TestClasses.Outer+Inner",
-                fullMethodName: "Method2`1(System.Int32)");
+                managedTypeName: "TestClasses.Outer+Inner",
+                managedMethodName: "Method2`1(System.Int32)");
         }
 
         [TestMethod]
@@ -411,8 +411,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Outer.Inner).GetMethod("Method3").MakeGenericMethod(typeof(float), typeof(string)),
                 containingTypeSymbol: outerInner,
                 methodSymbol: outerInner.FindMethod("Method3").Construct(@float, @string),
-                fullTypeName: "TestClasses.Outer+Inner",
-                fullMethodName: "Method3`2(System.Int32)");
+                managedTypeName: "TestClasses.Outer+Inner",
+                managedMethodName: "Method3`2(System.Int32)");
         }
 
         [TestMethod]
@@ -424,8 +424,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Impl).GetMethod("TestClasses.IImplementation.ImplMethod0", PrivateBindingFlags),
                 containingTypeSymbol: impl,
                 methodSymbol: impl.FindMethod("TestClasses.IImplementation.ImplMethod0"),
-                fullTypeName: "TestClasses.Impl",
-                fullMethodName: "TestClasses.IImplementation.ImplMethod0");
+                managedTypeName: "TestClasses.Impl",
+                managedMethodName: "TestClasses.IImplementation.ImplMethod0");
         }
 
         [TestMethod]
@@ -437,8 +437,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Impl).GetMethod("TestClasses.IImplementation.ImplMethod1", PrivateBindingFlags),
                 containingTypeSymbol: impl,
                 methodSymbol: impl.FindMethod("TestClasses.IImplementation.ImplMethod1"),
-                fullTypeName: "TestClasses.Impl",
-                fullMethodName: "TestClasses.IImplementation.ImplMethod1(System.Int32)");
+                managedTypeName: "TestClasses.Impl",
+                managedMethodName: "TestClasses.IImplementation.ImplMethod1(System.Int32)");
         }
 
         [TestMethod]
@@ -450,8 +450,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod0", PrivateBindingFlags),
                 containingTypeSymbol: implT,
                 methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod0"),
-                fullTypeName: "TestClasses.Impl`1",
-                fullMethodName: "TestClasses.IImplementation<T>.ImplMethod0");
+                managedTypeName: "TestClasses.Impl`1",
+                managedMethodName: "TestClasses.IImplementation<T>.ImplMethod0");
         }
 
         [TestMethod]
@@ -463,8 +463,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod1", PrivateBindingFlags),
                 containingTypeSymbol: implT,
                 methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod1"),
-                fullTypeName: "TestClasses.Impl`1",
-                fullMethodName: "TestClasses.IImplementation<T>.ImplMethod1(!0)");
+                managedTypeName: "TestClasses.Impl`1",
+                managedMethodName: "TestClasses.IImplementation<T>.ImplMethod1(!0)");
         }
 
         [TestMethod]
@@ -476,8 +476,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Impl<>).GetMethod("TestClasses.IImplementation<T>.ImplMethod2", PrivateBindingFlags),
                 containingTypeSymbol: implT,
                 methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod2"),
-                fullTypeName: "TestClasses.Impl`1",
-                fullMethodName: "TestClasses.IImplementation<T>.ImplMethod2`1(!0,!!0,System.String)");
+                managedTypeName: "TestClasses.Impl`1",
+                managedMethodName: "TestClasses.IImplementation<T>.ImplMethod2`1(!0,!!0,System.String)");
         }
 
         [TestMethod]
@@ -489,8 +489,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.OuterPrime).GetMethod("Method3"),
                 containingTypeSymbol: outerPrime,
                 methodSymbol: outerPrime.FindMethod("Method3"),
-                fullTypeName: "TestClasses.OuterPrime",
-                fullMethodName: "Method3(System.String,System.Int32)");
+                managedTypeName: "TestClasses.OuterPrime",
+                managedMethodName: "Method3(System.String,System.Int32)");
         }
 
         [TestMethod]
@@ -502,8 +502,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.OuterPrime<>).GetMethod("Method3"),
                 containingTypeSymbol: outerPrimeZ,
                 methodSymbol: outerPrimeZ.FindMethod("Method3"),
-                fullTypeName: "TestClasses.OuterPrime`1",
-                fullMethodName: "Method3`1(!0,!!0)");
+                managedTypeName: "TestClasses.OuterPrime`1",
+                managedMethodName: "Method3`1(!0,!!0)");
         }
 
         [TestMethod]
@@ -515,8 +515,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.OuterPrime<,>).GetMethod("Method3"),
                 containingTypeSymbol: outerPrimeYZ,
                 methodSymbol: outerPrimeYZ.FindMethod("Method3"),
-                fullTypeName: "TestClasses.OuterPrime`2",
-                fullMethodName: "Method3`1(!1,!!0)");
+                managedTypeName: "TestClasses.OuterPrime`2",
+                managedMethodName: "Method3`1(!1,!!0)");
         }
 
         [TestMethod]
@@ -528,8 +528,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.OuterString).GetMethod("Method3"),
                 containingTypeSymbol: outerString,
                 methodSymbol: outerString.FindMethod("Method3"),
-                fullTypeName: "TestClasses.OuterString",
-                fullMethodName: "Method3`1(System.String,!!0)");
+                managedTypeName: "TestClasses.OuterString",
+                managedMethodName: "Method3`1(System.String,!!0)");
         }
 
         [TestMethod]
@@ -541,8 +541,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0()"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 0),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0");
         }
 
         [TestMethod]
@@ -555,8 +555,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32)"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 0, @int),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0(System.Int32)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0(System.Int32)");
         }
 
         [TestMethod]
@@ -569,8 +569,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32, TestClasses.Overloads)"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 0, @int, overloads),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0(System.Int32,TestClasses.Overloads)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0(System.Int32,TestClasses.Overloads)");
         }
 
         [TestMethod]
@@ -584,8 +584,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(Int32*)"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 0, intptr),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0(System.Int32*)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0(System.Int32*)");
         }
 
         [TestMethod]
@@ -598,8 +598,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0(System.Object)"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 0, dynamic),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0(System.Object)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0(System.Object)");
         }
 
         [TestMethod]
@@ -611,8 +611,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](U)"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 1, 1, m => m.Parameters.Single().Type == m.TypeParameters.Single()),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(!!0)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(!!0)");
         }
 
         [TestMethod]
@@ -624,8 +624,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U]()"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 1),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1");
         }
 
         [TestMethod]
@@ -637,8 +637,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U,T]()"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 2),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`2");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`2");
         }
 
         [TestMethod]
@@ -653,8 +653,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                     m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
                          arrayType.Rank == 1 &&
                          arrayType.ElementType == m.TypeParameters.Single()),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(!!0[])");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(!!0[])");
         }
 
         [TestMethod]
@@ -671,8 +671,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                          arrayType.ElementType is IArrayTypeSymbol innerArrayType &&
                          innerArrayType.Rank == 1 &&
                          innerArrayType.ElementType == m.TypeParameters.Single()),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(!!0[][])");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(!!0[][])");
         }
 
         [TestMethod]
@@ -687,8 +687,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                     m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
                          arrayType.Rank == 2 &&
                          arrayType.ElementType == m.TypeParameters.Single()),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(!!0[,])");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(!!0[,])");
         }
 
         [TestMethod]
@@ -703,8 +703,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                     m => m.Parameters.Single().Type is IArrayTypeSymbol arrayType &&
                          arrayType.Rank == 3 &&
                          arrayType.ElementType == m.TypeParameters.Single()),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(!!0[,,])");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(!!0[,,])");
         }
 
         [TestMethod]
@@ -718,8 +718,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 methodInfo: typeof(TestClasses.Overloads).FindMethod("Void Overload0[U](System.Collections.Generic.List`1[System.Int32])"),
                 containingTypeSymbol: overloads,
                 methodSymbol: overloads.FindMethod("Overload0", 1, listInt),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(System.Collections.Generic.List`1<System.Int32>)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(System.Collections.Generic.List`1<System.Int32>)");
         }
 
         [TestMethod]
@@ -736,8 +736,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                         m.Parameters.Single().Type is INamedTypeSymbol p &&
                         p.OriginalDefinition == list &&
                         p.TypeArguments.Single() == m.TypeParameters.Single()),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(System.Collections.Generic.List`1<!!0>)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(System.Collections.Generic.List`1<!!0>)");
         }
 
         [TestMethod]
@@ -757,8 +757,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                         m.Parameters.Last() is INamedTypeSymbol p2 &&
                         p2.OriginalDefinition == tuple2 &&
                         p2.TypeArguments.SequenceEqual(m.TypeParameters.Reverse())),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`2(System.Tuple`2<!!0,!!1>,System.Tuple`2<!!1,!!0>)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`2(System.Tuple`2<!!0,!!1>,System.Tuple`2<!!1,!!0>)");
         }
 
         [TestMethod]
@@ -777,8 +777,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                         p.OriginalDefinition == tuple1 &&
                         p.TypeArguments.Single() is INamedTypeSymbol t &&
                         t.OriginalDefinition == tuple2),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0(System.Tuple`1<System.Tuple`2<System.String[,],System.Int32>>)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0(System.Tuple`1<System.Tuple`2<System.String[,],System.Int32>>)");
         }
 
         [TestMethod]
@@ -796,8 +796,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                         m.Parameters.Single().Type is INamedTypeSymbol p &&
                         p.OriginalDefinition == tuple2 &&
                         p.TypeArguments.All(t => t.OriginalDefinition == tuple1)),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0(System.Tuple`2<System.Tuple`1<System.String>,System.Tuple`1<System.Int32>>)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0(System.Tuple`2<System.Tuple`1<System.String>,System.Tuple`1<System.Int32>>)");
         }
 
         [TestMethod]
@@ -815,8 +815,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                         p.OriginalDefinition == tuple1 &&
                         p.TypeArguments.Single() is INamedTypeSymbol t &&
                         t.OriginalDefinition == tuple1),
-                fullTypeName: "TestClasses.Overloads",
-                fullMethodName: "Overload0`1(System.Tuple`1<System.Tuple`1<TestClasses.Outer`1+Inner`1<!!0,!!0>>>)");
+                managedTypeName: "TestClasses.Overloads",
+                managedMethodName: "Overload0`1(System.Tuple`1<System.Tuple`1<TestClasses.Outer`1+Inner`1<!!0,!!0>>>)");
         }
 
         #region Helpers
@@ -824,45 +824,45 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             MethodInfo methodInfo,
             INamedTypeSymbol containingTypeSymbol,
             IMethodSymbol methodSymbol,
-            string fullTypeName,
-            string fullMethodName)
+            string managedTypeName,
+            string managedMethodName)
         {
-            VerifyRoundTripFromMethodInfo(methodInfo, fullTypeName, fullMethodName);
-            VerifyRoundTripFromName(fullTypeName, fullMethodName, methodInfo);
-            // VerifyRoundTripFromMethodSymbol(containingTypeSymbol, methodSymbol, fullTypeName, fullMethodName);
-            // VerifyRoundTripFromName(fullTypeName, fullMethodName, containingTypeSymbol, methodSymbol);
+            VerifyRoundTripFromMethodInfo(methodInfo, managedTypeName, managedMethodName);
+            VerifyRoundTripFromName(managedTypeName, managedMethodName, methodInfo);
+            // VerifyRoundTripFromMethodSymbol(containingTypeSymbol, methodSymbol, managedTypeName, managedMethodName);
+            // VerifyRoundTripFromName(managedTypeName, managedMethodName, containingTypeSymbol, methodSymbol);
         }
 
         private void VerifyRoundTripFromMethodInfo(
             MethodInfo methodInfo,
-            string expectedFullTypeName,
-            string expectedFullMethodName)
+            string expectedManagedTypeName,
+            string expectedManagedMethodName)
         {
             // Generate the fqn for the Reflection MethodInfo
-            ManagedNameHelper.GetManagedName(methodInfo, out var fullTypeName, out var fullMethodName);
+            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName);
 
-            Assert.AreEqual(expectedFullTypeName, fullTypeName);
-            Assert.AreEqual(expectedFullMethodName, fullMethodName);
+            Assert.AreEqual(expectedManagedTypeName, managedTypeName);
+            Assert.AreEqual(expectedManagedMethodName, managedMethodName);
 
             // Lookup the Reflection MethodInfo using fullTypeName and fullMethodName
-            var roundTrippedMethodInfo = ManagedNameHelper.GetManagedName(
+            var roundTrippedMethodInfo = ManagedNameHelper.GetMethod(
                 Assembly.GetExecutingAssembly(),
-                fullTypeName,
-                fullMethodName);
+                managedTypeName,
+                managedMethodName);
 
             Assert.AreEqual(methodInfo.MetadataToken, roundTrippedMethodInfo.MetadataToken);
         }
 
         private void VerifyRoundTripFromName(
-            string fullTypeName,
-            string fullMethodName,
+            string managedTypeName,
+            string managedMethodName,
             MethodInfo expectedMethodInfo)
         {
             // Lookup the Reflection MethodInfo using fullTypeName and fullMethodName
-            var methodInfo = ManagedNameHelper.GetManagedName(
+            var methodInfo = ManagedNameHelper.GetMethod(
                 Assembly.GetExecutingAssembly(),
-                fullTypeName,
-                fullMethodName);
+                managedTypeName,
+                managedMethodName);
 
             Assert.AreEqual(expectedMethodInfo.MetadataToken, methodInfo.MetadataToken);
 
@@ -872,8 +872,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 out var roundTrippedFullTypeName,
                 out var roundTrippedFullMethodName);
 
-            Assert.AreEqual(fullTypeName, roundTrippedFullTypeName);
-            Assert.AreEqual(fullMethodName, roundTrippedFullMethodName);
+            Assert.AreEqual(managedTypeName, roundTrippedFullTypeName);
+            Assert.AreEqual(managedMethodName, roundTrippedFullMethodName);
         }
 
         // private void VerifyRoundTripFromMethodSymbol(
