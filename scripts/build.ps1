@@ -820,17 +820,17 @@ function Create-NugetPackages
 
     # Copy over the nuspecs to the staging directory
     $nuspecFiles = @(
-        "TestPlatform.TranslationLayer.nuspec",
-        "TestPlatform.ObjectModel.nuspec",
-        "Microsoft.TestPlatform.AdapterUtilities.nuspec",
-        "TestPlatform.TestHost.nuspec",
-        "TestPlatform.CLI.nuspec",
-        "TestPlatform.Build.nuspec",
-        "TestPlatform.Extensions.TrxLogger.nuspec", 
+        "Microsoft.CodeCoverage.nuspec",
         "Microsoft.NET.Test.Sdk.nuspec",
+        "Microsoft.TestPlatform.AdapterUtilities.nuspec",
         "Microsoft.TestPlatform.nuspec",
         "Microsoft.TestPlatform.Portable.nuspec",
-        "Microsoft.CodeCoverage.nuspec"
+        "TestPlatform.Build.nuspec",
+        "TestPlatform.CLI.nuspec",
+        "TestPlatform.Extensions.TrxLogger.nuspec",
+        "TestPlatform.ObjectModel.nuspec",
+        "TestPlatform.TestHost.nuspec",
+        "TestPlatform.TranslationLayer.nuspec"
     )
 
     $targetFiles = @("Microsoft.CodeCoverage.targets")

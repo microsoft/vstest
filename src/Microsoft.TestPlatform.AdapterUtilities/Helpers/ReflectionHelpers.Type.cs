@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
 
     internal static partial class ReflectionHelpers
     {
-        public static bool IsGenericType(Type type)
+        internal static bool IsGenericType(Type type)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return type.IsGenericType;
@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
 #endif
         }
 
-        public static MethodBase GetDeclaringMethod(Type type)
+        internal static MethodBase GetDeclaringMethod(Type type)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return type.DeclaringMethod;

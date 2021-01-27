@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
         private static readonly PropertyInfo methodHandleProperty = methodBase.GetRuntimeProperty(MethodHandlePropertyName);
 #endif
 
-        public static bool IsMethod(MethodBase method)
+        internal static bool IsMethod(MethodBase method)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return method.MemberType == MemberTypes.Method;
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
 #endif
         }
 
-        public static Type GetReflectedType(MethodBase method)
+        internal static Type GetReflectedType(MethodBase method)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return method.ReflectedType;
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
 #endif
         }
 
-        public static RuntimeMethodHandle GetMethodHandle(MethodBase method)
+        internal static RuntimeMethodHandle GetMethodHandle(MethodBase method)
         {
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
             return method.MethodHandle;
