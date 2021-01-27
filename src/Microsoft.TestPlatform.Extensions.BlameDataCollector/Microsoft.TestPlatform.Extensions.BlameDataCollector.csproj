@@ -17,11 +17,14 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />
@@ -31,9 +34,7 @@
     <Reference Include="netstandard" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client">
-      <Version>0.2.0-preview.20419.2</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.20419.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">

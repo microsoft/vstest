@@ -13,6 +13,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    // monitoring the processes does not work correctly
+    [TestCategory("Windows-Review")]
     public class RunsettingsTests : AcceptanceTestBase
     {
         private string runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
@@ -274,6 +276,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #region LegacySettings Tests
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
         {
@@ -303,6 +306,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
         {
@@ -353,6 +357,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
         {
@@ -387,6 +392,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
         {
@@ -411,6 +417,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
         {
@@ -488,6 +495,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         /// <param name="runnerInfo"></param>
         [TestMethod]
+        // patched dotnet is not published on non-windows systems
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)

@@ -4,11 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces
 {
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
@@ -51,13 +49,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="sources">
         /// Test run sources
         /// </param>
+        /// <param name="isTelemetryOptedIn">
+        /// Telemetry opted in flag.
+        /// </param>
         /// <param name="runEventsHandler">
         /// Test message event handler for handling messages.
         /// </param>
         /// <returns>
         /// BeforeTestRunStartResult containing environment variables
         /// </returns>
-        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, IEnumerable<string> sources, ITestMessageEventHandler runEventsHandler);
+        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler runEventsHandler);
 
         /// <summary>
         /// Sends the AfterTestRunEnd event and waits for result
@@ -69,8 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// The value to specify whether the test run is canceled or not.
         /// </param>
         /// <returns>
-        /// DataCollector attachments
+        /// AfterTestRunEndResult containing dataCollector attachments and metrics
         /// </returns>
-        Collection<AttachmentSet> SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled);
+        AfterTestRunEndResult SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled);
     }
 }

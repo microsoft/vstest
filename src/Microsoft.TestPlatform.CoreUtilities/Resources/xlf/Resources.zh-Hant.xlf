@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-1121215064">
+  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="-1121215064">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">119</count>
@@ -159,13 +159,6 @@
         <source>Could not find '{0}' host. Make sure that '{0}' is installed on the machine and is available in PATH environment variable.</source>
         <target state="translated">找不到 '{0}' 主機。請確認 '{0}' 已安裝在機器上，而且可在 PATH 環境變數中使用。</target>
         <note />
-      </trans-unit>
-      <trans-unit id="MethodNotImplementedOnPlatform">
-        <source>'{0}.{1}' is not implemented on this platform!</source>
-        <target state="new">'{0}.{1}' is not implemented on this platform!</target>
-        <note>'{className}.{methodName}' is not implemented on this platform!
-
-Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
       </trans-unit>
     </body>
   </file>

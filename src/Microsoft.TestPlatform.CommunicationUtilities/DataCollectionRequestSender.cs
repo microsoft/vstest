@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Net;
 
@@ -108,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, ITestMessageEventHandler runEventsHandler)
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, bool isTelemetryOptedIn, ITestMessageEventHandler runEventsHandler)
         {
             var isDataCollectionStarted = false;
             BeforeTestRunStartResult result = null;
@@ -121,7 +120,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             var payload = new BeforeTestRunStartPayload
             {
                 SettingsXml = settingsXml,
-                Sources = sources
+                Sources = sources,
+                IsTelemetryOptedIn = isTelemetryOptedIn
             };
 
             this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);
@@ -151,10 +151,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public Collection<AttachmentSet> SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
+        public AfterTestRunEndResult SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
         {
             var isDataCollectionComplete = false;
-            Collection<AttachmentSet> attachmentSets = null;
+            AfterTestRunEndResult result = null;
 
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -181,12 +181,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 }
                 else if (message.MessageType == MessageType.AfterTestRunEndResult)
                 {
-                    attachmentSets = this.dataSerializer.DeserializePayload<Collection<AttachmentSet>>(message);
+                    result = this.dataSerializer.DeserializePayload<AfterTestRunEndResult>(message);
                     isDataCollectionComplete = true;
                 }
             }
 
-            return attachmentSets;
+            return result;
         }
 
         private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)

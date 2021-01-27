@@ -404,7 +404,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
                 cancellationToken.ThrowIfCancellationRequested();
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) as Process;
+                this.testHostProcess = this.processHelper.LaunchProcess(
+                    testHostStartInfo.FileName,
+                    testHostStartInfo.Arguments,
+                    testHostStartInfo.WorkingDirectory,
+                    testHostStartInfo.EnvironmentVariables,
+                    this.ErrorReceivedCallback,
+                    this.ExitCallBack,
+                    null) as Process;
             }
             else
             {

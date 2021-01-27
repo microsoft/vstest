@@ -6,9 +6,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class CUITTest : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void CUITRunAllTests(RunnerInfo runnerInfo)
         {

@@ -8,23 +8,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.Coverage.CoreLib.Net;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProcessor
     {
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
         private const string CoverageFileExtension = ".coverage";
         private const string CoverageFriendlyName = "Code Coverage";
-
-        private const string CodeCoverageAnalysisAssemblyName = "Microsoft.VisualStudio.Coverage.Analysis";
-        private const string MergeMethodName = "MergeCoverageFiles";
-        private const string CoverageInfoTypeName = "CoverageInfo";
 
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
 
@@ -35,93 +31,102 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             yield return CodeCoverageDataCollectorUri;
         }    
 
-        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        public async Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
             if (attachments != null && attachments.Any())
             {
-                var codeCoverageFiles = attachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
-                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles, progressReporter, cancellationToken);
-                var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
+                var coverageReportFilePaths = new List<string>();
+                var coverageOtherFilePaths = new List<string>();
 
-                if (!string.IsNullOrEmpty(outputFile))
+                foreach (var attachmentSet in attachments)
                 {
-                    attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
-                    return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet> { attachmentSet });
+                    foreach (var attachment in attachmentSet.Attachments)
+                    {
+                        if (attachment.Uri.LocalPath.EndsWith(CoverageFileExtension, StringComparison.OrdinalIgnoreCase))
+                        {
+                            coverageReportFilePaths.Add(attachment.Uri.LocalPath);
+                        }
+                        else
+                        {
+                            coverageOtherFilePaths.Add(attachment.Uri.LocalPath);
+                        }
+                    }
                 }
 
-                // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
-                return Task.FromResult(attachments);
+                if(coverageReportFilePaths.Count > 1)
+                {
+                    var mergedCoverageReportFilePath = await this.MergeCodeCoverageFilesAsync(coverageReportFilePaths, progressReporter, cancellationToken).ConfigureAwait(false);
+                    if (!string.IsNullOrEmpty(mergedCoverageReportFilePath))
+                    {
+                        var resultAttachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
+                        resultAttachmentSet.Attachments.Add(new UriDataAttachment(new Uri(mergedCoverageReportFilePath), CoverageFriendlyName));
+
+                        foreach (var coverageOtherFilePath in coverageOtherFilePaths)
+                        {
+                            resultAttachmentSet.Attachments.Add(new UriDataAttachment(new Uri(coverageOtherFilePath), string.Empty));
+                        }
+
+                        return new Collection<AttachmentSet> { resultAttachmentSet };
+                    }
+                }
+
+                return attachments;
             }
 
-            return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet>());
+            return new Collection<AttachmentSet>();
         }
 
-        private string MergeCodeCoverageFiles(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
+        private async Task<string> MergeCodeCoverageFilesAsync(IList<string> files, IProgress<int> progressReporter, CancellationToken cancellationToken)
         {
-            if(files.Count == 1)
-            {
-                return files[0];
-            }
-
-            string tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
-            string outputfileName = files[0];
-
-            File.Create(tempFileName).Dispose();
-            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageAnalysisAssemblyName + ".dll");
-
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
-                var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
-
-                var methodInfo = type?.GetMethod(MergeMethodName);
-
-                if (methodInfo != null)
-                {
-                    IList<string> filesToDelete = new List<string>(files.Count) { tempFileName };
-
-                    for (int i = 1; i < files.Count; i++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        progressReporter?.Report(100 * i / files.Count);
-
-                        cancellationToken.ThrowIfCancellationRequested();
-                        methodInfo.Invoke(null, new object[] { files[i], outputfileName, tempFileName, true });
-
-                        cancellationToken.ThrowIfCancellationRequested();
-                        File.Copy(tempFileName, outputfileName, true);
-
-                        filesToDelete.Add(files[i]);
-                    }
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                    foreach (string fileName in filesToDelete)
-                    {
-                        File.Delete(fileName);
-                    }
-                }
-
+                // Warning: Don't remove this method call.
+                //
+                // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
+                // resolved, this method call will throw an exception that will be caught and
+                // absorbed here.
+                var result = await this.MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
                 progressReporter?.Report(100);
-                return outputfileName;
+                return result;
             }
             catch (OperationCanceledException)
             {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("CodeCoverageDataCollectorAttachmentsHandler: operation was cancelled.");
-                }
+                // Occurs due to cancellation, ok to re-throw.
                 throw;
             }
             catch (Exception ex)
             {
-                if (EqtTrace.IsErrorEnabled)
+                EqtTrace.Error(
+                    "CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector. Error: {0}",
+                    ex.ToString());
+            }
+
+            return null;
+        }
+
+        private async Task<string> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
+        {
+            var coverageUtility = new CoverageFileUtility();
+
+            var coverageData = await coverageUtility.MergeCoverageFilesAsync(
+                    files,
+                    cancellationToken).ConfigureAwait(false);
+
+            coverageUtility.WriteCoverageFile(files[0], coverageData);
+
+            foreach(var file in files.Skip(1))
+            {
+                try
                 {
-                    EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector of type : {0} from location : {1}. Error : {2}", CodeCoverageAnalysisAssemblyName, assemblyPath, ex.ToString());
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error($"CodeCoverageDataCollectorAttachmentsHandler: Failed to remove {file}. Error: {ex}");
                 }
             }
 
-            return string.Empty;
+            return files[0];
         }
     }
 }

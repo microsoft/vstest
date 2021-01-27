@@ -4,7 +4,13 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
+    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -49,6 +55,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
@@ -89,6 +96,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
 
             this.ExitCodeEquals(0);
+        }
+
+        [TestMethod]
+        public void TypesToLoadAttributeTests()
+        {
+            var environment = new IntegrationTestEnvironment();
+            var extensionsDirectory = environment.ExtensionsDirectory;
+            var extensionsToVerify = new Dictionary<string, string[]>
+            {
+                {"Microsoft.TestPlatform.Extensions.EventLogCollector.dll", new[] { "Microsoft.TestPlatform.Extensions.EventLogCollector.EventLogDataCollector"} },
+                {"Microsoft.TestPlatform.Extensions.BlameDataCollector.dll", new[] { "Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameLogger", "Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameCollector" } },
+                {"Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll", new[] { "Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger" } },
+                {"Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", new[] { "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.TrxLogger" } },
+                {"Microsoft.TestPlatform.TestHostRuntimeProvider.dll", new[] { "Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting.DefaultTestHostManager", "Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting.DotnetTestHostManager" } }
+            };
+
+            foreach (var extension in extensionsToVerify.Keys)
+            {
+                var assemblyFile = Path.Combine(extensionsDirectory, extension);
+                var assembly = Assembly.LoadFrom(assemblyFile);
+
+                var expected = extensionsToVerify[extension];
+                var actual = TypesToLoadUtilities.GetTypesToLoad(assembly).Select(i => i.FullName).ToArray();
+
+                CollectionAssert.AreEquivalent(expected, actual, $"Specified types using TypesToLoadAttribute in \"{extension}\" assembly doesn't match the expected.");
+            }
         }
     }
 }

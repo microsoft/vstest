@@ -26,7 +26,7 @@
   <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <!-- This csproj restore external tools required for build process -->
     <PackageReference Include="NuGet.CommandLine">
-      <Version>3.4.3</Version>
+      <Version>5.8.1</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="fmdev.xlftool">
@@ -51,6 +51,14 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
       <Version>$(TestPlatformExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Coverage.Interprocess">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
