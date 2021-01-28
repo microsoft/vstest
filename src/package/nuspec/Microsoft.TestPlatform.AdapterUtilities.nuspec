@@ -10,7 +10,7 @@
         <description>
             Includes helpers for the Test Platform's modern functionality such as standardized fully qualified names and hierarchical test case names.
         </description>
-        <license>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</license>
+        <license type="file">LICENSE_NET.txt</license>
         <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
         <icon>Icon.png</icon>
         <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
@@ -38,7 +38,7 @@
 
     <files>
         <file src="Icon.png" target="" />
-
+        <file src="licenses\LICENSE_NET.txt" target="" />
         <file src="netstandard1.0\Microsoft.TestPlatform.AdapterUtilities.dll" target="lib\netstandard1.0" />
         <file src="netstandard1.0\**\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\netstandard1.0" />
 

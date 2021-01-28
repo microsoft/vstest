@@ -8,7 +8,7 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>C# SDK for the test platform protocol. This SDK can be used in IDE or Editors to use test platform for discovery and execution of tests.</description>
-    <license>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</license>
+    <license type="file">LICENSE_NET.txt</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
@@ -40,7 +40,7 @@
   </metadata>
   <files>
     <file src="Icon.png" target="" />
-    
+    <file src="licenses\LICENSE_NET.txt" target="" />
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" target="lib\net451\" />

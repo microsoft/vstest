@@ -8,7 +8,7 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Build tasks and targets for running tests with Test Platform</description>
-    <license>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</license>
+    <license type="file">LICENSE_NET.txt</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
@@ -25,7 +25,7 @@
   </metadata>
   <files>
     <file src="Icon.png" target="" />
-    
+    <file src="licenses\LICENSE_NET.txt" target="" />
     <file src="Microsoft.TestPlatform.Build\netstandard2.0\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
 
     <!-- Add localized resources -->

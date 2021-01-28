@@ -8,7 +8,7 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>The Microsoft Test Platform Object Model.</description>
-    <license>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</license>
+    <license type="file">LICENSE_NET.txt</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
@@ -82,8 +82,8 @@
     </frameworkAssemblies>
   </metadata>
   <files>	
-    <file src="Icon.png" target="" />
-    
+      <file src="Icon.png" target="" />
+      <file src="licenses\LICENSE_NET.txt" target="" />
     <!-- net45 -->
       <file src="net45\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net45\" />
       <file src="net45\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"            target="lib\net45\" />
