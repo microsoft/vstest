@@ -10,7 +10,7 @@
         <description>
             Includes helpers for the Test Platform's modern functionality such as standardized fully qualified names and hierarchical test case names.
         </description>
-        <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+        <license>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</license>
         <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
         <icon>Icon.png</icon>
         <projectUrl>https://github.com/microsoft/vstest/</projectUrl>

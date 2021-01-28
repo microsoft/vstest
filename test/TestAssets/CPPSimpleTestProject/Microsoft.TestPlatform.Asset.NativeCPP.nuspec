@@ -7,7 +7,7 @@
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <license>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <description>MSDia typelib for reading debug symbols from managed code.</description>
     <copyright>Copyright © Microsoft Corporation</copyright>

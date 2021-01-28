@@ -9,7 +9,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>This package contains the full set of binaries for the Visual Studio Test Platform (vstest). It provides a modern, cross platform testing engine that powers the testing on .NET Core as well. It integrates with popular test frameworks like MSTest(v1 and v2), xUnit and Nunit with support for extensibility. The package supports running Coded UI tests. While running Coded UI tests, you must ensure that the package version matches the major version of Visual Studio used to build the test binaries. For example, if your Coded UI test project was built using Visual Studio 2019 (version 16.x), you must use test platform version 16.x. Coded UI test is deprecated (https://docs.microsoft.com/en-us/visualstudio/releases/2019/release-notes-preview#test-tools) and Visual Studio 2019 (Test Platform version 16.x) will be the last version with Coded UI test functionality. Visit https://github.com/microsoft/vstest to know more about vstest platform.</description>
     <summary>This package contains the full set of binaries for the Visual Studio Test Platform (vstest). It provides a modern, cross platform testing engine that powers the testing on .NET Core as well. It integrates with popular test frameworks like MSTest(v1 and v2), xUnit and Nunit with support for extensibility. </summary>
-    <licenseUrl>https://www.visualstudio.com/microsoft-visual-studio-test-platform</licenseUrl>
+    <license>https://www.visualstudio.com/microsoft-visual-studio-test-platform</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
