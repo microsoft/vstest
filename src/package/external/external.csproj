@@ -45,7 +45,7 @@
       <Version>2.0.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-	<PackageReference Include="Microsoft.DiaSymReader.Pdb2Pdb">
+	  <PackageReference Include="Microsoft.DiaSymReader.Pdb2Pdb">
       <Version>1.1.0-beta2-21075-01</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>

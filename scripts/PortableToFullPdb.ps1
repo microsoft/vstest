@@ -22,7 +22,7 @@ function Locate-PdbConverterTool
 {
     $pdbConverter = Join-Path -path $TP_PACKAGES_DIR -ChildPath "Microsoft.DiaSymReader.Pdb2Pdb\$PdbConverterToolVersion\tools\Pdb2Pdb.exe"
 
-       if (!(Test-Path -path $pdbConverter)) {
+    if (!(Test-Path -path $pdbConverter)) {
        throw "Unable to locate Pdb2Pdb converter exe in path '$pdbConverter'."
    }
 
