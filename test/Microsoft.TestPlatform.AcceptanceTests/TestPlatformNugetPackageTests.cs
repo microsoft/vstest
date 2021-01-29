@@ -25,8 +25,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             nugetPackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage));
             ZipFile.ExtractToDirectory(nugetPackage, nugetPackageFolder);
 
-            Directory.Move(Path.Combine(nugetPackageFolder, "tools", "net451", "Team%20Tools"), Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools"));
-            Directory.Move(Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"), Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools"));
+            TryMoveDirectory(
+                sourceDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team%20Tools"),
+                destDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools")
+            );
+
+            TryMoveDirectory(
+                sourceDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic%20Code%20Coverage%20Tools"),
+                destDirName: Path.Combine(nugetPackageFolder, "tools", "net451", "Team Tools", "Dynamic Code Coverage Tools")
+            );
         }
 
         [ClassCleanup]
@@ -96,6 +103,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             return arguments;
+        }
+
+        private static void TryMoveDirectory(string sourceDirName, string destDirName)
+        {
+            if (Directory.Exists(sourceDirName))
+            {
+                Directory.Move(sourceDirName, destDirName);
+            }
         }
     }
 }

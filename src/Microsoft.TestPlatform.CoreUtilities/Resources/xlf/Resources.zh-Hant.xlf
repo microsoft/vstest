@@ -160,13 +160,6 @@
         <target state="translated">找不到 '{0}' 主機。請確認 '{0}' 已安裝在機器上，而且可在 PATH 環境變數中使用。</target>
         <note />
       </trans-unit>
-      <trans-unit id="MethodNotImplementedOnPlatform">
-        <source>'{0}.{1}' is not implemented on this platform!</source>
-        <target state="translated">'{0}.{1}' 未在此平台上實作!</target>
-        <note>'{className}.{methodName}' is not implemented on this platform!
-
-Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

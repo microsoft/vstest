@@ -32,6 +32,7 @@ build*.log
 build*.wrn
 build*.err
 *.binlog
+*.svclog
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

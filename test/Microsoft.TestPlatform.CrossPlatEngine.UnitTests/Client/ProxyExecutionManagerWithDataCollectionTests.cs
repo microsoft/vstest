@@ -99,7 +99,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var mockRequestSender = new Mock<IDataCollectionRequestSender>();
             var testSources = new List<string>() { "abc.dll", "efg.dll" };
-            mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
+            mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
             mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
