@@ -390,6 +390,7 @@ function create_package()
     cp "$TP_PACKAGE_NUSPEC_DIR/_._" $stagingDir
     cp "$TP_PACKAGE_NUSPEC_DIR/../ThirdPartyNotices.txt" $stagingDir
     cp "$TP_PACKAGE_NUSPEC_DIR/../Icon.png" $stagingDir
+    cp -r "$TP_PACKAGE_NUSPEC_DIR/../licenses" $stagingDir
 
     for i in ${projectFiles[@]}; do
         log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \

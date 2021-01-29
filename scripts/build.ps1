@@ -812,6 +812,7 @@ function Create-NugetPackages
     
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
+
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
     }
@@ -846,6 +847,9 @@ function Create-NugetPackages
     # Copy empty and third patry notice file
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
+
+    # Copy licenses folder
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "licenses") $stagingDir -Force -Recurse
 
     #Copy Uap target, & props
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")

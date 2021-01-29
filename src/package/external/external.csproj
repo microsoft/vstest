@@ -45,8 +45,8 @@
       <Version>2.0.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-	<PackageReference Include="Pdb2Pdb">
-      <Version>1.1.0-beta1-62316-01</Version>
+	  <PackageReference Include="Microsoft.DiaSymReader.Pdb2Pdb">
+      <Version>1.1.0-beta2-21075-01</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
