@@ -5,7 +5,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     
@@ -26,6 +26,11 @@
     <!-- On non windows environment, make UAP behave like desktop .NET framework -->
     <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+    <RuntimeIdentifier>any</RuntimeIdentifier>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
