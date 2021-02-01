@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassedTests = PassedTests,
                 TotalTests = TotalTests,
                 SkippedTests = SkippedTests,
-                PassPercentage = (PassedTests * 100) / TotalTests,
+                PassPercentage = (PassedTests * 100) / (TotalTests >= 1 ? TotalTests : 1),
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
             if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
