@@ -284,6 +284,16 @@
         <target state="translated">{0} "TestResults" 폴더를 언급된 위치에 만드는 동안 액세스가 거부되었습니다. 쓰기 권한이 필요한 폴더에서 vstest.console.exe를 실행하고 있으므로 이 예외가 발생했습니다. 이 문제를 해결하려면 쓰기 권한이 있는 폴더에서 vstest.console.exe를 실행하세요. 자세한 내용은 다음 오류 메시지를 확인하세요.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

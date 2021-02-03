@@ -165,6 +165,9 @@
   <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
     <value>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</value>
   </data>
+  <data name="InnerException" xml:space="preserve">
+    <value>Inner exception:</value>
+  </data>
   <data name="InvalidCondition" xml:space="preserve">
     <value>Error: Invalid Condition '{0}'</value>
   </data>
@@ -212,6 +215,9 @@
   </data>
   <data name="SettingsProviderNotFound" xml:space="preserve">
     <value>Settings Provider named '{0}' was not found.  The settings can not be loaded.</value>
+  </data>
+  <data name="StackTrace" xml:space="preserve">
+    <value>Stack trace:</value>
   </data>
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>

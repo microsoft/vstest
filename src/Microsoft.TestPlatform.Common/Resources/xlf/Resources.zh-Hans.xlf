@@ -284,6 +284,16 @@
         <target state="translated">{0} 尝试在所述位置创建 "TestResults" 文件夹时，访问被拒。你收到此异常是因为你正在从需要具有写入权限的文件夹运行 vstest.console.exe。若要解决此问题，请从你具有写入权限的文件夹运行 vstest.console.exe。有关详细信息，请查看错误消息:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
