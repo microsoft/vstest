@@ -284,6 +284,16 @@
         <target state="translated">{0} Při pokusu o vytvoření složky TestResults v uvedeném umístění došlo k odepření přístupu. Tato výjimka se vyvolala, protože spouštíte vstest.console.exe ze složky, která vyžaduje, abyste měli přístup pro zápis. Pokud chcete problém vyřešit, spusťte prosím vstest.console.exe ze složky, ve které máte oprávnění k zápisu. Další informace najdete v chybové zprávě:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

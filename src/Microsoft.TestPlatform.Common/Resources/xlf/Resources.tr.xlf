@@ -284,6 +284,16 @@
         <target state="translated">{0} Belirtilen konumda "TestResults" klasörü oluşturulmaya çalışılırken erişim engellendi. Yazma erişimi gerektiren bir klasörden vstest.console.exe çalıştırdığınız için bu özel durumu aldınız. Sorunu çözmek için: Lütfen yazma ayrıcalıklarına sahip olduğunuz bir klasörden vstest.console.exe dosyasını çalıştırın. Daha fazla bilgi için lütfen hata iletisine bakın:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
