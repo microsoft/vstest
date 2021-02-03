@@ -284,6 +284,16 @@
         <target state="translated">{0} Accès refusé durant la tentative de création du dossier "TestResults" à l'emplacement indiqué. Vous obtenez cette exception, car vous exécutez vstest.console.exe à partir d'un dossier qui nécessite un accès en écriture. Pour résoudre le problème, exécutez vstest.console.exe à partir d'un dossier sur lequel vous disposez de privilèges d'accès en écriture. Pour plus d'informations, consultez le message d'erreur :</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

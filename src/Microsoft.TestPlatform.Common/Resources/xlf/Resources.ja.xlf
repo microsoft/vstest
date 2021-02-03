@@ -284,6 +284,16 @@
         <target state="translated">{0} 記載した場所に "TestResults" フォルダーを作成しようとしたときにアクセスが拒否されました。書き込みアクセスを必要とするフォルダーから vstest.console.exe を実行しているため、この例外が発生しています。この問題を解決するには、書き込み権限のあるフォルダーから vstest.console.exe を実行してください。詳細については、次のエラー メッセージをご覧ください。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
