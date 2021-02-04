@@ -87,7 +87,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             AppendTypeString(typeBuilder, semanticType, closedType: false);
 
             // Method Name with method arity
-            methodBuilder.Append(method.Name);
+            AppendMethodString(methodBuilder, method.Name);
             var arity = method.GetGenericArguments().Length;
             if (arity > 0)
             {
@@ -143,12 +143,14 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         {
             Type type;
 
+            var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
+
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-            type = assembly.GetType(managedTypeName, throwOnError: false, ignoreCase: false);
+            type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
 #else
             try
             {
-                type = assembly.GetType(managedTypeName);
+                type = assembly.GetType(parsedManagedTypeName);
             }
             catch
             {
@@ -158,7 +160,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             if (type == null)
             {
-                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, managedTypeName);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, parsedManagedTypeName);
                 throw new InvalidManagedNameException(message);
             }
 
@@ -266,6 +268,72 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
         }
 
+        private static void AppendMethodString(StringBuilder methodBuilder, string name)
+        {
+            if (IsNormalized(name))
+            {
+                methodBuilder.Append(name);
+                return;
+            }
+
+            methodBuilder.Append("'");
+            for (int i = 0; i < name.Length; i++)
+            {
+                char c = name[i];
+                if (NeedsEscaping(c, i))
+                {
+                    var encoded = Convert.ToString(((uint)c), 16);
+                    methodBuilder.Append("\\u");
+                    methodBuilder.Append('0', 4 - encoded.Length);
+                    methodBuilder.Append(encoded);
+                }
+                else
+                {
+                    methodBuilder.Append(c);
+                }
+            }
+            methodBuilder.Append("'");
+        }
+
+        private static bool IsNormalized(string s)
+        {
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (NeedsEscaping(s[i], i))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool NeedsEscaping(char c, int pos)
+        {
+            if (pos == 0 && char.IsDigit(c))
+            {
+                return true;
+            }
+
+            if (c == '_'
+              || char.IsLetterOrDigit(c) // Lu, Ll, Lt, Lm, Lo, or Nl 
+              )
+            {
+                return false;
+            }
+
+            var category = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (category == UnicodeCategory.NonSpacingMark        // Mn
+             || category == UnicodeCategory.SpacingCombiningMark  // Mc
+             || category == UnicodeCategory.ConnectorPunctuation  // Pc
+             || category == UnicodeCategory.Format)               // Cf
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private static void AppendNestedTypeName(StringBuilder b, Type type)
         {
             if (type.IsNested)
@@ -273,7 +341,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 AppendNestedTypeName(b, type.DeclaringType);
                 b.Append('+');
             }
-            b.Append(type.Name);
+            AppendMethodString(b, type.Name);
         }
 
         private static void AppendGenericTypeParameters(StringBuilder b, Type type)

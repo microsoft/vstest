@@ -122,6 +122,7 @@ $env:MSBUILD_VERSION = "15.0"
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
+$TPB_TestAssets_CILAssets = Join-Path $env:TP_ROOT_DIR "test\TestAssets\CILProject\CILProject.proj"
 $TPB_TargetFramework45 = "net45"
 $TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework472 = "net472"
@@ -291,6 +292,11 @@ function Invoke-TestAssetsBuild
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
+    Write-Log ".. .. Build: Complete."
+
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_CILAssets"
+    Write-Verbose "$dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
+    & $dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\CILAssets.binlog"
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError

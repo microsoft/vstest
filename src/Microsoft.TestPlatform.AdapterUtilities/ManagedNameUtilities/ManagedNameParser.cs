@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 {
+    using Microsoft.TestPlatform.AdapterUtilities.Helpers;
     using Microsoft.TestPlatform.AdapterUtilities.Resources;
 
     using System.Collections.Generic;
@@ -66,7 +67,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         /// </exception>
         public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[] parameterTypes)
         {
-            int pos = ParseMethodName(managedMethodName, 0, out methodName, out arity);
+            int pos = ParseMethodName(managedMethodName, 0, out var escapedMethodName, out arity);
+            methodName = ReflectionHelpers.ParseEscapedString(escapedMethodName);
             pos = ParseParameterTypeList(managedMethodName, pos, out parameterTypes);
             if (pos != managedMethodName.Length)
             {

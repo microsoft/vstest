@@ -70,6 +70,5 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method("), "ManagedName is incomplete");
             Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method`4a"), "Method arity must be numeric");
         }
-
     }
 }
