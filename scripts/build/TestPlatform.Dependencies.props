@@ -10,13 +10,13 @@
     they are both the same during build -->
     <!-- this version also needs to be "statically" readable because the test fixture will inspect this file for the version 
     and because during the test `dotnet test` will run and re-build some of the test projects and at that time the version 
-    from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync --> 
+    from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
     <NETTestSdkVersion>16.9.0-dev</NETTestSdkVersion>
 
     <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>
     <MSTestAdapterVersion>2.1.0</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
-    
+
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.3.1</XUnitAdapterVersion>
     <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
@@ -32,7 +32,7 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.9.0-preview-4267359</TestPlatformExternalsVersion>
-    <CodeCoverageExternalsVersion>16.9.0-beta.21072.1</CodeCoverageExternalsVersion>
+    <CodeCoverageExternalsVersion>16.9.0-beta.21105.3</CodeCoverageExternalsVersion>
     <MicrosoftFakesVersion>16.9.0-beta.20628.1</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
