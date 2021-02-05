@@ -8,21 +8,22 @@ function Unzip
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
-
 function Verify-Nuget-Packages($packageDirectory, $version)
 {
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{
-                     "Microsoft.CodeCoverage" = 44;
-                     "Microsoft.NET.Test.Sdk" = 18;
-                     "Microsoft.TestPlatform" = 486;
-                     "Microsoft.TestPlatform.Build" = 19;
-                     "Microsoft.TestPlatform.CLI" = 353;
-                     "Microsoft.TestPlatform.Extensions.TrxLogger" = 33;
-                     "Microsoft.TestPlatform.ObjectModel" = 178;
-                     "Microsoft.TestPlatform.Portable" = 568;
-                     "Microsoft.TestPlatform.TestHost" = 212;
-                     "Microsoft.TestPlatform.TranslationLayer" = 121}
+        "Microsoft.CodeCoverage" = 61;
+        "Microsoft.NET.Test.Sdk" = 27;
+        "Microsoft.TestPlatform" = 515;
+        "Microsoft.TestPlatform.Build" = 21;
+        "Microsoft.TestPlatform.CLI" = 381;
+        "Microsoft.TestPlatform.Extensions.TrxLogger" = 35;
+        "Microsoft.TestPlatform.ObjectModel" = 180;
+        "Microsoft.TestPlatform.AdapterUtilities" = 48;
+        "Microsoft.TestPlatform.Portable" = 570;
+        "Microsoft.TestPlatform.TestHost" = 214;
+        "Microsoft.TestPlatform.TranslationLayer" = 123;
+    }
 
     $nugetPackages = Get-ChildItem -Filter "*$version*.nupkg" $packageDirectory | % { $_.FullName }
 

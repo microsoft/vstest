@@ -19,14 +19,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
          */
         protected const double ExpectedMinimalModuleCoverage = 30.0;
 
-        protected string GetCodeCoveragePath()
+        protected string GetNetStandardAdapterPath()
         {
             return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
         }
 
+        protected string GetNetFrameworkAdapterPath()
+        {
+            return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "net451", "win7-x64", "Extensions");
+        }
+
         protected string GetCodeCoverageExePath()
         {
-            return Path.Combine(this.GetCodeCoveragePath(), "CodeCoverage", "CodeCoverage.exe");
+            return Path.Combine(this.GetNetStandardAdapterPath(), "CodeCoverage", "CodeCoverage.exe");
         }
 
         protected XmlNode GetModuleNode(XmlNode node, string name)

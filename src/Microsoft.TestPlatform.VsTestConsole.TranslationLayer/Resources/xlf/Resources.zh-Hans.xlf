@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-HANS" original="../Resources.resx" build-num="-627307614">
+  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-627307614">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">23</count>
@@ -64,6 +64,16 @@
       <trans-unit id="AbortedTestRunAttachmentsProcessing">
         <source>The active Test Run Attachments Processing was aborted.</source>
         <target state="translated">已中止正在进行的测试运行附件处理操作。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AbortedStartTestSession">
+        <source>The Start Test Session operation was aborted.</source>
+        <target state="translated">已中止启动测试会话操作。</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AbortedStopTestSession">
+        <source>The Stop Test Session operation was aborted.</source>
+        <target state="translated">已中止停止测试会话操作。</target>
         <note></note>
       </trans-unit>
     </body>

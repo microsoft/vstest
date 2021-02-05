@@ -57,6 +57,29 @@ Param(
 $ErrorActionPreference = "Stop"
 
 #
+# Git Branch
+#
+$TPB_BRANCH = "LOCALBRANCH"
+$TPB_COMMIT = "LOCALBUILD"
+
+try {
+    $TPB_BRANCH = $env:BUILD_SOURCEBRANCH -replace "^refs/heads/"  
+    if ([string]::IsNullOrWhiteSpace($TPB_BRANCH)) { 
+        $TPB_BRANCH = git -C "." rev-parse --abbrev-ref HEAD
+    }
+}
+catch { }
+
+try {
+    $TPB_COMMIT = $env:BUILD_SOURCEVERSION
+    if ([string]::IsNullOrWhiteSpace($TPB_COMMIT)) { 
+        $TPB_COMMIT = git -C "." rev-parse HEAD
+    }
+}
+catch { }
+
+
+#
 # Variables
 #
 Write-Verbose "Setup environment variables."
@@ -87,8 +110,8 @@ Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
-$env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "5.0.100"
+$env:NUGET_EXE_Version = "5.8.1"
+$env:DOTNET_CLI_VERSION = "6.0.100-alpha.1.21067.8"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -194,6 +217,12 @@ function Install-DotNetCli
     $env:DOTNET_ROOT= $dotnetInstallPath
 
     & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '3.1.0' -Channel '3.1.0' -Architecture x86 -NoPath
+    ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
+
+    & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '5.0.1' -Channel '5.0.1' -Architecture x64 -NoPath
+    $env:DOTNET_ROOT= $dotnetInstallPath
+
+    & $dotnetInstallScript -InstallDir "${dotnetInstallPath}_x86" -Runtime 'dotnet' -Version '5.0.1' -Channel '5.0.1' -Architecture x86 -NoPath
     ${env:DOTNET_ROOT(x86)} = "${dotnetInstallPath}_x86"
 
     $env:DOTNET_MULTILEVEL_LOOKUP=0
@@ -305,6 +334,9 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackage451Dir = Get-FullCLRPackageDirectory
     $fullCLRPackage45Dir = Get-FullCLRPackageDirectory45
+    $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
+    $net20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net20");
+    $net35PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net35");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
@@ -367,16 +399,16 @@ function Publish-Package
     
     # Copy the .NET multitarget testhost exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
-        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force 
-        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.pdb" $testhostFullPackageDir\testhost.$tfm.pdb -Force 
-        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.exe.config" $testhostFullPackageDir\testhost.$tfm.exe.config -Force 
+        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force 
+        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.pdb" $testhostFullPackageDir\testhost.$tfm.pdb -Force 
+        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe.config" $testhostFullPackageDir\testhost.$tfm.exe.config -Force 
     }
 
     # Copy the .NET multitarget testhost.x86 exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
-        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.x86.exe" $testhostFullPackageDir\testhost.$tfm.x86.exe -Force 
-        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.x86.pdb" $testhostFullPackageDir\testhost.$tfm.x86.pdb -Force 
-        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force 
+        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe" $testhostFullPackageDir\testhost.$tfm.x86.exe -Force 
+        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.pdb" $testhostFullPackageDir\testhost.$tfm.x86.pdb -Force 
+        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force 
     }
 
     # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
@@ -448,6 +480,17 @@ function Publish-Package
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
               }
+
+    ################################################################################
+    # Publish Microsoft.TestPlatform.AdapterUtilities
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
+            -files @{
+              # "net20"                     = $net20PackageDir               # net20 \ net20, and net35 isn't supported by the Test Platform
+              # "net35"                     = $net35PackageDir               # net35 / but this package supports, so adding targets.
+                $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
+                $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
+                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
+            }
 
     ################################################################################
     # Publish msdia
@@ -568,7 +611,7 @@ function Publish-Package
     }
 
     Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
-    
+
     # Copy Microsoft.VisualStudio.Telemetry APIs
     $testPlatformDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace\Common7\IDE\Extensions\TestPlatform"
     
@@ -685,6 +728,17 @@ function Create-VsixPackage
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
+    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+
+    # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
+    $traceDataCollectorPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
+    Copy-Item $traceDataCollectorPackageDirectory\Microsoft.VisualStudio.TraceDataCollector.dll $extensionsPackageDir -Force
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $traceDataCollectorPackageDirectory $extensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+    }
+
+    $codeCoverageInterprocessPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    Copy-Item $codeCoverageInterprocessPackageDirectory\Microsoft.VisualStudio.Coverage.Interprocess.dll $extensionsPackageDir -Force
 
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion\contentFiles\any\any"
@@ -721,8 +775,7 @@ function Create-VsixPackage
     }
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
     
-    $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
-    Copy-Item $fileToCopy $packageDir -Force
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt") $packageDir -Force
 
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
@@ -756,6 +809,9 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = $TPB_PackageOutDir
+    
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
+
 
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
@@ -764,16 +820,19 @@ function Create-NugetPackages
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec",
-                     "TestPlatform.ObjectModel.nuspec",
-                     "TestPlatform.TestHost.nuspec",
-                     "TestPlatform.CLI.nuspec",
-                     "TestPlatform.Build.nuspec",
-                     "TestPlatform.Extensions.TrxLogger.nuspec", 
-                     "Microsoft.NET.Test.Sdk.nuspec",
-                     "Microsoft.TestPlatform.nuspec",
-                     "Microsoft.TestPlatform.Portable.nuspec",
-                     "Microsoft.CodeCoverage.nuspec")
+    $nuspecFiles = @(
+        "Microsoft.CodeCoverage.nuspec",
+        "Microsoft.NET.Test.Sdk.nuspec",
+        "Microsoft.TestPlatform.AdapterUtilities.nuspec",
+        "Microsoft.TestPlatform.nuspec",
+        "Microsoft.TestPlatform.Portable.nuspec",
+        "TestPlatform.Build.nuspec",
+        "TestPlatform.CLI.nuspec",
+        "TestPlatform.Extensions.TrxLogger.nuspec",
+        "TestPlatform.ObjectModel.nuspec",
+        "TestPlatform.TestHost.nuspec",
+        "TestPlatform.TranslationLayer.nuspec"
+    )
 
     $targetFiles = @("Microsoft.CodeCoverage.targets")
     $propFiles = @("Microsoft.NET.Test.Sdk.props", "Microsoft.CodeCoverage.props")
@@ -788,6 +847,9 @@ function Create-NugetPackages
     # Copy empty and third patry notice file
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
+
+    # Copy licenses folder
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "licenses") $stagingDir -Force -Recurse
 
     #Copy Uap target, & props
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")
@@ -818,7 +880,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir`;BranchName=$TPB_BRANCH`;CommitId=$TPB_COMMIT $additionalArgs
 
         Set-ScriptFailedOnError
     }
@@ -833,21 +895,28 @@ function Create-NugetPackages
 function Copy-CodeCoverage-Package-Artifacts
 {
     # Copy TraceDataCollector to Microsoft.CodeCoverage folder.
+    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+    $traceDataCollectorPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.tracedatacollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $internalCodeCoveragePackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.internal.codecoverage\$codeCoverageExternalsVersion\contentFiles\any\any\"
+    $codeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+    $codeCoverageInterprocessPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
+
     $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
 
     New-Item -ItemType directory -Path $microsoftCodeCoveragePackageDir -Force | Out-Null
 
-    $traceDataCollectorOutDir = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$TPB_Configuration\$TPB_TargetFrameworkNS20"
-
-    Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $traceDataCollectorOutDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
-    Copy-Item $traceDataCollectorOutDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
+    Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $traceDataCollectorPackagesDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageCoreLibPackagesDir\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $codeCoverageInterprocessPackagesDir\Microsoft.VisualStudio.Coverage.Interprocess.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $internalCodeCoveragePackagesDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
+    Copy-Item $internalCodeCoveragePackagesDir\InstrumentationEngine $microsoftCodeCoveragePackageDir -Force -Recurse
+    Copy-Item $internalCodeCoveragePackagesDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
 
     # Copy TraceDataCollector resource dlls
     if($TPB_LocalizedBuild) {
-        Copy-Loc-Files $traceDataCollectorOutDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
-        Copy-Loc-Files $traceDataCollectorOutDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+        Copy-Loc-Files $traceDataCollectorPackagesDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+        Copy-Loc-Files $codeCoverageCoreLibPackagesDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll"
     }
 }
 

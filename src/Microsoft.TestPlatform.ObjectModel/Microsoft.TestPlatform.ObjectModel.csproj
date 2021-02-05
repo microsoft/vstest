@@ -78,7 +78,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
     <EmbeddedResource Include="Resources\CommonResources.resx" />
-    <EmbeddedResource Include="Resources\ManagedNameMessages.resx" />
 
     <None Include="Resources\CommonResources.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -90,11 +89,6 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>CommonResources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Resources\ManagedNameMessages.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ManagedNameMessages.resx</DependentUpon>
     </Compile>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -108,17 +102,10 @@
       <DependentUpon>Resources\CommonResources.tt</DependentUpon>
       <LastGenOutput>CommonResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ManagedNameMessages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ManagedNameMessages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.ObjectModel</RootNamespace>

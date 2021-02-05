@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Microsoft.TestPlatform.TranslationLayer</id>
     <version>15.0.0</version>
@@ -8,11 +8,17 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>C# SDK for the test platform protocol. This SDK can be used in IDE or Editors to use test platform for discovery and execution of tests.</description>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <license type="file">LICENSE_NET.txt</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
+    <repository type="git" 
+                url="https://github.com/microsoft/vstest" 
+                branch="$BranchName$" 
+                commit="$CommitId$" />
+
     <dependencies>
       <group targetFramework="net451">
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
@@ -30,6 +36,8 @@
     </frameworkAssemblies>
   </metadata>
   <files>
+    <file src="Icon.png" target="" />
+    <file src="licenses\LICENSE_NET.txt" target="" />
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     

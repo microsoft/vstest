@@ -67,6 +67,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 testElement.TestCategories.Add(testCategory);
             }
 
+            var workItems = GetCustomPropertyValueFromTestCase(rockSteadyTestCase, "WorkItemIds")
+                .Select(workItem => int.Parse(workItem));
+            foreach (int workItem in workItems)
+            {
+                testElement.WorkItems.Add(workItem);
+            }
+
             return testElement;
         }
 

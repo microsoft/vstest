@@ -19,5 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets list of test sources.
         /// </summary>
         public IEnumerable<string> Sources { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether telemetry is enabled.
+        /// </summary>
+        public bool IsTelemetryOptedIn { get; set; }
     }
 }

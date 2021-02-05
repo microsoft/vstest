@@ -24,9 +24,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public class TestRequestHandler : ITestRequestHandler
     {
         private int protocolVersion = 1;
-        
-        // Also check TestRequestSender.
-        private int highestSupportedVersion = 4;
+
+        // Must be in sync with the highest supported version in
+        // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
+        private int highestSupportedVersion = 5;
 
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;

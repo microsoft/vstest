@@ -217,6 +217,21 @@
         <target state="translated">{0} Acesso negado ao tentar criar a pasta "TestResults" no local mencionado. Você está recebendo esta exceção porque está executando o vstest.console.exe em uma pasta que requer acesso para gravação. Para resolver o problema: execute vstest.console.exe em uma pasta na qual você tenha privilégios de gravação.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoAvailableProxyForDeque">
+        <source>Could not find an available proxy to deque.</source>
+        <target state="translated">Não foi possível encontrar um proxy disponível para deque.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoSuchProxyId">
+        <source>Proxy with id {0} is not managed by the current session manager.</source>
+        <target state="translated">O proxy com a ID {0} não é gerenciado pelo gerenciador de sessão atual.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProxyIsAlreadyAvailable">
+        <source>Proxy with id {0} is already available and cannot be re-enqueued.</source>
+        <target state="translated">O proxy com a ID {0} já está disponível e não pode ser enfileirado novamente.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

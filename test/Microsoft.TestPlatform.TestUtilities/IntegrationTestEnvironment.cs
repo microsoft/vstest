@@ -17,7 +17,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestEnvironment
     {
-        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
+        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR")
+                                                      ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
         private static Dictionary<string, string> dependencyVersions;
 
@@ -97,7 +98,6 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-               
                 // this used to switch to src\package\package\bin\based on whether 
                 // this is running in cli, but that's a bad idea, the console there does not have 
                 // a runtime config and will fail to start with error testhostpolicy.dll not found
@@ -116,6 +116,11 @@ namespace Microsoft.TestPlatform.TestUtilities
                 return publishDirectory;
             }
         }
+
+        /// <summary>
+        /// Gets the extensions directory for <c>vstest.console</c> package.
+        /// </summary>
+        public string ExtensionsDirectory => Path.Combine(PublishDirectory, "Extensions");
 
         /// <summary>
         /// Gets the target framework.

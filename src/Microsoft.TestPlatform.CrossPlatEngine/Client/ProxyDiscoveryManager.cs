@@ -23,8 +23,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
     /// </summary>
-    public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager, ITestDiscoveryEventsHandler2
+    public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
     {
+        private ProxyOperationManager proxyOperationManager;
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private bool isCommunicationEstablished;
@@ -38,72 +39,82 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
-        /// <param name="requestData">The Request Data for providing discovery services and data.</param>
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing discovery services and data.
+        /// </param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, new FileHelper())
+        public ProxyDiscoveryManager(
+            IRequestData requestData,
+            ITestRequestSender testRequestSender,
+            ITestRuntimeProvider testHostManager)
+            : this(
+                  requestData,
+                  testRequestSender,
+                  testHostManager,
+                  JsonDataSerializer.Instance,
+                  new FileHelper())
         {
             this.testHostManager = testHostManager;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
-        /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
-        /// <param name="requestData"></param>
-        /// <param name="requestSender">
-        ///     The request Sender.
+        /// 
+        /// <remarks>
+        /// Constructor with dependency injection. Used for unit testing.
+        /// </remarks>
+        /// 
+        /// <param name="requestData">
+        /// The request data for providing discovery services and data.
         /// </param>
-        /// <param name="testHostManager">
-        ///     Test host Manager instance
-        /// </param>
-        /// <param name="dataSerializer"></param>
-        internal ProxyDiscoveryManager(IRequestData requestData,
+        /// <param name="requestSender">The request sender.</param>
+        /// <param name="testHostManager">Test host manager instance.</param>
+        /// <param name="dataSerializer">The data serializer.</param>
+        /// <param name="fileHelper">The file helper.</param>
+        internal ProxyDiscoveryManager(
+            IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
             IFileHelper fileHelper)
-            : base(requestData, requestSender, testHostManager)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
             this.fileHelper = fileHelper;
+
+            // Create a new proxy operation manager.
+            this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
         }
 
         #endregion
 
         #region IProxyDiscoveryManager implementation.
 
-        /// <summary>
-        /// Ensure that the discovery component of engine is ready for discovery usually by loading extensions.
-        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
-        /// </summary>
+        /// <inheritdoc/>
         public void Initialize(bool skipDefaultAdapters)
         {
             this.skipDefaultAdapters = skipDefaultAdapters;
         }
 
-        /// <summary>
-        /// Discovers tests
-        /// </summary>
-        /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
-        /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
+        /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
+                this.isCommunicationEstablished = this.proxyOperationManager.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
 
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
-                    this.RequestSender.DiscoverTests(discoveryCriteria, this);
+                    this.proxyOperationManager.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
             }
             catch (Exception exception)
@@ -139,8 +150,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void Abort()
         {
             // Cancel fast, try to stop testhost deployment/launch
-            this.CancellationTokenSource.Cancel();
+            this.proxyOperationManager.CancellationTokenSource.Cancel();
             this.Close();
+        }
+
+        /// <inheritdoc/>
+        public void Close()
+        {
+            this.proxyOperationManager.Close();
         }
 
         /// <inheritdoc/>
@@ -175,6 +192,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #endregion
 
+        #region IBaseProxy implementation.
+        /// <inheritdoc/>
+        public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        {
+            // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
+            var telemetryOptedIn = this.proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
+            testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
+            return testProcessStartInfo;
+        }
+        #endregion
+
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
@@ -192,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.RequestSender.InitializeDiscovery(platformExtensions);
+                this.proxyOperationManager.RequestSender.InitializeDiscovery(platformExtensions);
             }
         }
 

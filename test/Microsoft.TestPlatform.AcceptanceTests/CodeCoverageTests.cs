@@ -204,7 +204,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.GetAssetFullPath(testParameters.AssemblyName);
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
-                "src", "DataCollectors", "TraceDataCollector", "bin", IntegrationTestEnvironment.BuildConfiguration, "netstandard2.0");
+                "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
