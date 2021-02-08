@@ -707,9 +707,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 var source = sd.Key;
                 var sourceSummary = new SourceSummary();
 
-                foreach (var result in sd.ToArray())
+                var results = sd.ToArray();
+                // duration of the whole source is the difference between the test that ended last and the one that started first
+                sourceSummary.Duration = !results.Any() ? TimeSpan.Zero : results.Max(r => r.EndTime) - results.Min(r => r.StartTime);
+                foreach (var result in results)
                 {
-                    sourceSummary.Duration += result.Duration;
                     switch (result.Outcome)
                     {
                         case TestOutcome.Passed:
