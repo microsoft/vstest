@@ -9,6 +9,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
     using System.Reflection;
 
     [TestClass]
+    [TestCategory("Windows")]
+    [TestCategory("AcceptanceTests")]
     public class SpecialNameTests
     {
         [TestMethod]
@@ -17,8 +19,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             var environment = new IntegrationTestEnvironment();
             var asset = environment.GetTestAsset("CILProject.dll", "net451");
             var assembly = Assembly.LoadFrom(asset);
-
             var types = assembly.GetTypes();
+            
             foreach (var type in types)
             {
                 var methods = type.GetMethods();

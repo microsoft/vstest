@@ -278,6 +278,11 @@ function Invoke-Build
     & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog
     Write-Log ".. .. Build: Complete."
 
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_CILAssets"
+    Write-Verbose "$dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
+    & $dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\CILAssets.binlog"
+    Write-Log ".. .. Build: Complete."
+
     Set-ScriptFailedOnError
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
@@ -292,11 +297,6 @@ function Invoke-TestAssetsBuild
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
-    Write-Log ".. .. Build: Complete."
-
-    Write-Log ".. .. Build: Source: $TPB_TestAssets_CILAssets"
-    Write-Verbose "$dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\CILAssets.binlog"
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError

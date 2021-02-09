@@ -207,6 +207,7 @@ function Invoke-Test
             }
             else
             {
+                Write-Log ".. . $testContainerName test container found. ($testOutputPath)"
                 $testContainers += ,"$testContainerPath"
             }
         }

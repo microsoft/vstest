@@ -80,15 +80,15 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 method = ((MethodInfo)method).GetGenericMethodDefinition();
             }
 
-            var methodBuilder = new StringBuilder();
             var typeBuilder = new StringBuilder();
+            var methodBuilder = new StringBuilder();
 
             // Namespace and Type Name (with arity designation)
             AppendTypeString(typeBuilder, semanticType, closedType: false);
 
             // Method Name with method arity
-            AppendMethodString(methodBuilder, method.Name);
             var arity = method.GetGenericArguments().Length;
+            AppendMethodString(methodBuilder, method.Name, arity);
             if (arity > 0)
             {
                 methodBuilder.Append('`');
@@ -268,11 +268,30 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
         }
 
-        private static void AppendMethodString(StringBuilder methodBuilder, string name)
+        private static void AppendMethodString(StringBuilder methodBuilder, string name, int methodArity)
         {
+            var arityStart = name.LastIndexOf('`');
+            var arity = 0;
+            if (arityStart > 0)
+            {
+                arityStart++;
+                var arityString = name.Substring(arityStart, name.Length - arityStart);
+                if (int.TryParse(arityString, out arity))
+                {
+                    if (arity == methodArity)
+                    {
+                        name = name.Substring(0, arityStart - 1);
+                    }
+                }
+            }
+
             if (IsNormalized(name))
             {
                 methodBuilder.Append(name);
+                if (arity > 0 && methodArity == arity)
+                {
+                    methodBuilder.Append($"`{arity}");
+                }
                 return;
             }
 
@@ -293,13 +312,17 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 }
             }
             methodBuilder.Append("'");
+            if (arity > 0 && methodArity == arity)
+            {
+                methodBuilder.Append($"`{arity}");
+            }
         }
 
         private static bool IsNormalized(string s)
         {
             for (int i = 0; i < s.Length; i++)
             {
-                if (NeedsEscaping(s[i], i))
+                if (NeedsEscaping(s[i], i) && s[i] != '.')
                 {
                     return false;
                 }
@@ -334,14 +357,39 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             return true;
         }
 
-        private static void AppendNestedTypeName(StringBuilder b, Type type)
+        private static int AppendNestedTypeName(StringBuilder b, Type type)
         {
+            var outerArity = 0;
             if (type.IsNested)
             {
-                AppendNestedTypeName(b, type.DeclaringType);
+                outerArity = AppendNestedTypeName(b, type.DeclaringType);
                 b.Append('+');
             }
-            AppendMethodString(b, type.Name);
+
+            var typeName = type.Name;
+            var stars = 0;
+            if (type.IsPointer)
+            {
+                for (int i = typeName.Length - 1; i > 0; i--)
+                {
+                    if (typeName[i] != '*')
+                    {
+                        stars = typeName.Length - i - 1;
+                        typeName = typeName.Substring(0, i + 1);
+                        break;
+                    }
+                }
+            }
+
+            var info = type.GetTypeInfo();
+            var arity = info.IsGenericType == false ? 0
+                      : info.GenericTypeParameters.Length > 0
+                      ? info.GenericTypeParameters.Length
+                      : info.GenericTypeArguments.Length;
+
+            AppendMethodString(b, typeName, arity - outerArity);
+            b.Append('*', stars);
+            return arity;
         }
 
         private static void AppendGenericTypeParameters(StringBuilder b, Type type)
