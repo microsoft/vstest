@@ -70,7 +70,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.CUIT">
-      <Version>16.8.0-preview-4040788</Version>
+      <Version>16.9.30701-preview-4-30919-500</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
@@ -99,6 +99,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness">
       <Version>$(MicrosoftFakesVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="VsWebSite.Interop">
+      <Version>16.10.0-preview-1-31003-223</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.

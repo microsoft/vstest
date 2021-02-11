@@ -29,7 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.cuit">
-      <Version>16.8.0-preview-4040788</Version>
+      <Version>16.9.30701-preview-4-30919-500</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
