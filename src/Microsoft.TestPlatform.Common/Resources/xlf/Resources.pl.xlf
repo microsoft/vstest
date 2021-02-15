@@ -284,6 +284,16 @@
         <target state="translated">{0} Odmowa dostępu podczas próby utworzenia folderu „TestResults” w określonej lokalizacji. Widzisz ten wyjątek, ponieważ program vstest.console.exe został uruchomiony z folderu wymagającego dostępu do zapisu. Aby rozwiązać ten problem: uruchom program vstest.console.exe z folderu, w którym masz uprawnienia do zapisu. Więcej informacji można znaleźć w komunikacie o błędzie:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

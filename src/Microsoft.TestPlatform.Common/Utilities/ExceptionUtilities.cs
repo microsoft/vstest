@@ -24,15 +24,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             var exceptionString = new StringBuilder(exception.Message);
+            AppendStackTrace(exceptionString, exception);
+
             var inner = exception.InnerException;
             while (inner != null)
             {
-                exceptionString.Append(Environment.NewLine);
-                exceptionString.Append(inner.Message);
+                exceptionString
+                    .AppendLine()
+                    .Append(Resources.Resources.InnerException).Append(" ").AppendLine(inner.Message);
+                AppendStackTrace(exceptionString, inner);
                 inner = inner.InnerException;
             }
 
             return exceptionString.ToString();
+        }
+
+        private static void AppendStackTrace(StringBuilder stringBuilder, Exception exception)
+        {
+            if (!string.IsNullOrEmpty(exception.StackTrace))
+            {
+                stringBuilder
+                    .AppendLine()
+                    .AppendLine(Resources.Resources.StackTrace)
+                    .AppendLine(exception.StackTrace);
+            }
         }
     }
 }

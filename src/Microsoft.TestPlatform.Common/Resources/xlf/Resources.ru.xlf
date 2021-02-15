@@ -284,6 +284,16 @@
         <target state="translated">{0} Отказано в доступе при попытке создания папки "TestResults" в указанном расположении. Это исключение возникло, так как вы запускаете файл vstest.console.exe из папки, для которой требуется доступ на запись. Чтобы устранить эту проблему, запустите vstest.console.exe из папки, для которой у вас есть разрешения на запись. Дополнительные сведения см. в сообщении об ошибке:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

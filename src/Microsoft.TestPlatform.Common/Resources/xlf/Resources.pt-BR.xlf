@@ -284,6 +284,16 @@
         <target state="translated">{0} Acesso negado ao tentar criar a pasta "TestResults" no local mencionado. Você está recebendo esta exceção porque está executando o vstest.console.exe em uma pasta que requer acesso para gravação. Para resolver o problema: execute vstest.console.exe em uma pasta na qual você tenha privilégios de gravação. Para obter mais informações, verifique a mensagem de erro:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

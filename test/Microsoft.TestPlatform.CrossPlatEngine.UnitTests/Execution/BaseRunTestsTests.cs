@@ -446,7 +446,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var messageFormat = "An exception occurred while invoking executor '{0}': {1}";
             var message = string.Format(messageFormat, BaseRunTestsExecutorUri.ToLower(), "Test influenced.");
             this.mockTestRunEventsHandler.Verify(
-                treh => treh.HandleLogMessage(TestMessageLevel.Error, message),
+                treh => treh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.StartsWith(message))),
                 Times.Once);
 
             // Also validate that a test run complete is called.

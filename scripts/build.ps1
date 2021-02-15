@@ -335,8 +335,7 @@ function Publish-Package
     $fullCLRPackage451Dir = Get-FullCLRPackageDirectory
     $fullCLRPackage45Dir = Get-FullCLRPackageDirectory45
     $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
-    $net20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net20");
-    $net35PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net35");
+    $net45PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net45");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
@@ -485,8 +484,8 @@ function Publish-Package
     # Publish Microsoft.TestPlatform.AdapterUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
             -files @{
-              # "net20"                     = $net20PackageDir               # net20 \ net20, and net35 isn't supported by the Test Platform
-              # "net35"                     = $net35PackageDir               # net35 / but this package supports, so adding targets.
+              # "net20"                     = $net20PackageDir               # net20
+                "net45/any"                 = $net45PackageDir               # $net4
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0

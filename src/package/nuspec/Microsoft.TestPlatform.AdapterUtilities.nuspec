@@ -23,22 +23,30 @@
 
         <dependencies>
             <group targetFramework="netstandard1.0">
-                <dependency id="NETStandard.Library" version="[1.6.1, )" />
+                <dependency id="System.Globalization" version="[4.0.11, )" />
+                <dependency id="System.Reflection" version="[4.1.0, )" />
+                <dependency id="System.Runtime" version="[4.1.0, )" />
+                <dependency id="System.Collections" version="[4.0.11, )" />
+                <dependency id="System.Diagnostics.Debug" version="[4.0.11, )" />
+                <dependency id="System.Linq" version="[4.1.0, )" />
+                <dependency id="System.Reflection.Extensions" version="[4.0.1, )" />
+                <dependency id="System.Resources.ResourceManager" version="[4.0.1, )" />
             </group>
 
-            <group targetFramework="netstandard2.0">
-                <dependency id="NETStandard.Library" version="[1.6.1, )" />
-            </group>
+            <group targetFramework="netstandard2.0" />
             
             <group targetFramework="uap10.0">
                 <dependency id="Microsoft.NETCore.UniversalWindowsPlatform" version="[5.1.0, )" />
             </group>
+            
+            <group targetFramework="net45" />
         </dependencies>
     </metadata>
 
     <files>
         <file src="Icon.png" target="" />
         <file src="licenses\LICENSE_NET.txt" target="" />
+
         <file src="netstandard1.0\Microsoft.TestPlatform.AdapterUtilities.dll" target="lib\netstandard1.0" />
         <file src="netstandard1.0\**\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\netstandard1.0" />
 
@@ -47,5 +55,8 @@
         
         <file src="uap10.0\Microsoft.TestPlatform.AdapterUtilities.dll" target="lib\uap10.0" />
         <file src="uap10.0\**\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\uap10.0" />
+        
+        <file src="net45\Microsoft.TestPlatform.AdapterUtilities.dll" target="lib\net45" />
+        <file src="net45\**\Microsoft.TestPlatform.AdapterUtilities.resources.dll" target="lib\net45" />
     </files>
 </package>
