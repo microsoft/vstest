@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             var asset = environment.GetTestAsset("CILProject.dll", "net451");
             var assembly = Assembly.LoadFrom(asset);
             var types = assembly.GetTypes();
-            
+
             foreach (var type in types)
             {
                 var methods = type.GetMethods();
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
 
                     Assert.IsTrue(method == methodInfo);
                     Assert.AreEqual(typeName, typeName2, $"Type parse roundtrip test failed: {method} ({typeName} != {typeName2})");
-                    Assert.AreEqual(methodName, methodName, $"Method parse roundtrip test failed: {method} ({methodName} != {methodName})");
+                    Assert.AreEqual(methodName, methodName2, $"Method parse roundtrip test failed: {method} ({methodName} != {methodName2})");
                 }
             }
         }

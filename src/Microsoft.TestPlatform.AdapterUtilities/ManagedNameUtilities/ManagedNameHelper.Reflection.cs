@@ -166,8 +166,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             MethodInfo method = null;
             ManagedNameParser.ParseManagedMethodName(managedMethodName, out var methodName, out var methodArity, out var parameterTypes);
-#if NET20 || NET35
 
+#if NET20 || NET35
             if (!IsNullOrWhiteSpace(methodName))
 #else
             if (!string.IsNullOrWhiteSpace(methodName))
@@ -256,7 +256,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
             else
             {
-                b.Append(type.Namespace);
+                AppendNamespace(b, type.Namespace);
                 b.Append('.');
 
                 AppendNestedTypeName(b, type);
@@ -265,6 +265,39 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 {
                     AppendGenericTypeParameters(b, type);
                 }
+            }
+        }
+
+        private static void AppendNamespace(StringBuilder b, string ns)
+        {
+            int start = 0;
+            bool shouldEscape = false;
+
+            for (int i = 0; i <= ns.Length; i++)
+            {
+                if (i == ns.Length || ns[i] == '.')
+                {
+                    if (start != 0)
+                    {
+                        b.Append('.');
+                    }
+
+                    var part = ns.Substring(start, i - start);
+                    if (shouldEscape)
+                    {
+                        NormalizeString(b, part);
+                        shouldEscape = false;
+                    }
+                    else
+                    {
+                        b.Append(part);
+                    }
+
+                    start = i + 1;
+                    continue;
+                }
+
+                shouldEscape = shouldEscape || NeedsEscaping(ns[i], i - start);
             }
         }
 
@@ -288,34 +321,42 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             if (IsNormalized(name))
             {
                 methodBuilder.Append(name);
-                if (arity > 0 && methodArity == arity)
-                {
-                    methodBuilder.Append($"`{arity}");
-                }
-                return;
+            }
+            else
+            {
+                NormalizeString(methodBuilder, name);
             }
 
-            methodBuilder.Append("'");
+            if (arity > 0 && methodArity == arity)
+            {
+                methodBuilder.Append($"`{arity}");
+            }
+        }
+
+        private static void NormalizeString(StringBuilder b, string name)
+        {
+            b.Append("'");
             for (int i = 0; i < name.Length; i++)
             {
                 char c = name[i];
                 if (NeedsEscaping(c, i))
                 {
-                    var encoded = Convert.ToString(((uint)c), 16);
-                    methodBuilder.Append("\\u");
-                    methodBuilder.Append('0', 4 - encoded.Length);
-                    methodBuilder.Append(encoded);
+                    if (c == '\\' || c == '\'')
+                    {
+                        // var encoded = Convert.ToString(((uint)c), 16);
+                        // b.Append("\\u");
+                        // b.Append('0', 4 - encoded.Length);
+                        // b.Append(encoded);
+
+                        b.Append("\\");
+                        b.Append(c);
+                        continue;
+                    }
                 }
-                else
-                {
-                    methodBuilder.Append(c);
-                }
+
+                b.Append(c);
             }
-            methodBuilder.Append("'");
-            if (arity > 0 && methodArity == arity)
-            {
-                methodBuilder.Append($"`{arity}");
-            }
+            b.Append("'");
         }
 
         private static bool IsNormalized(string s)

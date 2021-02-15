@@ -82,10 +82,18 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static int ParseMethodName(string managedMethodName, int start, out string methodName, out int arity)
         {
-            int i = start;
+            var i = start;
+            var quoted = false;
             for (; i < managedMethodName.Length; i++)
             {
-                switch (managedMethodName[i])
+                var c = managedMethodName[i];
+                if (c == '\'' || quoted)
+                {
+                    quoted = c == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
+                switch (c)
                 {
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
@@ -161,10 +169,17 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         private static int ParseParameterType(string managedMethodName, int start, out string parameterType)
         {
             parameterType = string.Empty;
+            var quoted = false;
 
             int i = start;
-            for (; i < managedMethodName.Length; i++)
+            for (i = start; i < managedMethodName.Length; i++)
             {
+                if (managedMethodName[i] == '\'' || quoted)
+                {
+                    quoted = managedMethodName[i] == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
                 switch (managedMethodName[i])
                 {
                     case '<':
@@ -187,8 +202,16 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static int ParseArrayBrackets(string managedMethodName, int start)
         {
+            var quoted = false;
+
             for (int i = start; i < managedMethodName.Length; i++)
             {
+                if (managedMethodName[i] == '\'' || quoted)
+                {
+                    quoted = managedMethodName[i] == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
                 switch (managedMethodName[i])
                 {
                     case ']':
@@ -205,8 +228,16 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static int ParseGenericBrackets(string managedMethodName, int start)
         {
+            var quoted = false;
+
             for (int i = start; i < managedMethodName.Length; i++)
             {
+                if (managedMethodName[i] == '\'' || quoted)
+                {
+                    quoted = managedMethodName[i] == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
                 switch (managedMethodName[i])
                 {
                     case '<':
