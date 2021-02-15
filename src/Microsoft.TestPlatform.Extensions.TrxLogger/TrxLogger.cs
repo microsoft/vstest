@@ -20,11 +20,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using System.Globalization;
     using System.IO;
     using System.Text;
-    using System.Threading;
     using System.Xml;
+    using ObjectModelConstants = ObjectModel.Constants;
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = Resources.TrxResource;
 
     /// <summary>
     /// Logger for Generating TRX
@@ -65,13 +65,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         // The converter class
         private Converter converter;
 
-        private TrxLoggerObjectModel.TestRun testRun;
-        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
-        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
+        private TestRun testRun;
+        private ConcurrentDictionary<Guid, ITestResult> results;
+        private ConcurrentDictionary<Guid, ITestElement> testElements;
         private ConcurrentDictionary<Guid, TestEntry> entries;
 
         // Caching results and inner test entries for constant time lookup for inner parents.
-        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
+        private ConcurrentDictionary<Guid, ITestResult> innerResults;
         private ConcurrentDictionary<Guid, TestEntry> innerTestEntries;
 
         private readonly TrxFileHelper trxFileHelper;
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private StringBuilder runLevelStdOut;
 
         // List of run level errors and warnings generated. These are logged in the Trx in the Results Summary.
-        private List<TrxLoggerObjectModel.RunInfo> runLevelErrorsAndWarnings;
+        private List<RunInfo> runLevelErrorsAndWarnings;
 
         private TrxLoggerObjectModel.TestOutcome testRunOutcome = TrxLoggerObjectModel.TestOutcome.Passed;
 
@@ -230,10 +230,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
+            ValidateArg.NotNull(sender, "sender");
+            ValidateArg.NotNull(e, "e");
 
             RunInfo runMessage;
+
+            e.Level = changeMessageLevelIfNecessary(e.Level);
+
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
@@ -263,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// The eventArgs.
         /// </param>
-        internal void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
+        internal void TestResultHandler(object sender, TestResultEventArgs e)
         {
             // Create test run
             if (this.testRun == null)
@@ -758,6 +761,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             return testEntry;
+        }
+
+        private TestMessageLevel changeMessageLevelIfNecessary (TestMessageLevel level)
+        {
+            // Currently if no tests were discovered/executed in trx logs we get outcome as Warning
+            // If TreatNoTestsAsError was set to True, we want to return ResultSummary as Failed and RunInfo as Error
+            if (level == TestMessageLevel.Warning && parametersDictionary[ObjectModelConstants.TreatNoTestsAsError] == bool.TrueString)
+            {
+                level = TestMessageLevel.Error;
+            }
+
+            return level;
         }
 
         #endregion
