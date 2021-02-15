@@ -2,6 +2,7 @@
 {
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
@@ -66,15 +67,13 @@
         [TestMethod]
         public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
         {
-            var arguments = PrepareArguments(
-                this.GetSampleTestAssembly(),
-                null,
-                null,
-                this.FrameworkArgValue);
+            var resultsDir = GetResultsDirectory();
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), null, null, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
-
             this.StdOutputContains("Adapter lookup is being changed, please follow");
+
+            TryRemoveDirectory(resultsDir);
         }
 
         public override string GetConsoleRunnerPath()
