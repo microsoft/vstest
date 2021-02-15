@@ -3,9 +3,11 @@
 
 namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
 {
+    using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
     using Microsoft.TestPlatform.AdapterUtilities.Resources;
 
     using System;
+    using System.Globalization;
     using System.Text;
 
     internal static partial class ReflectionHelpers
@@ -45,37 +47,52 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
             return stringBuilder.ToString();
         }
 
+        // Unescapes a C# style escaped string.
         private static int ParseEscapedStringSegment(string escapedStringSegment, int pos, StringBuilder stringBuilder)
         {
             for (int i = pos; i < escapedStringSegment.Length; i++)
             {
-                var c = escapedStringSegment[i];
-                if (c == '\\')
+                switch (escapedStringSegment[i])
                 {
-                    if (escapedStringSegment[i + 1] == 'u')
-                    {
-                        var code = escapedStringSegment.Substring(i + 2, 4);
-                        c = (char)Convert.ToInt32(code, 16);
-                        stringBuilder.Append(c);
-                        i += 5;
-                    }
-                    else
-                    {
-                        stringBuilder.Append(escapedStringSegment[i + 1]);
-                        i += 1;
-                    }
-                }
-                else if (c == '\'')
-                {
-                    return i + 1;
-                }
-                else
-                {
-                    stringBuilder.Append(escapedStringSegment[i]);
+                    case '\\':
+                        if (escapedStringSegment[i + 1] == 'u')
+                        {
+                            char c;
+
+                            try
+                            {
+                                var code = escapedStringSegment.Substring(i + 2, 4);
+                                c = (char)Convert.ToInt32(code, 16);
+                            }
+                            catch
+                            {
+                                throw new InvalidManagedNameException(
+                                    string.Format(CultureInfo.CurrentCulture, Resources.ErrorInvalidSequenceAt, escapedStringSegment, i)
+                                );
+                            }
+
+                            stringBuilder.Append(c);
+                            i += 5;
+                        }
+                        else
+                        {
+                            stringBuilder.Append(escapedStringSegment[i + 1]);
+                            i += 1;
+                        }
+
+                        break;
+
+                    case '\'':
+                        return i + 1;
+
+                    default:
+                        stringBuilder.Append(escapedStringSegment[i]);
+                        break;
                 }
             }
 
-            return escapedStringSegment.Length;
+            string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorNoClosingQuote, escapedStringSegment);
+            throw new InvalidManagedNameException(message);
         }
     }
 }

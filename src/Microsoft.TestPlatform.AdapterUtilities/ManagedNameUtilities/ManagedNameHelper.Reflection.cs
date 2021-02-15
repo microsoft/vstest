@@ -207,7 +207,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
                 for (int i = 0; i < paramList.Length; i++)
                 {
-                    if (TypeString(paramList[i].ParameterType, closedType: true) != parameterTypes[i])
+                    if (GetTypeString(paramList[i].ParameterType, closedType: true) != parameterTypes[i])
                     {
                         return false;
                     }
@@ -268,24 +268,24 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
         }
 
-        private static void AppendNamespace(StringBuilder b, string ns)
+        private static void AppendNamespace(StringBuilder b, string namespaceString)
         {
             int start = 0;
             bool shouldEscape = false;
 
-            for (int i = 0; i <= ns.Length; i++)
+            for (int i = 0; i <= namespaceString.Length; i++)
             {
-                if (i == ns.Length || ns[i] == '.')
+                if (i == namespaceString.Length || namespaceString[i] == '.')
                 {
                     if (start != 0)
                     {
                         b.Append('.');
                     }
 
-                    var part = ns.Substring(start, i - start);
+                    var part = namespaceString.Substring(start, i - start);
                     if (shouldEscape)
                     {
-                        NormalizeString(b, part);
+                        NormalizeAndAppendString(b, part);
                         shouldEscape = false;
                     }
                     else
@@ -297,7 +297,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                     continue;
                 }
 
-                shouldEscape = shouldEscape || NeedsEscaping(ns[i], i - start);
+                shouldEscape = shouldEscape || NeedsEscaping(namespaceString[i], i - start);
             }
         }
 
@@ -324,7 +324,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
             else
             {
-                NormalizeString(methodBuilder, name);
+                NormalizeAndAppendString(methodBuilder, name);
             }
 
             if (arity > 0 && methodArity == arity)
@@ -333,7 +333,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
         }
 
-        private static void NormalizeString(StringBuilder b, string name)
+        private static void NormalizeAndAppendString(StringBuilder b, string name)
         {
             b.Append("'");
             for (int i = 0; i < name.Length; i++)
@@ -357,6 +357,65 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 b.Append(c);
             }
             b.Append("'");
+        }
+
+        private static int AppendNestedTypeName(StringBuilder b, Type type)
+        {
+            var outerArity = 0;
+            if (type.IsNested)
+            {
+                outerArity = AppendNestedTypeName(b, type.DeclaringType);
+                b.Append('+');
+            }
+
+            var typeName = type.Name;
+            var stars = 0;
+            if (type.IsPointer)
+            {
+                for (int i = typeName.Length - 1; i > 0; i--)
+                {
+                    if (typeName[i] != '*')
+                    {
+                        stars = typeName.Length - i - 1;
+                        typeName = typeName.Substring(0, i + 1);
+                        break;
+                    }
+                }
+            }
+
+            var info = type.GetTypeInfo();
+            var arity = !info.IsGenericType
+                      ? 0
+                      : info.GenericTypeParameters.Length > 0
+                        ? info.GenericTypeParameters.Length
+                        : info.GenericTypeArguments.Length;
+
+            AppendMethodString(b, typeName, arity - outerArity);
+            b.Append('*', stars);
+            return arity;
+        }
+
+        private static void AppendGenericTypeParameters(StringBuilder b, Type type)
+        {
+            Type[] genargs;
+
+#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
+            genargs = type.GetGenericArguments();
+#else
+            genargs = type.GetTypeInfo().GenericTypeArguments;
+#endif
+
+            if (genargs.Length != 0)
+            {
+                b.Append('<');
+                foreach (var argType in genargs)
+                {
+                    AppendTypeString(b, argType, closedType: true);
+                    b.Append(',');
+                }
+                // Replace the last ',' with '>'
+                b[b.Length - 1] = '>';
+            }
         }
 
         private static bool IsNormalized(string s)
@@ -398,65 +457,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             return true;
         }
 
-        private static int AppendNestedTypeName(StringBuilder b, Type type)
-        {
-            var outerArity = 0;
-            if (type.IsNested)
-            {
-                outerArity = AppendNestedTypeName(b, type.DeclaringType);
-                b.Append('+');
-            }
-
-            var typeName = type.Name;
-            var stars = 0;
-            if (type.IsPointer)
-            {
-                for (int i = typeName.Length - 1; i > 0; i--)
-                {
-                    if (typeName[i] != '*')
-                    {
-                        stars = typeName.Length - i - 1;
-                        typeName = typeName.Substring(0, i + 1);
-                        break;
-                    }
-                }
-            }
-
-            var info = type.GetTypeInfo();
-            var arity = info.IsGenericType == false ? 0
-                      : info.GenericTypeParameters.Length > 0
-                      ? info.GenericTypeParameters.Length
-                      : info.GenericTypeArguments.Length;
-
-            AppendMethodString(b, typeName, arity - outerArity);
-            b.Append('*', stars);
-            return arity;
-        }
-
-        private static void AppendGenericTypeParameters(StringBuilder b, Type type)
-        {
-            Type[] genargs;
-
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-            genargs = type.GetGenericArguments();
-#else
-            genargs = type.GetTypeInfo().GenericTypeArguments;
-#endif
-
-            if (genargs.Length != 0)
-            {
-                b.Append('<');
-                foreach (var argType in genargs)
-                {
-                    AppendTypeString(b, argType, closedType: true);
-                    b.Append(',');
-                }
-                // Replace the last ',' with '>'
-                b[b.Length - 1] = '>';
-            }
-        }
-
-        private static string TypeString(Type type, bool closedType)
+        private static string GetTypeString(Type type, bool closedType)
         {
             var builder = new StringBuilder();
             AppendTypeString(builder, type, closedType);

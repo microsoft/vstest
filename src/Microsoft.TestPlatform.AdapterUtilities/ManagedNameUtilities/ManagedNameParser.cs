@@ -98,9 +98,11 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
+
                     case '`':
                         methodName = Capture(managedMethodName, start, i);
                         return ParseArity(managedMethodName, i, out arity);
+
                     case '(':
                         methodName = Capture(managedMethodName, start, i);
                         arity = 0;
@@ -153,8 +155,10 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                             parameterTypes = types.ToArray();
                         }
                         return i + 1; // consume right parens
+
                     case ',':
                         break;
+
                     default:
                         i = ParseParameterType(managedMethodName, i, out var parameterType);
                         types.Add(parameterType);
@@ -185,13 +189,16 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                     case '<':
                         i = ParseGenericBrackets(managedMethodName, i + 1);
                         break;
+
                     case '[':
                         i = ParseArrayBrackets(managedMethodName, i + 1);
                         break;
+
                     case ',':
                     case ')':
                         parameterType = Capture(managedMethodName, start, i);
                         return i - 1;
+
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
@@ -243,8 +250,10 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                     case '<':
                         i = ParseGenericBrackets(managedMethodName, i + 1);
                         break;
+
                     case '>':
                         return i;
+
                     case var w when char.IsWhiteSpace(w):
                         string msg = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(msg);
