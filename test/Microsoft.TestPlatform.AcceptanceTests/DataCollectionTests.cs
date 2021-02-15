@@ -16,22 +16,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
-        private readonly string resultsDir;
-
-        public DataCollectionTests()
-        {
-            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            if (Directory.Exists(this.resultsDir))
-            {
-                Directory.Delete(this.resultsDir, true);
-            }
-        }
-
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
@@ -39,22 +23,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
+            var resultsDir = GetResultsDirectory();
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = this.GetRunsettingsFilePath();
-            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            string runSettings = this.GetRunsettingsFilePath(resultsDir);
+            string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
                 "bin",
                 IntegrationTestEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
-            var arguments = PrepareArguments(assemblyPaths, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
+            var arguments = PrepareArguments(assemblyPaths, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
-            this.VaildateDataCollectorOutput();
+            this.VaildateDataCollectorOutput(resultsDir);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -64,8 +51,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
+            var resultsDir = GetResultsDirectory();
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
@@ -73,13 +61,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 IntegrationTestEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
 
-            var arguments = PrepareArguments(assemblyPaths, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
+            var arguments = PrepareArguments(assemblyPaths, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDir);
+            arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
-            this.VaildateDataCollectorOutput();
+            this.VaildateDataCollectorOutput(resultsDir);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -88,10 +78,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, this.FrameworkArgValue);
+            var resultsDir = GetResultsDirectory();
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -101,10 +94,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue);
+            var resultsDir = GetResultsDirectory();
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
@@ -133,7 +129,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private void VaildateDataCollectorOutput()
+        private void VaildateDataCollectorOutput(string resultsDir)
         {
             // Output of datacollection attachment.
             this.StdOutputContains("filename.txt");
@@ -153,7 +149,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var testCaseLevelAttachmentsCount = 0;
             var diaglogsFileCount = 0;
 
-            var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
+            var resultFiles = Directory.GetFiles(resultsDir, "*.txt", SearchOption.AllDirectories);
 
             foreach (var file in resultFiles)
             {
@@ -180,11 +176,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.AreEqual(3, diaglogsFileCount);
         }
 
-        private string GetRunsettingsFilePath()
+        private string GetRunsettingsFilePath(string resultsDir)
         {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(resultsDir, "test_" + Guid.NewGuid() + ".runsettings");
             var dataCollectionAttributes = new Dictionary<string, string>();
 
             dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
