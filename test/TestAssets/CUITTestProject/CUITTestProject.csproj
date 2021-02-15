@@ -28,8 +28,8 @@
     <Reference Include="Microsoft.VisualStudio.TestTools.UITesting" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.cuit">
-      <Version>16.9.30701-preview-4-30919-500</Version>
+    <PackageReference Include="Microsoft.VisualStudio.Cuit">
+      <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
