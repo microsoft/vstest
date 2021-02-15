@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -137,7 +138,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 Environment.SetEnvironmentVariable(env, vstestConsolePath);
                 if (arguments.Contains(".csproj"))
-                {                   
+                {
                     arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
                 }
 
@@ -162,8 +163,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             string framework,
             string runSettings = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue);
+            var resultsDir = GetResultsDirectory();
+
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             this.InvokeVsTest(arguments);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -174,9 +178,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue);
+            var resultsDir = GetResultsDirectory();
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -623,7 +629,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 process.Start();
                 process.BeginOutputReadLine();
-                process.BeginErrorReadLine(); 
+                process.BeginErrorReadLine();
                 if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
                 {
                     Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
@@ -717,6 +723,30 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             return string.Join(" ", assertFullPaths);
+        }
+
+        protected static string GetResultsDirectory()
+        {
+            var directoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            return directoryPath;
+        }
+
+        protected static void TryRemoveDirectory(string directory)
+        {
+            if (Directory.Exists(directory))
+            {
+                try
+                {
+                    Directory.Delete(directory, true);
+                }
+                catch { }
+            }
         }
     }
 }
