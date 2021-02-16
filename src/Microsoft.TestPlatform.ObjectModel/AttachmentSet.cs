@@ -77,5 +77,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(Description)}: {Description}";
         }
+
+        public static UriDataAttachment CreateFrom(string localFilePath, string description)
+        {
+            var uri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
+            return new UriDataAttachment(uri, description);
+        }
     }
 }
