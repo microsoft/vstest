@@ -59,11 +59,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     if (!string.IsNullOrEmpty(mergedCoverageReportFilePath))
                     {
                         var resultAttachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
-                        resultAttachmentSet.Attachments.Add(new UriDataAttachment(new Uri(mergedCoverageReportFilePath), CoverageFriendlyName));
+                        resultAttachmentSet.Attachments.Add(UriDataAttachment.CreateFrom(mergedCoverageReportFilePath, CoverageFriendlyName));
 
                         foreach (var coverageOtherFilePath in coverageOtherFilePaths)
                         {
-                            resultAttachmentSet.Attachments.Add(new UriDataAttachment(new Uri(coverageOtherFilePath), string.Empty));
+                            resultAttachmentSet.Attachments.Add(UriDataAttachment.CreateFrom(coverageOtherFilePath, string.Empty));
                         }
 
                         return new Collection<AttachmentSet> { resultAttachmentSet };
