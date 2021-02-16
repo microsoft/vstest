@@ -330,7 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         {
                             lock (attachmentTaskLock)
                             {
-                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(localFilePath, fileTransferInfo.Description));
+                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(UriDataAttachment.CreateFrom(localFilePath, fileTransferInfo.Description));
                             }
                         }
 
