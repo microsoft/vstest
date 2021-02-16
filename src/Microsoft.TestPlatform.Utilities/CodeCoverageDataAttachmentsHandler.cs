@@ -45,7 +45,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                 if (!string.IsNullOrEmpty(outputFile))
                 {
-                    attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
+                    // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
+                    var attachmentUri = new UriBuilder() { Scheme = "file", Host = "", Path = outputFile }.Uri;
+                    attachmentSet.Attachments.Add(new UriDataAttachment(attachmentUri, CoverageFriendlyName));
                     return Task.FromResult((ICollection<AttachmentSet>)new Collection<AttachmentSet> { attachmentSet });
                 }
 
