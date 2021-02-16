@@ -725,14 +725,20 @@ namespace Microsoft.TestPlatform.TestUtilities
             return string.Join(" ", assertFullPaths);
         }
 
+        /// <summary>
+        /// Creates an unique temporary directory for storing test results.
+        /// </summary>
+        /// <returns>
+        /// Path of the created directory.
+        /// </returns>
         protected static string GetResultsDirectory()
         {
-            var directoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
+            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
+            // that is cleaned up after every job. This is preferable to use over 
+            // just the normal temp. 
+            var temp = Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
+            var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
+            Directory.CreateDirectory(directoryPath);
 
             return directoryPath;
         }
