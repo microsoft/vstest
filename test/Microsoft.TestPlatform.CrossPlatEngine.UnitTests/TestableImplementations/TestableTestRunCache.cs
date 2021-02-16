@@ -9,7 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-    public class TestableTestRunCache : ITestRunCache
+    internal class TestableTestRunCache : ITestRunCache
     {
         public TestableTestRunCache()
         {
@@ -34,6 +34,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
         public TestRunStatistics TestRunStatistics { get; set; }
 
         public long TotalExecutedTests { get; set; }
+
+        public Dictionary<string, TestResultMetric> TestsPerAdapter => new Dictionary<string, TestResultMetric>();
 
         public ICollection<TestResult> GetLastChunk()
         {

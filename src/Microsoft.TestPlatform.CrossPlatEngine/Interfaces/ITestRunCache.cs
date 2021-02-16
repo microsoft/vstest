@@ -19,7 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         ICollection<TestResult> TestResults { get; }
 
         ICollection<TestCase> InProgressTests { get; }
+
         long TotalExecutedTests { get; }
+
+        Dictionary<string, TestResultMetric> TestsPerAdapter { get; }
 
         TestRunStatistics TestRunStatistics { get; }
 
@@ -36,5 +39,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         ICollection<TestResult> GetLastChunk();
 
         #endregion
+    }
+
+    internal class TestResultMetric
+    {
+        internal TestResultMetric(TimeSpan duration)
+        {
+            Count = 1;
+            this.Duration = duration;
+        }
+
+        internal long Count { get; set; }
+
+        internal TimeSpan Duration { get; set; }
     }
 }

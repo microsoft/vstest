@@ -35,6 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         private long totalExecutedTests;
 
+        private Dictionary<string, TestResultMetric> totalExecutedTestsPerAdapter = new Dictionary<string, TestResultMetric>();
+
         /// <summary>
         /// Callback used when cache is ready to report some test results/case.
         /// </summary>
@@ -163,6 +165,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
+        public Dictionary<string, TestResultMetric> TestsPerAdapter
+        {
+            get
+            {
+                lock (this.syncObject)
+                {
+                    return this.totalExecutedTestsPerAdapter;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets the test run stats
         /// </summary>
@@ -220,6 +233,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             lock (this.syncObject)
             {
                 this.totalExecutedTests++;
+                var executor = testResult.TestCase.ExecutorUri.AbsoluteUri;
+                if (totalExecutedTestsPerAdapter.ContainsKey(executor))
+                {
+                    var metric = totalExecutedTestsPerAdapter[executor];
+                    metric.Count++;
+                    metric.Duration += testResult.Duration;
+                }
+                else
+                {
+                    totalExecutedTestsPerAdapter.Add(executor, new TestResultMetric(testResult.Duration));
+                }
+
                 this.testResults.Add(testResult);
 
                 long count;

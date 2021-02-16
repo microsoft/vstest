@@ -503,11 +503,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     // Identify whether the executor did run any tests at all
                     if (this.testRunCache.TotalExecutedTests > totalTests)
                     {
-                        this.executorUrisThatRanTests.Add(executorUriExtensionTuple.Item1.AbsoluteUri);
-
-                        // Collecting Total Tests Ran by each Adapter
-                        var totalTestRun = this.testRunCache.TotalExecutedTests - totalTests;
-                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, executorUriExtensionTuple.Item1.AbsoluteUri), totalTestRun);
+                        // Executors can hide other executors in them. Such as MSTestV1 internally delegating to MSTestV0
+                        // when calculating the metrics take the actual URIs reported by testcases, not the ones from DefaultExecutorUri.
+                        foreach (var pair in this.TestRunCache.TestsPerAdapter)
+                        {
+                            this.executorUrisThatRanTests.Add(pair.Key);
+                            this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, pair.Key), pair.Value.Count);
+                        }
 
                         if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(executor.Metadata.ExtensionUri, StringComparer.OrdinalIgnoreCase))
                         {
@@ -527,7 +529,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     }
 
                     // Collecting Time Taken by each executor Uri
-                    this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUriExtensionTuple.Item1.AbsoluteUri), totalTimeTaken.TotalSeconds);
+                    // Executors can hide other executors in them. Such as MSTestV1 internally delegating to MSTestV0
+                    // when calculating the metrics take the actual URIs reported by testcases, not the ones from DefaultExecutorUri.
+                    foreach (var pair in this.TestRunCache.TestsPerAdapter)
+                    {
+                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, pair.Key), pair.Value.Duration.TotalSeconds);
+                    }
+
+                    
                     totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
                 }
                 catch (Exception e)
