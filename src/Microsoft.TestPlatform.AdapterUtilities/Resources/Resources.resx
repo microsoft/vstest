@@ -120,12 +120,20 @@
   <data name="ErrorIncompleteManagedName" xml:space="preserve">
     <value>ManagedName is incomplete</value>
   </data>
+  <data name="ErrorInvalidSequenceAt" xml:space="preserve">
+    <value>Invalid escape sequence! (segment: {0}, pos: {1})</value>
+    <comment>An escape sequence started with '\', but it wasn't legal. {0}: Invalid string, {1}: starting postion of invalid sequence.</comment>
+  </data>
   <data name="ErrorMethodArityMustBeNumeric" xml:space="preserve">
     <value>Method arity must be numeric</value>
   </data>
   <data name="ErrorMethodNotFound" xml:space="preserve">
     <value>Method '{0}' not found on type '{1}'</value>
     <comment>{0} is the method name, {1} is the full type name.</comment>
+  </data>
+  <data name="ErrorNoClosingQuote" xml:space="preserve">
+    <value>A closing single quote was expected at the end of the segment! (segment: {0})</value>
+    <comment>An error thrown when the type name ended but opened single qoute was not matched.</comment>
   </data>
   <data name="ErrorTypeNotFound" xml:space="preserve">
     <value>Type '{0}' not found</value>
