@@ -73,6 +73,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Description = description;
         }
 
+        public UriDataAttachment(string localFilePath, string description)
+        {
+            Uri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
+            Description = description;
+        }
+
         public override string ToString()
         {
             return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(Description)}: {Description}";
