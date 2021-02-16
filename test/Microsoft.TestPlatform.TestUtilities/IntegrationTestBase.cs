@@ -59,6 +59,9 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.testEnvironment = new IntegrationTestEnvironment();
         }
 
+        public TestContext TestContext { get; set; }
+
+
         public string StdOut => this.standardTestOutput;
         public string StdOutWithWhiteSpace => this.standardTestOutputWithWhiteSpace;
 
@@ -120,6 +123,25 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void InvokeVsTest(string arguments)
         {
             this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+
+            if (TestContext != null)
+            {
+                var outputDir = Path.Combine(Path.GetTempPath(), TestContext.TestName, Guid.NewGuid().ToString());
+                if (!Directory.Exists(outputDir))
+                {
+                    Directory.CreateDirectory(outputDir);
+                }
+
+                var stdoutPath = Path.Combine(outputDir, "stdout.txt");
+                var stderrPath = Path.Combine(outputDir, "stderr.txt");
+
+                File.WriteAllText(stdoutPath, this.standardTestOutput);
+                File.WriteAllText(stderrPath, this.standardTestError);
+
+                TestContext.AddResultFile(stdoutPath);
+                TestContext.AddResultFile(stderrPath);
+            }
+
             this.FormatStandardOutCome();
         }
 
@@ -587,7 +609,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             using (Process process = new Process())
             {
-                Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
+                WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
                 process.StartInfo.FileName = path;
                 process.StartInfo.Arguments = args;
                 process.StartInfo.UseShellExecute = false;
@@ -621,8 +643,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
 
-                Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
-                Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
+                WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
+                WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -632,7 +654,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 process.BeginErrorReadLine();
                 if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
                 {
-                    Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
+                    WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
                     process.Kill();
                 }
                 else
@@ -643,15 +665,23 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 stopwatch.Stop();
 
-                Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
+                WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
 
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
                 exitCode = process.ExitCode;
 
-                Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
-                Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
-                Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
+                WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
+                WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
+                WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
+            }
+        }
+
+        private void WriteLine(string format, params object[] arg)
+        {
+            if (TestContext == null)
+            {
+                Console.WriteLine(format, arg);
             }
         }
 
