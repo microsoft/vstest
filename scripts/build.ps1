@@ -493,8 +493,7 @@ function Publish-Package
 
     ################################################################################
     # Publish msdia
-    $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\lib\net472"
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\lib\net451"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore20PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore10PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
@@ -741,30 +740,30 @@ function Create-VsixPackage
     Copy-Item $codeCoverageInterprocessPackageDirectory\Microsoft.VisualStudio.Coverage.Interprocess.dll $extensionsPackageDir -Force
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion\lib\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\$testPlatformExternalsVersion\lib\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Microsoft.VisualStudio.ArchitectureTools.PEReader to Extensions
     Copy-Item $legacyDir\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll $extensionsPackageDir -Force
 
     # Copy QtAgent Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\$testPlatformExternalsVersion\lib\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\$testPlatformExternalsVersion\lib\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Legacy data collectors Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\lib\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\lib\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy CUIT Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\lib\net472"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\lib\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\lib\net472"
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\lib\net451"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force    
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
-    $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\lib\net472"
+    $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\lib\net451"
     if (-not (Test-Path $testImpactComComponentsDir)) {
         New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
     }
