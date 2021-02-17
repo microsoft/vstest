@@ -505,10 +505,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     {
                         // Executors can hide other executors in them. Such as MSTestV1 internally delegating to MSTestV0
                         // when calculating the metrics take the actual URIs reported by testcases, not the ones from DefaultExecutorUri.
-                        foreach (var pair in this.TestRunCache.TestsPerAdapter)
+                        foreach (var pair in this.TestRunCache.TestsPerAdapter.ToList())
                         {
                             this.executorUrisThatRanTests.Add(pair.Key);
                             this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, pair.Key), pair.Value.Count);
+                            this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, pair.Key), pair.Value.Duration.TotalSeconds);
+                            this.TestRunCache.TestsPerAdapter.Remove(pair.Key);
                         }
 
                         if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(executor.Metadata.ExtensionUri, StringComparer.OrdinalIgnoreCase))
@@ -528,15 +530,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             executor.Metadata.ExtensionUri);
                     }
 
-                    // Collecting Time Taken by each executor Uri
-                    // Executors can hide other executors in them. Such as MSTestV1 internally delegating to MSTestV0
-                    // when calculating the metrics take the actual URIs reported by testcases, not the ones from DefaultExecutorUri.
-                    foreach (var pair in this.TestRunCache.TestsPerAdapter)
-                    {
-                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, pair.Key), pair.Value.Duration.TotalSeconds);
-                    }
-
-                    
                     totalTimeTakenByAdapters += totalTimeTaken.TotalSeconds;
                 }
                 catch (Exception e)

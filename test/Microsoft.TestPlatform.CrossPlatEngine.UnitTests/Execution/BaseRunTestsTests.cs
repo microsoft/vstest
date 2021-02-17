@@ -413,7 +413,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
                 {
-                    var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+                    var testCase = new TestCase("x.y.z", new Uri(executor.Metadata.ExtensionUri), "x.dll");
                     var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
                     this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
                 };
@@ -421,6 +421,34 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.RunTests();
 
             var expectedUris = new string[] { BaseRunTestsExecutorUri.ToLower() };
+            CollectionAssert.AreEqual(expectedUris, this.runTestsInstance.GetExecutorUrisThatRanTests.ToArray());
+        }
+
+        [TestMethod]
+        public void RunTestsShouldAddInternalExecutorUriToExecutorUriListIfExecutorHasRunTests()
+        {
+            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+            var executorUriExtensionMap = new List<Tuple<Uri, string>>
+            {
+                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
+            };
+
+            // Executor URI that the executor delegates the work to. For example as MSTestV1 delegates to MSTestV0 in some cases
+            var internalUri = "executor://internalExecutor/";
+
+            // Setup mocks.
+            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
+            this.runTestsInstance.InvokeExecutorCallback =
+                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
+                {
+                    var testCase = new TestCase("x.y.z", new Uri(internalUri), "x.dll");
+                    var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+                    this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
+                };
+
+            this.runTestsInstance.RunTests();
+
+            var expectedUris = new string[] { internalUri.ToLower() };
             CollectionAssert.AreEqual(expectedUris, this.runTestsInstance.GetExecutorUrisThatRanTests.ToArray());
         }
 
@@ -473,13 +501,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
                 {
+                    // If the current executor is the bad one fail it,
                     if (string.Equals(BadBaseRunTestsExecutorUri, executor.Metadata.ExtensionUri))
                     {
                         throw new Exception();
                     }
                     else
                     {
-                        var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+                        // otherwise report a new test case, linked to the current executor by it's uri.
+                        var testCase = new TestCase("x.y.z", new Uri(executor.Metadata.ExtensionUri), "x.dll");
                         var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
                         this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
                     }
@@ -506,7 +536,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
                 {
-                    var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+                    var testCase = new TestCase("x.y.z", new Uri(executor.Metadata.ExtensionUri), "x.dll");
                     var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
                     this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
                 };
@@ -739,7 +769,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
                     {
-                        var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+                        var testCase = new TestCase("x.y.z", new Uri(executor.Metadata.ExtensionUri), "x.dll");
                         var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
                         this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
                     };
@@ -899,7 +929,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
                 {
-                    var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+                    var testCase = new TestCase("x.y.z", new Uri(executor.Metadata.ExtensionUri), "x.dll");
                     var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
                     this.inProgressTestCase = new TestCase("x.y.z2", new Uri("uri://dummy"), "x.dll");
 
