@@ -235,8 +235,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             RunInfo runMessage;
 
-            e.Level = changeMessageLevelIfNecessary(e.Level);
-
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
@@ -365,6 +363,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             {
                 this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Completed;
             }
+
+            testRunOutcome = changeTestOutcomeIfNecessary(testRunOutcome);
 
             List<string> errorMessages = new List<string>();
             List<CollectorDataEntry> collectorEntries = this.converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
@@ -763,16 +763,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             return testEntry;
         }
 
-        private TestMessageLevel changeMessageLevelIfNecessary (TestMessageLevel level)
+        private TrxLoggerObjectModel.TestOutcome changeTestOutcomeIfNecessary (TrxLoggerObjectModel.TestOutcome outcome)
         {
-            // Currently if no tests were discovered/executed in trx logs we get outcome as Warning
-            // If TreatNoTestsAsError was set to True, we want to return ResultSummary as Failed and RunInfo as Error
-            if (level == TestMessageLevel.Warning && parametersDictionary[ObjectModelConstants.TreatNoTestsAsError] == bool.TrueString)
+            // If no tests discovered/executed and TreatNoTestsAsError was set to True
+            // We will return ResultSummary as Failed and RunInfo as Error
+            if (totalTests == 0 && parametersDictionary[ObjectModelConstants.TreatNoTestsAsError] == bool.TrueString)
             {
-                level = TestMessageLevel.Error;
+                outcome = TrxLoggerObjectModel.TestOutcome.Failed;
             }
 
-            return level;
+            return outcome;
         }
 
         #endregion
