@@ -666,8 +666,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             loggerParams[DefaultLoggerParameterNames.TargetFramework] = targetFramework;
 
             // Add custom logger parameters
-            // TODO think about constans for TreatNoTestsAsError, do we really need to pu in constants?
-            loggerParams[Constants.TreatNoTestsAsError] = treatNoTestsAsError.ToString();
+            if (treatNoTestsAsError)
+            {
+                loggerParams[Constants.TreatNoTestsAsError] = treatNoTestsAsError.ToString();
+            }
             
             return loggerParams;
         }

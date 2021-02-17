@@ -116,6 +116,52 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             IsFileAndContentEqual(htmlLogFilePath);
         }
 
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedIfNoTestsExecutedAndTreatNoTestsAsErrorIsTrue(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var trxFileName = "TrxLogger.trx";
+
+            arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
+
+            // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=true");
+
+            this.InvokeVsTest(arguments);
+
+            var trxLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", trxFileName);
+            string outcomeValue = GetElementAtributeValueFromTrx(trxLogFilePath, "ResultSummary", "outcome");
+
+            Assert.AreEqual("Failed", outcomeValue);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var trxFileName = "TrxLogger.trx";
+
+            arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
+
+            // Setting /TestCaseFilter to the test name, which does not exists in the assembly, so we will have 0 tests executed
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestNameThatMatchesNoTestInTheAssembly");
+            arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
+
+            this.InvokeVsTest(arguments);
+
+            var trxLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", trxFileName);
+            string outcomeValue = GetElementAtributeValueFromTrx(trxLogFilePath, "ResultSummary", "outcome");
+
+            Assert.AreEqual("Completed", outcomeValue);
+        }
+
         private bool IsValidXml(string xmlFilePath)
         {
             var reader = System.Xml.XmlReader.Create(File.OpenRead(xmlFilePath));
@@ -145,6 +191,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 StringAssert.Contains(filePathContent, str);
             }
+        }
+
+        private static string GetElementAtributeValueFromTrx(string trxFileName, string fieldName, string attributeName)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            using (XmlReader reader = XmlReader.Create(file))
+            {
+                while (reader.Read())
+                {
+                    if (reader.Name.Equals(fieldName) && reader.NodeType == XmlNodeType.Element && reader.HasAttributes)
+                    {
+                        return reader.GetAttribute(attributeName);
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

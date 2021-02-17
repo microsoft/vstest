@@ -767,7 +767,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             // If no tests discovered/executed and TreatNoTestsAsError was set to True
             // We will return ResultSummary as Failed and RunInfo as Error
-            if (totalTests == 0 && parametersDictionary[ObjectModelConstants.TreatNoTestsAsError] == bool.TrueString)
+            // Note : we only send the value of TreatNoTestsAsError if it is "True"
+            if (totalTests == 0 && parametersDictionary.ContainsKey(ObjectModelConstants.TreatNoTestsAsError))
             {
                 outcome = TrxLoggerObjectModel.TestOutcome.Failed;
             }
