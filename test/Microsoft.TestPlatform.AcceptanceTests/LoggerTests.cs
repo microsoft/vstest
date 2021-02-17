@@ -117,6 +117,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedIfNoTestsExecutedAndTreatNoTestsAsErrorIsTrue(RunnerInfo runnerInfo)
         {
@@ -140,6 +141,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
         {
