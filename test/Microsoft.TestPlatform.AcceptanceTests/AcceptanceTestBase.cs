@@ -4,8 +4,8 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using System.IO;
+
     using Microsoft.TestPlatform.TestUtilities;
 
     public class AcceptanceTestBase : IntegrationTestBase

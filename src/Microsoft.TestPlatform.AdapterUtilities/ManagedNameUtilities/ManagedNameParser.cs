@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 {
+    using Microsoft.TestPlatform.AdapterUtilities.Helpers;
     using Microsoft.TestPlatform.AdapterUtilities.Resources;
 
     using System.Collections.Generic;
@@ -66,7 +67,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         /// </exception>
         public static void ParseManagedMethodName(string managedMethodName, out string methodName, out int arity, out string[] parameterTypes)
         {
-            int pos = ParseMethodName(managedMethodName, 0, out methodName, out arity);
+            int pos = ParseMethodName(managedMethodName, 0, out var escapedMethodName, out arity);
+            methodName = ReflectionHelpers.ParseEscapedString(escapedMethodName);
             pos = ParseParameterTypeList(managedMethodName, pos, out parameterTypes);
             if (pos != managedMethodName.Length)
             {
@@ -80,17 +82,27 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static int ParseMethodName(string managedMethodName, int start, out string methodName, out int arity)
         {
-            int i = start;
+            var i = start;
+            var quoted = false;
             for (; i < managedMethodName.Length; i++)
             {
-                switch (managedMethodName[i])
+                var c = managedMethodName[i];
+                if (c == '\'' || quoted)
+                {
+                    quoted = c == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
+                switch (c)
                 {
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
+
                     case '`':
                         methodName = Capture(managedMethodName, start, i);
                         return ParseArity(managedMethodName, i, out arity);
+
                     case '(':
                         methodName = Capture(managedMethodName, start, i);
                         arity = 0;
@@ -143,8 +155,10 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                             parameterTypes = types.ToArray();
                         }
                         return i + 1; // consume right parens
+
                     case ',':
                         break;
+
                     default:
                         i = ParseParameterType(managedMethodName, i, out var parameterType);
                         types.Add(parameterType);
@@ -159,22 +173,32 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         private static int ParseParameterType(string managedMethodName, int start, out string parameterType)
         {
             parameterType = string.Empty;
+            var quoted = false;
 
             int i = start;
-            for (; i < managedMethodName.Length; i++)
+            for (i = start; i < managedMethodName.Length; i++)
             {
+                if (managedMethodName[i] == '\'' || quoted)
+                {
+                    quoted = managedMethodName[i] == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
                 switch (managedMethodName[i])
                 {
                     case '<':
                         i = ParseGenericBrackets(managedMethodName, i + 1);
                         break;
+
                     case '[':
                         i = ParseArrayBrackets(managedMethodName, i + 1);
                         break;
+
                     case ',':
                     case ')':
                         parameterType = Capture(managedMethodName, start, i);
                         return i - 1;
+
                     case var w when char.IsWhiteSpace(w):
                         string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(message);
@@ -185,8 +209,16 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static int ParseArrayBrackets(string managedMethodName, int start)
         {
+            var quoted = false;
+
             for (int i = start; i < managedMethodName.Length; i++)
             {
+                if (managedMethodName[i] == '\'' || quoted)
+                {
+                    quoted = managedMethodName[i] == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
                 switch (managedMethodName[i])
                 {
                     case ']':
@@ -203,15 +235,25 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static int ParseGenericBrackets(string managedMethodName, int start)
         {
+            var quoted = false;
+
             for (int i = start; i < managedMethodName.Length; i++)
             {
+                if (managedMethodName[i] == '\'' || quoted)
+                {
+                    quoted = managedMethodName[i] == '\'' ? !quoted : quoted;
+                    continue;
+                }
+
                 switch (managedMethodName[i])
                 {
                     case '<':
                         i = ParseGenericBrackets(managedMethodName, i + 1);
                         break;
+
                     case '>':
                         return i;
+
                     case var w when char.IsWhiteSpace(w):
                         string msg = string.Format(CultureInfo.CurrentCulture, Resources.ErrorWhitespaceNotValid, i);
                         throw new InvalidManagedNameException(msg);

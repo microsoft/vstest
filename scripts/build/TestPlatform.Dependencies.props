@@ -29,6 +29,7 @@
     <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
+    <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.9.0-preview-4267359</TestPlatformExternalsVersion>

@@ -6,6 +6,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
+    using System.Runtime.ExceptionServices;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -42,7 +43,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 thread.Join();
                 if (exThrown != null)
                 {
-                    throw exThrown;
+                    // Preserve the stacktrace when re-throwing the exception.
+                    ExceptionDispatchInfo.Capture(exThrown).Throw();
                 }
             }
         }

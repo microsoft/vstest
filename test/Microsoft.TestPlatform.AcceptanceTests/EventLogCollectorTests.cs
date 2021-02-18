@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
@@ -18,7 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public EventLogCollectorTests()
         {
-            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.resultsDir = GetResultsDirectory();
         }
 
         // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
@@ -33,8 +34,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
 
@@ -55,8 +55,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
 
