@@ -766,7 +766,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private TrxLoggerObjectModel.TestOutcome changeTestOutcomeIfNecessary (TrxLoggerObjectModel.TestOutcome outcome)
         {
             // If no tests discovered/executed and TreatNoTestsAsError was set to True
-            // We will return ResultSummary as Failed and RunInfo as Error
+            // We will return ResultSummary as Failed
             // Note : we only send the value of TreatNoTestsAsError if it is "True"
             if (totalTests == 0 && parametersDictionary.ContainsKey(ObjectModelConstants.TreatNoTestsAsError))
             {
