@@ -9,7 +9,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <AssemblyName>MstestV1UnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

@@ -501,6 +501,9 @@ function Publish-Package
     Copy-Item -Recurse $comComponentsDirectory\* $testhostUapPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
+    $microsoftInternalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformExternalsVersion\tools\net472"
+    Copy-Item -Recurse $microsoftInternalDiaInterop\* $coreCLR20TestHostPackageDir -Force
+
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackage451Dir $extensions_Dir
@@ -611,6 +614,15 @@ function Publish-Package
     }
 
     Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
+
+    # Copy IntelliTrace Extensions components.
+    $intellitraceExtensionsSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace.Extensions\16.10.0-preview-1-31017-088\tools\net472"
+
+    if (-not (Test-Path $intellitraceExtensionsSourceDirectory)) {
+        New-Item $intellitraceExtensionsSourceDirectory -Type Directory -Force | Out-Null
+    }
+
+    Copy-Item -Recurse $intellitraceExtensionsSourceDirectory\* $intellitraceTargetDirectory -Force
 
     # Copy Microsoft.VisualStudio.Telemetry APIs
     $testPlatformDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace\Common7\IDE\Extensions\TestPlatform"
@@ -761,7 +773,15 @@ function Create-VsixPackage
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net472"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force    
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+
+    # Copy Microsoft.Internal.Dia.Interop
+    $internalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformExternalsVersion\tools\net472"
+    Copy-Item -Recurse $internalDiaInterop\* $packageDir -Force
+
+    # Copy VsWebSite.Interop
+    $vsWebSiteInterop = Join-Path $env:TP_PACKAGES_DIR "VsWebSite.Interop\$testPlatformExternalsVersion\lib\net45"
+    Copy-Item -Recurse $vsWebSiteInterop\* $packageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net472"
@@ -851,7 +871,7 @@ function Create-NugetPackages
     # Copy licenses folder
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "licenses") $stagingDir -Force -Recurse
 
-    #Copy Uap target, & props
+    # Copy Uap target, & props
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.props -Force
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.targets -Force
