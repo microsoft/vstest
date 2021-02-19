@@ -79,8 +79,7 @@
         public async Task HandleDataCollectionAttachmentSetsShouldReturnInputIfOnlySeveralLogsAttachmentAnd1Report()
         {
             var attachmentSet = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
-            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(@"D:\Code\SampleFiles\Merge1.coverage"), "coverage"));
-            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(@"D:\Code\SampleFiles\Merge2.coverage"), "coverage"));
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.coverage"), "coverage"));
 
             var attachmentSet1 = new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), string.Empty);
             attachmentSet1.Attachments.Add(new UriDataAttachment(new Uri("C:\\temp\\aa.logs"), "coverage"));
@@ -104,7 +103,7 @@
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.Cancel();
 
-            Collection<AttachmentSet> attachment = new Collection<AttachmentSet>
+            Collection<AttachmentSet> attachment = new Collection<AttachmentSet> 
             {
                 attachmentSet,
                 attachmentSet
