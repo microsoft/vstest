@@ -112,6 +112,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private async Task<string> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageCoreLibNetAssemblyName + ".dll");
             
             // Get assembly, type and methods
