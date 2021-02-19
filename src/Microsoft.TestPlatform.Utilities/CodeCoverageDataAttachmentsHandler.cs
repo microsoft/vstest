@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private const string CodeCoverageCoreLibNetAssemblyName = "Microsoft.VisualStudio.Coverage.CoreLib.Net";
         private const string CoverageFileUtilityTypeName = "CoverageFileUtility";
-        private const string MergeMethodName = "MergeCoverageFiles";
+        private const string MergeMethodName = "MergeCoverageFilesAsync";
         private const string WriteMethodName = "WriteCoverageFile";
 
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // We took a dependency on Coverage.CoreLib.Net. In the unlikely case it cannot be
                 // resolved, this method call will throw an exception that will be caught and
                 // absorbed here.
-                var result = await Task.FromResult(MergeCodeCoverageFiles(files, cancellationToken)).ConfigureAwait(false);
+                var result = await MergeCodeCoverageFilesAsync(files, cancellationToken).ConfigureAwait(false);
                 progressReporter?.Report(100);
                 return result;
             }
@@ -109,24 +109,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return null;
         }
 
-        private string MergeCodeCoverageFiles(IList<string> files, CancellationToken cancellationToken)
+        private async Task<string> MergeCodeCoverageFilesAsync(IList<string> files, CancellationToken cancellationToken)
         {
             var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageCoreLibNetAssemblyName + ".dll");
-            assemblyPath = @"D:\Code\vstest\artifacts\Debug\Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll";
+
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
                 var classType = assembly.GetType($"{CodeCoverageCoreLibNetAssemblyName}.{CoverageFileUtilityTypeName}");
                 var classInstance = Activator.CreateInstance(classType);
-                var mergeMethodInfo = classType?.GetMethod(MergeMethodName, new[] { typeof(IList<string>) });
+                var mergeMethodInfo = classType?.GetMethod(MergeMethodName, new[] { typeof(IList<string>), typeof(CancellationToken) });
                 var returnType = mergeMethodInfo.ReturnType;
                 var writeMethodInfo = classType?.GetMethod(WriteMethodName);
 
                 if (mergeMethodInfo != null && writeMethodInfo != null)
                 {
                     var coverageData = Activator.CreateInstance(returnType, true);
-                    coverageData = mergeMethodInfo.Invoke(classInstance, new object[] { files });
+                    var task = (Task)mergeMethodInfo.Invoke(classInstance, new object[] { files, cancellationToken });
+                    await task.ConfigureAwait(false);
+                    coverageData = task.GetType().GetProperty("Result").GetValue(task, null);
                     writeMethodInfo.Invoke(classInstance, new object[] { files[0], coverageData });
                 }
 
