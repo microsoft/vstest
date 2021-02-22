@@ -56,6 +56,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.DiscoverTests(
         ///     IEnumerable{string},
@@ -103,6 +104,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.RunTests(
         ///     IEnumerable{string},
@@ -145,6 +147,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         ///     IVsTestConsoleWrapper.RunTests(
         ///     IEnumerable{TestCase},
@@ -191,6 +194,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.RunTestsWithCustomTestHost(
         ///     IEnumerable{string},
@@ -239,6 +243,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.RunTestsWithCustomTestHost(
         ///     IEnumerable{TestCase},
@@ -257,6 +262,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.StartTestSession(
         ///     IList{string},
@@ -269,6 +275,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.StartTestSession(
         ///     IList{string},
@@ -283,6 +290,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.StartTestSession(
         ///     IList{string},
@@ -299,6 +307,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher testHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Asynchronous equivalent of <see cref="
         /// IVsTestConsoleWrapper.StopTestSession(
         ///     TestSessionInfo,

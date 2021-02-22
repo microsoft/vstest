@@ -46,6 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             TestRunCriteria testRunCriteria);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Fetches the TestSessionManager for this engine. This manager would provide all
         /// functionality required for test session management.
         /// </summary>

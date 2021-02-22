@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     /// <summary>
+    /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
     /// Defines the test session info object to be passed around between vstest.console and
     /// vstest.console wrapper in order to indentify the current session.
     /// </summary>
