@@ -110,7 +110,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions">
-      <Version>16.10.0-preview-1-31017-088</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.
