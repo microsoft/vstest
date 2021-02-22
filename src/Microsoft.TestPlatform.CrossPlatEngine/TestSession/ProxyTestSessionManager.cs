@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
+    /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
     /// Orchestrates test session operations for the engine communicating with the client.
     /// </summary>
     public class ProxyTestSessionManager : IProxyTestSessionManager
@@ -27,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IDictionary<Guid, ProxyOperationManagerContainer> proxyMap;
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
         /// </summary>
         /// 
@@ -100,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Dequeues a proxy to be used either by discovery or execution.
         /// </summary>
         /// 
@@ -133,6 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Enqueues a proxy back once discovery or executions is done with it.
         /// </summary>
         /// 

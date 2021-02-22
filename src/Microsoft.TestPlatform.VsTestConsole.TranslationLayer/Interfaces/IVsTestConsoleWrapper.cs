@@ -54,6 +54,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts test discovery.
         /// </summary>
         /// 
@@ -101,6 +102,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -143,6 +145,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -189,6 +192,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -237,6 +241,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -255,6 +260,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a new test session.
         /// </summary>
         /// 
@@ -269,6 +275,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a new test session.
         /// </summary>
         /// 
@@ -285,6 +292,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a new test session.
         /// </summary>
         /// 
@@ -303,6 +311,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             ITestHostLauncher testHostLauncher);
 
         /// <summary>
+        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Stops the test session.
         /// </summary>
         /// 
