@@ -94,6 +94,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)CoreCon\VisualStudioDatastoreConfigurationProvider.dll" />
 
       <!-- Qualitytools dlls -->
+      <!-- These dlls are already signed from VS nuget feed
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.AgentObject.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.AgentProcessManager.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Common.dll" />
@@ -102,7 +103,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.LoadTest.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Resource.dll" />
-      <!--
+      
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.GenericTest.Adapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.GenericTest.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.GenericTest.Tip.dll" />
@@ -118,13 +119,13 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Tip.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.WebLoadTest.Tip.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.TMI.dll" />
-      -->
+  
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" />
-      <!--<AssembliesToSign Include="$(ArtifactsDirectory)VsWebSite.Interop.dll" />-->
+      <AssembliesToSign Include="$(ArtifactsDirectory)VsWebSite.Interop.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent32.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent32_35.exe" />
@@ -133,17 +134,20 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent_40.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTDCAgent.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTDCAgent32.exe" />
-
+      -->
       <!-- DataCollector related dlls -->
+      <!--These dlls are already signed from VS nuget feed
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.IntelliTrace.Core.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
-
+      -->
       <!-- CUIT related dlls -->
+      <!--These dlls are already signed from VS nuget feed
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Sqm.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.OLE.Interop.dll" />
+      -->
       
       <!-- These are already signed, trying to sign them again causes warnings in the build pipeline.
         <AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" />
@@ -242,6 +246,7 @@
 
     <!-- Intellitrace -->
     <ItemGroup>
+    <!--These dlls are already signed from VS nuget feed
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Concord.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.ConfigUI.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Core.dll" />
@@ -262,8 +267,7 @@
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.NotifyPointInProcHost.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\1033\Microsoft.IntelliTrace.Profilerui.dll" />
-      <!-- Commented out DiaSymReader.dll as it is already signed. Resigning is resulting in some issuesl -->
-      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.DiaSymReader.dll" /> -->
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.DiaSymReader.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\concrt140.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\Microsoft.IntelliTrace.ProfilerProxy.dll" />
@@ -280,21 +284,21 @@
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
-      <!-- These files are removed from Intellitrace. Get these from Microsoft.Internal.CodeCoverage -->
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe" />
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProcessSnapshotCleanup.exe" />
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe" />
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
+    </ItemGroup>
+    -->
+    <!-- These files are removed from Intellitrace. Get these from Microsoft.Internal.CodeCoverage -->
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" /> -->
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\covrun32.dll" /> -->
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\msdia140.dll" /> -->
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" /> -->
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" /> -->
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProcessSnapshotCleanup.exe" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe" />
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" /> -->
       <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" /> -->
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
-    </ItemGroup>
-
     <!-- Sign test platform v2 assemblies for .NET Core -->
     <ItemGroup>
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)DataCollector.dll" />
