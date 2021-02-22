@@ -25,13 +25,14 @@ namespace Microsoft.TestPlatform.SmokeTests
             // We use netcoreapp runner 
             // "...\vstest\tools\dotnet\dotnet.exe "...\vstest\artifacts\Debug\netcoreapp2.1\vstest.console.dll" --collect:"XPlat Code Coverage" ...
             this.testEnvironment.RunnerFramework = CoreRunnerFramework;
+            var resultsDir = GetResultsDirectory();
 
             string coverletAdapterPath = Path.GetDirectoryName(Directory.GetFiles(this.testEnvironment.GetNugetPackage("coverlet.collector"), "coverlet.collector.dll", SearchOption.AllDirectories).Single());
             string logId = Guid.NewGuid().ToString("N");
             string assemblyPath = this.BuildMultipleAssemblyPath("CoverletCoverageTestProject.dll").Trim('\"');
             string logPath = Path.Combine(Path.GetDirectoryName(assemblyPath), $"coverletcoverage.{logId}.log");
             string logPathDirectory = Path.GetDirectoryName(logPath);
-            string argument = $"--collect:{"XPlat Code Coverage".AddDoubleQuote()} {PrepareArguments(assemblyPath, coverletAdapterPath, "", ".NETCoreApp,Version=v2.1")} --diag:{logPath.AddDoubleQuote()}";
+            string argument = $"--collect:{"XPlat Code Coverage".AddDoubleQuote()} {PrepareArguments(assemblyPath, coverletAdapterPath, "", ".NETCoreApp,Version=v2.1", resultsDirectory: resultsDir)} --diag:{logPath.AddDoubleQuote()}";
             this.InvokeVsTest(argument);
 
             // Verify vstest.console.dll CollectArgumentProcessor fix codeBase for coverlet package
@@ -50,6 +51,7 @@ namespace Microsoft.TestPlatform.SmokeTests
 
             // Verify default coverage file is generated
             this.StdOutputContains("coverage.cobertura.xml");
+            TryRemoveDirectory(resultsDir);
         }
     }
 }

@@ -131,20 +131,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return cpuCount;
         }
         /// <summary>
-        /// Gets the value of FailWhenNoTestsFound parameter from runsettings file
+        /// Gets the value of TreatNoTestsAsError parameter from runsettings file
         /// </summary>
         /// <param name="runSettings">Runsetting string value</param>
-        /// <returns>The value of FailWhenNoTestsFound</returns>
+        /// <returns>The value of TreatNoTestsAsError</returns>
         public static bool GetTreatNoTestsAsError(string runSettings)
         {
-            bool failWhenNoTestFound = false;
+            bool treatNoTestsAsError = false;
 
             if (runSettings != null)
             {
                 try
                 {
                     RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-                    failWhenNoTestFound = GetTreatNoTestsAsError(runConfiguration);
+                    treatNoTestsAsError = GetTreatNoTestsAsError(runConfiguration);
                 }
                 catch (SettingsException se)
                 {
@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 }
             }
 
-            return failWhenNoTestFound;
+            return treatNoTestsAsError;
         }
 
         private static bool GetTreatNoTestsAsError(RunConfiguration runConfiguration)
