@@ -122,6 +122,7 @@ $env:MSBUILD_VERSION = "15.0"
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
+$TPB_TestAssets_CILAssets = Join-Path $env:TP_ROOT_DIR "test\TestAssets\CILProject\CILProject.proj"
 $TPB_TargetFramework45 = "net45"
 $TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework472 = "net472"
@@ -277,6 +278,11 @@ function Invoke-Build
     & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog
     Write-Log ".. .. Build: Complete."
 
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_CILAssets"
+    Write-Verbose "$dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
+    & $dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\CILAssets.binlog"
+    Write-Log ".. .. Build: Complete."
+
     Set-ScriptFailedOnError
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
@@ -335,8 +341,7 @@ function Publish-Package
     $fullCLRPackage451Dir = Get-FullCLRPackageDirectory
     $fullCLRPackage45Dir = Get-FullCLRPackageDirectory45
     $uap100PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkUap100");
-    $net20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net20");
-    $net35PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net35");
+    $net45PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\net45");
     $netstandard10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS10");
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
@@ -485,8 +490,8 @@ function Publish-Package
     # Publish Microsoft.TestPlatform.AdapterUtilities
     Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
             -files @{
-              # "net20"                     = $net20PackageDir               # net20 \ net20, and net35 isn't supported by the Test Platform
-              # "net35"                     = $net35PackageDir               # net35 / but this package supports, so adding targets.
+              # "net20"                     = $net20PackageDir               # net20
+                "net45/any"                 = $net45PackageDir               # $net4
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
@@ -571,6 +576,14 @@ function Publish-Package
     if($TPB_LocalizedBuild) {
         Copy-Loc-Files $eventLogDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
         Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
+    }
+
+    # Copy Coverage.CoreLib.Net dlls
+    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+    $codeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
+    Copy-Item $codeCoverageCoreLibPackagesDir\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll $coreCLR20PackageDir -Force
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $codeCoverageCoreLibPackagesDir $coreCLR20PackageDir "Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll"
     }
 
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
@@ -736,6 +749,13 @@ function Create-VsixPackage
     if($TPB_LocalizedBuild) {
         Copy-Loc-Files $traceDataCollectorPackageDirectory $extensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
     }
+	
+	# Copy Microsoft.VisualStudio.CoreLib.Net
+    $codeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
+    Copy-Item $codeCoverageCoreLibPackagesDir\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll $packageDir -Force
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $codeCoverageCoreLibPackagesDir $packageDir "Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll"
+    }
 
     $codeCoverageInterprocessPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
     Copy-Item $codeCoverageInterprocessPackageDirectory\Microsoft.VisualStudio.Coverage.Interprocess.dll $extensionsPackageDir -Force
@@ -812,6 +832,7 @@ function Create-NugetPackages
     
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "Icon.png") $stagingDir -Force
 
+
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
     }
@@ -846,6 +867,9 @@ function Create-NugetPackages
     # Copy empty and third patry notice file
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
+
+    # Copy licenses folder
+    Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "licenses") $stagingDir -Force -Recurse
 
     #Copy Uap target, & props
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")

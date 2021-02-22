@@ -284,6 +284,16 @@
         <target state="translated">{0} Accesso negato durante il tentativo di creare la cartella "TestResults" nel percorso indicato. Si riceve questa eccezione perché si esegue vstest.console.exe da una cartella per cui è necessario l'accesso in scrittura. Per risolvere il problema, eseguire vstest.console.exe da una cartella per cui si hanno privilegi di scrittura. Per altre informazioni, vedere il messaggio di errore:</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

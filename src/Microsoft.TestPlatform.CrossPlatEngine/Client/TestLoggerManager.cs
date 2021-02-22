@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Common.Resources.Resources;
 
     /// <summary>
     /// Responsible for managing logger extensions and broadcasting results
@@ -51,6 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Target framework.
         /// </summary>
         private string targetFramework;
+
+        /// <summary>
+        /// TreatNoTestsAsError value;
+        /// </summary>
+        private bool treatNoTestsAsError;
 
         /// <summary>
         /// Test Logger Events instance which will be passed to loggers when they are initialized.
@@ -145,6 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
             this.testRunDirectory = GetResultsDirectory(runSettings);
             this.targetFramework = GetTargetFramework(runSettings)?.Name;
+            this.treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
 
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -488,6 +494,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
+        /// Get TreatNoTestsAsError value of the test run
+        /// </summary>
+        /// <param name="runSettings"></param>
+        /// <returns></returns>
+        internal bool GetTreatNoTestsAsError(string runSettings)
+        {
+            return RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
+        }
+
+        /// <summary>
         /// Enables sending of events to the loggers which are registered.
         /// </summary>
         /// <remarks>
@@ -648,6 +664,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Add default logger parameters...
             loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = testRunDirectory;
             loggerParams[DefaultLoggerParameterNames.TargetFramework] = targetFramework;
+
+            // Add custom logger parameters
+            if (treatNoTestsAsError)
+            {
+                loggerParams[Constants.TreatNoTestsAsError] = treatNoTestsAsError.ToString();
+            }
+            
             return loggerParams;
         }
 

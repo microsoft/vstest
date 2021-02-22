@@ -16,13 +16,13 @@ $TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullN
 $TP_PACKAGES_DIR = Join-Path $TP_ROOT_DIR "packages"
 $TP_OUT_DIR = Join-Path $TP_ROOT_DIR "artifacts"
 
-$PdbConverterToolVersion = "1.1.0-beta1-62316-01"
+$PdbConverterToolVersion = "1.1.0-beta2-21075-01"
 
 function Locate-PdbConverterTool
 {
-    $pdbConverter = Join-Path -path $TP_PACKAGES_DIR -ChildPath "Pdb2Pdb\$PdbConverterToolVersion\tools\Pdb2Pdb.exe"
+    $pdbConverter = Join-Path -path $TP_PACKAGES_DIR -ChildPath "Microsoft.DiaSymReader.Pdb2Pdb\$PdbConverterToolVersion\tools\Pdb2Pdb.exe"
 
-       if (!(Test-Path -path $pdbConverter)) {
+    if (!(Test-Path -path $pdbConverter)) {
        throw "Unable to locate Pdb2Pdb converter exe in path '$pdbConverter'."
    }
 

@@ -573,6 +573,20 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.IsTrue(htmlLogger.HtmlFilePath.Contains(".html"));
         }
 
+        [TestMethod]
+        public void TestCompleteHandlerShouldNotDivideByZeroWhenThereAre0TestResults()
+        {
+
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+            {
+            }).Returns(new Mock<Stream>().Object);
+
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            Assert.AreEqual(0, this.htmlLogger.TestRunDetails.Summary.TotalTests);
+            Assert.AreEqual(0, this.htmlLogger.TestRunDetails.Summary.PassPercentage);
+        }
+
         private static TestCase CreateTestCase(string testCaseName)
         {
             return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");

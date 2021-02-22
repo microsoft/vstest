@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -24,7 +25,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public BlameDataCollectorTests()
         {
-            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.resultsDir = GetResultsDirectory();
         }
 
         [TestCleanup]
@@ -32,10 +33,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
 
-            if (Directory.Exists(this.resultsDir))
-            {
-                Directory.Delete(this.resultsDir, true);
-            }
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -64,7 +62,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
 
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);            
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump");
@@ -91,7 +89,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
             this.InvokeVsTest(arguments);
-            
+
             Assert.IsFalse(this.StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
         }
 
@@ -245,8 +243,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (dumps.Count < expectedDumpCount)
             {
-                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}." 
-                    + Environment.NewLine 
+                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}."
+                    + Environment.NewLine
                     + string.Join(Environment.NewLine, dumps));
             }
 

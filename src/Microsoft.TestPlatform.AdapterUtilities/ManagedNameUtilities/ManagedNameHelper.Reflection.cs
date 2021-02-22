@@ -80,15 +80,15 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 method = ((MethodInfo)method).GetGenericMethodDefinition();
             }
 
-            var methodBuilder = new StringBuilder();
             var typeBuilder = new StringBuilder();
+            var methodBuilder = new StringBuilder();
 
             // Namespace and Type Name (with arity designation)
             AppendTypeString(typeBuilder, semanticType, closedType: false);
 
             // Method Name with method arity
-            methodBuilder.Append(method.Name);
             var arity = method.GetGenericArguments().Length;
+            AppendMethodString(methodBuilder, method.Name, arity);
             if (arity > 0)
             {
                 methodBuilder.Append('`');
@@ -143,12 +143,14 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         {
             Type type;
 
+            var parsedManagedTypeName = ReflectionHelpers.ParseEscapedString(managedTypeName);
+
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3 && !WINDOWS_UWP
-            type = assembly.GetType(managedTypeName, throwOnError: false, ignoreCase: false);
+            type = assembly.GetType(parsedManagedTypeName, throwOnError: false, ignoreCase: false);
 #else
             try
             {
-                type = assembly.GetType(managedTypeName);
+                type = assembly.GetType(parsedManagedTypeName);
             }
             catch
             {
@@ -158,14 +160,14 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             if (type == null)
             {
-                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, managedTypeName);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.ErrorTypeNotFound, parsedManagedTypeName);
                 throw new InvalidManagedNameException(message);
             }
 
             MethodInfo method = null;
             ManagedNameParser.ParseManagedMethodName(managedMethodName, out var methodName, out var methodArity, out var parameterTypes);
-#if NET20 || NET35
 
+#if NET20 || NET35
             if (!IsNullOrWhiteSpace(methodName))
 #else
             if (!string.IsNullOrWhiteSpace(methodName))
@@ -205,7 +207,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
                 for (int i = 0; i < paramList.Length; i++)
                 {
-                    if (TypeString(paramList[i].ParameterType, closedType: true) != parameterTypes[i])
+                    if (GetTypeString(paramList[i].ParameterType, closedType: true) != parameterTypes[i])
                     {
                         return false;
                     }
@@ -254,7 +256,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
             else
             {
-                b.Append(type.Namespace);
+                AppendNamespace(b, type.Namespace);
                 b.Append('.');
 
                 AppendNestedTypeName(b, type);
@@ -266,14 +268,131 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
         }
 
-        private static void AppendNestedTypeName(StringBuilder b, Type type)
+        private static void AppendNamespace(StringBuilder b, string namespaceString)
         {
+            int start = 0;
+            bool shouldEscape = false;
+
+            for (int i = 0; i <= namespaceString.Length; i++)
+            {
+                if (i == namespaceString.Length || namespaceString[i] == '.')
+                {
+                    if (start != 0)
+                    {
+                        b.Append('.');
+                    }
+
+                    var part = namespaceString.Substring(start, i - start);
+                    if (shouldEscape)
+                    {
+                        NormalizeAndAppendString(b, part);
+                        shouldEscape = false;
+                    }
+                    else
+                    {
+                        b.Append(part);
+                    }
+
+                    start = i + 1;
+                    continue;
+                }
+
+                shouldEscape = shouldEscape || NeedsEscaping(namespaceString[i], i - start);
+            }
+        }
+
+        private static void AppendMethodString(StringBuilder methodBuilder, string name, int methodArity)
+        {
+            var arityStart = name.LastIndexOf('`');
+            var arity = 0;
+            if (arityStart > 0)
+            {
+                arityStart++;
+                var arityString = name.Substring(arityStart, name.Length - arityStart);
+                if (int.TryParse(arityString, out arity))
+                {
+                    if (arity == methodArity)
+                    {
+                        name = name.Substring(0, arityStart - 1);
+                    }
+                }
+            }
+
+            if (IsNormalized(name))
+            {
+                methodBuilder.Append(name);
+            }
+            else
+            {
+                NormalizeAndAppendString(methodBuilder, name);
+            }
+
+            if (arity > 0 && methodArity == arity)
+            {
+                methodBuilder.Append($"`{arity}");
+            }
+        }
+
+        private static void NormalizeAndAppendString(StringBuilder b, string name)
+        {
+            b.Append("'");
+            for (int i = 0; i < name.Length; i++)
+            {
+                char c = name[i];
+                if (NeedsEscaping(c, i))
+                {
+                    if (c == '\\' || c == '\'')
+                    {
+                        // var encoded = Convert.ToString(((uint)c), 16);
+                        // b.Append("\\u");
+                        // b.Append('0', 4 - encoded.Length);
+                        // b.Append(encoded);
+
+                        b.Append("\\");
+                        b.Append(c);
+                        continue;
+                    }
+                }
+
+                b.Append(c);
+            }
+            b.Append("'");
+        }
+
+        private static int AppendNestedTypeName(StringBuilder b, Type type)
+        {
+            var outerArity = 0;
             if (type.IsNested)
             {
-                AppendNestedTypeName(b, type.DeclaringType);
+                outerArity = AppendNestedTypeName(b, type.DeclaringType);
                 b.Append('+');
             }
-            b.Append(type.Name);
+
+            var typeName = type.Name;
+            var stars = 0;
+            if (type.IsPointer)
+            {
+                for (int i = typeName.Length - 1; i > 0; i--)
+                {
+                    if (typeName[i] != '*')
+                    {
+                        stars = typeName.Length - i - 1;
+                        typeName = typeName.Substring(0, i + 1);
+                        break;
+                    }
+                }
+            }
+
+            var info = type.GetTypeInfo();
+            var arity = !info.IsGenericType
+                      ? 0
+                      : info.GenericTypeParameters.Length > 0
+                        ? info.GenericTypeParameters.Length
+                        : info.GenericTypeArguments.Length;
+
+            AppendMethodString(b, typeName, arity - outerArity);
+            b.Append('*', stars);
+            return arity;
         }
 
         private static void AppendGenericTypeParameters(StringBuilder b, Type type)
@@ -299,7 +418,46 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
         }
 
-        private static string TypeString(Type type, bool closedType)
+        private static bool IsNormalized(string s)
+        {
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (NeedsEscaping(s[i], i) && s[i] != '.')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool NeedsEscaping(char c, int pos)
+        {
+            if (pos == 0 && char.IsDigit(c))
+            {
+                return true;
+            }
+
+            if (c == '_'
+              || char.IsLetterOrDigit(c) // Lu, Ll, Lt, Lm, Lo, or Nl 
+              )
+            {
+                return false;
+            }
+
+            var category = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (category == UnicodeCategory.NonSpacingMark        // Mn
+             || category == UnicodeCategory.SpacingCombiningMark  // Mc
+             || category == UnicodeCategory.ConnectorPunctuation  // Pc
+             || category == UnicodeCategory.Format)               // Cf
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string GetTypeString(Type type, bool closedType)
         {
             var builder = new StringBuilder();
             AppendTypeString(builder, type, closedType);

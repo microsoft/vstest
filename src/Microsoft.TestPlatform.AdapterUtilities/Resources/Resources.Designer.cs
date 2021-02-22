@@ -27,7 +27,7 @@
             {
                 if (object.ReferenceEquals(resourceMan, null))
                 {
-#if NET20 || NET35
+#if NET20 || NET35 || NET40
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.AdapterUtilities.Resources.Resources", typeof(Resources).Assembly);
 #else
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.AdapterUtilities.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
@@ -129,6 +129,28 @@
             get
             {
                 return ResourceManager.GetString("MethodNotImplementedOnPlatform", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A closing single quote was expected at the end of the segment! (segment: {0}).
+        /// </summary>
+        internal static string ErrorNoClosingQuote
+        {
+            get
+            {
+                return ResourceManager.GetString("ErrorNoClosingQuote", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid escape sequence! (segment: {0}, pos: {1})
+        /// </summary>
+        internal static string ErrorInvalidSequenceAt
+        {
+            get
+            {
+                return ResourceManager.GetString("ErrorInvalidSequenceAt", resourceCulture);
             }
         }
     }

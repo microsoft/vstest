@@ -16,7 +16,7 @@
     <ArtifactsBaseDirectory Condition="'$(ArtifactsBaseDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\</ArtifactsBaseDirectory>
 
     <!-- Directory with .NET binaries -->
-    <ArtifactsFw45Directory Condition="'$(ArtifactsFw45Directory)' == ''">$(ArtifactsBaseDirectory)net45\$(TargetRuntime)\</ArtifactsFw45Directory>
+    <ArtifactsFw45Directory Condition="'$(ArtifactsFw45Directory)' == ''">$(ArtifactsBaseDirectory)net45\</ArtifactsFw45Directory>
 
     <!-- Directory with .NET binaries -->
     <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
@@ -180,12 +180,14 @@
 
     <!-- Sign .Net 4.5 assemblies -->
     <ItemGroup>
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)\Microsoft.TestPlatform.AdapterUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       
       <!-- Localized resources -->
-      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)%(ResxLang.Identity)\*.*" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)\%(ResxLang.Identity)\*.*" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -222,8 +224,8 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
 
       <!-- NetFullExtensions -->
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
+      <!--<AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" /> -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
@@ -233,7 +235,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\%(ResxLang.Identity)\*.*" />
 
       <!-- Third Party assemblies to sign -->
-      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
+      <!--<ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />-->
     </ItemGroup>
 
     <!-- Intellitrace -->
