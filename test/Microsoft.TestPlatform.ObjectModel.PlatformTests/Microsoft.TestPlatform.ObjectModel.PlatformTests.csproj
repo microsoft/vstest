@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformExternalsVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\packages\microsoft.internal.dia\$(TestPlatformExternalsVersion)\lib\net472\**\*">
+    <Content Include="..\..\packages\microsoft.internal.dia\$(TestPlatformExternalsVersion)\tools\net451\**\*">
     </Content>
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
