@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// Defines a test session object that can be used to make calls to the vstest.console
     /// process.
     /// </summary>
-    public class TestSession : ITestSession
+    internal class TestSession : ITestSession
     {
         private TestSessionInfo testSessionInfo;
         private VsTestConsoleWrapper consoleWrapper;
