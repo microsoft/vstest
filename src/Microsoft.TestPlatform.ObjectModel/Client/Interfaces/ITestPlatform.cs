@@ -60,7 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             TestPlatformOptions options);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test session.
         /// </summary>
         /// 

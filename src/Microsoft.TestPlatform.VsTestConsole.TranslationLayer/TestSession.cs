@@ -12,18 +12,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
     /// <summary>
-    /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
     /// Defines a test session object that can be used to make calls to the vstest.console
     /// process.
     /// </summary>
-    public class TestSession : ITestSession
+    internal class TestSession : ITestSession
     {
         private TestSessionInfo testSessionInfo;
         private VsTestConsoleWrapper consoleWrapper;
 
         #region Constructors
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Initializes a new instance of the <see cref="TestSession"/> class.
         /// </summary>
         /// 
