@@ -10,14 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
-    /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
     /// Defines a test session that can be used to make calls to the vstest.console
     /// process.
     /// </summary>
-    public interface ITestSession : ITestSessionAsync
+    internal interface ITestSession : ITestSessionAsync
     {
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts test discovery.
         /// </summary>
         /// 
@@ -30,7 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestDiscoveryEventsHandler discoveryEventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts test discovery.
         /// </summary>
         /// 
@@ -45,13 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Cancels the last discovery request.
         /// </summary>
         new void CancelDiscovery();
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -64,7 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -79,7 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -92,7 +85,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -107,7 +99,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -122,7 +113,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -139,7 +129,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -154,7 +143,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts a test run.
         /// </summary>
         /// 
@@ -171,7 +159,6 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
             ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Stops the test session.
         /// </summary>
         /// 
@@ -181,13 +168,11 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         bool StopTestSession(ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Cancels the last test run.
         /// </summary>
         new void CancelTestRun();
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Aborts the last test run.
         /// </summary>
         new void AbortTestRun();

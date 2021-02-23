@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
-    /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
     /// Represents the test session pool.
     /// </summary>
     public class TestSessionPool
@@ -23,7 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private Dictionary<TestSessionInfo, ProxyTestSessionManager> sessionPool;
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Initializes a new instance of the <see cref="TestSessionPool"/> class.
         /// </summary>
         private TestSessionPool()
@@ -32,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Gets the test session pool instance.
         /// </summary>
         /// 
@@ -57,7 +54,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Adds a session to the pool.
         /// </summary>
         /// 
@@ -84,7 +80,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Kills and removes a session from the pool.
         /// </summary>
         /// 
@@ -116,7 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Gets a reference to the proxy object from the session pool.
         /// </summary>
         /// 
@@ -140,7 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Returns the proxy object to the session pool.
         /// </summary>
         /// 

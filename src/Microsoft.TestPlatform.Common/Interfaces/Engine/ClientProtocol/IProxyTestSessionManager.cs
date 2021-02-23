@@ -6,14 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
-    /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
     /// Orchestrates test session related functionality for the engine communicating with the
     /// client.
     /// </summary>
     public interface IProxyTestSessionManager
     {
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Initialize the proxy.
         /// </summary>
         /// 
@@ -21,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         void Initialize(bool skipDefaultAdapters);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Starts the test session based on the test session criteria.
         /// </summary>
         /// 
@@ -34,7 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
-        /// THIS API IS INTERNAL AND IT'S SUBJECT TO CHANGE.
         /// Stops the test session.
         /// </summary>
         void StopSession();
