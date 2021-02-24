@@ -91,9 +91,9 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
 
       <!-- UWP runtime provider and dependent dlls -->
-      <!-- We removed this dll from package-->
+      <!-- Commenting for now, as we removed that dll from nuget package.
+           If after UWP test it does not work without this dll, we will add it back-->
       <!--<AssembliesToSign Include="$(ArtifactsDirectory)CoreCon\VisualStudioDatastoreConfigurationProvider.dll" />-->
-
 
       <!-- Qualitytools dlls -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.TMI.dll" />

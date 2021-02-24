@@ -81,6 +81,10 @@ function Verify-Assemblies
                     elseif ($signature.SignerCertificate.Thumbprint -eq "912357a68d29b8fe17168ef8c44d6830d1d42801") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
+                    # For some dlls sign certificate is different signature, which already come as signed from nuget packages. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "81C25099511180D15B858DC2B7EC4C057B1CE4BF") {
+                        Write-Log "Valid (Prod Signed): $($_.FullName)."
+                    }
                     else {
                         Write-FailLog "Incorrect certificate. File: $($_.FullName). Certificate: $($signature.SignerCertificate.Thumbprint)."
                     }
