@@ -207,6 +207,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
+        [Ignore]
         public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))

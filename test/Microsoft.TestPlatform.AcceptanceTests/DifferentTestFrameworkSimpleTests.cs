@@ -48,6 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
+        [Ignore]
         public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -72,6 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
+        [Ignore]
         public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

@@ -282,6 +282,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        [Ignore]
         public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -314,6 +315,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        [Ignore]
         public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -367,6 +369,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        [Ignore]
         public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -404,6 +407,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        [Ignore]
         public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -432,6 +436,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        [Ignore]
         public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

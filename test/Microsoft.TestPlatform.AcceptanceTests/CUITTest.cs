@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
+        [Ignore]
         public void CUITRunAllTests(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
