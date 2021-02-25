@@ -1,61 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../CommonResources.resx" build-num="595041357">
-    <header>
-      <count-group name="BlackBox wordcount">
-        <count count-type="x-wordCount">71</count>
-        <count count-type="x-adjWordCount">60.35</count>
-        <count count-type="x-curAdjWordCount">60.35</count>
-        <count count-type="x-repeatAdjWordCount">0</count>
-        <count count-type="x-termWordCount">0</count>
-      </count-group>
-      <count-group name="BlackBox wordcount analysis">
-        <count count-type="x-match102%">0</count>
-        <count count-type="x-match101%">0</count>
-        <count count-type="x-match100%">0</count>
-        <count count-type="x-match99-90%">0</count>
-        <count count-type="x-match89-75%">0</count>
-        <count count-type="x-mt">71</count>
-        <count count-type="repetition">0</count>
-      </count-group>
-    </header>
+  <file datatype="xml" source-language="en" original="../CommonResources.resx" target-language="zh-Hans">
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
+        <note>
+        </note>
         <target state="translated">参数不能为 NULL 或为空。</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Der Parameter darf nicht null oder leer sein.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
         <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
+        <note>
+        </note>
         <target state="translated">测试运行检测到为不同框架和平台版本构建的 DLL。后面的 DLL 与当前设置(即 {0} 框架和 {1} 平台)不匹配。{2}如需了解如何管理这些设置，请转到 {3}。</target>
-        <note></note>
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Testlauf verwendet DLLs für Framework {0} und {1}-Plattform integriert. Folgende DLLs nicht Teil ausführen: {2} zur {3} Einzelheiten auf diese Einstellungen.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
+        <note>
+        </note>
         <target state="translated">提供的所有测试容器均与用于测试运行的平台体系结构和 .Net Framework 设置不匹配。平台: {0}。.Net Framework: {1}。有关管理这些设置的详细信息，请转到http://go.microsoft.com/fwlink/?LinkID=330428。</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Keine der angegebenen Container übereinstimmt Plattformarchitektur und .net Framework-Einstellungen für den Testlauf. Plattform: {0} .net Framework: {1}. Lesen Sie http://go.microsoft.com/fwlink/?LinkID=330428 Weitere Informationen über diese Einstellungen.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>
       <trans-unit id="MalformedRunSettingsFile">
         <source>Settings file provided does not conform to required format.</source>
         <target state="translated">提供的设置文件不符合格式要求。</target>
-        <note />
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
         <target state="translated">{0} 适用于 {1} 框架和 {2} 平台。</target>
-        <note />
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>
