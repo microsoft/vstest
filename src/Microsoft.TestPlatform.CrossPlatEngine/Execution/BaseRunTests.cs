@@ -464,7 +464,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 var executorUri = executorUriExtensionTuple.Item1.AbsoluteUri;
                 // Get the executor from the cache.
                 if (!executorCache.TryGetValue(executorUri, out var executor))
-                {   
+                {
                     continue;
                 }
 
