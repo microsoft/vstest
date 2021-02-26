@@ -111,7 +111,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "5.8.1"
-$env:DOTNET_CLI_VERSION = "6.0.100-alpha.1.21067.8"
+$env:DOTNET_CLI_VERSION = "6.0.100-preview.1.21103.13"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -206,7 +206,7 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
-    & $dotnetInstallScript -Channel "release/6.0.1xx-preview1" -InstallDir $dotnetInstallPath # -Version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -Channel "release/6.0.1xx-preview1" -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
     
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.0' -Channel '2.1.0' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
