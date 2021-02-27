@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-        [Ignore]
         public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

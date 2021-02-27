@@ -512,6 +512,7 @@
         <StrongName>StrongName</StrongName>
       </TestHostCoreAssembliesToSign>
 
+      <!--
       <IntellitraceAssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
@@ -521,6 +522,7 @@
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
+      -->
 
       <ThirdPartyAssembliesToSign>
         <Authenticode>3PartySHA2</Authenticode>
@@ -586,7 +588,7 @@
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
-
+    <!--
     <Message Text="Signing using authenticode certificate IntellitraceAssembliesToSign:'%(IntellitraceAssembliesToSign.Authenticode)' for @(IntellitraceAssembliesToSign)"/>
     <SignFiles Files="@(IntellitraceAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Intellitrace"
@@ -598,6 +600,8 @@
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
+
+    -->
   </Target>
 
   <Target Name="SignNugetPackages">
