@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<LCX SchemaVersion="6.0" Name="C:\A\1\24\s\src\Microsoft.TestPlatform.AdapterUtilities\Resources\xlf\Resources.xlf" PsrId="308" SrcCul="en-US" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx" TgtCul="ja-JP">
+<LCX SchemaVersion="6.0" Name="C:\A\1\24\s\src\Microsoft.TestPlatform.AdapterUtilities\Resources\xlf\Resources.xlf" PsrId="308" FileType="1" SrcCul="en-US" TgtCul="ja-JP" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
   <OwnedComments>
     <Cmt Name="Dev" />
     <Cmt Name="LcxAdmin" />
@@ -12,6 +12,9 @@
       <Item ItemId=";ErrorIncompleteManagedName" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[ManagedName is incomplete]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ManagedName が不完全です]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -20,69 +23,66 @@
           <Val><![CDATA[Invalid escape sequence! (segment: {0}, pos: {1})]]></Val>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA[An escape sequence started with '\', but it wasn't legal. {0}: Invalid string, {1}: starting postion of invalid sequence.;]]></Cmt>
-        </Cmts>
       </Item>
       <Item ItemId=";ErrorMethodArityMustBeNumeric" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Method arity must be numeric]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[メソッドのアリティは、数値でなければなりません。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";ErrorMethodNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Method '{0}' not found on type '{1}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[メソッド '{0}' が型 '{1}' に見つかりませんでした。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA[{0} is the method name, {1} is the full type name.;]]></Cmt>
-        </Cmts>
       </Item>
       <Item ItemId=";ErrorNoClosingQuote" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[A closing single quote was expected at the end of the segment! (segment: {0})]]></Val>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA[An error thrown when the type name ended but opened single qoute was not matched.;]]></Cmt>
-        </Cmts>
       </Item>
       <Item ItemId=";ErrorTypeNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Type '{0}' not found]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[型 '{0}' が見つかりません。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA[{0} is the full type name.;]]></Cmt>
-        </Cmts>
       </Item>
       <Item ItemId=";ErrorUnexpectedCharactersAtEnd" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unexpected characters after the end of the ManagedName (pos: {0})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ManagedName の末尾の後ろに予期しない文字があります (位置: {0})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA[{0} is the position of unexpected characters;]]></Cmt>
-        </Cmts>
       </Item>
       <Item ItemId=";ErrorWhitespaceNotValid" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Whitespace is not valid in a ManagedName (pos: {0})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ManagedName では空白は無効です (位置: {0})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA[{0} is the position of invalid whitespace;]]></Cmt>
-        </Cmts>
       </Item>
       <Item ItemId=";MethodNotImplementedOnPlatform" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA['{0}.{1}' is not implemented on this platform!]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA['{0}.{1}' はこのプラットフォームに実装されていません。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
-        <Cmts>
-          <Cmt Name="Dev"><![CDATA['{className}.{methodName}' is not implemented on this platform!]D;]A;]D;]A;Example: 'System.Reflection.MethodBase' is not implemented on this platform!;]]></Cmt>
-        </Cmts>
       </Item>
     </Item>
   </Item>
