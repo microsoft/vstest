@@ -180,6 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
+        public IDictionary<string, int> AdapterTelemetry { get; set; } = new Dictionary<string, int>();
         #endregion
 
         #region Public/internal methods
@@ -221,6 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.totalExecutedTests++;
                 this.testResults.Add(testResult);
+                MSTestV1TelemetryHelper.AddTelemetry(testResult, this.AdapterTelemetry);
 
                 long count;
                 if (this.runStats.TryGetValue(testResult.Outcome, out count))
