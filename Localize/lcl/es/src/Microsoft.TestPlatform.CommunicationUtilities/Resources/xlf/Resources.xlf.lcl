@@ -10,7 +10,7 @@
     <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" />
     <Item ItemId=";Xliff Resources" ItemType="0" PsrId="308" Leaf="false">
       <Disp Icon="Str" Disp="true" LocTbl="false" />
-      <Item ItemId=";AbortedTestDiscovery" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";AbortedTestDiscovery" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The active test discovery was aborted. Reason: {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -19,7 +19,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";AbortedTestRun" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";AbortedTestRun" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The active test run was aborted. Reason: {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -37,7 +37,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";ConnectionClosed" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";ConnectionClosed" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An existing connection was forcibly closed by the remote host.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -64,7 +64,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";UnableToCommunicateToTestHost" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";UnableToCommunicateToTestHost" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unable to communicate with test host process.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
