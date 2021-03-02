@@ -46,7 +46,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DiscovererInstantiationException" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DiscovererInstantiationException" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Exception occurred while instantiating discoverer : {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -64,7 +64,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DuplicateSource" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DuplicateSource" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Ignoring the specified duplicate source '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -73,7 +73,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";ExceptionFromLoadTests" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";ExceptionFromLoadTests" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -82,7 +82,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";ExceptionFromRunTests" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";ExceptionFromRunTests" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An exception occurred while invoking executor '{0}': {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -109,7 +109,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";FileNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";FileNotFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not find file {0}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -127,7 +127,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";IgnoringExecutorAsNoDefaultExecutorUriAttribute" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";IgnoringExecutorAsNoDefaultExecutorUriAttribute" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -136,7 +136,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InitializationFailed" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";InitializationFailed" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Failed to initialize client proxy: could not connect to test process.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -145,7 +145,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";LaunchDebugProcessNotAllowedForANonDebugRun" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";LaunchDebugProcessNotAllowedForANonDebugRun" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[This operation is not allowed in the context of a non-debug run.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -199,7 +199,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NoValidSourceFoundForDiscovery" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";NoValidSourceFoundForDiscovery" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. ]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -235,7 +235,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";StringSeperator" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";StringSeperator" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[, ]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -283,7 +283,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";UnsupportedPropertiesInTestCaseFilter" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";UnsupportedPropertiesInTestCaseFilter" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
