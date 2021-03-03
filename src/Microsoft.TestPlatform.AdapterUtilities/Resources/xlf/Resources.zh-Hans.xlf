@@ -5,36 +5,36 @@
       <trans-unit id="ErrorIncompleteManagedName">
         <source>ManagedName is incomplete</source>
         <note />
-        <target state="new">ManagedName is incomplete</target>
+        <target state="translated">ManagedName 不完整</target>
       </trans-unit>
       <trans-unit id="ErrorMethodArityMustBeNumeric">
         <source>Method arity must be numeric</source>
         <note />
-        <target state="new">Method arity must be numeric</target>
+        <target state="translated">方法参数数量必须是数值</target>
       </trans-unit>
       <trans-unit id="ErrorMethodNotFound">
         <source>Method '{0}' not found on type '{1}'</source>
         <note>{0} is the method name, {1} is the full type name.</note>
-        <target state="new">Method '{0}' not found on type '{1}'</target>
+        <target state="translated">类型“{1}”上找不到方法“{0}”</target>
       </trans-unit>
       <trans-unit id="ErrorTypeNotFound">
         <source>Type '{0}' not found</source>
         <note>{0} is the full type name.</note>
-        <target state="new">Type '{0}' not found</target>
+        <target state="translated">找不到类型“{0}”</target>
       </trans-unit>
       <trans-unit id="ErrorUnexpectedCharactersAtEnd">
         <source>Unexpected characters after the end of the ManagedName (pos: {0})</source>
         <note>{0} is the position of unexpected characters</note>
-        <target state="new">Unexpected characters after the end of the ManagedName (pos: {0})</target>
+        <target state="translated">ManagedName 末尾后面有不需要的字符(位置: {0})</target>
       </trans-unit>
       <trans-unit id="ErrorWhitespaceNotValid">
         <source>Whitespace is not valid in a ManagedName (pos: {0})</source>
         <note>{0} is the position of invalid whitespace</note>
-        <target state="new">Whitespace is not valid in a ManagedName (pos: {0})</target>
+        <target state="translated">ManagedName 中空白无效(位置: {0})</target>
       </trans-unit>
       <trans-unit id="MethodNotImplementedOnPlatform">
         <source>'{0}.{1}' is not implemented on this platform!</source>
-        <target state="new">'{0}.{1}' is not implemented on this platform!</target>
+        <target state="translated">未在此平台上实现 "{0}.{1}"!</target>
         <note>'{className}.{methodName}' is not implemented on this platform!
 
 Example: 'System.Reflection.MethodBase' is not implemented on this platform!</note>
