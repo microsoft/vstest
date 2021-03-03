@@ -21,6 +21,9 @@
       <Item ItemId=";ErrorInvalidSequenceAt" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid escape sequence! (segment: {0}, pos: {1})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[逸出序列無效! (區段: {0}，位置: {1})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -45,6 +48,9 @@
       <Item ItemId=";ErrorNoClosingQuote" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[A closing single quote was expected at the end of the segment! (segment: {0})]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[區段結尾必須有右單引號! (區段: {0})]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
