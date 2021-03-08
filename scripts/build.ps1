@@ -573,6 +573,14 @@ function Publish-Package
         Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
     }
 
+    # Copy Coverage.CoreLib.Net dlls
+    $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+    $codeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkStandard"
+    Copy-Item $codeCoverageCoreLibPackagesDir\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll $coreCLR20PackageDir -Force
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $codeCoverageCoreLibPackagesDir $coreCLR20PackageDir "Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll"
+    }
+
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
@@ -735,6 +743,13 @@ function Create-VsixPackage
     Copy-Item $traceDataCollectorPackageDirectory\Microsoft.VisualStudio.TraceDataCollector.dll $extensionsPackageDir -Force
     if($TPB_LocalizedBuild) {
         Copy-Loc-Files $traceDataCollectorPackageDirectory $extensionsPackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+    }
+	
+	# Copy Microsoft.VisualStudio.CoreLib.Net
+    $codeCoverageCoreLibPackagesDir = Join-Path $env:TP_PACKAGES_DIR "microsoft.visualstudio.coverage.corelib.net\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework451"
+    Copy-Item $codeCoverageCoreLibPackagesDir\Microsoft.VisualStudio.Coverage.CoreLib.Net.dll $packageDir -Force
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $codeCoverageCoreLibPackagesDir $packageDir "Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll"
     }
 
     $codeCoverageInterprocessPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Coverage.Interprocess\$codeCoverageExternalsVersion\lib\$TPB_TargetFrameworkNS20"
