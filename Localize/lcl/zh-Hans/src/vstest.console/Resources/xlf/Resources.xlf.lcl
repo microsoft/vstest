@@ -773,7 +773,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Argument {0} is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[参数 {0} 不应出现在 "UseVsixExtensions" 命令中。指定指示是否应使用或跳过 vsix 扩展的命令(示例：vstest.console.exe myTests.dll /UseVsixExtensions:true)，然后重试。]]></Val>
+            <Val><![CDATA[参数 {0} 不应出现在 "UseVsixExtensions" 命令中.指定指示是否应使用或跳过 vsix 扩展的命令(示例:vstest.console.exe myTests.dll /UseVsixExtensions:true),然后重试.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
