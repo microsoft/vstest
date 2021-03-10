@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
         private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
         private const string EnvironmentVariablesNodePath = @"/RunSettings/RunConfiguration/EnvironmentVariables";
-        private const string multiTargettingForwardLink = @"https://docs.microsoft.com/visualstudio/test/run-a-unit-test-as-a-64-bit-process?view=vs-2019";
+        private const string multiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
         // To make things compatible for older runsettings
         private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
