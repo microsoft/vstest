@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 		private readonly Framework frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
 		private readonly Framework frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
 		private readonly Framework frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
-		private const string multiTargettingForwardLink = @"https://docs.microsoft.com/visualstudio/test/run-a-unit-test-as-a-64-bit-process?view=vs-2019";
+		private const string multiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
 		public InferRunSettingsHelperTests()
 		{
