@@ -25,6 +25,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 		private readonly Framework frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
 		private readonly Framework frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
 		private readonly Framework frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
+		private const string multiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
 		public InferRunSettingsHelperTests()
 		{
@@ -404,7 +405,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sb.AppendLine(GetSourceIncompatibleMessage("x64net47.exe"));
 			sb.AppendLine(GetSourceIncompatibleMessage("x86net45.dll"));
 
-			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), multiTargettingForwardLink);
 			#endregion
 
 			string warningMessage = string.Empty;
@@ -428,7 +429,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sb.AppendLine();
 			sb.AppendLine(GetSourceIncompatibleMessage("x64net45.exe"));
 
-			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), multiTargettingForwardLink);
 
 			string warningMessage = string.Empty;
 			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
