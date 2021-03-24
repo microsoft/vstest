@@ -689,7 +689,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				<RunSettings>
 					 <RunConfiguration>
 					 <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
-					 <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
+					 <TargetPlatform>{Architecture.ARM}</TargetPlatform>
 					 </RunConfiguration>
 				</RunSettings>"
 			};
@@ -1449,7 +1449,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				<RunSettings>
 					 <RunConfiguration>
 						 <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
-						 <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
+						 <TargetPlatform>{Architecture.ARM}</TargetPlatform>
 					 </RunConfiguration>
 				</RunSettings>"
 			};
