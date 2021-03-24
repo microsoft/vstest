@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
         {
-            return default(IEnumerable<KeyValuePair<string, string>>);
+            return default;
         }
 
         protected override void Dispose(bool disposing)

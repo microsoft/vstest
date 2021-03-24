@@ -616,7 +616,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 return (T)attributes[0];
             }
 
-            return default(T);
+            return default;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Reviewed. Suppression is OK here.")]
