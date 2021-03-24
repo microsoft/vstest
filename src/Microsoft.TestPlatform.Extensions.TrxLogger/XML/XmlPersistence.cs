@@ -506,14 +506,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </returns>
         private static IEnumerable<FieldPersistenceInfo> GetFieldInfos(Type type)
         {
-            IEnumerable<FieldPersistenceInfo> toReturn;
-            if (!typeToPersistenceInfoCache.TryGetValue(type, out toReturn))
+            if (!typeToPersistenceInfoCache.TryGetValue(type, out IEnumerable<FieldPersistenceInfo> toReturn))
             {
                 toReturn = ReflectFields(type);
                 lock (typeToPersistenceInfoCache)
                 {
-                    IEnumerable<FieldPersistenceInfo> checkCache;
-                    if (!typeToPersistenceInfoCache.TryGetValue(type, out checkCache))
+                    if (!typeToPersistenceInfoCache.TryGetValue(type, out IEnumerable<FieldPersistenceInfo> checkCache))
                     {
                         typeToPersistenceInfoCache.Add(type, toReturn);
                     }

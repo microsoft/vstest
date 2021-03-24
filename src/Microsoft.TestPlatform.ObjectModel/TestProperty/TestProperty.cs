@@ -280,10 +280,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             TestProperty result = null;
 
-            KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair;
             lock (s_properties)
             {
-                if (s_properties.TryGetValue(id, out propertyTypePair))
+                if (s_properties.TryGetValue(id, out KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair))
                 {
                     result = propertyTypePair.Key;
                 }
@@ -324,11 +323,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             TestProperty result;
 
-            KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair;
-
             lock (s_properties)
             {
-                if (s_properties.TryGetValue(id, out propertyTypePair))
+                if (s_properties.TryGetValue(id, out KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair))
                 {
                     // verify the data valueType is valid
                     if (propertyTypePair.Key.ValueType == valueType.AssemblyQualifiedName

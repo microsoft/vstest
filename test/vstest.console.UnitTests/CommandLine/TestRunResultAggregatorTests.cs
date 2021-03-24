@@ -126,8 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             {
                 get
                 {
-                    long count;
-                    if (this.Stats.TryGetValue(testOutcome, out count))
+                    if (this.Stats.TryGetValue(testOutcome, out long count))
                     {
                         return count;
                     }

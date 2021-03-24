@@ -67,8 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
             // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
                 var isTraceLevelArgValid = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt);
@@ -117,8 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 });
 
             // Get server port and initialize communication.
-            string portValue;
-            int port = argsDictionary.TryGetValue(PortArgument, out portValue) ? int.Parse(portValue) : 0;
+            int port = argsDictionary.TryGetValue(PortArgument, out string portValue) ? int.Parse(portValue) : 0;
 
             if (port <= 0)
             {

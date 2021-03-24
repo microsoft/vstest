@@ -63,8 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             get
             {
-                long count;
-                if (this.Stats.TryGetValue(testOutcome, out count))
+                if (this.Stats.TryGetValue(testOutcome, out long count))
                 {
                     return count;
                 }

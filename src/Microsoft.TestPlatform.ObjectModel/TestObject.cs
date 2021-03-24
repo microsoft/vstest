@@ -184,8 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, "property");
 
-            object value;
-            if (this.store.TryGetValue(property, out value))
+            if (this.store.TryGetValue(property, out object value))
             {
                 this.store.Remove(property);
             }
@@ -243,8 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, "property");
 
-            object value;
-            if (!this.store.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out object value))
             {
                 value = defaultValue;
             }

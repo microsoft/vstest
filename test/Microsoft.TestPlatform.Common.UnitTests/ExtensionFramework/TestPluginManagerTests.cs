@@ -71,13 +71,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests));
 
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
-
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                out unfilteredTestExtensions,
-                out testExtensions);
+                out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
+                out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
 
             Assert.IsNotNull(unfilteredTestExtensions);
             Assert.IsNotNull(testExtensions);
@@ -90,13 +87,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var discoveryCount = 0;
             TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => { discoveryCount++; });
 
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
-
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                out unfilteredTestExtensions,
-                out testExtensions);
+                out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
+                out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
 
             // Call this again to verify that discovery is not called again.
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
@@ -113,14 +107,12 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
         {
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
-                    out unfilteredTestExtensions,
-                    out testExtensions);
+                    out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
+                    out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
 
             Assert.IsNotNull(testExtensions);
             Assert.IsTrue(testExtensions.Count() > 0);

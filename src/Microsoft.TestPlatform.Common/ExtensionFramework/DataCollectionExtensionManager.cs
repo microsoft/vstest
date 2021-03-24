@@ -51,13 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </returns>
         public static DataCollectorExtensionManager Create(IMessageLogger messageLogger)
         {
-            IEnumerable<LazyExtension<DataCollector, IDataCollectorCapabilities>> filteredTestExtensions;
-            IEnumerable<LazyExtension<DataCollector, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
                 TestPlatformConstants.DataCollectorEndsWithPattern,
-                out unfilteredTestExtensions,
-                out filteredTestExtensions);
+                out IEnumerable<LazyExtension<DataCollector, Dictionary<string, object>>> unfilteredTestExtensions,
+                out IEnumerable<LazyExtension<DataCollector, IDataCollectorCapabilities>> filteredTestExtensions);
 
             return new DataCollectorExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }

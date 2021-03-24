@@ -176,9 +176,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)))
                 {
                     var newValue = Convert.ToDouble(metric.Value);
-                    object oldValue;
 
-                    if (this.metricsAggregator.TryGetValue(metric.Key, out oldValue))
+                    if (this.metricsAggregator.TryGetValue(metric.Key, out object oldValue))
                     {
                         var oldDoubleValue = Convert.ToDouble(oldValue);
                         this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;

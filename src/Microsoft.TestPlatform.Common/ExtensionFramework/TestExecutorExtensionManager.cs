@@ -117,24 +117,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 {
                     if (testExecutorExtensionManager == null)
                     {
-                        IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions1;
-                        IEnumerable<LazyExtension<ITestExecutor2, Dictionary<string, object>>> unfilteredTestExtensions2;
-                        IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions1;
-                        IEnumerable<LazyExtension<ITestExecutor2, ITestExecutorCapabilities>> testExtensions2;
 
                         // Get all extensions for ITestExecutor.
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                                out unfilteredTestExtensions1,
-                                out testExtensions1);
+                                out IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions1,
+                                out IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions1);
 
                         // Get all extensions for ITestExecutor2.
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                                out unfilteredTestExtensions2,
-                                out testExtensions2);
+                                out IEnumerable<LazyExtension<ITestExecutor2, Dictionary<string, object>>> unfilteredTestExtensions2,
+                                out IEnumerable<LazyExtension<ITestExecutor2, ITestExecutorCapabilities>> testExtensions2);
 
                         // Merge the extension lists.
                         var mergedUnfilteredTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(
@@ -166,24 +162,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </remarks>
         internal static TestExecutorExtensionManager GetExecutionExtensionManager(string extensionAssembly)
         {
-            IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions1;
-            IEnumerable<LazyExtension<ITestExecutor2, Dictionary<string, object>>> unfilteredTestExtensions2;
-            IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions1;
-            IEnumerable<LazyExtension<ITestExecutor2, ITestExecutorCapabilities>> testExtensions2;
 
             // Get all extensions for ITestExecutor.
             TestPluginManager.Instance
                 .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                     extensionAssembly,
-                    out unfilteredTestExtensions1,
-                    out testExtensions1);
+                    out IEnumerable<LazyExtension<ITestExecutor, Dictionary<string, object>>> unfilteredTestExtensions1,
+                    out IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions1);
 
             // Get all extensions for ITestExecutor2.
             TestPluginManager.Instance
                 .GetTestExtensions<TestExecutorPluginInformation2, ITestExecutor2, ITestExecutorCapabilities, TestExecutorMetadata>(
                     extensionAssembly,
-                    out unfilteredTestExtensions2,
-                    out testExtensions2);
+                    out IEnumerable<LazyExtension<ITestExecutor2, Dictionary<string, object>>> unfilteredTestExtensions2,
+                    out IEnumerable<LazyExtension<ITestExecutor2, ITestExecutorCapabilities>> testExtensions2);
 
             // Merge the extension lists.
             var mergedUnfilteredTestExtensions = TestExecutorExtensionManager.MergeTestExtensionLists(

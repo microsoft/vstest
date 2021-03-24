@@ -75,14 +75,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             if (testDiscoveryExtensionManager == null)
             {
-                IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-                IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
                 TestPluginManager.Instance
                     .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                         TestPlatformConstants.TestAdapterEndsWithPattern,
-                        out unfilteredTestExtensions,
-                        out testExtensions);
+                        out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
+                        out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
 
                 testDiscoveryExtensionManager = new TestDiscoveryExtensionManager(
                     testExtensions,
@@ -103,14 +101,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </remarks>
         public static TestDiscoveryExtensionManager GetDiscoveryExtensionManager(string extensionAssembly)
         {
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     extensionAssembly,
-                    out unfilteredTestExtensions,
-                    out testExtensions);
+                    out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
+                    out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
 
             return new TestDiscoveryExtensionManager(
                 testExtensions,
