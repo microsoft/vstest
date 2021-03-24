@@ -158,7 +158,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
-            Assert.IsTrue(!File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
+            Assert.IsFalse(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]
@@ -204,7 +204,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.IsNullOrEmpty());
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
-            Assert.IsTrue(!File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
+            Assert.IsFalse(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]
@@ -254,7 +254,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(testRunAttachmentsProcessingEventHandler.CompleteArgs.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForAttachmentsProcessing));
 
             Assert.IsTrue(File.Exists(runEventHandler.Attachments.First().Attachments.First().Uri.LocalPath));
-            Assert.IsTrue(!File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
+            Assert.IsFalse(File.Exists(runEventHandler.Attachments.Last().Attachments.First().Uri.LocalPath));
         }
 
         [TestMethod]
