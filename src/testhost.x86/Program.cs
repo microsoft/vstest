@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
@@ -14,6 +15,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Newtonsoft.Json;
+    using System.Linq;
+    using System.Reflection.Metadata;
 
     /// <summary>
     /// The program.
@@ -55,6 +59,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             WaitForDebuggerIfEnabled();
             SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
+
+#if NET6_0_OR_GREATER
+            LoadModules();
+#endif
 
             // Invoke the engine with arguments
             GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
@@ -130,6 +138,60 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
             }
         }
+
+#if NET6_0_OR_GREATER   
+        private static Dictionary<Guid, List<Update>> Modules;
+        private static void LoadModules()
+        {
+            //Debugger.Launch();
+            var hotReloadModules = File.ReadAllText(@"C:\repos\hotReload.txt");
+            Modules = JsonConvert.DeserializeObject<Dictionary<Guid, List<Update>>>(hotReloadModules);
+
+            File.WriteAllText(@"C:\repos\tempFile.txt", $"loaded modules");
+
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyLoad += new AssemblyLoadEventHandler(OnAssemblyLoad);
+        }
+
+        private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
+        {
+            // ApplyUpdate doesn't work with debuggers attached
+            var mvid = args.LoadedAssembly.Modules.FirstOrDefault()?.ModuleVersionId;
+
+            if (mvid != null && Modules.ContainsKey((Guid)mvid))
+            {
+                foreach (var update in Modules[(Guid)mvid])
+                {
+                    try
+                    {
+                        System.Reflection.Metadata.AssemblyExtensions.ApplyUpdate(args.LoadedAssembly, update.MetadataDelta, update.ILDelta, update.PdbDelta);
+                        File.AppendAllText(@"C:\repos\tempFile.txt", $"added {args.LoadedAssembly.FullName}");
+                    }
+                    catch (Exception e)
+                    {
+                        File.AppendAllText(@"C:\repos\tempFile.txt", $"Module: {args.LoadedAssembly.FullName}\n{e}");
+                    }
+                }
+            }
+        }
+
+        [Serializable]
+        private struct Update
+        {
+            public Update(byte[] iLDelta, byte[] metadataDelta, byte[] pdbDelta, int[] updatedMethods)
+            {
+                this.ILDelta = iLDelta;
+                this.MetadataDelta = metadataDelta;
+                this.PdbDelta = pdbDelta;
+                this.UpdatedMethods = updatedMethods;
+            }
+
+            public byte[] ILDelta;
+            public byte[] MetadataDelta;
+            public byte[] PdbDelta;
+            public int[] UpdatedMethods;
+        }
+#endif
 
         // Native APIs for enabling native debugging.
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]

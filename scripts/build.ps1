@@ -111,7 +111,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "5.8.1"
-$env:DOTNET_CLI_VERSION = "6.0.100-preview.1.21103.13"
+$env:DOTNET_CLI_VERSION = "6.0.100-preview.2.21155.3"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
@@ -128,6 +128,7 @@ $TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework472 = "net472"
 $TPB_TargetFrameworkCore10 = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.1"
+$TPB_TargetFrameworkCore60 = "net6.0"
 $TPB_TargetFrameworkUap100 = "uap10.0"
 $TPB_TargetFrameworkNS10 = "netstandard1.0"
 $TPB_TargetFrameworkNS13 = "netstandard1.3"
@@ -358,6 +359,12 @@ function Publish-Package
     $testhostCore20PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
     $testhostCore20PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
     
+    $testhostCore60PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore60")
+    $testhostCore60PackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore60\$TPB_X64_Runtime")
+    $testhostCore60PackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore60\$TPB_X86_Runtime")
+    $testhostCore60PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore60\$TPB_X64_Runtime")
+    $testhostCore60PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore60\$TPB_X86_Runtime")
+
     $testhostCore10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10")
     $testhostCore10PackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X64_Runtime")
     $testhostCore10PackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X86_Runtime")
@@ -393,14 +400,17 @@ function Publish-Package
     Publish-PackageInternal $testHostProject $TPB_TargetFramework451 $testhostFullPackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCore20PackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore10 $testhostCore10PackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore60 $testhostCore60PackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostUapPackageDir
     Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore20 $TPB_X64_Runtime false $testhostCore20PackageTempX64Dir
     Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore10 $TPB_X64_Runtime true $testhostCore10PackageTempX64Dir
+    Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore60 $TPB_X64_Runtime false $testhostCore60PackageTempX64Dir
     
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework451 $testhostFullPackageDir
     Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore20 $TPB_X86_Runtime false $testhostCore20PackageTempX86Dir
     Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore10 $TPB_X86_Runtime true $testhostCore10PackageTempX86Dir
+    Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore60 $TPB_X86_Runtime false $testhostCore60PackageTempX86Dir
     
     # Copy the .NET multitarget testhost exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
@@ -432,6 +442,14 @@ function Publish-Package
     New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
     Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -Recurse
     Copy-Item $testhostCore10PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX86Dir -Force
+    
+    New-Item -ItemType directory -Path $testhostCore60PackageX64Dir -Force | Out-Null
+    Copy-Item $testhostCore60PackageTempX64Dir\testhost* $testhostCore60PackageX64Dir -Force -Recurse
+    Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore60PackageX64Dir -Force
+
+    New-Item -ItemType directory -Path $testhostCore60PackageX86Dir -Force | Out-Null
+    Copy-Item $testhostCore60PackageTempX86Dir\testhost.x86* $testhostCore60PackageX86Dir -Force -Recurse
+    Copy-Item $testhostCore60PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore60PackageX86Dir -Force
     
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
@@ -501,6 +519,7 @@ function Publish-Package
     # Publish msdia
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net451"
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostCore60PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore20PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore10PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
@@ -902,6 +921,9 @@ function Create-NugetPackages
     
     $testhostCore10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10")
     Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCore10PackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    
+    $testhostCore60PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore60")
+    Copy-Item $tpNuspecDir\"Microsoft.TestPlatform.TestHost.NetCore.props" $testhostCore60PackageDir\Microsoft.TestPlatform.TestHost.props -Force
         
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
