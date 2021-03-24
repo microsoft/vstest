@@ -422,7 +422,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Event Handlers
+       #region Event Handlers
 
         /// <summary>
         /// Called when a test run start is received
@@ -546,7 +546,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // This would happen if the key already exists. This should not happen, because we are 
                 // inserting by GUID key, so this would mean an error in our code.
                 throw new InvalidOperationException($"ExecutionId {executionId} already exists.");
-            };
+            }
 
             switch (e.Result.Outcome)
             {
@@ -763,7 +763,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         default:
                             resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
                             break;
-                    };
+                    }
 
                     var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
                     var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
