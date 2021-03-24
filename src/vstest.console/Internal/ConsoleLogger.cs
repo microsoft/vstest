@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
         /// tracking counts per source for the minimal and quiet output.
         /// </summary>
-        private ConcurrentDictionary<Guid, TestResult> leafTestResults { get; set; }
+        private ConcurrentDictionary<Guid, TestResult> LeafTestResults { get; set; }
 
         #endregion
 
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            this.leafTestResults = new ConcurrentDictionary<Guid, TestResult>();
+            this.LeafTestResults = new ConcurrentDictionary<Guid, TestResult>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -538,10 +538,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // This would return false if the id did not exist,
                 // or true if it did exist. In either case the id is not in the dictionary
                 // which is our goal.
-                leafTestResults.TryRemove(parentExecutionId, out _);
+                LeafTestResults.TryRemove(parentExecutionId, out _);
             }
 
-            if (!leafTestResults.TryAdd(executionId, e.Result))
+            if (!LeafTestResults.TryAdd(executionId, e.Result))
             {
                 // This would happen if the key already exists. This should not happen, because we are 
                 // inserting by GUID key, so this would mean an error in our code.
@@ -701,7 +701,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            var leafTestResultsPerSource = this.leafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
+            var leafTestResultsPerSource = this.LeafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
             foreach (var sd in leafTestResultsPerSource)
             {
                 var source = sd.Key;

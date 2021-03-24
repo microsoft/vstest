@@ -12,9 +12,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [DataCollectorTypeUri("my://custom/datacollector")]
     public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
-        public DataCollectionEnvironmentContext dataCollectionEnvironmentContext { get; set; }
+        public DataCollectionEnvironmentContext DataCollectionEnvironmentContext { get; set; }
 
-        public DataCollectionSink dataSink { get; set; }
+        public DataCollectionSink DataSink { get; set; }
 
         public override void Initialize(
             XmlElement configurationElement,
