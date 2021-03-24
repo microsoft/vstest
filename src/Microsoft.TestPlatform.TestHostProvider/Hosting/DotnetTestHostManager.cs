@@ -376,8 +376,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public bool AttachDebuggerToTestHost()
         {
             return this.customTestHostLauncher is ITestHostLauncher2 launcher
-                ? launcher.AttachDebuggerToProcess(this.testHostProcess.Id)
-                : false;
+            && launcher.AttachDebuggerToProcess(this.testHostProcess.Id);
         }
 
         /// <summary>
