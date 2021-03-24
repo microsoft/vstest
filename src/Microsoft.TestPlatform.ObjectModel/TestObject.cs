@@ -328,17 +328,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");
 
-            var lazyValue = value as LazyPropertyValue<T>;
 
             if (value == null)
             {
                 return default(T);
             }
-            else if (value is T)
+            else if (value is T t)
             {
-                return (T)value;
+                return t;
             }
-            else if (lazyValue != null)
+            else if (value is LazyPropertyValue<T> lazyValue)
             {
                 return lazyValue.Value;
             }

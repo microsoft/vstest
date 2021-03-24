@@ -250,8 +250,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             if (objectToSave != null && location != null)
             {
                 string nameSpaceUri = this.namespaceUri;
-                IXmlTestStoreCustom customStore = objectToSave as IXmlTestStoreCustom;
-                if (customStore != null)
+                if (objectToSave is IXmlTestStoreCustom customStore)
                 {
                     nameSpaceUri = customStore.NamespaceUri;
                 }
@@ -259,8 +258,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 XmlNode xmlNode = this.EnsureLocationExists(parentXml, location, nameSpaceUri);
                 this.SaveObject(objectToSave, xmlNode, parameters);
 
-                XmlElement element = xmlNode as XmlElement;
-                if (element != null &&
+                if (xmlNode is XmlElement element &&
                     !element.HasAttributes &&
                     !element.HasChildNodes &&
                     string.IsNullOrEmpty(element.InnerText))
@@ -306,8 +304,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (objectToSave != null)
             {
-                IXmlTestStore persistable = objectToSave as IXmlTestStore;
-                if (persistable != null)
+                if (objectToSave is IXmlTestStore persistable)
                 {
                     persistable.Save((XmlElement)nodeToSaveAt, parameters);
                 }
@@ -664,8 +661,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
             // Remove invalid char if any
             valueToSave = RemoveInvalidXmlChar(valueToSave);
-            XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
-            if (elementToSaveAt != null)
+            if (nodeToSaveAt is XmlElement elementToSaveAt)
             {
                 elementToSaveAt.InnerText = valueToSave;
             }
@@ -792,10 +788,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             Debug.Assert(persistee != null, "persistee is null");
 
-            IXmlTestStoreCustom custom = persistee as IXmlTestStoreCustom;
-
             NewElementCreateData toReturn = new NewElementCreateData();
-            if (custom != null)
+            if (persistee is IXmlTestStoreCustom custom)
             {
                 toReturn.ElementName = custom.ElementName;
                 toReturn.NamespaceUri = custom.NamespaceUri;
