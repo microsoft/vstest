@@ -371,7 +371,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             // Delete all the temp event log directories
             this.RemoveTempEventLogDirs(this.eventLogDirectories);
-            GC.SuppressFinalize(this);
         }
 
         #endregion
