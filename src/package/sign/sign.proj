@@ -467,11 +467,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\*.so" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\InstrumentationEngine\alpine\*.so" />
-    </ItemGroup>
-
-    <ItemGroup>
       <NetStandard10AssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
@@ -522,12 +517,12 @@
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </IntellitraceAssembliesToSign>
-        -->
-      
+
       <CodeCoverageAssembliesToSign>
         <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
+      -->
 
       <ThirdPartyAssembliesToSign>
         <Authenticode>3PartySHA2</Authenticode>
@@ -599,13 +594,14 @@
                BinariesDirectory="$(ArtifactsBaseDirectory)Intellitrace"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
-      -->
 
     <Message Text="Signing using authenticode certificate CodeCoverageAssembliesToSign:'%(CodeCoverageAssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
     <SignFiles Files="@(CodeCoverageAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
+
+    -->
   </Target>
 
   <Target Name="SignNugetPackages">

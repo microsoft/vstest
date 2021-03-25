@@ -73,7 +73,7 @@
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net45\" />
 
     <!-- Add localized resources for trace data collector -->
-    <!-- <file src="Microsoft.CodeCoverage\cs\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\cs" />
+    <file src="Microsoft.CodeCoverage\cs\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\cs" />
     <file src="Microsoft.CodeCoverage\de\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\de" />
     <file src="Microsoft.CodeCoverage\es\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\es" />
     <file src="Microsoft.CodeCoverage\fr\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\fr" />
@@ -85,6 +85,6 @@
     <file src="Microsoft.CodeCoverage\ru\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\ru" />
     <file src="Microsoft.CodeCoverage\tr\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\tr" />
     <file src="Microsoft.CodeCoverage\zh-Hans\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hans" />
-    <file src="Microsoft.CodeCoverage\zh-Hant\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hant" /> -->
+    <file src="Microsoft.CodeCoverage\zh-Hant\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hant" />
   </files>
 </package>
