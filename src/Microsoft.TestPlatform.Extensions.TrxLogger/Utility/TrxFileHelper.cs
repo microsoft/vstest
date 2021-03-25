@@ -208,7 +208,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // and "\\dir1". We need to compare the first non-null token
             // to know if we've got differences.
             int i = 0;
-            for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++)
+            for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++) 
+            { 
+            }
 
             if (i >= max)
             {
