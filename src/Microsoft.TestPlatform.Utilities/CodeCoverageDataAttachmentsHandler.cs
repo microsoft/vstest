@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string CoverageFileExtension = ".coverage";
         private const string CoverageFriendlyName = "Code Coverage";
 
-        private const string CodeCoverageCoreLibNetAssemblyName = "Microsoft.VisualStudio.Coverage.CoreLib.Net";
+        private const string CodeCoverageIOAssemblyName = "Microsoft.VisualStudio.Coverage.IO";
         private const string CoverageFileUtilityTypeName = "CoverageFileUtility";
         private const string MergeMethodName = "MergeCoverageFilesAsync";
         private const string WriteMethodName = "WriteCoverageFile";
@@ -114,11 +114,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageCoreLibNetAssemblyName + ".dll");
+            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageIOAssemblyName + ".dll");
             
             // Get assembly, type and methods
             Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
-            var classType = assembly.GetType($"{CodeCoverageCoreLibNetAssemblyName}.{CoverageFileUtilityTypeName}");
+            var classType = assembly.GetType($"{CodeCoverageIOAssemblyName}.{CoverageFileUtilityTypeName}");
             var classInstance = Activator.CreateInstance(classType);
             var mergeMethodInfo = classType?.GetMethod(MergeMethodName, new[] { typeof(IList<string>), typeof(CancellationToken) });
             var writeMethodInfo = classType?.GetMethod(WriteMethodName);
