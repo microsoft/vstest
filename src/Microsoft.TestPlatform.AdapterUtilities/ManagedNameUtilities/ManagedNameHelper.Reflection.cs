@@ -24,12 +24,12 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         /// A <see cref="MethodBase" /> instance to get fully qualified managed type and method name.
         /// </param>
         /// <param name="managedTypeName">
-        /// When this method returns, contains the fully qualified managed type name of the <paramref name="method"/>. 
+        /// When this method returns, contains the fully qualified managed type name of the <paramref name="method"/>.
         /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
         /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedtype-property">the RFC</see>.
         /// </param>
         /// <param name="managedMethodName">
-        /// When this method returns, contains the fully qualified managed method name of the <paramref name="method"/>. 
+        /// When this method returns, contains the fully qualified managed method name of the <paramref name="method"/>.
         /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
         /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedmethod-property">the RFC</see>.
         /// </param>
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         /// Required functionality on <paramref name="method"/> is missing on the current platform.
         /// </exception>
         /// <remarks>
-        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in 
+        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
         /// <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
         /// </remarks>
         public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName)
@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                 // sure we are working with the open form of the generic type.
                 semanticType = semanticType.GetGenericTypeDefinition();
 
-                // The method might have some of its parameters specified by the original closed type 
+                // The method might have some of its parameters specified by the original closed type
                 // declaration. Here we use the method handle (basically metadata token) to create
                 // a new method reference using the open form of the reflected type. The intent is
                 // to strip all generic type parameters.
@@ -114,7 +114,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         }
 
         /// <summary>
-        /// Gets the <see cref="MethodBase"/> object with the specified <paramref name="managedTypeName"/> 
+        /// Gets the <see cref="MethodBase"/> object with the specified <paramref name="managedTypeName"/>
         /// and <paramref name="managedMethodName"/> in the <paramref name="assembly"/> instance.
         /// </summary>
         /// <param name="assembly">
@@ -132,11 +132,11 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         /// A <see cref="MethodBase" /> object that represents specified parameters, throws if null.
         /// </returns>
         /// <exception cref="InvalidManagedNameException">
-        /// Values specified with <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> 
+        /// Values specified with <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/>
         /// does not correspond to a method in the <paramref name="assembly"/> instance, or malformed.
         /// </exception>
         /// <remarks>
-        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in 
+        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
         /// <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
         /// </remarks>
         public static MethodBase GetMethod(Assembly assembly, string managedTypeName, string managedMethodName)
@@ -335,7 +335,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
         private static void NormalizeAndAppendString(StringBuilder b, string name)
         {
-            b.Append("'");
+            b.Append('\'');
             for (int i = 0; i < name.Length; i++)
             {
                 char c = name[i];
@@ -348,7 +348,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
                         // b.Append('0', 4 - encoded.Length);
                         // b.Append(encoded);
 
-                        b.Append("\\");
+                        b.Append('\\');
                         b.Append(c);
                         continue;
                     }
@@ -356,7 +356,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
                 b.Append(c);
             }
-            b.Append("'");
+            b.Append('\'');
         }
 
         private static int AppendNestedTypeName(StringBuilder b, Type type)
@@ -439,7 +439,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
 
             if (c == '_'
-              || char.IsLetterOrDigit(c) // Lu, Ll, Lt, Lm, Lo, or Nl 
+              || char.IsLetterOrDigit(c) // Lu, Ll, Lt, Lm, Lo, or Nl
               )
             {
                 return false;
