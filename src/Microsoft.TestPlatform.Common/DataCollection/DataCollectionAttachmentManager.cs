@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             List<AttachmentSet> attachments = new List<AttachmentSet>();
 
-            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out Dictionary<Uri, AttachmentSet> uriAttachmentSetMap))
+            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out var uriAttachmentSetMap))
             {
                 attachments = uriAttachmentSetMap.Values.ToList();
                 this.attachmentTasks.Remove(dataCollectionContext);

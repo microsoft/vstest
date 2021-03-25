@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
         /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
         public static string GetStringArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
         {
-            return argsDictionary.TryGetValue(fullname, out string optionValue) ? optionValue : string.Empty;
+            return argsDictionary.TryGetValue(fullname, out var optionValue) ? optionValue : string.Empty;
         }
     }
 }

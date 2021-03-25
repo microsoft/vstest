@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     var newValue = Convert.ToDouble(metric.Value);
 
-                    if (this.metricsAggregator.TryGetValue(metric.Key, out object oldValue))
+                    if (this.metricsAggregator.TryGetValue(metric.Key, out var oldValue))
                     {
                         var oldDoubleValue = Convert.ToDouble(oldValue);
                         this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;

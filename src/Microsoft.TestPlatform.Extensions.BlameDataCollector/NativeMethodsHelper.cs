@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // WOW64 is the x86 emulator that allows 32 bit Windows - based applications to run seamlessly on 64 bit Windows.
 
             // If the function succeeds, the return value is a nonzero value.
-            if (!IsWow64Process(processHandle, out bool isWow64))
+            if (!IsWow64Process(processHandle, out var isWow64))
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {

@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             // when runsettings specifies platform, that takes precedence over the user specified platform via command line arguments.
             var shouldUpdatePlatform = true;
 
-            TryGetPlatformXml(runSettingsNavigator, out string nodeXml);
+            TryGetPlatformXml(runSettingsNavigator, out var nodeXml);
             if (!string.IsNullOrEmpty(nodeXml))
             {
                 architecture = (Architecture)Enum.Parse(typeof(Architecture), nodeXml, true);
@@ -521,7 +521,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
             {
-                if (!TryGetPlatformXml(runSettingsNavigator, out string nodeXml))
+                if (!TryGetPlatformXml(runSettingsNavigator, out var nodeXml))
                 {
                     throw new XmlException(
                         string.Format(

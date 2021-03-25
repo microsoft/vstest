@@ -264,7 +264,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out object value));
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out var value));
             Assert.AreEqual(4, Convert.ToInt32(value));
         }
 
@@ -281,7 +281,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, out object value));
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, out var value));
             Assert.AreEqual(.04182, value);
         }
 
@@ -298,7 +298,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, out object value));
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, out var value));
             Assert.AreEqual(.04182, value);
         }
 
@@ -315,7 +315,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out object value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out var value));
         }
 
         [TestMethod]
@@ -357,7 +357,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out object value));
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out var value));
             Assert.AreEqual(1, value);
         }
 
@@ -374,7 +374,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out object value));
+            Assert.IsTrue(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out var value));
             Assert.AreEqual(2, value);
         }
 
@@ -388,7 +388,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out object value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out var value));
         }
 
         [TestMethod]
@@ -401,7 +401,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out object value));
+            Assert.IsFalse(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out var value));
         }
     }
 }

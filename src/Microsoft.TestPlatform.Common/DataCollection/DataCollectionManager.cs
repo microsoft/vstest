@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             // Once all data collectors have been initialized, query for environment variables
-            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out bool unloadedAnyCollector);
+            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out var unloadedAnyCollector);
 
             foreach (var variable in dataCollectorEnvironmentVariables.Values)
             {
@@ -648,7 +648,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 var collectorFriendlyName = dataCollectionWrapper.DataCollectorConfig.FriendlyName;
                 foreach (var namevaluepair in dataCollectionWrapper.TestExecutionEnvironmentVariables)
                 {
-                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out DataCollectionEnvironmentVariable alreadyRequestedVariable))
+                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out var alreadyRequestedVariable))
                     {
                         // Dev10 behavior is to consider environment variables values as case sensitive.
                         if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))

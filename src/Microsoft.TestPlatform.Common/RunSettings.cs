@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
 
             // Try and lookup the settings provider.
             ISettingsProvider result = null;
-            this.settings.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> provider);
+            this.settings.TryGetValue(settingsName, out var provider);
 
             // If a provider was found, return it.
             if (provider != null)

@@ -118,7 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     return null;
                 }
 
-                this.nameValuePairs.TryGetValue(name, out string settingValue);
+                this.nameValuePairs.TryGetValue(name, out var settingValue);
                 return settingValue;
             }
 

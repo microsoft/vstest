@@ -79,8 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 TestPluginManager.Instance
                     .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                         TestPlatformConstants.TestAdapterEndsWithPattern,
-                        out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
-                        out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
+                        out var unfilteredTestExtensions,
+                        out var testExtensions);
 
                 testDiscoveryExtensionManager = new TestDiscoveryExtensionManager(
                     testExtensions,
@@ -105,8 +105,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     extensionAssembly,
-                    out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
-                    out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
+                    out var unfilteredTestExtensions,
+                    out var testExtensions);
 
             return new TestDiscoveryExtensionManager(
                 testExtensions,

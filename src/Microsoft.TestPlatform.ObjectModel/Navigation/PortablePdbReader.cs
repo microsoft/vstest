@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             {
                 var methodDebugDefinition = this.reader.GetMethodDebugInformation(handle);
                 var fileName = this.GetMethodFileName(methodDebugDefinition);
-                GetMethodMinAndMaxLineNumber(methodDebugDefinition, out int minLineNumber, out int maxLineNumber);
+                GetMethodMinAndMaxLineNumber(methodDebugDefinition, out var minLineNumber, out var maxLineNumber);
 
                 diaNavigationData = new DiaNavigationData(fileName, minLineNumber, maxLineNumber);
             }

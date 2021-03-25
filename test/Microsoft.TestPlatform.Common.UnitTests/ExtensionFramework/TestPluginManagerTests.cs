@@ -73,8 +73,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
-                out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
+                out var unfilteredTestExtensions,
+                out var testExtensions);
 
             Assert.IsNotNull(unfilteredTestExtensions);
             Assert.IsNotNull(testExtensions);
@@ -89,8 +89,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
-                out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
+                out var unfilteredTestExtensions,
+                out var testExtensions);
 
             // Call this again to verify that discovery is not called again.
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
@@ -111,8 +111,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
-                    out IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions,
-                    out IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions);
+                    out var unfilteredTestExtensions,
+                    out var testExtensions);
 
             Assert.IsNotNull(testExtensions);
             Assert.IsTrue(testExtensions.Count() > 0);

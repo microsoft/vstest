@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             lock (s_properties)
             {
-                if (s_properties.TryGetValue(id, out KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair))
+                if (s_properties.TryGetValue(id, out var propertyTypePair))
                 {
                     result = propertyTypePair.Key;
                 }
@@ -325,7 +325,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             lock (s_properties)
             {
-                if (s_properties.TryGetValue(id, out KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair))
+                if (s_properties.TryGetValue(id, out var propertyTypePair))
                 {
                     // verify the data valueType is valid
                     if (propertyTypePair.Key.ValueType == valueType.AssemblyQualifiedName

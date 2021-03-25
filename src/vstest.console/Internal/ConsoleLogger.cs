@@ -220,19 +220,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
 
-            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosity);
+            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out var verbosity);
             if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
                 this.verbosityLevel = verbosityLevel;
             }
 
-            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
+            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out var prefix);
             if (prefixExists)
             {
                 bool.TryParse(prefix, out AppendPrefix);
             }
 
-            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out string enableProgress);
+            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out var enableProgress);
             if (progressArgExists)
             {
                 bool.TryParse(enableProgress, out EnableProgress);

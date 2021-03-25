@@ -54,8 +54,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             TestPluginManager.Instance.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
                 TestPlatformConstants.DataCollectorEndsWithPattern,
-                out IEnumerable<LazyExtension<DataCollector, Dictionary<string, object>>> unfilteredTestExtensions,
-                out IEnumerable<LazyExtension<DataCollector, IDataCollectorCapabilities>> filteredTestExtensions);
+                out var unfilteredTestExtensions,
+                out var filteredTestExtensions);
 
             return new DataCollectorExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }

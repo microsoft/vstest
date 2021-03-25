@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             ValidateArg.NotNull(e, "DataCollectionEventArgs");
 
 
-            if (this.eventArgsToEventInvokerMap.TryGetValue(e.GetType(), out EventInvoker onEvent))
+            if (this.eventArgsToEventInvokerMap.TryGetValue(e.GetType(), out var onEvent))
             {
                 onEvent(e);
             }

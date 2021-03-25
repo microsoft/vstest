@@ -114,8 +114,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                                out IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredTestExtensions,
-                                out IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> testExtensions);
+                                out var unfilteredTestExtensions,
+                                out var testExtensions);
 
                         settingsProviderExtensionManager = new SettingsProviderExtensionManager(
                             testExtensions, unfilteredTestExtensions, TestSessionMessageLogger.Instance);

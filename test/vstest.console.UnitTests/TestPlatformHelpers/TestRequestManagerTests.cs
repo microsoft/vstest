@@ -308,10 +308,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
             // Verify.
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out object targetDevice));
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out object maxcount));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out object targetPlatform));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out object disableAppDomain));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out var maxcount));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out var targetPlatform));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out var disableAppDomain));
 			Assert.AreEqual("Other", targetDevice);
 			Assert.AreEqual(2, maxcount);
 			Assert.AreEqual("X86", targetPlatform.ToString());
@@ -357,7 +357,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out object targetDevice));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
 			Assert.AreEqual("Local Machine", targetDevice);
 		}
 
@@ -443,7 +443,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out object targetDevice));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
 			Assert.AreEqual("Emulator 8.1 U1 WVGA 4 inch 512MB", targetDevice);
 		}
 
@@ -491,7 +491,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out object commandLineSwitches));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
 			var commandLineArray = commandLineSwitches.ToString();
 
@@ -542,7 +542,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
             // Verify
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out object commandLineSwitches));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
             var commandLineArray = commandLineSwitches.ToString();
 
@@ -589,7 +589,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
             // Verify
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out object commandLineSwitches));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
             var commandLineArray = commandLineSwitches.ToString();
 
@@ -636,7 +636,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out object commandLineSwitches));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
 			var commandLineArray = commandLineSwitches.ToString();
 
@@ -962,7 +962,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
 			// Verify
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out object commandLineSwitches));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
 			var commandLineArray = commandLineSwitches.ToString();
 
@@ -1121,10 +1121,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
             // Verify
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out object targetDevice));
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out object maxcount));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out object targetPlatform));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out object disableAppDomain));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out var maxcount));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out var targetPlatform));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out var disableAppDomain));
 			Assert.AreEqual("Other", targetDevice);
 			Assert.AreEqual(2, maxcount);
 			Assert.AreEqual("X86", targetPlatform.ToString());

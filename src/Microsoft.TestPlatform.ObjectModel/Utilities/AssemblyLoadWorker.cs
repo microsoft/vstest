@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                 var a = Assembly.ReflectionOnlyLoadFrom(path);
                 Debug.Assert(a != null);
-                a.ManifestModule.GetPEKind(out PortableExecutableKinds peKind, out ImageFileMachine machine);
+                a.ManifestModule.GetPEKind(out var peKind, out var machine);
 
                 // conversion to string type is needed for below reason
                 // -- PortableExecutableKinds.Preferred32Bit and ImageFileMachine.ARM is available only
