@@ -178,12 +178,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </returns>
         internal static ICollection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
         {
-            if (null == newAttachments || newAttachments.Count == 0)
+            if (newAttachments == null || newAttachments.Count == 0)
             {
                 return originalAttachmentSets;
             }
 
-            if (null == originalAttachmentSets)
+            if (originalAttachmentSets == null)
             {
                 return new Collection<AttachmentSet>(newAttachments.ToList());
             }
@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             foreach (var attachmentSet in newAttachments)
             {
                 var attSet = originalAttachmentSets.FirstOrDefault(item => Uri.Equals(item.Uri, attachmentSet.Uri));
-                if (null == attSet)
+                if (attSet == null)
                 {
                     originalAttachmentSets.Add(attachmentSet);
                 }
