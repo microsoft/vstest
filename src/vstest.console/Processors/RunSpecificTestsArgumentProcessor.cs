@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (this.selectedTestCases.Count > 0)
             {
-                if (this.undiscoveredFilters.Count() != 0)
+                if (this.undiscoveredFilters.Count != 0)
                 {
                     string missingFilters = string.Join(", ", this.undiscoveredFilters);
                     string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, this.discoveredTestCount, missingFilters);
