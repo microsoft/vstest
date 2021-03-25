@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(executorUri))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "executorUri");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(executorUri));
             }
 
             ExecutorUri = executorUri;
