@@ -89,6 +89,10 @@
       <Version>15.8.3247</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Interop">
+      <Version>$(InteropExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
       <Version>16.3.58</Version>
       <PrivateAssets>All</PrivateAssets>
@@ -103,10 +107,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness">
       <Version>$(MicrosoftFakesVersion)</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="VsWebSite.Interop">
-      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions">

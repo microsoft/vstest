@@ -755,6 +755,7 @@ function Create-VsixPackage
 
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+    $interopExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.InteropExternalsVersion
 
     # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
     $traceDataCollectorPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
@@ -791,6 +792,12 @@ function Create-VsixPackage
     # Copy CUIT Related depedencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\tools\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
+    $fileToRemove = Join-Path $packageDir "Microsoft.VisualStudio.Ole.Interop.dll"
+    Remove-Item $fileToRemove -Force
+
+    # Copy Interop depedencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Interop\$interopExternalsVersion\lib\net45"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net451"
@@ -799,10 +806,6 @@ function Create-VsixPackage
     # Copy Microsoft.Internal.Dia.Interop
     $internalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformExternalsVersion\tools\net451"
     Copy-Item -Recurse $internalDiaInterop\* $packageDir -Force
-
-    # Copy VsWebSite.Interop
-    $vsWebSiteInterop = Join-Path $env:TP_PACKAGES_DIR "VsWebSite.Interop\$testPlatformExternalsVersion\lib\net45"
-    Copy-Item -Recurse $vsWebSiteInterop\* $packageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net451"
