@@ -198,7 +198,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "'{0}' {1}",
-                this.name != null ? this.name : TrxLoggerResources.Common_NullInMessages,
+                this.name ?? TrxLoggerResources.Common_NullInMessages,
                 this.id != null ? this.id.ToString() : TrxLoggerResources.Common_NullInMessages);
         }
 

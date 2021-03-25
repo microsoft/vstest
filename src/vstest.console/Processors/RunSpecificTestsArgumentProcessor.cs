@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.runSettingsManager = runSettingsProvider;
             this.output = output;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
+            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.DiscoveryRequest_OnDiscoveredTests);
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
@@ -300,7 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void discoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
+        private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
         {
             this.discoveredTestCount += args.DiscoveredTestCases.Count();
             foreach (var testCase in args.DiscoveredTestCases)

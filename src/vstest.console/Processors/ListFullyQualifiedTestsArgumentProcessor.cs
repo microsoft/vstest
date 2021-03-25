@@ -252,15 +252,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests += this.DiscoveryRequest_OnDiscoveredTests;
             }
 
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests -= this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests -= this.DiscoveryRequest_OnDiscoveredTests;
             }
 
-            private void discoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
+            private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
             {
                 if (args == null)
                 {
@@ -360,7 +360,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     traitDictionary = GetTraitsInTraitDictionary(traitDictionary, testCase.Traits);
 
                     // Skip test if not fitting filter criteria.
-                    if (filterExpression.MatchTestCase(testCase, p => PropertyValueProvider(p, traitDictionary)) == false)
+                    if (!filterExpression.MatchTestCase(testCase, p => PropertyValueProvider(p, traitDictionary)))
                     {
                         continue;
                     }

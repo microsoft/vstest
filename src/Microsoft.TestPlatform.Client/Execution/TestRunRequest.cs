@@ -622,9 +622,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
                 }
 
-                if (message is VersionedMessage)
+                if (message is VersionedMessage message1)
                 {
-                    var version = ((VersionedMessage)message).Version;
+                    var version = message1.Version;
 
                     rawMessage = this.dataSerializer.SerializePayload(
                         MessageType.ExecutionComplete,
@@ -664,8 +664,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public bool AttachDebuggerToProcess(int pid)
         {
             return this.testRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
-                ? launcher.AttachDebuggerToProcess(pid)
-                : false;
+                    && launcher.AttachDebuggerToProcess(pid);
         }
 
         /// <summary>
