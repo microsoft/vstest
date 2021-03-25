@@ -679,7 +679,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private bool IsTestSourceIsPackage()
         {
-            return string.IsNullOrEmpty(this.package) == false;
+            return !string.IsNullOrEmpty(this.package);
         }
 
         private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTestCases)

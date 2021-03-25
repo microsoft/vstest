@@ -32,12 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="defaultSettingsRootNode">The default settings root node.</param>
         public CodeCoverageRunSettingsProcessor(XmlNode defaultSettingsRootNode)
         {
-            if (defaultSettingsRootNode == null)
-            {
-                throw new ArgumentNullException("Default settings root node is null.");
-            }
-
-            this.defaultSettingsRootNode = defaultSettingsRootNode;
+            this.defaultSettingsRootNode = defaultSettingsRootNode ?? throw new ArgumentNullException("Default settings root node is null.");
         }
         #endregion
 

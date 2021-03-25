@@ -239,15 +239,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests += this.DiscoveryRequest_OnDiscoveredTests;
             }
 
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests -= this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests -= this.DiscoveryRequest_OnDiscoveredTests;
             }
 
-            private void discoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
+            private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
             {
                 // List out each of the tests.
                 foreach (var test in args.DiscoveredTestCases)

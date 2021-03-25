@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (string.IsNullOrEmpty(path))
             {
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
             }
 
             string root = Path.GetDirectoryName(path);

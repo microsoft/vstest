@@ -85,8 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
         private static Guid GetProfilerGuid(string profilerGuid)
         {
-            Guid guid;
-            if (Guid.TryParse(profilerGuid, out guid))
+            if (Guid.TryParse(profilerGuid, out var guid))
             {
                 return guid;
             }
