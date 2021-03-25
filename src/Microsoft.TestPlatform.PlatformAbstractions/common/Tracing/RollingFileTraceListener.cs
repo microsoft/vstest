@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentException(nameof(fileName));
+                throw new ArgumentException("fileName was null or whitespace", nameof(fileName));
             }
 
             if (rollSizeKB <= 0)

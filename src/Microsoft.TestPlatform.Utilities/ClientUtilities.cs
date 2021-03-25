@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             if (xmlDocument == null)
             {
-                throw new ArgumentNullException("xPathNavigator");
+                throw new ArgumentNullException(nameof(xmlDocument));
             }
 
             if (string.IsNullOrEmpty(path))
