@@ -24,7 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private const string CrossPlatformConfiguratorMethodName = "GetCrossPlatformDataCollectorSettings";
 
-        private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
+        private const string FakesConfiguratorAssemblyDev16 = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
+        private const string FakesConfiguratorAssemblyDev17 = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=17.0.0.0, Culture=neutral";
 
         /// <summary>
         /// Dynamically compute the Fakes data collector settings, given a set of test assemblies
@@ -236,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 #if NETFRAMEWORK
             try
             {
-                Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
+                var assembly = LoadTestPlatformAssembly();
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
                 var method = type?.GetMethod(NetFrameworkConfiguratorMethodName, new Type[] { typeof(IEnumerable<string>) });
                 if (method != null)
@@ -259,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             try
             {
-                Assembly assembly = Assembly.Load(new AssemblyName(FakesConfiguratorAssembly));
+                var assembly = LoadTestPlatformAssembly();
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false, false);
                 var method = type?.GetMethod(CrossPlatformConfiguratorMethodName, new Type[] { typeof(IDictionary<string, FrameworkVersion>) });
                 if (method != null)
@@ -276,6 +277,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Testplatform.Fakes has version 16.0 in Dev 16
+        /// and version 17.0 in Dev 17.
+        /// </summary>
+        /// <returns></returns>
+        private static Assembly LoadTestPlatformAssembly()
+        {
+            try
+            {
+                return Assembly.Load(new AssemblyName(FakesConfiguratorAssemblyDev16));
+            }
+            catch
+            {
+                return Assembly.Load(new AssemblyName(FakesConfiguratorAssemblyDev17));
+            }
         }
 
         /// <summary>
