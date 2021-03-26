@@ -64,7 +64,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
             Assert.IsNotNull(allDiscoverers);
-            Assert.IsTrue(allDiscoverers.Count() > 0);
+            Assert.IsTrue(allDiscoverers.Any());
         }
 
         #endregion

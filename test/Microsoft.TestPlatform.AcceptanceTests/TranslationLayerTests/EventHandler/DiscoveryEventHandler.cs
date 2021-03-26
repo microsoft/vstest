@@ -158,7 +158,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            if (discoveredTestCases != null & discoveredTestCases.Count() != 0)
+            if (discoveredTestCases != null & discoveredTestCases.Any())
             {
                 this.DiscoveredTestCases.AddRange(discoveredTestCases);
                 this.BatchSize = discoveredTestCases.Count();

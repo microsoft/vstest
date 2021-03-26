@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.commandLineOptions != null);
             Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
-            if (this.commandLineOptions.Sources.Count() <= 0)
+            if (!this.commandLineOptions.Sources.Any())
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
