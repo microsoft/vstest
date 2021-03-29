@@ -35,12 +35,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 #if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
-            GC.SuppressFinalize(this);
 #else
             // tcpClient.Close() not available for netcoreapp1.0
             this.tcpClient?.Dispose();
-            GC.SuppressFinalize(this);
 #endif
+            GC.SuppressFinalize(this);
         }
 
         [TestMethod]
