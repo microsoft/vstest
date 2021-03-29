@@ -336,6 +336,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 EqtTrace.Error("HtmlLogger : Failed to populate html file. Exception : {0}",
                     ex.ToString());
                 ConsoleOutput.Instance.Error(false, string.Concat(HtmlResource.HtmlLoggerError), ex.Message);
+                return;
             }
             finally
             {
