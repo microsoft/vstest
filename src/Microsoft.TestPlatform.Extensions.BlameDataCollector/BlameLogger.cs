@@ -107,7 +107,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             // Gets the faulty test cases if test aborted
             var testCaseNames = this.GetFaultyTestCaseNames(e);
-            if (testCaseNames.Count() == 0)
+            if (!testCaseNames.Any())
             {
                 return;
             }

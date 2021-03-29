@@ -535,8 +535,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.IsNotNull(receivedRunStatusArgs);
             Assert.AreEqual(this.runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, receivedRunStatusArgs.TestRunStatistics.ExecutedTests);
             Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
-            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
-            Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || receivedRunStatusArgs.ActiveTests.Count() == 0);
+            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Any());
+            Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || !receivedRunStatusArgs.ActiveTests.Any());
 
             // Attachments
             Assert.IsNotNull(receivedattachments);
@@ -568,7 +568,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             // Test run changed event assertions
             Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
-            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
+            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Any());
 
             // verify TC.Source is updated with package
             foreach (var tr in receivedRunStatusArgs.NewTestResults)

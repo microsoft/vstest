@@ -25,12 +25,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         {
             if (string.IsNullOrWhiteSpace(message))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "message");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(message));
             }
 
             if (level < TestMessageLevel.Informational || level > TestMessageLevel.Error)
             {
-                throw new ArgumentOutOfRangeException("level");
+                throw new ArgumentOutOfRangeException(nameof(level));
             }
 
             Level = level;

@@ -242,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             Results.TryAdd(executionId, testResult);
 
-            // Check for parent execution id to store the test results in hierarchical way 
+            // Check for parent execution id to store the test results in hierarchical way
             if (parentExecutionId == Guid.Empty)
             {
                 if (e.Result.Outcome == TestOutcome.Failed)

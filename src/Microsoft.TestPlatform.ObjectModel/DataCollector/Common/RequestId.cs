@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             RequestId other = obj as RequestId;
             if (other == null)
             {
-                throw new ArgumentException(string.Format(Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), "obj");
+                throw new ArgumentException(string.Format(Resources.Common_ObjectMustBeOfType, new object[] { typeof(RequestId).Name }), nameof(obj));
             }
 
             return Id.CompareTo(other.Id);

@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
             SettingsName = settingsName;

@@ -78,7 +78,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             Assert.IsNotNull(unfilteredTestExtensions);
             Assert.IsNotNull(testExtensions);
-            Assert.IsTrue(testExtensions.Count() > 0);
+            Assert.IsTrue(testExtensions.Any());
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                     out var testExtensions);
 
             Assert.IsNotNull(testExtensions);
-            Assert.IsTrue(testExtensions.Count() > 0);
+            Assert.IsTrue(testExtensions.Any());
         }
 
         #region Implementations
