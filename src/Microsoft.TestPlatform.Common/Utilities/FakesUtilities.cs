@@ -24,7 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private const string CrossPlatformConfiguratorMethodName = "GetCrossPlatformDataCollectorSettings";
 
-        private const string FakesConfiguratorAssemblyDev16 = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
         private const string FakesConfiguratorAssemblyDev17 = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=17.0.0.0, Culture=neutral";
 
         /// <summary>
@@ -288,12 +287,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             try
             {
-                return Assembly.Load(new AssemblyName(FakesConfiguratorAssemblyDev16));
-            }
-            catch
-            {
                 return Assembly.Load(new AssemblyName(FakesConfiguratorAssemblyDev17));
             }
+            catch (Exception ex)
+            {
+                EqtTrace.Info("Failed to load assembly {0}. Reason:{1}", FakesConfiguratorAssemblyDev17, ex);
+            }
+            return null;
         }
 
         /// <summary>
