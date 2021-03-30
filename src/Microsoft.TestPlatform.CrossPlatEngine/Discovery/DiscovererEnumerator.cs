@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             try
             {
                 // Collecting Total Number of Adapters Discovered in Machine
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count);
 
                 var context = new DiscoveryContext { RunSettings = settings };
                 context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             ref double totalAdaptersUsed,
             ref double totalTimeTakenByAdapters)
         {
-            if (DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType) == false)
+            if (!DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType))
             {
                 // Fail to instantiate the discoverer type.
                 return;
@@ -311,7 +311,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             var sourcesString = string.Join(" ", sources);
 
             // Print warning on no tests.
-            if (string.IsNullOrEmpty(testCaseFilter) == false)
+            if (!string.IsNullOrEmpty(testCaseFilter))
             {
                 var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
 

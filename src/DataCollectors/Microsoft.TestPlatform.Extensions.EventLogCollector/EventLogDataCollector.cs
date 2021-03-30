@@ -317,7 +317,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
                 eventLogPath,
                 eventLogEntries.Where(
-                    entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).OrderBy(x => x.TimeGenerated).ToList().Take(maxLogEntries).ToList(),
+                    entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).OrderBy(x => x.TimeGenerated).Take(maxLogEntries).ToList(),
                 this.fileHelper);
 
             stopwatch.Stop();
@@ -371,7 +371,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             // Delete all the temp event log directories
             this.RemoveTempEventLogDirs(this.eventLogDirectories);
-            GC.SuppressFinalize(this);
         }
 
         #endregion

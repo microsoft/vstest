@@ -119,9 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     false, BindingFlags.Default, null,
                     null, null, null);
 
-                string procArchType;
-                string frameworkVersion;
-                worker.GetPlatformAndFrameworkSettings(testSource, out procArchType, out frameworkVersion);
+                worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
                 Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
                 FrameworkVersion targetFramework = FrameworkVersion.Framework45;

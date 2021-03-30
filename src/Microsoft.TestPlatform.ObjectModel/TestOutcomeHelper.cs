@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     result = Resources.Resources.TestOutcomeNotFound;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("outcome");
+                    throw new ArgumentOutOfRangeException(nameof(outcome));
             }
 
             return result;

@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             {
                 ManagedNameParser.ParseManagedTypeName(managedTypeName, out var namespaceName, out var typeName);
                 return (namespaceName, typeName);
-            };
+            }
 
             Assert.AreEqual(("NS", "Class"), Parse("NS.Class"));
             Assert.AreEqual(("NS.NS", "Class"), Parse("NS.NS.Class"));

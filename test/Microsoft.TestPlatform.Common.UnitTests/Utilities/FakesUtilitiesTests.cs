@@ -118,7 +118,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
             FakesUtilities.InsertOrReplaceFakesDataCollectorNode(doc, dataCollectorNode2);
             Assert.IsTrue(XmlRunSettingsUtilities.ContainsDataCollector(doc, FakesUtilities.FakesMetadata.DataCollectorUriV2));
             XmlNodeList nodes = doc.SelectNodes("//RunSettings/RunConfiguration/TargetFrameworkVersion");
-            Assert.AreEqual(nodes[0].InnerText, "FrameworkCore10");
+            Assert.AreEqual("FrameworkCore10", nodes[0].InnerText);
         }
     }
 }

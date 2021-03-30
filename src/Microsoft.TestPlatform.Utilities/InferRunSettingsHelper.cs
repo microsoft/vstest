@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
         private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
         private const string EnvironmentVariablesNodePath = @"/RunSettings/RunConfiguration/EnvironmentVariables";
-        private const string multiTargettingForwardLink = @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409";
+        private const string multiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
         // To make things compatible for older runsettings
         private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
@@ -150,9 +150,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             // when runsettings specifies platform, that takes precedence over the user specified platform via command line arguments.
             var shouldUpdatePlatform = true;
-            string nodeXml;
 
-            TryGetPlatformXml(runSettingsNavigator, out nodeXml);
+            TryGetPlatformXml(runSettingsNavigator, out var nodeXml);
             if (!string.IsNullOrEmpty(nodeXml))
             {
                 architecture = (Architecture)Enum.Parse(typeof(Architecture), nodeXml, true);
@@ -522,8 +521,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
             {
-                string nodeXml;
-                if (!TryGetPlatformXml(runSettingsNavigator, out nodeXml))
+                if (!TryGetPlatformXml(runSettingsNavigator, out var nodeXml))
                 {
                     throw new XmlException(
                         string.Format(
