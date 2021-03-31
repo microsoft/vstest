@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(friendlyName))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "friendlyName");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(friendlyName));
             }
 
             FriendlyName = friendlyName;

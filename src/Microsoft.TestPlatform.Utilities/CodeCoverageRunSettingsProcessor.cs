@@ -28,16 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Constructs an <see cref="CodeCoverageRunSettingsProcessor"/> object.
         /// </summary>
-        /// 
+        ///
         /// <param name="defaultSettingsRootNode">The default settings root node.</param>
         public CodeCoverageRunSettingsProcessor(XmlNode defaultSettingsRootNode)
         {
-            if (defaultSettingsRootNode == null)
-            {
-                throw new ArgumentNullException("Default settings root node is null.");
-            }
-
-            this.defaultSettingsRootNode = defaultSettingsRootNode;
+            this.defaultSettingsRootNode = defaultSettingsRootNode ?? throw new ArgumentNullException(nameof(defaultSettingsRootNode), "Default settings root node is null.");
         }
         #endregion
 
@@ -45,9 +40,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Processes the current settings for the code coverage data collector.
         /// </summary>
-        /// 
+        ///
         /// <param name="currentSettings">The code coverage settings.</param>
-        /// 
+        ///
         /// <returns>An updated version of the current run settings.</returns>
         public XmlNode Process(string currentSettings)
         {
@@ -66,11 +61,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Processes the current settings for the code coverage data collector.
         /// </summary>
-        /// 
+        ///
         /// <param name="currentSettingsDocument">
         /// The code coverage settings document.
         /// </param>
-        /// 
+        ///
         /// <returns>An updated version of the current run settings.</returns>
         public XmlNode Process(XmlDocument currentSettingsDocument)
         {
@@ -85,9 +80,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Processes the current settings for the code coverage data collector.
         /// </summary>
-        /// 
+        ///
         /// <param name="currentSettingsRootNode">The code coverage root element.</param>
-        /// 
+        ///
         /// <returns>An updated version of the current run settings.</returns>
         public XmlNode Process(XmlNode currentSettingsRootNode)
         {
@@ -164,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <see cref="XPathNavigator"/> style path. If unable to select the requested node it adds
         /// default settings along the path.
         /// </summary>
-        /// 
+        ///
         /// <param name="currentRootNode">
         /// The root node from the current settings document for the extraction.
         /// </param>
@@ -172,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// The corresponding root node from the default settings document.
         /// </param>
         /// <param name="pathComponents">The path components.</param>
-        /// 
+        ///
         /// <returns>The requested node if successful, <see cref="null"/> otherwise.</returns>
         private XmlNode SelectNodeOrAddDefaults(
             XmlNode currentRootNode,
@@ -181,8 +176,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             var currentNode = currentRootNode;
             var partialPath = new StringBuilder();
-            
-            partialPath.Append(".");
+
+            partialPath.Append('.');
 
             foreach (var component in pathComponents)
             {
@@ -225,9 +220,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Checks if we should process the current exclusion node.
         /// </summary>
-        /// 
+        ///
         /// <param name="node">The current exclusion node.</param>
-        /// 
+        ///
         /// <returns>
         /// <see cref="true"/> if the node should be processed, <see cref="false"/> otherwise.
         /// </returns>
@@ -253,7 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Assembles a relative path from the path given as components.
         /// </summary>
-        /// 
+        ///
         /// <returns>A relative path built from path components.</returns>
         private string BuildPath(IList<string> pathComponents)
         {
@@ -263,10 +258,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Extracts the node specified by the current path using the provided node as root.
         /// </summary>
-        /// 
+        ///
         /// <param name="node">The root to be used for extraction.</param>
         /// <param name="path">The path used to specify the requested node.</param>
-        /// 
+        ///
         /// <returns>The extracted node if successful, <see cref="null"/> otherwise.</returns>
         private XmlNode ExtractNode(XmlNode node, string path)
         {
@@ -287,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Merges the current settings rules with the default settings rules.
         /// </summary>
-        /// 
+        ///
         /// <param name="currentNode">The current settings root node.</param>
         /// <param name="defaultNode">The default settings root node.</param>
         private void MergeNodes(XmlNode currentNode, XmlNode defaultNode)

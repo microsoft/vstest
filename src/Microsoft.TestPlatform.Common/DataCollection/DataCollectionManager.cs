@@ -196,8 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             // Once all data collectors have been initialized, query for environment variables
-            bool unloadedAnyCollector;
-            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out unloadedAnyCollector);
+            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out var unloadedAnyCollector);
 
             foreach (var variable in dataCollectorEnvironmentVariables.Values)
             {
@@ -649,8 +648,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 var collectorFriendlyName = dataCollectionWrapper.DataCollectorConfig.FriendlyName;
                 foreach (var namevaluepair in dataCollectionWrapper.TestExecutionEnvironmentVariables)
                 {
-                    DataCollectionEnvironmentVariable alreadyRequestedVariable;
-                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out alreadyRequestedVariable))
+                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out var alreadyRequestedVariable))
                     {
                         // Dev10 behavior is to consider environment variables values as case sensitive.
                         if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))
@@ -668,8 +666,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                     namevaluepair.Value,
                                     alreadyRequestedVariable.FirstDataCollectorThatRequested,
                                     alreadyRequestedVariable.Value);
-            
-                            if(collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
+
+                            if (collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
                             {
                                 // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios 
                                 EqtTrace.Info(message);
@@ -677,7 +675,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                             else
                             {
                                 dataCollectionWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
-                            }                            
+                            }
                         }
 
                         dataCollectionTelemetryManager.RecordEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value, alreadyRequestedVariable.Value);

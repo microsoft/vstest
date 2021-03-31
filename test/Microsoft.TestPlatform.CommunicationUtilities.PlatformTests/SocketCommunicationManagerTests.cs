@@ -51,6 +51,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 #endif
             this.communicationManager.StopServer();
             this.communicationManager.StopClient();
+            GC.SuppressFinalize(this);
         }
 
         #region Server tests

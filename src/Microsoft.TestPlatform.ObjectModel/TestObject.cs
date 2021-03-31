@@ -184,8 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, "property");
 
-            object value;
-            if (this.store.TryGetValue(property, out value))
+            if (this.store.TryGetValue(property, out var value))
             {
                 this.store.Remove(property);
             }
@@ -243,8 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, "property");
 
-            object value;
-            if (!this.store.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out var value))
             {
                 value = defaultValue;
             }
@@ -330,17 +328,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");
 
-            var lazyValue = value as LazyPropertyValue<T>;
 
             if (value == null)
             {
-                return default(T);
+                return default;
             }
-            else if (value is T)
+            else if (value is T t)
             {
-                return (T)value;
+                return t;
             }
-            else if (lazyValue != null)
+            else if (value is LazyPropertyValue<T> lazyValue)
             {
                 return lazyValue.Value;
             }

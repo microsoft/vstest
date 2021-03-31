@@ -470,6 +470,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             this.communicationEndpoint.Stop();
+            GC.SuppressFinalize(this);
         }
 
         private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)

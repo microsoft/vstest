@@ -38,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
 
             this.reader.Dispose();
             this.writer.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         [TestMethod]

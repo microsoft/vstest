@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             this.proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, CancellationToken.None, this.mockDataSerializer.Object);
+            this.testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, CancellationToken.None);
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
 
             var cancellationTokenSource = new CancellationTokenSource();
-            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, cancellationTokenSource.Token, this.mockDataSerializer.Object);
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, cancellationTokenSource.Token);
 
             testRunEventHandler.HandleRawMessage(string.Empty);
 
@@ -95,7 +95,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
 
             var cancellationTokenSource = new CancellationTokenSource();
-            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, cancellationTokenSource.Token, this.mockDataSerializer.Object);
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, cancellationTokenSource.Token);
             cancellationTokenSource.Cancel();
 
             testRunEventHandler.HandleRawMessage(string.Empty);

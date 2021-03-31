@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             : base(context)
         {
             this.TestCaseId = testCaseId;
-            this.TestCaseName = testCaseName == null ? string.Empty : testCaseName;
+            this.TestCaseName = testCaseName ?? string.Empty;
             this.IsChildTestCase = isChildTestCase;
         }
 

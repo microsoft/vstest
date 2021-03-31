@@ -364,7 +364,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Completed;
             }
 
-            testRunOutcome = changeTestOutcomeIfNecessary(testRunOutcome);
+            testRunOutcome = ChangeTestOutcomeIfNecessary(testRunOutcome);
 
             List<string> errorMessages = new List<string>();
             List<CollectorDataEntry> collectorEntries = this.converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
@@ -763,7 +763,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             return testEntry;
         }
 
-        private TrxLoggerObjectModel.TestOutcome changeTestOutcomeIfNecessary (TrxLoggerObjectModel.TestOutcome outcome)
+        private TrxLoggerObjectModel.TestOutcome ChangeTestOutcomeIfNecessary (TrxLoggerObjectModel.TestOutcome outcome)
         {
             // If no tests discovered/executed and TreatNoTestsAsError was set to True
             // We will return ResultSummary as Failed
