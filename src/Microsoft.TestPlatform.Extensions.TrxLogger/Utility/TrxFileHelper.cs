@@ -72,7 +72,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <returns>Replaced string.</returns>
         public string ReplaceInvalidFileNameChars(string fileName)
         {
-            EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
+            EqtAssert.StringNotNullOrEmpty(fileName, nameof(fileName));
 
             // Replace bad chars by this.
             char replacementChar = '_';
@@ -127,8 +127,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </returns>
         public string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
         {
-            EqtAssert.StringNotNullOrEmpty(parentDirectoryName, "parentDirectoryName");
-            EqtAssert.StringNotNullOrEmpty(originalFileName, "originalFileName");
+            EqtAssert.StringNotNullOrEmpty(parentDirectoryName, nameof(parentDirectoryName));
+            EqtAssert.StringNotNullOrEmpty(originalFileName, nameof(originalFileName));
             return GetNextIterationNameHelper(parentDirectoryName, originalFileName, new FileIterationHelper(checkMatchingDirectory));
         }
 
@@ -146,8 +146,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
         {
             EqtAssert.StringNotNullOrEmpty(directoryName, "parentDirectoryName");
-            EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
-            EqtAssert.StringNotNullOrEmpty(timestampFormat, "timestampFormat");
+            EqtAssert.StringNotNullOrEmpty(fileName, nameof(fileName));
+            EqtAssert.StringNotNullOrEmpty(timestampFormat, nameof(timestampFormat));
 
             ushort iteration = 0;
             var iterationStamp = TimeProvider();
@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         public string MakePathRelative(string path, string basePath)
         {
-            EqtAssert.StringNotNullOrEmpty(path, "path");
+            EqtAssert.StringNotNullOrEmpty(path, nameof(path));
 
             // Can't be relative to nothing
             if (string.IsNullOrEmpty(basePath))

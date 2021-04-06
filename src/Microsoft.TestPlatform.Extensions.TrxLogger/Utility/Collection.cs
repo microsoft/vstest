@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             public void Dispose()
             {
-                
+
             }
         }
         #endregion
@@ -86,7 +86,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="other">The object to copy items from.</param>
         protected EqtBaseCollection(EqtBaseCollection<T> other)
         {
-            EqtAssert.ParameterNotNull(other, "other");
+            EqtAssert.ParameterNotNull(other, nameof(other));
             this.container = new Hashtable(other.container);
         }
         #endregion
@@ -95,7 +95,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         // TODO: Consider putting check for null to derived classes.
         public virtual void Add(T item)
         {
-            EqtAssert.ParameterNotNull(item, "item");
+            EqtAssert.ParameterNotNull(item, nameof(item));
 
             if (!this.container.Contains(item))
             {
@@ -120,7 +120,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <returns>True if collection contained the item, otherwise false.</returns>
         public virtual bool Remove(T item)
         {
-            EqtAssert.ParameterNotNull(item, "item");   // This is to be consistent with Add...
+            EqtAssert.ParameterNotNull(item, nameof(item));   // This is to be consistent with Add...
             if (this.container.Contains(item))
             {
                 this.container.Remove(item);
@@ -154,7 +154,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         public virtual void CopyTo(T[] array, int index)
         {
-            EqtAssert.ParameterNotNull(array, "array");
+            EqtAssert.ParameterNotNull(array, nameof(array));
             this.container.Keys.CopyTo(array, index);
         }
 

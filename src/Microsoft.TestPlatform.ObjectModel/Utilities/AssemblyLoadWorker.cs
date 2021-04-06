@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
         {
-            procArchType = Architecture.Default.ToString();
+            procArchType = nameof(Architecture.Default);
             frameworkVersion = String.Empty;
 
             try

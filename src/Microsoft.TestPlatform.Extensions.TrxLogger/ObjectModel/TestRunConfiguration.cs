@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         internal TestRunConfiguration(string name, TrxFileHelper trxFileHelper)
         {
-            EqtAssert.ParameterNotNull(name, "name");
+            EqtAssert.ParameterNotNull(name, nameof(name));
 
             this.name = name;
             this.runDeploymentRoot = string.Empty;

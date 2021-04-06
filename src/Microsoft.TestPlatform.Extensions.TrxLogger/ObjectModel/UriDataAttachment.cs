@@ -86,7 +86,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            EqtAssert.ParameterNotNull(element, "element");
+            EqtAssert.ParameterNotNull(element, nameof(element));
 
             XmlPersistence helper = new XmlPersistence();
             helper.SaveSimpleField(element, ".", this.description, null);
@@ -141,8 +141,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         private void Initialize(string desc, Uri uri)
         {
-            EqtAssert.ParameterNotNull(desc, "desc");
-            EqtAssert.ParameterNotNull(uri, "uri");
+            EqtAssert.ParameterNotNull(desc, nameof(desc));
+            EqtAssert.ParameterNotNull(uri, nameof(uri));
 
             this.description = desc;
             this.uri = uri;
