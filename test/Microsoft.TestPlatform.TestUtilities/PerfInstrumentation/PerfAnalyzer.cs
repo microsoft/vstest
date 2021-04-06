@@ -180,7 +180,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
             if (key != null)
             {
                 var task = testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
-                long.TryParse(task.PayLoadProperties["numberOfTests"].ToString(), out totalTestsExecuted);
+                long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
             }
 #endif
             return totalTestsExecuted;
