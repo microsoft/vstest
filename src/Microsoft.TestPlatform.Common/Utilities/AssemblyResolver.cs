@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             if (string.IsNullOrEmpty(args?.Name))
             {
-                Debug.Assert(false, "AssemblyResolver.OnResolve: args.Name is null or empty.");
+                Debug.Fail("AssemblyResolver.OnResolve: args.Name is null or empty.");
                 return null;
             }
 

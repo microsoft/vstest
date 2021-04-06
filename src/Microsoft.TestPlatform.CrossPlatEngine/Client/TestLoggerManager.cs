@@ -414,7 +414,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var extensionManager = this.TestLoggerExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {

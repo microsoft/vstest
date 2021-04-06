@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             LazyExtension<TExtension, TMetadata> testExtension = null;
             foreach (var availableExtensionUri in this.TestExtensionByUri.Keys)
             {
-                if (string.Compare(extensionUri, availableExtensionUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(extensionUri, availableExtensionUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
                 {
                     this.TestExtensionByUri.TryGetValue(availableExtensionUri, out testExtension);
                     break;

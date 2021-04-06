@@ -386,7 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
                 {
                     dataCollectorUri = extension.Metadata.ExtensionUri;
                     return true;
@@ -407,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

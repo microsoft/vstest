@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 foreach (AssemblyName referencedAssembly in assemblies)
                 {
                     // Check without version. Only name and public key token.
-                    if (string.Compare(referencedAssembly.Name, referenceAssemblyName, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Equals(referencedAssembly.Name, referenceAssemblyName, StringComparison.OrdinalIgnoreCase))
                     {
                         byte[] publicKeyToken1 = referencedAssembly.GetPublicKeyToken();
 
