@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             string[] invalidProperties = null;
 
-            if (null == properties)
+            if (properties == null)
             {
                 // if null, initialize to empty list so that invalid properties can be found.
                 properties = Enumerable.Empty<string>();
@@ -147,11 +147,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 invalidProperties = this.left.ValidForProperties(properties, propertyProvider);
                 var invalidRight = this.right.ValidForProperties(properties, propertyProvider);
-                if (null == invalidProperties)
+                if (invalidProperties == null)
                 {
                     invalidProperties = invalidRight;
                 }
-                else if (null != invalidRight)
+                else if (invalidRight != null)
                 {
                     invalidProperties = invalidProperties.Concat(invalidRight).ToArray();
                 }
@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
             bool filterResult = false;
-            if (null != this.condition)
+            if (this.condition != null)
             {
                 filterResult = this.condition.Evaluate(propertyValueProvider);
             }

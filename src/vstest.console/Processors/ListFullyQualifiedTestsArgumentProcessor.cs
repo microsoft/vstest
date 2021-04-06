@@ -427,7 +427,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                     else
                     {
-                        if (null == currentTraitValue)
+                        if (currentTraitValue == null)
                         {
                             // if the current trait's value is null, replace the previous value with the current value
                             traitDictionary[trait.Name] = newTraitValueList;
