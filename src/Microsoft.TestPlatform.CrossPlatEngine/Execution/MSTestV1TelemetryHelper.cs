@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 if (adapterTelemetry.ContainsKey(key))
                 {
-                    adapterTelemetry[key] = adapterTelemetry[key] + 1;
+                    adapterTelemetry[key] += 1;
                 }
                 else
                 {
