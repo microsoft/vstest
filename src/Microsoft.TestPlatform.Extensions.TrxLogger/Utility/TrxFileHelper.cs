@@ -133,7 +133,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         }
 
         /// <summary>
-        /// Constructs and returns first available timestamped file name. 
+        /// Constructs and returns first available timestamped file name.
         /// This does not checks for the file permissions.
         /// </summary>
         /// <param name="directoryName">Directory to try timestamped file names in.</param>
@@ -141,7 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="timestampFormat">Timestamp format to be passed into DateTime.ToString method.</param>
         /// <returns>First available filename with the format of `FileName{Timestamp}.ext`.</returns>
         /// <example>
-        ///     <code>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</code> will return "c:\data\log_20200801185521.txt", if available.
+        ///     <c>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</c> will return "c:\data\log_20200801185521.txt", if available.
         /// </example>
         public string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
         {
@@ -208,8 +208,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // and "\\dir1". We need to compare the first non-null token
             // to know if we've got differences.
             int i = 0;
-            for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++) 
-            { 
+            for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++)
+            {
             }
 
             if (i >= max)
