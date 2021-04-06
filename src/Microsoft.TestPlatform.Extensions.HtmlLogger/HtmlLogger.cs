@@ -159,8 +159,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <param name="e"></param>
         public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull(sender, "sender");
-            ValidateArg.NotNull(e, "e");
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             switch (e.Level)
             {
@@ -195,8 +195,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <param name="e"></param>
         public void TestResultHandler(object sender, TestResultEventArgs e)
         {
-            ValidateArg.NotNull(sender, "sender");
-            ValidateArg.NotNull(e, "e");
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             var testResult = new ObjectModel.TestResult
             {

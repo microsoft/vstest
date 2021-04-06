@@ -30,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             try
             {
-                ValidateArg.NotNullOrEmpty(source, "source");
-                ValidateArg.NotNull(referenceAssembly, "referenceAssembly");
+                ValidateArg.NotNullOrEmpty(source, nameof(source));
+                ValidateArg.NotNull(referenceAssembly, nameof(referenceAssembly));
 
                 Debug.Assert(!string.IsNullOrEmpty(source));
 
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <returns></returns>
         public static KeyValuePair<Architecture, FrameworkVersion> GetFrameworkVersionAndArchitectureForSource(string testSource)
         {
-            ValidateArg.NotNullOrEmpty(testSource, "testSource");
+            ValidateArg.NotNullOrEmpty(testSource, nameof(testSource));
 
             var sourceDirectory = Path.GetDirectoryName(testSource);
             var setupInfo = new AppDomainSetup();

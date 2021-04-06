@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public Trait(string name, string value)
         {
-            ValidateArg.NotNull(name, "name");
+            ValidateArg.NotNull(name, nameof(name));
 
             this.Name = name;
             this.Value = value;

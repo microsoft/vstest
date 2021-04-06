@@ -228,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   testHostLauncher)
         {
             var testSources = sources as IList<string> ?? sources.ToList();
-            ValidateArg.NotNullOrEmpty(testSources, "sources");
+            ValidateArg.NotNullOrEmpty(testSources, nameof(sources));
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
@@ -253,7 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             : base(testRunCriteria)
         {
             var testSources = sources as IList<string> ?? sources.ToArray();
-            ValidateArg.NotNullOrEmpty(testSources, "sources");
+            ValidateArg.NotNullOrEmpty(testSources, nameof(sources));
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   runStatsChangeEventTimeout,
                   testHostLauncher)
         {
-            ValidateArg.NotNullOrEmpty(adapterSourceMap, "adapterSourceMap");
+            ValidateArg.NotNullOrEmpty(adapterSourceMap, nameof(adapterSourceMap));
 
             this.AdapterSourceMap = adapterSourceMap;
         }
@@ -400,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             : base(baseTestRunCriteria)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
-            ValidateArg.NotNullOrEmpty(testCases, "tests");
+            ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
             this.Tests = testCases;
         }
@@ -477,7 +477,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   testHostLauncher)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
-            ValidateArg.NotNullOrEmpty(testCases, "tests");
+            ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
             this.Tests = testCases;
             this.TestSessionInfo = testSessionInfo;
@@ -661,7 +661,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="runCriteria">Run criteria to clone.</param>
         public BaseTestRunCriteria(BaseTestRunCriteria runCriteria)
         {
-            ValidateArg.NotNull(runCriteria, "runCriteria");
+            ValidateArg.NotNull(runCriteria, nameof(runCriteria));
 
             this.FrequencyOfRunStatsChangeEvent = runCriteria.FrequencyOfRunStatsChangeEvent;
             this.KeepAlive = runCriteria.KeepAlive;

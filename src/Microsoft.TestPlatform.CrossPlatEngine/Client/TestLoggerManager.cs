@@ -372,7 +372,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Case insensitive needs to be supported "), SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Third party loggers could potentially throw all kinds of exceptions.")]
         internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
         {
-            ValidateArg.NotNull<Uri>(uri, "uri");
+            ValidateArg.NotNull<Uri>(uri, nameof(uri));
             this.CheckDisposed();
 
             // Look up the extension and initialize it if one is found.

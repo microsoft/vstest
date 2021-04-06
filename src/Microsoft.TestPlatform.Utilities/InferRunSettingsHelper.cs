@@ -434,7 +434,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
         {
-            ValidateArg.NotNull(runSettingsNavigator, "runSettingsNavigator");
+            ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
             deviceXml = null;
             XPathNavigator targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);

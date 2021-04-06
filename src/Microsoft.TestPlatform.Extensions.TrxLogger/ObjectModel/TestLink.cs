@@ -24,8 +24,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 throw new ArgumentException("ID cant be empty");
             }
 
-            EqtAssert.StringNotNullOrEmpty(name, "name");
-            EqtAssert.ParameterNotNull(storage, "storage");
+            EqtAssert.StringNotNullOrEmpty(name, nameof(name));
+            EqtAssert.ParameterNotNull(storage, nameof(storage));
 
             this.id = id;
             this.name = name;

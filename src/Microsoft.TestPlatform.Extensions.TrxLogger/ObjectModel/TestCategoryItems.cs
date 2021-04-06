@@ -139,7 +139,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="items">Add these items to the collection.</param>
         public TestCategoryItemCollection(string[] items)
         {
-            EqtAssert.ParameterNotNull(items, "items");
+            EqtAssert.ParameterNotNull(items, nameof(items));
             foreach (string s in items)
             {
                 this.Add(s);
@@ -165,7 +165,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="item">Category to be added.</param>
         public override void Add(TestCategoryItem item)
         {
-            EqtAssert.ParameterNotNull(item, "item");
+            EqtAssert.ParameterNotNull(item, nameof(item));
 
             // Don't add empty items.
             if (!String.IsNullOrEmpty(item.TestCategory))

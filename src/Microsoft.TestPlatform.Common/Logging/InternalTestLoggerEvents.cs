@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args">Arguments to to be raised.</param>
         internal void RaiseTestResult(TestResultEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             this.CheckDisposed();
 
@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args">Arguments to be raised.</param>
         internal void RaiseTestRunStart(TestRunStartEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             CheckDisposed();
 
@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args">Arguments to be raised.</param>
         internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             CheckDisposed();
 
@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args">Arguments to be raised.</param>
         internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             this.CheckDisposed();
 
@@ -257,7 +257,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args"> Arguments to be raised. </param>
         internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             CheckDisposed();
 
@@ -270,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args"> Arguments to be raised. </param>
         internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             CheckDisposed();
 
@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args"> Arguments to be raised </param>
         internal void RaiseTestRunComplete(TestRunCompleteEventArgs args)
         {
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(args, nameof(args));
 
             CheckDisposed();
 
@@ -341,8 +341,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         private void SafeInvokeAsync(Func<MulticastDelegate> eventHandlersFactory, EventArgs args, int size, string traceDisplayName)
         {
-            ValidateArg.NotNull(eventHandlersFactory, "eventHandlersFactory");
-            ValidateArg.NotNull(args, "args");
+            ValidateArg.NotNull(eventHandlersFactory, nameof(eventHandlersFactory));
+            ValidateArg.NotNull(args, nameof(args));
 
             // Invoke the handlers on a background thread.
             this.loggerEventQueue.QueueJob(

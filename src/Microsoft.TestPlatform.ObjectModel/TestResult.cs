@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {
@@ -221,7 +221,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         protected override void ProtectedSetPropertyValue(TestProperty property, object value)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {

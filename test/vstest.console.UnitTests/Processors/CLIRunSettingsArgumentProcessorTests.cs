@@ -292,7 +292,7 @@ namespace vstest.console.UnitTests.Processors
             runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
-            var args = new string[] { $"RunConfiguration.TargetPlatform={Architecture.ARM.ToString()}" };
+            var args = new string[] { $"RunConfiguration.TargetPlatform={nameof(Architecture.ARM)}" };
             this.executor.Initialize(args);
 
             Assert.IsTrue(this.commandLineOptions.ArchitectureSpecified);

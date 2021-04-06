@@ -230,8 +230,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull(sender, "sender");
-            ValidateArg.NotNull(e, "e");
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             RunInfo runMessage;
 

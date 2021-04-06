@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private TestPlatformDataCollectionEvents events;
 
         /// <summary>
-        /// Specifies whether the object is disposed or not. 
+        /// Specifies whether the object is disposed or not.
         /// </summary>
         private bool disposed;
 
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
             }
 
-            ValidateArg.NotNull(settingsXml, "settingsXml");
+            ValidateArg.NotNull(settingsXml, nameof(settingsXml));
 
             var sessionId = new SessionId(Guid.NewGuid());
             var dataCollectionContext = new DataCollectionContext(sessionId);
@@ -669,7 +669,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
                             if (collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
                             {
-                                // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios 
+                                // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios
                                 EqtTrace.Info(message);
                             }
                             else

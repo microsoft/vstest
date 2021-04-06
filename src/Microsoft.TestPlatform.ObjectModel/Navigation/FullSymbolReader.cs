@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol)
         {
-            ValidateArg.NotNull(symbol, "symbol");
+            ValidateArg.NotNull(symbol, nameof(symbol));
 
             DiaNavigationData navigationData = new DiaNavigationData(null, int.MaxValue, int.MinValue);
 
@@ -309,7 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private IDiaSymbol GetTypeSymbol(string typeName, SymTagEnum symTag)
         {
-            ValidateArg.NotNullOrEmpty(typeName, "typeName");
+            ValidateArg.NotNullOrEmpty(typeName, nameof(typeName));
 
             IDiaEnumSymbols enumSymbols = null;
             IDiaSymbol typeSymbol = null;
@@ -376,8 +376,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private IDiaSymbol GetMethodSymbol(IDiaSymbol typeSymbol, string methodName)
         {
-            ValidateArg.NotNull(typeSymbol, "typeSymbol");
-            ValidateArg.NotNullOrEmpty(methodName, "methodName");
+            ValidateArg.NotNull(typeSymbol, nameof(typeSymbol));
+            ValidateArg.NotNullOrEmpty(methodName, nameof(methodName));
 
             IDiaEnumSymbols enumSymbols = null;
             IDiaSymbol methodSymbol = null;
