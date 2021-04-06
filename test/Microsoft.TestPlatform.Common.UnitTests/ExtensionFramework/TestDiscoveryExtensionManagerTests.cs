@@ -89,7 +89,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestDiscovererMetadataCtorDoesNotThrowWhenFileExtensionsIsEmpty()
         {
-            var metadata = new TestDiscovererMetadata(new List<string> {}, null);
+            var metadata = new TestDiscovererMetadata(new List<string>(), null);
 
             Assert.IsNull(metadata.FileExtension);
         }
@@ -97,7 +97,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestDiscovererMetadataCtorDoesNotThrowWhenDefaultUriIsNull()
         {
-            var metadata = new TestDiscovererMetadata(new List<string> { }, null);
+            var metadata = new TestDiscovererMetadata(new List<string>(), null);
 
             Assert.IsNull(metadata.DefaultExecutorUri);
         }
@@ -105,7 +105,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestDiscovererMetadataCtorDoesNotThrowWhenDefaultUriIsEmpty()
         {
-            var metadata = new TestDiscovererMetadata(new List<string> { }, " ");
+            var metadata = new TestDiscovererMetadata(new List<string>(), " ");
 
             Assert.IsNull(metadata.DefaultExecutorUri);
         }
