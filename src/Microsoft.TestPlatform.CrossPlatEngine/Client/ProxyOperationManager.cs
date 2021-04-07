@@ -239,9 +239,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
             var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
-            if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
-                new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
+            if ((!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal)) ||
+                (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
             {
                 ConsoleOutput.Instance.WriteLine(
                     CrossPlatEngineResources.HostDebuggerWarning,
