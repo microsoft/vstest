@@ -27,7 +27,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
             {
                 Directory.CreateDirectory(dirPath);
                 logFile = Path.Combine(dirPath, "trace.log");
-
             }
             catch(Exception ex)
             {

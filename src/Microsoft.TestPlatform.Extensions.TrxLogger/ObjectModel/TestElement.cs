@@ -45,7 +45,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             this.adapter = adapter;
         }
 
-
         /// <summary>
         /// Gets the id.
         /// </summary>

@@ -120,7 +120,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         double oldDoubleValue = Convert.ToDouble(oldValue);
                         this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                     }
-
                     else
                     {
                         this.metricsAggregator.TryAdd(metric.Key, newValue);

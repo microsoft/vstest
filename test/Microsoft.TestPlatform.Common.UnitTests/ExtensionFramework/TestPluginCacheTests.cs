@@ -368,7 +368,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         #endregion
 
-
         private void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
         {
             TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);

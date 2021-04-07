@@ -81,6 +81,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             Assert.AreEqual(ArgumentProcessorResult.Success, this.executor.Execute());
         }
-
     }
 }

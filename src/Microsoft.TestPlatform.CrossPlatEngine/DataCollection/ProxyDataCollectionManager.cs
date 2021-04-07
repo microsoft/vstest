@@ -131,7 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
             this.LogEnabledDataCollectors();
-
         }
 
         /// <summary>

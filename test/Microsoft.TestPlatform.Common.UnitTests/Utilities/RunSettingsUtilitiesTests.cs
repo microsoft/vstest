@@ -121,5 +121,4 @@ namespace TestPlatform.Common.UnitTests.Utilities
 
         public static string StringToVerify = string.Empty;
     }
-
 }

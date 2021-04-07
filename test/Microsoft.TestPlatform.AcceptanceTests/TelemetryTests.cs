@@ -84,7 +84,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateOutput("Execution");
         }
 
-
         private void DiscoverTests(string runnerFramework)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
@@ -128,7 +127,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         isValid = isPresent;
                         break;
                     }
-
                     else if (line.Contains(TelemetryDataConstants.TestDiscoveryCompleteEvent) && command.Equals("Discovery", StringComparison.Ordinal))
                     {
                         var isPresent = line.Contains(TelemetryDataConstants.TotalTestsDiscovered + '=' + "3")

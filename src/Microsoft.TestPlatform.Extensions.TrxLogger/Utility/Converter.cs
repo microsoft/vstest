@@ -192,7 +192,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return collectorEntries;
         }
 
-
         public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
             List<string> errorMessages)
         {
@@ -730,6 +729,5 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 new TestResultAggregation(runId, testId, executionId, parentExecutionId, resultName, Environment.MachineName, outcome, testType, testCategoryId, trxFileHelper) :
                 new UnitTestResult(runId, testId, executionId, parentExecutionId, resultName, Environment.MachineName, outcome, testType, testCategoryId, trxFileHelper);
         }
-
     }
 }

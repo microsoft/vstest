@@ -181,7 +181,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.activeTestRun.Abort();
             }
-
         }
 
         #endregion

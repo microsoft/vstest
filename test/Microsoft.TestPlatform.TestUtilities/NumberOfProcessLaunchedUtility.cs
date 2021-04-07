@@ -83,7 +83,6 @@ namespace TestPlatform.TestUtilities
 
         private static IEnumerable<Process> GetProcesses(IEnumerable<string> processNames)
         {
-
             var processes = new List<Process>();
             foreach (var processName in processNames)
             {

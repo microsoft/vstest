@@ -107,7 +107,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
         {
-
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,

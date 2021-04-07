@@ -134,7 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return updatedRunSettingsXml;
         }
 
-
         /// <summary>
         /// Updates the run settings XML with the specified values.
         /// </summary>
@@ -701,7 +700,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
         }
-
 
         /// <summary>
         /// Returns true if source Platform is incompatible with target platform.

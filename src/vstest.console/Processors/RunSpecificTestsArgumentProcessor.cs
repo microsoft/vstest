@@ -293,7 +293,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
-
         /// <summary>
         /// Filter discovered tests and find matching tests from given search strings.
         /// Any name of the test that can match multiple strings will be added only once.

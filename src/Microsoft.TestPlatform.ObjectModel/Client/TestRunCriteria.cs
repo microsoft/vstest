@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         public TestRunCriteria(
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -244,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// Create the TestRunCriteria for a test run.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="testRunCriteria">The test run criteria.</param>
         public TestRunCriteria(
@@ -260,13 +260,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
             this.TestCaseFilter = testRunCriteria.testCaseFilter;
             this.FilterOptions = testRunCriteria.filterOptions;
-
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="adapterSourceMap">
         /// Sources which contains tests that should be executed.
         /// </param>
@@ -303,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         public TestRunCriteria(
@@ -319,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -340,7 +339,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -364,7 +363,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -393,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="baseTestRunCriteria">The base test run criteria.</param>
         public TestRunCriteria(IEnumerable<TestCase> tests, BaseTestRunCriteria baseTestRunCriteria)
@@ -408,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -443,7 +442,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -657,7 +656,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="runCriteria">Run criteria to clone.</param>
         public BaseTestRunCriteria(BaseTestRunCriteria runCriteria)
         {
@@ -673,7 +672,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -685,7 +684,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -700,7 +699,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -723,7 +722,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -751,7 +750,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -813,7 +812,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets the frequency of run stats test event.
         /// </summary>
-        /// 
+        ///
         /// <remarks>
         /// Run stats change event will be raised after completion of these number of tests.
         /// Note that this event is raised asynchronously and the underlying execution process is not

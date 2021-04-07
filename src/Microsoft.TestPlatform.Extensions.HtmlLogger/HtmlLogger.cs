@@ -287,7 +287,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             };
             if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
-
                 var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
                 if (framework != null)
                 {

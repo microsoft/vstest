@@ -215,7 +215,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateDump(2);
         }
 
-
         private void ValidateDump(int expectedDumpCount = 1)
         {
             var attachments = this.StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)

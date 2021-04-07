@@ -54,7 +54,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             public void Dispose()
             {
-
             }
         }
         #endregion

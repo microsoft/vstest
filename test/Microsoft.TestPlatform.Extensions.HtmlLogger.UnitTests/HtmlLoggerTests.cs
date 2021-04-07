@@ -182,7 +182,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldKeepTrackOfSkippedResult()
         {
-
             var skipTestCase1 = CreateTestCase("Skip1");
             var skipResult1 = new ObjectModel.TestResult(skipTestCase1) { Outcome = TestOutcome.Skipped };
 
@@ -509,7 +508,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
             var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
 
-
             this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
                 {
                 }).Returns(new Mock<Stream>().Object);
@@ -536,7 +534,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.mockFileHelper.Verify(x => x.Delete(It.IsAny<string>()), Times.Once);
         }
-
 
         [TestMethod]
         public void TestCompleteHandlerShouldCallHtmlTransformerCorrectly()
@@ -576,7 +573,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         [TestMethod]
         public void TestCompleteHandlerShouldNotDivideByZeroWhenThereAre0TestResults()
         {
-
             this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
             {
             }).Returns(new Mock<Stream>().Object);

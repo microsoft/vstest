@@ -394,7 +394,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
 
-
             this.ReserveTrxFilePath();
             this.PopulateTrxFile(this.trxFilePath, rootElement);
         }
@@ -519,7 +518,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                 filePath = trxFileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
             }
-
             else if (isLogFileNameParameterExists)
             {
                 filePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
@@ -544,7 +542,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private string SetDefaultTrxFilePath()
         {
             var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
-            
+
             return trxFileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 
