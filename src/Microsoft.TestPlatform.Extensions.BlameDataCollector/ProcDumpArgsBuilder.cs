@@ -25,10 +25,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             foreach (var exceptionFilter in procDumpExceptionsList)
             {
-                procDumpArgument.Append("-f ").Append(exceptionFilter).Append(' ');
+                procDumpArgument.Append($"-f {exceptionFilter} ");
             }
 
-            procDumpArgument.Append(processId).Append(' ').Append(filename).Append(".dmp");
+            procDumpArgument.Append($"{processId} {filename}.dmp");
             var argument = procDumpArgument.ToString();
 
             return argument;
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 procDumpArgument.Append(" -ma");
             }
 
-            procDumpArgument.Append(' ').Append(processId).Append(' ').Append(filename).Append(".dmp");
+            procDumpArgument.Append($" {processId} {filename}.dmp");
             var argument = procDumpArgument.ToString();
 
             return argument;
