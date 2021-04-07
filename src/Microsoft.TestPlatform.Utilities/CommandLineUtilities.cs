@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                             else
                             {
                                 currentArg.Append('\\', (cSlashes >> 1));
-                                if ((cSlashes & 1) != 0)
+                                if (0 != (cSlashes & 1))
                                 {
                                     currentArg.Append('"');
                                 }

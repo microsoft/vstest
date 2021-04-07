@@ -218,7 +218,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             EqtAssert.StringNotNullOrEmpty(agentName, nameof(agentName));
             EqtAssert.StringNotNullOrEmpty(agentDisplayName, nameof(agentDisplayName));
 
-            if (attachments != null)
+            if (null != attachments)
             {
                 // Copy the attachments
                 foreach (IDataAttachment attachment in attachments)

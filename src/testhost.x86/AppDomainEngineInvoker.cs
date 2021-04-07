@@ -286,7 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
                 finally
                 {
-                    if (assembly == null)
+                    if (null == assembly)
                     {
                         EqtTrace.Verbose("CurrentDomainAssemblyResolve: Failed to resolve assembly '{0}'.", args.Name);
                     }
