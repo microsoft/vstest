@@ -579,11 +579,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             StoreXmlAttribute locationAttribute = GetAttribute<StoreXmlAttribute>(fieldInfo);
             if (locationAttribute != null)
             {
-                location = locationAttribute.Location;
-                if (location == null)
-                {
-                    location = GetDefaultFieldLocation(fieldInfo);
-                }
+                location = locationAttribute.Location ?? GetDefaultFieldLocation(fieldInfo);
             }
 
             return location;
