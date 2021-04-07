@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // InProcess should not have any values or arguments
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => this.executor.Initialize("true"),
-                "Argument " + "true" + " is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.");
+                "Argument true is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.");
         }
 
         [TestMethod]

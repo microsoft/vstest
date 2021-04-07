@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                         && line.Contains(TelemetryDataConstants.TimeTakenInSecByAllAdapters)
                                         && line.Contains(TelemetryDataConstants.TotalTestsByAdapter)
                                         && line.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter)
-                                        && line.Contains(TelemetryDataConstants.DiscoveryState + "=" + "Completed")
+                                        && line.Contains(TelemetryDataConstants.DiscoveryState + "=Completed")
                                         && line.Contains(TelemetryDataConstants.NumberOfSourcesSentForDiscovery + '=' + "1")
                                         && line.Contains(
                                             TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery)
