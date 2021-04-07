@@ -582,7 +582,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             string resultsDirectory)
         {
             var childNode = xmlDocument.SelectSingleNode(ResultsDirectoryNodePath);
-            if (null != childNode)
+            if (childNode != null)
             {
                 resultsDirectory = childNode.InnerXml;
             }

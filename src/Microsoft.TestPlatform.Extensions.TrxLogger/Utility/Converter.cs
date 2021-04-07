@@ -193,7 +193,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         }
 
 
-        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory, 
+        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
             List<string> errorMessages)
         {
             List<String> resultFiles = new List<string>();
@@ -216,8 +216,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                         string errorMsg = string.Format(
                             CultureInfo.CurrentCulture,
                             TrxLoggerResources.FailureToAttach,
-                            attachmentSet.DisplayName, 
-                            e.GetType().ToString(), 
+                            attachmentSet.DisplayName,
+                            e.GetType().ToString(),
                             e);
 
                         if (EqtTrace.IsErrorEnabled)
@@ -312,7 +312,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             TestProperty tmiTestIdProperty = rockSteadyTestCase.Properties.FirstOrDefault(
                                              property => property.Id.Equals(Constants.TmiTestIdPropertyIdentifier));
 
-            if (null != tmiTestIdProperty)
+            if (tmiTestIdProperty != null)
                 testId = rockSteadyTestCase.GetPropertyValue(tmiTestIdProperty, Guid.Empty);
 
             // If tmi test id not present, picking from platform test id.
@@ -419,8 +419,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     string errorMsg = string.Format(
                         CultureInfo.CurrentCulture,
                         TrxLoggerResources.FailureToAttach,
-                        attachmentSet.DisplayName, 
-                        e.GetType().ToString(), 
+                        attachmentSet.DisplayName,
+                        e.GetType().ToString(),
                         e);
 
                     if (EqtTrace.IsErrorEnabled)
@@ -478,7 +478,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 }
 
                 string sourceFile = uriDataAttachment.Uri.LocalPath;
-                
+
                 var rooted = (Path.GetFullPath(sourceFile) == sourceFile);
                 Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
 
