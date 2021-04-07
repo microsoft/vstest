@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="testEngine">The test engine.</param>
         /// <param name="filehelper">The file helper.</param>
         /// <param name="testHostProviderManager">The data.</param>
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// Updates the test adapter paths provided through run settings to be used by the test
         /// service.
         /// </summary>
-        /// 
+        ///
         /// <param name="runSettings">The run settings.</param>
         private void AddExtensionAssemblies(string runSettings)
         {
@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     var extensionAssemblies = new List<string>(
                         this.fileHelper.EnumerateFiles(
                             adapterPath,
-                            SearchOption.AllDirectories, 
+                            SearchOption.AllDirectories,
                             TestPlatformConstants.TestAdapterEndsWithPattern,
                             TestPlatformConstants.TestLoggerEndsWithPattern,
                             TestPlatformConstants.DataCollectorEndsWithPattern,
@@ -288,7 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Updates the extension assemblies from source directory.
         /// </summary>
-        /// 
+        ///
         /// <param name="testRunCriteria">The test run criteria.</param>
         private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
         {
@@ -305,7 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Updates the test logger paths from source directory.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">The list of sources.</param>
         private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
         {

@@ -30,7 +30,7 @@ namespace TestPlatform.TestUtilities
         {
             return await NumberOfProcessCreated(cts, new[] { processName });
         }
-            
+
         public static async Task<ICollection<string>> NumberOfProcessCreated(CancellationTokenSource cts, IEnumerable<string> processNames)
         {
             var processesBeforeRun = GetProcesses(processNames);

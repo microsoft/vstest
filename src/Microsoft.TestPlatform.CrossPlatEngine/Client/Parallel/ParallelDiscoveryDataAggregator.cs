@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     internal class ParallelDiscoveryDataAggregator
     {
         #region PrivateFields
-                
+
         private object dataUpdateSyncObject = new object();
         private ConcurrentDictionary<string, object> metricsAggregator;
 

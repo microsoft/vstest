@@ -670,7 +670,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 loggerParams[Constants.TreatNoTestsAsError] = treatNoTestsAsError.ToString();
             }
-            
+
             return loggerParams;
         }
 
