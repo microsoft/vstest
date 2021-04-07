@@ -329,7 +329,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             if (arity > 0 && methodArity == arity)
             {
-                methodBuilder.Append($"`{arity}");
+                methodBuilder.Append('`').Append(arity);
             }
         }
 
