@@ -233,12 +233,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var dumps = attachments
-                .Where(a => a.EndsWith(".dmp"))
                 // On Windows we might collect conhost which tells us nothing
                 // or WerFault in case we would start hanging during crash
                 // we don't want these to make cross-platform checks more difficult
                 // so we filter them out.
-                .Where(a => !a.Contains("WerFault") && !a.Contains("conhost"))
+                .Where(a => a.EndsWith(".dmp") && !a.Contains("WerFault") && !a.Contains("conhost"))
                 .Select(a => a.Trim()).ToList();
 
             if (dumps.Count < expectedDumpCount)
