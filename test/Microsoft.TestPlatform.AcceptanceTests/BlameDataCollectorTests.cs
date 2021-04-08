@@ -115,7 +115,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
-        // should make no difference, keeping for easy debug
+        // should make no difference, keeping for easy debug 
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void HangDumpOnTimeout(RunnerInfo runnerInfo)
         {
@@ -131,9 +131,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        // net5.0 does not suppord dump on exit
+        // net5.0 does not suppord dump on exit        
         [NetCoreRunner("net452;net472;netcoreapp3.1")]
-        // should make no difference, keeping for easy debug
+        // should make no difference, keeping for easy debug 
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
 
         public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
@@ -152,7 +152,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         // net5.0 does not suppord dump on exit
         [NetCoreRunner("net452;net472;netcoreapp3.1")]
-        // should make no difference, keeping for easy debug
+        // should make no difference, keeping for easy debug 
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
 
         public void CrashDumpOnExit(RunnerInfo runnerInfo)
@@ -170,7 +170,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
-        // should make no difference, keeping for easy debug
+        // should make no difference, keeping for easy debug 
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
         {
@@ -187,7 +187,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner(NET50)]
-        // should make no difference, keeping for easy debug
+        // should make no difference, keeping for easy debug 
         // [NetFrameworkRunner(NET50)]
         public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
         {
@@ -202,7 +202,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
-        // should make no difference, keeping for easy debug
+        // should make no difference, keeping for easy debug 
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void HangDumpChildProcesses(RunnerInfo runnerInfo)
         {
@@ -233,7 +233,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var dumps = attachments
                 .Where(a => a.EndsWith(".dmp"))
-                // On Windows we might collect conhost which tells us nothing
+                // On Windows we might collect conhost which tells us nothing 
                 // or WerFault in case we would start hanging during crash
                 // we don't want these to make cross-platform checks more difficult
                 // so we filter them out.
@@ -273,14 +273,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 err.AppendLine("Expected all dumps in the list of attachments to exist, and not be empty, but:");
                 if (nonExistingDumps.Any())
                 {
-                    err.Append(nonExistingDumps.Count).AppendLine(" don't exist:")
-                    .AppendJoin(Environment.NewLine, nonExistingDumps).AppendLine();
+                    err.AppendLine($"{nonExistingDumps.Count} don't exist:")
+                    .AppendLine(string.Join(Environment.NewLine, nonExistingDumps));
                 }
 
                 if (emptyDumps.Any())
                 {
-                    err.Append(emptyDumps.Count).AppendLine(" are empty:")
-                    .AppendJoin(Environment.NewLine, emptyDumps).AppendLine();
+                    err.AppendLine($"{emptyDumps.Count} are empty:")
+                    .AppendLine(string.Join(Environment.NewLine, emptyDumps));
                 }
 
                 err.AppendLine("Reported attachments:")

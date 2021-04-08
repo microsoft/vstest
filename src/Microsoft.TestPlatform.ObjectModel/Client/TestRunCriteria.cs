@@ -592,16 +592,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(CultureInfo.CurrentCulture, "TestRunCriteria:").AppendLine();
-            sb.AppendFormat(
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "TestRunCriteria:"));
+            sb.AppendLine(string.Format(
                     CultureInfo.CurrentCulture,
                     "   KeepAlive={0},FrequencyOfRunStatsChangeEvent={1},RunStatsChangeEventTimeout={2},TestCaseFilter={3},TestExecutorLauncher={4}",
                     this.KeepAlive,
                     this.FrequencyOfRunStatsChangeEvent,
                     this.RunStatsChangeEventTimeout,
                     this.TestCaseFilter,
-                    this.TestHostLauncher).AppendLine();
-            sb.AppendFormat(CultureInfo.CurrentCulture, "   Settingsxml={0}", this.TestRunSettings).AppendLine();
+                    this.TestHostLauncher));
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   Settingsxml={0}", this.TestRunSettings));
 
             return sb.ToString();
         }

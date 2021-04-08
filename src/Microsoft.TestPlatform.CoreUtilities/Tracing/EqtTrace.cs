@@ -728,23 +728,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             // Format this exception
             StringBuilder message = new StringBuilder();
-            message.AppendFormat(
+            message.Append(
+                string.Format(
                     CultureInfo.InvariantCulture,
                     "Exception: {0}{1}Message: {2}{3}Stack Trace: {4}",
                     exceptionToTrace.GetType(),
                     prefix,
                     exceptionToTrace.Message,
                     prefix,
-                    exceptionToTrace.StackTrace);
+                    exceptionToTrace.StackTrace));
 
             // If there is base exception, add that to message
             if (exceptionToTrace.GetBaseException() != null)
             {
-                message.AppendFormat(
+                message.Append(
+                    string.Format(
                         CultureInfo.InvariantCulture,
                         "{0}BaseExceptionMessage: {1}",
                         prefix,
-                        exceptionToTrace.GetBaseException().Message);
+                        exceptionToTrace.GetBaseException().Message));
             }
 
             // If there is inner exception, add that to message
@@ -755,7 +757,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // "InnerException" is prefixed to each line
                 Exception inner = exceptionToTrace.InnerException;
                 prefix += "InnerException";
-                message.AppendFormat(
+                message.Append(
+                    string.Format(
                         CultureInfo.InvariantCulture,
                         "{0}: {1}{2} Message: {3}{4} Stack Trace: {5}",
                         prefix,
@@ -763,15 +766,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         prefix,
                         inner.Message,
                         prefix,
-                        inner.StackTrace);
+                        inner.StackTrace));
 
                 if (inner.GetBaseException() != null)
                 {
-                    message.AppendFormat(
+                    message.Append(
+                        string.Format(
                             CultureInfo.InvariantCulture,
                             "{0}BaseExceptionMessage: {1}",
                             prefix,
-                            inner.GetBaseException().Message);
+                            inner.GetBaseException().Message));
                 }
             }
 

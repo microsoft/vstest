@@ -30,11 +30,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(CultureInfo.CurrentCulture, "FilterOptions:").AppendLine();
-            sb.AppendFormat(CultureInfo.CurrentCulture,
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "FilterOptions:"));
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture,
                 "   FilterRegEx={0}   FilterRegExReplacement={1}",
                 this.FilterRegEx ?? string.Empty,
-                this.FilterRegExReplacement ?? string.Empty).AppendLine();
+                this.FilterRegExReplacement ?? string.Empty));
             return sb.ToString();
         }
 
