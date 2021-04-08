@@ -42,6 +42,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             // tcpClient.Close() not available for netcoreapp1.0
             this.tcpClient?.Dispose();
 #endif
+            GC.SuppressFinalize(this);
         }
 
         [TestMethod]

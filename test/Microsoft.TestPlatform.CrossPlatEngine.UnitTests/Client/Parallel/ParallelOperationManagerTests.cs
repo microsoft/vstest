@@ -106,7 +106,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.proxyParallelManager.AddManager(new SampleConcurrentClass(true), new SampleHandlerClass());
 
             Assert.AreEqual(3, this.proxyParallelManager.GetConcurrentManagersCount());
-            Assert.AreEqual(1, this.proxyParallelManager.GetConcurrentManagerInstances().Where(m => m.CheckValue == true).Count());
+            Assert.AreEqual(1, this.proxyParallelManager.GetConcurrentManagerInstances().Count(m => m.CheckValue));
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.proxyParallelManager.RemoveManager(manager);
 
             Assert.AreEqual(2, this.proxyParallelManager.GetConcurrentManagersCount());
-            Assert.AreEqual(0, this.proxyParallelManager.GetConcurrentManagerInstances().Where(m => m.CheckValue == true).Count());
+            Assert.AreEqual(0, this.proxyParallelManager.GetConcurrentManagerInstances().Count(m => m.CheckValue));
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.proxyParallelManager.UpdateHandlerForManager(manager, new SampleHandlerClass());
 
             Assert.AreEqual(3, this.proxyParallelManager.GetConcurrentManagersCount());
-            Assert.AreEqual(1, this.proxyParallelManager.GetConcurrentManagerInstances().Where(m => m.CheckValue == true).Count());
+            Assert.AreEqual(1, this.proxyParallelManager.GetConcurrentManagerInstances().Count(m => m.CheckValue));
         }
 
         [TestMethod]

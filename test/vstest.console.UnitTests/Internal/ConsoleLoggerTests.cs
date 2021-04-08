@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             Assert.ThrowsException<ArgumentNullException>(() =>
            {
-               loggerEvents.RaiseTestRunMessage(default(TestRunMessageEventArgs));
+               loggerEvents.RaiseTestRunMessage(default);
            });
         }
 
@@ -233,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                loggerEvents.RaiseTestResult(default(TestResultEventArgs));
+                loggerEvents.RaiseTestResult(default);
             });
         }
 

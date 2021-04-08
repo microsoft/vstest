@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             if (extensionType == null)
             {
-                throw new ArgumentNullException("extensionType");
+                throw new ArgumentNullException(nameof(extensionType));
             }
 
             EqtTrace.Info("TestPluginManager.CreateTestExtension: Attempting to load test extension: " + extensionType);

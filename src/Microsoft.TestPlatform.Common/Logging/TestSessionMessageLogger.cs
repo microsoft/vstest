@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             if (string.IsNullOrWhiteSpace(message))
             {
-                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "message");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(message));
             }
 
             if (this.TreatTestAdapterErrorsAsWarnings

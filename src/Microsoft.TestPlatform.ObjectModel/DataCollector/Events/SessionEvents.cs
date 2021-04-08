@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             ValidateArg.NotNullOrEmpty(property, "property");
 
-            this.Properties.TryGetValue(property, out object propertyValue);
+            this.Properties.TryGetValue(property, out var propertyValue);
 
             return propertyValue;
         }

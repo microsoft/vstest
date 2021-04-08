@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The proxy Data Collection Manager.
         /// </param>
         public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
-            : this(baseTestRunEventsHandler, proxyDataCollectionManager, cancellationToken, JsonDataSerializer.Instance)
+            : this(baseTestRunEventsHandler, proxyDataCollectionManager, JsonDataSerializer.Instance, cancellationToken)
         {
         }
 
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataSerializer">
         /// The data Serializer.
         /// </param>
-        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken, IDataSerializer dataSerializer)
+        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
         {
             this.proxyDataCollectionManager = proxyDataCollectionManager;
             this.testRunEventsHandler = baseTestRunEventsHandler;
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleRawMessage(string rawMessage)
         {
-            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete 
+            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
             if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
@@ -178,20 +178,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </returns>
         internal static ICollection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
         {
-            if (null == newAttachments || newAttachments.Count == 0)
+            if (newAttachments == null || newAttachments.Count == 0)
             {
                 return originalAttachmentSets;
             }
 
-            if (null == originalAttachmentSets)
+            if (originalAttachmentSets == null)
             {
                 return new Collection<AttachmentSet>(newAttachments.ToList());
             }
 
             foreach (var attachmentSet in newAttachments)
             {
-                var attSet = originalAttachmentSets.Where(item => Uri.Equals(item.Uri, attachmentSet.Uri)).FirstOrDefault();
-                if (null == attSet)
+                var attSet = originalAttachmentSets.FirstOrDefault(item => Uri.Equals(item.Uri, attachmentSet.Uri));
+                if (attSet == null)
                 {
                     originalAttachmentSets.Add(attachmentSet);
                 }

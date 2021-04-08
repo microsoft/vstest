@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var fileOutput = File.ReadAllLines(this.dummyFilePath);
             Assert.IsTrue(fileOutput.Length == 1);
             Assert.IsTrue(fileOutput.Contains("Test1"));
-            Assert.IsTrue(!fileOutput.Contains("Test2"));
+            Assert.IsFalse(fileOutput.Contains("Test2"));
         }
 
         [ExpectedException(typeof(CommandLineException))]

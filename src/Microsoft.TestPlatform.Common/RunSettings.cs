@@ -69,13 +69,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         {
             if (StringUtilities.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
             // Try and lookup the settings provider.
             ISettingsProvider result = null;
-            LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> provider;
-            this.settings.TryGetValue(settingsName, out provider);
+            this.settings.TryGetValue(settingsName, out var provider);
 
             // If a provider was found, return it.
             if (provider != null)

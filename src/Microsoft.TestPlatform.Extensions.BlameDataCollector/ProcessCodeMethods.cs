@@ -128,9 +128,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             try
             {
                 var handle = process.Handle;
-                PROCESS_BASIC_INFORMATION pbi;
-                int size;
-                var res = NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out size);
+                var res = NtQueryInformationProcess(handle, 0, out var pbi, Marshal.SizeOf<PROCESS_BASIC_INFORMATION>(), out int size);
 
                 var p = res != 0 ? InvalidProcessId : pbi.InheritedFromUniqueProcessId.ToInt32();
 

@@ -27,7 +27,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var extensionManager = TestExecutorExtensionManager.Create();
 
             Assert.IsNotNull(extensionManager.TestExtensions);
-            Assert.IsTrue(extensionManager.TestExtensions.Count() > 0);
+            Assert.IsTrue(extensionManager.TestExtensions.Any());
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             TestExecutorExtensionManager.Create();
 
             Assert.IsNotNull(extensionManager.TestExtensions);
-            Assert.IsTrue(extensionManager.TestExtensions.Count() > 0);
+            Assert.IsTrue(extensionManager.TestExtensions.Any());
         }
 
         [TestMethod]
@@ -50,7 +50,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                     typeof(TestExecutorExtensionManagerTests).GetTypeInfo().Assembly.Location);
 
             Assert.IsNotNull(extensionManager.TestExtensions);
-            Assert.IsTrue(extensionManager.TestExtensions.Count() > 0);
+            Assert.IsTrue(extensionManager.TestExtensions.Any());
         }
 
         #region LoadAndInitialize tests

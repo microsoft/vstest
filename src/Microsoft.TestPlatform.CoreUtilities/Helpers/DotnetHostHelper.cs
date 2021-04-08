@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <inheritdoc />
         public string GetDotnetPath()
         {
-            if (!TryGetExecutablePath("dotnet", out string dotnetPath))
+            if (!TryGetExecutablePath("dotnet", out var dotnetPath))
             {
                 string errorMessage = string.Format(Resources.NoDotnetExeFound, "dotnet");
 
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public string GetMonoPath()
         {
-            if (!TryGetExecutablePath(MONOEXENAME, out string monoPath))
+            if (!TryGetExecutablePath(MONOEXENAME, out var monoPath))
             {
                 string errorMessage = string.Format(Resources.NoDotnetExeFound, MONOEXENAME);
 

@@ -92,7 +92,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var resultsDir = GetResultsDirectory();
 
-            var testAssembly = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"'); ;
+            var testAssembly = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
             testAssembly = testAssembly.Replace("SimpleTestProject2.dll", "*TestProj*.dll");
 

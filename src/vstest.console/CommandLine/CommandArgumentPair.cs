@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(input))
             {
-                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "input");
+                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(input));
             }
             Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
 
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(command))
             {
-                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "command");
+                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(command));
             }
 
             Contract.Ensures(Command == command);
