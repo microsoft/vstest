@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     try
                     {
-                        System.Reflection.Metadata.AssemblyExtensions.ApplyUpdate(args.LoadedAssembly, update.MetadataDelta, update.ILDelta, update.PdbDelta);
+                        AssemblyExtensions.ApplyUpdate(args.LoadedAssembly, update.MetadataDelta, update.ILDelta, update.PdbDelta);
                         File.AppendAllText(@"C:\repos\tempFile.txt", $"added {args.LoadedAssembly.FullName}");
                     }
                     catch (Exception e)
@@ -178,18 +178,16 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         [Serializable]
         private struct Update
         {
-            public Update(byte[] iLDelta, byte[] metadataDelta, byte[] pdbDelta, int[] updatedMethods)
+            public Update(byte[] iLDelta, byte[] metadataDelta, byte[] pdbDelta)
             {
                 this.ILDelta = iLDelta;
                 this.MetadataDelta = metadataDelta;
                 this.PdbDelta = pdbDelta;
-                this.UpdatedMethods = updatedMethods;
             }
 
             public byte[] ILDelta;
             public byte[] MetadataDelta;
             public byte[] PdbDelta;
-            public int[] UpdatedMethods;
         }
 #endif
 
