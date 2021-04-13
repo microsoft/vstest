@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ITestRunEventsHandler testRunEventsHandler;
         private ITestEventsPublisher testEventsPublisher;
         private ITestRunCache testRunCache;
-        private string package;
+        private protected string package;
         private IRequestData requestData;
 
         /// <summary>
