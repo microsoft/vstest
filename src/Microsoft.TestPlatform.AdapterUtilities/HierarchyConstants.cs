@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities
             /// <summary>
             /// Total length of Hierarchy array.
             /// </summary>
-            public const int TotalLevelCount = 4;
+            public const int TotalLevelCount = 2;
 
             /// <summary>
             /// Index of the namespace element of the array.
@@ -37,16 +37,6 @@ namespace Microsoft.TestPlatform.AdapterUtilities
             /// Index of the class element of the array.
             /// </summary>
             public const int ClassIndex = 1;
-
-            /// <summary>
-            /// Index of the test group element of the array.
-            /// </summary>
-            public const int TestGroupIndex = 2;
-
-            /// <summary>
-            /// Index of the display name element of the array.
-            /// </summary>
-            public const int DisplayNameIndex = 3;
         }
     }
 }
