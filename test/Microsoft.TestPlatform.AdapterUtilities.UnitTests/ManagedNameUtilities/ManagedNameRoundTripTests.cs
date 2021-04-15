@@ -839,7 +839,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             string expectedManagedMethodName)
         {
             // Generate the fqn for the Reflection MethodInfo
-            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName);
+            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName, out var hierarchyValues);
 
             Assert.AreEqual(expectedManagedTypeName, managedTypeName);
             Assert.AreEqual(expectedManagedMethodName, managedMethodName);

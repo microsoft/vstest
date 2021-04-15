@@ -47,6 +47,42 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
         /// <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
         /// </remarks>
         public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName)
+            => GetManagedName(method, out managedTypeName, out managedMethodName, out _);
+
+        /// <summary>
+        /// Gets fully qualified managed type and method name from given <see href="MethodBase" /> instance.
+        /// </summary>
+        /// <param name="method">
+        /// A <see cref="MethodBase" /> instance to get fully qualified managed type and method name.
+        /// </param>
+        /// <param name="managedTypeName">
+        /// When this method returns, contains the fully qualified managed type name of the <paramref name="method"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedtype-property">the RFC</see>.
+        /// </param>
+        /// <param name="managedMethodName">
+        /// When this method returns, contains the fully qualified managed method name of the <paramref name="method"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// The format is defined in <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md#managedmethod-property">the RFC</see>.
+        /// </param>
+        /// <param name="hierarchyValues">
+        /// When this method returns, contains the default test hierarchy values of the <paramref name="method"/>.
+        /// This parameter is passed uninitialized; any value originally supplied in result will be overwritten.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="method"/> is null.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="method"/> must describe a method.
+        /// </exception>
+        /// <exception cref="NotImplementedException">
+        /// Required functionality on <paramref name="method"/> is missing on the current platform.
+        /// </exception>
+        /// <remarks>
+        /// More information about <paramref name="managedTypeName"/> and <paramref name="managedMethodName"/> can be found in
+        /// <see href="https://github.com/microsoft/vstest-docs/blob/master/RFCs/0017-Managed-TestCase-Properties.md">the RFC</see>.
+        /// </remarks>
+        public static void GetManagedName(MethodBase method, out string managedTypeName, out string managedMethodName, out string[] hierarchyValues)
         {
             if (method == null)
             {
@@ -84,7 +120,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             var methodBuilder = new StringBuilder();
 
             // Namespace and Type Name (with arity designation)
-            AppendTypeString(typeBuilder, semanticType, closedType: false);
+            var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: false);
 
             // Method Name with method arity
             var arity = method.GetGenericArguments().Length;
@@ -111,6 +147,10 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 
             managedTypeName = typeBuilder.ToString();
             managedMethodName = methodBuilder.ToString();
+            hierarchyValues = new[] {
+                managedTypeName.Substring(hierarchyPos[0], hierarchyPos[1] - hierarchyPos[0]),
+                managedTypeName.Substring(hierarchyPos[1] + 1, hierarchyPos[2] - hierarchyPos[1] - 1),
+            };
         }
 
         /// <summary>
@@ -233,11 +273,13 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
 #endif
         }
 
-        private static void AppendTypeString(StringBuilder b, Type type, bool closedType)
+        private static int[] AppendTypeString(StringBuilder b, Type type, bool closedType)
         {
+            int[] hierarchies = null;
+
             if (type.IsArray)
             {
-                AppendTypeString(b, type.GetElementType(), closedType);
+                hierarchies = AppendTypeString(b, type.GetElementType(), closedType);
                 b.Append('[');
                 for (int i = 0; i < type.GetArrayRank() - 1; i++)
                 {
@@ -256,16 +298,23 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             }
             else
             {
+                hierarchies = new int[3];
+                hierarchies[0] = b.Length;
+
                 AppendNamespace(b, type.Namespace);
+                hierarchies[1] = b.Length;
+
                 b.Append('.');
 
                 AppendNestedTypeName(b, type);
-
                 if (closedType)
                 {
                     AppendGenericTypeParameters(b, type);
                 }
+                hierarchies[2] = b.Length;
             }
+
+            return hierarchies;
         }
 
         private static void AppendNamespace(StringBuilder b, string namespaceString)
