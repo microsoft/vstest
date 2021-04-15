@@ -76,8 +76,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.Helpers
                         }
                         else
                         {
-                            stringBuilder.Append(escapedStringSegment[i + 1]);
-                            i++;
+                            stringBuilder.Append(escapedStringSegment[++i]);
                         }
 
                         break;
