@@ -168,6 +168,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ICollection<AttachmentSet> runContextAttachments,
                 ICollection<string> executorUris)
         {
+            // When we abort the run we might have saved the error before we gave the handler the chance to abort
+            // if the handler does not return with any new error we report the original one.
             if (testRunCompleteArgs.IsAborted && testRunCompleteArgs.Error == null && this.messageProcessingUnrecoverableError != null)
             {
                 var curentArgs = testRunCompleteArgs;
@@ -388,11 +390,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             this.testHostManagerFactoryReady.Wait();
                             var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
-                            var a = true;
-                            if (a)
-                            {
-                                throw new InvalidOperationException("fffffaaaail!");
-                            }
                             Action job = () =>
                             {
                                 EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
