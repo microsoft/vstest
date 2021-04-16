@@ -788,7 +788,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         sourceName,
                         frameworkString);
 
-                    
+
                     ConsoleColor? color = null;
                     if (sourceOutcome == TestOutcome.Failed)
                     {
@@ -831,7 +831,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
                 else if (e.IsAborted)
                 {
-                    Output.Error(false, CommandLineResources.TestRunAborted);
+                    if (e.Error == null)
+                    {
+                        Output.Error(false, CommandLineResources.TestRunAborted);
+                    }
+                    else
+                    {
+                        Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
+                    }
                 }
 
                 return;
@@ -843,7 +850,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else if (e.IsAborted)
             {
-                Output.Error(false, CommandLineResources.TestRunAborted);
+                if (e.Error == null)
+                {
+                    Output.Error(false, CommandLineResources.TestRunAborted);
+                }
+                else
+                {
+                    Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
+                }
             }
             else if (failedTests > 0 || this.testRunHasErrorMessages)
             {
