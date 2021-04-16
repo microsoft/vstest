@@ -41,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private ManualResetEventSlim sessionCompleted;
         private Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
         private Action<Message> onAttachDebuggerAckRecieved;
+        private Exception messageProcessingUnrecoverableError;
 
         public TestHostConnectionInfo ConnectionInfo { get; set; }
 
@@ -167,6 +168,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ICollection<AttachmentSet> runContextAttachments,
                 ICollection<string> executorUris)
         {
+            if (testRunCompleteArgs.IsAborted && testRunCompleteArgs.Error == null && this.messageProcessingUnrecoverableError != null)
+            {
+                var curentArgs = testRunCompleteArgs;
+                testRunCompleteArgs = new TestRunCompleteEventArgs(
+                    curentArgs.TestRunStatistics,
+                    curentArgs.IsCanceled,
+                    curentArgs.IsAborted,
+                    this.messageProcessingUnrecoverableError,
+                    curentArgs.AttachmentSets, curentArgs.ElapsedTimeInRunningTests
+                    );
+            }
             var data = this.dataSerializer.SerializePayload(
                     MessageType.ExecutionComplete,
                     new TestRunCompletePayload
@@ -257,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("TestRequestHandler.ProcessRequests: received message: {0}", message);
+                EqtTrace.Info("TestRequestHandler.OnMessageReceived: received message: {0}", message);
             }
 
             switch (message.MessageType)
@@ -312,6 +324,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     }
                     catch (Exception ex)
                     {
+                        this.messageProcessingUnrecoverableError = ex;
                         EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
                         EqtTrace.Error(ex);
                         goto case MessageType.AbortTestRun;
@@ -334,6 +347,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         }
                         catch (Exception ex)
                         {
+                            this.messageProcessingUnrecoverableError = ex;
                             EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
                             EqtTrace.Error(ex);
                             goto case MessageType.AbortTestRun;
@@ -359,6 +373,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         }
                         catch (Exception ex)
                         {
+                            this.messageProcessingUnrecoverableError = ex;
                             EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
                             EqtTrace.Error(ex);
                             goto case MessageType.AbortTestRun;
@@ -373,6 +388,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             this.testHostManagerFactoryReady.Wait();
                             var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                            var a = true;
+                            if (a)
+                            {
+                                throw new InvalidOperationException("fffffaaaail!");
+                            }
                             Action job = () =>
                             {
                                 EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
@@ -382,6 +402,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         }
                         catch (Exception ex)
                         {
+                            this.messageProcessingUnrecoverableError = ex;
                             EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
                             EqtTrace.Error(ex);
                             goto case MessageType.AbortTestRun;
@@ -412,6 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         }
                         catch (Exception ex)
                         {
+                            this.messageProcessingUnrecoverableError = ex;
                             EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
                             EqtTrace.Error(ex);
                             goto case MessageType.AbortTestRun;
@@ -444,6 +466,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         }
                         catch (Exception ex)
                         {
+                            this.messageProcessingUnrecoverableError = ex;
                             EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
                             EqtTrace.Error(ex);
                             goto case MessageType.AbortTestRun;
