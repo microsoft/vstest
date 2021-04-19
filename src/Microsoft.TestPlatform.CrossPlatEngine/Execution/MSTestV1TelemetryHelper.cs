@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     internal class MSTestV1TelemetryHelper
     {
-
         private static TestProperty testTypeProperty;
         private static TestProperty extensionIdProperty;
 
@@ -31,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 if (testTypeProperty == null)
                 {
-                    // this is present when the legacy runner is used, and contains a guid which 
-                    // is the test type. 
+                    // this is present when the legacy runner is used, and contains a guid which
+                    // is the test type.
                     // GenericTestType 982B8C01-1A8A-48F5-B98A-67EE64BC8687
                     // OrderedTestType ec4800e8-40e5-4ab3-8510-b8bf29b1904d
                     // UnitTestType 13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B
@@ -79,14 +78,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 if (adapterTelemetry.ContainsKey(key))
                 {
-                    adapterTelemetry[key] = adapterTelemetry[key] + 1;
+                    adapterTelemetry[key]++;
                 }
                 else
                 {
-                    adapterTelemetry.Add(key, 1);
+                    adapterTelemetry[key] =  1;
                 }
             }
         }
-
     }
 }

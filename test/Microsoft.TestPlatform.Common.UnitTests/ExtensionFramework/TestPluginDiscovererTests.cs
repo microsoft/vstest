@@ -306,7 +306,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                 DataCollectionLogger logger,
                 DataCollectionEnvironmentContext environmentContext)
             {
-
             }
         }
 
@@ -330,7 +329,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                 DataCollectionLogger logger,
                 DataCollectionEnvironmentContext environmentContext)
             {
-
             }
         }
         #endregion

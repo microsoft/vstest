@@ -193,7 +193,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             return
                 object.ReferenceEquals(left, right) ||
-                !object.ReferenceEquals(left, null) && left.ValueEquals(right);
+                (!object.ReferenceEquals(left, null) && left.ValueEquals(right));
         }
 
         /// <summary>

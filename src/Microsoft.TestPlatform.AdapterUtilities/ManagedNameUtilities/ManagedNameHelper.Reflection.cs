@@ -265,7 +265,6 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities
             methods = type.GetRuntimeMethods().Where(m => filter(m, null)).ToArray();
 #endif
 
-
 #if NET20
             return (MethodInfo)SingleOrDefault(methods);
 #else

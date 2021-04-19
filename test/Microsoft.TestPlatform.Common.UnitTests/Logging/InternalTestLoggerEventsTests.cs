@@ -568,7 +568,4 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
             return loggerEvents;
         }
     }
-
-
-
 }

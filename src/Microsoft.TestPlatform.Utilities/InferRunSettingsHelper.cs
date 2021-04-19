@@ -134,7 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return updatedRunSettingsXml;
         }
 
-
         /// <summary>
         /// Updates the run settings XML with the specified values.
         /// </summary>
@@ -434,7 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
         {
-            ValidateArg.NotNull(runSettingsNavigator, "runSettingsNavigator");
+            ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
             deviceXml = null;
             XPathNavigator targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);
@@ -582,7 +581,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             string resultsDirectory)
         {
             var childNode = xmlDocument.SelectSingleNode(ResultsDirectoryNodePath);
-            if (null != childNode)
+            if (childNode != null)
             {
                 resultsDirectory = childNode.InnerXml;
             }
@@ -701,7 +700,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
         }
-
 
         /// <summary>
         /// Returns true if source Platform is incompatible with target platform.

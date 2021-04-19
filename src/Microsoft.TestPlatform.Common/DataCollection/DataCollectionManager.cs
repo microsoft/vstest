@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private TestPlatformDataCollectionEvents events;
 
         /// <summary>
-        /// Specifies whether the object is disposed or not. 
+        /// Specifies whether the object is disposed or not.
         /// </summary>
         private bool disposed;
 
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
             }
 
-            ValidateArg.NotNull(settingsXml, "settingsXml");
+            ValidateArg.NotNull(settingsXml, nameof(settingsXml));
 
             var sessionId = new SessionId(Guid.NewGuid());
             var dataCollectionContext = new DataCollectionContext(sessionId);
@@ -386,7 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
                 {
                     dataCollectorUri = extension.Metadata.ExtensionUri;
                     return true;
@@ -407,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -669,7 +669,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
                             if (collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
                             {
-                                // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios 
+                                // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios
                                 EqtTrace.Info(message);
                             }
                             else

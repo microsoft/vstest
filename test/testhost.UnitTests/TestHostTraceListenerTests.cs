@@ -6,7 +6,7 @@
 
 namespace testhost.UnitTests
 {
-#if NETCOREAPP 
+#if NETCOREAPP
     using Microsoft.VisualStudio.TestPlatform.TestHost;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
@@ -22,8 +22,8 @@ namespace testhost.UnitTests
         {
             this.listeners = new TraceListener[Trace.Listeners.Count];
             Trace.Listeners.CopyTo(this.listeners, 0);
-            // not using the TestHostTraceListener.Setup method here 
-            // because that detects only default trace listeners and there won't 
+            // not using the TestHostTraceListener.Setup method here
+            // because that detects only default trace listeners and there won't
             // be any when this is in production, so this would end up testing against
             // an older version of the trace listener
             Trace.Listeners.Clear();
@@ -120,9 +120,9 @@ namespace testhost.UnitTests
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new DefaultTraceListener());
             TestHostTraceListener.Setup();
-            
-            // this is what will happen in the majority of cases, there will be a single 
-            // trace listener that will be the default trace listener and we will replace it 
+
+            // this is what will happen in the majority of cases, there will be a single
+            // trace listener that will be the default trace listener and we will replace it
             // with ours
             Assert.IsInstanceOfType(Trace.Listeners[0], typeof(TestHostTraceListener));
         }

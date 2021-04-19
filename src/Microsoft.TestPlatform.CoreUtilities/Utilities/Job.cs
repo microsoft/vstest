@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns> The wait job. </returns>
         public static Job<TPayload> CreateWaitJob(ManualResetEvent waitEvent)
         {
-            ValidateArg.NotNull<ManualResetEvent>(waitEvent, "waitEvent");
+            ValidateArg.NotNull<ManualResetEvent>(waitEvent, nameof(waitEvent));
             var waitJob = new Job<TPayload>();
             waitJob.WaitManualResetEvent = waitEvent;
 

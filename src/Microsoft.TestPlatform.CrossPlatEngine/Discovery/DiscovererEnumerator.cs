@@ -237,7 +237,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 totalAdaptersUsed++;
 
-
                 EqtTrace.Verbose("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Done loading tests for {0}",
                         discoverer.Value.GetType().FullName);
 
@@ -330,7 +329,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
         }
 
-
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
         {
             var discoveryMessageLogger = messageLogger as TestSessionMessageLogger;
@@ -400,7 +398,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                                                 Path.GetExtension(source),
                                                 StringComparer.OrdinalIgnoreCase))
                                        select source).ToList(); // ToList is required to actually execute the query
-
 
                 // Update the source list for which no matching source is available.
                 if (matchingSources.Any())
@@ -499,6 +496,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return null;
             }
         }
-
     }
 }

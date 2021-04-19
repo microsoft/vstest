@@ -60,9 +60,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
             IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
             IMessageLogger logger)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, "settingsProviders");
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, "unfilteredSettingsProviders");
-            ValidateArg.NotNull<IMessageLogger>(logger, "logger");
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, nameof(settingsProviders));
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, nameof(unfilteredSettingsProviders));
+            ValidateArg.NotNull<IMessageLogger>(logger, nameof(logger));
 
             this.settingsProviders = settingsProviders;
             this.UnfilteredSettingsProviders = unfilteredSettingsProviders;

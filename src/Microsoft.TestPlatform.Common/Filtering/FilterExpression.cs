@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             else
             {
-                Debug.Assert(false, "ProcessOperator called for Unexpected operator.");
+                Debug.Fail("ProcessOperator called for Unexpected operator.");
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Empty));
             }
         }

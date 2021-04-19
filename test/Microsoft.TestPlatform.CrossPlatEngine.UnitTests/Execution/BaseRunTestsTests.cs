@@ -30,7 +30,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using OMTestResult =  Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-
     using Moq;
     using Microsoft.TestPlatform.TestUtilities;
 
@@ -590,7 +589,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             Assert.IsNotNull(receivedRunStatusArgs.ActiveTests);
             Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
-
 
             foreach (var tc in receivedRunStatusArgs.ActiveTests)
             {

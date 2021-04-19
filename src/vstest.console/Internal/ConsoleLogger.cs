@@ -429,8 +429,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunStartEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunStartEventArgs>(e, nameof(e));
 
             // Print all test containers.
             Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
@@ -448,8 +448,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunMessageEventArgs>(e, nameof(e));
 
             switch (e.Level)
             {
@@ -513,8 +513,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestResultHandler(object sender, TestResultEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestResultEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestResultEventArgs>(e, nameof(e));
 
             var testDisplayName = e.Result.DisplayName;
 

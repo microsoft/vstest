@@ -39,8 +39,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="parentCategoryId">Id of parent category. Use TestListCategoryId.Root for top level categories.</param>
         public TestListCategory(string name, TestListCategoryId parentCategoryId)
         {
-            EqtAssert.StringNotNullOrEmpty(name, "name");
-            EqtAssert.ParameterNotNull(parentCategoryId, "parentCategoryId");
+            EqtAssert.StringNotNullOrEmpty(name, nameof(name));
+            EqtAssert.ParameterNotNull(parentCategoryId, nameof(parentCategoryId));
 
             this.name = name;
             this.parentCategoryId = parentCategoryId;
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </param>
         private TestListCategory(string name, TestListCategoryId id, TestListCategoryId parentId) : this(name, parentId)
         {
-            EqtAssert.ParameterNotNull(id, "id");
+            EqtAssert.ParameterNotNull(id, nameof(id));
             this.id = id;
         }
 

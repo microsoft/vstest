@@ -72,7 +72,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <returns>Replaced string.</returns>
         public string ReplaceInvalidFileNameChars(string fileName)
         {
-            EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
+            EqtAssert.StringNotNullOrEmpty(fileName, nameof(fileName));
 
             // Replace bad chars by this.
             char replacementChar = '_';
@@ -127,13 +127,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </returns>
         public string GetNextIterationFileName(string parentDirectoryName, string originalFileName, bool checkMatchingDirectory)
         {
-            EqtAssert.StringNotNullOrEmpty(parentDirectoryName, "parentDirectoryName");
-            EqtAssert.StringNotNullOrEmpty(originalFileName, "originalFileName");
+            EqtAssert.StringNotNullOrEmpty(parentDirectoryName, nameof(parentDirectoryName));
+            EqtAssert.StringNotNullOrEmpty(originalFileName, nameof(originalFileName));
             return GetNextIterationNameHelper(parentDirectoryName, originalFileName, new FileIterationHelper(checkMatchingDirectory));
         }
 
         /// <summary>
-        /// Constructs and returns first available timestamped file name. 
+        /// Constructs and returns first available timestamped file name.
         /// This does not checks for the file permissions.
         /// </summary>
         /// <param name="directoryName">Directory to try timestamped file names in.</param>
@@ -141,13 +141,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="timestampFormat">Timestamp format to be passed into DateTime.ToString method.</param>
         /// <returns>First available filename with the format of `FileName{Timestamp}.ext`.</returns>
         /// <example>
-        ///     <code>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</code> will return "c:\data\log_20200801185521.txt", if available.
+        ///     <c>GetNextTimestampFileName("c:\data", "log.txt", "_yyyyMMddHHmmss")</c> will return "c:\data\log_20200801185521.txt", if available.
         /// </example>
         public string GetNextTimestampFileName(string directoryName, string fileName, string timestampFormat)
         {
             EqtAssert.StringNotNullOrEmpty(directoryName, "parentDirectoryName");
-            EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
-            EqtAssert.StringNotNullOrEmpty(timestampFormat, "timestampFormat");
+            EqtAssert.StringNotNullOrEmpty(fileName, nameof(fileName));
+            EqtAssert.StringNotNullOrEmpty(timestampFormat, nameof(timestampFormat));
 
             ushort iteration = 0;
             var iterationStamp = TimeProvider();
@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         public string MakePathRelative(string path, string basePath)
         {
-            EqtAssert.StringNotNullOrEmpty(path, "path");
+            EqtAssert.StringNotNullOrEmpty(path, nameof(path));
 
             // Can't be relative to nothing
             if (string.IsNullOrEmpty(basePath))
@@ -208,8 +208,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // and "\\dir1". We need to compare the first non-null token
             // to know if we've got differences.
             int i = 0;
-            for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++) 
-            { 
+            for (i = 0; i < max && pathTokens[i].Length == 0 && basePathTokens[i].Length == 0; i++)
+            {
             }
 
             if (i >= max)

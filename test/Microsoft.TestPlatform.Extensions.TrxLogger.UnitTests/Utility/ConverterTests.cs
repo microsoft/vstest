@@ -95,7 +95,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
 
             object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
 
-            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x.ToString()).ToArray());
+            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x).ToArray());
         }
 
         [TestMethod]

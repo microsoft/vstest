@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             // Arrange.
             var fileName = "C:\\temp\\r.runsettings";
-            var settingsXml = $"<RunSettings><RunConfiguration><TargetPlatform>{Architecture.X64.ToString()}</TargetPlatform><TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion></RunConfiguration></RunSettings>";
+            var settingsXml = $"<RunSettings><RunConfiguration><TargetPlatform>{nameof(Architecture.X64)}</TargetPlatform><TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion></RunConfiguration></RunSettings>";
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,

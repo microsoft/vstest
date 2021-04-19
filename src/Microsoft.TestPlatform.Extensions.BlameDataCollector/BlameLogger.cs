@@ -95,8 +95,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new ArgumentNullException(nameof(sender));
             }
 
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
 
             if (!e.IsAborted)
             {

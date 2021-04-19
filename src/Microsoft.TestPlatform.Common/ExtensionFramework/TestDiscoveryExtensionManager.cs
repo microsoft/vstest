@@ -33,8 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers,
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>>>(discoverers, "discoverers");
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>>>(unfilteredDiscoverers, "unfilteredDiscoverers");
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>>>(discoverers, nameof(discoverers));
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>>>(unfilteredDiscoverers, nameof(unfilteredDiscoverers));
 
             this.Discoverers = discoverers;
             this.UnfilteredDiscoverers = unfilteredDiscoverers;

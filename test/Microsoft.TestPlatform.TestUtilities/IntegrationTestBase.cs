@@ -535,7 +535,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             string testMethodName = string.Empty;
 
             var splits = testFullName.Split('.');
-            if (splits.Count() >= 3)
+            if (splits.Length >= 3)
             {
                 testMethodName = testFullName.Split('.')[2];
             }

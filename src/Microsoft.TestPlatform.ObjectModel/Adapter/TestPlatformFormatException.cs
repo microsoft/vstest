@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         protected TestPlatformFormatException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            ValidateArg.NotNull(info, "info");
+            ValidateArg.NotNull(info, nameof(info));
             // Save the basic properties.
             this.FilterValue = info.GetString("FilterValue");
         }

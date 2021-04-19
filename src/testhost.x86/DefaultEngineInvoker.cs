@@ -57,7 +57,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private IProcessHelper processHelper;
 
-
         public DefaultEngineInvoker() : this(new TestRequestHandler(), DataCollectionTestCaseEventSender.Create(), new ProcessHelper())
         {
         }

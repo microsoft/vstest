@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         {
             if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
-                executableBaseName = executableBaseName + ".exe";
+                executableBaseName += ".exe";
             }
 
             executablePath = string.Empty;

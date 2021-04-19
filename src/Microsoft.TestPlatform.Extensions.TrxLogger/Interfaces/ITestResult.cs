@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
-
     using System;
 
     internal interface ITestResult

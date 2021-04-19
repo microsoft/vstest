@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// <param name="runSettings">RunSettings to make the active Run Settings.</param>
         public void SetActiveRunSettings(RunSettings runSettings)
         {
-            ValidateArg.NotNull<RunSettings>(runSettings, "runSettings");
+            ValidateArg.NotNull<RunSettings>(runSettings, nameof(runSettings));
             this.ActiveRunSettings = runSettings;
         }
 
