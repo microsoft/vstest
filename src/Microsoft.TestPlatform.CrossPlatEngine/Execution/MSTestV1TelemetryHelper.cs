@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
                 else
                 {
-                    adapterTelemetry.Add(key, 1);
+                    adapterTelemetry[key] =  1;
                 }
             }
         }
