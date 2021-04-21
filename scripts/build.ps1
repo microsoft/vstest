@@ -346,6 +346,7 @@ function Publish-Package
     $netstandard13PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS13");
     $netstandard20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkNS20");
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
+    $coreCLR10PackageDir = Get-CoreCLR10PackageDirectory
     $coreCLR20TestHostPackageDir = Get-CoreCLR20TestHostPackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
@@ -480,6 +481,8 @@ function Publish-Package
               -files @{
                 $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
                 $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
+                $TPB_TargetFrameworkCore10  = $coreCLR10PackageDir           # netcoreapp1.0
+                $TPB_TargetFrameworkCore20  = $coreCLR20PackageDir           # netcoreapp2.1
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
@@ -1047,6 +1050,11 @@ function Get-FullCLRPackageDirectory45
 function Get-CoreCLR20PackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20")
+}
+
+function Get-CoreCLR10PackageDirectory
+{
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore10")
 }
 
 function Get-CoreCLR20TestHostPackageDirectory

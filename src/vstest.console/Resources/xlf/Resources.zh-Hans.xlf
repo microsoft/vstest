@@ -1103,6 +1103,11 @@
         <target state="translated">环境变量“{0}”已定义，但它被 -Environment 参数替代。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="new">Test Run Aborted with error {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

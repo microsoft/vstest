@@ -1103,6 +1103,11 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         <target state="translated">'{0}' ortam değişkeni zaten tanımlandı, ancak -Environment bağımsız değişkeni tarafından geçersiz kılındı.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="new">Test Run Aborted with error {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

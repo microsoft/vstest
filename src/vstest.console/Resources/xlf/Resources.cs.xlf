@@ -1103,6 +1103,11 @@
         <target state="translated">Proměnná prostředí {0} se už definovala, ale přepsal ji argument -Environment.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="new">Test Run Aborted with error {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
