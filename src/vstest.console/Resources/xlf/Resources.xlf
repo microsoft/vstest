@@ -896,6 +896,11 @@ Format : TestRunParameters.Parameter(name="&lt;name&gt;", value="&lt;value&gt;")
         <target state="new">Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="new">Test Run Aborted with error {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

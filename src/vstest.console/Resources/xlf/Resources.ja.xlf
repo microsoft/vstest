@@ -1103,6 +1103,11 @@
         <target state="translated">環境変数 '{0}' は既に定義されていますが、-Environment 引数でオーバーライドされます。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="new">Test Run Aborted with error {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

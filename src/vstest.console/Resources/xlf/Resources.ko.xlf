@@ -1103,6 +1103,11 @@
         <target state="translated">환경 변수 '{0}'이(가) 이미 정의되어 있지만 -Environment 인수로 재정의되었습니다.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="new">Test Run Aborted with error {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
