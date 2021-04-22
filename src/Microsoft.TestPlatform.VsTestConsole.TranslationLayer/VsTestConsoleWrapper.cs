@@ -211,7 +211,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void DiscoverTests(
+        internal void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
@@ -263,7 +263,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void RunTests(
+        internal void RunTests(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -315,7 +315,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void RunTests(
+        internal void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
@@ -371,7 +371,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void RunTestsWithCustomTestHost(
+        internal void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -429,7 +429,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public void RunTestsWithCustomTestHost(
+        internal void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
@@ -455,7 +455,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public ITestSession StartTestSession(
+        internal ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler)
@@ -468,7 +468,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public ITestSession StartTestSession(
+        internal ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -483,7 +483,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public ITestSession StartTestSession(
+        internal ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -504,7 +504,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public bool StopTestSession(
+        internal bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
         {
@@ -612,7 +612,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task DiscoverTestsAsync(
+        internal async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
@@ -658,7 +658,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task RunTestsAsync(
+        internal async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -710,7 +710,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task RunTestsAsync(
+        internal async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
@@ -766,7 +766,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task RunTestsWithCustomTestHostAsync(
+        internal async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -824,7 +824,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task RunTestsWithCustomTestHostAsync(
+        internal async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
             TestPlatformOptions options,
@@ -850,7 +850,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task<ITestSession> StartTestSessionAsync(
+        internal async Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
             ITestSessionEventsHandler eventsHandler)
@@ -863,7 +863,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task<ITestSession> StartTestSessionAsync(
+        internal async Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -878,7 +878,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task<ITestSession> StartTestSessionAsync(
+        internal async Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
             TestPlatformOptions options,
@@ -899,7 +899,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        public async Task<bool> StopTestSessionAsync(
+        internal async Task<bool> StopTestSessionAsync(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
         {
