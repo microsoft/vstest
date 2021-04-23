@@ -1447,6 +1447,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestRunAbortedWithError" ItemType="0" PsrId="308" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Test Run Aborted with error {0}.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[테스트 실행이 {0} 오류로 인해 중단되었습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TestRunCanceled" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Test Run Canceled.]]></Val>
