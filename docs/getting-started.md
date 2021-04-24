@@ -32,4 +32,4 @@ Before starting discussion about high level architecture, let's look at some ter
 
 The diagram below shows very high-level structure of Test Platform (numbers near arrow indicates the order of workflow) :
 
-[![vstest.console overall architecture](images/TP_diagram.png)](images/TP_diagram.png)
+[![vstest.console overall architecture](images/tp_diagram.png)](images/tp_diagram.png)
