@@ -34,7 +34,7 @@
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.10.0-preview-2-31119-371</TestPlatformExternalsVersion>
     <CodeCoverageExternalsVersion>17.0.0-beta.21219.2</CodeCoverageExternalsVersion>
-    <InteropExternalsVersion>17.0.0-preview-1-31216-036</InteropExternalsVersion>
+    <InteropExternalsVersion>17.0.0-preview-2-31223-026</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.0.0-beta.21179.1</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
