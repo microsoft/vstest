@@ -1105,7 +1105,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       </trans-unit>
       <trans-unit id="TestRunAbortedWithError">
         <source>Test Run Aborted with error {0}.</source>
-        <target state="new">Test Run Aborted with error {0}.</target>
+        <target state="translated">Test Çalıştırması {0} hatasıyla durduruldu.</target>
         <note></note>
       </trans-unit>
     </body>
