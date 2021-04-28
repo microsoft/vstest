@@ -265,6 +265,8 @@
 
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.Coverage.Interprocess.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Coverage.Interprocess.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.Coverage.Instrumentation.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Coverage.Instrumentation.dll" />
+    <file src="net451\$Runtime$\Extensions\Mono.Cecil.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Mono.Cecil.dll" />
+    <file src="net451\$Runtime$\Extensions\Mono.Cecil.Pdb.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Mono.Cecil.Pdb.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.Coverage.Core.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.Coverage.Core.dll" />
     
     <file src="net451\$Runtime$\Microsoft.VisualStudio.Coverage.IO.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Coverage.IO.dll" />
