@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+    using CommonResources = Common.Resources.Resources;
+
     /// <summary>
     /// ParallelDiscoveryEventsHandler for handling the discovery events in case of parallel discovery
     /// </summary>
@@ -78,6 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // Do not send TestDiscoveryComplete to actual test discovery handler
             // We need to see if there are still sources left - let the parallel manager decide
+
             var parallelDiscoveryComplete = this.parallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(
                     this.proxyDiscoveryManager,
                     totalTests,
@@ -117,6 +120,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public void HandleRawMessage(string rawMessage)
         {
+            // Do not send CancellationRequested message to Output window in IDE
+            if (string.Equals(rawMessage, CommonResources.CancellationRequested))
+            {
+                return;
+            }
+
             // In case of parallel - we can send everything but handle complete
             // DiscoveryComplete is not true-end of the overall discovery as we only get completion of one host here
             // Always aggregate data, deserialize and raw for complete events

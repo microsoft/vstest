@@ -83,13 +83,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + this.availableTestSources);
             }
+
             this.DiscoverTestsPrivate(eventHandler);
         }
 
         /// <inheritdoc/>
         public void Abort()
         {
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+            this.DoActionOnAllManagers(proxyManager => proxyManager.Abort(), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>
@@ -122,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             }
 
             // Discovery is completed. Schedule the clean up for managers and handlers.
-            if (allDiscoverersCompleted)
+            if (allDiscoverersCompleted || isAborted)
             {
                 // Reset enumerators
                 this.sourceEnumerator = null;
@@ -139,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Discovery is not complete.
             // First, clean up the used proxy discovery manager if the last run was aborted
             // or this run doesn't support shared hosts (netcore tests)
-            if (!this.SharedHosts || isAborted)
+            if (!this.SharedHosts)
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -178,6 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
+
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                                                 this.requestData,
                                                 concurrentManager,
