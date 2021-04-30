@@ -502,7 +502,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
-            this.testDiscoveryManager.Abort();
+            this.testDiscoveryManager.Abort(mockTestDiscoveryEventsHandler.Object);
 
             this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
         }

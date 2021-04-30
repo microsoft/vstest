@@ -90,9 +90,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Aborts the test operation.
         /// </summary>
-        public void Abort()
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
-            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort());
+            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort(eventHandler));
         }
 
         private void InitializeExtensions(IEnumerable<string> sources)

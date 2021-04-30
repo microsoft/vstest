@@ -114,11 +114,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void AbortShouldCallDiscoveryManagerAbort()
         {
             var manualResetEvent = new ManualResetEvent(false);
+            var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
-            this.mockDiscoveryManager.Setup(o => o.Abort()).Callback(
+            this.mockDiscoveryManager.Setup(o => o.Abort(mockTestDiscoveryEventsHandler.Object)).Callback(
                 () => manualResetEvent.Set());
 
-            this.inProcessProxyDiscoveryManager.Abort();
+            this.inProcessProxyDiscoveryManager.Abort(mockTestDiscoveryEventsHandler.Object);
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.Abort should get called");
         }

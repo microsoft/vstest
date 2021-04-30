@@ -78,6 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void EndSession();
 
         /// <summary>
+        /// Send the request to abort the discovery
+        /// </summary>
+        void SendDiscoveryAbort();
+
+        /// <summary>
         /// Send the request to cancel the test run
         /// </summary>
         void SendTestRunCancel();

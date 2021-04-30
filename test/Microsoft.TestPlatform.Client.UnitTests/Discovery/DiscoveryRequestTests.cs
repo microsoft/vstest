@@ -92,19 +92,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         [TestMethod]
         public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort()
         {
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
             // Just to set the IsDiscoveryInProgress flag
             this.discoveryRequest.DiscoverAsync();
 
             this.discoveryRequest.Abort();
-            this.discoveryManager.Verify(dm => dm.Abort(), Times.Once);
+            this.discoveryManager.Verify(dm => dm.Abort(eventsHandler), Times.Once);
         }
 
         [TestMethod]
         public void AbortIfDiscoveryIsNotInProgressShouldNotCallDiscoveryManagerAbort()
         {
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+
             // DiscoveryAsync has not been called, discoveryInProgress should be false
             this.discoveryRequest.Abort();
-            this.discoveryManager.Verify(dm => dm.Abort(), Times.Never);
+            this.discoveryManager.Verify(dm => dm.Abort(eventsHandler), Times.Never);
         }
 
         [TestMethod]

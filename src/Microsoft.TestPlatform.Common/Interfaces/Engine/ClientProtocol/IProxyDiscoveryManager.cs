@@ -22,11 +22,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler);
-
+     
         /// <summary>
-        /// Aborts the test operation.
+        /// Aborts the discovery operation
         /// </summary>
-        void Abort();
+        /// <param name="eventHandler"> EventHandler for handling discovey opearation from Engine</param>
+        void Abort(ITestDiscoveryEventsHandler2 eventHandler);
 
         /// <summary>
         /// Closes the current test operation.

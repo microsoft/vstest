@@ -38,6 +38,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IRequestData requestData;
 
+        // This field indicates if abort was requested by testplatform (user)
+        private bool discoveryAbortRequested = false;
+
         #endregion
 
         #region Concurrency Keeper Objects
@@ -88,9 +91,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <inheritdoc/>
-        public void Abort()
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
-            this.DoActionOnAllManagers(proxyManager => proxyManager.Abort(), doActionsInParallel: true);
+            this.discoveryAbortRequested = true;
+            this.DoActionOnAllManagers(proxyManager => proxyManager.Abort(eventHandler), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>
@@ -122,8 +126,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
             }
 
-            // Discovery is completed. Schedule the clean up for managers and handlers.
-            if (allDiscoverersCompleted || isAborted)
+            /*
+             If discovery is complete or discovery aborting was requsted by testPlatfrom(user)
+             we need to stop all ongoing discoveries, because we want to separate aborting request 
+             when testhost crashed by itself and when user requested it (f.e. through TW)
+             Schedule the clean up for managers and handlers.
+            */
+            if (allDiscoverersCompleted || discoveryAbortRequested)
             {
                 // Reset enumerators
                 this.sourceEnumerator = null;
@@ -140,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Discovery is not complete.
             // First, clean up the used proxy discovery manager if the last run was aborted
             // or this run doesn't support shared hosts (netcore tests)
-            if (!this.SharedHosts)
+            if (!this.SharedHosts || isAborted)
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {

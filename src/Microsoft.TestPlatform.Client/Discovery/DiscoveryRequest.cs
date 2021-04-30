@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                 if (this.discoveryInProgress)
                 {
-                    this.DiscoveryManager.Abort();
+                    this.DiscoveryManager.Abort(this);
                 }
                 else
                 {

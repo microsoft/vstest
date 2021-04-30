@@ -78,10 +78,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 4, false);
 
-            parallelDiscoveryManager.Abort();
+            parallelDiscoveryManager.Abort(mockHandler.Object);
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
-            createdMockManagers.ForEach(dm => dm.Verify(m => m.Abort(), Times.Once));
+            createdMockManagers.ForEach(dm => dm.Verify(m => m.Abort(mockHandler.Object), Times.Once));
         }
 
         [TestMethod]
@@ -96,7 +96,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
             });
 
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(this.discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
             AssertMissingAndDuplicateSources(processedSources);
         }
@@ -118,7 +118,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
             });
 
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(this.discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(2, processedSources.Count, "All Sources must be processed.");
         }
 
