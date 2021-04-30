@@ -28,7 +28,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DataCollectionMessageFormat" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DataCollectionMessageFormat" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Data collection : {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -55,7 +55,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DataCollectorMessageFormat" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DataCollectorMessageFormat" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Data collector '{0}' message: {1}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -82,7 +82,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DuplicateExtensionUri" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DuplicateExtensionUri" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -91,7 +91,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DuplicateSettingsName" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DuplicateSettingsName" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -100,7 +100,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";DuplicateSettingsProvided" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";DuplicateSettingsProvided" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -109,7 +109,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";EmptyParenthesis" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";EmptyParenthesis" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error: Empty parenthesis ( )]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -166,7 +166,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InvalidCondition" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";InvalidCondition" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error: Invalid Condition '{0}']]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -175,7 +175,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InvalidExtensionUriFormat" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";InvalidExtensionUriFormat" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Test Extension has an invalid URI '{0}': {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -184,7 +184,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InvalidOperator" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";InvalidOperator" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error: Invalid operator '{0}']]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -193,7 +193,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";LoggerInitializationError" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";LoggerInitializationError" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -202,7 +202,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";LoggerNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";LoggerNotFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -220,7 +220,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";MissingCloseParenthesis" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";MissingCloseParenthesis" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error: Missing ')']]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -229,7 +229,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";MissingOpenParenthesis" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";MissingOpenParenthesis" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error: Missing '(']]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -238,7 +238,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";MissingOperand" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";MissingOperand" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error: Missing operand]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -247,7 +247,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";MissingOperator" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";MissingOperator" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Missing Operator '|' or '&']]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -265,7 +265,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";RunSettingsAlreadyLoaded" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";RunSettingsAlreadyLoaded" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The Run Settings have already been loaded.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -274,7 +274,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";RunSettingsParseError" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";RunSettingsParseError" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An error occurred while loading the run settings.  Error: {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -283,7 +283,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";SettingsNodeInvalidName" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";SettingsNodeInvalidName" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid settings node specified. The name property of the settings node must be non-empty.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -292,7 +292,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";SettingsProviderInitializationError" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";SettingsProviderInitializationError" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An error occurred while initializing the settings provider named '{0}'. Error: {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -301,7 +301,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";SettingsProviderNotFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";SettingsProviderNotFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Settings Provider named '{0}' was not found.  The settings can not be loaded.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -319,7 +319,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";TestCaseFilterFormatException" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";TestCaseFilterFormatException" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
