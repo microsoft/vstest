@@ -230,6 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case 2:
                 case 4:
                 case 5:
+                case 6:
                     return payloadSerializer2;
                 default:
                     throw new NotSupportedException($"Protocol version {version} is not supported. " +
