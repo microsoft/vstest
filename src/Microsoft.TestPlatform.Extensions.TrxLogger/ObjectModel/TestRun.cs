@@ -161,7 +161,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         internal string GetResultFilesDirectory(TestResult result)
         {
-            EqtAssert.ParameterNotNull(result, "result");
+            EqtAssert.ParameterNotNull(result, nameof(result));
             return Path.Combine(this.GetResultsDirectory(), result.RelativeTestResultsDirectory);
         }
 

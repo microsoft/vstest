@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             if (objectType != typeof(List<KeyValuePair<TestProperty, object>>))
             {
                 // Support only deserialization of KeyValuePair list
-                throw new ArgumentException(nameof(objectType));
+                throw new ArgumentException("the objectType was not a KeyValuePair list", nameof(objectType));
             }
 
             var propertyList = new List<KeyValuePair<TestProperty, object>>();

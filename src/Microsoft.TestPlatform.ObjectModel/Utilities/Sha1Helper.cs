@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 PadMessage(ref message);
 
                 var messageCount = message.Length / BlockBytes;
-                for (var i = 0; i < messageCount; i += 1)
+                for (var i = 0; i < messageCount; ++i)
                 {
                     ProcessBlock(message, i * BlockBytes, BlockBytes);
                 }

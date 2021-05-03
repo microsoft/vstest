@@ -507,7 +507,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="text">Message to be added</param>
         public void AddTextMessage(string text)
         {
-            EqtAssert.ParameterNotNull(text, "text");
+            EqtAssert.ParameterNotNull(text, nameof(text));
             this.textMessages.Add(text);
         }
 

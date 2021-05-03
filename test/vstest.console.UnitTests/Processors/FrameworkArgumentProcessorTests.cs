@@ -118,11 +118,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldNotSetFrameworkIfSettingsFileIsLegacy()
         {
-            this.runSettingsProvider.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath, FrameworkVersion.Framework45.ToString());
+            this.runSettingsProvider.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath, nameof(FrameworkVersion.Framework45));
             CommandLineOptions.Instance.SettingsFile = @"c:\tmp\settings.testsettings";
             this.executor.Initialize(".NETFramework,Version=v3.5");
             Assert.AreEqual(".NETFramework,Version=v3.5", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
-            Assert.AreEqual(FrameworkVersion.Framework45.ToString(), this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(nameof(FrameworkVersion.Framework45), this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         #endregion

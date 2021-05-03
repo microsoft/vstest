@@ -107,6 +107,5 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty TestTypeProperty = TestProperty.Register("TestType", TestTypePropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
-
     }
 }

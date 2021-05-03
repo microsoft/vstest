@@ -56,7 +56,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result.Value, typeof(ITestLogger));
-
         }
 
         [TestMethod]
@@ -78,7 +77,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var result = testExtensionManager.TryGetTestExtension("");
             Assert.IsNull(result);
         }
-
 
         [TestMethod]
         public void TryGetTestExtensionWithStringUriUnitTest()
@@ -107,7 +105,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
             {
-
             }
 
             private void TestMessageHandler(object sender, TestRunMessageEventArgs e)

@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -137,7 +138,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 Environment.SetEnvironmentVariable(env, vstestConsolePath);
                 if (arguments.Contains(".csproj"))
-                {                   
+                {
                     arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
                 }
 
@@ -162,8 +163,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             string framework,
             string runSettings = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue);
+            var resultsDir = GetResultsDirectory();
+
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             this.InvokeVsTest(arguments);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -174,9 +178,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue);
+            var resultsDir = GetResultsDirectory();
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -486,7 +492,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             var logFileName = Path.GetFileName(Path.GetTempFileName());
             var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
 
-            if (Directory.Exists(logFileDir) == false)
+            if (!Directory.Exists(logFileDir))
             {
                 Directory.CreateDirectory(logFileDir);
             }
@@ -529,7 +535,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             string testMethodName = string.Empty;
 
             var splits = testFullName.Split('.');
-            if (splits.Count() >= 3)
+            if (splits.Length >= 3)
             {
                 testMethodName = testFullName.Split('.')[2];
             }
@@ -623,7 +629,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 process.Start();
                 process.BeginOutputReadLine();
-                process.BeginErrorReadLine(); 
+                process.BeginErrorReadLine();
                 if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
                 {
                     Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
@@ -717,6 +723,36 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             return string.Join(" ", assertFullPaths);
+        }
+
+        /// <summary>
+        /// Creates an unique temporary directory for storing test results.
+        /// </summary>
+        /// <returns>
+        /// Path of the created directory.
+        /// </returns>
+        protected static string GetResultsDirectory()
+        {
+            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
+            // that is cleaned up after every job. This is preferable to use over 
+            // just the normal temp. 
+            var temp = Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
+            var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
+            Directory.CreateDirectory(directoryPath);
+
+            return directoryPath;
+        }
+
+        protected static void TryRemoveDirectory(string directory)
+        {
+            if (Directory.Exists(directory))
+            {
+                try
+                {
+                    Directory.Delete(directory, true);
+                }
+                catch { }
+            }
         }
     }
 }

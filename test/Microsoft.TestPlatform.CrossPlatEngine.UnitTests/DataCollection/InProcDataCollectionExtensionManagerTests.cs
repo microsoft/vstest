@@ -63,7 +63,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             StringAssert.Equals(dataCollector.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a");
             StringAssert.Equals(dataCollector.CodeBase, Path.Combine(temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests.dll"));
-            StringAssert.Equals(dataCollector.Configuration.OuterXml.ToString(), @"<Configuration><Port>4312</Port></Configuration>");
+            StringAssert.Equals(dataCollector.Configuration.OuterXml, @"<Configuration><Port>4312</Port></Configuration>");
         }
 
         [TestMethod]
@@ -175,11 +175,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             Assert.IsTrue(string.Equals(dataCollector1.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
             Assert.IsTrue(string.Equals(dataCollector1.CodeBase, Path.Combine(temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests1.dll"), StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollector1.Configuration.OuterXml.ToString(), @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector1.Configuration.OuterXml, @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
 
             Assert.IsTrue(string.Equals(dataCollector2.AssemblyQualifiedName, "TestImpactListener.Tests, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
             Assert.IsTrue(string.Equals(dataCollector2.CodeBase, Path.Combine(temp, "repos", "MSTest", "src", "managed", "TestPlatform", "TestImpactListener.Tests", "bin", "Debug", "TestImpactListener.Tests2.dll"), StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollector2.Configuration.OuterXml.ToString(), @"<Configuration><Port>4313</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector2.Configuration.OuterXml, @"<Configuration><Port>4313</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
         }
 
         [TestMethod]

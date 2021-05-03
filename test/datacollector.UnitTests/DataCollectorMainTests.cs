@@ -114,6 +114,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var message = Assert.ThrowsException<TestPlatformException>(() => this.dataCollectorMain.Run(args)).Message;
             Assert.AreEqual(DataCollectorMainTests.TimoutErrorMessage, message);
         }
-
     }
 }

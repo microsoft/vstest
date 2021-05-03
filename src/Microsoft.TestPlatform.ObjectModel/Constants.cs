@@ -116,6 +116,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string LoggerConfigurationNameLower = "configuration";
 
         /// <summary>
+        /// Name of TreatNoTestsAsError parameter
+        /// </summary>
+        public const string TreatNoTestsAsError = "TreatNoTestsAsError";
+
+        /// <summary>
         /// Name of RunConfiguration settings node in RunSettings.
         /// </summary>
         public const string RunConfigurationSettingsName = "RunConfiguration";

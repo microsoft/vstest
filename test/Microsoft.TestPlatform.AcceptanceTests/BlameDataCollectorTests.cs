@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -24,7 +25,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public BlameDataCollectorTests()
         {
-            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.resultsDir = GetResultsDirectory();
         }
 
         [TestCleanup]
@@ -32,10 +33,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
 
-            if (Directory.Exists(this.resultsDir))
-            {
-                Directory.Delete(this.resultsDir, true);
-            }
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -64,7 +62,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
 
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);            
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump");
@@ -91,7 +89,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
             this.InvokeVsTest(arguments);
-            
+
             Assert.IsFalse(this.StdOut.Contains(".dmp"), "it should not collect a dump, because nothing crashed");
         }
 
@@ -117,7 +115,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
-        // should make no difference, keeping for easy debug 
+        // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void HangDumpOnTimeout(RunnerInfo runnerInfo)
         {
@@ -133,9 +131,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        // net5.0 does not suppord dump on exit        
+        // net5.0 does not suppord dump on exit
         [NetCoreRunner("net452;net472;netcoreapp3.1")]
-        // should make no difference, keeping for easy debug 
+        // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
 
         public void CrashDumpWhenThereIsNoTimeout(RunnerInfo runnerInfo)
@@ -154,7 +152,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         // net5.0 does not suppord dump on exit
         [NetCoreRunner("net452;net472;netcoreapp3.1")]
-        // should make no difference, keeping for easy debug 
+        // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
 
         public void CrashDumpOnExit(RunnerInfo runnerInfo)
@@ -172,7 +170,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
-        // should make no difference, keeping for easy debug 
+        // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void CrashDumpOnStackOverflow(RunnerInfo runnerInfo)
         {
@@ -189,7 +187,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner(NET50)]
-        // should make no difference, keeping for easy debug 
+        // should make no difference, keeping for easy debug
         // [NetFrameworkRunner(NET50)]
         public void CrashDumpChildProcesses(RunnerInfo runnerInfo)
         {
@@ -204,7 +202,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetCoreRunner("net452;net472;netcoreapp3.1;net5.0")]
-        // should make no difference, keeping for easy debug 
+        // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1;net5.0")]
         public void HangDumpChildProcesses(RunnerInfo runnerInfo)
         {
@@ -217,7 +215,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateDump(2);
         }
 
-
         private void ValidateDump(int expectedDumpCount = 1)
         {
             var attachments = this.StdOutWithWhiteSpace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
@@ -229,14 +226,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             if (!attachments.Any(a => a.Contains("Sequence_")))
             {
                 // sequence file is pretty flaky, and easily substituted by diag log
-                // throw new AssertFailedException("Expected Sequence file in Attachments, but there was none." 
-                //    + Environment.NewLine 
+                // throw new AssertFailedException("Expected Sequence file in Attachments, but there was none."
+                //    + Environment.NewLine
                 //    + output);
             }
 
             var dumps = attachments
                 .Where(a => a.EndsWith(".dmp"))
-                // On Windows we might collect conhost which tells us nothing 
+                // On Windows we might collect conhost which tells us nothing
                 // or WerFault in case we would start hanging during crash
                 // we don't want these to make cross-platform checks more difficult
                 // so we filter them out.
@@ -245,8 +242,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (dumps.Count < expectedDumpCount)
             {
-                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}." 
-                    + Environment.NewLine 
+                throw new AssertFailedException($"Expected at least {expectedDumpCount} dump file in Attachments, but there were {dumps.Count}."
+                    + Environment.NewLine
                     + string.Join(Environment.NewLine, dumps));
             }
 

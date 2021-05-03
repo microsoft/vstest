@@ -42,7 +42,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
         }
 
-
         internal ParallelRunEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,

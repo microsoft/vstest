@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
             bool matched = false;
             foreach (var name in this.FilterProperties.Keys)

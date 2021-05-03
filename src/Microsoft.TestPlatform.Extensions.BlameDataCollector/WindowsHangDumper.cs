@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // Open the file for writing
             using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
-                NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default(NativeMethods.MINIDUMP_EXCEPTION_INFORMATION);
+                NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default;
 
                 NativeMethods.MINIDUMP_TYPE dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpNormal;
                 switch (type)

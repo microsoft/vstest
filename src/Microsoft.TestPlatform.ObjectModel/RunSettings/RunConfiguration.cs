@@ -621,7 +621,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         public static RunConfiguration FromXml(XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
             var runConfiguration = new RunConfiguration();
             var empty = reader.IsEmptyElement;
 

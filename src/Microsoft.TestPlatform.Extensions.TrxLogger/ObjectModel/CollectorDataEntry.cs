@@ -153,7 +153,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="parameters">Parameters to customize the save behavior</param>
         public void Save(XmlElement element, XmlTestStoreParameters parameters)
         {
-            EqtAssert.ParameterNotNull(element, "element");
+            EqtAssert.ParameterNotNull(element, nameof(element));
 
             XmlPersistence helper = new XmlPersistence();
             helper.SaveSimpleField(element, "@agentName", this.agentName, null);
@@ -213,10 +213,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         private void Initialize(Uri uri, string collectorDisplayName, string agentName, string agentDisplayName, bool isFromRemoteAgent, IEnumerable<IDataAttachment> attachments)
         {
-            EqtAssert.ParameterNotNull(uri, "uri");
-            EqtAssert.StringNotNullOrEmpty(collectorDisplayName, "collectorDisplayName");
-            EqtAssert.StringNotNullOrEmpty(agentName, "agentName");
-            EqtAssert.StringNotNullOrEmpty(agentDisplayName, "agentDisplayName");
+            EqtAssert.ParameterNotNull(uri, nameof(uri));
+            EqtAssert.StringNotNullOrEmpty(collectorDisplayName, nameof(collectorDisplayName));
+            EqtAssert.StringNotNullOrEmpty(agentName, nameof(agentName));
+            EqtAssert.StringNotNullOrEmpty(agentDisplayName, nameof(agentDisplayName));
 
             if (null != attachments)
             {

@@ -250,8 +250,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             if (objectToSave != null && location != null)
             {
                 string nameSpaceUri = this.namespaceUri;
-                IXmlTestStoreCustom customStore = objectToSave as IXmlTestStoreCustom;
-                if (customStore != null)
+                if (objectToSave is IXmlTestStoreCustom customStore)
                 {
                     nameSpaceUri = customStore.NamespaceUri;
                 }
@@ -259,8 +258,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 XmlNode xmlNode = this.EnsureLocationExists(parentXml, location, nameSpaceUri);
                 this.SaveObject(objectToSave, xmlNode, parameters);
 
-                XmlElement element = xmlNode as XmlElement;
-                if (element != null &&
+                if (xmlNode is XmlElement element &&
                     !element.HasAttributes &&
                     !element.HasChildNodes &&
                     string.IsNullOrEmpty(element.InnerText))
@@ -306,8 +304,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (objectToSave != null)
             {
-                IXmlTestStore persistable = objectToSave as IXmlTestStore;
-                if (persistable != null)
+                if (objectToSave is IXmlTestStore persistable)
                 {
                     persistable.Save((XmlElement)nodeToSaveAt, parameters);
                 }
@@ -489,7 +486,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             helper.SaveSingleFields(element, instance, requestedType, parameters);
         }
 
-        #endregion PublicSaveDataInTrx 
+        #endregion PublicSaveDataInTrx
 
         #region Utilities
 
@@ -506,14 +503,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// </returns>
         private static IEnumerable<FieldPersistenceInfo> GetFieldInfos(Type type)
         {
-            IEnumerable<FieldPersistenceInfo> toReturn;
-            if (!typeToPersistenceInfoCache.TryGetValue(type, out toReturn))
+            if (!typeToPersistenceInfoCache.TryGetValue(type, out var toReturn))
             {
                 toReturn = ReflectFields(type);
                 lock (typeToPersistenceInfoCache)
                 {
-                    IEnumerable<FieldPersistenceInfo> checkCache;
-                    if (!typeToPersistenceInfoCache.TryGetValue(type, out checkCache))
+                    if (!typeToPersistenceInfoCache.TryGetValue(type, out var checkCache))
                     {
                         typeToPersistenceInfoCache.Add(type, toReturn);
                     }
@@ -584,11 +579,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             StoreXmlAttribute locationAttribute = GetAttribute<StoreXmlAttribute>(fieldInfo);
             if (locationAttribute != null)
             {
-                location = locationAttribute.Location;
-                if (location == null)
-                {
-                    location = GetDefaultFieldLocation(fieldInfo);
-                }
+                location = locationAttribute.Location ?? GetDefaultFieldLocation(fieldInfo);
             }
 
             return location;
@@ -621,7 +612,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 return (T)attributes[0];
             }
 
-            return default(T);
+            return default;
         }
 
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Reviewed. Suppression is OK here.")]
@@ -666,8 +657,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
             // Remove invalid char if any
             valueToSave = RemoveInvalidXmlChar(valueToSave);
-            XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
-            if (elementToSaveAt != null)
+            if (nodeToSaveAt is XmlElement elementToSaveAt)
             {
                 elementToSaveAt.InnerText = valueToSave;
             }
@@ -686,8 +676,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             if (str != null)
             {
-                // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
-                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
+                // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
+                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
 
                 // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
                 // because C# support unicode character in range \u0000 to \uFFFF
@@ -703,7 +693,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             char x = match.Value[0];
             return string.Format(@"\u{0:x4}", (ushort)x);
-
         }
 
         private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)
@@ -750,9 +739,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         private string GetNamespaceUriOrDefault(string nameSpaceUri)
         {
-            return nameSpaceUri != null ? nameSpaceUri : this.namespaceUri;
+            return nameSpaceUri ?? this.namespaceUri;
         }
-
 
         /// <summary>
         /// Creates a new element with the given name in the current (of this instance of XmlPersistence namespace)
@@ -794,10 +782,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         {
             Debug.Assert(persistee != null, "persistee is null");
 
-            IXmlTestStoreCustom custom = persistee as IXmlTestStoreCustom;
-
             NewElementCreateData toReturn = new NewElementCreateData();
-            if (custom != null)
+            if (persistee is IXmlTestStoreCustom custom)
             {
                 toReturn.ElementName = custom.ElementName;
                 toReturn.NamespaceUri = custom.NamespaceUri;

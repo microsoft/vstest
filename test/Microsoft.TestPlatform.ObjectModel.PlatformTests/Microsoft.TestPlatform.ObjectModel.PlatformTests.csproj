@@ -18,11 +18,10 @@
     <Reference Include="System.Runtime" />
     <Reference Include="Microsoft.CSharp" />
 
-    <PackageReference Include="Microsoft.Internal.Dia" Version="14.0.0" />
+    <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformExternalsVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\packages\microsoft.internal.dia\14.0.0\contentFiles\any\any\ComComponents\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="..\..\packages\microsoft.internal.dia\$(TestPlatformExternalsVersion)\tools\net451\**\*">
     </Content>
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />

@@ -11,6 +11,9 @@
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\scripts\build\ExternalAssemblyVersions.cs" Link="ExternalAssemblyVersions.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
