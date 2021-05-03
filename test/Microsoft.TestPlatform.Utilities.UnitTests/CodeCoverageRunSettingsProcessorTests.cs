@@ -277,7 +277,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                 set.Remove(child.OuterXml);
             }
 
-            Assert.AreEqual(set.Count, 0);
+            Assert.AreEqual(0, set.Count);
         }
         #endregion
     }

@@ -84,8 +84,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            Assert.IsNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
         }
 
         [TestMethod]
@@ -95,7 +95,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -125,7 +125,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -135,7 +135,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -155,7 +155,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
         }
 
         [TestMethod]
@@ -165,7 +165,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
         }
 
         [TestMethod]
@@ -175,7 +175,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=minimal")));
         }
 
         [TestMethod]
@@ -185,7 +185,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=minimal")));
         }
 
         [TestMethod]
@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
 
         [TestMethod]
@@ -205,7 +205,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:Console;Verbosity=quiet")));
         }
 
         [TestMethod]
@@ -215,7 +215,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
         }
 
         [TestMethod]
@@ -228,8 +228,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name 2\"")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--collect:name1")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--collect:\"name 2\"")));
         }
 
         [TestMethod]
@@ -239,8 +239,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path2")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--testAdapterPath:path1")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--testAdapterPath:path2")));
         }
 
         [TestMethod]
@@ -249,8 +249,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx", "console" };
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:console")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--logger:console")));
         }
 
         [TestMethod]
@@ -301,7 +301,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:")));
+            Assert.IsNull(Array.Find(allArguments, arg => arg.Contains("--testAdapterPath:")));
         }
 
         [TestMethod]
@@ -310,7 +310,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestNoLogo = "--nologo";
             var allArguments = this.vsTestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--nologo")));
+            Assert.IsNotNull(Array.Find(allArguments, arg => arg.Contains("--nologo")));
         }
     }
 }

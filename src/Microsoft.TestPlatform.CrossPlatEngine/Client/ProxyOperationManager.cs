@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="requestData">Request data instance.</param>
         /// <param name="requestSender">Request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="requestData">Request data instance.</param>
         /// <param name="requestSender">Request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes the proxy.
         /// </summary>
-        /// 
+        ///
         /// <param name="skipDefaultAdapters">
         /// Flag indicating if we should skip the default adapters initialization.
         /// </param>
@@ -139,11 +139,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Ensures that the engine is ready for test operations. Usually includes starting up the
         /// test host process.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">List of test sources.</param>
         /// <param name="runSettings">Run settings to be used.</param>
         /// <param name="eventHandler">The events handler.</param>
-        /// 
+        ///
         /// <returns>
         /// Returns true if the communication is established b/w runner and host, false otherwise.
         /// </returns>
@@ -159,10 +159,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Ensures that the engine is ready for test operations. Usually includes starting up the
         /// test host process.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">List of test sources.</param>
         /// <param name="runSettings">Run settings to be used.</param>
-        /// 
+        ///
         /// <returns>
         /// Returns true if the communication is established b/w runner and host, false otherwise.
         /// </returns>
@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             this.testHostProcessStdError = string.Empty;
             TestHostConnectionInfo testHostConnectionInfo = this.TestHostManager.GetTestHostConnectionInfo();
-                
+
             var portNumber = 0;
             if (testHostConnectionInfo.Role == ConnectionRole.Client)
             {
@@ -239,9 +239,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
             var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
-            if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
-                new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
+            if ((!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal)) ||
+                (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
             {
                 ConsoleOutput.Instance.WriteLine(
                     CrossPlatEngineResources.HostDebuggerWarning,
@@ -338,9 +338,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <see cref="TestProcessStartInfo"/>. For example, data collectors need additional
         /// environment variables to be passed.
         /// </summary>
-        /// 
+        ///
         /// <param name="testProcessStartInfo">The test process start info.</param>
-        /// 
+        ///
         /// <returns>
         /// The <see cref="TestProcessStartInfo"/>.
         /// </returns>
@@ -362,9 +362,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// This is necessary because older test hosts may throw exceptions when encountering
         /// unknown nodes.
         /// </summary>
-        /// 
+        ///
         /// <param name="runsettingsXml">Run settings string.</param>
-        /// 
+        ///
         /// <returns>The run settings after removing non-required nodes.</returns>
         public string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
         {
@@ -438,7 +438,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         private void ThrowOnTestHostExited(bool testHostExited)
-        {            
+        {
             if (testHostExited)
             {
                 // We might consider passing standard output here in case standard error is not

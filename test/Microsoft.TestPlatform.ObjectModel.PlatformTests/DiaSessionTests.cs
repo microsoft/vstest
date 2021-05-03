@@ -135,7 +135,6 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
                 {
                     Assert.AreEqual(min + 1, max, "Incorrect min line number");
                 }
-
                 else if (max == 27)
                 {
                     Assert.AreEqual(min + 1, max, "Incorrect min line number");

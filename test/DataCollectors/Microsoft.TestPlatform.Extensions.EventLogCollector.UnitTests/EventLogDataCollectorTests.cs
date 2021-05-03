@@ -372,7 +372,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             }
 
             var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
-                .OrderBy(x => x.TimeGenerated).ToList().Take(5).ToList();
+                .OrderBy(x => x.TimeGenerated).Take(5).ToList();
 
             this.eventLogDataCollector.WriteEventLogs(
                 entries,
@@ -415,7 +415,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             }
 
             var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
-                .OrderBy(x => x.TimeGenerated).ToList().Take(10).ToList();
+                .OrderBy(x => x.TimeGenerated).Take(10).ToList();
 
             this.eventLogDataCollector.WriteEventLogs(
                 entries,

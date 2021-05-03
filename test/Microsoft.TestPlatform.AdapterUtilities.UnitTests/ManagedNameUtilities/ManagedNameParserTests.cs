@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             {
                 ManagedNameParser.ParseManagedTypeName(managedTypeName, out var namespaceName, out var typeName);
                 return (namespaceName, typeName);
-            };
+            }
 
             Assert.AreEqual(("NS", "Class"), Parse("NS.Class"));
             Assert.AreEqual(("NS.NS", "Class"), Parse("NS.NS.Class"));
@@ -70,6 +70,5 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method("), "ManagedName is incomplete");
             Assert.ThrowsException<InvalidManagedNameException>(() => Parse("Method`4a"), "Method arity must be numeric");
         }
-
     }
 }

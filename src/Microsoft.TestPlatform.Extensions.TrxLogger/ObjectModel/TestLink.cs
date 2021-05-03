@@ -24,8 +24,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 throw new ArgumentException("ID cant be empty");
             }
 
-            EqtAssert.StringNotNullOrEmpty(name, "name");
-            EqtAssert.ParameterNotNull(storage, "storage");
+            EqtAssert.StringNotNullOrEmpty(name, nameof(name));
+            EqtAssert.ParameterNotNull(storage, nameof(storage));
 
             this.id = id;
             this.name = name;
@@ -98,9 +98,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "Link to '{0}' {1} '{2}'.",
-                this.name != null ? this.name : "(null)",
+                this.name ?? "(null)",
                 this.id.ToString("B"),
-                this.storage != null ? this.storage : "(null)");
+                this.storage ?? "(null)");
         }
 
         public void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)

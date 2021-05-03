@@ -30,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             try
             {
-                ValidateArg.NotNullOrEmpty(source, "source");
-                ValidateArg.NotNull(referenceAssembly, "referenceAssembly");
+                ValidateArg.NotNullOrEmpty(source, nameof(source));
+                ValidateArg.NotNull(referenceAssembly, nameof(referenceAssembly));
 
                 Debug.Assert(!string.IsNullOrEmpty(source));
 
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <returns></returns>
         public static KeyValuePair<Architecture, FrameworkVersion> GetFrameworkVersionAndArchitectureForSource(string testSource)
         {
-            ValidateArg.NotNullOrEmpty(testSource, "testSource");
+            ValidateArg.NotNullOrEmpty(testSource, nameof(testSource));
 
             var sourceDirectory = Path.GetDirectoryName(testSource);
             var setupInfo = new AppDomainSetup();
@@ -119,9 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     false, BindingFlags.Default, null,
                     null, null, null);
 
-                string procArchType;
-                string frameworkVersion;
-                worker.GetPlatformAndFrameworkSettings(testSource, out procArchType, out frameworkVersion);
+                worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
                 Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
                 FrameworkVersion targetFramework = FrameworkVersion.Framework45;

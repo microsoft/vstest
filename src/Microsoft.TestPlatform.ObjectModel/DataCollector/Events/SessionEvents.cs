@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public T GetPropertyValue<T>(string property)
         {
-            ValidateArg.NotNullOrEmpty(property, "property");
+            ValidateArg.NotNullOrEmpty(property, nameof(property));
 
             return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
         }
@@ -88,9 +88,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public object GetPropertyValue(string property)
         {
-            ValidateArg.NotNullOrEmpty(property, "property");
+            ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-            this.Properties.TryGetValue(property, out object propertyValue);
+            this.Properties.TryGetValue(property, out var propertyValue);
 
             return propertyValue;
         }

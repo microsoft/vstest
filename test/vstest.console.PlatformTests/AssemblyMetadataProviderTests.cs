@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         [TestCleanup]
         public void Cleanup()
         {
-            if (this.isManagedAssemblyArchitectureTest == false)
+            if (!this.isManagedAssemblyArchitectureTest)
             {
                 this.fileHelperMock.Verify(
                     f => f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read), Times.Once);

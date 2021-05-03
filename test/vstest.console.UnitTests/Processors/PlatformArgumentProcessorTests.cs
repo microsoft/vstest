@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             this.executor.Initialize("x64");
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
-            Assert.AreEqual(ObjectModel.Architecture.X64.ToString(), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(nameof(ObjectModel.Architecture.X64), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             executor.Initialize("ArM");
             Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
-            Assert.AreEqual(ObjectModel.Architecture.ARM.ToString(), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(nameof(ObjectModel.Architecture.ARM), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         #endregion

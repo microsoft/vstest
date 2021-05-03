@@ -529,7 +529,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 try
                 {
-                    EqtTrace.Verbose("CurrentDomain_AssemblyResolve: Resolving assembly '{0}'.", args.Name);
+                    EqtTrace.Verbose("CurrentDomainAssemblyResolve: Resolving assembly '{0}'.", args.Name);
 
                     if (this.resolvedAssemblies.TryGetValue(args.Name, out assembly))
                     {

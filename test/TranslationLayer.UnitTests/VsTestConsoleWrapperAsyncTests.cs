@@ -185,7 +185,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testSources, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
-
         [TestMethod]
         public async Task RunTestsAsyncWithSourcesAndNullOptionsShouldSucceedOnNullOptions()
         {
@@ -193,7 +192,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testSources, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
-
 
         [TestMethod]
         public async Task RunTestsAsyncWithSourcesAndOptionsShouldSucceedOnOptions()

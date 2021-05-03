@@ -131,5 +131,27 @@
                 return ResourceManager.GetString("MethodNotImplementedOnPlatform", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A closing single quote was expected at the end of the segment! (segment: {0}).
+        /// </summary>
+        internal static string ErrorNoClosingQuote
+        {
+            get
+            {
+                return ResourceManager.GetString("ErrorNoClosingQuote", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid escape sequence! (segment: {0}, pos: {1})
+        /// </summary>
+        internal static string ErrorInvalidSequenceAt
+        {
+            get
+            {
+                return ResourceManager.GetString("ErrorInvalidSequenceAt", resourceCulture);
+            }
+        }
     }
 }

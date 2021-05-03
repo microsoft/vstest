@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         internal DiaSession(string binaryPath, string searchPath, ISymbolReader symbolReader)
         {
             this.symbolReader = symbolReader;
-            ValidateArg.NotNullOrEmpty(binaryPath, "binaryPath");
+            ValidateArg.NotNullOrEmpty(binaryPath, nameof(binaryPath));
             this.symbolReader.CacheSymbols(binaryPath, searchPath);
         }
 
@@ -86,8 +86,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns> The <see cref="INavigationData" /> for that method. </returns>
         public INavigationData GetNavigationDataForMethod(string declaringTypeName, string methodName)
         {
-            ValidateArg.NotNullOrEmpty(declaringTypeName, "declaringTypeName");
-            ValidateArg.NotNullOrEmpty(methodName, "methodName");
+            ValidateArg.NotNullOrEmpty(declaringTypeName, nameof(declaringTypeName));
+            ValidateArg.NotNullOrEmpty(methodName, nameof(methodName));
             methodName = methodName.TrimEnd(TestNameStripChars);
             return this.symbolReader.GetNavigationData(declaringTypeName, methodName);
         }

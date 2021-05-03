@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
         /// tracking counts per source for the minimal and quiet output.
         /// </summary>
-        private ConcurrentDictionary<Guid, TestResult> leafTestResults { get; set; }
+        private ConcurrentDictionary<Guid, TestResult> LeafTestResults { get; set; }
 
         #endregion
 
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             if (events == null)
             {
-                throw new ArgumentNullException("events");
+                throw new ArgumentNullException(nameof(events));
             }
 
             if (ConsoleLogger.Output == null)
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            this.leafTestResults = new ConcurrentDictionary<Guid, TestResult>();
+            this.LeafTestResults = new ConcurrentDictionary<Guid, TestResult>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -220,19 +220,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
 
-            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosity);
+            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out var verbosity);
             if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
                 this.verbosityLevel = verbosityLevel;
             }
 
-            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
+            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out var prefix);
             if (prefixExists)
             {
                 bool.TryParse(prefix, out AppendPrefix);
             }
 
-            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out string enableProgress);
+            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out var enableProgress);
             if (progressArgExists)
             {
                 bool.TryParse(enableProgress, out EnableProgress);
@@ -422,15 +422,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Event Handlers
+       #region Event Handlers
 
         /// <summary>
         /// Called when a test run start is received
         /// </summary>
         private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunStartEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunStartEventArgs>(e, nameof(e));
 
             // Print all test containers.
             Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
@@ -448,8 +448,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunMessageEventArgs>(e, nameof(e));
 
             switch (e.Level)
             {
@@ -513,8 +513,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestResultHandler(object sender, TestResultEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestResultEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestResultEventArgs>(e, nameof(e));
 
             var testDisplayName = e.Result.DisplayName;
 
@@ -538,15 +538,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // This would return false if the id did not exist,
                 // or true if it did exist. In either case the id is not in the dictionary
                 // which is our goal.
-                leafTestResults.TryRemove(parentExecutionId, out _);
+                LeafTestResults.TryRemove(parentExecutionId, out _);
             }
 
-            if (!leafTestResults.TryAdd(executionId, e.Result))
+            if (!LeafTestResults.TryAdd(executionId, e.Result))
             {
                 // This would happen if the key already exists. This should not happen, because we are 
                 // inserting by GUID key, so this would mean an error in our code.
                 throw new InvalidOperationException($"ExecutionId {executionId} already exists.");
-            };
+            }
 
             switch (e.Result.Outcome)
             {
@@ -701,7 +701,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            var leafTestResultsPerSource = this.leafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
+            var leafTestResultsPerSource = this.LeafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
             foreach (var sd in leafTestResultsPerSource)
             {
                 var source = sd.Key;
@@ -763,7 +763,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         default:
                             resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
                             break;
-                    };
+                    }
 
                     var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
                     var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
@@ -788,7 +788,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         sourceName,
                         frameworkString);
 
-                    
+
                     ConsoleColor? color = null;
                     if (sourceOutcome == TestOutcome.Failed)
                     {
@@ -831,7 +831,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
                 else if (e.IsAborted)
                 {
-                    Output.Error(false, CommandLineResources.TestRunAborted);
+                    if (e.Error == null)
+                    {
+                        Output.Error(false, CommandLineResources.TestRunAborted);
+                    }
+                    else
+                    {
+                        Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
+                    }
                 }
 
                 return;
@@ -843,7 +850,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else if (e.IsAborted)
             {
-                Output.Error(false, CommandLineResources.TestRunAborted);
+                if (e.Error == null)
+                {
+                    Output.Error(false, CommandLineResources.TestRunAborted);
+                }
+                else
+                {
+                    Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
+                }
             }
             else if (failedTests > 0 || this.testRunHasErrorMessages)
             {

@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="fileTransferInformation">Information about the file being transferred.</param>
         public override void SendFileAsync(FileTransferInformation fileTransferInformation)
         {
-            ValidateArg.NotNull(fileTransferInformation, "fileTransferInformation");
+            ValidateArg.NotNull(fileTransferInformation, nameof(fileTransferInformation));
 
             this.AttachmentManager.AddAttachment(fileTransferInformation, this.SendFileCompleted, this.DataCollectorConfig.TypeUri, this.DataCollectorConfig.FriendlyName);
         }

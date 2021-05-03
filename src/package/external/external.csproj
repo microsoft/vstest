@@ -57,10 +57,22 @@
       <Version>$(CodeCoverageExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Coverage.Interprocess">
+    <PackageReference Include="Microsoft.VisualStudio.Coverage.IO">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>     
+    <PackageReference Include="Microsoft.Internal.CodeCoverage">
       <Version>$(CodeCoverageExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Internal.CodeCoverage.InstrumentationMethod.alpine">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.CodeCoverage.InstrumentationMethod.ubuntu">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>    
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
@@ -70,7 +82,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.CUIT">
-      <Version>16.8.0-preview-4040788</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
@@ -78,11 +90,19 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">
-      <Version>14.0.0</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.Dia.Interop">
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3247</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Interop">
+      <Version>$(InteropExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
@@ -101,6 +121,10 @@
       <Version>$(MicrosoftFakesVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions">
+      <Version>$(TestPlatformExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.
          We've to set to net472 since the net451 and other packages have assemblies in wrong case.
          E.g. System.XML instead of System.Xml. -->
@@ -108,6 +132,9 @@
       <Version>1.0.0</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+
+    <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
+    <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

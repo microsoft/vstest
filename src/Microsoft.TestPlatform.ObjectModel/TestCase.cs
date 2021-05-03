@@ -54,9 +54,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </param>
         public TestCase(string fullyQualifiedName, Uri executorUri, string source)
         {
-            ValidateArg.NotNullOrEmpty(fullyQualifiedName, "fullyQualifiedName");
-            ValidateArg.NotNull(executorUri, "executorUri");
-            ValidateArg.NotNullOrEmpty(source, "source");
+            ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
+            ValidateArg.NotNull(executorUri, nameof(executorUri));
+            ValidateArg.NotNullOrEmpty(source, nameof(source));
 
             this.FullyQualifiedName = fullyQualifiedName;
             this.ExecutorUri = executorUri;
@@ -258,7 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {
@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         protected override void ProtectedSetPropertyValue(TestProperty property, object value)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {

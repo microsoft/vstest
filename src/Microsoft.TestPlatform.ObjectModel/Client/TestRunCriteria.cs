@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         public TestRunCriteria(
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -228,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   testHostLauncher)
         {
             var testSources = sources as IList<string> ?? sources.ToList();
-            ValidateArg.NotNullOrEmpty(testSources, "sources");
+            ValidateArg.NotNullOrEmpty(testSources, nameof(sources));
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
@@ -244,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// Create the TestRunCriteria for a test run.
         /// </summary>
-        /// 
+        ///
         /// <param name="sources">Sources which contains tests that should be executed.</param>
         /// <param name="testRunCriteria">The test run criteria.</param>
         public TestRunCriteria(
@@ -253,20 +253,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             : base(testRunCriteria)
         {
             var testSources = sources as IList<string> ?? sources.ToArray();
-            ValidateArg.NotNullOrEmpty(testSources, "sources");
+            ValidateArg.NotNullOrEmpty(testSources, nameof(sources));
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
 
             this.TestCaseFilter = testRunCriteria.testCaseFilter;
             this.FilterOptions = testRunCriteria.filterOptions;
-
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="adapterSourceMap">
         /// Sources which contains tests that should be executed.
         /// </param>
@@ -295,7 +294,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   runStatsChangeEventTimeout,
                   testHostLauncher)
         {
-            ValidateArg.NotNullOrEmpty(adapterSourceMap, "adapterSourceMap");
+            ValidateArg.NotNullOrEmpty(adapterSourceMap, nameof(adapterSourceMap));
 
             this.AdapterSourceMap = adapterSourceMap;
         }
@@ -303,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         public TestRunCriteria(
@@ -319,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -340,7 +339,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -364,7 +363,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -393,14 +392,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="baseTestRunCriteria">The base test run criteria.</param>
         public TestRunCriteria(IEnumerable<TestCase> tests, BaseTestRunCriteria baseTestRunCriteria)
             : base(baseTestRunCriteria)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
-            ValidateArg.NotNullOrEmpty(testCases, "tests");
+            ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
             this.Tests = testCases;
         }
@@ -408,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -443,7 +442,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="tests">Tests which should be executed.</param>
         /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event.</param>
         /// <param name="keepAlive">
@@ -477,7 +476,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   testHostLauncher)
         {
             var testCases = tests as IList<TestCase> ?? tests.ToList();
-            ValidateArg.NotNullOrEmpty(testCases, "tests");
+            ValidateArg.NotNullOrEmpty(testCases, nameof(tests));
 
             this.Tests = testCases;
             this.TestSessionInfo = testSessionInfo;
@@ -657,11 +656,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="runCriteria">Run criteria to clone.</param>
         public BaseTestRunCriteria(BaseTestRunCriteria runCriteria)
         {
-            ValidateArg.NotNull(runCriteria, "runCriteria");
+            ValidateArg.NotNull(runCriteria, nameof(runCriteria));
 
             this.FrequencyOfRunStatsChangeEvent = runCriteria.FrequencyOfRunStatsChangeEvent;
             this.KeepAlive = runCriteria.KeepAlive;
@@ -673,7 +672,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -685,7 +684,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -700,7 +699,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -723,7 +722,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -751,7 +750,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="frequencyOfRunStatsChangeEvent">
         /// Frequency of <c>TestRunChangedEvent</c>.
         /// </param>
@@ -813,7 +812,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets the frequency of run stats test event.
         /// </summary>
-        /// 
+        ///
         /// <remarks>
         /// Run stats change event will be raised after completion of these number of tests.
         /// Note that this event is raised asynchronously and the underlying execution process is not

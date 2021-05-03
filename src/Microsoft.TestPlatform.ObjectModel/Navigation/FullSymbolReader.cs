@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol)
         {
-            ValidateArg.NotNull(symbol, "symbol");
+            ValidateArg.NotNull(symbol, nameof(symbol));
 
             DiaNavigationData navigationData = new DiaNavigationData(null, int.MaxValue, int.MinValue);
 
@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                             continue;
                         }
 
-                        sourceFile.GetFilename(out string srcFileName);
+                        sourceFile.GetFilename(out var srcFileName);
 
                         navigationData.FileName = srcFileName;
                         navigationData.MinLineNumber = Math.Min(navigationData.MinLineNumber, (int)startLine);
@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 enumTypeSymbols.GetNext(1, out IDiaSymbol typeSymbol, out uint celtTypeSymbol);
                 while (celtTypeSymbol == 1 && typeSymbol != null)
                 {
-                    typeSymbol.GetName(out string name);
+                    typeSymbol.GetName(out var name);
                     this.typeSymbols[name] = typeSymbol;
 
                     IDiaEnumSymbols enumMethodSymbols = null;
@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                         enumMethodSymbols.GetNext(1, out IDiaSymbol methodSymbol, out uint celtMethodSymbol);
                         while (celtMethodSymbol == 1 && methodSymbol != null)
                         {
-                            methodSymbol.GetName(out string methodName);
+                            methodSymbol.GetName(out var methodName);
                             UpdateMethodSymbolCache(methodName, methodSymbol, methodSymbolsForType);
                             enumMethodSymbols.GetNext(1, out methodSymbol, out celtMethodSymbol);
                         }
@@ -309,7 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private IDiaSymbol GetTypeSymbol(string typeName, SymTagEnum symTag)
         {
-            ValidateArg.NotNullOrEmpty(typeName, "typeName");
+            ValidateArg.NotNullOrEmpty(typeName, nameof(typeName));
 
             IDiaEnumSymbols enumSymbols = null;
             IDiaSymbol typeSymbol = null;
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                                 break;
                             }
 
-                            childSymbol.GetName(out string childSymbolName);
+                            childSymbol.GetName(out var childSymbolName);
                             children.Add(childSymbolName);
                             ReleaseComObject(ref childSymbol);
                         }
@@ -376,8 +376,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private IDiaSymbol GetMethodSymbol(IDiaSymbol typeSymbol, string methodName)
         {
-            ValidateArg.NotNull(typeSymbol, "typeSymbol");
-            ValidateArg.NotNullOrEmpty(methodName, "methodName");
+            ValidateArg.NotNull(typeSymbol, nameof(typeSymbol));
+            ValidateArg.NotNullOrEmpty(methodName, nameof(methodName));
 
             IDiaEnumSymbols enumSymbols = null;
             IDiaSymbol methodSymbol = null;

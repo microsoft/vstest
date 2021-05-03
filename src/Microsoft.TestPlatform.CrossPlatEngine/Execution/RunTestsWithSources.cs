@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Validate the sources 
             foreach (var kvp in this.adapterSourceMap)
             {
-                var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger);
+                var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger, package);
                 if (verifiedSources.Any())
                 {
                     verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);

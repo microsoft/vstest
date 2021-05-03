@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Get trace level from diag parameters.
-            var traceLevelExists = diagParameters.TryGetValue(TraceLevelParam, out string traceLevelStr);
+            var traceLevelExists = diagParameters.TryGetValue(TraceLevelParam, out var traceLevelStr);
             if (traceLevelExists && Enum.TryParse(traceLevelStr, true, out PlatformTraceLevel traceLevel))
             {
                 return traceLevel;

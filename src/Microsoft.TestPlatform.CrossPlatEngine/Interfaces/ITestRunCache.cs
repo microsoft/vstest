@@ -23,6 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         TestRunStatistics TestRunStatistics { get; }
 
+        IDictionary<string, int> AdapterTelemetry { get; }
+
         #endregion
 
         #region Methods

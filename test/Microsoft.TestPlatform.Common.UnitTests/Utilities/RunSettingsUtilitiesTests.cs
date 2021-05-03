@@ -114,12 +114,11 @@ namespace TestPlatform.Common.UnitTests.Utilities
     {
         public void Load(XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
             reader.Read();
             StringToVerify = reader.ReadOuterXml();
         }
 
         public static string StringToVerify = string.Empty;
     }
-
 }

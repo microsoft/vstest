@@ -40,28 +40,28 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         internal TraitCollection(TestObject testObject)
         {
-            ValidateArg.NotNull(testObject, "testObject");
+            ValidateArg.NotNull(testObject, nameof(testObject));
 
             this.testObject = testObject;
         }
 
         public void Add(Trait trait)
         {
-            ValidateArg.NotNull(trait, "trait");
+            ValidateArg.NotNull(trait, nameof(trait));
 
             this.AddRange(new[] { trait });
         }
 
         public void Add(string name, string value)
         {
-            ValidateArg.NotNull(name, "name");
+            ValidateArg.NotNull(name, nameof(name));
 
             this.Add(new Trait(name, value));
         }
 
         public void AddRange(IEnumerable<Trait> traits)
         {
-            ValidateArg.NotNull(traits, "traits");
+            ValidateArg.NotNull(traits, nameof(traits));
 
             var existingTraits = this.GetTraits();
             this.Add(existingTraits, traits);

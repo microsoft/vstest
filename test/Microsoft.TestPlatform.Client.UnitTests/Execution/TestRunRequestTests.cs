@@ -156,7 +156,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             executionManager.Verify(dm => dm.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
-
         [TestMethod]
         public void OnTestSessionTimeoutShouldCallAbort()
         {
@@ -481,7 +480,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         {
             testRunRequest.HandleLogMessage(TestMessageLevel.Error, "hello");
             loggerManager.Verify(lm => lm.HandleTestRunMessage(It.IsAny<TestRunMessageEventArgs>()), Times.Once);
-
         }
 
         [TestMethod]
