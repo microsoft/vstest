@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+    using TranslationLayerResources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
     /// <summary>
     /// Vstest console request sender for sending requests to vstest.console.exe
@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// The minimum protocol version that has test session support.
         /// </summary>
-        private const int MinimumProtocolVersionWithTestSessionSupport = 5;
+        private const int MinimumProtocolVersionWithTestSessionSupport = 6;
 
         private readonly ICommunicationManager communicationManager;
 

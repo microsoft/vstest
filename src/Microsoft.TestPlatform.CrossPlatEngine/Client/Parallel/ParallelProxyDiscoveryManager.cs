@@ -188,7 +188,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
-
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                                                 this.requestData,
                                                 concurrentManager,
