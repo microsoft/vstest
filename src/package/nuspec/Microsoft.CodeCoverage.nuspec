@@ -28,6 +28,8 @@
   <files>
     <file src="Icon.png" target="" />
     <file src="licenses\LICENSE_NET.txt" target="" />
+    <file src="ThirdPartyNoticesCodeCoverage.txt" target="ThirdPartyNotices.txt" />
+    <file src="ThirdPartyNoticesCodeCoverage.txt" target="build\netstandard1.0\ThirdPartyNotices.txt" />
     <file src="Microsoft.CodeCoverage.props" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage.targets" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard1.0\" />
