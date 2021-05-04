@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -111,6 +111,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     this.discoveryDataAggregator.IsAborted);
                 finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
+                // Getting all sources with their discovery statuses
+                finalDiscoveryCompleteEventArgs.FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered);
+                finalDiscoveryCompleteEventArgs.PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered);
+                finalDiscoveryCompleteEventArgs.NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered);
+
                 // send actual test discovery complete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
             }
@@ -159,6 +164,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        }
+
+        /// <summary>
+        /// Filters dictionary based on condition if source was fully discovered or not
+        /// </summary>
+        /// <param name="discoveryStatus">discoveryStatus indicates if source was fully or partially discovered</param>
+        /// <returns></returns>
+        private IList<string> getFilteredSources(DiscoveryStatus discoveryStatus)
+        {
+            var discoveredSources = this.parallelProxyDiscoveryManager.DiscoveredSources;
+            
+            if (discoveredSources == null)
+            {
+                return null;
+            }
+
+            return  discoveredSources.Where(source => source.Value == discoveryStatus)
+                                     .Select(source => source.Key).ToList();
         }
     }
 }

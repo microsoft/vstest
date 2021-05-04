@@ -38,6 +38,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         public bool IsAborted { get; private set; }
 
+        // List of sources which were fully discovered
+        public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+
+        // List of sources which were partially discovered (started discover tests, but then discovery aborted)
+        public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+
+        // List of sources which were not discovered at all
+        public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+
         /// <summary>
         /// Metrics
         /// </summary>

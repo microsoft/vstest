@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -49,6 +50,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// LockObject to update discovery status in parallel
         /// </summary>
         private object discoveryStatusLockObject = new object();
+
+        // Lock object for putting Not discovered sources in a dictionary
+        private object enumeratorLockObject = new object();
+
+        public ConcurrentDictionary<string, DiscoveryStatus> DiscoveredSources { get; set; } = new ConcurrentDictionary<string, DiscoveryStatus> ();
 
         #endregion
 
@@ -115,8 +121,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 // Each concurrent Executor calls this method
                 // So, we need to keep track of total discovery complete calls
-                this.discoveryCompletedClients++;
-
+                this.discoveryCompletedClients++;              
+                
                 // If there are no more sources/testcases, a parallel executor is truly done with discovery
                 allDiscoverersCompleted = this.discoveryCompletedClients == this.availableTestSources;
 
@@ -134,6 +140,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             */
             if (allDiscoverersCompleted || discoveryAbortRequested)
             {
+                // Put all sources which are not enumerated as NotDiscovered
+                this.getAllNotDiscoveredSources();
+
                 // Reset enumerators
                 this.sourceEnumerator = null;
 
@@ -225,7 +234,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                             EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
                         }
 
+                        // First marking source as "partially discovered"
+                        DiscoveredSources[nextSource] = DiscoveryStatus.PartiallyDiscovered;
+
                         proxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.GetHandlerForGivenManager(proxyDiscoveryManager));
+
+                        // Then marking source as "fully discovered" after discovery finishes
+                        if (DiscoveredSources.ContainsKey(nextSource))
+                        {
+                            DiscoveredSources[nextSource] = DiscoveryStatus.FullyDiscovered;
+                        }
                     })
                     .ContinueWith(t =>
                     {
@@ -256,6 +274,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
+            }
+        }
+
+        /// <summary>
+        /// Gets all sources which were not discovered(skipped), because of cancelation/abortion of discovery
+        /// </summary>
+        private void getAllNotDiscoveredSources()
+        {
+            lock (enumeratorLockObject)
+            {
+                while (this.sourceEnumerator != null && this.sourceEnumerator.MoveNext())
+                {
+                    DiscoveredSources[sourceEnumerator.Current] = DiscoveryStatus.NotDiscovered;
+                }
             }
         }
     }
