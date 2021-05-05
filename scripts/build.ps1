@@ -902,6 +902,7 @@ function Create-NugetPackages
     # Copy empty and third patry notice file
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
+    Copy-Item $tpNuspecDir\..\"ThirdPartyNoticesCodeCoverage.txt" $stagingDir -Force
 
     # Copy licenses folder
     Copy-Item (Join-Path $env:TP_PACKAGE_PROJ_DIR "licenses") $stagingDir -Force -Recurse
