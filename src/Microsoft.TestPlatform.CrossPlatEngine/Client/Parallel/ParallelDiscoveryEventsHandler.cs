@@ -94,8 +94,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     TotalTests = discoveryDataAggregator.TotalTests,
                     IsAborted = discoveryDataAggregator.IsAborted,
-                    LastDiscoveredTests = null
+                    LastDiscoveredTests = null,
                 };
+
+                testDiscoveryCompletePayload.FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered);
+                testDiscoveryCompletePayload.PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered);
+                testDiscoveryCompletePayload.NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered);
 
                 // Collecting Final Discovery State
                 this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, isAborted ? "Aborted" : "Completed");
@@ -112,9 +116,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // Getting all sources with their discovery statuses
-                finalDiscoveryCompleteEventArgs.FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered);
-                finalDiscoveryCompleteEventArgs.PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered);
-                finalDiscoveryCompleteEventArgs.NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered);
+                //finalDiscoveryCompleteEventArgs.FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered);
+                //finalDiscoveryCompleteEventArgs.PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered);
+                //finalDiscoveryCompleteEventArgs.NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered);
 
                 // send actual test discovery complete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);

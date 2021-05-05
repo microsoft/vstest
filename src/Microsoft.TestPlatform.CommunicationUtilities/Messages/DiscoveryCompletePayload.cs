@@ -30,5 +30,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets the Metrics
         /// </summary>
         public IDictionary<string, object> Metrics { get; set; }
+
+        // List of sources which were fully discovered
+        public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+
+        // List of sources which were partially discovered (started discover tests, but then discovery aborted)
+        public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+
+        // List of sources which were not discovered at all
+        public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
     }
 }
