@@ -52,6 +52,6 @@ VSTest platform is licensed under the [MIT license](https://github.com/Microsoft
 
 ### Issue Tracking
 Please see [issue tracking](https://github.com/Microsoft/vstest-docs/blob/master/issuetracking.md) for a description of the workflow we use to process issues.
-
+ 
 ### Roadmap
 For more information on shipped and upcoming features/enhancements please refer to our [Releases](https://github.com/Microsoft/vstest-docs/blob/master/docs/releases.md) and [Quarterly Checkin reports](https://github.com/Microsoft/vstest-docs/tree/master/Quarterly%20Checkins)
