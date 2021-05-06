@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -11,33 +12,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
     /// </summary>
     public class DiscoveryCompletePayload
     {
+        [DataMember]
+
         /// <summary>
         /// Gets or sets the total number of tests discovered.
         /// </summary>
         public long TotalTests { get; set; }
+
+        [DataMember]
 
         /// <summary>
         /// Gets or sets the last chunk of discovered tests.
         /// </summary>
         public IEnumerable<TestCase> LastDiscoveredTests { get; set; }
 
+        [DataMember]
+
         /// <summary>
         /// Gets or sets a value indicating whether discovery was aborted.
         /// </summary>
         public bool IsAborted { get; set; }
+
+        [DataMember]
 
         /// <summary>
         /// Gets or sets the Metrics
         /// </summary>
         public IDictionary<string, object> Metrics { get; set; }
 
-        // List of sources which were fully discovered
-        public IList<string> FullyDiscoveredSources { get; set; } = new List<string>();
+        [DataMember]
 
-        // List of sources which were partially discovered (started discover tests, but then discovery aborted)
-        public IList<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+        /// <summary>
+        /// Gets or sets list of sources which were fully discovered
+        /// </summary>
+        public IReadOnlyCollection<string> FullyDiscoveredSources { get; set; } = new List<string>();
 
-        // List of sources which were not discovered at all
-        public IList<string> NotDiscoveredSources { get; set; } = new List<string>();
+        [DataMember]
+
+        /// <summary>
+        /// Gets or sets list of sources which were partially discovered (started discover tests, but then discovery aborted)
+        /// </summary>
+        public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; set; } = new List<string>();
+
+        [DataMember]
+
+        /// <summary>
+        /// Gets or sets list of sources which were not discovered at all
+        /// </summary>
+        public IReadOnlyCollection<string> NotDiscoveredSources { get; set; } = new List<string>();
     }
 }

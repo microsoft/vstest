@@ -3,8 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
-    using System.Collections.Generic;
     using System.Linq;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -95,11 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     TotalTests = discoveryDataAggregator.TotalTests,
                     IsAborted = discoveryDataAggregator.IsAborted,
                     LastDiscoveredTests = null,
+                    FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered),
+                    PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered),
+                    NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered)
                 };
-
-                testDiscoveryCompletePayload.FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered);
-                testDiscoveryCompletePayload.PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered);
-                testDiscoveryCompletePayload.NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered);
 
                 // Collecting Final Discovery State
                 this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, isAborted ? "Aborted" : "Completed");
@@ -114,11 +113,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
                     this.discoveryDataAggregator.IsAborted);
                 finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
-
-                // Getting all sources with their discovery statuses
-                //finalDiscoveryCompleteEventArgs.FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered);
-                //finalDiscoveryCompleteEventArgs.PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered);
-                //finalDiscoveryCompleteEventArgs.NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered);
 
                 // send actual test discovery complete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
@@ -175,15 +169,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         /// <param name="discoveryStatus">discoveryStatus indicates if source was fully or partially discovered</param>
         /// <returns></returns>
-        private IList<string> getFilteredSources(DiscoveryStatus discoveryStatus)
+        private IReadOnlyCollection<string> getFilteredSources(DiscoveryStatus discoveryStatus)
         {
-            var discoveredSources = this.parallelProxyDiscoveryManager.DiscoveredSources;
-            
+            var discoveredSources = this.parallelProxyDiscoveryManager.DiscoveredSources;      
             if (discoveredSources == null)
             {
                 return null;
             }
-
             return  discoveredSources.Where(source => source.Value == discoveryStatus)
                                      .Select(source => source.Key).ToList();
         }
