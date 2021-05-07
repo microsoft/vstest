@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -23,10 +24,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Utilities;
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     /// <summary>
     /// Enumerates through all the discoverers.
@@ -38,6 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private readonly IRequestData requestData;
         private readonly IAssemblyProperties assemblyProperties;
         private readonly CancellationToken cancellationToken;
+
+        internal ConcurrentDictionary<string, DiscoveryStatus> DiscoveredSources { get; private set; } = new ConcurrentDictionary<string, DiscoveryStatus>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
@@ -161,6 +165,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         return;
                     }
 
+                    // First mark sources as partially discovered before starting discovery
+                    markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.PartiallyDiscovered);
                     this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
                 }
 
@@ -200,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             ref double totalAdaptersUsed,
             ref double totalTimeTakenByAdapters)
         {
-            if (!DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType))
+            if (!TryToLoadDiscoverer(discoverer, logger, out var discovererType))
             {
                 // Fail to instantiate the discoverer type.
                 return;
@@ -231,6 +237,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 // Record Total Tests Discovered By each Discoverer.
                 var totalTestsDiscoveredByCurrentDiscoverer = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
+
+                // If we discovered tests in sources, so mark them as fully discovered
+                if (totalTestsDiscoveredByCurrentDiscoverer > 0)
+                {
+                    markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.FullyDiscovered);
+                }
+
                 this.requestData.MetricsCollection.Add(
                     string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
                         discoverer.Metadata.DefaultExecutorUri), totalTestsDiscoveredByCurrentDiscoverer);
@@ -255,6 +268,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
             catch (Exception e)
             {
+                // If exception happens mark sources as not discovered
+                markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
+
                 var message = string.Format(
                     CultureInfo.CurrentUICulture,
                     CrossPlatEngineResources.ExceptionFromLoadTests,
@@ -494,6 +510,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
 
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Marking sources with specific Dis
+        /// </summary>
+        /// <param name="sources">List of sources to mark</param>
+        /// <param name="status">Status to set</param>
+        private void markSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
+        {
+            if (sources == null) return;
+
+            foreach (var source in sources)
+            {
+                DiscoveredSources[source] = status;
             }
         }
     }

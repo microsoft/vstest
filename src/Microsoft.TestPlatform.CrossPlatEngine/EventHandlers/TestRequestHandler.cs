@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
@@ -204,7 +205,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         TotalTests = discoveryCompleteEventArgs.TotalCount,
                         LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
                         IsAborted = discoveryCompleteEventArgs.IsAborted,
-                        Metrics = discoveryCompleteEventArgs.Metrics
+                        Metrics = discoveryCompleteEventArgs.Metrics,
+                        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
+                        PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
+                        NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources
                     },
                     this.protocolVersion);
             this.SendData(data);
