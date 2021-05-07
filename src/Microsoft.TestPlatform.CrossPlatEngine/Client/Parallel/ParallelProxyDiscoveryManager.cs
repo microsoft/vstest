@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 // Each concurrent Executor calls this method
                 // So, we need to keep track of total discovery complete calls
-                this.discoveryCompletedClients++;              
+                this.discoveryCompletedClients++;
                 
                 // If there are no more sources/testcases, a parallel executor is truly done with discovery
                 allDiscoverersCompleted = this.discoveryCompletedClients == this.availableTestSources;
