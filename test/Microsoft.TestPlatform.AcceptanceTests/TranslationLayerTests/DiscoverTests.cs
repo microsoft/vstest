@@ -145,6 +145,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         [TestMethod]
         [NetCoreTargetFrameworkDataSource]
+        [NetFullTargetFrameworkDataSource]
         public void DisoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);

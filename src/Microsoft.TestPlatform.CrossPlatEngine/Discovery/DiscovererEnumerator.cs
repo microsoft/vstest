@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
 
                     // First mark sources as partially discovered before starting discovery
-                    markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.PartiallyDiscovered);
+                    markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
                     this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
                 }
 
@@ -269,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             catch (Exception e)
             {
                 // If exception happens mark sources as not discovered
-                markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
+                markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.PartiallyDiscovered);
 
                 var message = string.Format(
                     CultureInfo.CurrentUICulture,
