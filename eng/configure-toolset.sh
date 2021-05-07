@@ -6,6 +6,8 @@ function Test-FilesUseTelemetryOutput {
         'eng/common/cibuild.sh'
         'eng/common/cross/armel/tizen-build-rootfs.sh'
         'eng/common/cross/armel/tizen-fetch.sh'
+        'eng/common/cross/arm64/tizen-build-rootfs.sh'
+        'eng/common/cross/arm64/tizen-fetch.sh'
         'eng/common/cross/build-android-rootfs.sh'
         'eng/common/cross/build-rootfs.sh'
         'eng/common/darc-init.sh'

@@ -4,6 +4,10 @@
 
 set -e
 
+# install Arcade and tooling
+source "eng/common/tools.sh"
+InitializeToolset
+
 source "scripts/build.sh" "$@"
 
 if [[ $? -ne 0 ]]; then
