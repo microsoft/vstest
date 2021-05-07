@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (allDiscoverersCompleted || discoveryAbortRequested)
             {
                 // Put all sources which are not enumerated as NotDiscovered
-                this.getAllNotDiscoveredSources();
+                this.GetAllNotDiscoveredSources();
 
                 // Reset enumerators
                 this.sourceEnumerator = null;
@@ -280,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <summary>
         /// Gets all sources which were not discovered(skipped), because of cancelation/abortion of discovery
         /// </summary>
-        private void getAllNotDiscoveredSources()
+        private void GetAllNotDiscoveredSources()
         {
             lock (enumeratorLockObject)
             {

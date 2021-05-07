@@ -146,9 +146,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
                                                         totalDiscoveredTestCount,
                                                         false,
-                                                        getFilteredSources(discovererEnumerator, DiscoveryStatus.FullyDiscovered),
-                                                        getFilteredSources(discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
-                                                        getFilteredSources(discovererEnumerator, DiscoveryStatus.NotDiscovered));
+                                                        GetFilteredSources(discovererEnumerator, DiscoveryStatus.FullyDiscovered),
+                                                        GetFilteredSources(discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
+                                                        GetFilteredSources(discovererEnumerator, DiscoveryStatus.NotDiscovered));
 
                     discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
@@ -313,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="discoveryStatus">discoveryStatus indicates if source was fully/partially/not discovered</param>
         /// <returns></returns>
-        private IReadOnlyCollection<string> getFilteredSources(DiscovererEnumerator discovererEnumerator, DiscoveryStatus discoveryStatus)
+        private IReadOnlyCollection<string> GetFilteredSources(DiscovererEnumerator discovererEnumerator, DiscoveryStatus discoveryStatus)
         {
             // If there were no sources to discover we will return empty list of all 3 discovery statuses
             if (discovererEnumerator == null)

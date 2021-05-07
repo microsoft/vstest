@@ -95,9 +95,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     TotalTests = discoveryDataAggregator.TotalTests,
                     IsAborted = discoveryDataAggregator.IsAborted,
                     LastDiscoveredTests = null,
-                    FullyDiscoveredSources = getFilteredSources(DiscoveryStatus.FullyDiscovered),
-                    PartiallyDiscoveredSources = getFilteredSources(DiscoveryStatus.PartiallyDiscovered),
-                    NotDiscoveredSources = getFilteredSources(DiscoveryStatus.NotDiscovered)
+                    FullyDiscoveredSources = GetFilteredSources(DiscoveryStatus.FullyDiscovered),
+                    PartiallyDiscoveredSources = GetFilteredSources(DiscoveryStatus.PartiallyDiscovered),
+                    NotDiscoveredSources = GetFilteredSources(DiscoveryStatus.NotDiscovered)
                 };
 
                 // Collecting Final Discovery State
@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         /// <param name="discoveryStatus">discoveryStatus indicates if source was fully or partially discovered</param>
         /// <returns></returns>
-        private IReadOnlyCollection<string> getFilteredSources(DiscoveryStatus discoveryStatus)
+        private IReadOnlyCollection<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
         {
             var discoveredSources = this.parallelProxyDiscoveryManager.DiscoveredSources;      
             if (discoveredSources == null)

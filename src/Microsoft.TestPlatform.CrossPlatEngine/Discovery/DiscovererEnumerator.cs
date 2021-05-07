@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
 
                     // First mark sources as partially discovered before starting discovery
-                    markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
+                    MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
                     this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
                 }
 
@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If we discovered tests in sources, so mark them as fully discovered
                 if (totalTestsDiscoveredByCurrentDiscoverer > 0)
                 {
-                    markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.FullyDiscovered);
+                    MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.FullyDiscovered);
                 }
 
                 this.requestData.MetricsCollection.Add(
@@ -269,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             catch (Exception e)
             {
                 // If exception happens mark sources as not discovered
-                markSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.PartiallyDiscovered);
+                MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.PartiallyDiscovered);
 
                 var message = string.Format(
                     CultureInfo.CurrentUICulture,
@@ -518,7 +518,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="sources">List of sources to mark</param>
         /// <param name="status">Status to set</param>
-        private void markSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
+        private void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
         {
             if (sources == null) return;
 
