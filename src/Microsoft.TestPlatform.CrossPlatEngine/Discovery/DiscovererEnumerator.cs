@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         return;
                     }
 
-                    // First mark sources as partially discovered before starting discovery
+                    // First mark sources as not discovered before starting discovery
                     MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
                     this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
                 }
@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
             catch (Exception e)
             {
-                // If exception happens mark sources as not discovered
+                // If exception happens mark sources as not partially discovered
                 MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.PartiallyDiscovered);
 
                 var message = string.Format(
