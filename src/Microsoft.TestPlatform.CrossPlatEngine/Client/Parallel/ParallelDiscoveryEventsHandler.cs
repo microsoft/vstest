@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
-    using System.Linq;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -94,10 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     TotalTests = discoveryDataAggregator.TotalTests,
                     IsAborted = discoveryDataAggregator.IsAborted,
-                    LastDiscoveredTests = null,
-                    FullyDiscoveredSources = GetFilteredSources(DiscoveryStatus.FullyDiscovered),
-                    PartiallyDiscoveredSources = GetFilteredSources(DiscoveryStatus.PartiallyDiscovered),
-                    NotDiscoveredSources = GetFilteredSources(DiscoveryStatus.NotDiscovered)
+                    LastDiscoveredTests = null
                 };
 
                 // Collecting Final Discovery State
@@ -162,22 +158,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
-        }
-
-        /// <summary>
-        /// Filters dictionary based on condition if source was fully discovered or not
-        /// </summary>
-        /// <param name="discoveryStatus">discoveryStatus indicates if source was fully or partially discovered</param>
-        /// <returns></returns>
-        private IReadOnlyCollection<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
-        {
-            var discoveredSources = this.parallelProxyDiscoveryManager.DiscoveredSources;      
-            if (discoveredSources == null)
-            {
-                return null;
-            }
-            return  discoveredSources.Where(source => source.Value == discoveryStatus)
-                                     .Select(source => source.Key).ToList();
         }
     }
 }

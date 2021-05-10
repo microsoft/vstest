@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     /// <summary>
@@ -11,9 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// </summary>
     public interface IParallelProxyDiscoveryManager : IParallelOperationManager, IProxyDiscoveryManager
     {
-        // Dictionary for mapping sources with DiscoveryState
-        ConcurrentDictionary<string, DiscoveryStatus> DiscoveredSources { get; set; }
-
         /// <summary>
         /// Handles Partial Discovery Complete event coming from a specific concurrent proxy discovery manager
         /// Each concurrent proxy discovery manager will signal the parallel discovery manager when its complete
@@ -28,15 +24,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             long totalTests,
             IEnumerable<TestCase> lastChunk,
             bool isAborted);
-    }
-
-    /// <summary>
-    /// Enums for indicating discovery status of source
-    /// </summary>
-    public enum DiscoveryStatus
-    {
-        FullyDiscovered, // FullyDiscovered means that source was fully discovered
-        PartiallyDiscovered, // PartiallyDiscovered means that we started discovery of the source but smth happened (cancel/abort) and we stop processing it
-        NotDiscovered // Sources which were not touched during discovery
     }
 }

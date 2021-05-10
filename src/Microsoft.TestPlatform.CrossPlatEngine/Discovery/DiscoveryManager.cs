@@ -144,11 +144,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     // Collecting Total Tests Discovered
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
-                                                        totalDiscoveredTestCount,
-                                                        false,
-                                                        GetFilteredSources(discovererEnumerator, DiscoveryStatus.FullyDiscovered),
-                                                        GetFilteredSources(discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
-                                                        GetFilteredSources(discovererEnumerator, DiscoveryStatus.NotDiscovered));
+                                                          totalDiscoveredTestCount,
+                                                          false);
 
                     discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
@@ -306,30 +303,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     tc.Source = package;
                 }
             }
-        }
-
-        /// <summary>
-        /// Filters discovery sources based on discovery status condition
-        /// </summary>
-        /// <param name="discoveryStatus">discoveryStatus indicates if source was fully/partially/not discovered</param>
-        /// <returns></returns>
-        private IReadOnlyCollection<string> GetFilteredSources(DiscovererEnumerator discovererEnumerator, DiscoveryStatus discoveryStatus)
-        {
-            // If there were no sources to discover we will return empty list of all 3 discovery statuses
-            if (discovererEnumerator == null)
-            {
-                return new List<string>();
-            }
-
-            var discoveredSources = discovererEnumerator.DiscoveredSources;
-
-            if (discoveredSources == null)
-            {
-                return null;
-            }
-
-            return discoveredSources.Where(source => source.Value == discoveryStatus)
-                                     .Select(source => source.Key).ToList();
         }
     }
 }

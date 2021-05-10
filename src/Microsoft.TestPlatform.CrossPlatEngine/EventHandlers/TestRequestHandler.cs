@@ -204,10 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         TotalTests = discoveryCompleteEventArgs.TotalCount,
                         LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
                         IsAborted = discoveryCompleteEventArgs.IsAborted,
-                        Metrics = discoveryCompleteEventArgs.Metrics,
-                        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
-                        PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
-                        NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources
+                        Metrics = discoveryCompleteEventArgs.Metrics
                     },
                     this.protocolVersion);
             this.SendData(data);
