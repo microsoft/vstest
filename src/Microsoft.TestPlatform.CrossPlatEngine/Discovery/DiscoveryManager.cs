@@ -18,7 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -91,8 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 discoveryCriteria.DiscoveredTestEventTimeout,
                 this.OnReportTestCases);
 
-            DiscovererEnumerator discovererEnumerator = null;
-
             try
             {
                 this.discoveryCriteria = discoveryCriteria;
@@ -113,12 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    discovererEnumerator = new DiscovererEnumerator(this.requestData, discoveryResultCache, cancellationTokenSource.Token);
-                    discovererEnumerator.LoadTests(
-                        verifiedExtensionSourceMap,
-                        RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
-                        discoveryCriteria.TestCaseFilter,
-                        this.sessionMessageLogger);
+                    new DiscovererEnumerator(this.requestData, discoveryResultCache, cancellationTokenSource.Token).LoadTests(
+                                            verifiedExtensionSourceMap,
+                                            RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
+                                            discoveryCriteria.TestCaseFilter,
+                                            this.sessionMessageLogger);
                 }
             }
             finally
@@ -145,9 +141,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(
                                                           totalDiscoveredTestCount,
-                                                          false);
+                                                          false)
+                    {
+                        Metrics = this.requestData.MetricsCollection.Metrics
+                    };
 
-                    discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
                 }
                 else

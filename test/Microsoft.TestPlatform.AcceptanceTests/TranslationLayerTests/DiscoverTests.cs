@@ -144,25 +144,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [NetCoreTargetFrameworkDataSource]
-        [NetFullTargetFrameworkDataSource]
-        public void DisoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
-        {
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
-
-            var eventHandler2 = new DiscoveryEventHandler2();
-
-            this.vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(),
-                                                    this.GetDefaultRunSettings(),
-                                                    null,
-                                                    eventHandler2);
-
-            // Assert.
-            Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources.Count);
-        }
-
-        [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)

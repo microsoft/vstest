@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -87,9 +86,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + this.availableTestSources);
             }
-
-            // After previous enumerating, sourceEnumerator will be null, so we need again assign head of list to it
-            this.sourceEnumerator = discoveryCriteria.Sources.GetEnumerator();
 
             this.DiscoverTestsPrivate(eventHandler);
         }
