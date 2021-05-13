@@ -190,7 +190,7 @@ function install_cli()
         $install_script  --runtime dotnet --version "5.0.1" --channel "release/5.0.1" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
 
         log "install_cli: Get the latest dotnet cli toolset..."
-        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "master" --version $DOTNET_CLI_VERSION
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "main" --version $DOTNET_CLI_VERSION
 
 
         log " ---- dotnet x64"
