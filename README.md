@@ -34,7 +34,7 @@ There are many ways to contribute to VSTest
 - [Skip Default Adapters](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0018-Skip-Default-Adapters.md)
 - [Disable Appdomain While Running Tests](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0019-Disable-Appdomain-While-Running-Tests.md)
 - [Improving Logic To Pass Sources To Adapters](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0020-Improving-Logic-To-Pass-Sources-To-Adapters.md)
-- [Code Coverage for .Net Core](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0021-CodeCoverageForNetCore.md)
+- [Code Coverage for .NET Core](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0021-CodeCoverageForNetCore.md)
 - [User Specified TestAdapter Lookup](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md)
 - [TestSettings Deprecation](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0023-TestSettings-Deprecation.md)
 - [Blame Collector Options](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0024-Blame-Collector-Options.md)
