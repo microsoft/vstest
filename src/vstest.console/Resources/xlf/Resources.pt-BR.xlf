@@ -1273,6 +1273,11 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <note>
         </note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="translated">Execução de Teste Abortada com Erro {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

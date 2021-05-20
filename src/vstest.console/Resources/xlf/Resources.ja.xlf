@@ -1273,6 +1273,11 @@
         <note>
         </note>
       </trans-unit>
+      <trans-unit id="TestRunAbortedWithError">
+        <source>Test Run Aborted with error {0}.</source>
+        <target state="translated">テストの実行がエラー {0} により中止されました。</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
