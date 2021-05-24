@@ -101,8 +101,27 @@ TP_PACKAGE_NUSPEC_DIR="$TP_ROOT_DIR/src/package/nuspec"
 TP_SRC_DIR="$TP_ROOT_DIR/src"
 TP_USE_REPO_API=$DOTNET_BUILD_FROM_SOURCE
 
+global_json_file="$TP_ROOT_DIR/global.json"
+
+
 # Set VERSION from scripts/build/TestPlatform.Settings.targets
 VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/TestPlatform.Settings.targets  | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+
+
+function ReadGlobalVersion {
+  local key=$1
+
+  if command -v jq &> /dev/null; then
+    _ReadGlobalVersion="$(jq -r ".[] | select(has(\"$key\")) | .\"$key\"" "$global_json_file")"
+  elif [[ "$(cat "$global_json_file")" =~ \"$key\"[[:space:]\:]*\"([^\"]+) ]]; then
+    _ReadGlobalVersion=${BASH_REMATCH[1]}
+  fi
+
+  if [[ -z "$_ReadGlobalVersion" ]]; then
+    Write-PipelineTelemetryError -category 'Build' "Error: Cannot find \"$key\" in $global_json_file"
+    ExitWithExitCode 1
+  fi
+}
 
 #
 # Dotnet configuration
@@ -111,7 +130,10 @@ VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/Te
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="6.0.100-alpha.1.21067.8"
+
+ReadGlobalVersion "dotnet"
+DOTNET_CLI_VERSION=$_ReadGlobalVersion
+
 #DOTNET_RUNTIME_VERSION="LATEST"
 
 #

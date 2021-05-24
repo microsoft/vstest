@@ -2,8 +2,8 @@
 <Project>
   <PropertyGroup>
     <!-- This repo version -->
-    <VersionPrefix>5.0.0</VersionPrefix>
-    <PreReleaseVersionLabel>beta</PreReleaseVersionLabel>
+    <VersionPrefix>17.0.0</VersionPrefix>
+    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies Condition="'$(DotNetBuildFromSource)' != 'true'">true</UsingToolNetFrameworkReferenceAssemblies>
@@ -68,13 +68,13 @@
     <MicrosoftDotNetGitHubIssueLabelerAssetsVersion>1.5.0</MicrosoftDotNetGitHubIssueLabelerAssetsVersion>
     <MicrosoftMLVersion>1.0.0</MicrosoftMLVersion>
     <MicrosoftVisualStudioWebCodeGenerationDesignVersion>2.0.4</MicrosoftVisualStudioWebCodeGenerationDesignVersion>
-    <MicrosoftDiaSymReaderConverterVersion>1.1.0-beta2-19575-01</MicrosoftDiaSymReaderConverterVersion>
+    <MicrosoftDiaSymReaderConverterVersion>1.1.0-beta2-21075-01</MicrosoftDiaSymReaderConverterVersion>
     <MicrosoftDiaSymReaderPdb2PdbVersion>1.1.0-beta2-19575-01</MicrosoftDiaSymReaderPdb2PdbVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0</MicrosoftDiaSymReaderNativeVersion>
-    <MicrosoftDotNetMaestroClientVersion>1.1.0-beta.19556.4</MicrosoftDotNetMaestroClientVersion>
+    <MicrosoftDotNetMaestroClientVersion>1.1.0-beta.20074.1</MicrosoftDotNetMaestroClientVersion>
     <MicrosoftSourceLinkVersion>1.0.0-beta2-19554-01</MicrosoftSourceLinkVersion>
     <MicrosoftDotNetSwaggerGeneratorMSBuildVersion>6.0.0-beta.21274.3</MicrosoftDotNetSwaggerGeneratorMSBuildVersion>
-    <XliffTasksVersion>1.0.0-beta.20055.1</XliffTasksVersion>
+    <XliffTasksVersion>1.0.0-beta.21272.1</XliffTasksVersion>
     <!-- Roslyn -->
     <!-- WARNING: Depending on Roslyn in code that also supports unmanaged scenarios (e.g. C++,
          JS etc.) is risky. This can break setup authoring and cause runtime failures in workloads
