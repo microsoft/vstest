@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
         /// tracking counts per source for the minimal and quiet output.
         /// </summary>
-        private ConcurrentDictionary<Guid, TestResult> LeafTestResults { get; set; }
+        private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
 
         #endregion
 
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            this.LeafTestResults = new ConcurrentDictionary<Guid, TestResult>();
+            this.LeafTestResults = new ConcurrentDictionary<Guid, MinimalTestResult>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -541,7 +541,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 LeafTestResults.TryRemove(parentExecutionId, out _);
             }
 
-            if (!LeafTestResults.TryAdd(executionId, e.Result))
+            if (!LeafTestResults.TryAdd(executionId, new MinimalTestResult(e.Result)))
             {
                 // This would happen if the key already exists. This should not happen, because we are 
                 // inserting by GUID key, so this would mean an error in our code.
@@ -914,6 +914,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
 
             Output.Warning(AppendPrefix, warningMessage);
+        }
+
+        private class MinimalTestResult
+        {
+            public MinimalTestResult(TestResult testResult)
+            {
+                TestCase = testResult.TestCase;
+                Outcome = testResult.Outcome;
+                StartTime = testResult.StartTime;
+                EndTime = testResult.EndTime;
+            }
+
+            public TestCase TestCase { get; }
+            public TestOutcome Outcome { get; }
+            public DateTimeOffset StartTime { get; }
+            public DateTimeOffset EndTime { get; }
         }
     }
 }
