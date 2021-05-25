@@ -1,0 +1,39 @@
+From 38082210a35235e9a7c4b8da68fcf040b7a669c8 Mon Sep 17 00:00:00 2001
+From: Davis Goodin <dagood@microsoft.com>
+Date: Mon, 9 Nov 2020 14:10:53 -0600
+Subject: [PATCH] Use Microsoft.Diagnostics.NETCore.Client from PVP
+
+Source-build produces this package now, so it needs to be in eng/Versions.props.
+---
+ eng/Versions.props                                              | 1 +
+ .../Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/eng/Versions.props b/eng/Versions.props
+index cf2f6830..fe8f5028 100644
+--- a/eng/Versions.props
++++ b/eng/Versions.props
+@@ -26,6 +26,7 @@
+     <MicrosoftCodeAnalysisCSharpVersion>2.9.0</MicrosoftCodeAnalysisCSharpVersion>
+     <MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>2.1.0</MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>
+     <MicrosoftDotNetPlatformAbstractionsVersion>2.1.0</MicrosoftDotNetPlatformAbstractionsVersion>
++    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.0-preview.20419.2</MicrosoftDiagnosticsNETCoreClientVersion>
+     <MicrosoftIdentityModelClientsActiveDirectoryVersion>3.19.8</MicrosoftIdentityModelClientsActiveDirectoryVersion>
+     <MicrosoftRestClientRuntimeVersion>2.3.13</MicrosoftRestClientRuntimeVersion>
+     <MicrosoftExtensionsDependencyModelVersion>2.1.0</MicrosoftExtensionsDependencyModelVersion>
+diff --git a/src/Microsoft.TestPlatform.Extensions.BlameDataCollector/Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj b/src/Microsoft.TestPlatform.Extensions.BlameDataCollector/Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj
+index 11a26e7f..3592917f 100644
+--- a/src/Microsoft.TestPlatform.Extensions.BlameDataCollector/Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj
++++ b/src/Microsoft.TestPlatform.Extensions.BlameDataCollector/Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj
+@@ -34,7 +34,7 @@
+     <Reference Include="netstandard" />
+   </ItemGroup>
+   <ItemGroup>
+-    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.20419.2" />
++    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="$(MicrosoftDiagnosticsNETCoreClientVersion)" />
+   </ItemGroup>
+   <ItemGroup>
+     <Compile Update="Resources\Resources.Designer.cs">
+-- 
+2.25.2
+
