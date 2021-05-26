@@ -10,7 +10,7 @@
     <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" />
     <Item ItemId=";Xliff Resources" ItemType="0" PsrId="308" Leaf="false">
       <Disp Icon="Str" Disp="true" LocTbl="false" />
-      <Item ItemId=";InvalidRunSettingsXml" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";InvalidRunSettingsXml" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Run settings XML does not contain "RunSettings" node.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -19,7 +19,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InvalidSettingsIncorrectValue" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";InvalidSettingsIncorrectValue" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -28,7 +28,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";MissingRunSettingsNode" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";MissingRunSettingsNode" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not find 'RunSettings' node.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -37,7 +37,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NoRunSettingsNodeFound" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";NoRunSettingsNodeFound" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not find 'RunSettings' node.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -46,7 +46,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";RunSettingsParseError" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";RunSettingsParseError" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An error occurred while loading the settings.  Error: {0}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -55,7 +55,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";SystemArchitectureIncompatibleWithTargetPlatform" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";SystemArchitectureIncompatibleWithTargetPlatform" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Incompatible Target platform settings '{0}' with system architecture '{1}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
@@ -64,7 +64,7 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";UnExpectedSettingsFile" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
+      <Item ItemId=";UnExpectedSettingsFile" ItemType="0" PsrId="308" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unexpected settings file specified.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
