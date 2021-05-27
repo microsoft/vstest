@@ -24,6 +24,9 @@
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Interop">
+      <Version>$(InteropExternalsVersion)</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="MstestV1UnitTestProjectTestSettings.testsettings">
