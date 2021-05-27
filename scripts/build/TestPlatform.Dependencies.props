@@ -32,7 +32,7 @@
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
-    <TestPlatformExternalsVersion>16.10.0-preview-2-31119-371</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>17.0.0-previews-1-31325-360</TestPlatformExternalsVersion>
     <CodeCoverageExternalsVersion>17.0.0-beta.21268.4</CodeCoverageExternalsVersion>
     <InteropExternalsVersion>17.0.0-preview-2-31223-026</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.0.0-beta.21179.1</MicrosoftFakesVersion>
