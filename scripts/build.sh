@@ -389,7 +389,13 @@ function create_package()
     local start=$SECONDS
     log "Create-NugetPackages: Started."
     stagingDir="$TP_OUT_DIR/$TPB_Configuration"
-    packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
+
+    if [[ $TP_USE_REPO_API = 0 ]]; then
+        packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
+    else
+        packageOutputDir="$TP_OUT_DIR/packages/$TPB_Configuration"
+    fi
+
     mkdir -p $packageOutputDir
 
     nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
