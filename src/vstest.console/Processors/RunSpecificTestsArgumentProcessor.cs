@@ -10,15 +10,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
     {
@@ -118,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private long discoveredTestCount = 0;
 
         /// <summary>
-        /// Collection of test cases that match atleast one of the given search strings
+        /// Collection of test cases that match at least one of the given search strings
         /// </summary>
         private Collection<TestCase> selectedTestCases = new Collection<TestCase>();
 
@@ -163,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.runSettingsManager = runSettingsProvider;
             this.output = output;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
+            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.DiscoveryRequest_OnDiscoveredTests);
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
@@ -210,11 +211,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
 
-            if (!string.IsNullOrWhiteSpace(this.commandLineOptions.TestCaseFilterValue))
-            {
-                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidTestCaseFilterValueForSpecificTests));
-            }
-
             this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             // Discover tests from sources and filter on every discovery reported.
@@ -222,6 +218,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             // Now that tests are discovered and filtered, we run only those selected tests.
             this.ExecuteSelectedTests();
+
+            bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(effectiveRunSettings);
+
+            if (treatNoTestsAsError && this.selectedTestCases.Count == 0)
+            {
+                return ArgumentProcessorResult.Fail;
+            }
 
             return ArgumentProcessorResult.Success;
         }
@@ -253,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (this.selectedTestCases.Count > 0)
             {
-                if (this.undiscoveredFilters.Count() != 0)
+                if (this.undiscoveredFilters.Count != 0)
                 {
                     string missingFilters = string.Join(", ", this.undiscoveredFilters);
                     string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, this.discoveredTestCount, missingFilters);
@@ -296,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void discoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
+        private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
         {
             this.discoveredTestCount += args.DiscoveredTestCases.Count();
             foreach (var testCase in args.DiscoveredTestCases)
@@ -375,7 +378,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             /// <param name="e">RunCompletion args</param>
             private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
             {
-                // If run is not aborted/cancelled then check the count of executed tests.
+                // If run is not aborted/canceled then check the count of executed tests.
                 // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
                 if (!e.IsAborted && !e.IsCanceled)
                 {

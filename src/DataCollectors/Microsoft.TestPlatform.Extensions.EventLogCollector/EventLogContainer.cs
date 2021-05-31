@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
@@ -183,7 +182,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                         for (;
                             this.nextEntryIndexToCollect <= mostRecentIndexInLog;
-                            this.nextEntryIndexToCollect = this.nextEntryIndexToCollect + 1)
+                            this.nextEntryIndexToCollect++)
                         {
                             int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
                             EventLogEntry nextEntry = this.eventLog.Entries[nextEntryIndexInCurrentLog];

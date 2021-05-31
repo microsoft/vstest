@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
@@ -44,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private Dictionary<DataCollectionContext, List<Task>> attachmentTasks;
 
         /// <summary>
-        /// Use to cancel attachment transfers if test run is cancelled.
+        /// Use to cancel attachment transfers if test run is canceled.
         /// </summary>
         private CancellationTokenSource cancellationTokenSource;
 
@@ -61,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Initializes a new instance of the <see cref="DataCollectionAttachmentManager"/> class.
         /// </summary>
         public DataCollectionAttachmentManager()
-            : this(new Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper())
+            : this(new TestPlatform.Utilities.Helpers.FileHelper())
         {
         }
 
@@ -117,11 +118,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 this.SessionOutputDirectory = Path.Combine(absolutePath, id.Id.ToString());
             }
 
-            // Create the output directory if it doesn't exist.
-            if (!Directory.Exists(this.SessionOutputDirectory))
+            try
             {
-                Directory.CreateDirectory(this.SessionOutputDirectory);
+                // Create the output directory if it doesn't exist.
+                if (!Directory.Exists(this.SessionOutputDirectory))
+                {
+                    Directory.CreateDirectory(this.SessionOutputDirectory);
+                }
             }
+            catch (UnauthorizedAccessException accessException)
+            {
+                string accessDeniedMessage = string.Format(CultureInfo.CurrentCulture, Resources.Resources.AccessDenied, accessException.Message);
+                ConsoleOutput.Instance.Error(false, accessDeniedMessage);
+                throw;
+            }
+
         }
 
         /// <inheritdoc/>
@@ -129,7 +140,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             try
             {
-                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray()).Wait();
+                if (this.attachmentTasks.TryGetValue(dataCollectionContext, out var tasks))
+                {
+                    Task.WhenAll(tasks.ToArray()).Wait();
+                }
             }
             catch (Exception ex)
             {
@@ -138,8 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             List<AttachmentSet> attachments = new List<AttachmentSet>();
 
-            Dictionary<Uri, AttachmentSet> uriAttachmentSetMap;
-            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out uriAttachmentSetMap))
+            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out var uriAttachmentSetMap))
             {
                 attachments = uriAttachmentSetMap.Values.ToList();
                 this.attachmentTasks.Remove(dataCollectionContext);
@@ -314,18 +327,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     {
                         if (t.Exception == null)
                         {
-                            // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
-                            var attachmentUri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
                             lock (attachmentTaskLock)
                             {
-                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(attachmentUri, fileTransferInfo.Description));
+                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(UriDataAttachment.CreateFrom(localFilePath, fileTransferInfo.Description));
                             }
                         }
 
-                        if (sendFileCompletedCallback != null)
-                        {
-                            sendFileCompletedCallback(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
-                        }
+                        sendFileCompletedCallback?.Invoke(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
                     }
                     catch (Exception e)
                     {

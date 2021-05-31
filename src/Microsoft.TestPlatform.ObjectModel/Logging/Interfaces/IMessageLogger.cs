@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
 {
-    using System;
-
     /// <summary>
     /// Used for logging error warning and informational messages.
     /// </summary>

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkPreviousVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkVersion)" />
     <PackageReference Include="NUnit" Version="$(NUnit3FrameworkVersion)" />
     <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3AdapterVersion)" />
   </ItemGroup>

@@ -4,13 +4,16 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+#if NETFRAMEWORK
     using System.Runtime.Serialization;
+#endif
+
 
     /// <summary>
     /// Exception thrown by Run Settings when an error with a settings provider
     /// is encountered.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public class SettingsException : Exception
@@ -43,9 +46,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
-        /// Seralization constructor.
+        /// Serialization constructor.
         /// </summary>
         protected SettingsException(SerializationInfo info, StreamingContext context)
             : base(info, context)

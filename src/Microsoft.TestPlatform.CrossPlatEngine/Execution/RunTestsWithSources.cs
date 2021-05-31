@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
@@ -23,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using ObjectModel.Client;
     using ObjectModel.Logging;
     using Utilities;
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     internal class RunTestsWithSources : BaseRunTests
     {
@@ -61,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
         {
             // If run was with sources and no test was executed and cancellation was not requested,
-            // then raise a warning saying that no test was present in the sources.  
+            // then raise a warning saying that no test was present in the sources.
             // The warning is raised only if total no of tests that have been run is zero.
             if (!exceptionsHitDuringRunTests && this.executorUriVsSourceList?.Count > 0 && !this.IsCancellationRequested
                 && this.TestRunCache?.TotalExecutedTests <= 0)
@@ -112,9 +111,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return executorUris;
         }
 
-        protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
+        protected override void InvokeExecutor(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUriExtensionTuple,
+            RunContext runContext,
+            IFrameworkHandle frameworkHandle)
         {
             executor?.Value.RunTests(this.executorUriVsSourceList[executorUriExtensionTuple], runContext, frameworkHandle);
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldAttachDebuggerToTestHost(
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+            Tuple<Uri, string> executorUriExtensionTuple,
+            RunContext runContext)
+        {
+            // If the adapter doesn't implement the new test executor interface we should attach to
+            // the default test host by default to preserve old behavior.
+            if (!(executor?.Value is ITestExecutor2 convertedExecutor))
+            {
+                return true;
+            }
+
+            return convertedExecutor.ShouldAttachToTestHost(
+                this.executorUriVsSourceList[executorUriExtensionTuple],
+                runContext);
         }
 
         /// <summary>
@@ -129,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Validate the sources 
             foreach (var kvp in this.adapterSourceMap)
             {
-                var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger);
+                var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger, package);
                 if (verifiedSources.Any())
                 {
                     verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);

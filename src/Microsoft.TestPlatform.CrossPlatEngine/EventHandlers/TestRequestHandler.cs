@@ -19,27 +19,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
     public class TestRequestHandler : ITestRequestHandler
     {
+        private int protocolVersion = 1;
+
+        // Must be in sync with the highest supported version in
+        // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
+        private int highestSupportedVersion = 5;
+
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
         private ICommunicationEndPoint communicationEndPoint;
         private ICommunicationEndpointFactory communicationEndpointFactory;
-        private int protocolVersion = 1;
-
-        public TestHostConnectionInfo ConnectionInfo { get; set; }
-
-        private int highestSupportedVersion = 2;
-        private JobQueue<Action> jobQueue;
         private ICommunicationChannel channel;
 
+        private JobQueue<Action> jobQueue;
         private ManualResetEventSlim requestSenderConnected;
         private ManualResetEventSlim testHostManagerFactoryReady;
-
         private ManualResetEventSlim sessionCompleted;
+        private Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
+        private Action<Message> onAttachDebuggerAckRecieved;
+        private Exception messageProcessingUnrecoverableError;
 
-        private Action<Message> onAckMessageRecieved;
+        public TestHostConnectionInfo ConnectionInfo { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestHandler" />.
@@ -48,7 +52,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
+        protected TestRequestHandler(
+            TestHostConnectionInfo connectionInfo,
+            ICommunicationEndpointFactory communicationEndpointFactory,
+            IDataSerializer dataSerializer,
+            JobQueue<Action> jobQueue,
+            Action<Message> onLaunchAdapterProcessWithDebuggerAttachedAckReceived,
+            Action<Message> onAttachDebuggerAckRecieved)
         {
             this.communicationEndpointFactory = communicationEndpointFactory;
             this.ConnectionInfo = connectionInfo;
@@ -56,7 +66,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
-            this.onAckMessageRecieved = onAckMessageRecieved;
+            this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived = onLaunchAdapterProcessWithDebuggerAttachedAckReceived;
+            this.onAttachDebuggerAckRecieved = onAttachDebuggerAckRecieved;
             this.jobQueue = jobQueue;
         }
 
@@ -67,7 +78,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
-            this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
+            this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived = (message) => { throw new NotImplementedException(); };
+            this.onAttachDebuggerAckRecieved = (message) => { throw new NotImplementedException(); };
 
             this.jobQueue = new JobQueue<Action>(
                 (action) => { action(); },
@@ -156,6 +168,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ICollection<AttachmentSet> runContextAttachments,
                 ICollection<string> executorUris)
         {
+            // When we abort the run we might have saved the error before we gave the handler the chance to abort
+            // if the handler does not return with any new error we report the original one.
+            if (testRunCompleteArgs.IsAborted && testRunCompleteArgs.Error == null && this.messageProcessingUnrecoverableError != null)
+            {
+                var curentArgs = testRunCompleteArgs;
+                testRunCompleteArgs = new TestRunCompleteEventArgs(
+                    curentArgs.TestRunStatistics,
+                    curentArgs.IsCanceled,
+                    curentArgs.IsAborted,
+                    this.messageProcessingUnrecoverableError,
+                    curentArgs.AttachmentSets, curentArgs.ElapsedTimeInRunningTests
+                    );
+            }
             var data = this.dataSerializer.SerializePayload(
                     MessageType.ExecutionComplete,
                     new TestRunCompletePayload
@@ -190,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var waitHandle = new ManualResetEventSlim(false);
             Message ackMessage = null;
-            this.onAckMessageRecieved = (ackRawMessage) =>
+            this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -203,8 +228,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             EqtTrace.Verbose("Waiting for LaunchAdapterProcessWithDebuggerAttached ack");
             waitHandle.Wait();
-            this.onAckMessageRecieved = null;
+            this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
+        }
+
+        /// <inheritdoc />
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            // If an attach request is issued but there is no support for attaching on the other
+            // side of the communication channel, we simply return and let the caller know the
+            // request failed.
+            if (this.protocolVersion < ObjectModelConstants.MinimumProtocolVersionWithDebugSupport)
+            {
+                return false;
+            }
+
+            Message ackMessage = null;
+            var waitHandle = new ManualResetEventSlim(false);
+
+            this.onAttachDebuggerAckRecieved = (ackRawMessage) =>
+            {
+                ackMessage = ackRawMessage;
+                waitHandle.Set();
+            };
+
+            var data = dataSerializer.SerializePayload(
+                MessageType.AttachDebugger,
+                new TestProcessAttachDebuggerPayload(pid),
+                protocolVersion);
+            this.SendData(data);
+
+            EqtTrace.Verbose("Waiting for AttachDebuggerToProcess ack ...");
+            waitHandle.Wait();
+
+            this.onAttachDebuggerAckRecieved = null;
+            return this.dataSerializer.DeserializePayload<bool>(ackMessage);
         }
 
         public void OnMessageReceived(object sender, MessageReceivedEventArgs messageReceivedArgs)
@@ -213,75 +271,152 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("TestRequestHandler.ProcessRequests: received message: {0}", message);
+                EqtTrace.Info("TestRequestHandler.OnMessageReceived: received message: {0}", message);
             }
 
             switch (message.MessageType)
             {
                 case MessageType.VersionCheck:
-                    var version = this.dataSerializer.DeserializePayload<int>(message);
-                    this.protocolVersion = Math.Min(version, highestSupportedVersion);
-
-                    // Send the negotiated protocol to request sender
-                    this.channel.Send(this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.protocolVersion));
-
-                    // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
-                    if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+                    try
                     {
-                        this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
+                        var version = this.dataSerializer.DeserializePayload<int>(message);
+                        // choose the highest version that we both support
+                        var negotiatedVersion = Math.Min(version, highestSupportedVersion);
+                        // BUT don't choose 3, because protocol version 3 has performance problems in 16.7.1-16.8. Those problems are caused
+                        // by choosing payloadSerializer instead of payloadSerializer2 for protocol version 3.
+                        //
+                        // We cannot just update the code to choose the new serializer, because then that change would apply only to testhost.
+                        // Testhost is is delivered by Microsoft.NET.Test.SDK nuget package, and can be used with an older vstest.console.
+                        // An older vstest.console, that supports protocol version 3, would serialize its messages using payloadSerializer,
+                        // but the fixed testhost would serialize it using payloadSerializer2, resulting in incompatible messages.
+                        //
+                        // Instead we must downgrade to protocol version 2 when 3 would be negotiated. Or higher when higher version
+                        // would be negotiated.
+                        if (negotiatedVersion != 3)
+                        {
+                            this.protocolVersion = negotiatedVersion;
+                        }
+                        else
+                        {
+                            var flag = Environment.GetEnvironmentVariable("VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE");
+                            var flagIsEnabled = flag != null && flag != "0";
+                            var dowgradeIsDisabled = flagIsEnabled;
+                            if (dowgradeIsDisabled)
+                            {
+                                this.protocolVersion = negotiatedVersion;
+                            }
+                            else
+                            {
+                                this.protocolVersion = 2;
+                            }
+                        }
+
+                        // Send the negotiated protocol to request sender
+                        this.channel.Send(this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.protocolVersion));
+
+                        // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
+                        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+                        {
+                            this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
+                        }
+                        else if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                        {
+                            this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
+                        }
                     }
-                    else if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                    catch (Exception ex)
                     {
-                        this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
+                        this.messageProcessingUnrecoverableError = ex;
+                        EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
+                        EqtTrace.Error(ex);
+                        goto case MessageType.AbortTestRun;
                     }
                     break;
 
                 case MessageType.DiscoveryInitialize:
                     {
-                        EqtTrace.Info("Discovery Session Initialize.");
-                        this.testHostManagerFactoryReady.Wait();
-                        var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
-                        jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions, discoveryEventsHandler), 0);
+                        try
+                        {
+                            this.testHostManagerFactoryReady.Wait();
+                            var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
+                            var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                            Action job = () =>
+                            {
+                                EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                                testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions, discoveryEventsHandler);
+                            };
+                            jobQueue.QueueJob(job, 0);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.messageProcessingUnrecoverableError = ex;
+                            EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
+                            EqtTrace.Error(ex);
+                            goto case MessageType.AbortTestRun;
+                        }
                         break;
                     }
 
                 case MessageType.StartDiscovery:
                     {
-                        EqtTrace.Info("Discovery started.");
-                        this.testHostManagerFactoryReady.Wait();
-                        var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
-                        jobQueue.QueueJob(
-                                () =>
+                        try
+                        {
+                            this.testHostManagerFactoryReady.Wait();
+                            var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
+                            var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
+                            Action job = () =>
+                            {
+                                EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
                                 testHostManagerFactory.GetDiscoveryManager()
-                                .DiscoverTests(discoveryCriteria, discoveryEventsHandler), 0);
+                                    .DiscoverTests(discoveryCriteria, discoveryEventsHandler);
+                            };
 
+                            jobQueue.QueueJob(job, 0);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.messageProcessingUnrecoverableError = ex;
+                            EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
+                            EqtTrace.Error(ex);
+                            goto case MessageType.AbortTestRun;
+                        }
                         break;
                     }
 
                 case MessageType.ExecutionInitialize:
                     {
-                        EqtTrace.Info("Execution Session Initialize.");
-                        this.testHostManagerFactoryReady.Wait();
-                        var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
-                        var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
-                        jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testInitializeEventsHandler), 0);
+                        try
+                        {
+                            this.testHostManagerFactoryReady.Wait();
+                            var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
+                            var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
+                            Action job = () =>
+                            {
+                                EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
+                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testInitializeEventsHandler);
+                            };
+                            jobQueue.QueueJob(job, 0);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.messageProcessingUnrecoverableError = ex;
+                            EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
+                            EqtTrace.Error(ex);
+                            goto case MessageType.AbortTestRun;
+                        }
                         break;
                     }
 
                 case MessageType.StartTestExecutionWithSources:
                     {
-                        EqtTrace.Info("Execution started.");
-                        var testRunEventsHandler = new TestRunEventsHandler(this);
-                        this.testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
-                        jobQueue.QueueJob(
-                                () =>
+                        try
+                        {
+                            var testRunEventsHandler = new TestRunEventsHandler(this);
+                            this.testHostManagerFactoryReady.Wait();
+                            var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
+                            Action job = () =>
+                            {
+                                EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
                                 testHostManagerFactory.GetExecutionManager()
                                 .StartTestRun(
                                     testRunCriteriaWithSources.AdapterSourceMap,
@@ -289,22 +424,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                     testRunCriteriaWithSources.RunSettings,
                                     testRunCriteriaWithSources.TestExecutionContext,
                                     this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
-                                    testRunEventsHandler),
-                                0);
-
+                                    testRunEventsHandler);
+                            };
+                            jobQueue.QueueJob(job, 0);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.messageProcessingUnrecoverableError = ex;
+                            EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
+                            EqtTrace.Error(ex);
+                            goto case MessageType.AbortTestRun;
+                        }
                         break;
                     }
 
                 case MessageType.StartTestExecutionWithTests:
                     {
-                        EqtTrace.Info("Execution started.");
-                        var testRunEventsHandler = new TestRunEventsHandler(this);
-                        this.testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithTests =
-                            this.dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message);
+                        try
+                        {
+                            var testRunEventsHandler = new TestRunEventsHandler(this);
+                            this.testHostManagerFactoryReady.Wait();
+                            var testRunCriteriaWithTests =
+                                this.dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message);
 
-                        jobQueue.QueueJob(
-                                () =>
+                            Action job = () =>
+                            {
+                                EqtTrace.Info("TestRequestHandler.OnMessageReceived: Running job '{0}'.", message.MessageType);
                                 testHostManagerFactory.GetExecutionManager()
                                 .StartTestRun(
                                     testRunCriteriaWithTests.Tests,
@@ -312,9 +457,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                     testRunCriteriaWithTests.RunSettings,
                                     testRunCriteriaWithTests.TestExecutionContext,
                                     this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
-                                    testRunEventsHandler),
-                                0);
-
+                                    testRunEventsHandler);
+                            };
+                            jobQueue.QueueJob(job, 0);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.messageProcessingUnrecoverableError = ex;
+                            EqtTrace.Error("Failed processing message {0}, aborting test run.", message.MessageType);
+                            EqtTrace.Error(ex);
+                            goto case MessageType.AbortTestRun;
+                        }
                         break;
                     }
 
@@ -325,13 +478,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     break;
 
                 case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
-                    this.onAckMessageRecieved?.Invoke(message);
+                    this.onLaunchAdapterProcessWithDebuggerAttachedAckReceived?.Invoke(message);
+                    break;
+
+                case MessageType.AttachDebuggerCallback:
+                    this.onAttachDebuggerAckRecieved?.Invoke(message);
                     break;
 
                 case MessageType.AbortTestRun:
-                    jobQueue.Pause();
-                    this.testHostManagerFactoryReady.Wait();
-                    testHostManagerFactory.GetExecutionManager().Abort(new TestRunEventsHandler(this));
+                    try
+                    {
+                        jobQueue.Pause();
+                        this.testHostManagerFactoryReady.Wait();
+                        testHostManagerFactory.GetExecutionManager().Abort(new TestRunEventsHandler(this));
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error("Failed processing message {0}. Stopping communication.", message.MessageType);
+                        EqtTrace.Error(ex);
+                        sessionCompleted.Set();
+                        this.Close();
+                    }
                     break;
 
                 case MessageType.SessionEnd:
@@ -344,7 +511,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 case MessageType.SessionAbort:
                     {
-                        // Dont do anything for now.
+                        // Don't do anything for now.
                         break;
                     }
 

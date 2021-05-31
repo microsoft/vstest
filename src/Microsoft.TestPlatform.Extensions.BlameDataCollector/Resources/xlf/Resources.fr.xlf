@@ -1,68 +1,81 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-508382432">
-    <header>
-      <count-group name="BlackBox wordcount">
-        <count count-type="x-wordCount">27</count>
-        <count count-type="x-adjWordCount">22.95</count>
-        <count count-type="x-curAdjWordCount">22.95</count>
-        <count count-type="x-repeatAdjWordCount">0</count>
-        <count count-type="x-termWordCount">0</count>
-      </count-group>
-      <count-group name="BlackBox wordcount analysis">
-        <count count-type="x-match102%">0</count>
-        <count count-type="x-match101%">0</count>
-        <count count-type="x-match100%">0</count>
-        <count count-type="x-match99-90%">0</count>
-        <count count-type="x-match89-75%">0</count>
-        <count count-type="x-mt">27</count>
-        <count count-type="repetition">0</count>
-      </count-group>
-    </header>
+  <file datatype="xml" source-language="en" original="../Resources.resx" target-language="fr">
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</source>
-        <target state="translated">La série de tests active a été abandonnée, car le processus hôte s'est arrêté de manière inattendue durant l'exécution du ou des tests suivants :</target>
-        <note />
+        <source>The active Test Run was aborted because the host process exited unexpectedly. Please inspect the call stack above, if available, to get more information about where the exception originated from.
+The test running when the crash occurred: 
+{0}
+This test may, or may not be the source of the crash.</source>
+        <target state="translated">La série de tests active a été abandonnée, car le processus hôte s'est arrêté de manière inattendue. Inspectez la pile des appels ci-dessus, le cas échéant, pour obtenir plus d'informations sur l'origine de l'exception.
+Test en cours d'exécution au moment du plantage : 
+{0}
+Ce test est éventuellement à l'origine du plantage.</target>
+        <note>{0} is a single test (or in rare cases multiple tests) that were running when test host crashed.</note>
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
         <target state="translated">La variable d'environnement exigée PROCDUMP_PATH était null ou vide. Affectez à PROCDUMP_PATH le chemin du dossier contenant l'exécutable procdump approprié.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
         <target state="translated">La collecte de fichiers dump a été activée, mais aucun fichier dump n'a été généré.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterKeyIncorrect">
         <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
         <target state="translated">La clé de paramètre blame spécifiée {0} n'est pas valide. Cette clé est ignorée.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
         <target state="translated">La clé de paramètre blame {0} peut prendre en charge uniquement les valeurs {1}/{2}. Cette clé est ignorée.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
         <target state="translated">Impossible de démarrer le fichier dump du processus : {0}</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="ProcDumpNotGenerated">
         <source>CollectDump was enabled but dump file was not generated.</source>
         <target state="translated">CollectDump a été activé, mais le fichier dump n'a pas été généré.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InactivityTimeout">
-        <source>The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process.</source>
-        <target state="translated">Le délai d'inactivité spécifié, {0} minutes/s, s'est écoulé. Collecte d'une image mémoire et arrêt du processus hôte de test.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InactivityTimeout">
+        <source>The specified inactivity time of {0} {1} has elapsed. Collecting hang dumps from testhost and its child processes</source>
+        <target state="translated">Le délai d'inactivité spécifié ({0} {1}) s'est écoulé. Collecte d'images mémoire des plantages de l'hôte de test et de ses processus enfants</target>
+        <note>{0} value, {1} one of the unit strings below, Minutes/Seconds</note>
+      </trans-unit>
       <trans-unit id="UnexpectedValueForInactivityTimespanValue">
-        <source>Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input.</source>
-        <target state="translated">Valeur {0} inattendue fournie pour ExpectedExecutionTimeOfLongestRunningTestInMinutes. Indiquez un entier positif en entrée.</target>
+        <source>Unexpected value '{0}' provided as timeout. Please provide a value in this format: 1.5h / 90m / 5400s / 5400000ms / 5400000</source>
+        <target state="translated">Valeur inattendue '{0}' fournie en tant que délai d'expiration. Indiquez une valeur au format suivant : 1.5h / 90m / 5400s / 5400000ms / 5400000</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NotGeneratingSequenceFile">
+        <source>All tests finished running, Sequence file will not be generated</source>
+        <target state="translated">Tous les tests ont fini de s'exécuter. Le fichier de séquence ne sera pas généré</target>
+        <note>"Sequence" is the name of the file.</note>
+      </trans-unit>
+      <trans-unit id="Dumping">
+        <source>Dumping {0} - {1}</source>
+        <target state="translated">Création d'une image mémoire {0} - {1}</target>
+        <note>as in creating a process dump, {0} process id, {1} process name</note>
+      </trans-unit>
+      <trans-unit id="DumpingTree">
+        <source>Dumping this process tree (from bottom)</source>
+        <target state="translated">Création d'une image mémoire de cette arborescence de processus (à partir du bas)</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Minutes">
+        <source>minutes</source>
+        <target state="translated">minutes</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Seconds">
+        <source>seconds</source>
+        <target state="translated">secondes</target>
         <note></note>
       </trans-unit>
     </body>

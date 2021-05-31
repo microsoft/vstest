@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// The name of the command line argument that the TestCaseFilterArgumentExecutor handles.
         /// </summary>
         public const string CommandName = "/TestCaseFilter";
-        
+
         #endregion
 
         private Lazy<IArgumentProcessorCapabilities> metadata;
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class TestCaseFilterArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override string CommandName => TestCaseFilterArgumentProcessor.CommandName;
-        
+
         public override bool AllowMultiple => false;
 
         public override bool IsAction => false;
@@ -117,12 +117,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
+            var defaultFilter = this.commandLineOptions.TestCaseFilterValue;
+            var hasDefaultFilter = !string.IsNullOrWhiteSpace(defaultFilter);
+            
+            if (!hasDefaultFilter && string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
             }
 
-            this.commandLineOptions.TestCaseFilterValue = argument;
+            if (!hasDefaultFilter)
+            {
+                this.commandLineOptions.TestCaseFilterValue = argument;
+            }
+            else
+            {
+                // Merge default filter an provided filter by AND operator to have both the default filter and custom filter applied.
+                this.commandLineOptions.TestCaseFilterValue = $"({defaultFilter})&({argument})";
+            }
         }
 
         /// <summary>

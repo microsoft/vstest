@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         Completed = 3,
 
         /// <summary>
-        /// Run is canceled and remaing tests have been aborted
+        /// Run is canceled and remaining tests have been aborted
         /// </summary>
         Canceled = 4,
 

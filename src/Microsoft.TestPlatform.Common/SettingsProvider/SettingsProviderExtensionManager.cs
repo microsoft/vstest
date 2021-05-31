@@ -53,16 +53,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <remarks>
         /// The settings providers are imported as non-shared because we need different settings provider
         /// instances to be used for each run settings.
-        /// </remarks>        
+        /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         protected SettingsProviderExtensionManager(
             IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settingsProviders,
             IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
             IMessageLogger logger)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, "settingsProviders");
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, "unfilteredSettingsProviders");
-            ValidateArg.NotNull<IMessageLogger>(logger, "logger");
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, nameof(settingsProviders));
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, nameof(unfilteredSettingsProviders));
+            ValidateArg.NotNull<IMessageLogger>(logger, nameof(logger));
 
             this.settingsProviders = settingsProviders;
             this.UnfilteredSettingsProviders = unfilteredSettingsProviders;
@@ -110,14 +110,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                 {
                     if (settingsProviderExtensionManager == null)
                     {
-                        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredTestExtensions;
-                        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> testExtensions;
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                                out unfilteredTestExtensions,
-                                out testExtensions);
+                                out var unfilteredTestExtensions,
+                                out var testExtensions);
 
                         settingsProviderExtensionManager = new SettingsProviderExtensionManager(
                             testExtensions, unfilteredTestExtensions, TestSessionMessageLogger.Instance);
@@ -145,14 +143,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <param name="shouldThrowOnError"> Indicates whether this method should throw on error. </param>
         public static void LoadAndInitializeAllExtensions(bool shouldThrowOnError)
         {
-            var extensionManager = SettingsProviderExtensionManager.Create();
+            var extensionManager = Create();
 
             try
             {
                 foreach (var settingsProvider in extensionManager.SettingsProvidersMap)
                 {
-                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to 
-                    // call executor.Value even if logging is not enabled. 
+                    // Note: - The below Verbose call should not be under IsVerboseEnabled check as we want to
+                    // call executor.Value even if logging is not enabled.
                     EqtTrace.Verbose("SettingsProviderExtensionManager: Loading settings provider {0}", settingsProvider.Value.Value);
                 }
             }
@@ -160,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occured while loading extensions {0}", ex);
+                    EqtTrace.Error("SettingsProviderExtensionManager: LoadAndInitialize: Exception occurred while loading extensions {0}", ex);
                 }
 
                 if (shouldThrowOnError)
@@ -183,11 +181,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         {
             if (string.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
-            LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider;
-            this.SettingsProvidersMap.TryGetValue(settingsName, out settingsProvider);
+            this.SettingsProvidersMap.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider);
 
             return settingsProvider;
         }

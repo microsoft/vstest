@@ -3,6 +3,15 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 {
+    using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
+    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using NuGet.Frameworks;
+    using ObjectModel.Logging;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -12,19 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using System.IO;
     using System.Text;
     using System.Xml;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using NuGet.Frameworks;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using ObjectModel.Logging;
+    using ObjectModelConstants = ObjectModel.Constants;
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = Resources.TrxResource;
 
     /// <summary>
     /// Logger for Generating TRX
@@ -33,29 +33,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     [ExtensionUri(TrxLoggerConstants.ExtensionUri)]
     public class TrxLogger : ITestLoggerWithParameters
     {
-        #region Fields
-
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// </summary>
-        public TrxLogger():
-            this (new Utilities.Helpers.FileHelper())
-        {
-        }
+        public TrxLogger() : this(new Utilities.Helpers.FileHelper()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="fileHelper">The file helper interface.</param>
-        protected TrxLogger(IFileHelper fileHelper)
+        protected TrxLogger(IFileHelper fileHelper) : this(new Utilities.Helpers.FileHelper(), new TrxFileHelper()) { }
+
+        internal TrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper)
         {
-            this.converter = new Converter(fileHelper);
+            this.converter = new Converter(fileHelper, trxFileHelper);
+            this.trxFileHelper = trxFileHelper;
         }
 
         #endregion
+
+        #region Fields
 
         /// <summary>
         /// Cache the TRX file path
@@ -65,14 +65,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         // The converter class
         private Converter converter;
 
-        private TrxLoggerObjectModel.TestRun testRun;
-        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
-        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
+        private TestRun testRun;
+        private ConcurrentDictionary<Guid, ITestResult> results;
+        private ConcurrentDictionary<Guid, ITestElement> testElements;
         private ConcurrentDictionary<Guid, TestEntry> entries;
 
         // Caching results and inner test entries for constant time lookup for inner parents.
-        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
+        private ConcurrentDictionary<Guid, ITestResult> innerResults;
         private ConcurrentDictionary<Guid, TestEntry> innerTestEntries;
+
+        private readonly TrxFileHelper trxFileHelper;
 
         /// <summary>
         /// Specifies the run level "out" messages
@@ -80,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private StringBuilder runLevelStdOut;
 
         // List of run level errors and warnings generated. These are logged in the Trx in the Results Summary.
-        private List<TrxLoggerObjectModel.RunInfo> runLevelErrorsAndWarnings;
+        private List<RunInfo> runLevelErrorsAndWarnings;
 
         private TrxLoggerObjectModel.TestOutcome testRunOutcome = TrxLoggerObjectModel.TestOutcome.Passed;
 
@@ -96,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private Dictionary<string, string> parametersDictionary;
 
         /// <summary>
-        /// Gets the directory under which default trx file and test results attachements should be saved.
+        /// Gets the directory under which default trx file and test results attachments should be saved.
         /// </summary>
         private string testResultsDirPath;
 
@@ -163,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             return this.runLevelStdOut.ToString();
         }
 
-        internal List<TrxLoggerObjectModel.RunInfo> GetRunLevelErrorsAndWarnings()
+        internal List<RunInfo> GetRunLevelErrorsAndWarnings()
         {
             return this.runLevelErrorsAndWarnings;
         }
@@ -228,22 +230,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
-            TrxLoggerObjectModel.RunInfo runMessage;
+            RunInfo runMessage;
+
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
                     this.AddRunLevelInformationalMessage(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    runMessage = new TrxLoggerObjectModel.RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Warning);
+                    runMessage = new RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Warning);
                     this.runLevelErrorsAndWarnings.Add(runMessage);
                     break;
                 case TestMessageLevel.Error:
                     this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Failed;
-                    runMessage = new TrxLoggerObjectModel.RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
+                    runMessage = new RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
                     this.runLevelErrorsAndWarnings.Add(runMessage);
                     break;
                 default:
@@ -261,13 +264,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// The eventArgs.
         /// </param>
-        internal void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
+        internal void TestResultHandler(object sender, TestResultEventArgs e)
         {
             // Create test run
             if (this.testRun == null)
                 CreateTestRun();
 
-            // Convert skipped test to a log entry as that is the behaviour of mstest.
+            // Convert skipped test to a log entry as that is the behavior of mstest.
             if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
                 this.HandleSkippedTest(e.Result);
 
@@ -299,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             // Update test entries
             UpdateTestEntries(executionId, parentExecutionId, testElement, parentTestElement);
 
-            // Set various counts (passtests, failed tests, total tests)
+            // Set various counts (passed tests, failed tests, total tests)
             this.totalTests++;
             if (testResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
             {
@@ -353,7 +356,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             List<TestListCategory> categories = new List<TestListCategory>();
             categories.Add(TestListCategory.UncategorizedResults);
             categories.Add(TestListCategory.AllResults);
-            helper.SaveList<TestListCategory>(categories, rootElement, "TestLists", ".", "TestList", parameters);
+            helper.SaveList(categories, rootElement, "TestLists", ".", "TestList", parameters);
 
             // Save summary
             if (this.testRunOutcome == TrxLoggerObjectModel.TestOutcome.Passed)
@@ -361,9 +364,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Completed;
             }
 
+            testRunOutcome = ChangeTestOutcomeIfNecessary(testRunOutcome);
+
             List<string> errorMessages = new List<string>();
             List<CollectorDataEntry> collectorEntries = this.converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
-            IList<String> resultFiles = this.converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
+            IList<string> resultFiles = this.converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
 
             if (errorMessages.Count > 0)
             {
@@ -389,13 +394,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
 
-            //Save results to Trx file
-            this.DeriveTrxFilePath();
+            this.ReserveTrxFilePath();
             this.PopulateTrxFile(this.trxFilePath, rootElement);
         }
 
         /// <summary>
-        /// populate trx file from the xmlelement
+        /// populate trx file from the xml element
         /// </summary>
         /// <param name="trxFileName">
         /// Trx full path
@@ -407,21 +411,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             try
             {
-                var trxFileDirPath = Path.GetDirectoryName(trxFilePath);
-                if (Directory.Exists(trxFileDirPath) == false)
-                {
-                    Directory.CreateDirectory(trxFileDirPath);
-                }
-
-                if (File.Exists(trxFilePath))
-                {
-                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture,
-                        TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName);
-                    ConsoleOutput.Instance.Warning(false, overwriteWarningMsg);
-                    EqtTrace.Warning(overwriteWarningMsg);
-                }
-
-                using (var fs = File.Open(trxFileName, FileMode.Create))
+                using (var fs = File.Open(trxFileName, FileMode.Truncate))
                 {
                     using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize, Indent = true }))
                     {
@@ -430,11 +420,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     }
                 }
 
-                String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
+                string resultsFileMessage = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
                 ConsoleOutput.Instance.Information(false, resultsFileMessage);
                 EqtTrace.Info(resultsFileMessage);
             }
-            catch (System.UnauthorizedAccessException fileWriteException)
+            catch (UnauthorizedAccessException fileWriteException)
             {
                 ConsoleOutput.Instance.Error(false, fileWriteException.Message);
             }
@@ -443,10 +433,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         // Initializes trx logger cache.
         private void InitializeInternal()
         {
-            this.results = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
-            this.innerResults = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
+            this.results = new ConcurrentDictionary<Guid, ITestResult>();
+            this.innerResults = new ConcurrentDictionary<Guid, ITestResult>();
             this.testElements = new ConcurrentDictionary<Guid, ITestElement>();
-            this.entries = new ConcurrentDictionary<Guid,TestEntry>();
+            this.entries = new ConcurrentDictionary<Guid, TestEntry>();
             this.innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
             this.runLevelErrorsAndWarnings = new List<RunInfo>();
             this.testRun = null;
@@ -474,53 +464,86 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             Debug.Assert(rsTestResult.Outcome == ObjectModel.TestOutcome.Skipped, "Test Result should be skipped but it is " + rsTestResult.Outcome);
 
-            ObjectModel.TestCase testCase = rsTestResult.TestCase;
+            TestCase testCase = rsTestResult.TestCase;
             string testCaseName = !string.IsNullOrEmpty(testCase.DisplayName) ? testCase.DisplayName : testCase.FullyQualifiedName;
-            string message = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, testCaseName);
+            string message = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, testCaseName);
             this.AddRunLevelInformationalMessage(message);
         }
 
-        private void DeriveTrxFilePath()
+        private void ReserveTrxFilePath()
         {
-            var isLogFilePrefixParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue);
-            var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue);
+            for (short retries = 0; retries != short.MaxValue; retries++)
+            {
+                var filePath = AcquireTrxFileNamePath(out var shouldOverwrite);
+
+                if (shouldOverwrite && File.Exists(filePath))
+                {
+                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, filePath);
+                    ConsoleOutput.Instance.Warning(false, overwriteWarningMsg);
+                    EqtTrace.Warning(overwriteWarningMsg);
+                }
+                else
+                {
+                    try
+                    {
+                        using (var fs = File.Open(filePath, FileMode.CreateNew)) { }
+                    }
+                    catch (IOException)
+                    {
+                        // File already exists, try again!
+                        continue;
+                    }
+                }
+
+                trxFilePath = filePath;
+                return;
+            }
+        }
+
+        private string AcquireTrxFileNamePath(out bool shouldOverwrite)
+        {
+            shouldOverwrite = false;
+            var isLogFileNameParameterExists = parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue);
+            var isLogFilePrefixParameterExists = parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue);
+
+            string filePath = null;
 
             if (isLogFilePrefixParameterExists)
             {
-                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))              
+                if (parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out var framework) && framework != null)
                 {
-                    var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
-                    if (framework != null)
-                    {
-                        framework = NuGetFramework.Parse(framework).GetShortFolderName();
-                        logFilePrefixValue = logFilePrefixValue + "_" + framework;
-                    }
-
-                    logFilePrefixValue = logFilePrefixValue + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + this.trxFileExtension;
-                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFilePrefixValue);
-                    return;
+                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                    logFilePrefixValue = logFilePrefixValue + "_" + framework;
                 }
-            }
 
+                filePath = trxFileHelper.GetNextTimestampFileName(this.testResultsDirPath, logFilePrefixValue + this.trxFileExtension, "_yyyyMMddHHmmss");
+            }
             else if (isLogFileNameParameterExists)
             {
-                if (!string.IsNullOrWhiteSpace(logFileNameValue))
-                {
-                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
-                    return;
-                }
+                filePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                shouldOverwrite = true;
             }
 
-            this.SetDefaultTrxFilePath();
+            filePath = filePath ?? this.SetDefaultTrxFilePath();
+
+            var trxFileDirPath = Path.GetDirectoryName(filePath);
+
+            if (!Directory.Exists(trxFileDirPath))
+            {
+                Directory.CreateDirectory(trxFileDirPath);
+            }
+
+            return filePath;
         }
 
         /// <summary>
-        /// Sets auto generated Trx file name under test results directory.
+        /// Returns an auto generated Trx file name under test results directory.
         /// </summary>
-        private void SetDefaultTrxFilePath()
+        private string SetDefaultTrxFilePath()
         {
             var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
-            this.trxFilePath = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
+
+            return trxFileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 
         /// <summary>
@@ -537,13 +560,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             // We cannot rely on the StartTime for the first test result
             // In case of parallel, first test result is the fastest test and not the one which started first.
-            // Setting Started to DateTime.Now in Intialize will make sure we include the startup cost, which was being ignored earlier.
+            // Setting Started to DateTime.Now in Initialize will make sure we include the startup cost, which was being ignored earlier.
             // This is in parity with the way we set this.testRun.Finished
             this.testRun.Started = this.testRunStartTime;
 
             // Save default test settings
-            string runDeploymentRoot = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
-            TestRunConfiguration testrunConfig = new TestRunConfiguration("default");
+            string runDeploymentRoot = trxFileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
+            TestRunConfiguration testrunConfig = new TestRunConfiguration("default", trxFileHelper);
             testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
             this.testRun.RunConfiguration = testrunConfig;
         }
@@ -736,6 +759,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             return testEntry;
+        }
+
+        private TrxLoggerObjectModel.TestOutcome ChangeTestOutcomeIfNecessary (TrxLoggerObjectModel.TestOutcome outcome)
+        {
+            // If no tests discovered/executed and TreatNoTestsAsError was set to True
+            // We will return ResultSummary as Failed
+            // Note : we only send the value of TreatNoTestsAsError if it is "True"
+            if (totalTests == 0 && parametersDictionary.ContainsKey(ObjectModelConstants.TreatNoTestsAsError))
+            {
+                outcome = TrxLoggerObjectModel.TestOutcome.Failed;
+            }
+
+            return outcome;
         }
 
         #endregion

@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector
 {
-    using System;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 

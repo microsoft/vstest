@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if !NETSTANDARD1_0
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -14,6 +12,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+    using System;
+    using System.IO;
 
     public class DotnetHostHelper : IDotnetHostHelper
     {
@@ -42,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <inheritdoc />
         public string GetDotnetPath()
         {
-            if (!TryGetExecutablePath("dotnet", out string dotnetPath))
+            if (!TryGetExecutablePath("dotnet", out var dotnetPath))
             {
                 string errorMessage = string.Format(Resources.NoDotnetExeFound, "dotnet");
 
@@ -55,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public string GetMonoPath()
         {
-            if (!TryGetExecutablePath(MONOEXENAME, out string monoPath))
+            if (!TryGetExecutablePath(MONOEXENAME, out var monoPath))
             {
                 string errorMessage = string.Format(Resources.NoDotnetExeFound, MONOEXENAME);
 
@@ -70,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         {
             if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
-                executableBaseName = executableBaseName + ".exe";
+                executableBaseName += ".exe";
             }
 
             executablePath = string.Empty;
@@ -89,3 +90,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         }
     }
 }
+
+#endif

@@ -317,7 +317,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
                 eventLogPath,
                 eventLogEntries.Where(
-                    entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).OrderBy(x => x.TimeGenerated).ToList().Take(maxLogEntries).ToList(),
+                    entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).OrderBy(x => x.TimeGenerated).Take(maxLogEntries).ToList(),
                 this.fileHelper);
 
             stopwatch.Stop();
@@ -354,7 +354,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// Cleans up resources allocated by the data collector
         /// </summary>
-        /// <param name="disposing">Not used since this class does not have a finaliser.</param>
+        /// <param name="disposing">Not used since this class does not have a finalizer.</param>
         protected override void Dispose(bool disposing)
         {
             // Unregister events
@@ -371,7 +371,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             // Delete all the temp event log directories
             this.RemoveTempEventLogDirs(this.eventLogDirectories);
-            GC.SuppressFinalize(this);
         }
 
         #endregion

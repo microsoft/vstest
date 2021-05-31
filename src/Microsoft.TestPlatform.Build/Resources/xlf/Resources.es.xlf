@@ -1,49 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="-508382432">
-    <header>
-      <count-group name="BlackBox wordcount">
-        <count count-type="x-wordCount">27</count>
-        <count count-type="x-adjWordCount">22.95</count>
-        <count count-type="x-curAdjWordCount">22.95</count>
-        <count count-type="x-repeatAdjWordCount">0</count>
-        <count count-type="x-termWordCount">0</count>
-      </count-group>
-      <count-group name="BlackBox wordcount analysis">
-        <count count-type="x-match102%">0</count>
-        <count count-type="x-match101%">0</count>
-        <count count-type="x-match100%">0</count>
-        <count count-type="x-match99-90%">0</count>
-        <count count-type="x-match89-75%">0</count>
-        <count count-type="x-mt">27</count>
-        <count count-type="repetition">0</count>
-      </count-group>
-    </header>
+  <file datatype="xml" source-language="en" original="../Resources.resx" target-language="es">
     <body>
       <trans-unit id="BuildCompleted">
         <source>Build completed.</source>
         <target state="translated">Se completó la compilación.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="BuildStarted">
         <source>Build started, please wait...</source>
         <target state="translated">Compilación iniciada, espere...</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="TestRunningSummary">
-        <source>Test run for {0}({1})</source>
-        <target state="translated">Serie de pruebas para {0}({1})</target>
-        <note />
+        <source>Test run for {0} ({1})</source>
+        <target state="translated">Serie de pruebas para {0} ({1})</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="UpdateTestSdkForCollectingCodeCoverage">
         <source>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</source>
         <target state="translated">Advertencia: Actualice la referencia del paquete Microsoft.NET.Test.Sdk a la versión 15.8.0 o posterior para recopilar la cobertura de código.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="NoIsTestProjectProperty">
         <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
         <target state="translated">Omitiendo la ejecución de la prueba para el proyecto {0}. Para ejecutar pruebas con dotnet test, agregue la propiedad "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" al archivo del proyecto.</target>
-        <note />
+        <note></note>
       </trans-unit>
     </body>
   </file>

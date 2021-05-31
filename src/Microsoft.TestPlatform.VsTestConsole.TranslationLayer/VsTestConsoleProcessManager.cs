@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Creates an instance of VsTestConsoleProcessManager class.
         /// </summary>
-        /// <param name="vstestConsolePath">The fullpath to vstest.console</param>
+        /// <param name="vstestConsolePath">The full path to vstest.console</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
             this.FileHelper = new FileHelper();
@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
-#if NET451
+#if NETFRAMEWORK
             if (consoleParameters.EnvironmentVariables != null)
             {
                 info.EnvironmentVariables.Clear();
@@ -121,7 +121,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     if (envVariable.Key != null)
                     {
-                        info.EnvironmentVariables.Add(envVariable.Key.ToString(), envVariable.Value?.ToString());
+                        info.EnvironmentVariables.Add(envVariable.Key, envVariable.Value?.ToString());
                     }
                 }
             }
@@ -150,7 +150,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void ShutdownProcess()
         {
             // Ideally process should die by itself
-            if(!processExitedEvent.WaitOne(ENDSESSIONTIMEOUT) && IsProcessInitialized())
+            if (!processExitedEvent.WaitOne(ENDSESSIONTIMEOUT) && IsProcessInitialized())
             {
                 EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {ENDSESSIONTIMEOUT} milliseconds.");
                 vstestConsoleExited = true;
@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 SafelyTerminateProcess();
                 this.process.Dispose();
                 this.process = null;
-            }            
+            }
         }
 
         private void SafelyTerminateProcess()
@@ -220,15 +220,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (isNetCoreRunner)
             {
-                args.Insert(0, vstestConsolePath);
+                args.Insert(0, GetEscapeSequencedPath(vstestConsolePath));
             }
 
             return args.ToArray();
         }
 
         private string GetConsoleRunner()
-        {
-            return isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : vstestConsolePath;
-        }
+            => isNetCoreRunner ? (string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : GetEscapeSequencedPath(this.vstestConsolePath);
+
+        private string GetEscapeSequencedPath(string path)
+            => string.IsNullOrEmpty(path) ? path : $"\"{path.Trim('"')}\"";
     }
 }

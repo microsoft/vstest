@@ -17,11 +17,11 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestEnvironment
     {
-        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
+        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR")
+                                                      ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
         private static Dictionary<string, string> dependencyVersions;
 
-        private readonly bool runningInCli;
         private string targetRuntime;
 
         public IntegrationTestEnvironment()
@@ -40,18 +40,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (string.IsNullOrEmpty(TestPlatformRootDirectory))
             {
                 // Running in VS/IDE. Use artifacts directory as root.
-                this.runningInCli = false;
-
                 // Get root directory from test assembly output directory
-                TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
-            }
-            else
-            {
-                // Running in command line/CI
-                this.runningInCli = true;
+                TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
             }
 
-            this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
+            this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, $@"test{Path.DirectorySeparatorChar}TestAssets");
 
             // There is an assumption that integration tests will always run from a source enlistment.
             // Need to remove this assumption when we move to a CDP.
@@ -105,29 +98,29 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-                string value = string.Empty;
-                if (this.runningInCli)
-                {
-                    value = Path.Combine(
-                        TestPlatformRootDirectory,
-                        "artifacts",
-                        BuildConfiguration,
-                        this.RunnerFramework,
-                        this.TargetRuntime);
-                }
-                else
-                {
-                    value = Path.Combine(
+                // this used to switch to src\package\package\bin\based on whether
+                // this is running in cli, but that's a bad idea, the console there does not have
+                // a runtime config and will fail to start with error testhostpolicy.dll not found
+                var publishDirectory = Path.Combine(
                     TestPlatformRootDirectory,
-                    @"src\package\package\bin",
+                    "artifacts",
                     BuildConfiguration,
                     this.RunnerFramework,
                     this.TargetRuntime);
+
+                if (!Directory.Exists(publishDirectory))
+                {
+                    throw new InvalidOperationException($"Path '{publishDirectory}' does not exist, did you build the solution via build.cmd?");
                 }
 
-                return value;
+                return publishDirectory;
             }
         }
+
+        /// <summary>
+        /// Gets the extensions directory for <c>vstest.console</c> package.
+        /// </summary>
+        public string ExtensionsDirectory => Path.Combine(PublishDirectory, "Extensions");
 
         /// <summary>
         /// Gets the target framework.
@@ -151,7 +144,6 @@ namespace Microsoft.TestPlatform.TestUtilities
                 {
                     if (string.IsNullOrEmpty(this.targetRuntime))
                     {
-
                         this.targetRuntime = "win7-x64";
                     }
                 }
@@ -276,7 +268,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private static Dictionary<string, string> GetDependencies(string testPlatformRoot)
         {
-            var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props");
+            var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props".Replace('\\', Path.DirectorySeparatorChar));
             var dependencyProps = new Dictionary<string, string>();
             if (!File.Exists(dependencyPropsFile))
             {
@@ -294,7 +286,14 @@ namespace Microsoft.TestPlatform.TestUtilities
                     {
                         if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
                         {
-                            dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                            if (!dependencyProps.ContainsKey(props.Name))
+                            {
+                                dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                            }
+                            else
+                            {
+                                dependencyProps[props.Name] = string.Join(", ", dependencyProps[props.Name], props.ReadElementContentAsString());
+                            }
                         }
                         props.Read();
                     }

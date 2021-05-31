@@ -9,7 +9,7 @@ function Test-FilesUseTelemetryOutput {
 
     If($filesMissingTelemetry) {
         Write-PipelineTelemetryError -category 'Build' 'One or more eng/common scripts do not use telemetry categorization.'
-        Write-Host "See https://github.com/dotnet/arcade/blob/master/Documentation/Projects/DevOps/CI/Telemetry-Guidance.md"
+        Write-Host "See https://github.com/dotnet/arcade/blob/main/Documentation/Projects/DevOps/CI/Telemetry-Guidance.md"
         Write-Host "The following ps1 files do not include telemetry categorization output:"
         ForEach($file In $filesMissingTelemetry) {
             Write-Host $file

@@ -28,6 +28,9 @@
         margin-top: 15px;
         margin-bottom:10px;
         }
+        pre {
+        white-space: pre-wrap;
+        }
         .summary {font-family:monospace;
         display: -webkit-flex; /* Safari */
         -webkit-flex-wrap: wrap; /* Safari 6.1+ */
@@ -180,11 +183,11 @@
   </xsl:template>
   
   <xsl:template match = "tp:ErrorMessage">
-    Error: <span class="error-message"><xsl:value-of select = "." /></span><br />
+    Error: <span class="error-message"><pre><xsl:value-of select = "." /></pre></span><br />
   </xsl:template>
 
   <xsl:template match = "tp:ErrorStackTrace">
-    Stack trace: <span class="error-stack-trace"><xsl:value-of select = "." /></span><br />
+    Stack trace: <span class="error-stack-trace"><pre><xsl:value-of select = "." /></pre></span><br />
   </xsl:template>
 
   <xsl:template match = "tp:FailedTests">

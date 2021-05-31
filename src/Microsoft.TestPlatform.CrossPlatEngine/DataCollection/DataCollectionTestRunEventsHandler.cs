@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
 
@@ -18,10 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete. 
-    /// Existing functionality of ITestRunEventsHandler is decorated with aditional call to Data Collection Process.
+    /// Handles DataCollection attachments by calling DataCollection Process on Test Run Complete.
+    /// Existing functionality of ITestRunEventsHandler is decorated with additional call to Data Collection Process.
     /// </summary>
-    internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler
+    internal class DataCollectionTestRunEventsHandler : ITestRunEventsHandler2
     {
         private IProxyDataCollectionManager proxyDataCollectionManager;
         private ITestRunEventsHandler testRunEventsHandler;
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The proxy Data Collection Manager.
         /// </param>
         public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
-            : this(baseTestRunEventsHandler, proxyDataCollectionManager, cancellationToken, JsonDataSerializer.Instance)
+            : this(baseTestRunEventsHandler, proxyDataCollectionManager, JsonDataSerializer.Instance, cancellationToken)
         {
         }
 
@@ -55,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataSerializer">
         /// The data Serializer.
         /// </param>
-        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken, IDataSerializer dataSerializer)
+        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer, CancellationToken cancellationToken)
         {
             this.proxyDataCollectionManager = proxyDataCollectionManager;
             this.testRunEventsHandler = baseTestRunEventsHandler;
@@ -85,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleRawMessage(string rawMessage)
         {
-            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete 
+            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
             if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
@@ -129,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
             {
-                runContextAttachments = DataCollectionTestRunEventsHandler.GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
+                runContextAttachments = GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
             }
 
             this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
@@ -157,6 +158,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             return this.testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
+        /// <inheritdoc />
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            return ((ITestRunEventsHandler2)this.testRunEventsHandler).AttachDebuggerToProcess(pid);
+        }
+
         /// <summary>
         /// The get combined attachment sets.
         /// </summary>
@@ -164,27 +171,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The run attachments.
         /// </param>
         /// <param name="newAttachments">
-        /// The runcontext attachments.
+        /// The run context attachments.
         /// </param>
         /// <returns>
         /// The <see cref="Collection"/>.
         /// </returns>
         internal static ICollection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
         {
-            if (null == newAttachments || newAttachments.Count == 0)
+            if (newAttachments == null || newAttachments.Count == 0)
             {
                 return originalAttachmentSets;
             }
 
-            if (null == originalAttachmentSets)
+            if (originalAttachmentSets == null)
             {
                 return new Collection<AttachmentSet>(newAttachments.ToList());
             }
 
             foreach (var attachmentSet in newAttachments)
             {
-                var attSet = originalAttachmentSets.Where(item => Uri.Equals(item.Uri, attachmentSet.Uri)).FirstOrDefault();
-                if (null == attSet)
+                var attSet = originalAttachmentSets.FirstOrDefault(item => Uri.Equals(item.Uri, attachmentSet.Uri));
+                if (attSet == null)
                 {
                     originalAttachmentSets.Add(attachmentSet);
                 }

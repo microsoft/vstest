@@ -5,15 +5,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 {
     using System;
 
-#if NET451
+#if NETFRAMEWORK
     using System.Runtime.Serialization;
 #endif
 
     /// <summary>
-    /// Exception thrown by the framework when an executor attempts to send 
-    /// test result to the framework when the test is canceled.  
+    /// Exception thrown by the framework when an executor attempts to send
+    /// test result to the framework when the test is canceled.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public class TestCanceledException : Exception
@@ -46,9 +46,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         {
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
-        /// Seralization constructor.
+        /// Serialization constructor.
         /// </summary>
         protected TestCanceledException(SerializationInfo info, StreamingContext context)
             : base(info, context)

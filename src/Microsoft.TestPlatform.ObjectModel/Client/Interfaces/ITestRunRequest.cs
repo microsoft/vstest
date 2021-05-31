@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         event EventHandler<TestRunCompleteEventArgs> OnRunCompletion;
 
         /// <summary>
-        ///  Handler for receiving error during fetching/execution. This is used for when abnormal error 
+        ///  Handler for receiving error during fetching/execution. This is used for when abnormal error
         ///  occurs; equivalent of IRunMessageLogger in the current RockSteady core
         /// </summary>
         event EventHandler<TestRunMessageEventArgs> TestRunMessage;

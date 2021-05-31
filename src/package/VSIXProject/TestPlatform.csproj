@@ -238,6 +238,22 @@
 
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.exe" /> 
     <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net452.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net452.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net452.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net452.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net46.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net46.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net46.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net46.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net461.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net461.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net461.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net461.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net462.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net462.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net462.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net462.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net47.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net47.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net47.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net471.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net471.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net471.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net472.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net472.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net472.x86.exe" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net48.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.net48.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="2" NgenApplication="$(ExtensionInstallationRelativeToVS)\testhost.net48.x86.exe" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License.rtf">

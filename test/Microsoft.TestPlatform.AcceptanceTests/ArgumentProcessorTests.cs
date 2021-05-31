@@ -6,10 +6,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class ArgumentProcessorTests : AcceptanceTestBase
     {
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
         {
@@ -30,12 +32,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            var testResults = GetResultsDirectory();
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: testResults);
             arguments = string.Concat(arguments, " /badArgument");
 
             this.InvokeVsTest(arguments);
@@ -53,6 +57,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             //Check for message which guides using help option
             this.StdErrorContains("Please use the /help option to check the list of valid arguments");
+
+            TryRemoveDirectory(testResults);
         }
     }
 }

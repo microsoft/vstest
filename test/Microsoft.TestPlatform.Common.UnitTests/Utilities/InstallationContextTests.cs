@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using System.Linq;
 
     [TestClass]
     public class InstallationContextTests
@@ -46,7 +47,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
         {
             var devenvPath = this.installationContext.GetVisualStudioPath(@"C:\temp");
 
-            Assert.AreEqual(@"C:\temp\devenv.exe", devenvPath);
+            Assert.AreEqual(@"C:\temp\devenv.exe", devenvPath.Replace("/", "\\"));
         }
 
         [TestMethod]
@@ -60,7 +61,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
                 @"C:\temp\CommonExtensions\Microsoft\TeamFoundation\Team Explorer",
                 @"C:\temp"
             };
-            var commonLocations = this.installationContext.GetVisualStudioCommonLocations(@"C:\temp");
+            var commonLocations = this.installationContext.GetVisualStudioCommonLocations(@"C:\temp").Select(p => p.Replace("/", "\\")).ToArray();
 
             CollectionAssert.AreEquivalent(expectedLocations, commonLocations);
         }

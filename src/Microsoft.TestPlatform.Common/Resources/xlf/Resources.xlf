@@ -137,8 +137,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FastFilterException">
-        <source>An error occured while creating Fast filter.</source>
-        <target state="new">An error occured while creating Fast filter.</target>
+        <source>An error occurred while creating Fast filter.</source>
+        <target state="new">An error occurred while creating Fast filter.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CancellationRequested">
@@ -154,6 +154,21 @@
       <trans-unit id="FailedToLoadAdapaterFile">
         <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
         <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AccessDenied">
+        <source>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</source>
+        <target state="new">Access denied while trying to create "TestResults" folder in current location. You are getting this exception because you are running vstest.console.exe from a folder which requires administrator rights. To solve the issue : please open command line "As Administrator" or run vstest.console.exe from a folder where you have admin privileges.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InnerException">
+        <source>Inner exception:</source>
+        <target state="new">Inner exception:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StackTrace">
+        <source>Stack trace:</source>
+        <target state="new">Stack trace:</target>
         <note></note>
       </trans-unit>
     </body>

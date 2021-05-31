@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
-    /// This only exists because there is an issue with MSTest v2 and ThrowsException with a message API. 
+    /// This only exists because there is an issue with MSTest v2 and ThrowsException with a message API.
     /// Move to Assert.ThrowException() with a message once the bug is fixed.
     /// </summary>
     public static class ExceptionUtilities

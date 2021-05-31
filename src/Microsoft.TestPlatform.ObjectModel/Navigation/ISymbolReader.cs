@@ -4,12 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    
+
     /// <summary>
-    /// Caches filename and linenumber for symbols in assembly.
+    /// Caches filename and line number for symbols in assembly.
     /// </summary>
     internal interface ISymbolReader : IDisposable
     {

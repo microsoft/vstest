@@ -3,10 +3,7 @@
 
 namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
 {
-    using System.Collections;
     using System.Collections.Generic;
-
-    using Microsoft.TestPlatform.TestUtilities;    
 
     /// <summary>
     /// The performance test base.
@@ -39,14 +36,14 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
         {
             // Start session and listen
-#if NET451
+#if NETFRAMEWORK
             this.perfAnalyzer.EnableProvider();
 #endif
             // Run Test
             this.InvokeVsTestForExecution(testAsset, testAdapterPath, ".NETFramework,Version=v4.5.1", runSettings);
 
             // Stop Listening
-#if NET451
+#if NETFRAMEWORK
             this.perfAnalyzer.DisableProvider();
 #endif
         }
@@ -66,20 +63,20 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void RunDiscoveryPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
         {
             // Start session and listen
-#if NET451
+#if NETFRAMEWORK
             this.perfAnalyzer.EnableProvider();
 #endif
             // Run Test
             this.InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings, ".NETFramework,Version=v4.5.1");
 
             // Stop Listening
-#if NET451
+#if NETFRAMEWORK
             this.perfAnalyzer.DisableProvider();
 #endif
         }
 
         /// <summary>
-        /// The analyze perf data.
+        /// The analyze performance data.
         /// </summary>
         public void AnalyzePerfData()
         {

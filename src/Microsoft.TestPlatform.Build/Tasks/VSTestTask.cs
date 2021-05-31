@@ -5,7 +5,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
@@ -109,6 +111,41 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestBlameCrash
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameCrashDumpType
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameCrashCollectAlways
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameHang
+        {
+            get;
+            set;
+        }
+
+        public string VSTestBlameHangDumpType
+        {
+            get;
+            set;
+        }
+        public string VSTestBlameHangTimeout
+        {
+            get;
+            set;
+        }
+
         public string VSTestTraceDataCollectorDirectoryPath
         {
             get;
@@ -125,6 +162,27 @@ namespace Microsoft.TestPlatform.Build.Tasks
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
             Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
+
+            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_BUILD_DEBUG");
+            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                Console.WriteLine("Waiting for debugger attach...");
+
+                var currentProcess = Process.GetCurrentProcess();
+                Console.WriteLine(string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName));
+
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                Debugger.Break();
+            }
+
+            // Avoid logging "Task returned false but did not log an error." on test failure, because we don't
+            // write MSBuild error. https://github.com/dotnet/msbuild/blob/51a1071f8871e0c93afbaf1b2ac2c9e59c7b6491/src/Framework/IBuildEngine7.cs#L12
+            var allowfailureWithoutError = BuildEngine.GetType().GetProperty("AllowFailureWithoutError");
+            allowfailureWithoutError?.SetValue(BuildEngine, true);
 
             vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
@@ -243,8 +301,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
             if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
             {
-                var normalTestLogging = new List<string>() {"n", "normal", "d", "detailed", "diag", "diagnostic"};
-                var quietTestLogging = new List<string>() {"q", "quiet"};
+                var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
+                var quietTestLogging = new List<string>() { "q", "quiet" };
 
                 string vsTestVerbosity = "minimal";
                 if (normalTestLogging.Contains(this.VSTestVerbosity.ToLowerInvariant()))
@@ -259,9 +317,51 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestBlame))
+            var blameCrash = !string.IsNullOrEmpty(this.VSTestBlameCrash);
+            var blameHang = !string.IsNullOrEmpty(this.VSTestBlameHang);
+            if (!string.IsNullOrEmpty(this.VSTestBlame) || blameCrash || blameHang)
             {
-                allArgs.Add("--Blame");
+                var blameArgs = "--Blame";
+
+                var dumpArgs = new List<string>();
+                if (blameCrash || blameHang)
+                {
+                    if (blameCrash)
+                    {
+                        dumpArgs.Add("CollectDump");
+                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashCollectAlways))
+                        {
+                            dumpArgs.Add($"CollectAlways={this.VSTestBlameCrashCollectAlways}");
+                        }
+
+                        if (!string.IsNullOrEmpty(this.VSTestBlameCrashDumpType))
+                        {
+                            dumpArgs.Add($"DumpType={this.VSTestBlameCrashDumpType}");
+                        }
+                    }
+
+                    if (blameHang)
+                    {
+                        dumpArgs.Add("CollectHangDump");
+
+                        if (!string.IsNullOrEmpty(this.VSTestBlameHangDumpType))
+                        {
+                            dumpArgs.Add($"HangDumpType={this.VSTestBlameHangDumpType}");
+                        }
+
+                        if (!string.IsNullOrEmpty(this.VSTestBlameHangTimeout))
+                        {
+                            dumpArgs.Add($"TestTimeout={this.VSTestBlameHangTimeout}");
+                        }
+                    }
+
+                    if (dumpArgs.Any())
+                    {
+                        blameArgs += $":\"{string.Join(";", dumpArgs)}\"";
+                    }
+                }
+
+                allArgs.Add(blameArgs);
             }
 
             if (this.VSTestCollect != null && this.VSTestCollect.Length > 0)
@@ -303,7 +403,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if(!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
+            if (!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
             {
                 allArgs.Add("--nologo");
             }

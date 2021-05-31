@@ -5,12 +5,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -73,7 +71,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var port = this.SetupFakeCommunicationChannel();
 
-            Assert.AreEqual(port, "123", "Correct port must be returned.");
+            Assert.AreEqual("123", port, "Correct port must be returned.");
         }
 
         [TestMethod]

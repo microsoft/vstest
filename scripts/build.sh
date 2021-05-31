@@ -15,7 +15,7 @@ NOCOLOR='\033[0m'
 # Parse options
 #
 CONFIGURATION="Debug"
-TARGET_RUNTIME="ubuntu.16.04-x64"
+TARGET_RUNTIME="ubuntu.18.04-x64"
 VERSION="" # Will set this later by reading TestPlatform.Settings.targets file.
 VERSION_SUFFIX="dev"
 FAIL_FAST=false
@@ -93,7 +93,7 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
-TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet}"
+TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet-linux}"
 TP_PACKAGES_DIR="${NUGET_PACKAGES:-${TP_ROOT_DIR}/packages}"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
@@ -101,8 +101,27 @@ TP_PACKAGE_NUSPEC_DIR="$TP_ROOT_DIR/src/package/nuspec"
 TP_SRC_DIR="$TP_ROOT_DIR/src"
 TP_USE_REPO_API=$DOTNET_BUILD_FROM_SOURCE
 
+global_json_file="$TP_ROOT_DIR/global.json"
+
+
 # Set VERSION from scripts/build/TestPlatform.Settings.targets
 VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/TestPlatform.Settings.targets  | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+
+
+function ReadGlobalVersion {
+  local key=$1
+
+  if command -v jq &> /dev/null; then
+    _ReadGlobalVersion="$(jq -r ".[] | select(has(\"$key\")) | .\"$key\"" "$global_json_file")"
+  elif [[ "$(cat "$global_json_file")" =~ \"$key\"[[:space:]\:]*\"([^\"]+) ]]; then
+    _ReadGlobalVersion=${BASH_REMATCH[1]}
+  fi
+
+  if [[ -z "$_ReadGlobalVersion" ]]; then
+    Write-PipelineTelemetryError -category 'Build' "Error: Cannot find \"$key\" in $global_json_file"
+    ExitWithExitCode 1
+  fi
+}
 
 #
 # Dotnet configuration
@@ -111,7 +130,10 @@ VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/Te
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="3.1.100-preview2-014569"
+
+ReadGlobalVersion "dotnet"
+DOTNET_CLI_VERSION=$_ReadGlobalVersion
+
 #DOTNET_RUNTIME_VERSION="LATEST"
 
 #
@@ -184,19 +206,17 @@ function install_cli()
             return 1
         fi
         chmod u+x $install_script
+        # Get netcoreapp1.1 shared components
+        $install_script  --runtime dotnet --version "2.1.0" --channel "release/2.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "3.1.0" --channel "release/3.1.0" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
+        $install_script  --runtime dotnet --version "5.0.1" --channel "release/5.0.1" --install-dir "$TP_DOTNET_DIR" --no-path --architecture x64
 
         log "install_cli: Get the latest dotnet cli toolset..."
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
+        $install_script --install-dir "$TP_DOTNET_DIR" --no-path --channel "main" --version $DOTNET_CLI_VERSION
 
-        # Get netcoreapp1.1 shared components
-        log "install_cli: Get the shared netcoreapp1.0 runtime..."
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
-        log "install_cli: Get the shared netcoreapp1.1 runtime..."
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
-        log "install_cli: Get the shared netcoreapp2.0 runtime..."
-        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
-        #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-        #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
+
+        log " ---- dotnet x64"
+        "$TP_DOTNET_DIR/dotnet" --info
     fi
 
     local dotnet_path=$(_get_dotnet_path)
@@ -217,18 +237,18 @@ function restore_package()
     log "restore_package: Start restoring packages to $TP_PACKAGES_DIR."
     local start=$SECONDS
 
-	if [[ $TP_USE_REPO_API = 0 ]]; then
-		log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
-		$dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
-	else
-		log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj"
-		$dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version  -p:DotNetBuildFromSource=true || failed=true
-	fi
+    if [[ $TP_USE_REPO_API = 0 ]]; then
+        log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
+        $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
+    else
+        log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj"
+        $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version  -p:DotNetBuildFromSource=true || failed=true
+    fi
 
-	if [ "$failed" = true ]; then
-		error "Failed to restore packages."
-		return 2
-	fi
+    if [ "$failed" = true ]; then
+        error "Failed to restore packages."
+        return 2
+    fi
 
     log "restore_package: Complete. Elapsed $(( SECONDS - start ))s."
 }
@@ -243,13 +263,13 @@ function invoke_build()
     log ".. .. Build: Source: $TPB_Solution"
     
     # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
+    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.7.2/1.0.0/lib/net472/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
         if [[ $TP_USE_REPO_API = 0 ]]; then
-            $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
+            $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog || failed=true
         else
-            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true || failed=true
+            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true -bl:TestPlatform.binlog || failed=true
        fi
     else
         find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -369,11 +389,18 @@ function create_package()
     local start=$SECONDS
     log "Create-NugetPackages: Started."
     stagingDir="$TP_OUT_DIR/$TPB_Configuration"
-    packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
+
+    if [[ $TP_USE_REPO_API = 0 ]]; then
+        packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
+    else
+        packageOutputDir="$TP_OUT_DIR/packages/$TPB_Configuration"
+    fi
+
     mkdir -p $packageOutputDir
 
-    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
-        "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
+    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
+        "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec"\
+        "Microsoft.CodeCoverage.nuspec" "Microsoft.TestPlatform.AdapterUtilities.nuspec" "TestPlatform.Extensions.TrxLogger.nuspec")
     projectFiles=("Microsoft.TestPlatform.CLI.csproj" "Microsoft.TestPlatform.Build.csproj")
     binDir="$TP_ROOT_DIR/bin/packages"
 
@@ -390,7 +417,8 @@ function create_package()
     # Copy over empty and third patry notice file
     cp "$TP_PACKAGE_NUSPEC_DIR/_._" $stagingDir
     cp "$TP_PACKAGE_NUSPEC_DIR/../ThirdPartyNotices.txt" $stagingDir
-
+    cp "$TP_PACKAGE_NUSPEC_DIR/../Icon.png" $stagingDir
+    cp -r "$TP_PACKAGE_NUSPEC_DIR/../licenses" $stagingDir
 
     for i in ${projectFiles[@]}; do
         log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \

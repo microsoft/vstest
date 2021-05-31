@@ -3,15 +3,17 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+#if NETFRAMEWORK
     using System;
+#endif
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// Class that holds Trait. 
+    /// Class that holds Trait.
     /// A traits is Name, Value pair.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     [DataContract]
@@ -30,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public Trait(string name, string value)
         {
-            ValidateArg.NotNull(name, "name");
+            ValidateArg.NotNull(name, nameof(name));
 
             this.Name = name;
             this.Value = value;

@@ -99,7 +99,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                         It.Is<TestRunnerConnectionInfo>(
                             t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
                                  && t.LogFile.Contains("_" + Thread.CurrentThread.ManagedThreadId + ".txt"))));
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Off;
@@ -124,7 +124,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelShouldAddCorrectTraceLevelForTestHost()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -267,7 +267,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             cancellationTokenSource.Cancel();
             var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), this.defaultRunSettings)).Message;
-            StringAssert.Equals("Cancelling the operation as requested.", message);
+            StringAssert.Equals("Canceling the operation as requested.", message);
         }
 
         [TestMethod]
@@ -282,7 +282,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
 
             var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), this.defaultRunSettings)).Message;
-            StringAssert.Equals("Cancelling the operation as requested.", message);
+            StringAssert.Equals("Canceling the operation as requested.", message);
         }
 
         [TestMethod]
@@ -296,7 +296,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
 
             var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), this.defaultRunSettings)).Message;
-            StringAssert.Equals("Cancelling the operation as requested.", message);
+            StringAssert.Equals("Canceling the operation as requested.", message);
         }
 
         [TestMethod]

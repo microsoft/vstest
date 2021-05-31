@@ -7,23 +7,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class EventLogCollectorTests : AcceptanceTestBase
     {
         private readonly string resultsDir;
 
         public EventLogCollectorTests()
         {
-            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.resultsDir = GetResultsDirectory();
         }
 
         // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
         // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
         [Ignore]
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
@@ -31,8 +34,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
 
@@ -45,6 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
         {
@@ -52,8 +55,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
 
@@ -70,15 +72,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Path.GetTempPath(),
                 "test_" + Guid.NewGuid() + ".runsettings");
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
       </RunConfiguration>
-      <DataCollectionRunSettings>  
-        <DataCollectors>  
+      <DataCollectionRunSettings>
+        <DataCollectors>
             <DataCollector friendlyName=""Event Log"" >
                 <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /></Configuration>
             </DataCollector>
@@ -96,15 +98,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Path.GetTempPath(),
                 "test_" + Guid.NewGuid() + ".runsettings");
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
       </RunConfiguration>
-      <DataCollectionRunSettings>  
-        <DataCollectors>  
+      <DataCollectionRunSettings>
+        <DataCollectors>
             <DataCollector friendlyName=""Event Log"" >
                 <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /><Setting name=""EventSources"" value=""CustomEventSource"" /></Configuration>
             </DataCollector>

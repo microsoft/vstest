@@ -22,8 +22,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="isFullDump">
         /// Is full dump enabled
         /// </param>
+        /// <param name="collectAlways">
+        /// Collects the dump on process exit even when there is no exception
+        /// </param>
         /// <returns>Arguments</returns>
-        string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump = false);
+        string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump, bool collectAlways);
 
         /// <summary>
         /// Arguments for procdump.exe for getting a dump in case of a testhost hang
@@ -38,6 +41,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Is full dump enabled
         /// </param>
         /// <returns>Arguments</returns>
-        string BuildHangBasedProcDumpArgs(int processId, string filename, bool isFullDump = false);
+        string BuildHangBasedProcDumpArgs(int processId, string filename, bool isFullDump);
     }
 }

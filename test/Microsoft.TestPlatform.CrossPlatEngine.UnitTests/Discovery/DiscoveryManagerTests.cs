@@ -8,7 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -20,8 +20,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -61,12 +59,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             TestPluginCache.Instance = new TestableTestPluginCache();
 
             this.discoveryManager.Initialize(
-                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location }, mockLogger.Object);
+                new string[] { typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location }, mockLogger.Object);
 
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
             Assert.IsNotNull(allDiscoverers);
-            Assert.IsTrue(allDiscoverers.Count() > 0);
+            Assert.IsTrue(allDiscoverers.Any());
         }
 
         #endregion
@@ -82,6 +80,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(Directory.GetCurrentDirectory(), "imaginary.dll"));
+            mockLogger.Verify(
+                l =>
+                l.HandleLogMessage(
+                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel.Warning,
+                    errorMessage),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldLogIfTheSourceDoesNotExistIfItHasAPackage()
+        {
+            var criteria = new DiscoveryCriteria(new List<string> { "imaginary.exe" }, 100, null);
+
+            var packageName = "recipe.AppxRecipe";
+
+            var fakeDirectory = Directory.GetDirectoryRoot(typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location);
+
+            criteria.Package = Path.Combine(fakeDirectory, Path.Combine(packageName));
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
+
+            this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
+
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(fakeDirectory, "imaginary.exe"));
             mockLogger.Verify(
                 l =>
                 l.HandleLogMessage(
@@ -112,7 +133,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void DiscoverTestsShouldLogIfTheSameSourceIsSpecifiedTwice()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -139,7 +160,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void DiscoverTestsShouldDiscoverTestsInTheSpecifiedSource()
         {
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -167,7 +188,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
 
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -206,7 +227,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
@@ -231,14 +252,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             var assemblyLocation = typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location;
             var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
-            TestPluginCacheTests.SetupMockExtensions(
+            TestPluginCacheHelper.SetupMockExtensions(
                 new string[] { assemblyLocation },
                 () => { });
 
             //Act
             this.discoveryManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);
 
-            //when handler instance returns warning              
+            //when handler instance returns warning
             sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once");
 
             // Verify.

@@ -8,11 +8,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("TestHost: Error occured during initialization of TestHost : {0}", ex);
+                EqtTrace.Error("TestHost: Error occurred during initialization of TestHost : {0}", ex);
 
                 // Throw exception so that vstest.console get the exception message.
                 throw;
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             WaitForDebuggerIfEnabled();
             SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
-            
+
             // Invoke the engine with arguments
             GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
         }
@@ -63,10 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
         {
             IEngineInvoker invoker = null;
-#if NET451
-            // If Args contains test source argument, invoker Engine in new appdomain 
-            string testSourcePath;
-            if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
+#if NETFRAMEWORK
+            // If Args contains test source argument, invoker Engine in new appdomain
+            if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
             {
                 // remove the test source arg from dictionary
                 argsDictionary.Remove(TestSourceArgumentString);
@@ -84,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         }
 
         private static void WaitForDebuggerIfEnabled()
-        {   
+        {
             // Check if native debugging is enabled and OS is windows.
             var nativeDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
@@ -93,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 while (!IsDebuggerPresent())
                 {
-                    System.Threading.Tasks.Task.Delay(1000).Wait();
+                    Task.Delay(1000).Wait();
                 }
 
                 DebugBreak();
@@ -107,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     while (!Debugger.IsAttached)
                     {
-                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                        Task.Delay(1000).Wait();
                     }
 
                     Debugger.Break();

@@ -144,4 +144,7 @@
   <data name="TestHostProcessCrashed" xml:space="preserve">
     <value>Test host process crashed</value>
   </data>
+  <data name="AttachDebuggerToDefaultTestHostFailure" xml:space="preserve">
+    <value>Cannot attach the debugger to the default test host.</value>
+  </data>
 </root>

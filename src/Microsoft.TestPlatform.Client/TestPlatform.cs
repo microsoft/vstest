@@ -26,10 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+    using ClientResources = Resources.Resources;
 
     /// <summary>
-    /// Implementation for TestPlatform
+    /// Implementation for TestPlatform.
     /// </summary>
     internal class TestPlatform : ITestPlatform
     {
@@ -39,32 +39,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
         static TestPlatform()
         {
-            // TODO This is not the right away to force initialization of default extensions. Test runtime providers
-            // require this today. They're getting initialized even before test adapter paths are provided, which is
-            // incorrect.
+            // TODO: This is not the right way to force initialization of default extensions.
+            // Test runtime providers require this today. They're getting initialized even before
+            // test adapter paths are provided, which is incorrect.
             AddExtensionAssembliesFromExtensionDirectory();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        public TestPlatform() : this(new TestEngine(), new FileHelper(), TestRuntimeProviderManager.Instance)
+        public TestPlatform()
+            : this(
+                  new TestEngine(),
+                  new FileHelper(),
+                  TestRuntimeProviderManager.Instance)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        /// <param name="testEngine">
-        /// The test engine.
-        /// </param>
-        /// <param name="filehelper">
-        /// The filehelper.
-        /// </param>
-        /// <param name="testHostProviderManager">
-        /// The data.
-        /// </param>
-        protected TestPlatform(ITestEngine testEngine, IFileHelper filehelper, TestRuntimeProviderManager testHostProviderManager)
+        ///
+        /// <param name="testEngine">The test engine.</param>
+        /// <param name="filehelper">The file helper.</param>
+        /// <param name="testHostProviderManager">The data.</param>
+        protected TestPlatform(
+            ITestEngine testEngine,
+            IFileHelper filehelper,
+            TestRuntimeProviderManager testHostProviderManager)
         {
             this.TestEngine = testEngine;
             this.fileHelper = filehelper;
@@ -72,36 +74,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Gets or sets Test Engine instance
+        /// Gets or sets the test engine instance.
         /// </summary>
         private ITestEngine TestEngine { get; set; }
 
-        /// <summary>
-        /// The create discovery request.
-        /// </summary>
-        /// <param name="requestData">Request data.</param>
-        /// <param name="discoveryCriteria"> The discovery criteria. </param>
-        /// <param name="options">Test platform options.</param>
-        /// <returns> The <see cref="IDiscoveryRequest"/>. </returns>
-        /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options)
+        /// <inheritdoc/>
+        public IDiscoveryRequest CreateDiscoveryRequest(
+            IRequestData requestData,
+            DiscoveryCriteria discoveryCriteria,
+            TestPlatformOptions options)
         {
             if (discoveryCriteria == null)
             {
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            // Update cache with Extension Folder's files
+            // Update cache with Extension folder's files.
             this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
             // Update extension assemblies from source when design mode is false.
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            if (runConfiguration.DesignMode == false)
+            if (!runConfiguration.DesignMode)
             {
                 this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
             }
 
-            // Initialize loggers
+            // Initialize loggers.
             var loggerManager = this.TestEngine.GetLoggerManager(requestData);
             loggerManager.Initialize(discoveryCriteria.RunSettings);
 
@@ -116,15 +114,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
         }
 
-        /// <summary>
-        /// The create test run request.
-        /// </summary>
-        /// <param name="requestData">Request data.</param>
-        /// <param name="testRunCriteria"> The test run criteria.  </param>
-        /// <param name="options">Test platform options.</param>
-        /// <returns> The <see cref="ITestRunRequest"/>. </returns>
-        /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options)
+        /// <inheritdoc/>
+        public ITestRunRequest CreateTestRunRequest(
+            IRequestData requestData,
+            TestRunCriteria testRunCriteria,
+            TestPlatformOptions options)
         {
             if (testRunCriteria == null)
             {
@@ -136,12 +130,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
             // Update extension assemblies from source when design mode is false.
-            if (runConfiguration.DesignMode == false)
+            if (!runConfiguration.DesignMode)
             {
                 this.AddExtensionAssembliesFromSource(testRunCriteria);
             }
 
-            // Initialize loggers
+            // Initialize loggers.
             var loggerManager = this.TestEngine.GetLoggerManager(requestData);
             loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
@@ -150,6 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
+            // NOTE: The custom launcher should not be set when we have test session info available.
             if (testRunCriteria.TestHostLauncher != null)
             {
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
@@ -161,6 +156,60 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }
 
+        /// <inheritdoc/>
+        public void StartTestSession(
+            IRequestData requestData,
+            StartTestSessionCriteria testSessionCriteria,
+            ITestSessionEventsHandler eventsHandler)
+        {
+            if (testSessionCriteria == null)
+            {
+                throw new ArgumentNullException(nameof(testSessionCriteria));
+            }
+
+            this.AddExtensionAssemblies(testSessionCriteria.RunSettings);
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
+
+            // Update extension assemblies from source when design mode is false.
+            //
+            // TODO (copoiena): Is it possible for this code to run if we're not in design mode ?
+            // An use case for this would be when running tests with "dotnet test". Usually there's
+            // a build involved then.
+            if (!runConfiguration.DesignMode)
+            {
+                return;
+            }
+
+            // Initialize loggers.
+            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            loggerManager.Initialize(testSessionCriteria.RunSettings);
+
+            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testSessionCriteria.RunSettings);
+
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
+
+            if (testSessionCriteria.TestHostLauncher != null)
+            {
+                testHostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
+            }
+
+            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testHostManager, testSessionCriteria);
+            if (testSessionManager == null)
+            {
+                // The test session manager is null because the combination of runsettings and
+                // sources tells us we should run in-process (i.e. in vstest.console). Because
+                // of this no session will be created because there's no testhost to be launched.
+                // Expecting a subsequent call to execute tests with the same set of parameters.
+                eventsHandler.HandleStartTestSessionComplete(null);
+                return;
+            }
+
+            testSessionManager.Initialize(false);
+            testSessionManager.StartSession(testSessionCriteria, eventsHandler);
+        }
+
         /// <summary>
         /// The dispose.
         /// </summary>
@@ -169,43 +218,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// The update extensions.
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        /// <param name="skipExtensionFilters">Skips filtering by name (if true).</param>
-        public void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
+        /// <inheritdoc/>
+        public void UpdateExtensions(
+            IEnumerable<string> pathToAdditionalExtensions,
+            bool skipExtensionFilters)
         {
-            this.TestEngine.GetExtensionManager()
-                   .UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
+            this.TestEngine.GetExtensionManager().UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
         }
 
-        /// <summary>
-        /// Clears the cached extensions
-        /// </summary>
+        /// <inheritdoc/>
         public void ClearExtensions()
         {
             this.TestEngine.GetExtensionManager().ClearExtensions();
         }
 
-        private void ThrowExceptionIfTestHostManagerIsNull(ITestRuntimeProvider testHostManager, string settingXml)
+        private void ThrowExceptionIfTestHostManagerIsNull(
+            ITestRuntimeProvider testHostManager,
+            string settingXml)
         {
             if (testHostManager == null)
             {
-                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(settingXml);
-                var framework = config.TargetFramework;
-
                 EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
-                throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
             }
         }
 
         /// <summary>
-        /// Update the test adapter paths provided through run settings to be used by the test service
+        /// Updates the test adapter paths provided through run settings to be used by the test
+        /// service.
         /// </summary>
-        /// <param name="runSettings">
-        /// The run Settings.
-        /// </param>
+        ///
+        /// <param name="runSettings">The run settings.</param>
         private void AddExtensionAssemblies(string runSettings)
         {
             IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
@@ -225,11 +268,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
 
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, 
-                        TestPlatformConstants.TestAdapterEndsWithPattern,
-                        TestPlatformConstants.TestLoggerEndsWithPattern,
-                        TestPlatformConstants.DataCollectorEndsWithPattern,
-                        TestPlatformConstants.RunTimeEndsWithPattern));
+                    var extensionAssemblies = new List<string>(
+                        this.fileHelper.EnumerateFiles(
+                            adapterPath,
+                            SearchOption.AllDirectories,
+                            TestPlatformConstants.TestAdapterEndsWithPattern,
+                            TestPlatformConstants.TestLoggerEndsWithPattern,
+                            TestPlatformConstants.DataCollectorEndsWithPattern,
+                            TestPlatformConstants.RunTimeEndsWithPattern));
 
                     if (extensionAssemblies.Count > 0)
                     {
@@ -240,17 +286,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Update the extension assemblies from source directory
+        /// Updates the extension assemblies from source directory.
         /// </summary>
-        /// <param name="testRunCriteria">
-        /// The test Run Criteria.
-        /// </param>
+        ///
+        /// <param name="testRunCriteria">The test run criteria.</param>
         private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
         {
             IEnumerable<string> sources = testRunCriteria.Sources;
             if (testRunCriteria.HasSpecificTests)
             {
-                // If the test execution is with a test filter, group them by sources
+                // If the test execution is with a test filter, group them by sources.
                 sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
             }
 
@@ -258,20 +303,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Update the test logger paths from source directory
+        /// Updates the test logger paths from source directory.
         /// </summary>
-        /// <param name="sources"></param>
+        ///
+        /// <param name="sources">The list of sources.</param>
         private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
         {
-            // Currently we support discovering loggers only from Source directory
+            // Currently we support discovering loggers only from Source directory.
             var loggersToUpdate = new List<string>();
 
             foreach (var source in sources)
             {
                 var sourceDirectory = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
+                if (!string.IsNullOrEmpty(sourceDirectory)
+                    && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestPlatformConstants.TestLoggerEndsWithPattern));
+                    loggersToUpdate.AddRange(
+                        this.fileHelper.EnumerateFiles(
+                            sourceDirectory,
+                            SearchOption.TopDirectoryOnly,
+                            TestPlatformConstants.TestLoggerEndsWithPattern));
                 }
             }
 
@@ -282,16 +333,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Find all test platform extensions from the `.\Extensions` directory. This is used to load the inbox extensions like
-        /// Trx logger and legacy test extensions like mstest v1, mstest c++ etc..
+        /// Finds all test platform extensions from the `.\Extensions` directory. This is used to
+        /// load the inbox extensions like TrxLogger and legacy test extensions like MSTest v1,
+        /// MSTest C++, etc..
         /// </summary>
         private static void AddExtensionAssembliesFromExtensionDirectory()
         {
             var fileHelper = new FileHelper();
-            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
+            var extensionsFolder = Path.Combine(
+                Path.GetDirectoryName(
+                    typeof(TestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()),
+                "Extensions");
+
             if (fileHelper.DirectoryExists(extensionsFolder))
             {
-                var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe");
+                var defaultExtensionPaths = fileHelper.EnumerateFiles(
+                    extensionsFolder,
+                    SearchOption.TopDirectoryOnly,
+                    ".dll",
+                    ".exe");
+
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
             }
         }

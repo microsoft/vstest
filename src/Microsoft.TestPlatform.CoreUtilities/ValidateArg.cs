@@ -10,9 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
     /// <summary>
@@ -87,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Validated string.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if the input string is null null, empty or consists only of white-space characters.
+        /// Thrown if the input string is null, empty or consists only of white-space characters.
         /// </exception>
         [DebuggerStepThrough]
         public static string NotNullOrWhiteSpace([ValidatedNotNull]string arg, string parameterName)

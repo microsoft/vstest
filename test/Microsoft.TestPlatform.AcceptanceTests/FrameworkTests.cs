@@ -15,12 +15,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " ", $"/Framework:{this.FrameworkArgValue}");
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -29,22 +31,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.testEnvironment.TargetFramework);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " ", $"/Framework:{this.testEnvironment.TargetFramework}");
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
+        // framework runner not available on Linux
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
             if (runnerInfo.TargetFramework.Contains("netcore"))
             {
                 arguments = string.Concat(arguments, " ", "/Framework:Framework45");
@@ -63,6 +70,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 this.StdErrorContains("Test Run Aborted.");
             }
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -71,8 +80,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, string.Empty, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " ", "/tests:PassingTest");
             arguments = string.Concat(arguments, " ", "/Framework:Framework40");
 
@@ -84,9 +94,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             else
             {
-                this.StdOutputContains("Following DLL(s) do not match framework/platform settings. ");
+                this.StdOutputContains("Following DLL(s) do not match current settings, which are .NETFramework,Version=v4.0 framework and X86 platform.");
                 this.ValidateSummaryStatus(1, 0, 0);
             }
+
+            TryRemoveDirectory(resultsDir);
         }
     }
 }

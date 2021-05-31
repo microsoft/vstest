@@ -9,8 +9,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Linq;
     using System.Reflection;
 
-    using Common.UnitTests.ExtensionFramework;
-
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -32,8 +30,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using OMTestResult =  Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-
     using Moq;
+    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -96,14 +94,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new PlatformThread(),
                 this.mockDataSerializer.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
         }
 
         [TestCleanup]
         public void Cleanup()
         {
             TestExecutorExtensionManager.Destroy();
-            TestPluginCacheTests.ResetExtensionsCache();
+            TestPluginCacheHelper.ResetExtensionsCache();
         }
 
         #region Constructor tests
@@ -113,10 +111,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             var runContext = this.runTestsInstance.GetRunContext;
             Assert.IsNotNull(runContext);
-            Assert.AreEqual(false, runContext.KeepAlive);
-            Assert.AreEqual(false, runContext.InIsolation);
-            Assert.AreEqual(false, runContext.IsDataCollectionEnabled);
-            Assert.AreEqual(false, runContext.IsBeingDebugged);
+            Assert.IsFalse(runContext.KeepAlive);
+            Assert.IsFalse(runContext.InIsolation);
+            Assert.IsFalse(runContext.IsDataCollectionEnabled);
+            Assert.IsFalse(runContext.IsBeingDebugged);
         }
 
         [TestMethod]
@@ -447,7 +445,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var messageFormat = "An exception occurred while invoking executor '{0}': {1}";
             var message = string.Format(messageFormat, BaseRunTestsExecutorUri.ToLower(), "Test influenced.");
             this.mockTestRunEventsHandler.Verify(
-                treh => treh.HandleLogMessage(TestMessageLevel.Error, message),
+                treh => treh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.StartsWith(message))),
                 Times.Once);
 
             // Also validate that a test run complete is called.
@@ -536,8 +534,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.IsNotNull(receivedRunStatusArgs);
             Assert.AreEqual(this.runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, receivedRunStatusArgs.TestRunStatistics.ExecutedTests);
             Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
-            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
-            Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || receivedRunStatusArgs.ActiveTests.Count() == 0);
+            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Any());
+            Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || !receivedRunStatusArgs.ActiveTests.Any());
 
             // Attachments
             Assert.IsNotNull(receivedattachments);
@@ -569,7 +567,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             // Test run changed event assertions
             Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
-            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
+            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Any());
 
             // verify TC.Source is updated with package
             foreach (var tr in receivedRunStatusArgs.NewTestResults)
@@ -591,7 +589,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             Assert.IsNotNull(receivedRunStatusArgs.ActiveTests);
             Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
-
 
             foreach (var tc in receivedRunStatusArgs.ActiveTests)
             {
@@ -849,7 +846,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockThread.Object,
                 this.mockDataSerializer.Object);
 
-            TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
+            TestPluginCacheHelper.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
             {
@@ -1044,6 +1041,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             protected override void SendSessionStart()
             {
                 this.testCaseEventsHandler?.SendSessionStart(new Dictionary<string, object> { { "TestSources", new List<string>() { "1.dll" } } });
+            }
+
+            protected override bool ShouldAttachDebuggerToTestHost(
+                LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,
+                Tuple<Uri, string> executorUri,
+                RunContext runContext)
+            {
+                return false;
             }
         }
 

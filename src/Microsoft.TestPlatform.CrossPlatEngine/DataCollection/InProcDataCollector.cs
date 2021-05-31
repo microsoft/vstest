@@ -4,10 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -26,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private Type dataCollectorType;
 
         /// <summary>
-        /// Instance of the 
+        /// Instance of the
         /// </summary>
         private object dataCollectorObject;
 
@@ -45,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             string assemblyQualifiedName,
             TypeInfo interfaceTypeInfo,
             string configXml)
-            : this(codeBase, assemblyQualifiedName, interfaceTypeInfo, configXml, new PlatformAssemblyLoadContext())
+            : this(codeBase, assemblyQualifiedName, interfaceTypeInfo, configXml, new PlatformAssemblyLoadContext(), TestPluginCache.Instance)
         {
         }
 
@@ -62,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         /// <param name="assemblyLoadContext">
         /// </param>
-        internal InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml, IAssemblyLoadContext assemblyLoadContext)
+        internal InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml, IAssemblyLoadContext assemblyLoadContext, TestPluginCache testPluginCache)
         {
             this.configXml = configXml;
             this.assemblyLoadContext = assemblyLoadContext;
@@ -73,8 +74,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             if (Path.GetFileName(codeBase) == Constants.CoverletDataCollectorCodebase)
             {
                 // If we're loading coverlet collector we skip to check the version of assembly
-                // to allow upgrade throught nuget package
+                // to allow upgrade through nuget package
                 filterPredicate = (x) => x.FullName.Equals(Constants.CoverletDataCollectorTypeName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo());
+
+                // Coverlet collector is consumed as nuget package we need to add assemblies directory to resolver to correctly load references.
+                Debug.Assert(Path.IsPathRooted(codeBase), "Absolute path expected");
+                testPluginCache.AddResolverSearchDirectories(new string[] { Path.GetDirectoryName(codeBase) });
             }
             else
             {
@@ -91,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public string AssemblyQualifiedName { get; private set; }
 
         /// <summary>
-        /// Loads the DataCollector type 
+        /// Loads the DataCollector type
         /// </summary>
         /// <param name="inProcDataCollectionSink">Sink object to send data</param>
         public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
@@ -145,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Loads the assembly into the default context based on the codebase path
+        /// Loads the assembly into the default context based on the code base path
         /// </summary>
         /// <param name="codeBase"></param>
         /// <returns></returns>
@@ -159,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "InProcDataCollectionExtensionManager: Error occured while loading the InProcDataCollector : {0} , Exception Details : {1}", codeBase, ex);
+                    "InProcDataCollectionExtensionManager: Error occurred while loading the InProcDataCollector : {0} , Exception Details : {1}", codeBase, ex);
             }
 
             return assembly;

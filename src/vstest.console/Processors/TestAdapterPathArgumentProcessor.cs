@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.TestAdapterPath;
 
         public override string HelpContentResourceName => CommandLineResources.TestAdapterPathHelp;
 
@@ -119,11 +119,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// For file related operation
         /// </summary>
         private IFileHelper fileHelper;
-        
+
         /// <summary>
         /// Separators for multiple paths in argument.
         /// </summary>
-        private readonly char[] argumentSeparators = new [] { ';' };
+        private readonly char[] argumentSeparators = new[] { ';' };
 
         #endregion
 
@@ -168,22 +168,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 var testAdapterPaths = new List<string>();
                 var testAdapterFullPaths = new List<string>();
-                
+
                 // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
                 // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
                 // Remove leading and trailing ' " ' chars...
                 argument = argument.Trim().Trim(new char[] { '\"' });
 
-                // Get testadapter paths from RunSettings.
+                // Get test adapter paths from RunSettings.
                 var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
 
                 if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
                 {
                     testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
                 }
-                
+
                 testAdapterPaths.AddRange(SplitPaths(argument));
-                
+
                 foreach (var testadapterPath in testAdapterPaths)
                 {
                     // TestAdaptersPaths could contain environment variables

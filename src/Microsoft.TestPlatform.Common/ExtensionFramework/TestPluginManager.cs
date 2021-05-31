@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -70,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             if (extensionType == null)
             {
-                throw new ArgumentNullException("extensionType");
+                throw new ArgumentNullException(nameof(extensionType));
             }
 
             EqtTrace.Info("TestPluginManager.CreateTestExtension: Attempting to load test extension: " + extensionType);
@@ -92,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     }
                     throw;
                 }
-#if NET451
+#if NETFRAMEWORK
                 else if (ex is SystemException)
                 {
                     if (EqtTrace.IsErrorEnabled)

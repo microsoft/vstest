@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
     using System.IO;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -39,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
 
             this.reader.Dispose();
             this.writer.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         [TestMethod]

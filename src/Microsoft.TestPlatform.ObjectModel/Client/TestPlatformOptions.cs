@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets or sets the filter criteria for test cases.
         /// </summary>
+        /// 
         /// <remarks>
         /// This is only used when running tests with sources.
         /// </remarks>
@@ -23,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets or sets the filter options if there are any.
         /// </summary>
+        /// 
         /// <remarks>
         /// This will be valid only if TestCase filter is present.
         /// </remarks>
@@ -30,13 +32,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public FilterOptions FilterOptions { get; set; }
 
         /// <summary>
-        ///  Gets or sets whether Metrics should be collected or not.
+        /// Gets or sets whether metrics should be collected or not.
         /// </summary>
         [DataMember]
         public bool CollectMetrics { get; set; }
 
         /// <summary>
-        ///  Gets or sets whether default adapters should be skipped or not.
+        /// Gets or sets whether default adapters should be skipped or not.
         /// </summary>
         [DataMember]
         public bool SkipDefaultAdapters { get; set; }

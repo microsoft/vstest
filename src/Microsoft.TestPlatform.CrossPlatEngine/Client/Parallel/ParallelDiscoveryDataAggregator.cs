@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     internal class ParallelDiscoveryDataAggregator
     {
         #region PrivateFields
-                
+
         private object dataUpdateSyncObject = new object();
         private ConcurrentDictionary<string, object> metricsAggregator;
 
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #region Public Methods
 
         /// <summary>
-        /// Returns the Aggregated Metrcis.
+        /// Returns the Aggregated Metrics.
         /// </summary>
         /// <returns></returns>
         public IDictionary<string, object> GetAggregatedDiscoveryDataMetrics()
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <summary>
-        /// Aggregate discovery data 
+        /// Aggregate discovery data
         /// Must be thread-safe as this is expected to be called by parallel managers
         /// </summary>
         public void Aggregate(long totalTests, bool isAborted)
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     return;
                 }
 
-                this.TotalTests = this.TotalTests + totalTests;
+                this.TotalTests += totalTests;
             }
         }
 
@@ -120,7 +120,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         double oldDoubleValue = Convert.ToDouble(oldValue);
                         this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                     }
-
                     else
                     {
                         this.metricsAggregator.TryAdd(metric.Key, newValue);

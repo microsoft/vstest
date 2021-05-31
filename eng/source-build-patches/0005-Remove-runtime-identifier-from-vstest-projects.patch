@@ -1,0 +1,26 @@
+From 4a74073416e5798e9be49d291da9e8a9db598fff Mon Sep 17 00:00:00 2001
+From: dseefeld <dseefeld@microsoft.com>
+Date: Wed, 9 Oct 2019 20:39:30 +0000
+Subject: [PATCH] Remove runtime identifier from vstest projects
+
+---
+ src/testhost.x86/testhost.x86.csproj     | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/testhost.x86/testhost.x86.csproj b/src/testhost.x86/testhost.x86.csproj
+index 535a6e6a..d2199dc0 100644
+--- a/src/testhost.x86/testhost.x86.csproj
++++ b/src/testhost.x86/testhost.x86.csproj
+@@ -17,7 +17,7 @@
+     <ApplicationManifest>app.manifest</ApplicationManifest>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1' AND '$(TargetFramework)' != 'netcoreapp1.0'">
+-    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
++    <RuntimeIdentifier Condition=" '$(DotNetBuildFromSource)' != 'true' ">win7-x86</RuntimeIdentifier>
+     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+     <TargetName Condition="'$(TargetFramework)' != 'net451'">$(AssemblyName.Replace('.x86', '')).$(TargetFramework).x86</TargetName>
+   </PropertyGroup>
+-- 
+2.26.2
+1.8.3.1
+

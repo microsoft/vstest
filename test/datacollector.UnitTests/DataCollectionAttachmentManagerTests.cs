@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.IO;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -88,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(this.attachmentManager.AttachmentSets.Count, 0);
+            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
         }
 
         [TestMethod]

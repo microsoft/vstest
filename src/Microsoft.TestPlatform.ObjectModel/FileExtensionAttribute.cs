@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #region Constructor
 
         /// <summary>
-        /// Initializes with a file extension that the test discoverer can process tests from. 
+        /// Initializes with a file extension that the test discoverer can process tests from.
         /// For example ".dll" or ".exe".
         /// </summary>
         /// <param name="fileExtension">The file extensions that the test discoverer can process tests from.</param>
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(fileExtension))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "fileExtension");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(fileExtension));
             }
 
             FileExtension = fileExtension;

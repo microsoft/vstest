@@ -4,14 +4,12 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Text;
     using System.Xml;
-    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -144,6 +142,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     this.commandLineOptions.InIsolation = true;
                     this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
                 }
+
+                var testCaseFilter = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestCaseFilter");
+                if (testCaseFilter != null)
+                {
+                    this.commandLineOptions.TestCaseFilterValue = testCaseFilter;
+                }
             }
             catch (XmlException exception)
             {
@@ -195,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
-                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
+                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument);
             }
 
             return runSettingsDocument;

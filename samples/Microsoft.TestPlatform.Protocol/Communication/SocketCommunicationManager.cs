@@ -9,17 +9,17 @@ namespace Microsoft.TestPlatform.Protocol
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-    
+
     /// <summary>
     /// Facilitates communication using sockets
-    /// </summary>    
+    /// </summary>
     public class SocketCommunicationManager
     {
         /// <summary>
         /// TCP Listener to host TCP channel and listen
         /// </summary>
         private TcpListener tcpListener;
-        
+
         /// <summary>
         /// Binary Writer to write to channel stream
         /// </summary>
@@ -39,9 +39,9 @@ namespace Microsoft.TestPlatform.Protocol
         /// Event used to maintain client connection state
         /// </summary>
         private ManualResetEvent clientConnectedEvent = new ManualResetEvent(false);
-        
+
         /// <summary>
-        /// Sync object for sending messages 
+        /// Sync object for sending messages
         /// SendMessage over socket channel is NOT thread-safe
         /// </summary>
         private object sendSyncObject = new object();
@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.Protocol
         }
 
         #endregion
-        
+
         /// <summary>
         /// Writes message to the binary writer.
         /// </summary>
@@ -181,7 +181,7 @@ namespace Microsoft.TestPlatform.Protocol
             Console.WriteLine(rawMessage);
             return rawMessage;
         }
-        
+
         /// <summary>
         /// Deserializes the Message into actual TestPlatform objects
         /// </summary>
@@ -192,7 +192,7 @@ namespace Microsoft.TestPlatform.Protocol
         {
             return this.dataSerializer.DeserializePayload<T>(message);
         }
-        
+
         /// <summary>
         /// Writes the data on socket and flushes the buffer
         /// </summary>

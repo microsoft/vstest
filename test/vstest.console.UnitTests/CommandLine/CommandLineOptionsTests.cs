@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System.IO;
-    using MSTest.TestFramework.AssertExtensions;
     using vstest.console.Internal;
     using Microsoft.Extensions.FileSystemGlobbing;
 
@@ -60,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             CommandLineOptions.Instance.TargetDevice = "TargetDevice";
             Assert.IsTrue(CommandLineOptions.Instance.HasPhoneContext);
         }
-        
+
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForNullSource()
         {
@@ -78,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             CommandLineOptions.Instance.AddSource(relativeTestFilePath);
             Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(absolutePath));
         }
-        
+
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForInvalidSource()
         {
@@ -88,11 +87,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldAddSourceForValidSource()
         {
-            string testFilePath = "C:\\DummyTestFile.txt";
+            string testFilePath = Path.Combine(Path.GetTempPath(), "DummyTestFile.txt");
             this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
-            
+
             CommandLineOptions.Instance.AddSource(testFilePath);
-            
+
             Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(testFilePath));
         }
     }

@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
+using Microsoft.VisualStudio.TestPlatform;
+using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
@@ -21,3 +23,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("60d876ee-f278-4bf8-bc8a-15b356895c6f")]
+
+[assembly: TestExtensionTypes(typeof(TrxLogger))]

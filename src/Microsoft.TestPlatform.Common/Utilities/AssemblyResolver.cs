@@ -100,12 +100,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             if (string.IsNullOrEmpty(args?.Name))
             {
-                Debug.Assert(false, "AssemblyResolver.OnResolve: args.Name is null or empty.");
+                Debug.Fail("AssemblyResolver.OnResolve: args.Name is null or empty.");
                 return null;
             }
 
             if (this.searchDirectories == null || this.searchDirectories.Count == 0)
             {
+                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: There are no search directories, returning.", args.Name);
                 return null;
             }
 
@@ -146,6 +147,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         continue;
                     }
 
+                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Searching in: '{1}'.", args.Name, dir);
+
                     foreach (var extension in SupportedFileExtensions)
                     {
                         var assemblyPath = Path.Combine(dir, requestedName.Name + extension);
@@ -153,6 +156,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         {
                             if (!File.Exists(assemblyPath))
                             {
+                                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Assembly path does not exist: '{1}', returning.", args.Name, assemblyPath);
+
                                 continue;
                             }
 
@@ -160,9 +165,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
                             if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
                             {
+                                EqtTrace.Info("AssemblyResolver.OnResolve: {0}: File exists but version/public key is wrong. Try next extension.", args.Name);
                                 continue;   // File exists but version/public key is wrong. Try next extension.
                             }
 
+                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Loading assembly '{1}'.", args.Name, assemblyPath);
+                            
                             assembly = this.platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
                             this.resolvedAssemblies[args.Name] = assembly;
 
@@ -172,9 +180,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         }
                         catch (FileLoadException ex)
                         {
-                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
+                            EqtTrace.Error("AssemblyResolver.OnResolve: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
 
-                            // Rethrow FileLoadException, because this exception means that the assembly
+                            // Re-throw FileLoadException, because this exception means that the assembly
                             // was found, but could not be loaded. This will allow us to report a more
                             // specific error message to the user for things like access denied.
                             throw;

@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionSink"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionSink"/> class.
         /// </summary>
         protected DataCollectionSink()
         {

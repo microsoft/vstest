@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if !NETSTANDARD1_0
+
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
 {
-    using System.Diagnostics.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+
+    using System.Diagnostics.Tracing;
 
     /// <inheritdoc/>
     [EventSource(Name = "TestPlatform")]
@@ -237,5 +240,105 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.MetricsDisposeStopEventId);
         }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStartEventId)]
+        public void TestRunAttachmentsProcessingRequestStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStopEventId)]
+        public void TestRunAttachmentsProcessingRequestStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingRequestStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStartEventId)]
+        public void TestRunAttachmentsProcessingStart(long numberOfAttachments)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStartEventId, numberOfAttachments);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStopEventId)]
+        public void TestRunAttachmentsProcessingStop(long numberOfAttachments)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestRunAttachmentsProcessingStopEventId, numberOfAttachments);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStartEventId)]
+        public void TranslationLayerTestRunAttachmentsProcessingStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId)]
+        public void TranslationLayerTestRunAttachmentsProcessingStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerTestRunAttachmentsProcessingStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StartTestSessionStartEventId)]
+        public void StartTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StartTestSessionStopEventId)]
+        public void StartTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StartTestSessionStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStartEventId)]
+        public void TranslationLayerStartTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStopEventId)]
+        public void TranslationLayerStartTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStartTestSessionStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StopTestSessionStartEventId)]
+        public void StopTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StopTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.StopTestSessionStopEventId)]
+        public void StopTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.StopTestSessionStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStartEventId)]
+        public void TranslationLayerStopTestSessionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStopEventId)]
+        public void TranslationLayerStopTestSessionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerStopTestSessionStopEventId);
+        }
     }
 }
+
+#endif

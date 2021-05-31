@@ -3,19 +3,17 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers
 {
-    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The test run events handler.
     /// </summary>
-    public class TestRunEventsHandler : ITestRunEventsHandler
+    public class TestRunEventsHandler : ITestRunEventsHandler2
     {
         private ITestRequestHandler requestHandler;
 
@@ -96,6 +94,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         {
             EqtTrace.Info("Sending LaunchProcessWithDebuggerAttached on additional test process: {0}", testProcessStartInfo?.FileName);
             return this.requestHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
+        /// <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", pid);
+            return this.requestHandler.AttachDebuggerToProcess(pid);
         }
     }
 }

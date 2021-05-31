@@ -3,7 +3,7 @@
 
 namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
-    using global::TestPlatform.Common.UnitTests.ExtensionFramework;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,7 +15,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestInitialize]
         public void Initialize()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestLoggerExtensionManagerTests));
         }
 
         [TestMethod]
@@ -25,7 +25,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             {
                 var testLoggerExtensionManager = TestLoggerExtensionManager.Create(null);
             });
-
         }
 
         [TestMethod]

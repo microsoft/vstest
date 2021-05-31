@@ -39,6 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             private set;
         }
 
+#if !NETSTANDARD1_0
         public override XmlElement ToXml()
         {
             var doc = new XmlDocument();
@@ -54,6 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return root;
         }
+#endif
 
         /// <summary>
         /// The from xml.
@@ -69,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </exception>
         internal static LoggerRunSettings FromXml(XmlReader reader)
         {
-            ValidateArg.NotNull(reader, "reader");
+            ValidateArg.NotNull(reader, nameof(reader));
 
             return FromXml(reader,
                 Constants.LoggersSettingName,

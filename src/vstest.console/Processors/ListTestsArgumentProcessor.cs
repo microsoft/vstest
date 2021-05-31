@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -202,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.commandLineOptions != null);
             Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
-            if (this.commandLineOptions.Sources.Count() <= 0)
+            if (!this.commandLineOptions.Sources.Any())
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
@@ -240,15 +239,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests += this.DiscoveryRequest_OnDiscoveredTests;
             }
 
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests -= this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests -= this.DiscoveryRequest_OnDiscoveredTests;
             }
 
-            private void discoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
+            private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
             {
                 // List out each of the tests.
                 foreach (var test in args.DiscoveredTestCases)

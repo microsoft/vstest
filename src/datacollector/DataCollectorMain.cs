@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System;
     using System.Diagnostics;
     using System.Globalization;
-
+    using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
@@ -67,8 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
             // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out var logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
                 var isTraceLevelArgValid = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt);
@@ -79,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 // Initialize trace.
                 EqtTrace.InitializeTrace(logFile, traceLevel);
 
+
                 // Log warning in case tracelevel passed in arg is invalid
                 if (!isTraceLevelArgValid)
                 {
@@ -88,6 +88,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             else
             {
                 EqtTrace.DoNotInitailize = true;
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                var version = typeof(DataCollectorMain)
+                    .GetTypeInfo()
+                    .Assembly
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                EqtTrace.Verbose($"Version: { version }");
             }
 
             SetCultureSpecifiedByUser();
@@ -107,8 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 });
 
             // Get server port and initialize communication.
-            string portValue;
-            int port = argsDictionary.TryGetValue(PortArgument, out portValue) ? int.Parse(portValue) : 0;
+            int port = argsDictionary.TryGetValue(PortArgument, out var portValue) ? int.Parse(portValue) : 0;
 
             if (port <= 0)
             {

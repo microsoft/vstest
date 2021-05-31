@@ -5,7 +5,6 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
 {
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.Collections.Generic;

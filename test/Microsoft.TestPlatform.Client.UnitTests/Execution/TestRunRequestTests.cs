@@ -156,7 +156,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             executionManager.Verify(dm => dm.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
-
         [TestMethod]
         public void OnTestSessionTimeoutShouldCallAbort()
         {
@@ -283,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             string rawMessage = "HelloWorld";
             string messageReceived = null;
 
-            // Call should NOT fail even if onrawmessagereceived is not registered.
+            // Call should NOT fail even if on raw message received is not registered.
             testRunRequest.HandleRawMessage(rawMessage);
 
             EventHandler<string> handler = (sender, e) => { messageReceived = e; };
@@ -481,7 +480,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         {
             testRunRequest.HandleLogMessage(TestMessageLevel.Error, "hello");
             loggerManager.Verify(lm => lm.HandleTestRunMessage(It.IsAny<TestRunMessageEventArgs>()), Times.Once);
-
         }
 
         [TestMethod]

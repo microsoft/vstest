@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="reader">Reader to move to the next element.</param>
         public static void ReadToNextElement(this XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
             while (!reader.EOF && reader.Read() && reader.NodeType != XmlNodeType.Element)
             {
             }
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="reader">Reader to move to the next element.</param>
         public static void SkipToNextElement(this XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
             reader.Skip();
 
             if (reader.NodeType != XmlNodeType.Element)
@@ -54,8 +54,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="reader">XmlReader for the file.</param>
         public static void ReadToRootNode(XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
-            
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
+
             // Read to the root node.
             reader.ReadToNextElement();
 

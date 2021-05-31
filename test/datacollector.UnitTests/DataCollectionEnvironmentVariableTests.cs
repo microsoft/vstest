@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.ThrowsException<ArgumentNullException>(
                 () =>
                     {
-                        var envvariable = new DataCollectionEnvironmentVariable(default(KeyValuePair<string, string>), null);
+                        var envvariable = new DataCollectionEnvironmentVariable(default, null);
                     });
         }
 

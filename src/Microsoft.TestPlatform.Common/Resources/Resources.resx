@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>{0} Access denied while trying to create "TestResults" folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges. For more information, please look at the error message:</value>
+  </data>
   <data name="CancellationRequested" xml:space="preserve">
     <value>Cancelling the operation as requested.</value>
   </data>
@@ -157,10 +160,13 @@
     <value>Failed to load extensions from file '{0}'. Please use /diag for more information.</value>
   </data>
   <data name="FastFilterException" xml:space="preserve">
-    <value>An error occured while creating Fast filter.</value>
+    <value>An error occurred while creating Fast filter.</value>
   </data>
   <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
     <value>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</value>
+  </data>
+  <data name="InnerException" xml:space="preserve">
+    <value>Inner exception:</value>
   </data>
   <data name="InvalidCondition" xml:space="preserve">
     <value>Error: Invalid Condition '{0}'</value>
@@ -209,6 +215,9 @@
   </data>
   <data name="SettingsProviderNotFound" xml:space="preserve">
     <value>Settings Provider named '{0}' was not found.  The settings can not be loaded.</value>
+  </data>
+  <data name="StackTrace" xml:space="preserve">
+    <value>Stack trace:</value>
   </data>
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>

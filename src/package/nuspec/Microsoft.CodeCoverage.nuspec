@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Microsoft.CodeCoverage</id>
     <version>$Version$</version>
@@ -8,29 +8,75 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Microsoft.CodeCoverage package brings infra for collecting code coverage from vstest.console.exe and "dotnet test".</description>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <license type="file">LICENSE_NET.txt</license>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <icon>Icon.png</icon>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing codecoverage code-coverage</tags>
+    <repository type="git" 
+                url="https://github.com/microsoft/vstest" 
+                branch="$BranchName$" 
+                commit="$CommitId$" />
+                
+    <dependencies>
+      <group targetFramework="net45"></group>
+      <group targetFramework="netcoreapp1.0"></group>
+    </dependencies>
   </metadata>
 
   <files>
-
+    <file src="Icon.png" target="" />
+    <file src="licenses\LICENSE_NET.txt" target="" />
+    <file src="ThirdPartyNoticesCodeCoverage.txt" target="ThirdPartyNotices.txt" />
+    <file src="ThirdPartyNoticesCodeCoverage.txt" target="build\netstandard1.0\ThirdPartyNotices.txt" />
     <file src="Microsoft.CodeCoverage.props" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage.targets" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.Core.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.Interprocess.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.Coverage.Instrumentation.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Mono.Cecil.dll" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Mono.Cecil.Pdb.dll" target="build\netstandard1.0\" />
+    
     <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.config" target="build\netstandard1.0\CodeCoverage\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" target="build\netstandard1.0\CodeCoverage\" />
-    <file src="Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" target="build\netstandard1.0\CodeCoverage\codecoveragemessages.dll" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" target="build\netstandard1.0\CodeCoverage\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\msvcdis140.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\msvcp140.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\msvcp140_atomic_wait.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\vcruntime140.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\VanguardInstrumentationProfiler_x86.config" target="build\netstandard1.0\CodeCoverage\" />
+    
+    <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="build\netstandard1.0\CodeCoverage\coreclr\" />
+    
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\CodeCoverage.exe" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msvcdis140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msvcp140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msvcp140_atomic_wait.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\vcruntime140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\vcruntime140_1.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\VanguardInstrumentationProfiler_x64.config" target="build\netstandard1.0\CodeCoverage\amd64\" />
+
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll"	target="build\netstandard1.0\InstrumentationEngine\x86\MicrosoftInstrumentationEngine_x86.dll" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll"	target="build\netstandard1.0\InstrumentationEngine\x64\MicrosoftInstrumentationEngine_x64.dll" />
+    
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\libCoverageInstrumentationMethod.so"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\libCoverageInstrumentationMethod.so" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\libInstrumentationEngine.so"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\libInstrumentationEngine.so" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\ProductionBreakpoints_x64.config"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\ProductionBreakpoints_x64.config" />
+
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\libCoverageInstrumentationMethod.so"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\libCoverageInstrumentationMethod.so" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\libInstrumentationEngine.so"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\libInstrumentationEngine.so" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\ProductionBreakpoints_x64.config"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\ProductionBreakpoints_x64.config" />
+
     <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp1.0\" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net45\" />
 
-    <!-- Add localized resources -->
+    <!-- Add localized resources for trace data collector -->
     <file src="Microsoft.CodeCoverage\cs\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\cs" />
     <file src="Microsoft.CodeCoverage\de\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\de" />
     <file src="Microsoft.CodeCoverage\es\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\es" />
@@ -44,6 +90,5 @@
     <file src="Microsoft.CodeCoverage\tr\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\tr" />
     <file src="Microsoft.CodeCoverage\zh-Hans\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hans" />
     <file src="Microsoft.CodeCoverage\zh-Hant\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hant" />
-
   </files>
 </package>
