@@ -533,7 +533,7 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize("XPlat Code Coverage");
             
             Assert.AreEqual(string.Join(Environment.NewLine,
-                "<?xml version="1.0" encoding="utf-16"?>",
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
                 "  <RunConfiguration>",
                 "    <TestAdaptersPaths>c:\AdapterFolderPath</TestAdaptersPaths>",
@@ -569,7 +569,7 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize("XPlat Code Coverage");
 
             Assert.AreEqual(string.Join(Environment.NewLine,
-                "<?xml version="1.0" encoding="utf-16"?>",
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
                 "  <RunConfiguration>",
                 "  </RunConfiguration>",
