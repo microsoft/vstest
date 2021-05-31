@@ -15,21 +15,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         /// Notify the framework about the test result.
         /// </summary>
         /// <param name="testResult">Test Result to be sent to the framework.</param>
-        /// <exception cref="TestCanceledException">Exception thrown by the framework when an executor attempts to send 
-        /// test result to the framework when the test(s) is canceled. </exception>        
+        /// <exception cref="TestCanceledException">Exception thrown by the framework when an executor attempts to send
+        /// test result to the framework when the test(s) is canceled. </exception>
         void RecordResult(TestResult testResult);
 
 
         /// <summary>
-        /// Notify the framework about starting of the test case. 
-        /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored. 
+        /// Notify the framework about starting of the test case.
+        /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored.
         /// </summary>
         /// <param name="testCase">testcase which will be started.</param>
         void RecordStart(TestCase testCase);
 
         /// <summary>
-        /// Notify the framework about completion of the test case. 
-        /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored. 
+        /// Notify the framework about completion of the test case.
+        /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored.
         /// </summary>
         /// <param name="testCase">testcase which has completed.</param>
         /// <param name="outcome">outcome of the test case.</param>

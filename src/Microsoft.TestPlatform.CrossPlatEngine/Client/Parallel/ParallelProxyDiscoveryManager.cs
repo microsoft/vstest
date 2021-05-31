@@ -31,12 +31,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private DiscoveryCriteria actualDiscoveryCriteria;
 
         private IEnumerator<string> sourceEnumerator;
-        
+
         private ITestDiscoveryEventsHandler2 currentDiscoveryEventsHandler;
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
 
         private IRequestData requestData;
+
+        // This field indicates if abort was requested by testplatform (user)
+        private bool discoveryAbortRequested = false;
 
         #endregion
 
@@ -89,6 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public void Abort()
         {
+            this.discoveryAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
         }
 
@@ -108,8 +112,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             var allDiscoverersCompleted = false;
             lock (this.discoveryStatusLockObject)
             {
-                // Each concurrent Executor calls this method 
-                // So, we need to keep track of total discoverycomplete calls
+                // Each concurrent Executor calls this method
+                // So, we need to keep track of total discovery complete calls
                 this.discoveryCompletedClients++;
 
                 // If there are no more sources/testcases, a parallel executor is truly done with discovery
@@ -121,8 +125,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
             }
 
-            // Discovery is completed. Schedule the clean up for managers and handlers.
-            if (allDiscoverersCompleted)
+            /*
+             If discovery is complete or discovery aborting was requsted by testPlatfrom(user)
+             we need to stop all ongoing discoveries, because we want to separate aborting request
+             when testhost crashed by itself and when user requested it (f.e. through TW)
+             Schedule the clean up for managers and handlers.
+            */
+            if (allDiscoverersCompleted || discoveryAbortRequested)
             {
                 // Reset enumerators
                 this.sourceEnumerator = null;
@@ -170,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             this.currentDiscoveryEventsHandler = discoveryEventsHandler;
 
-            // Reset the discoverycomplete data
+            // Reset the discovery complete data
             this.discoveryCompletedClients = 0;
 
             // One data aggregator per parallel discovery

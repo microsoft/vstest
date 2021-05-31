@@ -59,15 +59,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new TestAdapterPathArgumentProcessorCapabilities();
             Assert.AreEqual("/TestAdapterPath", capabilities.CommandName);
-            Assert.AreEqual("--TestAdapterPath|/TestAdapterPath" + Environment.NewLine + "      This makes vstest.console.exe process use custom test adapters" + Environment.NewLine + "      from a given path (if any) in the test run. " + Environment.NewLine + "      Example  /TestAdapterPath:<pathToCustomAdapters>", capabilities.HelpContentResourceName);
+            var expected = "--TestAdapterPath|/TestAdapterPath\r\n      This makes vstest.console.exe process use custom test adapters\r\n      from a given path (if any) in the test run. \r\n      Example  /TestAdapterPath:<pathToCustomAdapters>";
+            Assert.AreEqual(expected: expected.NormalizeLineEndings().ShowWhiteSpace(), capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace());
 
             Assert.AreEqual(HelpContentPriority.TestAdapterPathArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.TestAdapterPath, capabilities.Priority);
 
-            Assert.AreEqual(true, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsTrue(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion
@@ -173,6 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldMergeTestAdapterPathsInRunSettings()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -191,6 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldMergeTestAdapterPathsInRunSettingsIgnoringDuplicatePaths()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;c:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -209,6 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldMergeMultipleTestAdapterPathsWithPathsInRunSettings()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -227,6 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldHonorEnvironmentVariablesInTestAdapterPaths()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>%temp%\\adapters1</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -247,6 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldAddRightAdapterPathInErrorMessage()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -281,6 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void InitializeShouldTrimTrailingAndLeadingDoubleQuotes()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";

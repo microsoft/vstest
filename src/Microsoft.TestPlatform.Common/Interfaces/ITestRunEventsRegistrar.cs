@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
         void RegisterTestRunEvents(ITestRunRequest testRunRequest);
 
         /// <summary>
-        /// Unregisters the events from the test run request. 
+        /// Unregisters the events from the test run request.
         /// </summary>
         /// <param name="testRunRequest">The run request from which events should be unregistered.</param>
         void UnregisterTestRunEvents(ITestRunRequest testRunRequest);

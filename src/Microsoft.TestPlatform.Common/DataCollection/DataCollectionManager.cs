@@ -8,12 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     internal class DataCollectionManager : IDataCollectionManager
     {
         private static object syncObject = new object();
+        private const string CodeCoverageFriendlyName = "Code Coverage";
 
         /// <summary>
         /// Value indicating whether data collection is currently enabled.
@@ -51,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private TestPlatformDataCollectionEvents events;
 
         /// <summary>
-        /// Specifies whether the object is disposed or not. 
+        /// Specifies whether the object is disposed or not.
         /// </summary>
         private bool disposed;
 
@@ -61,12 +62,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private DataCollectorExtensionManager dataCollectorExtensionManager;
 
         /// <summary>
+        /// Request data
+        /// </summary>
+        private IDataCollectionTelemetryManager dataCollectionTelemetryManager;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink)
+        internal DataCollectionManager(IMessageSink messageSink, IRequestData requestData) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectionTelemetryManager(requestData))
         {
         }
 
@@ -82,13 +88,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <remarks>
         /// The constructor is not public because the factory method should be used to get instances of this class.
         /// </remarks>
-        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink)
+        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectionTelemetryManager dataCollectionTelemetryManager)
         {
             this.attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
             this.events = new TestPlatformDataCollectionEvents();
             this.dataCollectorExtensionManager = null;
             this.RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
+            this.dataCollectionTelemetryManager = dataCollectionTelemetryManager;
         }
 
         /// <summary>
@@ -110,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (this.dataCollectorExtensionManager == null)
                 {
-                    // todo : change IMessageSink and use IMessageLogger instead.
+                    // TODO : change IMessageSink and use IMessageLogger instead.
                     this.dataCollectorExtensionManager = DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
                 }
 
@@ -127,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <returns>
         /// The <see cref="DataCollectionManager"/>.
         /// </returns>
-        public static DataCollectionManager Create(IMessageSink messageSink)
+        public static DataCollectionManager Create(IMessageSink messageSink, IRequestData requestData)
         {
             if (Instance == null)
             {
@@ -135,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     if (Instance == null)
                     {
-                        Instance = new DataCollectionManager(messageSink);
+                        Instance = new DataCollectionManager(messageSink, requestData);
                     }
                 }
             }
@@ -151,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
             }
 
-            ValidateArg.NotNull(settingsXml, "settingsXml");
+            ValidateArg.NotNull(settingsXml, nameof(settingsXml));
 
             var sessionId = new SessionId(Guid.NewGuid());
             var dataCollectionContext = new DataCollectionContext(sessionId);
@@ -162,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             this.attachmentManager.Initialize(sessionId, resultsDirectory, this.messageSink);
 
-            // Enviornment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
+            // Environment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
             // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
             var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -189,8 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             // Once all data collectors have been initialized, query for environment variables
-            bool unloadedAnyCollector;
-            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out unloadedAnyCollector);
+            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out var unloadedAnyCollector);
 
             foreach (var variable in dataCollectorEnvironmentVariables.Values)
             {
@@ -380,7 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
                 {
                     dataCollectorUri = extension.Metadata.ExtensionUri;
                     return true;
@@ -401,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -591,7 +597,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var failedCollectors = new List<DataCollectorInformation>();
             unloadedAnyCollector = false;
             var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
-            foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
+
+            // Ordering here is temporary to enable Fakes + Code Coverage integration in scenarios when Fakes decides to instrument code using
+            // CLR Instrumentation Engine. This code will be cleaned when both Fakes and Code Coverage will fully switch to CLR Instrumentation Engine.
+            foreach (var dataCollectorInfo in this.RunDataCollectors.Values.
+                OrderBy(rdc => rdc.DataCollectorConfig.FriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase) ? 1 : 0))
             {
                 try
                 {
@@ -638,8 +648,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 var collectorFriendlyName = dataCollectionWrapper.DataCollectorConfig.FriendlyName;
                 foreach (var namevaluepair in dataCollectionWrapper.TestExecutionEnvironmentVariables)
                 {
-                    DataCollectionEnvironmentVariable alreadyRequestedVariable;
-                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out alreadyRequestedVariable))
+                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out var alreadyRequestedVariable))
                     {
                         // Dev10 behavior is to consider environment variables values as case sensitive.
                         if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))
@@ -648,18 +657,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         }
                         else
                         {
-                            // Data collector is overriding an already requested variable, possibly an error.                            
-                            dataCollectionWrapper.Logger.LogError(
-                                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
-                                string.Format(
+                            // Data collector is overriding an already requested variable, possibly an error.
+                            var message = string.Format(
                                     CultureInfo.CurrentUICulture,
                                     Resources.Resources.DataCollectorRequestedDuplicateEnvironmentVariable,
                                     collectorFriendlyName,
                                     namevaluepair.Key,
                                     namevaluepair.Value,
                                     alreadyRequestedVariable.FirstDataCollectorThatRequested,
-                                    alreadyRequestedVariable.Value));
+                                    alreadyRequestedVariable.Value);
+
+                            if (collectorFriendlyName.Equals(CodeCoverageFriendlyName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Do not treat this as error for Code Coverage Data Collector. This is expected in some Fakes integration scenarios
+                                EqtTrace.Info(message);
+                            }
+                            else
+                            {
+                                dataCollectionWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, message);
+                            }
                         }
+
+                        dataCollectionTelemetryManager.RecordEnvironmentVariableConflict(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value, alreadyRequestedVariable.Value);
                     }
                     else
                     {
@@ -672,6 +691,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         dataCollectorEnvironmentVariables.Add(
                             namevaluepair.Key,
                             new DataCollectionEnvironmentVariable(namevaluepair, collectorFriendlyName));
+
+                        dataCollectionTelemetryManager.RecordEnvironmentVariableAddition(dataCollectionWrapper, namevaluepair.Key, namevaluepair.Value);
                     }
                 }
             }

@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System.ComponentModel;
-    using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -16,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     internal class TestPlatformDataCollectionSink : DataCollectionSink
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionSink"/> class. 
+        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionSink"/> class.
         /// Creates a data collector sink for data transfer.
         /// </summary>
         /// <param name="attachmentManager">
@@ -61,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="fileTransferInformation">Information about the file being transferred.</param>
         public override void SendFileAsync(FileTransferInformation fileTransferInformation)
         {
-            ValidateArg.NotNull(fileTransferInformation, "fileTransferInformation");
+            ValidateArg.NotNull(fileTransferInformation, nameof(fileTransferInformation));
 
             this.AttachmentManager.AddAttachment(fileTransferInformation, this.SendFileCompleted, this.DataCollectorConfig.TypeUri, this.DataCollectorConfig.FriendlyName);
         }

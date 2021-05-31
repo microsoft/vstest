@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities
         }
 
         /// <summary>
-        /// Gets default code base path for inproc collector from test sources
+        /// Gets default code base path for in-proc collector from test sources
         /// </summary>
         /// <param name="adapterSourceMap"> The test list. </param>
         /// <returns> List of test Sources </returns>
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities
         }
 
         /// <summary>
-        /// Gets default code base path for inproc collector from test sources
+        /// Gets default code base path for in-proc collector from test sources
         /// </summary>
         /// <param name="tests"> The test list. </param>
         /// <returns> List of test Sources </returns>

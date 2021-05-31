@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Globalization;
     using System.IO;
     using System.Xml;
-    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -20,21 +19,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     public static class MSTestSettingsUtilities
     {
         /// <summary>
-        /// Imports the parameter settings file in the default runsettings. 
+        /// Imports the parameter settings file in the default runsettings.
         /// </summary>
         /// <param name="settingsFile">
         /// Settings file which need to be imported. The file extension of the settings file will be specified by <paramref name="SettingsFileExtension"/> property.
         /// </param>
         /// <param name="defaultRunSettings"> Input RunSettings document to which settings file need to be imported. </param>
-        /// <param name="architecture"> The architecture. </param>
-        /// <param name="frameworkVersion"> The framework Version. </param>
         /// <returns> Updated RunSetting Xml document with imported settings. </returns>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings, Architecture architecture, FrameworkVersion frameworkVersion)
+        public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings)
         {
-            ValidateArg.NotNull(settingsFile, "settingsFile");
-            ValidateArg.NotNull(defaultRunSettings, "defaultRunSettings");
+            ValidateArg.NotNull(settingsFile, nameof(settingsFile));
+            ValidateArg.NotNull(defaultRunSettings, nameof(defaultRunSettings));
 
             if (IsLegacyTestSettingsFile(settingsFile) == false)
             {
@@ -49,22 +46,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             var settingsNode = GenerateMSTestXml(settingsFile);
-            
+
             defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(settingsNode, true));
 
-            // Adding RunConfig 
+            // Adding RunConfig
             if (!navigator.MoveToChild(Constants.RunConfigurationSettingsName, string.Empty))
             {
                 var doc = new XmlDocument();
                 var runConfigurationNode = doc.CreateElement(Constants.RunConfigurationSettingsName);
-
-                var targetPlatformNode = doc.CreateElement("TargetPlatform");
-                targetPlatformNode.InnerXml = architecture.ToString();
-                runConfigurationNode.AppendChild(targetPlatformNode);
-
-                var targetFrameworkVersionNode = doc.CreateElement("TargetFrameworkVersion");
-                targetFrameworkVersionNode.InnerXml = frameworkVersion.ToString();
-                runConfigurationNode.AppendChild(targetFrameworkVersionNode);
 
                 defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(runConfigurationNode, true));
             }

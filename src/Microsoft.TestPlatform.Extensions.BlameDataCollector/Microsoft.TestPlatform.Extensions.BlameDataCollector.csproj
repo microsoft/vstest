@@ -9,23 +9,32 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+    <!-- to copy the netcore.client dependency to bin folder on build -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="netstandard" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.20419.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">

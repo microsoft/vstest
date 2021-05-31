@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System;
 
     [TestClass]
     public class ExecutorUnitTests
@@ -46,16 +47,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
             // Verify that messages exist
-            Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print atleast copyright info");
+            Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print at least copyright info");
             Assert.IsNotNull(mockOutput.Messages.First().Message, "First Printed Message cannot be null or empty");
 
             // Just check first 20 characters - don't need to check whole thing as assembly version is variable
-            Assert.IsTrue(
-                mockOutput.Messages.First()
-                    .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
-                "First Printed message must be Microsoft Copyright");
+            // "First Printed message must be Microsoft Copyright");
+            StringAssert.Contains(mockOutput.Messages.First().Message, 
+                CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20));
 
-            Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(assemblyVersion));
+            var suffixIndex = assemblyVersion.IndexOf("-");
+            var version = suffixIndex == -1 ? assemblyVersion : assemblyVersion.Substring(0, suffixIndex);
+            StringAssert.Contains(mockOutput.Messages.First().Message, 
+                version);
         }
 
         [TestMethod]
@@ -86,27 +89,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 
             Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(CommandLineResources.NoArgumentsProvided)));
         }
-
-        [TestMethod]
-        public void ExecutorShouldSanitizeNoLogoInputAndShouldProcessOtherArgs()
-        {
-            // Create temp file for testsource dll to pass FileUtil.Exits()
-            var testSourceDllPath = Path.GetTempFileName();
-            string[] args = { testSourceDllPath, "/tests:Test1", "/testCasefilter:Test", "--nologo" };
-            var mockOutput = new MockOutput();
-
-            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
-
-            var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(CommandLineResources.InvalidTestCaseFilterValueForSpecificTests));
-            Assert.AreEqual(1, errorMessageCount, "Invalid Arguments Combination should display error.");
-            Assert.AreEqual(1, exitCode, "Invalid Arguments Combination execution should exit with error.");
-
-            Assert.IsFalse(mockOutput.Messages.First().Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
-                "First Printed message must be Microsoft Copyright");
-
-            File.Delete(testSourceDllPath);
-        }
-
 
         /// <summary>
         /// Executor should Print Error message and Help contents when no arguments are provided.
@@ -167,9 +149,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
             RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-            Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-            Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
-            Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
+            Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
+            Assert.AreEqual(Framework.DefaultFramework.ToString(), runConfiguration.TargetFramework.ToString());
+            Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
         }
 
         [TestMethod]
@@ -188,22 +170,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
 
             this.mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStop(), Times.Once);
-        }
-
-        [TestMethod]
-        public void ExecuteShouldExitWithErrorOnInvalidArgumentCombination()
-        {
-            // Create temp file for testsource dll to pass FileUtil.Exits()
-            var testSourceDllPath = Path.GetTempFileName();
-            string[] args = { testSourceDllPath, "/tests:Test1", "/testCasefilter:Test" };
-            var mockOutput = new MockOutput();
-
-            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
-
-            var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(CommandLineResources.InvalidTestCaseFilterValueForSpecificTests));
-            Assert.AreEqual(1, errorMessageCount, "Invalid Arguments Combination should display error.");
-            Assert.AreEqual(1, exitCode, "Invalid Arguments Combination execution should exit with error.");
-            File.Delete(testSourceDllPath);
         }
 
         [TestMethod]
@@ -243,7 +209,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 
                 File.WriteAllText(runSettingsFile, fileContents);
 
-                string[] args = { "/settings:" + runSettingsFile };
+                var testSourceDllPath = Path.GetTempFileName();
+                string[] args = { testSourceDllPath, "/settings:" + runSettingsFile };
                 var mockOutput = new MockOutput();
 
                 var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);

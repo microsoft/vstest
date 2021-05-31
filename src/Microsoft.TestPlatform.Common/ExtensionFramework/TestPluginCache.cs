@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
-#if NET451
+#if NETFRAMEWORK
     using System.Threading;
 #endif
     using System;
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
             where TPluginInfo : TestPluginInformation
         {
-            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies endswith: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
+            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies ends with: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
             // Return the cached value if cache is valid.
             if (this.TestExtensions != null && this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
             {
@@ -179,10 +179,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     this.TestExtensions = new TestExtensions();
                 }
 
-                this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+                this.TestExtensions.AddExtension(pluginInfos);
 
                 // Set the cache bool to true.
-                this.TestExtensions.SetTestExtensionsCacheStatus<TPluginInfo>();
+                this.TestExtensions.SetTestExtensionsCacheStatusToTrue<TPluginInfo>();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.LogExtensions();
             }
-#if NET451
+#if NETFRAMEWORK
             catch (ThreadAbortException)
             {
                 // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (skipExtensionFilters)
                 {
-                    // Add the extensions to unfilter list. These extensions will never be filtered
+                    // Add the extensions to un-filter list. These extensions will never be filtered
                     // based on file name (e.g. *.testadapter.dll etc.).
                     if (TryMergeExtensionPaths(this.unfilterableExtensionPaths, extensions,
                         out this.unfilterableExtensionPaths))
@@ -342,8 +342,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
         {
             // Check if extensions from this assembly have already been discovered.
-            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(this.TestExtensions.GetTestExtensionCache<TPluginInfo>(), extensionAssembly);
-
+            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+                this.TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+                extensionAssembly);
 
             if (extensions != null)
             {
@@ -528,7 +529,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 try
                 {
-                    EqtTrace.Verbose("CurrentDomain_AssemblyResolve: Resolving assembly '{0}'.", args.Name);
+                    EqtTrace.Verbose("CurrentDomainAssemblyResolve: Resolving assembly '{0}'.", args.Name);
 
                     if (this.resolvedAssemblies.TryGetValue(args.Name, out assembly))
                     {
@@ -536,7 +537,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     }
 
                     // Put it in the resolved assembly so that if below Assembly.Load call
-                    // triggers another assembly resolution, then we dont end up in stack overflow
+                    // triggers another assembly resolution, then we don't end up in stack overflow
                     this.resolvedAssemblies[args.Name] = null;
 
                     assembly = Assembly.Load(assemblyName);
@@ -568,6 +569,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 var executors = this.TestExtensions.TestExecutors != null ? string.Join(",", this.TestExtensions.TestExecutors.Keys.ToArray()) : null;
                 EqtTrace.Verbose("TestPluginCache: Executors are '{0}'.", executors);
+
+                var executors2 = this.TestExtensions.TestExecutors2 != null ? string.Join(",", this.TestExtensions.TestExecutors2.Keys.ToArray()) : null;
+                EqtTrace.Verbose("TestPluginCache: Executors2 are '{0}'.", executors2);
 
                 var settingsProviders = this.TestExtensions.TestSettingsProviders != null ? string.Join(",", this.TestExtensions.TestSettingsProviders.Keys.ToArray()) : null;
                 EqtTrace.Verbose("TestPluginCache: Setting providers are '{0}'.", settingsProviders);

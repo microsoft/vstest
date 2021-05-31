@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
-    using System;
-
     /// <summary>
     /// Interface implemented to log messages and results from tests.  A class that
     /// implements this interface will be available for use if it exports its type via

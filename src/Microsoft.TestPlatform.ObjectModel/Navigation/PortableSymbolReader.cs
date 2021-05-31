@@ -94,7 +94,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     // At this point, the assembly should be already loaded into the load context. We query for a reference to
                     // find the types and cache the symbol information. Let the loader follow default lookup order instead of
                     // forcing load from a specific path.
-                    var asm = Assembly.Load(new PlatformAssemblyLoadContext().GetAssemblyNameFromPath(binaryPath));
+                    Assembly asm;
+                    try
+                    {
+                        asm = Assembly.Load(new PlatformAssemblyLoadContext().GetAssemblyNameFromPath(binaryPath));
+                    }
+                    catch (FileNotFoundException)
+                    {
+#if !NETSTANDARD1_3 && !WINDOWS_UWP && !NETCOREAPP1_0
+                        // fallback when the assembly is not loaded
+                        asm = Assembly.LoadFile(binaryPath);
+#else
+                        // fallback is not supported
+                        throw;
+#endif
+                    }
 
                     foreach (var type in asm.GetTypes())
                     {

@@ -14,11 +14,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
@@ -62,7 +65,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// LockObject to update execution status in parallel
         /// </summary>
         private readonly object executionStatusLockObject = new object();
-     
 
         #endregion
 
@@ -110,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     testCasesBySource[test.Source].Add(test);
                 }
 
-                // Do not use "Dictionary.ValueCollection.Enumerator" - it becomes undetermenstic once we go out of scope of this method
+                // Do not use "Dictionary.ValueCollection.Enumerator" - it becomes nondeterministic once we go out of scope of this method
                 // Use "ToArray" to copy ValueColleciton to a simple array and use it's enumerator
                 // Set the enumerator for parallel yielding of testCases
                 // Whenever a concurrent executor becomes free, it picks up the next set of testCases using this enumerator
@@ -155,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #region IParallelProxyExecutionManager methods
 
         /// <summary>
-        /// Handles Partial Run Complete event coming from a specific concurrent proxy exceution manager
+        /// Handles Partial Run Complete event coming from a specific concurrent proxy execution manager
         /// Each concurrent proxy execution manager will signal the parallel execution manager when its complete
         /// </summary>
         /// <param name="proxyExecutionManager">Concurrent Execution manager that completed the run</param>
@@ -175,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             lock (this.executionStatusLockObject)
             {
                 // Each concurrent Executor calls this method 
-                // So, we need to keep track of total runcomplete calls
+                // So, we need to keep track of total run complete calls
                 this.runCompletedClients++;
 
                 if (testRunCompleteArgs.IsCanceled || abortRequested)
@@ -204,9 +206,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.currentRunEventsHandler = null;
 
                 // Dispose concurrent executors
-                // Do not do the cleanuptask in the current thread as we will unncessarily add to execution time
+                // Do not do the cleanup task in the current thread as we will unnecessarily add to execution time
                 this.UpdateParallelLevel(0);
-                
+
                 return true;
             }
 
@@ -237,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             this.currentRunEventsHandler = runEventsHandler;
 
-            // Reset the runcomplete data
+            // Reset the run complete data
             this.runCompletedClients = 0;
 
             // One data aggregator per parallel run
@@ -257,12 +259,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             if (concurrentManager is ProxyExecutionManagerWithDataCollection)
             {
+                var concurrentManagerWithDataCollection = concurrentManager as ProxyExecutionManagerWithDataCollection;
+
+                // TODO : use TestPluginCache to iterate over all IDataCollectorAttachments
+                var attachmentsProcessingManager = new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new CodeCoverageDataAttachmentsHandler());
+
                 return new ParallelDataCollectionEventsHandler(
                             this.requestData,
-                            concurrentManager,
+                            concurrentManagerWithDataCollection,
                             this.currentRunEventsHandler,
                             this,
-                            this.currentRunDataAggregator);
+                            this.currentRunDataAggregator,
+                            attachmentsProcessingManager,
+                            concurrentManagerWithDataCollection.CancellationToken);
             }
 
             return new ParallelRunEventsHandler(

@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public TimeSpan ElapsedTime { get; set; }
 
-        public Collection<AttachmentSet> RunContextAttachments { get; }
+        public Collection<AttachmentSet> RunContextAttachments { get; set; }
 
         public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <summary>
-        /// Aggregate Run Data 
+        /// Aggregate Run Data
         /// Must be thread-safe as this is expected to be called by parallel managers
         /// </summary>
         public void Aggregate(
@@ -176,9 +176,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)))
                 {
                     var newValue = Convert.ToDouble(metric.Value);
-                    object oldValue;
 
-                    if (this.metricsAggregator.TryGetValue(metric.Key, out oldValue))
+                    if (this.metricsAggregator.TryGetValue(metric.Key, out var oldValue))
                     {
                         var oldDoubleValue = Convert.ToDouble(oldValue);
                         this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;

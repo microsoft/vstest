@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
         // NOTE: These constructors are protected internal to allow 3rd parties to
         //       do unit testing of their data collectors.
-        // 
+        //
         //       We do not want to make the constructors of this class public as it
         //       would lead to a great deal of user error when they start creating
         //       their own data collection context instances to log errors/warnings
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// or null if no executing test case is in context</param>
         protected internal DataCollectionContext(SessionId sessionId, TestExecId testExecId)
         {
-            //todo
+            //TODO
             //EqtAssert.ParameterNotNull(sessionId, "sessionId");
 
             this.sessionId = sessionId;

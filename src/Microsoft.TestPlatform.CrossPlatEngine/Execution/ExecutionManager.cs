@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             //unsubscrive session logger
             this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
 
-            this.testPlatformEventSource.AdapterSearchStop();          
+            this.testPlatformEventSource.AdapterSearchStop();
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
             catch (Exception e)
             {
-                runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
+                runEventsHandler.HandleLogMessage(TestMessageLevel.Error, e.ToString());
                 this.Abort(runEventsHandler);
             }
             finally
@@ -139,11 +139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
-                
             }
             catch (Exception e)
             {
-                runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
+                runEventsHandler.HandleLogMessage(TestMessageLevel.Error, e.ToString());
                 this.Abort(runEventsHandler);
             }
             finally
@@ -182,7 +181,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.activeTestRun.Abort();
             }
-
         }
 
         #endregion
@@ -209,23 +207,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 if (EqtTrace.IsWarningEnabled)
                 {
-                    EqtTrace.Warning("TestExecutorWebService: Exception occured while calling test connection. {0}", ex);
+                    EqtTrace.Warning("TestExecutorWebService: Exception occurred while calling test connection. {0}", ex);
                 }
             }
         }
 
         /// <summary>
-        /// Initializes outproc and inproc data collectors.
+        /// Initializes out-proc and in-proc data collectors.
         /// </summary>
         private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
         {
-            // Initialize outproc data collectors if declared in run settings.
+            // Initialize out-proc data collectors if declared in run settings.
             if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
             {
                 var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
             }
 
-            // Initialize inproc data collectors if declared in run settings.
+            // Initialize in-proc data collectors if declared in run settings.
             if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {
                 var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase, TestPluginCache.Instance);

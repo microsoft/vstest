@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         public static readonly char[] EqualNameValueSeparator = { '=' };
 
         /// <summary>
-        /// Get argument list from raw argument usign argument separator.
+        /// Get argument list from raw argument using argument separator.
         /// </summary>
         /// <param name="rawArgument">Raw argument.</param>
         /// <param name="argumentSeparator">Argument separator.</param>

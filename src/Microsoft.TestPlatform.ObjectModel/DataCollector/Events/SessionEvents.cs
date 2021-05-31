@@ -19,11 +19,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class.
         /// </summary>
         /// <remarks>
         /// Default constructor with empty properties and default DataCollectionContext.
-        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
         /// </remarks>
         public SessionStartEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)), new Dictionary<string, object>())
         {
@@ -31,11 +31,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class.
         /// </summary>
         /// <remarks>
         /// constructor with properties and default DataCollectionContext.
-        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
         /// </remarks>
         public SessionStartEventArgs(IDictionary<string, object> properties) : this(new DataCollectionContext(new SessionId(Guid.Empty)), properties)
         {
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class.
         /// </summary>
         /// <param name="context">
         /// Context information for the session
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public T GetPropertyValue<T>(string property)
         {
-            ValidateArg.NotNullOrEmpty(property, "property");
+            ValidateArg.NotNullOrEmpty(property, nameof(property));
 
             return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
         }
@@ -88,9 +88,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </param>
         public object GetPropertyValue(string property)
         {
-            ValidateArg.NotNullOrEmpty(property, "property");
+            ValidateArg.NotNullOrEmpty(property, nameof(property));
 
-            this.Properties.TryGetValue(property, out object propertyValue);
+            this.Properties.TryGetValue(property, out var propertyValue);
 
             return propertyValue;
         }
@@ -107,11 +107,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class.
         /// </summary>
         /// <remarks>
         /// Default constructor with default DataCollectionContext.
-        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// DataCollectionContext with empty session signifies that is it irrelevant in the current context.
         /// </remarks>
         public SessionEndEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)))
         {
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class.
         /// </summary>
         /// <param name="context">
         /// Context information for the session

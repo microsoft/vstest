@@ -15,8 +15,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <summary>
         /// simple xpath location. only element and attribute names can be used.
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:AccessibleFieldsMustBeginWithUpperCaseLetter", Justification = "Reviewed. Suppression is OK here.")]
-        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is OK here.")]
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:AccessibleFieldsMustBeginWithUpperCaseLetter", Justification = "Reviewed. Suppression is ok here.")]
+        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is ok here.")]
         public string Location;
 
         /// <summary>
@@ -44,8 +44,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     internal sealed class StoreXmlSimpleFieldAttribute : StoreXmlAttribute
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
-        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is OK here.")]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is ok here.")]
+        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is ok here.")]
         public object DefaultValue;
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         /// <summary>
         /// If there's no xml for the field a default instance is created or not.
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is OK here.")]
+        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is ok here.")]
         public bool CreateDefaultInstance = CreateDefaultInstanceDefault;
 
         /// <summary>

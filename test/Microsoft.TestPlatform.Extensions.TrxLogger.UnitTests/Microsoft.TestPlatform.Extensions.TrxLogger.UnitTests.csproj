@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
     <WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>

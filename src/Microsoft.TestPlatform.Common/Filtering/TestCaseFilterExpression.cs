@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         private FilterExpressionWrapper filterWrapper;
 
         /// <summary>
-        /// If filter Expression is valid for performing TestCase matching 
+        /// If filter Expression is valid for performing TestCase matching
         /// (has only supported properties, syntax etc)
         /// </summary>
         private readonly bool validForMatch;

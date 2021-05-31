@@ -146,7 +146,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Failed), Times.Never);
         }
-        
+
         [TestMethod]
         public void RecordEndShouldInvokeSendTestCaseEndMultipleTimesInDataDrivenScenario()
         {

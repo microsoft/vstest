@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 
     /// <summary>
     /// Managed datacollector interaction from runner process.
@@ -130,7 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
             this.LogEnabledDataCollectors();
-
         }
 
         /// <summary>
@@ -147,15 +147,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </returns>
         public Collection<AttachmentSet> AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler)
         {
-            Collection<AttachmentSet> attachmentSet = null;
+            AfterTestRunEndResult afterTestRunEnd = null;
             this.InvokeDataCollectionServiceAction(
-           () =>
-           {
-               EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
-               attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
-           },
-                runEventsHandler);
-            return attachmentSet;
+            () =>
+            {
+                EqtTrace.Info("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
+                afterTestRunEnd = this.dataCollectionRequestSender.SendAfterTestRunEndAndGetResult(runEventsHandler, isCanceled);
+            },
+            runEventsHandler);
+
+            if (requestData.IsTelemetryOptedIn && afterTestRunEnd?.Metrics != null)
+            {
+                foreach (var metric in afterTestRunEnd.Metrics)
+                {
+                    requestData.MetricsCollection.Add(metric.Key, metric.Value);
+                }
+            }
+
+            return afterTestRunEnd?.AttachmentSets;
         }
 
         /// <summary>
@@ -185,8 +194,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
             () =>
             {
-                EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.SettingsXml, this.Sources, runEventsHandler);
+                EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get environment variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.SettingsXml, this.Sources, this.requestData.IsTelemetryOptedIn, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
@@ -216,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public void Dispose()
         {
-            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dospose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
+            EqtTrace.Info("ProxyDataCollectionManager.Dispose: calling dispose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
             this.dataCollectionRequestSender.Close();
         }
 
@@ -340,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Update Extensions path folder in testadapterspaths in runsettings.
+        /// Update Extensions path folder in test adapters paths in runsettings.
         /// </summary>
         /// <param name="settingsXml"></param>
         private static string UpdateExtensionsFolderInRunSettings(string settingsXml)

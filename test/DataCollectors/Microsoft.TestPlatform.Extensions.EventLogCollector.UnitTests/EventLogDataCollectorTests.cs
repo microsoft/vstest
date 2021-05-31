@@ -229,21 +229,21 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public void TestSessionStartEventShouldCreateEventLogContainer()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 0);
+            Assert.AreEqual(0, eventLogDataCollector.ContextMap.Count);
             eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
-            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 1);
+            Assert.AreEqual(1, eventLogDataCollector.ContextMap.Count);
         }
 
         [TestMethod]
         public void TestCaseStartEventShouldCreateEventLogContainer()
         {
             var eventLogDataCollector = new EventLogDataCollector();
-            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 0);
+            Assert.AreEqual(0, eventLogDataCollector.ContextMap.Count);
 
             eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid())), new TestCase()));
-            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 1);
+            Assert.AreEqual(1, eventLogDataCollector.ContextMap.Count);
         }
 
         [TestMethod]
@@ -372,7 +372,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             }
 
             var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
-                .OrderBy(x => x.TimeGenerated).ToList().Take(5).ToList();
+                .OrderBy(x => x.TimeGenerated).Take(5).ToList();
 
             this.eventLogDataCollector.WriteEventLogs(
                 entries,
@@ -415,7 +415,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             }
 
             var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
-                .OrderBy(x => x.TimeGenerated).ToList().Take(10).ToList();
+                .OrderBy(x => x.TimeGenerated).Take(10).ToList();
 
             this.eventLogDataCollector.WriteEventLogs(
                 entries,

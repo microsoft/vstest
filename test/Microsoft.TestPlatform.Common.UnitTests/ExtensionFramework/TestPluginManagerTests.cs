@@ -5,10 +5,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -17,10 +16,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
 
     [TestClass]
     public class TestPluginManagerTests
@@ -73,34 +69,28 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldReturnTestDiscovererExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
-
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests));
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                out unfilteredTestExtensions,
-                out testExtensions);
+                out var unfilteredTestExtensions,
+                out var testExtensions);
 
             Assert.IsNotNull(unfilteredTestExtensions);
             Assert.IsNotNull(testExtensions);
-            Assert.IsTrue(testExtensions.Count() > 0);
+            Assert.IsTrue(testExtensions.Any());
         }
 
         [TestMethod]
         public void GetTestExtensionsShouldDiscoverExtensionsOnlyOnce()
         {
             var discoveryCount = 0;
-            TestPluginCacheTests.SetupMockExtensions(() => { discoveryCount++; });
-
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestPluginManagerTests), () => { discoveryCount++; });
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                out unfilteredTestExtensions,
-                out testExtensions);
+                out var unfilteredTestExtensions,
+                out var testExtensions);
 
             // Call this again to verify that discovery is not called again.
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
@@ -117,20 +107,17 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
         {
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
-
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
-                    out unfilteredTestExtensions,
-                    out testExtensions);
+                    out var unfilteredTestExtensions,
+                    out var testExtensions);
 
             Assert.IsNotNull(testExtensions);
-            Assert.IsTrue(testExtensions.Count() > 0);
+            Assert.IsTrue(testExtensions.Any());
         }
 
-        #region implementations
+        #region Implementations
 
         private abstract class AbstractDummyLogger : ITestLogger
         {

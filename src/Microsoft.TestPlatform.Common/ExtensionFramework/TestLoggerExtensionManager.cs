@@ -4,8 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -18,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestLoggerExtensionManager : TestExtensionManager<ITestLogger, ITestLoggerCapabilities>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestLoggerExtensionManager"/> class. 
+        /// Initializes a new instance of the <see cref="TestLoggerExtensionManager"/> class.
         /// </summary>
         /// <param name="unfilteredTestExtensions">
         /// The unfiltered Test Extensions.
@@ -72,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Constructor for TestLoggerMetadata
         /// </summary>
         /// <param name="extension">
-        /// Uri identifying the logger. 
+        /// Uri identifying the logger.
         /// </param>
         /// <param name="friendlyName">
         /// The friendly Name.

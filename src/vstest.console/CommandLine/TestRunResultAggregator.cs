@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="testRunRequest">The run request to register for events on.</param>
         public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
         {
-            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
+            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, nameof(testRunRequest));
 
             // Register for the events.
             testRunRequest.TestRunMessage += TestRunMessageHandler;
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="testRunRequest">The run request from which events should be unregistered.</param>
         public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
         {
-            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
+            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, nameof(testRunRequest));
 
             testRunRequest.TestRunMessage -= TestRunMessageHandler;
             testRunRequest.OnRunCompletion -= TestRunCompletionHandler;

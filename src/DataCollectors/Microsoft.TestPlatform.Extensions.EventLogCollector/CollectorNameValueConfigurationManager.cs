@@ -83,7 +83,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 }
 
                 // Save the name/value pair in the dictionary. Note that duplicate settings are
-                // overwritten with the last occurrance's value.
+                // overwritten with the last occurrence's value.
                 if (this.nameValuePairs.ContainsKey(settingName))
                 {
                     if (EqtTrace.IsVerboseEnabled)
@@ -118,8 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     return null;
                 }
 
-                string settingValue;
-                this.nameValuePairs.TryGetValue(name, out settingValue);
+                this.nameValuePairs.TryGetValue(name, out var settingValue);
                 return settingValue;
             }
 

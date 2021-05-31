@@ -6,7 +6,6 @@ namespace testhost.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -100,7 +99,7 @@ namespace testhost.UnitTests
         public void InvokeShouldInitializeTraceWithCorrectTraceLevel()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -116,7 +115,7 @@ namespace testhost.UnitTests
         public void InvokeShouldInitializeTraceWithVerboseTraceLevelIfInvalidTraceLevelPassed()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Warning;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;

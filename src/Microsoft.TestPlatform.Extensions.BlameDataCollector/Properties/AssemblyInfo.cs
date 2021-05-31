@@ -4,6 +4,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+using Microsoft.TestPlatform.Extensions.BlameDataCollector;
+using Microsoft.VisualStudio.TestPlatform;
+
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
@@ -20,3 +23,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("716373d6-9162-4ac6-9ae7-b5a3a4286808")]
+
+[assembly: TestExtensionTypes(typeof(BlameLogger), typeof(BlameCollector))]

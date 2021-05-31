@@ -43,12 +43,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("-?|--Help|/?|/Help" + Environment.NewLine + "      Display this usage message.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.HelpArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Help, capabilities.Priority);
 
-            Assert.AreEqual(true, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsTrue(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion

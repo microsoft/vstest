@@ -6,10 +6,13 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Common</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\scripts\build\ExternalAssemblyVersions.cs" Link="ExternalAssemblyVersions.cs" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
@@ -46,8 +49,5 @@
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.Common</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <InternalsVisibleTo Include="Microsoft.TestPlatform.Common.UnitTests" />
-  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

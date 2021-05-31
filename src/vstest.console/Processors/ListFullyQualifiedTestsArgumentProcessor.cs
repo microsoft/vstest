@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -204,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.commandLineOptions != null);
             Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
-            if (this.commandLineOptions.Sources.Count() <= 0)
+            if (!this.commandLineOptions.Sources.Any())
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
@@ -251,25 +250,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 ConsoleLogger.RaiseTestRunWarning(message);
             }
-            
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests += this.DiscoveryRequest_OnDiscoveredTests;
             }
 
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
-                discoveryRequest.OnDiscoveredTests -= this.discoveryRequest_OnDiscoveredTests;
+                discoveryRequest.OnDiscoveredTests -= this.DiscoveryRequest_OnDiscoveredTests;
             }
 
-            private void discoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
+            private void DiscoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
             {
                 if (args == null)
                 {
                     throw new TestPlatformException("DiscoveredTestsEventArgs cannot be null.");
                 }
 
-                // Initialising the test case filter here because the filter value is read late.
+                // Initializing the test case filter here because the filter value is read late.
                 this.testCasefilter.Initialize(this.options.TestCaseFilterValue);
                 var discoveredTests = args.DiscoveredTestCases.ToList();
                 var filteredTests = this.testCasefilter.FilterTests(discoveredTests).ToList();
@@ -362,7 +360,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     traitDictionary = GetTraitsInTraitDictionary(traitDictionary, testCase.Traits);
 
                     // Skip test if not fitting filter criteria.
-                    if (filterExpression.MatchTestCase(testCase, p => PropertyValueProvider(p, traitDictionary)) == false)
+                    if (!filterExpression.MatchTestCase(testCase, p => PropertyValueProvider(p, traitDictionary)))
                     {
                         continue;
                     }
@@ -374,7 +372,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             /// <summary>
-            /// fetch the testproperties on this test method as traits and populate a trait dictionary
+            /// fetch the test properties on this test method as traits and populate a trait dictionary
             /// </summary>
             private static Dictionary<string, List<string>> GetTestPropertiesInTraitDictionary(TestCase testCase)
             {
@@ -443,7 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                 }
 
-                //This is hack for NUnit,Xunit to understand test category -> This method is called only for NUnit/Xunit
+                //This is hack for NUnit, XUnit to understand test category -> This method is called only for NUnit/XUnit
                 if (!traitDictionary.ContainsKey(TestCategory) && traitDictionary.ContainsKey(Category))
                 {
                     traitDictionary.TryGetValue(Category, out var categoryValue);

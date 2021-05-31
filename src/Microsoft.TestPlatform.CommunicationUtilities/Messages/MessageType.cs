@@ -124,6 +124,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
         /// <summary>
+        /// Test run attachments processing
+        /// </summary>
+        public const string TestRunAttachmentsProcessingStart = "TestRunAttachmentsProcessing.Start";
+
+        /// <summary>
+        /// Test run attachments processing callback
+        /// </summary>
+        public const string TestRunAttachmentsProcessingComplete = "TestRunAttachmentsProcessing.Complete";
+
+        /// <summary>
+        /// Test run attachments processing progress
+        /// </summary>
+        public const string TestRunAttachmentsProcessingProgress = "TestRunAttachmentsProcessing.Progress";
+
+        /// <summary>
+        /// Cancel test run attachments processing
+        /// </summary>
+        public const string TestRunAttachmentsProcessingCancel = "TestRunAttachmentsProcessing.Cancel";
+
+        /// <summary>
         /// Extensions Initialization
         /// </summary>
         public const string ExtensionsInitialize = "Extensions.Initialize";
@@ -149,9 +169,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string LaunchAdapterProcessWithDebuggerAttachedCallback = "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback";
 
         /// <summary>
+        /// Attach debugger to process.
+        /// </summary>
+        public const string AttachDebugger = "TestExecution.AttachDebugger";
+
+        /// <summary>
+        /// Attach debugger to process callback.
+        /// </summary>
+        public const string AttachDebuggerCallback = "TestExecution.AttachDebuggerCallback";
+
+        /// <summary>
+        /// Attach debugger to process.
+        /// </summary>
+        public const string EditorAttachDebugger = "TestExecution.EditorAttachDebugger";
+
+        /// <summary>
+        /// Attach debugger to process callback.
+        /// </summary>
+        public const string EditorAttachDebuggerCallback = "TestExecution.EditorAttachDebuggerCallback";
+
+        /// <summary>
         /// Data Collection Message
         /// </summary>
         public const string DataCollectionMessage = "DataCollection.SendMessage";
+
+        /// <summary>
+        /// StartTestSession message.
+        /// </summary>
+        public const string StartTestSession = "TestSession.StartTestSession";
+
+        /// <summary>
+        /// StartTestSession callback message.
+        /// </summary>
+        public const string StartTestSessionCallback = "TestSession.StartTestSessionCallback";
+
+        /// <summary>
+        /// StopTestSession message.
+        /// </summary>
+        public const string StopTestSession = "TestSession.StopTestSession";
+
+        /// <summary>
+        /// StopTestSession callback message.
+        /// </summary>
+        public const string StopTestSessionCallback = "TestSession.StopTestSessionCallback";
 
         #region DataCollector messages
 
@@ -176,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string AfterTestRunEnd = "DataCollection.AfterTestRunEnd";
 
         /// <summary>
-        /// Event message type used by dastacollector to send result on receiving test run end event.
+        /// Event message type used by datacollector to send result on receiving test run end event.
         /// </summary>
         public const string AfterTestRunEndResult = "DataCollection.AfterTestRunEndResult";
 

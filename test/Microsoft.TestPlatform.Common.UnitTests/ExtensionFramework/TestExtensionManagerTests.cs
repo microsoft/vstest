@@ -5,7 +5,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -26,7 +26,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         public TestExtensionManagerTests()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestExtensionManagerTests));
             messageLogger = TestSessionMessageLogger.Instance;
             TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
                 (TestPlatformConstants.TestLoggerEndsWithPattern, out unfilteredTestExtensions, out filteredTestExtensions);
@@ -56,14 +56,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result.Value, typeof(ITestLogger));
-
         }
 
         [TestMethod]
         public void TryGetTestExtensionShouldThrowExceptionWithNullUri()
         {
             testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
-            TestPluginCacheTests.SetupMockAdditionalPathExtensions();
+            TestPluginCacheHelper.SetupMockAdditionalPathExtensions(typeof(TestExtensionManagerTests));
             Assert.ThrowsException<ArgumentNullException>(() =>
                     {
                         var result = testExtensionManager.TryGetTestExtension(default(Uri));
@@ -78,7 +77,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var result = testExtensionManager.TryGetTestExtension("");
             Assert.IsNull(result);
         }
-
 
         [TestMethod]
         public void TryGetTestExtensionWithStringUriUnitTest()
@@ -107,7 +105,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
             {
-
             }
 
             private void TestMessageHandler(object sender, TestRunMessageEventArgs e)

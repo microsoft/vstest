@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
+    using System;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -10,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// JsonDataSerializes serializes and deserializes data using Json format
@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             if (obj == null)
             {
-                return default(T);
+                return default;
             }
 
             var stringObj = this.Serialize<T>(obj, 2);
@@ -211,7 +211,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private JsonSerializer GetPayloadSerializer(int? version)
         {
-            return version == 2 ? payloadSerializer2 : payloadSerializer;
+            if (version == null)
+            {
+                version = 1;
+            }
+
+            switch (version)
+            {
+                // 0 is used during negotiation
+                case 0:
+                case 1:
+                // Protocol version 3 was accidentally used with serializer v1 and not
+                // serializer v2, we downgrade to protocol 2 when 3 would be negotiated
+                // unless this is disabled by VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
+                // env variable.
+                case 3:
+                    return payloadSerializer;
+                case 2:
+                case 4:
+                case 5:
+                    return payloadSerializer2;
+                default:
+                    throw new NotSupportedException($"Protocol version {version} is not supported. " +
+                        "Ensure it is compatible with the latest serializer or add a new one.");
+            }
         }
     }
 }

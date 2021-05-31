@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
 
     /// <summary>
@@ -13,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
     /// </summary>
     public interface IFileHelper
     {
+#if !NETSTANDARD1_0 
         /// <summary>
         /// Creates a directory.
         /// </summary>
@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <returns><see cref="DirectoryInfo"/> for the created directory.</returns>
         DirectoryInfo CreateDirectory(string path);
 
+#endif
         /// <summary>
         /// Gets the current directory
         /// </summary>
@@ -40,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <returns>True if directory exists <see cref="bool"/>.</returns>
         bool DirectoryExists(string path);
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Gets a stream for the file.
         /// </summary>
@@ -74,6 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="path">Full path of the file.</param>
         /// <returns>Attributes of the file.</returns>
         FileAttributes GetFileAttributes(string path);
+#endif
 
         /// <summary>
         /// Gets the version information of the file.
@@ -126,6 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// </param>
         void DeleteEmptyDirectroy(string directoryPath);
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Gets all files in directory based on search pattern
         /// </summary>
@@ -134,6 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="searchOption">Search option</param>
         /// <returns>string[]</returns>
         string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
+#endif
 
         /// <summary>
         /// Deletes the specified file

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -178,7 +179,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
+            var temp = Path.GetTempPath();
+            var testRunCriteria = new TestRunCriteria(new List<string> { $@"{temp}foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
             this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
                 .Returns(testRunCriteria.Sources);
 
@@ -209,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), "xyz\\1.dll") }, 10, false, settingsXml);
+            var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), $"xyz{Path.DirectorySeparatorChar}1.dll") }, 10, false, settingsXml);
 
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
@@ -238,9 +240,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), "xyz\\1.dll") }, 10, false, settingsXml);
+            var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), $"xyz{Path.DirectorySeparatorChar}1.dll") }, 10, false, settingsXml);
             this.hostManager.Setup(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()))
-                .Returns(new List<string> { "xyz\\1.dll" });
+                .Returns(new List<string> { $"xyz{Path.DirectorySeparatorChar}1.dll" });
 
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
@@ -390,7 +392,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var discoveryCriteria = new DiscoveryCriteria(new List<string> { @"x:dummy\foo.dll" }, 1, settingsXml);
+            var temp = Path.GetTempPath();
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { $@"{temp}foo.dll" }, 1, settingsXml);
             this.hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
                 .Returns(discoveryCriteria.Sources);
 

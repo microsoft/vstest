@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Xml;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,11 +25,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
     {
         private Converter converter;
         private Mock<IFileHelper> fileHelper;
+        private readonly TrxFileHelper trxFileHelper;
 
         public ConverterTests()
         {
             this.fileHelper = new Mock<IFileHelper>();
-            this.converter = new Converter(this.fileHelper.Object);
+            this.trxFileHelper = new TrxFileHelper();
+            this.converter = new Converter(this.fileHelper.Object, trxFileHelper);
         }
 
         [TestMethod]
@@ -68,11 +69,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         {
             ConverterTests.SetupForToCollectionEntries(out var tempDir, out var attachmentSets, out var testRun, out var testResultsDirectory);
 
-            this.converter = new Converter(new VisualStudio.TestPlatform.Utilities.Helpers.FileHelper());
+            this.converter = new Converter(new FileHelper(), trxFileHelper);
             List<CollectorDataEntry> collectorDataEntries = this.converter.ToCollectionEntries(attachmentSets, testRun, testResultsDirectory);
 
-            Assert.AreEqual($@"{Environment.MachineName}\123.coverage", ((ObjectModel.UriDataAttachment) collectorDataEntries[0].Attachments[0]).Uri.OriginalString);
-            Assert.AreEqual($@"{Environment.MachineName}\123[1].coverage", ((ObjectModel.UriDataAttachment)collectorDataEntries[0].Attachments[1]).Uri.OriginalString);
+            Assert.AreEqual(2, collectorDataEntries[0].Attachments.Count);
+            Assert.AreEqual($@"{Environment.MachineName}{Path.DirectorySeparatorChar}123.coverage", ((ObjectModel.UriDataAttachment) collectorDataEntries[0].Attachments[0]).Uri.OriginalString);
+            Assert.AreEqual($@"{Environment.MachineName}{Path.DirectorySeparatorChar}123[1].coverage", ((ObjectModel.UriDataAttachment)collectorDataEntries[0].Attachments[1]).Uri.OriginalString);
 
             Directory.Delete(tempDir, true);
         }
@@ -93,7 +95,23 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
 
             object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
 
-            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x.ToString()).ToArray());
+            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x).ToArray());
+        }
+
+        [TestMethod]
+        public void ToTestElementShouldAssignWorkitemOfUnitTestElement()
+        {
+            TestPlatformObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
+            TestProperty testProperty = TestProperty.Register("WorkItemIds", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
+
+            testCase.SetPropertyValue(testProperty, new[] { "3", "99999", "0" });
+
+            var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+
+            int[] expected = new[] { 0, 3, 99999 };
+
+            CollectionAssert.AreEquivalent(expected, unitTestElement.WorkItems.ToArray());
         }
 
         /// <summary>
@@ -116,34 +134,37 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnIsSameAsTestName()
         {
             var expectedClassName = "TestProject1.Class1";
-            var fullyQualifiedName = expectedClassName + "." + "TestMethod1";
+            var expectedTestName = "TestMethod1";
+            var fullyQualifiedName = expectedClassName + "." + expectedTestName;
             var testName = "TestProject1.Class1.TestMethod1";
 
-            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName, expectedTestName);
         }
 
         [TestMethod]
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnEndsWithTestName()
         {
             var expectedClassName = "TestProject1.Class1";
-            var fullyQualifiedName = expectedClassName + "." + "TestMethod1(2, 3, 4.0d)";
+            var expectedTestName = "TestMethod1(2, 3, 4.0d)";
+            var fullyQualifiedName = expectedClassName + "." + expectedTestName;
             var testName = "TestMethod1(2, 3, 4.0d)";
 
-            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName, expectedTestName);
         }
 
         [TestMethod]
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnDoesNotEndsWithTestName()
         {
             var expectedClassName = "TestProject1.Class1.TestMethod1(2, 3, 4";
-            var fullyQualifiedName = "TestProject1.Class1.TestMethod1(2, 3, 4.0d)";
+            var expectedTestName = "0d)";
+            var fullyQualifiedName = "TestProject1.Class1.TestMethod1(2, 3, 4." + expectedTestName;
             var testName = "TestMethod1";
 
-            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName, expectedTestName);
         }
 
         [TestMethod]
-        public void ToResultFilesShouldAddAttachementsWithRelativeURI()
+        public void ToResultFilesShouldAddAttachmentsWithRelativeURI()
         {
             UriDataAttachment uriDataAttachment1 =
                 new UriDataAttachment(new Uri($"/mnt/c/abc.txt", UriKind.Relative), "Description 1");
@@ -154,20 +175,39 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             };
 
             var testRun = new TestRun(Guid.NewGuid());
-            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1");
+            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1", trxFileHelper);
             attachmentSets[0].Attachments.Add(uriDataAttachment1);
 
             var resultFiles = this.converter.ToResultFiles(attachmentSets, testRun, @"c:\temp", null);
             Assert.IsTrue(resultFiles[0].Contains("abc.txt"));
         }
 
-        private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName)
+        [TestMethod]
+        public void ToTestElementShouldNotFailWhenClassNameIsTheSameAsFullyQualifiedName()
+        {
+            // the converter assumed to find 'classname' in the fqn and split it on 'classname.'
+            // but that threw an exception because 'classname.' is not contained in 'classname' 
+            // (notice the . at the end)
+            // we should not be assuming that the fqn will have '.' in them
+            // seen it for example with qtest
+
+            string expectedClassName, expectedTestName, fullyQualifiedName, source, testName;
+            expectedClassName = expectedTestName = fullyQualifiedName = source = testName = "test1";
+            
+            TestPlatformObjectModel.TestCase testCase = new TestPlatformObjectModel.TestCase(fullyQualifiedName, new Uri("some://uri"), source);
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
+            var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+
+            Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
+            Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);
+        }
+
+        private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName, string expectedTestName)
         {
             TestPlatformObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
             TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
 
             var unitTestElement = this.converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
-            var expectedTestName = fullyQualifiedName.StartsWith(expectedClassName) ? fullyQualifiedName.Remove(0, $"{expectedClassName}.".Length) : fullyQualifiedName;
 
             Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
             Assert.AreEqual(expectedTestName, unitTestElement.TestMethod.Name);
@@ -184,16 +224,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             ConverterTests.CreateTempCoverageFiles(out tempDir, out var coverageFilePath1, out var coverageFilePath2);
 
             UriDataAttachment uriDataAttachment1 =
-                new UriDataAttachment(new Uri($"file:///{coverageFilePath1}"), "Description 1");
+                new UriDataAttachment(new Uri(new Uri("file://"), coverageFilePath1), "Description 1");
             UriDataAttachment uriDataAttachment2 =
-                new UriDataAttachment(new Uri($"file:///{coverageFilePath2}"), "Description 2");
+                new UriDataAttachment(new Uri(new Uri("file://"), coverageFilePath2), "Description 2");
             attachmentSets = new List<AttachmentSet>
             {
                 new AttachmentSet(new Uri("datacollector://microsoft/CodeCoverage/2.0"), "Code Coverage")
             };
 
             testRun = new TestRun(Guid.NewGuid());
-            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1");
+            testRun.RunConfiguration = new TestRunConfiguration("Testrun 1", new TrxFileHelper());
             attachmentSets[0].Attachments.Add(uriDataAttachment1);
             attachmentSets[0].Attachments.Add(uriDataAttachment2);
             testResultsDirectory = Path.Combine(tempDir, "TestResults");

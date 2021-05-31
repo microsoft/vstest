@@ -16,12 +16,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -50,8 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
         private IFileHelper fileHelper;
 
+        private IRequestData requestData;
+
         /// <summary>
-        /// Use to cancel data collection test case events monitoring if test run is cancelled.
+        /// Use to cancel data collection test case events monitoring if test run is canceled.
         /// </summary>
         private CancellationTokenSource cancellationTokenSource;
 
@@ -61,14 +64,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="messageSink">
         /// The message sink.
         /// </param>
-        protected DataCollectionRequestHandler(IMessageSink messageSink)
+        /// <param name="requestData">
+        /// The request data.
+        /// </param>
+        protected DataCollectionRequestHandler(IMessageSink messageSink, IRequestData requestData)
             : this(
                 new SocketCommunicationManager(),
                 messageSink,
-                DataCollectionManager.Create(messageSink),
+                DataCollectionManager.Create(messageSink, requestData),
                 new DataCollectionTestCaseEventHandler(),
                 JsonDataSerializer.Instance,
-                new FileHelper())
+                new FileHelper(),
+                requestData)
         {
             this.messageSink = messageSink;
         }
@@ -94,13 +101,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="fileHelper">
         /// File Helper
         /// </param>
+        /// <param name="requestData">
+        /// Request data
+        /// </param>
         protected DataCollectionRequestHandler(
             ICommunicationManager communicationManager,
             IMessageSink messageSink,
             IDataCollectionManager dataCollectionManager,
             IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler,
             IDataSerializer dataSerializer,
-            IFileHelper fileHelper)
+            IFileHelper fileHelper,
+            IRequestData requestData)
         {
             this.communicationManager = communicationManager;
             this.messageSink = messageSink;
@@ -109,6 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             this.dataCollectionTestCaseEventHandler = dataCollectionTestCaseEventHandler;
             this.cancellationTokenSource = new CancellationTokenSource();
             this.fileHelper = fileHelper;
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -140,13 +152,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 {
                     if (Instance == null)
                     {
+                        var requestData = new RequestData();
+
                         Instance = new DataCollectionRequestHandler(
                             communicationManager,
                             messageSink,
-                            DataCollectionManager.Create(messageSink),
+                            DataCollectionManager.Create(messageSink, requestData),
                             new DataCollectionTestCaseEventHandler(),
                             JsonDataSerializer.Instance,
-                            new FileHelper());
+                            new FileHelper(),
+                            requestData);
                     }
                 }
             }
@@ -284,18 +299,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             }
             catch (Exception e)
             {
-                // If any exception is throuwn while updating additional assemblies, log the exception in eqt trace.
+                // If any exception is thrown while updating additional assemblies, log the exception in eqt trace.
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occured: {0}", e);
+                    EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occurred: {0}", e);
                 }
             }
         }
 
         private void HandleBeforeTestRunStart(Message message)
         {
-            // Initialize datacollectors and get enviornment variables.
+            // Initialize datacollectors and get environment variables.
             var payload = this.dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
+            this.UpdateRequestData(payload.IsTelemetryOptedIn);
             this.AddExtensionAssemblies(payload);
 
             var envVariables = this.dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
@@ -340,7 +356,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         }
                         catch (Exception e)
                         {
-                            EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occured during initialization of TestHost : {0}", e);
+                            EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occurred during initialization of TestHost : {0}", e);
                         }
                     },
                     this.cancellationTokenSource.Token);
@@ -373,17 +389,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             }
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
+            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, this.requestData.MetricsCollection.Metrics);
 
-            // Dispose all datacollectors before sending attachements to vstest.console process.
+            // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.
             this.dataCollectionManager?.Dispose();
 
-            this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachmentsets);
+            this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, afterTestRunEndResult);
             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
 
             this.Close();
 
             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection completed");
+        }
+
+        private void UpdateRequestData(bool isTelemetryOptedIn)
+        {
+            if (isTelemetryOptedIn != this.requestData.IsTelemetryOptedIn)
+            {
+                this.requestData.MetricsCollection = isTelemetryOptedIn ? (IMetricsCollection)new MetricsCollection() : new NoOpMetricsCollection();
+                this.requestData.IsTelemetryOptedIn = isTelemetryOptedIn;
+            }
         }
     }
 }

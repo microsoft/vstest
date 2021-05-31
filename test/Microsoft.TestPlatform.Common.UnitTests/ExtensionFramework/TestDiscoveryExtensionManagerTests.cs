@@ -6,7 +6,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.TestPlatform.Common;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,24 +24,24 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void CreateShouldDiscoverDiscovererExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestDiscoveryExtensionManagerTests));
 
             var extensionManager = TestDiscoveryExtensionManager.Create();
 
             Assert.IsNotNull(extensionManager.Discoverers);
-            Assert.IsTrue(extensionManager.Discoverers.Count() > 0);
+            Assert.IsTrue(extensionManager.Discoverers.Any());
         }
 
         [TestMethod]
         public void CreateShouldCacheDiscoveredExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions(() => { });
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestDiscoveryExtensionManagerTests), () => { });
 
             var extensionManager = TestDiscoveryExtensionManager.Create();
             TestDiscoveryExtensionManager.Create();
 
             Assert.IsNotNull(extensionManager.Discoverers);
-            Assert.IsTrue(extensionManager.Discoverers.Count() > 0);
+            Assert.IsTrue(extensionManager.Discoverers.Any());
         }
 
         [TestMethod]
@@ -51,7 +52,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                     typeof(TestDiscoveryExtensionManagerTests).GetTypeInfo().Assembly.Location);
 
             Assert.IsNotNull(extensionManager.Discoverers);
-            Assert.IsTrue(extensionManager.Discoverers.Count() > 0);
+            Assert.IsTrue(extensionManager.Discoverers.Any());
         }
 
         #region LoadAndInitialize tests
@@ -59,7 +60,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void LoadAndInitializeShouldInitializeAllExtensions()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestDiscoveryExtensionManagerTests));
 
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
 
@@ -88,7 +89,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestDiscovererMetadataCtorDoesNotThrowWhenFileExtensionsIsEmpty()
         {
-            var metadata = new TestDiscovererMetadata(new List<string> {}, null);
+            var metadata = new TestDiscovererMetadata(new List<string>(), null);
 
             Assert.IsNull(metadata.FileExtension);
         }
@@ -96,7 +97,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestDiscovererMetadataCtorDoesNotThrowWhenDefaultUriIsNull()
         {
-            var metadata = new TestDiscovererMetadata(new List<string> { }, null);
+            var metadata = new TestDiscovererMetadata(new List<string>(), null);
 
             Assert.IsNull(metadata.DefaultExecutorUri);
         }
@@ -104,7 +105,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void TestDiscovererMetadataCtorDoesNotThrowWhenDefaultUriIsEmpty()
         {
-            var metadata = new TestDiscovererMetadata(new List<string> { }, " ");
+            var metadata = new TestDiscovererMetadata(new List<string>(), " ");
 
             Assert.IsNull(metadata.DefaultExecutorUri);
         }

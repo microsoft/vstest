@@ -157,5 +157,75 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// Event fired on Metrics Dispose completes.
         /// </summary>
         public const int MetricsDisposeStopEventId = 0x39;
+
+        /// <summary>
+        /// The session attachments processing start event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingStartEventId = 0x40;
+
+        /// <summary>
+        /// The session attachments processing stop event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingStopEventId = 0x41;
+
+        /// <summary>
+        /// The session attachments processing request start event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingRequestStartEventId = 0x42;
+
+        /// <summary>
+        /// The session attachments processing request stop event id.
+        /// </summary>
+        public const int TestRunAttachmentsProcessingRequestStopEventId = 0x43;
+
+        /// <summary>
+        /// Events fired on session attachments processing start of translation layer.
+        /// </summary>
+        public const int TranslationLayerTestRunAttachmentsProcessingStartEventId = 0x44;
+
+        /// <summary>
+        /// Events fired on session attachments processing complete in translation layer.
+        /// </summary>
+        public const int TranslationLayerTestRunAttachmentsProcessingStopEventId = 0x45;
+
+        /// <summary>
+        /// The start test session start event id.
+        /// </summary>
+        public const int StartTestSessionStartEventId = 0x46;
+
+        /// <summary>
+        /// The start test session stop event id.
+        /// </summary>
+        public const int StartTestSessionStopEventId = 0x47;
+
+        /// <summary>
+        /// The translation layer start test session start event id.
+        /// </summary>
+        public const int TranslationLayerStartTestSessionStartEventId = 0x48;
+
+        /// <summary>
+        /// The translation layer start test session stop event id.
+        /// </summary>
+        public const int TranslationLayerStartTestSessionStopEventId = 0x49;
+
+        /// <summary>
+        /// The stop test session start event id.
+        /// </summary>
+        public const int StopTestSessionStartEventId = 0x4A;
+
+        /// <summary>
+        /// The stop test session stop event id.
+        /// </summary>
+        public const int StopTestSessionStopEventId = 0x4B;
+
+        /// <summary>
+        /// The translation layer stop test session start event id.
+        /// </summary>
+        public const int TranslationLayerStopTestSessionStartEventId = 0x4C;
+
+        /// <summary>
+        /// The translation layer stop test session stop event id.
+        /// </summary>
+        public const int TranslationLayerStopTestSessionStopEventId = 0x4D;
     }
 }

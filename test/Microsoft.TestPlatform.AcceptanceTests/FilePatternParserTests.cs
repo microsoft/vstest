@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System.IO;
 
     [TestClass]
@@ -15,6 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var testAssembly = this.GetSampleTestAssembly();
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -23,10 +25,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, this.FrameworkArgValue,
-               runnerInfo.InIsolationValue);
+               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -35,6 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var testAssembly = this.GetSampleTestAssembly();
             var oldAssemblyPath = Path.Combine("Debug", this.testEnvironment.TargetFramework, "SimpleTestProject.dll");
@@ -45,10 +49,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, string.Empty,
-               runnerInfo.InIsolationValue);
+               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -57,6 +62,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var testAssembly = this.GetSampleTestAssembly();
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -71,10 +77,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, string.Empty,
-               runnerInfo.InIsolationValue);
+               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -83,8 +90,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
-            var testAssembly = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"'); ;
+            var testAssembly = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
             testAssembly = testAssembly.Replace("SimpleTestProject2.dll", "*TestProj*.dll");
 
@@ -92,10 +100,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, this.FrameworkArgValue,
-               runnerInfo.InIsolationValue);
+               runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(2, 2, 2);
+            TryRemoveDirectory(resultsDir);
         }
     }
 }

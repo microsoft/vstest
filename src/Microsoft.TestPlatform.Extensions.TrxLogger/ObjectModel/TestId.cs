@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System.Globalization;
     using System.Xml;
 
-    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
     #region TestId
@@ -194,7 +193,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             return
                 object.ReferenceEquals(left, right) ||
-                !object.ReferenceEquals(left, null) && left.ValueEquals(right);
+                (!object.ReferenceEquals(left, null) && left.ValueEquals(right));
         }
 
         /// <summary>
@@ -228,7 +227,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             if (other == null)
             {
-                throw new ArgumentNullException("other");
+                throw new ArgumentNullException(nameof(other));
             }
 
             return this.id.CompareTo(other.id);

@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Rerturns the Instance of <see cref="IMetricsPublisher"/> on basis of given parameters.
+    /// Returns the Instance of <see cref="IMetricsPublisher"/> on basis of given parameters.
     /// </summary>
     public class MetricsPublisherFactory
     {

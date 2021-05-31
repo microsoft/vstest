@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// <summary>
     /// The custom test host launcher.
     /// </summary>
-    public class CustomTestHostLauncher : ITestHostLauncher
+    public class CustomTestHostLauncher : ITestHostLauncher2
     {
         public int ProcessId
         {
@@ -21,6 +21,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         /// <inheritdoc />
         public bool IsDebug => true;
+
+        public bool AttachDebuggerToProcess(int pid) => this.AttachDebuggerToProcess(pid, CancellationToken.None);
+
+        public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken) => true;
 
         /// <inheritdoc />
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)

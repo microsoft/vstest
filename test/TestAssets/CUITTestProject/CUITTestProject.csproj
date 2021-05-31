@@ -4,6 +4,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   
@@ -17,17 +18,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework" >
+      <HintPath>..\..\..\packages\microsoft.visualstudio.cuit\$(TestPlatformExternalsVersion)\tools\net451\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+      <HintPath>..\..\..\packages\microsoft.visualstudio.qualitytools\$(TestPlatformExternalsVersion)\tools\net451\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common">
+      <HintPath>..\..\..\packages\microsoft.visualstudio.cuit\$(TestPlatformExternalsVersion)\tools\net451\Microsoft.VisualStudio.TestTools.UITest.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension">
+      <HintPath>..\..\..\packages\microsoft.visualstudio.cuit\$(TestPlatformExternalsVersion)\tools\net451\Microsoft.VisualStudio.TestTools.UITest.Extension.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TestTools.UITesting" >
+      <HintPath>..\..\..\packages\microsoft.visualstudio.cuit\$(TestPlatformExternalsVersion)\tools\net451\Microsoft.VisualStudio.TestTools.UITesting.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-    <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework" />
-    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common" />
-    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension" />
-    <Reference Include="Microsoft.VisualStudio.TestTools.UITesting" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.cuit">
+    <PackageReference Include="Microsoft.VisualStudio.Cuit">
       <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">

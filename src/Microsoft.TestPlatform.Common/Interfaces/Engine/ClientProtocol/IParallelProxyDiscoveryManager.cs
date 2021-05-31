@@ -21,8 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <returns>True if parallel discovery is complete</returns>
         bool HandlePartialDiscoveryComplete(
             IProxyDiscoveryManager proxyDiscoveryManager,
-            long totalTests, 
-            IEnumerable<TestCase> lastChunk, 
+            long totalTests,
+            IEnumerable<TestCase> lastChunk,
             bool isAborted);
     }
 }

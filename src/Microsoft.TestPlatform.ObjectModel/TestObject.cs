@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>property value</returns>
         public object GetPropertyValue(TestProperty property)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             object defaultValue = null;
             var valueType = property.GetValueType();
@@ -182,23 +182,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="property"></param>
         public void RemovePropertyValue(TestProperty property)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
-            object value;
-            if (this.store.TryGetValue(property, out value))
+            if (this.store.TryGetValue(property, out var value))
             {
                 this.store.Remove(property);
             }
         }
- 
+
         /// <summary>
-        /// Returns TestProperty's value 
+        /// Returns TestProperty's value
         /// </summary>
         /// <returns>property's value. default value is returned if the property is not present</returns>
         public T GetPropertyValue<T>(TestProperty property, T defaultValue, CultureInfo culture)
         {
-            ValidateArg.NotNull(property, "property");
-            ValidateArg.NotNull(culture, "culture");
+            ValidateArg.NotNull(property, nameof(property));
+            ValidateArg.NotNull(culture, nameof(culture));
 
             object objValue = this.ProtectedGetPropertyValue(property, defaultValue);
 
@@ -210,8 +209,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public void SetPropertyValue<T>(TestProperty property, T value, CultureInfo culture)
         {
-            ValidateArg.NotNull(property, "property");
-            ValidateArg.NotNull(culture, "culture");
+            ValidateArg.NotNull(property, nameof(property));
+            ValidateArg.NotNull(culture, nameof(culture));
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
@@ -223,8 +222,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public void SetPropertyValue<T>(TestProperty property, LazyPropertyValue<T> value, CultureInfo culture)
         {
-            ValidateArg.NotNull(property, "property");
-            ValidateArg.NotNull(culture, "culture");
+            ValidateArg.NotNull(property, nameof(property));
+            ValidateArg.NotNull(culture, nameof(culture));
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
@@ -241,10 +240,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         protected virtual object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
-            object value;
-            if (!this.store.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out var value))
             {
                 value = defaultValue;
             }
@@ -257,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         protected virtual void ProtectedSetPropertyValue(TestProperty property, object value)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
             {
@@ -275,14 +273,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>Converted object</returns>
         private static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
         {
-            ValidateArg.NotNull(property, "property");
-            ValidateArg.NotNull(culture, "culture");
+            ValidateArg.NotNull(property, nameof(property));
+            ValidateArg.NotNull(culture, nameof(culture));
 
             var valueType = property.GetValueType();
 
             // Do not try conversion if the object is already of the type we're trying to convert.
             // Note that typeof(T) may be object in case the value is getting deserialized via the StoreKvpList, however
-            // the deserializer could have converted it already, hence the runtime type check.
+            // the de-serializer could have converted it already, hence the runtime type check.
             if (valueType != null && (valueType.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || valueType.GetTypeInfo().IsAssignableFrom(value?.GetType().GetTypeInfo())))
             {
                 return value;
@@ -316,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch (Exception e)
             {
-                // some type converters throw strange exceptions (eg: System.Exception by Int32Converter)
+                // some type converters throw strange exceptions (e.g.: System.Exception by Int32Converter)
                 throw new FormatException(e.Message, e);
             }
         }
@@ -327,20 +325,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>Converted object</returns>
         private static T ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object value)
         {
-            ValidateArg.NotNull(property, "property");
-            ValidateArg.NotNull(culture, "culture");
+            ValidateArg.NotNull(property, nameof(property));
+            ValidateArg.NotNull(culture, nameof(culture));
 
-            var lazyValue = value as LazyPropertyValue<T>;
 
             if (value == null)
             {
-                return default(T);
+                return default;
             }
-            else if (value is T)
+            else if (value is T t)
             {
-                return (T)value;
+                return t;
             }
-            else if (lazyValue != null)
+            else if (value is LazyPropertyValue<T> lazyValue)
             {
                 return lazyValue.Value;
             }
@@ -364,7 +361,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch (Exception e)
             {
-                // some type converters throw strange exceptions (eg: System.Exception by Int32Converter)
+                // some type converters throw strange exceptions (e.g.: System.Exception by Int32Converter)
                 throw new FormatException(e.Message, e);
             }
         }

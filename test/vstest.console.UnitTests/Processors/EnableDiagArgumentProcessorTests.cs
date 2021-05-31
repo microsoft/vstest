@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.diagProcessor = new TestableEnableDiagArgumentProcessor(this.mockFileHelper.Object);
 
             // Saving the EqtTrace state
-#if NET451
+#if NETFRAMEWORK
             traceLevel = EqtTrace.TraceLevel;
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else
@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             // Restoring to initial state for EqtTrace
             EqtTrace.InitializeTrace(traceFileName, PlatformTraceLevel.Verbose);
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = traceLevel;
 #else
             EqtTrace.TraceLevel = (PlatformTraceLevel)traceLevel;
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsFalse(this.diagProcessor.Metadata.Value.IsAction);
             Assert.IsFalse(this.diagProcessor.Metadata.Value.IsSpecialCommand);
             Assert.AreEqual(EnableDiagArgumentProcessor.CommandName, this.diagProcessor.Metadata.Value.CommandName);
-            Assert.AreEqual(null, this.diagProcessor.Metadata.Value.ShortCommandName);
+            Assert.IsNull(this.diagProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.Diag, this.diagProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, this.diagProcessor.Metadata.Value.HelpPriority);
             Assert.AreEqual(CommandLineResources.EnableDiagUsage, this.diagProcessor.Metadata.Value.HelpContentResourceName);
@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void EnableDiagArgumentProcessorExecutorShouldInitializeTraceWithCorrectTraceLevel(string argument)
         {
             // Setting any trace level  other than info.
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -173,8 +173,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
-            Assert.IsTrue(!EqtTrace.IsVerboseEnabled);
-#if NET451
+            Assert.IsFalse(EqtTrace.IsVerboseEnabled);
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Off;

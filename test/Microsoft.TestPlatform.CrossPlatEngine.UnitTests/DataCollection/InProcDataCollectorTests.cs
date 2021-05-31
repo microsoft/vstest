@@ -6,6 +6,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.IO;
     using System.Reflection;
     using Coverlet.Collector.DataCollection;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -16,7 +17,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class InProcDataCollectorTests
@@ -44,7 +44,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 this.assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, null);
+            Assert.IsNull(this.inProcDataCollector.AssemblyQualifiedName);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 this.assemblyLoadContext.Object,
                 TestPluginCache.Instance);
 
-            Assert.AreEqual(this.inProcDataCollector.AssemblyQualifiedName, null);
+            Assert.IsNull(this.inProcDataCollector.AssemblyQualifiedName);
         }
 
         [TestMethod]

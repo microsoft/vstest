@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests
             var requestData = new RequestData();
             requestData.IsTelemetryOptedIn = true;
 
-            Assert.AreEqual(true, requestData.IsTelemetryOptedIn);
+            Assert.IsTrue(requestData.IsTelemetryOptedIn);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests
             var requestData = new RequestData();
             requestData.IsTelemetryOptedIn = false;
 
-            Assert.AreEqual(false, requestData.IsTelemetryOptedIn);
+            Assert.IsFalse(requestData.IsTelemetryOptedIn);
         }
     }
 }

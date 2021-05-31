@@ -25,8 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         // <inheritdoc />
         public void SendData(DataCollectionContext dataCollectionContext, string key, string value)
         {
-            ValidateArg.NotNullOrEmpty(key, "key");
-            ValidateArg.NotNullOrEmpty(value, "value");
+            ValidateArg.NotNullOrEmpty(key, nameof(key));
+            ValidateArg.NotNullOrEmpty(value, nameof(value));
             ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
 
             var testCaseId = dataCollectionContext.TestCase.Id;
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
-                        EqtTrace.Warning("The data for inprocdata collector with key {0} has already been set. Will be reset with new value", key);
+                        EqtTrace.Warning("The data for in-proc data collector with key {0} has already been set. Will be reset with new value", key);
                     }
                     this.CollectionData[key] = value;
                 }

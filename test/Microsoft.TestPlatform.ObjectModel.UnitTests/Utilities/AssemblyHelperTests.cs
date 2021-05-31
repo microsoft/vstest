@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NET451
+#if NETFRAMEWORK
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
-            Assert.AreEqual(null, appDomainSetup.TargetFrameworkName);
+            Assert.IsNull(appDomainSetup.TargetFrameworkName);
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             AssemblyHelper.SetNETFrameworkCompatiblityMode(appDomainSetup, runContext.Object);
 
-            Assert.AreEqual(null, appDomainSetup.TargetFrameworkName);
+            Assert.IsNull(appDomainSetup.TargetFrameworkName);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // Set Current Opt in Status
             Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, CurrentOptInStatus);
 
-            // Unset the environment varaible
+            // Unset the environment variable
             Environment.SetEnvironmentVariable(LOG_TELEMETRY, "0");
 
             if (Directory.Exists(this.resultPath))
@@ -83,7 +83,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
             this.ValidateOutput("Execution");
         }
-
 
         private void DiscoverTests(string runnerFramework)
         {
@@ -128,7 +127,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         isValid = isPresent;
                         break;
                     }
-
                     else if (line.Contains(TelemetryDataConstants.TestDiscoveryCompleteEvent) && command.Equals("Discovery", StringComparison.Ordinal))
                     {
                         var isPresent = line.Contains(TelemetryDataConstants.TotalTestsDiscovered + '=' + "3")
@@ -138,7 +136,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                         && line.Contains(TelemetryDataConstants.TimeTakenInSecByAllAdapters)
                                         && line.Contains(TelemetryDataConstants.TotalTestsByAdapter)
                                         && line.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter)
-                                        && line.Contains(TelemetryDataConstants.DiscoveryState + "=" + "Completed")
+                                        && line.Contains(TelemetryDataConstants.DiscoveryState + "=Completed")
                                         && line.Contains(TelemetryDataConstants.NumberOfSourcesSentForDiscovery + '=' + "1")
                                         && line.Contains(
                                             TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery)

@@ -2,7 +2,6 @@
 
 namespace Microsoft.TestPlatform.Build.Utils.UnitTests
 {
-    using Microsoft.TestPlatform.Build.Utils;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -88,7 +87,7 @@ namespace Microsoft.TestPlatform.Build.Utils.UnitTests
         [TestMethod]
         public void ShouldSurroundWithQuotesShouldReturnFalseIfAlreadySurroundWithQuotes()
         {
-            string stringSurroundWithQuotes = "\"" + "some string" + "\"";
+            string stringSurroundWithQuotes = "\"some string\"";
 
             Assert.IsFalse(ArgumentEscaper.ShouldSurroundWithQuotes(stringSurroundWithQuotes));
         }
@@ -112,7 +111,7 @@ namespace Microsoft.TestPlatform.Build.Utils.UnitTests
         [TestMethod]
         public void IsSurroundedWithQuotesShouldReturnTrueIfStringIsSurrondedByQuotes()
         {
-            string stringSurroundWithQuotes = "\"" + "some string" + "\"";
+            string stringSurroundWithQuotes = "\"some string\"";
 
             Assert.IsTrue(ArgumentEscaper.IsSurroundedWithQuotes(stringSurroundWithQuotes));
         }

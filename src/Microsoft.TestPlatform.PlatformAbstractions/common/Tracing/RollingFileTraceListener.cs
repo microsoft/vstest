@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
@@ -34,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentException(nameof(fileName));
+                throw new ArgumentException("fileName was null or whitespace", nameof(fileName));
             }
 
             if (rollSizeKB <= 0)
@@ -116,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         internal sealed class StreamWriterRollingHelper : IDisposable
         {
             /// <summary>
-            /// Synchronisation lock.
+            /// Synchronization lock.
             /// </summary>
             private object synclock = new object();
 
@@ -229,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             /// <summary>
-            /// Updates bookeeping information necessary for rolling, as required by the specified
+            /// Updates book keeping information necessary for rolling, as required by the specified
             /// rolling configuration.
             /// </summary>
             /// <returns>true if update was successful, false if an error occurred.</returns>
@@ -279,7 +281,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 catch (IOException)
                 {
                     // catch errors and attempt move to a new file with a GUID
-                    archiveFileName = archiveFileName + Guid.NewGuid().ToString();
+                    archiveFileName += Guid.NewGuid().ToString();
 
                     try
                     {
@@ -472,3 +474,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
     }
 }
+
+#endif

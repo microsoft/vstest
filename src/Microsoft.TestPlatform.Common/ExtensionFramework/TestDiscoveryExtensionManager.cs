@@ -33,8 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> discoverers,
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredDiscoverers)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>>>(discoverers, "discoverers");
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>>>(unfilteredDiscoverers, "unfilteredDiscoverers");
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>>>(discoverers, nameof(discoverers));
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>>>(unfilteredDiscoverers, nameof(unfilteredDiscoverers));
 
             this.Discoverers = discoverers;
             this.UnfilteredDiscoverers = unfilteredDiscoverers;
@@ -68,21 +68,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Instance of the Test Discovery Extension Manager
         /// </returns>
         /// <remarks>
-        /// This would provide a discovery extension manager where extensions in 
+        /// This would provide a discovery extension manager where extensions in
         /// all the extension assemblies are discovered. This is cached.
         /// </remarks>
         public static TestDiscoveryExtensionManager Create()
         {
             if (testDiscoveryExtensionManager == null)
             {
-                IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-                IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
                 TestPluginManager.Instance
                     .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                         TestPlatformConstants.TestAdapterEndsWithPattern,
-                        out unfilteredTestExtensions,
-                        out testExtensions);
+                        out var unfilteredTestExtensions,
+                        out var testExtensions);
 
                 testDiscoveryExtensionManager = new TestDiscoveryExtensionManager(
                     testExtensions,
@@ -103,14 +101,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </remarks>
         public static TestDiscoveryExtensionManager GetDiscoveryExtensionManager(string extensionAssembly)
         {
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance
                 .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     extensionAssembly,
-                    out unfilteredTestExtensions,
-                    out testExtensions);
+                    out var unfilteredTestExtensions,
+                    out var testExtensions);
 
             return new TestDiscoveryExtensionManager(
                 testExtensions,
@@ -139,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occured while loading extensions {0}", ex);
+                    EqtTrace.Error("TestDiscoveryManager: LoadExtensions: Exception occurred while loading extensions {0}", ex);
                 }
 
                 if (throwOnError)
@@ -170,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </summary>
         /// <param name="fileExtensions"> The file Extensions. </param>
         /// <param name="defaultExecutorUri"> The default Executor Uri. </param>
-        public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri, AssemblyType assemblyType = default(AssemblyType))
+        public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri, AssemblyType assemblyType = default)
         {
             if (fileExtensions != null && fileExtensions.Count > 0)
             {

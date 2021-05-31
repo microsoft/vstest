@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 {
     using System;
-    using System.Globalization;
     using System.IO;
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace SampleUnitTestProject3
     using System.IO;
     using System.Reflection;
     using System.Threading;
-#if NET451
+#if NETFRAMEWORK
     using System.Windows.Forms;
 #endif
 
@@ -32,10 +32,11 @@ namespace SampleUnitTestProject3
         [TestMethod]
         public void ExitWithStackoverFlow()
         {
-            ExitWithStackoverFlow();
+            // a fast way to cause stack overflow, takes one method call instead of 9k that you need when calling a method recursively
+            Span<byte> s = stackalloc byte[int.MaxValue];
         }
 
-#if NET451
+#if NETFRAMEWORK
         [TestMethod]
         public void UITestMethod()
         {

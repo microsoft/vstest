@@ -36,12 +36,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             StringAssert.Contains(capabilities.HelpContentResourceName, "/TestCaseFilter:<Expression>" + Environment.NewLine + "      Run tests that match the given expression." + Environment.NewLine + "      <Expression> is of the format <property>Operator<value>[|&<Expression>]");
 
             Assert.AreEqual(HelpContentPriority.TestCaseFilterArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion
@@ -63,16 +63,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             }
         }
 
-        
-
         [TestMethod]
-        public void ExecutorInitializeWithValidTestCaseFilterShouldAddTestCaseFilterToCommandLineOptions()
-        {
+        public void ExecutorInitializeWithNullOrEmptyTestCaseFilterShouldNotThrowWhenTestFilterWasSpecifiedByPreviousStep()
+        {            
             var options = CommandLineOptions.Instance;
+            options.TestCaseFilterValue = "Test=FilterFromPreviousStep";
             TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
 
-            executor.Initialize("Debug");
-            Assert.AreEqual("Debug", options.TestCaseFilterValue);
+            executor.Initialize(null);
+        }
+
+        [TestMethod]
+        public void ExecutorInitializeWithTestCaseFilterShouldMergeWithTheValueProvidedByPreviousStep()
+        {
+            var options = CommandLineOptions.Instance;
+            var defaultValue = "Test=FilterFromPreviousStep";
+            options.TestCaseFilterValue = defaultValue;
+            Assert.AreEqual(defaultValue, options.TestCaseFilterValue);
+            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
+
+            var value = "Test=NewFilter";
+            executor.Initialize(value);
+
+            var expectedValue = $"({defaultValue})&({value})";
+            Assert.AreEqual(expectedValue, options.TestCaseFilterValue);
         }
 
         [TestMethod]

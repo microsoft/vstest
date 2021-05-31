@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -103,24 +102,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="exceptionLogger">The exception Logger.</param>
         public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
         {
-            if (processJob == null)
-            {
-                throw new ArgumentNullException("processJob");
-            }
+            this.processJob = processJob ?? throw new ArgumentNullException(nameof(processJob));
 
             if (string.IsNullOrWhiteSpace(displayName))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, "displayName");
+                throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(displayName));
             }
 
             if (maxQueueLength < 1)
             {
-                throw new ArgumentOutOfRangeException("maxQueueLength");
+                throw new ArgumentOutOfRangeException(nameof(maxQueueLength));
             }
 
             if (maxQueueSize < 1)
             {
-                throw new ArgumentOutOfRangeException("maxQueueSize");
+                throw new ArgumentOutOfRangeException(nameof(maxQueueSize));
             }
 
             this.maxNumberOfJobsInQueue = maxQueueLength;
@@ -135,7 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             this.isDisposed = false;
 
             // Save off the arguments.
-            this.processJob = processJob;
             this.displayName = displayName;
             this.exceptionLogger = exceptionLogger;
 
@@ -327,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     // Reset the manual reset event so we get notified of new jobs that are added.
                     this.jobAdded.Reset();
 
-                    // Releases a thread waiting on the queue to get empty, to continue with the enquing process.
+                    // Releases a thread waiting on the queue to get empty, to continue with the enqueuing process.
                     if (this.enableBoundsOnQueue)
                     {
                         Monitor.PulseAll(this.jobsQueue);

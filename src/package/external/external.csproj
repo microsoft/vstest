@@ -4,7 +4,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <AssemblyName>restore</AssemblyName>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -26,7 +26,7 @@
   <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <!-- This csproj restore external tools required for build process -->
     <PackageReference Include="NuGet.CommandLine">
-      <Version>3.4.3</Version>
+      <Version>5.8.1</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="fmdev.xlftool">
@@ -45,14 +45,34 @@
       <Version>2.0.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-	<PackageReference Include="Pdb2Pdb">
-      <Version>1.1.0-beta1-62316-01</Version>
+	  <PackageReference Include="Microsoft.DiaSymReader.Pdb2Pdb">
+      <Version>1.1.0-beta2-21075-01</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>$(TestPlatformExternalsVersion)-patched3</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Coverage.IO">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>     
+    <PackageReference Include="Microsoft.Internal.CodeCoverage">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.CodeCoverage.InstrumentationMethod.alpine">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.CodeCoverage.InstrumentationMethod.ubuntu">
+      <Version>$(CodeCoverageExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>    
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
@@ -66,28 +86,55 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
-      <Version>16.0.0-preview-20181010-02</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">
-      <Version>14.0.0</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.Dia.Interop">
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3247</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Interop">
+      <Version>$(InteropExternalsVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
-      <Version>15.6.815-master284DF69C</Version>
+      <Version>16.3.58</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.RemoteControl">
+      <Version>16.3.23</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Utilities.Internal">
+      <Version>16.3.23</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness">
+      <Version>$(MicrosoftFakesVersion)</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions">
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.
-         We've to set to net46 since the net451 and other packages have assemblies in wrong case.
+         We've to set to net472 since the net451 and other packages have assemblies in wrong case.
          E.g. System.XML instead of System.Xml. -->
-    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.6">
-      <Version>1.0.1</Version>
+    <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.7.2">
+      <Version>1.0.0</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+
+    <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
+    <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

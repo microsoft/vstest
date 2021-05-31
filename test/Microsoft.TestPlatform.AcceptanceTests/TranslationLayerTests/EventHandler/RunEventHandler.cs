@@ -3,19 +3,25 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
+    using System;
     using System.Collections.Generic;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />
-    public class RunEventHandler : ITestRunEventsHandler
+    public class RunEventHandler : ITestRunEventsHandler2
     {
         /// <summary>
         /// Gets the test results.
         /// </summary>
         public List<TestResult> TestResults { get; private set; }
+
+        /// <summary>
+        /// Gets the attachments.
+        /// </summary>
+        public List<AttachmentSet> Attachments { get; private set; }
 
         /// <summary>
         /// Gets the metrics.
@@ -27,6 +33,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public string LogMessage { get; private set; }
 
+        public List<string> Errors { get; set; }
+
         /// <summary>
         /// Gets the test message level.
         /// </summary>
@@ -35,12 +43,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public RunEventHandler()
         {
             this.TestResults = new List<TestResult>();
+            this.Errors = new List<string>();
+            this.Attachments = new List<AttachmentSet>();
+        }
+
+        public void EnsureSuccess()
+        {
+            if (this.Errors.Any())
+            {
+                throw new InvalidOperationException($"Test run reported errors:{Environment.NewLine}{string.Join(Environment.NewLine + Environment.NewLine, this.Errors)}");
+            }
         }
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.LogMessage = message;
             this.TestMessageLevel = level;
+            if (level == TestMessageLevel.Error) {
+                this.Errors.Add(message);
+            }
         }
 
         public void HandleTestRunComplete(
@@ -52,6 +73,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
             {
                 this.TestResults.AddRange(lastChunkArgs.NewTestResults);
+            }
+
+            if (testRunCompleteArgs.AttachmentSets != null)
+            {
+                this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
             }
 
             this.Metrics = testRunCompleteArgs.Metrics;
@@ -74,6 +100,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             // No op
             return -1;
+        }
+
+        public bool AttachDebuggerToProcess(int pid)
+        {
+            // No op
+            return true;
         }
     }
 }

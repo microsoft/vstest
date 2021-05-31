@@ -163,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task SetupClientAsync(IPEndPoint endpoint)
         {
-            // ToDo: pass cancellationtoken, if user cancels the operation, so we don't wait 50 secs to connect
+            // TODO: pass cancellation token, if user cancels the operation, so we don't wait 50 secs to connect
             // for now added a check for validation of this.tcpclient
             this.clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopClient()
         {
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else
@@ -370,8 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 catch (IOException ioException)
                 {
-                    var socketException = ioException.InnerException as SocketException;
-                    if (socketException != null
+                    if (ioException.InnerException is SocketException socketException
                         && socketException.SocketErrorCode == SocketError.TimedOut)
                     {
                         EqtTrace.Info(

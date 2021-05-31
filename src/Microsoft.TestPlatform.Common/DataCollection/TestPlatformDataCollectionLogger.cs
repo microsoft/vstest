@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private readonly IMessageSink sink;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionLogger"/> class. 
+        /// Initializes a new instance of the <see cref="TestPlatformDataCollectionLogger"/> class.
         /// </summary>
         /// <param name="sink">
         /// The underlying raw IMessageSink.  Cannot be null.
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         internal TestPlatformDataCollectionLogger(IMessageSink sink, DataCollectorConfig dataCollectorConfig)
         {
             ValidateArg.NotNull(dataCollectorConfig, "dataCollectorInformation");
-            ValidateArg.NotNull(sink, "sink");
+            ValidateArg.NotNull(sink, nameof(sink));
             this.dataCollectorConfig = dataCollectorConfig;
             this.sink = sink;
         }
@@ -47,8 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public override void LogError(DataCollectionContext context, string text)
         {
-            ValidateArg.NotNull(context, "context");
-            ValidateArg.NotNull(text, "text");
+            ValidateArg.NotNull(context, nameof(context));
+            ValidateArg.NotNull(text, nameof(text));
 
             if (EqtTrace.IsErrorEnabled)
             {
@@ -64,9 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public override void LogError(DataCollectionContext context, string text, Exception exception)
         {
-            ValidateArg.NotNull(context, "context");
-            ValidateArg.NotNull(text, "text");
-            ValidateArg.NotNull(exception, "exception");
+            ValidateArg.NotNull(context, nameof(context));
+            ValidateArg.NotNull(text, nameof(text));
+            ValidateArg.NotNull(exception, nameof(exception));
 
             // Make sure the data collection context is not a derived data collection context.  This
             // is done to safeguard from 3rd parties creating their own data collection contexts.
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     exception.StackTrace);
             }
 
-            // Currently there is one type of DataCollectionMessage sent accross client for all message kind.
+            // Currently there is one type of DataCollectionMessage sent across client for all message kind.
             // If required new type can be created for different message type.
             var message = string.Format(
                 CultureInfo.CurrentCulture,
@@ -103,8 +103,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public override void LogWarning(DataCollectionContext context, string text)
         {
-            ValidateArg.NotNull(context, "context");
-            ValidateArg.NotNull(text, "text");
+            ValidateArg.NotNull(context, nameof(context));
+            ValidateArg.NotNull(text, nameof(text));
             EqtTrace.Warning(
                     "Data collector '{0}' logged the following warning: {1}",
                     this.dataCollectorConfig.TypeUri,
@@ -129,8 +129,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </exception>
         private void SendTextMessage(DataCollectionContext context, string text, TestMessageLevel level)
         {
-            ValidateArg.NotNull(context, "context");
-            ValidateArg.NotNull(text, "text");
+            ValidateArg.NotNull(context, nameof(context));
+            ValidateArg.NotNull(text, nameof(text));
 
             Debug.Assert(
                 level >= TestMessageLevel.Informational && level <= TestMessageLevel.Error,

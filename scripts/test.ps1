@@ -59,15 +59,35 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
+
+Write-Verbose "Setup dotnet configuration."
 # Add latest dotnet.exe directory to environment variable PATH to tests run on latest dotnet.
 $env:PATH = "$(Split-Path $(Get-DotNetPath));$env:PATH"
 
-#
-# Dotnet configuration
-#
+# set the roots to use only the versions of dotnet that we installed
+$env:DOTNET_ROOT = Join-Path $env:TP_TOOLS_DIR "dotnet"
+# set the root for x86 runtimes as well
+${env:DOTNET_ROOT(x86)} = "${env:DOTNET_ROOT}_x86"
+# disable looking up other dotnets in programfiles
+$env:DOTNET_MULTILEVEL_LOOKUP = 0
+
 # Disable first run since we want to control all package sources 
-Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
+
+# list what we have set and what is available
+"---- dotnet environment variables"
+Get-ChildItem "Env:\dotnet_*"
+
+"`n`n---- x64 dotnet"
+& "$env:DOTNET_ROOT\dotnet.exe" --info
+
+"`n`n---- x86 dotnet"
+# avoid erroring out because we don't have the sdk for x86 that global.json requires
+try {
+    & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
+} catch {}
+
+
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 
@@ -91,7 +111,7 @@ $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
 $Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
 $Script:TPT_RunSettingsFile = Join-Path (Get-Item (Split-Path $MyInvocation.MyCommand.Path)) "vstest-codecoverage.runsettings"
-$Script:TPT_NSTraceDataCollectorPath = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$Script:TPT_Configuration\netstandard2.0"
+$Script:TPT_NSTraceDataCollectorPath = Join-Path $env:TP_OUT_DIR "$Script:TPT_Configuration\Microsoft.CodeCoverage"
 
 #
 # Capture error state in any step globally to modify return code
@@ -187,6 +207,7 @@ function Invoke-Test
             }
             else
             {
+                Write-Log ".. . $testContainerName test container found. ($testOutputPath)"
                 $testContainers += ,"$testContainerPath"
             }
         }

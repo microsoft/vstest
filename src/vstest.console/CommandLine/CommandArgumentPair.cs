@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Diagnostics.Contracts;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    
+
     /// <summary>
     /// Breaks a string down into command and argument based on the following format:
     ///     /command:argument.
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         internal const string Separator = ":";
 
         #endregion
-        
+
         #region Properties
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(input))
             {
-                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "input");
+                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(input));
             }
             Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
 
@@ -63,9 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(command))
             {
-                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "command");
+                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, nameof(command));
             }
-            
+
             Contract.Ensures(Command == command);
             Contract.Ensures(Argument == argument);
 
@@ -87,12 +87,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
             Contract.Ensures(Argument != null);
 
-            // Find the index of the seperator (":")
+            // Find the index of the separator (":")
             int index = input.IndexOf(CommandArgumentPair.Separator, StringComparison.OrdinalIgnoreCase);
 
             if (index == -1)
             {
-                // No seperator was found, so use the input as the command.
+                // No separator was found, so use the input as the command.
                 this.Command = input;
                 this.Argument = String.Empty;
             }

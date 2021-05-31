@@ -4,9 +4,7 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
-    using System.IO;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     public class BlameTestObject
     {
@@ -40,9 +38,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </param>
         public BlameTestObject(string fullyQualifiedName, Uri executorUri, string source)
         {
-            ValidateArg.NotNullOrEmpty(fullyQualifiedName, "fullyQualifiedName");
-            ValidateArg.NotNull(executorUri, "executorUri");
-            ValidateArg.NotNullOrEmpty(source, "source");
+            ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
+            ValidateArg.NotNull(executorUri, nameof(executorUri));
+            ValidateArg.NotNullOrEmpty(source, nameof(source));
 
             this.Id = Guid.Empty;
             this.FullyQualifiedName = fullyQualifiedName;

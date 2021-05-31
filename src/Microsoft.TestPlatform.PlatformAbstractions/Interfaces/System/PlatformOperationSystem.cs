@@ -3,14 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System;
-
     /// <summary>
     /// Available operating systems.
     /// </summary>
     public enum PlatformOperatingSystem
     {
         Windows,
-        Unix
+        Unix,
+        OSX
     }
 }

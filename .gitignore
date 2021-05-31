@@ -31,6 +31,8 @@ msbuild*.err
 build*.log
 build*.wrn
 build*.err
+*.binlog
+*.svclog
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -131,3 +133,8 @@ src/package/sign/sign.nuget.targets
 # Vscode files
 # ===========================
 .vscode/
+
+# ===========================
+# diag log files
+# ===========================
+logs/

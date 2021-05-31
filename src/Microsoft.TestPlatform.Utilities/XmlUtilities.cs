@@ -5,7 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+#if NETFRAMEWORK
     using System.Security;
+#endif
     using System.Xml;
     using System.Xml.XPath;
 
@@ -58,9 +60,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             var childNode = xmlDocument.SelectSingleNode(nodeXPath);
 
-            // Todo: There isn't an equivalent API to SecurityElement.Escape in Core yet. 
+            // TODO: There isn't an equivalent API to SecurityElement.Escape in Core yet.
             // So trusting that the XML is always valid for now.
-#if NET451
+#if NETFRAMEWORK
             var secureInnerXml = SecurityElement.Escape(innerXml);
 #else
             // fixing manually as we currently target to netcore 1.1 and we don't have default implementation for Escape functionality

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if NETFRAMEWORK || NETCOREAPP ||  NETSTANDARD2_0
+
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
@@ -8,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
@@ -208,10 +211,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         public void WaitForProcessExit(object process)
         {
             var proc = process as Process;
-            if (proc != null || !proc.HasExited)
+            if (proc != null && !proc.HasExited)
             {
                 proc.WaitForExit();
             }
         }
     }
 }
+
+#endif

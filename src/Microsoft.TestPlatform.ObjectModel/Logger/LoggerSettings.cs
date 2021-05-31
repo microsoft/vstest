@@ -57,6 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set;
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Gets or sets the configuration.
         /// </summary>
@@ -116,6 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             attribute.Value = attributeValue;
             owner.Attributes.Append(attribute);
         }
+#endif
 
         internal static LoggerSettings FromXml(XmlReader reader)
         {
@@ -142,10 +144,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             {
                                 settings.Uri = new Uri(reader.Value);
                             }
+#if NETSTANDARD1_0
+                            catch
+#else
                             catch (UriFormatException)
+#endif
                             {
                                 throw new SettingsException(
-                                    String.Format(
+                                    string.Format(
                                         CultureInfo.CurrentCulture,
                                         Resources.Resources.InvalidUriInSettings,
                                         reader.Value,
@@ -177,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
             }
 
-            // Check for required atttributes.
+            // Check for required attributes.
             if (string.IsNullOrWhiteSpace(settings.FriendlyName) &&
                 string.IsNullOrWhiteSpace(settings.Uri?.ToString()) &&
                 string.IsNullOrWhiteSpace(settings.AssemblyQualifiedName))
@@ -204,12 +210,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 switch (reader.Name.ToLowerInvariant())
                 {
-                    case Constants.LoggerConfigurationNameLower:
+#if !NETSTANDARD1_0
+                    case Constants.LoggerConfigurationNameLower:                        
                         var document = new XmlDocument();
                         var element = document.CreateElement(reader.Name);
                         element.InnerXml = reader.ReadInnerXml();
                         settings.Configuration = element;
                         break;
+#endif
                     default:
                         throw new SettingsException(
                             string.Format(

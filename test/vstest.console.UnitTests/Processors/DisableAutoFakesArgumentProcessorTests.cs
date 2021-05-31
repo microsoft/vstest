@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsFalse(this.disableAutoFakesArgumentProcessor.Metadata.Value.IsAction);
             Assert.IsFalse(this.disableAutoFakesArgumentProcessor.Metadata.Value.IsSpecialCommand);
             Assert.AreEqual(DisableAutoFakesArgumentProcessor.CommandName, this.disableAutoFakesArgumentProcessor.Metadata.Value.CommandName);
-            Assert.AreEqual(null, this.disableAutoFakesArgumentProcessor.Metadata.Value.ShortCommandName);
+            Assert.IsNull(this.disableAutoFakesArgumentProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, this.disableAutoFakesArgumentProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.DisableAutoFakesArgumentProcessorHelpPriority, this.disableAutoFakesArgumentProcessor.Metadata.Value.HelpPriority);
         }
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void DisableAutoFakesArgumentProcessorExecutorShouldSetCommandLineDisableAutoFakeValueAsPerArgumentProvided()
         {
             this.disableAutoFakesArgumentProcessor.Executor.Value.Initialize("true");
-            Assert.AreEqual(CommandLineOptions.Instance.DisableAutoFakes, true);
+            Assert.IsTrue(CommandLineOptions.Instance.DisableAutoFakes);
         }
     }
 }

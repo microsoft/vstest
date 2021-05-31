@@ -25,7 +25,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         /// <param name="message">Message for the exception.</param>
         public TestSourceException(string message)
-            : base(message)
+            : this(message, innerException: null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes with the message and innerException.
+        /// </summary>
+        /// <param name="message">Message for the exception.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
+        public TestSourceException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
 

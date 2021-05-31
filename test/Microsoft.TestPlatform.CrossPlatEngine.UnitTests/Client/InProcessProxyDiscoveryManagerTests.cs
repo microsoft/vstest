@@ -4,6 +4,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -64,9 +65,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), null)).Callback(
                 () => manualResetEvent.Set());
 
-            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\DiscoveryDummy.dll" });
+            var path = Path.Combine(Path.GetTempPath(), "DiscoveryDummy.dll");
+            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { path });
             var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
-            expectedResult.Add("C:\\DiscoveryDummy.dll");
+            expectedResult.Add(path);
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
 
             this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
@@ -159,7 +161,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.DiscoverTests should get called");
 
-            // AdapterSourceMap should contail updated testSources.
+            // AdapterSourceMap should contain updated testSources.
             Assert.AreEqual(actualSources.FirstOrDefault(), discoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
             Assert.AreEqual(inputSource.FirstOrDefault(), discoveryCriteria.Package);
         }

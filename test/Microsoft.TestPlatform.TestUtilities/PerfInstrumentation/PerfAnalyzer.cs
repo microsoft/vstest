@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
 {
     using System.Collections.Generic;
 
-#if NET451
+#if NETFRAMEWORK
     using Microsoft.Diagnostics.Tracing;
     using Microsoft.Diagnostics.Tracing.Parsers;
     using Microsoft.Diagnostics.Tracing.Session;
@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
 #endif
 
     /// <summary>
-    /// The perf analyzer.
+    /// The performance analyzer.
     /// </summary>
     public class PerfAnalyzer
     {
@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         private const string ETWSessionProviderName = "TestPlatform";
 
-#if NET451
+#if NETFRAMEWORK
         private string perfDataFileName;
         private TraceEventSession traceEventSession;
         private Dictionary<string, List<TestPlatformTask>> testPlatformTaskMap;
@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public PerfAnalyzer()
         {
-#if NET451
+#if NETFRAMEWORK
             this.perfDataFileName = "TestPlatformEventsData.etl";
             this.testPlatformTaskMap = new Dictionary<string, List<TestPlatformTask>>();
             this.traceEventSession = new TraceEventSession("TestPlatformSession", this.perfDataFileName);
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void EnableProvider()
         {
-#if NET451
+#if NETFRAMEWORK
             this.traceEventSession.StopOnDispose = true;
             this.traceEventSession.EnableProvider(ETWSessionProviderName);
 #endif
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void DisableProvider()
         {
-#if NET451
+#if NETFRAMEWORK
             this.traceEventSession.Dispose();
 #endif
         }
@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void AnalyzeEventsData()
         {
-#if NET451
+#if NETFRAMEWORK
             using (var source = new ETWTraceEventSource(this.perfDataFileName))
             {
                 // Open the file
@@ -121,7 +121,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public double GetElapsedTimeByTaskName(string taskName)
         {
             var timeTaken = 0.0;
-#if NET451
+#if NETFRAMEWORK
             var key = GetEventKey(taskName);
 
             if (key != null)
@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public IDictionary<string, string> GetEventDataByTaskName(string taskName)
         {
             IDictionary<string, string> properties = new Dictionary<string, string>();
-#if NET451
+#if NETFRAMEWORK
             var key = GetEventKey(taskName);
 
             if(key != null)
@@ -159,12 +159,12 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public double GetAdapterExecutionTime(string executorUri)
         {
             var timeTaken = 0.0;
-#if NET451
+#if NETFRAMEWORK
             var key = GetEventKey(Constants.AdapterExecutionTask);
 
             if(key != null)
             {
-                var task = testPlatformTaskMap[key].FirstOrDefault(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
+                var task = testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
                 timeTaken = task.EventStopped - task.EventStarted;
             }
 #endif
@@ -174,19 +174,19 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public long GetAdapterExecutedTests(string executorUri)
         {
             long totalTestsExecuted = 0;
-#if NET451
+#if NETFRAMEWORK
             var key = GetEventKey(Constants.AdapterExecutionTask);
 
             if (key != null)
             {
-                var task = testPlatformTaskMap[key].FirstOrDefault(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
-                long.TryParse(task.PayLoadProperties["numberOfTests"].ToString(), out totalTestsExecuted);
+                var task = testPlatformTaskMap[key].Find(t => t.PayLoadProperties["executorUri"].Equals(executorUri));
+                long.TryParse(task.PayLoadProperties["numberOfTests"], out totalTestsExecuted);
             }
 #endif
             return totalTestsExecuted;
         }
 
-#if NET451
+#if NETFRAMEWORK
 
         private string GetEventKey(string taskName)
         {

@@ -134,15 +134,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 throw new CommandLineException(CommandLineResources.FrameworkVersionRequired);
             }
-            
-            var validFramework = Framework.FromString(argument);
-            if (validFramework == null)
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
-            }
 
-            this.commandLineOptions.TargetFrameworkVersion = validFramework;
+            var validFramework = Framework.FromString(argument);
+            this.commandLineOptions.TargetFrameworkVersion = validFramework ?? throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
 
             if (this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
                 && !string.IsNullOrWhiteSpace(this.commandLineOptions.SettingsFile)

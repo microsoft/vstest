@@ -118,7 +118,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// <summary>
         /// Gets the batch size.
         /// </summary>
-        public long batchSize { get; private set; }
+        public long BatchSize { get; private set; }
 
         /// <summary>
         /// Gets the discovered test cases.
@@ -158,10 +158,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
-            if (discoveredTestCases != null & discoveredTestCases.Count() != 0)
+            if (discoveredTestCases != null && discoveredTestCases.Any())
             {
                 this.DiscoveredTestCases.AddRange(discoveredTestCases);
-                this.batchSize = discoveredTestCases.Count();
+                this.BatchSize = discoveredTestCases.Count();
             }
         }
     }

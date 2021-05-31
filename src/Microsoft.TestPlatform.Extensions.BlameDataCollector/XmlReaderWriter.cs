@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             ValidateArg.NotNull(testObjectDictionary, nameof(testObjectDictionary));
             ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
 
-            filePath = filePath + ".xml";
+            filePath += ".xml";
 
             // Writing test sequence
             var xmlDocument = new XmlDocument();
@@ -127,13 +127,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 foreach (XmlNode node in root)
                 {
                     var testCase = new BlameTestObject
-                                       {
-                                           FullyQualifiedName =
+                    {
+                        FullyQualifiedName =
                                                node.Attributes[Constants.TestNameAttribute].Value,
-                                           Source = node.Attributes[Constants.TestSourceAttribute].Value,
-                                           DisplayName = node.Attributes[Constants.TestDisplayNameAttribute].Value,
-                                           IsCompleted = node.Attributes[Constants.TestCompletedAttribute].Value == "True" ? true : false
-                                       };
+                        Source = node.Attributes[Constants.TestSourceAttribute].Value,
+                        DisplayName = node.Attributes[Constants.TestDisplayNameAttribute].Value,
+                        IsCompleted = node.Attributes[Constants.TestCompletedAttribute].Value == "True" ? true : false
+                    };
                     testCaseList.Add(testCase);
                 }
             }

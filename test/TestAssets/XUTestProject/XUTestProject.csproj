@@ -16,7 +16,7 @@
       <Version>$(XUnitAdapterVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>$(NETTestSdkPreviousVersion)</Version>
+      <Version>$(NETTestSdkVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

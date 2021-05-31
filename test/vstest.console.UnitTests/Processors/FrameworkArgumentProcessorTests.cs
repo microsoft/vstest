@@ -53,12 +53,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             StringAssert.Contains(capabilities.HelpContentResourceName, "Valid values are \".NETFramework,Version=v4.5.1\", \".NETCoreApp,Version=v1.0\"");
 
             Assert.AreEqual(HelpContentPriority.FrameworkArgumentProcessorHelpPriority, capabilities.HelpPriority);
-            Assert.AreEqual(false, capabilities.IsAction);
+            Assert.IsFalse(capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
-            Assert.AreEqual(false, capabilities.AlwaysExecute);
-            Assert.AreEqual(false, capabilities.IsSpecialCommand);
+            Assert.IsFalse(capabilities.AllowMultiple);
+            Assert.IsFalse(capabilities.AlwaysExecute);
+            Assert.IsFalse(capabilities.IsSpecialCommand);
         }
 
         #endregion
@@ -118,11 +118,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldNotSetFrameworkIfSettingsFileIsLegacy()
         {
-            this.runSettingsProvider.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath, FrameworkVersion.Framework45.ToString());
+            this.runSettingsProvider.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath, nameof(FrameworkVersion.Framework45));
             CommandLineOptions.Instance.SettingsFile = @"c:\tmp\settings.testsettings";
             this.executor.Initialize(".NETFramework,Version=v3.5");
             Assert.AreEqual(".NETFramework,Version=v3.5", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
-            Assert.AreEqual(FrameworkVersion.Framework45.ToString(), this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(nameof(FrameworkVersion.Framework45), this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         #endregion

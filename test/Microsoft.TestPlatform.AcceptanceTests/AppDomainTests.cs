@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-    using System.Linq;
 #if !NET451
     using System.Runtime.Loader;
 #else
@@ -15,14 +14,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class AppDomainTests : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
+            var testResults = GetResultsDirectory();
             var testAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
             var dataCollectorAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
 
@@ -35,13 +37,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
                 this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue,
+                testResults);
 
             this.InvokeVsTest(arguments);
 
             Assert.IsTrue(IsFilesContentEqual(testAppDomainDetailFileName, dataCollectorAppDomainDetailFileName), "Different AppDomains, test: {0} datacollector: {1}", File.ReadAllText(testAppDomainDetailFileName), File.ReadAllText(dataCollectorAppDomainDetailFileName));
             this.ValidateSummaryStatus(1, 1, 1);
             File.Delete(runsettingsFilePath);
+            TryRemoveDirectory(testResults);
         }
 
         private static bool IsFilesContentEqual(string filePath1, string filePath2)

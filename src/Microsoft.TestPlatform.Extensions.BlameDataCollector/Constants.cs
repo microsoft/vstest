@@ -54,14 +54,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string DumpModeKey = "CollectDump";
 
         /// <summary>
-        /// Procdump 32 bit version
+        /// Configuration key name for hang dump mode
+        /// </summary>
+        public const string HangDumpModeKey = "CollectHangDump";
+
+        /// <summary>
+        /// Proc dump 32 bit version
         /// </summary>
         public const string ProcdumpProcess = "procdump.exe";
 
         /// <summary>
-        /// Procdump 64 bit version
+        /// Proc dump 64 bit version
         /// </summary>
         public const string Procdump64Process = "procdump64.exe";
+
+        /// <summary>
+        /// Proc dump 64 bit version
+        /// </summary>
+        public const string ProcdumpUnixProcess = "procdump";
 
         /// <summary>
         /// Configuration key name for collect dump always
@@ -86,6 +96,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string DumpTypeKey = "DumpType";
 
         /// <summary>
+        /// Configuration key name for hang dump type
+        /// </summary>
+        public const string HangDumpTypeKey = "HangDumpType";
+
+        /// <summary>
         /// Configuration value for true
         /// </summary>
         public const string TrueConfigurationValue = "True";
@@ -104,5 +119,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Configuration value for mini
         /// </summary>
         public const string MiniConfigurationValue = "Mini";
+
+        /// <summary>
+        /// The target framework of test host.
+        /// </summary>
+        public const string TargetFramework = "Framework";
     }
 }

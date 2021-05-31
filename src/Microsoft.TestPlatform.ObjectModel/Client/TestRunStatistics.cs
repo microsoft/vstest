@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
     /// <summary>
     /// Defines the test run stats header
     /// </summary>
@@ -65,8 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         {
             get
             {
-                long count;
-                if (this.Stats.TryGetValue(testOutcome, out count))
+                if (this.Stats.TryGetValue(testOutcome, out var count))
                 {
                     return count;
                 }
