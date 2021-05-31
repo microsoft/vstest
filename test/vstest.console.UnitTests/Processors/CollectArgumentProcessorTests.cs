@@ -532,29 +532,6 @@ namespace vstest.console.UnitTests.Processors
             CollectArgumentExecutor executor = new CollectArgumentExecutor(settingsProvider, fileHelper.Object);
             executor.Initialize("XPlat Code Coverage");
             
-
-/*
-<?xml version="1.0" encoding="utf-16"?>
-<RunSettings>
-  <RunConfiguration>
-    <TestAdaptersPaths>c:\AdapterFolderPath</TestAdaptersPaths>
-  </RunConfiguration>
-  <DataCollectionRunSettings>
-    <DataCollectors>
-      <DataCollector friendlyName="MyDataCollector" enabled="True" />
-      <DataCollector friendlyName="MyDataCollector1" enabled="True" />
-      <DataCollector friendlyName="MyDataCollector2" enabled="True" />
-      <DataCollector friendlyName="XPlat Code Coverage" enabled="True" />
-    </DataCollectors>
-  </DataCollectionRunSettings>
-  <InProcDataCollectionRunSettings>
-    <InProcDataCollectors>
-      <InProcDataCollector assemblyQualifiedName="Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" friendlyName="XPlat Code Coverage" enabled="True" codebase="c:\AdapterFolderPath/coverlet.collector.dll" />
-    </InProcDataCollectors>
-  </InProcDataCollectionRunSettings>
-</RunSettings>
-*/
-            
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version="1.0" encoding="utf-16"?>",
                 "<RunSettings>",
@@ -598,15 +575,15 @@ namespace vstest.console.UnitTests.Processors
                 "  </RunConfiguration>",
                 "  <DataCollectionRunSettings>",
                 "    <DataCollectors>",
-                "      <DataCollector friendlyName="MyDataCollector" enabled="True" />",
-                "      <DataCollector friendlyName="MyDataCollector1" enabled="True" />",
-                "      <DataCollector friendlyName="MyDataCollector2" enabled="True" />",
-                "      <DataCollector friendlyName="XPlat Code Coverage" enabled="True" />",
+                "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />",
+                "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />",
+                "      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />",
+                "      <DataCollector friendlyName=\"XPlat Code Coverage\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
                 "  <InProcDataCollectionRunSettings>",
                 "    <InProcDataCollectors>",
-               $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled="True" codebase="coverlet.collector.dll" />",
+               $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"coverlet.collector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
                 "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
