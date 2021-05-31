@@ -548,7 +548,7 @@ namespace vstest.console.UnitTests.Processors
                 "  </DataCollectionRunSettings>",
                 "  <InProcDataCollectionRunSettings>",
                 "    <InProcDataCollectors>",
-               $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"c:\\AdapterFolderPath/coverlet.collector.dll\" />",
+               $"      <InProcDataCollector assemblyQualifiedName=\"{CoverletConstants.CoverletDataCollectorAssemblyQualifiedName}\" friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" codebase=\"c:\\AdapterFolderPath\\coverlet.collector.dll\" />",
                 "    </InProcDataCollectors>",
                 "  </InProcDataCollectionRunSettings>",
                 "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
