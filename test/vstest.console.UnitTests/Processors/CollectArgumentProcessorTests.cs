@@ -578,7 +578,7 @@ namespace vstest.console.UnitTests.Processors
                 "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />",
                 "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />",
                 "      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />",
-                "      <DataCollector friendlyName=\"XPlat Code Coverage\" enabled=\"True\" />",
+               $"      <DataCollector friendlyName=\"{CoverletConstants.CoverletDataCollectorFriendlyName}\" enabled=\"True\" />",
                 "    </DataCollectors>",
                 "  </DataCollectionRunSettings>",
                 "  <InProcDataCollectionRunSettings>",
