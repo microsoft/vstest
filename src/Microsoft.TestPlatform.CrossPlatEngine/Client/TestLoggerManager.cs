@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using CommonResources = Common.Resources.Resources;
 
     /// <summary>
     /// Responsible for managing logger extensions and broadcasting results
@@ -51,6 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Target framework.
         /// </summary>
         private string targetFramework;
+
+        /// <summary>
+        /// TreatNoTestsAsError value;
+        /// </summary>
+        private bool treatNoTestsAsError;
 
         /// <summary>
         /// Test Logger Events instance which will be passed to loggers when they are initialized.
@@ -145,6 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
             this.testRunDirectory = GetResultsDirectory(runSettings);
             this.targetFramework = GetTargetFramework(runSettings)?.Name;
+            this.treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
 
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -366,7 +372,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Case insensitive needs to be supported "), SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Third party loggers could potentially throw all kinds of exceptions.")]
         internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
         {
-            ValidateArg.NotNull<Uri>(uri, "uri");
+            ValidateArg.NotNull<Uri>(uri, nameof(uri));
             this.CheckDisposed();
 
             // Look up the extension and initialize it if one is found.
@@ -408,7 +414,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var extensionManager = this.TestLoggerExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
-                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
@@ -485,6 +491,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             return targetFramework;
+        }
+
+        /// <summary>
+        /// Get TreatNoTestsAsError value of the test run
+        /// </summary>
+        /// <param name="runSettings"></param>
+        /// <returns></returns>
+        internal bool GetTreatNoTestsAsError(string runSettings)
+        {
+            return RunSettingsUtilities.GetTreatNoTestsAsError(runSettings);
         }
 
         /// <summary>
@@ -648,6 +664,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Add default logger parameters...
             loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = testRunDirectory;
             loggerParams[DefaultLoggerParameterNames.TargetFramework] = targetFramework;
+
+            // Add custom logger parameters
+            if (treatNoTestsAsError)
+            {
+                loggerParams[Constants.TreatNoTestsAsError] = treatNoTestsAsError.ToString();
+            }
+
             return loggerParams;
         }
 
@@ -657,21 +680,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 throw new ObjectDisposedException(typeof(TestLoggerManager).FullName);
             }
-        }
-
-        /// <summary>
-        /// Check and raise warning if disposed.
-        /// </summary>
-        /// <param name="warning">Warning message.</param>
-        /// <returns>TestLoggerManager disposed flag.</returns>
-        private bool CheckAndRaiseWarningIfDisposed(string warning)
-        {
-            if (this.isDisposed)
-            {
-                EqtTrace.Warning("{0}: Ignoring as the object is disposed.", warning);
-            }
-
-            return this.isDisposed;
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Collections.Generic;
     using System.Globalization;
     using System.Net;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     internal class DefaultEngineInvoker :
-#if NET451
+#if NETFRAMEWORK
         MarshalByRefObject,
 #endif
         IEngineInvoker
@@ -56,7 +57,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private IProcessHelper processHelper;
 
-
         public DefaultEngineInvoker() : this(new TestRequestHandler(), DataCollectionTestCaseEventSender.Create(), new ProcessHelper())
         {
         }
@@ -73,11 +73,20 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             DefaultEngineInvoker.InitializeEqtTrace(argsDictionary);
 
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                var version = typeof(DefaultEngineInvoker)
+                    .GetTypeInfo()
+                    .Assembly
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                EqtTrace.Verbose($"Version: { version }");
+            }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("DefaultEngineInvoker.Invoke: Testhost process started with args :{0}",
                     string.Join(",", argsDictionary));
-#if NET451
+#if NETFRAMEWORK
                 var appConfigText =
  System.IO.File.ReadAllText(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
                 EqtTrace.Info("DefaultEngineInvoker: Using Application Configuration: '{0}'", appConfigText);
@@ -142,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 MetricsCollection =
                     telemetryOptedIn
-                        ? (IMetricsCollection) new MetricsCollection()
+                        ? (IMetricsCollection)new MetricsCollection()
                         : new NoOpMetricsCollection(),
                 IsTelemetryOptedIn = telemetryOptedIn
             };
@@ -246,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static void InitializeEqtTrace(IDictionary<string, string> argsDictionary)
         {
             // Setup logging if enabled
-            if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out var logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
 

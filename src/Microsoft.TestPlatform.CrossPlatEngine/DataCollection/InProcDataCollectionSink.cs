@@ -25,8 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         // <inheritdoc />
         public void SendData(DataCollectionContext dataCollectionContext, string key, string value)
         {
-            ValidateArg.NotNullOrEmpty(key, "key");
-            ValidateArg.NotNullOrEmpty(value, "value");
+            ValidateArg.NotNullOrEmpty(key, nameof(key));
+            ValidateArg.NotNullOrEmpty(value, nameof(value));
             ValidateArg.NotNullOrEmpty(dataCollectionContext.TestCase.Id.ToString(), "dataCollectionContext.TestCase.Id");
 
             var testCaseId = dataCollectionContext.TestCase.Id;

@@ -124,6 +124,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
         /// <summary>
+        /// Test run attachments processing
+        /// </summary>
+        public const string TestRunAttachmentsProcessingStart = "TestRunAttachmentsProcessing.Start";
+
+        /// <summary>
+        /// Test run attachments processing callback
+        /// </summary>
+        public const string TestRunAttachmentsProcessingComplete = "TestRunAttachmentsProcessing.Complete";
+
+        /// <summary>
+        /// Test run attachments processing progress
+        /// </summary>
+        public const string TestRunAttachmentsProcessingProgress = "TestRunAttachmentsProcessing.Progress";
+
+        /// <summary>
+        /// Cancel test run attachments processing
+        /// </summary>
+        public const string TestRunAttachmentsProcessingCancel = "TestRunAttachmentsProcessing.Cancel";
+
+        /// <summary>
         /// Extensions Initialization
         /// </summary>
         public const string ExtensionsInitialize = "Extensions.Initialize";
@@ -172,6 +192,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Data Collection Message
         /// </summary>
         public const string DataCollectionMessage = "DataCollection.SendMessage";
+
+        /// <summary>
+        /// StartTestSession message.
+        /// </summary>
+        public const string StartTestSession = "TestSession.StartTestSession";
+
+        /// <summary>
+        /// StartTestSession callback message.
+        /// </summary>
+        public const string StartTestSessionCallback = "TestSession.StartTestSessionCallback";
+
+        /// <summary>
+        /// StopTestSession message.
+        /// </summary>
+        public const string StopTestSession = "TestSession.StopTestSession";
+
+        /// <summary>
+        /// StopTestSession callback message.
+        /// </summary>
+        public const string StopTestSessionCallback = "TestSession.StopTestSessionCallback";
 
         #region DataCollector messages
 

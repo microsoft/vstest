@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IDataSerializer dataSerializer;
 
-        private IRequestData requestData;
+        protected IRequestData requestData;
 
         public ParallelRunEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,
@@ -41,7 +41,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
-
 
         internal ParallelRunEventsHandler(IRequestData requestData,
             IProxyExecutionManager proxyExecutionManager,

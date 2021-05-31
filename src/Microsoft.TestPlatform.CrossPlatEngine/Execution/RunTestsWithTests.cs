@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // TODO: Fill this in with the right extension value.
                 var executorUriExtensionTuple = new Tuple<Uri, string>(
                     test.ExecutorUri,
-                    ObjectModel.Constants.UnspecifiedAdapterPath);
+                    Constants.UnspecifiedAdapterPath);
 
                 if (result.TryGetValue(executorUriExtensionTuple, out testList))
                 {

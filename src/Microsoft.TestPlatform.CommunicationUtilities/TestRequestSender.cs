@@ -52,7 +52,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies host is using version 1.
         private int protocolVersion = 1;
 
-        private int highestSupportedVersion = 3;
+        // Must be in sync with the highest supported version in
+        // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
+        private int highestSupportedVersion = 5;
 
         private TestHostConnectionInfo connectionInfo;
 
@@ -468,6 +470,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             this.communicationEndpoint.Stop();
+            GC.SuppressFinalize(this);
         }
 
         private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)

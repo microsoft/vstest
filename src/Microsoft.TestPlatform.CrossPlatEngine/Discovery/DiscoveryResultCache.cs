@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="test"> The test. </param>
         public void AddTest(TestCase test)
         {
-            Debug.Assert(null != test, "DiscoveryResultCache.AddTest called with no new test.");
+            Debug.Assert(test != null, "DiscoveryResultCache.AddTest called with no new test.");
 
             if (test == null)
             {

@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
 	using System;
@@ -25,6 +22,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 	using System.Runtime.Versioning;
@@ -35,8 +33,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using vstest.console.UnitTests.TestDoubles;
 	using Microsoft.VisualStudio.TestPlatform.Utilities;
 	using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-	[TestClass]
+    [TestClass]
 	public class TestRequestManagerTests
 	{
 		private DummyLoggerEvents mockLoggerEvents;
@@ -49,12 +48,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		private InferHelper inferHelper;
 		private ITestRequestManager testRequestManager;
 		private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
-		private Mock<IRequestData> mockRequestData;
-		private Mock<IMetricsCollection> mockMetricsCollection;
 		private ProtocolConfig protocolConfig;
 		private Task<IMetricsPublisher> mockMetricsPublisherTask;
 		private Mock<IMetricsPublisher> mockMetricsPublisher;
 		private Mock<IProcessHelper> mockProcessHelper;
+		private Mock<ITestRunAttachmentsProcessingManager> mockAttachmentsProcessingManager;
 
 		private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
 				<RunSettings>
@@ -79,6 +77,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
 			this.mockMetricsPublisher = new Mock<IMetricsPublisher>();
 			this.mockMetricsPublisherTask = Task.FromResult(this.mockMetricsPublisher.Object);
+			this.mockAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
 			this.testRequestManager = new TestRequestManager(
 				this.commandLineOptions,
 				this.mockTestPlatform.Object,
@@ -86,10 +85,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
-			this.mockMetricsCollection = new Mock<IMetricsCollection>();
-			this.mockRequestData = new Mock<IRequestData>();
-			this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 			this.mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>()))
 				.Returns(this.mockDiscoveryRequest.Object);
 			this.mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>()))
@@ -122,7 +119,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 new Mock<ITestPlatformEventSource>().Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                this.mockProcessHelper.Object);
+                this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
 		}
@@ -203,8 +201,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				TestRunResultAggregator.Instance,
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
-			this.mockMetricsPublisherTask,
-			this.mockProcessHelper.Object);
+				this.mockMetricsPublisherTask,
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
 
@@ -236,7 +235,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				RunSettings = DefaultRunsettings
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -253,13 +252,14 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			Assert.AreEqual(4, actualRequestData.ProtocolConfig.Version);
+			Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
 		}
 
 
@@ -285,7 +285,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -300,18 +300,18 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
-			// Verify.
-			object targetDevice, maxcount, targetPlatform, disableAppDomain;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out disableAppDomain));
+            // Verify.
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out var maxcount));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out var targetPlatform));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out var disableAppDomain));
 			Assert.AreEqual("Other", targetDevice);
 			Assert.AreEqual(2, maxcount);
 			Assert.AreEqual("X86", targetPlatform.ToString());
@@ -334,7 +334,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -349,15 +349,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			object targetDevice;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
 			Assert.AreEqual("Local Machine", targetDevice);
 		}
 
@@ -377,7 +377,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -392,15 +392,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			object targetDevice;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out object targetDevice));
 			Assert.AreEqual("Device", targetDevice);
 		}
 
@@ -420,7 +420,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -435,15 +435,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			object targetDevice;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
 			Assert.AreEqual("Emulator 8.1 U1 WVGA 4 inch 512MB", targetDevice);
 		}
 
@@ -463,7 +463,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -478,7 +478,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.Parallel = true;
 			CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -490,8 +491,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify
-			object commandLineSwitches;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
 			var commandLineArray = commandLineSwitches.ToString();
 
@@ -518,7 +518,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -533,18 +533,18 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.testsettings";
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
-			// Verify
-			object commandLineSwitches;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
-			var commandLineArray = commandLineSwitches.ToString();
+            var commandLineArray = commandLineSwitches.ToString();
 
 			Assert.IsTrue(commandLineArray.Contains("/settings//.TestSettings"));
 		}
@@ -565,7 +565,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -580,18 +580,18 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.vsmdi";
 
 			// Act
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
-			// Verify
-			object commandLineSwitches;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
-			var commandLineArray = commandLineSwitches.ToString();
+            var commandLineArray = commandLineSwitches.ToString();
 
 			Assert.IsTrue(commandLineArray.Contains("/settings//.vsmdi"));
 		}
@@ -612,7 +612,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -627,7 +627,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.SettingsFile = @"c://temp/.testrunConfig";
 
@@ -635,8 +636,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify
-			object commandLineSwitches;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
 			var commandLineArray = commandLineSwitches.ToString();
 
@@ -675,7 +675,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
 
 			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -689,7 +689,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				<RunSettings>
 					 <RunConfiguration>
 					 <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
-					 <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
+					 <TargetPlatform>{Architecture.ARM}</TargetPlatform>
 					 </RunConfiguration>
 				</RunSettings>"
 			};
@@ -712,7 +712,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
 
 			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -746,7 +746,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
 
 			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -785,7 +785,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
 			Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -906,7 +906,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				Sources = new List<string>() { "a" },
 				RunSettings = DefaultRunsettings
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -919,7 +919,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
 			// Verify.
-			Assert.AreEqual(4, actualRequestData.ProtocolConfig.Version);
+			Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
 		}
 
 		[TestMethod]
@@ -933,7 +933,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 								  Sources = new List<string>() { "a" },
 								  RunSettings = DefaultRunsettings
 							  };
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -949,7 +949,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			CommandLineOptions.Instance.Parallel = true;
 			CommandLineOptions.Instance.EnableCodeCoverage = true;
@@ -961,8 +962,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
 			// Verify
-			object commandLineSwitches;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out var commandLineSwitches));
 
 			var commandLineArray = commandLineSwitches.ToString();
 
@@ -1000,7 +1000,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 									</LegacySettings>
 							   </RunSettings>"
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1016,7 +1016,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
                 this.mockMetricsPublisherTask,
-                this.mockProcessHelper.Object);
+                this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
             // Act.
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1049,7 +1050,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 									   </MSTest>
 							   </RunSettings>"
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1065,7 +1066,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			// Act.
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
@@ -1096,7 +1098,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 								</MSPhoneTest>
 							</RunSettings>"
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1112,17 +1114,17 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			// Act.
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
-			// Verify
-			object targetDevice, maxcount, targetPlatform, disableAppDomain;
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
-			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out disableAppDomain));
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out var targetDevice));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out var maxcount));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out var targetPlatform));
+			Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out var disableAppDomain));
 			Assert.AreEqual("Other", targetDevice);
 			Assert.AreEqual(2, maxcount);
 			Assert.AreEqual("X86", targetPlatform.ToString());
@@ -1159,7 +1161,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				this.mockTestPlatformEventSource.Object,
 				this.inferHelper,
 				this.mockMetricsPublisherTask,
-				this.mockProcessHelper.Object);
+				this.mockProcessHelper.Object,
+				this.mockAttachmentsProcessingManager.Object);
 
 			this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
@@ -1431,7 +1434,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
 
 			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
 
 		}
 
@@ -1446,7 +1449,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				<RunSettings>
 					 <RunConfiguration>
 						 <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
-						 <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
+						 <TargetPlatform>{Architecture.ARM}</TargetPlatform>
 					 </RunConfiguration>
 				</RunSettings>"
 			};
@@ -1470,7 +1473,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
 			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -1546,7 +1549,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
 
 			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -1584,7 +1587,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
 			Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
 		}
 
 		[TestMethod]
@@ -1627,7 +1630,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
 
 			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
-			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+			Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(nameof(Architecture.ARM)));
 			CollectionAssert.AreEqual(actualSources, archSources);
 			CollectionAssert.AreEqual(actualSources, fxSources);
 		}
@@ -2162,6 +2165,102 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
 			Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
 			Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+		}
+
+		[TestMethod]
+		public void ProcessTestRunAttachmentsShouldSucceedWithTelemetryEnabled()
+        {
+			var mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+			mockAttachmentsProcessingManager
+				.Setup(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns((IRequestData r, ICollection<AttachmentSet> a, ITestRunAttachmentsProcessingEventsHandler h, CancellationToken token) => Task.Run(() =>
+				{
+					r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, 5);
+					r.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing, 1);
+				}));
+
+			var payload = new TestRunAttachmentsProcessingPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = true
+			};
+
+			testRequestManager.ProcessTestRunAttachments(payload, mockEventsHandler.Object, this.protocolConfig);
+
+			mockAttachmentsProcessingManager.Verify(m => m.ProcessTestRunAttachmentsAsync(It.Is<IRequestData>(r => r.IsTelemetryOptedIn), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
+
+			mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
+				It.Is<Dictionary<string, object>>(m => m.Count == 2 &&
+					m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing] == 5 &&
+					m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing) && (int)m[TelemetryDataConstants.NumberOfAttachmentsAfterProcessing] == 1)));
+		}
+
+		[TestMethod]
+		public void ProcessTestRunAttachmentsShouldSucceedWithTelemetryDisabled()
+		{
+			var mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+			mockAttachmentsProcessingManager
+				.Setup(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns(Task.FromResult(true));
+
+			var payload = new TestRunAttachmentsProcessingPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = false
+			};
+
+			testRequestManager.ProcessTestRunAttachments(payload, mockEventsHandler.Object, this.protocolConfig);
+
+			mockAttachmentsProcessingManager.Verify(m => m.ProcessTestRunAttachmentsAsync(It.Is<IRequestData>(r => !r.IsTelemetryOptedIn), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
+		}
+
+		[TestMethod]
+		public async Task CancelTestRunAttachmentsProcessingShouldSucceedIfRequestInProgress()
+		{
+			var mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
+			mockAttachmentsProcessingManager
+				.Setup(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()))
+				.Returns((IRequestData r, ICollection<AttachmentSet> a, ITestRunAttachmentsProcessingEventsHandler h, CancellationToken token) => Task.Run(() =>
+				{
+					int i = 0;
+					while (!token.IsCancellationRequested)
+                    {
+						i++;
+						Console.WriteLine($"Iteration {i}");
+						Task.Delay(5).Wait();
+                    }
+
+					r.MetricsCollection.Add(TelemetryDataConstants.AttachmentsProcessingState, "Canceled");
+				}));
+
+			var payload = new TestRunAttachmentsProcessingPayload()
+			{
+				Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") },
+				CollectMetrics = true
+			};
+
+			Task task = Task.Run(() => testRequestManager.ProcessTestRunAttachments(payload, mockEventsHandler.Object, this.protocolConfig));
+			await Task.Delay(50);
+			testRequestManager.CancelTestRunAttachmentsProcessing();
+
+			await task;
+
+			mockAttachmentsProcessingManager.Verify(m => m.ProcessTestRunAttachmentsAsync(It.IsAny<IRequestData>(), payload.Attachments, mockEventsHandler.Object, It.IsAny<CancellationToken>()));
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStart());
+			mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
+
+			mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
+				It.Is<Dictionary<string, object>>(m => m.Count == 1 && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState) && (string)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
+		}
+
+		[TestMethod]
+		public void CancelTestRunAttachmentsProcessingShouldSucceedIfNoRequest()
+		{
+			testRequestManager.CancelTestRunAttachmentsProcessing();
 		}
 
 		private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

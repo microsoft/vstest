@@ -3,11 +3,11 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class TestHostExtensionManagerTests
@@ -15,7 +15,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         [TestInitialize]
         public void Initialize()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheHelper.SetupMockExtensions(typeof(TestHostExtensionManagerTests));
         }
         [TestMethod]
         public void CreateShouldThrowExceptionIfMessageLoggerIsNull()
@@ -24,7 +24,6 @@ namespace TestPlatform.Common.UnitTests.Logging
             {
                 var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null);
             });
-
         }
 
         [TestMethod]

@@ -32,11 +32,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private TestProperty(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes)
         {
-            ValidateArg.NotNullOrEmpty(id, "id");
-            ValidateArg.NotNull(label, "label");
-            ValidateArg.NotNull(category, "category");
-            ValidateArg.NotNull(description, "description");
-            ValidateArg.NotNull(valueType, "valueType");
+            ValidateArg.NotNullOrEmpty(id, nameof(id));
+            ValidateArg.NotNull(label, nameof(label));
+            ValidateArg.NotNull(category, nameof(category));
+            ValidateArg.NotNull(description, nameof(description));
+            ValidateArg.NotNull(valueType, nameof(valueType));
 
             // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
             if (valueType == typeof(KeyValuePair<string, string>[]))
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We use the default type whenever exception thrown")]
         private Type GetType(string typeName)
         {
-            ValidateArg.NotNull(typeName, "typeName");
+            ValidateArg.NotNull(typeName, nameof(typeName));
 
             Type type = null;
 
@@ -276,14 +276,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
         public static TestProperty Find(string id)
         {
-            ValidateArg.NotNull(id, "id");
+            ValidateArg.NotNull(id, nameof(id));
 
             TestProperty result = null;
 
-            KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair;
             lock (s_properties)
             {
-                if (s_properties.TryGetValue(id, out propertyTypePair))
+                if (s_properties.TryGetValue(id, out var propertyTypePair))
                 {
                     result = propertyTypePair.Key;
                 }
@@ -294,20 +293,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static TestProperty Register(string id, string label, Type valueType, Type owner)
         {
-            ValidateArg.NotNullOrEmpty(id, "id");
-            ValidateArg.NotNull(label, "label");
-            ValidateArg.NotNull(valueType, "valueType");
-            ValidateArg.NotNull(owner, "owner");
+            ValidateArg.NotNullOrEmpty(id, nameof(id));
+            ValidateArg.NotNull(label, nameof(label));
+            ValidateArg.NotNull(valueType, nameof(valueType));
+            ValidateArg.NotNull(owner, nameof(owner));
 
             return Register(id, label, string.Empty, string.Empty, valueType, null, TestPropertyAttributes.None, owner);
         }
 
         public static TestProperty Register(string id, string label, Type valueType, TestPropertyAttributes attributes, Type owner)
         {
-            ValidateArg.NotNullOrEmpty(id, "id");
-            ValidateArg.NotNull(label, "label");
-            ValidateArg.NotNull(valueType, "valueType");
-            ValidateArg.NotNull(owner, "owner");
+            ValidateArg.NotNullOrEmpty(id, nameof(id));
+            ValidateArg.NotNull(label, nameof(label));
+            ValidateArg.NotNull(valueType, nameof(valueType));
+            ValidateArg.NotNull(owner, nameof(owner));
 
             return Register(id, label, string.Empty, string.Empty, valueType, null, attributes, owner);
         }
@@ -315,20 +314,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
         public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes, Type owner)
         {
-            ValidateArg.NotNullOrEmpty(id, "id");
-            ValidateArg.NotNull(label, "label");
-            ValidateArg.NotNull(category, "category");
-            ValidateArg.NotNull(description, "description");
-            ValidateArg.NotNull(valueType, "valueType");
-            ValidateArg.NotNull(owner, "owner");
+            ValidateArg.NotNullOrEmpty(id, nameof(id));
+            ValidateArg.NotNull(label, nameof(label));
+            ValidateArg.NotNull(category, nameof(category));
+            ValidateArg.NotNull(description, nameof(description));
+            ValidateArg.NotNull(valueType, nameof(valueType));
+            ValidateArg.NotNull(owner, nameof(owner));
 
             TestProperty result;
 
-            KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair;
-
             lock (s_properties)
             {
-                if (s_properties.TryGetValue(id, out propertyTypePair))
+                if (s_properties.TryGetValue(id, out var propertyTypePair))
                 {
                     // verify the data valueType is valid
                     if (propertyTypePair.Key.ValueType == valueType.AssemblyQualifiedName
@@ -371,7 +368,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static bool TryUnregister(string id, out KeyValuePair<TestProperty, HashSet<Type>> propertyTypePair)
         {
-            ValidateArg.NotNullOrEmpty(id, "id");
+            ValidateArg.NotNullOrEmpty(id, nameof(id));
 
             lock (s_properties)
             {

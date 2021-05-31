@@ -122,6 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             TestRunDetails = new TestRunDetails();
             Results = new ConcurrentDictionary<Guid, ObjectModel.TestResult>();
             ResultCollectionDictionary = new ConcurrentDictionary<string, TestResultCollection>();
+
+            // Ensure test results directory exists.
+            Directory.CreateDirectory(testResultsDirPath);
         }
 
         /// <inheritdoc/>
@@ -156,8 +159,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <param name="e"></param>
         public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull(sender, "sender");
-            ValidateArg.NotNull(e, "e");
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             switch (e.Level)
             {
@@ -192,8 +195,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <param name="e"></param>
         public void TestResultHandler(object sender, TestResultEventArgs e)
         {
-            ValidateArg.NotNull(sender, "sender");
-            ValidateArg.NotNull(e, "e");
+            ValidateArg.NotNull(sender, nameof(sender));
+            ValidateArg.NotNull(e, nameof(e));
 
             var testResult = new ObjectModel.TestResult
             {
@@ -239,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             Results.TryAdd(executionId, testResult);
 
-            // Check for parent execution id to store the test results in hierarchical way 
+            // Check for parent execution id to store the test results in hierarchical way
             if (parentExecutionId == Guid.Empty)
             {
                 if (e.Result.Outcome == TestOutcome.Failed)
@@ -279,12 +282,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassedTests = PassedTests,
                 TotalTests = TotalTests,
                 SkippedTests = SkippedTests,
-                PassPercentage = (PassedTests * 100) / TotalTests,
+                PassPercentage = TotalTests == 0 ? 0 : PassedTests * 100 / TotalTests,
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
             if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
-
                 var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
                 if (framework != null)
                 {

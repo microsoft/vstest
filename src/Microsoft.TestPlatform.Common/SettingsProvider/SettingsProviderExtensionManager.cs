@@ -60,9 +60,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
             IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredSettingsProviders,
             IMessageLogger logger)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, "settingsProviders");
-            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, "unfilteredSettingsProviders");
-            ValidateArg.NotNull<IMessageLogger>(logger, "logger");
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>>>(settingsProviders, nameof(settingsProviders));
+            ValidateArg.NotNull<IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>>>(unfilteredSettingsProviders, nameof(unfilteredSettingsProviders));
+            ValidateArg.NotNull<IMessageLogger>(logger, nameof(logger));
 
             this.settingsProviders = settingsProviders;
             this.UnfilteredSettingsProviders = unfilteredSettingsProviders;
@@ -110,14 +110,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                 {
                     if (settingsProviderExtensionManager == null)
                     {
-                        IEnumerable<LazyExtension<ISettingsProvider, Dictionary<string, object>>> unfilteredTestExtensions;
-                        IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> testExtensions;
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
                                 TestPlatformConstants.TestAdapterEndsWithPattern,
-                                out unfilteredTestExtensions,
-                                out testExtensions);
+                                out var unfilteredTestExtensions,
+                                out var testExtensions);
 
                         settingsProviderExtensionManager = new SettingsProviderExtensionManager(
                             testExtensions, unfilteredTestExtensions, TestSessionMessageLogger.Instance);
@@ -145,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         /// <param name="shouldThrowOnError"> Indicates whether this method should throw on error. </param>
         public static void LoadAndInitializeAllExtensions(bool shouldThrowOnError)
         {
-            var extensionManager = SettingsProviderExtensionManager.Create();
+            var extensionManager = Create();
 
             try
             {
@@ -183,11 +181,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         {
             if (string.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
-            LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider;
-            this.SettingsProvidersMap.TryGetValue(settingsName, out settingsProvider);
+            this.SettingsProvidersMap.TryGetValue(settingsName, out LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider);
 
             return settingsProvider;
         }

@@ -6,9 +6,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class CUITTest : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void CUITRunAllTests(RunnerInfo runnerInfo)
         {
@@ -25,14 +27,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-            var arguments = PrepareArguments(
-                assemblyAbsolutePath,
-                string.Empty,
-                string.Empty,
-                this.FrameworkArgValue);
+            var resultsDirectory = GetResultsDirectory();
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDirectory);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDirectory);
         }
     }
 }

@@ -180,6 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
+        public IDictionary<string, int> AdapterTelemetry { get; set; } = new Dictionary<string, int>();
         #endregion
 
         #region Public/internal methods
@@ -221,6 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.totalExecutedTests++;
                 this.testResults.Add(testResult);
+                MSTestV1TelemetryHelper.AddTelemetry(testResult, this.AdapterTelemetry);
 
                 long count;
                 if (this.runStats.TryGetValue(testResult.Outcome, out count))
@@ -270,7 +272,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
 
                 // Try finding/removing a matching test corresponding to the completed test
-                var inProgressTest = this.inProgressTests.Where(inProgress => inProgress.Id == completedTest.Id).FirstOrDefault();
+                var inProgressTest = this.inProgressTests.FirstOrDefault(inProgress => inProgress.Id == completedTest.Id);
                 if (inProgressTest != null)
                 {
                     removed = this.inProgressTests.Remove(inProgressTest);

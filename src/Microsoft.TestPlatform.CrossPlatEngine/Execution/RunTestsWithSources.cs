@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using ObjectModel.Client;
     using ObjectModel.Logging;
     using Utilities;
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     internal class RunTestsWithSources : BaseRunTests
     {
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Validate the sources 
             foreach (var kvp in this.adapterSourceMap)
             {
-                var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger);
+                var verifiedSources = DiscoveryManager.GetValidSources(kvp.Value, logger, package);
                 if (verifiedSources.Any())
                 {
                     verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);

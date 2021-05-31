@@ -15,11 +15,29 @@
     <PackagesDirectory Condition="'$(PackagesDirectory)' == ''">$(RootDirectory)packages\</PackagesDirectory>
     <ArtifactsBaseDirectory Condition="'$(ArtifactsBaseDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\</ArtifactsBaseDirectory>
 
-    <!-- Directory with .NET 4.6 binaries -->
+    <!-- Directory with .NET binaries -->
+    <ArtifactsFw45Directory Condition="'$(ArtifactsFw45Directory)' == ''">$(ArtifactsBaseDirectory)net45\</ArtifactsFw45Directory>
+
+    <!-- Directory with .NET binaries -->
     <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
 
-    <!-- Directory with .NETCore binaries -->
-    <ArtifactsCoreDirectory Condition="'$(ArtifactsCoreDirectory)' == ''">$(ArtifactsBaseDirectory)netcoreapp2.1\</ArtifactsCoreDirectory>
+    <!-- Directory with netcoreapp2.1 binaries -->
+    <ArtifactsCore21Directory Condition="'$(ArtifactsCore21Directory)' == ''">$(ArtifactsBaseDirectory)netcoreapp2.1\</ArtifactsCore21Directory>
+    
+    <!-- Directory with netcoreapp1.0 binaries -->
+    <ArtifactsCore10Directory Condition="'$(ArtifactsCore10Directory)' == ''">$(ArtifactsBaseDirectory)netcoreapp1.0\</ArtifactsCore10Directory>
+    
+    <!-- Directory with NetStandard1.0 binaries -->
+    <ArtifactsNS10Directory Condition="'$(ArtifactsNS10Directory)' == ''">$(ArtifactsBaseDirectory)netstandard1.0\</ArtifactsNS10Directory>
+    
+    <!-- Directory with NetStandard1.3 binaries -->
+    <ArtifactsNS13Directory Condition="'$(ArtifactsNS13Directory)' == ''">$(ArtifactsBaseDirectory)netstandard1.3\</ArtifactsNS13Directory>
+    
+    <!-- Directory with NetStandard2.0 binaries -->
+    <ArtifactsNS20Directory Condition="'$(ArtifactsNS20Directory)' == ''">$(ArtifactsBaseDirectory)netstandard2.0\</ArtifactsNS20Directory>
+    
+    <!-- Directory with UAP10.0 binaries -->
+    <ArtifactsUAP100Directory Condition="'$(ArtifactsUAP100Directory)' == ''">$(ArtifactsBaseDirectory)uap10.0\</ArtifactsUAP100Directory>
 
     <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(ArtifactsBaseDirectory)obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
   </PropertyGroup>
@@ -36,30 +54,34 @@
   <Target Name="SignAssemblies">
     <!-- Sign all files if IncludeLegacyComponents is set to true -->
     <ItemGroup Condition="'$(IncludeLegacyComponents)' == 'true'">
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\VSTestVideoRecorder.exe" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" />
+      <!-- These are already signed, trying to sign them again causes warnings in the build pipeline.
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
+        
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\VSTestVideoRecorder.exe" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x86\Microsoft.VisualStudio.Coverage.Monitor.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\x64\Microsoft.VisualStudio.Coverage.Monitor.dll" />
 
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.QualityTools.VideoRecorderEngine.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\VSTestVideoRecorder.exe" />
+      -->
+
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\VideoRecorder\VSTestVideoRecorder.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.GenericTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.OrderedTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" />
@@ -72,9 +94,13 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
 
       <!-- UWP runtime provider and dependent dlls -->
-      <AssembliesToSign Include="$(ArtifactsDirectory)CoreCon\VisualStudioDatastoreConfigurationProvider.dll" />
+      <!-- Commenting for now, as we removed that dll from nuget package.
+           If after UWP test it does not work without this dll, we will add it back-->
+      <!--<AssembliesToSign Include="$(ArtifactsDirectory)CoreCon\VisualStudioDatastoreConfigurationProvider.dll" />-->
 
       <!-- Qualitytools dlls -->
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.TMI.dll" />
+      <!-- These dlls are already signed from VS nuget feed
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.AgentObject.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.AgentProcessManager.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Common.dll" />
@@ -83,6 +109,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.LoadTest.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Resource.dll" />
+      
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.GenericTest.Adapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.GenericTest.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.GenericTest.Tip.dll" />
@@ -98,12 +125,12 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Tip.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.WebLoadTest.Tip.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.TMI.dll" />
+  
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)VsWebSite.Interop.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent32.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent32_35.exe" />
@@ -112,49 +139,65 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent_40.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTDCAgent.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTDCAgent32.exe" />
-
+      -->
       <!-- DataCollector related dlls -->
+      <!--These dlls are already signed from VS nuget feed
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.IntelliTrace.Core.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Coverage.Analysis.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Coverage.Interop.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TraceDataCollector.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.Coverage.Interop.dll" />
-
+      -->
       <!-- CUIT related dlls -->
+      <!--These dlls are already signed from VS nuget feed
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Sqm.dll" />
-      <!-- This is already signed -->
-      <!--AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" /-->
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.ShDocVw.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.OLE.Interop.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITesting.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+      -->
+      
+      <!-- These are already signed, trying to sign them again causes warnings in the build pipeline.
+        <AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.ShDocVw.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITesting.dll" />
+        
+        <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+        <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
+      -->
+      
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />
+    </ItemGroup>
+
+    <!-- Sign .Net 4.5 assemblies -->
+    <ItemGroup>
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)\Microsoft.TestPlatform.AdapterUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      
+      <!-- Localized resources -->
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)\%(ResxLang.Identity)\*.*" />
+      <Fw45AssembliesToSign Include="$(ArtifactsFw45Directory)$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -172,11 +215,28 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
-	  <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net452.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net46.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net461.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net462.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net47.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net471.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net471.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net472.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.net48.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Interop.dll" />
 
       <!-- NetFullExtensions -->
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
+      <!--<AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" /> -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
@@ -184,9 +244,13 @@
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\%(ResxLang.Identity)\*.*" />
+
+      <!-- Third Party assemblies to sign -->
+      <!--<ThirdPartyAssembliesToSign Include="$(ArtifactsDirectory)Newtonsoft.Json.dll" />-->
     </ItemGroup>
 
     <!-- Intellitrace -->
+    <!--These dlls are already signed from VS nuget feed
     <ItemGroup>
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.Concord.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.IntelliTrace.ConfigUI.dll" />
@@ -208,8 +272,7 @@
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\Microsoft.VisualStudio.VIL.NotifyPointInProcHost.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\1033\Microsoft.IntelliTrace.Profilerui.dll" />
-      <!-- Commented out DiaSymReader.dll as it is already signed. Resigning is resulting in some issuesl -->
-      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.DiaSymReader.dll" /> -->
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.DiaSymReader.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\deps\Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\concrt140.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy\amd64\Microsoft.IntelliTrace.ProfilerProxy.dll" />
@@ -226,56 +289,103 @@
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\covrun32.dll" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\msdia140.dll" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProcessSnapshotCleanup.exe" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />
-      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
     </ItemGroup>
+    -->
+    <!-- These files are removed from Intellitrace. Get these from Microsoft.Internal.CodeCoverage -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" /> -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\covrun32.dll" /> -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\msdia140.dll" /> -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" /> -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" /> -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" /> -->
+      <!-- <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" /> -->
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
     <ItemGroup>
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)DataCollector.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.CoreUtilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.Utilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.Client.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)vstest.console.dll" />
+      <Core10AssembliesToSign Include="$(ArtifactsCore10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Core10AssembliesToSign Include="$(ArtifactsCore10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Core10AssembliesToSign Include="$(ArtifactsCore10Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+    
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)DataCollector.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.TestPlatform.Utilities.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.VisualStudio.TestPlatform.Client.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)vstest.console.dll" />
 
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.Utilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.exe" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.x86.exe" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\datacollector.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.TestPlatform.Utilities.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net452.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net452.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net46.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net46.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net461.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net461.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net462.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net462.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net47.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net47.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net471.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net471.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net472.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net472.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net48.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\testhost.net48.x86.exe" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\datacollector.exe" />
+
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
+
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
+
+      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
 
       <!-- NetCoreExtensions -->
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
 
       <!-- Localized resources -->
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
+      <Core10AssembliesToSign Include="$(ArtifactsCore10Directory)%(ResxLang.Identity)\*.*" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)%(ResxLang.Identity)\*.*" />
+      <NetStandard10AssembliesToSign Include="$(ArtifactsNS10Directory)%(ResxLang.Identity)\*.*" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)%(ResxLang.Identity)\*.*" />
+      <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)%(ResxLang.Identity)\*.*" />
+      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)%(ResxLang.Identity)\*.*" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\%(ResxLang.Identity)\*.*" />
+      <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\%(ResxLang.Identity)\*.*" />
+
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCore21Directory)Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsCore21Directory)TestHost\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.Build -->
@@ -284,27 +394,30 @@
       <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard2.0\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
-    <!-- Sign Microsoft.CodeCoverage -->
-    <ItemGroup>
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\%(ResxLang.Identity)\*.*" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" />
-      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" />
-    </ItemGroup>
-
     <!-- Sign Microsoft.TestPlatform.TestHost -->
     <ItemGroup>
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\testhost.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\testhost.x86.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.Utilities.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CoreUtilities.dll" />
+
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.CommunicationUtilities.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.CrossPlatEngine.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.PlatformAbstractions.dll" />
@@ -331,80 +444,183 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net452.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net452.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net46.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net46.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net461.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net461.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net462.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net462.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net47.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net47.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net471.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net471.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net472.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net472.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net48.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.net48.x86.exe" />
 
       <!-- Localized resources -->
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\%(ResxLang.Identity)\*.*" />
+      
+      <!-- Third Party assemblies to sign -->
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp2.1\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\uap10.0\Newtonsoft.Json.dll" />
+      <ThirdPartyAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <ItemGroup>
+      <NetStandard10AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </NetStandard10AssembliesToSign>
+      
+      <NetStandard13AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </NetStandard13AssembliesToSign>
+      
+      <NetStandard20AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </NetStandard20AssembliesToSign>
+      
+      <UAP100AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </UAP100AssembliesToSign>
+
       <AssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </AssembliesToSign>
 
-      <CoreAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+      <Fw45AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
-      </CoreAssembliesToSign>
+      </Fw45AssembliesToSign>
+
+      <Core21AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </Core21AssembliesToSign>
+
+      <Core10AssembliesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </Core10AssembliesToSign>
 
       <BuildAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </BuildAssembliesToSign>
 
       <TestHostCoreAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </TestHostCoreAssembliesToSign>
 
+      <!--
       <IntellitraceAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </IntellitraceAssembliesToSign>
 
       <CodeCoverageAssembliesToSign>
-        <Authenticode>Microsoft402400</Authenticode>
+        <Authenticode>Microsoft400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
+      -->
+
+      <ThirdPartyAssembliesToSign>
+        <Authenticode>3PartySHA2</Authenticode>
+      </ThirdPartyAssembliesToSign>
     </ItemGroup>
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
+    <Message Text="Signing 3rd party assemblies using authenticode certificate '%(ThirdPartyAssembliesToSign.Authenticode)' for @(ThirdPartyAssembliesToSign)"/>
+    <SignFiles Files="@(ThirdPartyAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(NetStandard10AssembliesToSign.Authenticode)' for @(NetStandard10AssembliesToSign)"/>
+    <SignFiles Files="@(NetStandard10AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsNS10Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate NetStandard13AssembliesToSign:'%(NetStandard13AssembliesToSign.Authenticode)' for @(NetStandard13AssembliesToSign)"/>
+    <SignFiles Files="@(NetStandard13AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsNS13Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate NetStandard20AssembliesToSign:'%(NetStandard20AssembliesToSign.Authenticode)' for @(NetStandard20AssembliesToSign)"/>
+    <SignFiles Files="@(NetStandard20AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsNS20Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate UAP100AssembliesToSign:'%(UAP100AssembliesToSign.Authenticode)' for @(UAP100AssembliesToSign)"/>
+    <SignFiles Files="@(UAP100AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsUAP100Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate Fw45AssembliesToSign:'%(Fw45AssembliesToSign.Authenticode)' for @(Fw45AssembliesToSign)"/>
+    <SignFiles Files="@(Fw45AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsFw45Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate AssembliesToSign:'%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
     <SignFiles Files="@(AssembliesToSign)"
                BinariesDirectory="$(ArtifactsDirectory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
-    <SignFiles Files="@(CoreAssembliesToSign)"
-               BinariesDirectory="$(ArtifactsCoreDirectory)"
+    <Message Text="Signing using authenticode certificate Core21AssembliesToSign:'%(Core21AssembliesToSign.Authenticode)' for @(Core21AssembliesToSign)"/>
+    <SignFiles Files="@(Core21AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsCore21Directory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate Core10AssembliesToSign:'%(Core10AssembliesToSign.Authenticode)' for @(Core10AssembliesToSign)"/>
+    <SignFiles Files="@(Core10AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsCore10Directory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate BuildAssembliesToSign:'%(BuildAssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
     <SignFiles Files="@(BuildAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(TestHostCoreAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate TestHostCoreAssembliesToSign:'%(TestHostCoreAssembliesToSign.Authenticode)' for @(TestHostCoreAssembliesToSign)"/>
     <SignFiles Files="@(TestHostCoreAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
-
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(IntellitraceAssembliesToSign)"/>
+    <!--
+    <Message Text="Signing using authenticode certificate IntellitraceAssembliesToSign:'%(IntellitraceAssembliesToSign.Authenticode)' for @(IntellitraceAssembliesToSign)"/>
     <SignFiles Files="@(IntellitraceAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Intellitrace"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
 
-    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
+    <Message Text="Signing using authenticode certificate CodeCoverageAssembliesToSign:'%(CodeCoverageAssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
     <SignFiles Files="@(CodeCoverageAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
+
+    -->
   </Target>
 
   <Target Name="SignNugetPackages">

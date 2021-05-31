@@ -60,7 +60,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new RunSettingsArgumentProcessorCapabilities();
             Assert.AreEqual("/Settings", capabilities.CommandName);
-            Assert.AreEqual("--Settings|/Settings:<Settings File>" + Environment.NewLine + "      Settings to use when running tests.", capabilities.HelpContentResourceName);
+            var expected = "--Settings|/Settings:<Settings File>\r\n      Settings to use when running tests.";
+            Assert.AreEqual(expected.NormalizeLineEndings().ShowWhiteSpace(), capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace());
 
             Assert.AreEqual(HelpContentPriority.RunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsFalse(capabilities.IsAction);
@@ -235,9 +236,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Act.
             executor.Initialize(fileName);
 
+
             // Assert.
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, $"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>\r\n    <TargetFrameworkVersion>{Framework.FromString(FrameworkVersion.Framework45.ToString()).Name}</TargetFrameworkVersion>\r\n    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>");
+
+            var expected = string.Join(Environment.NewLine,
+                $"<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                $"<RunSettings>",
+                $"  <RunConfiguration>",
+                $"    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>",
+                $"    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>",
+                $"    <TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>",
+                $"  </RunConfiguration>",
+                $"  <MSTest>",
+                $"    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>",
+                $"    <ForcedLegacyMode>true</ForcedLegacyMode>",
+                $"  </MSTest>",
+                $"  <DataCollectionRunSettings>",
+                $"    <DataCollectors />",
+                $"  </DataCollectionRunSettings>",
+                $"</RunSettings>");
+            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, expected);
         }
 
 
@@ -246,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             // Arrange.
             var fileName = "C:\\temp\\r.runsettings";
-            var settingsXml = $"<RunSettings><RunConfiguration><TargetPlatform>{Architecture.X64.ToString()}</TargetPlatform><TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion></RunConfiguration></RunSettings>";
+            var settingsXml = $"<RunSettings><RunConfiguration><TargetPlatform>{nameof(Architecture.X64)}</TargetPlatform><TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion></RunConfiguration></RunSettings>";
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,

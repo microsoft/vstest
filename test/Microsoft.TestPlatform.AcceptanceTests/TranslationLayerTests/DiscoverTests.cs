@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert.
             Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
-            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.batchSize);
+            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert.
             Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
-            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.batchSize);
+            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
         }
 
         [TestMethod]
@@ -172,7 +172,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource]
+        // flaky on the desktop runner, desktop framework combo
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
         [NetCoreTargetFrameworkDataSource]
         public void CancelTestDiscovery(RunnerInfo runnerInfo)
         {

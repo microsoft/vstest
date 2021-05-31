@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -62,10 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
         {
             IEngineInvoker invoker = null;
-#if NET451
+#if NETFRAMEWORK
             // If Args contains test source argument, invoker Engine in new appdomain
-            string testSourcePath;
-            if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
+            if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
             {
                 // remove the test source arg from dictionary
                 argsDictionary.Remove(TestSourceArgumentString);
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 while (!IsDebuggerPresent())
                 {
-                    System.Threading.Tasks.Task.Delay(1000).Wait();
+                    Task.Delay(1000).Wait();
                 }
 
                 DebugBreak();
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     while (!Debugger.IsAttached)
                     {
-                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                        Task.Delay(1000).Wait();
                     }
 
                     Debugger.Break();

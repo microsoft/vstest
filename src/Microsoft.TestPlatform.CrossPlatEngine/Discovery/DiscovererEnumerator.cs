@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             try
             {
                 // Collecting Total Number of Adapters Discovered in Machine
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count);
 
                 var context = new DiscoveryContext { RunSettings = settings };
                 context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             ref double totalAdaptersUsed,
             ref double totalTimeTakenByAdapters)
         {
-            if (DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType) == false)
+            if (!DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType))
             {
                 // Fail to instantiate the discoverer type.
                 return;
@@ -237,11 +237,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 totalAdaptersUsed++;
 
-
                 EqtTrace.Verbose("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Done loading tests for {0}",
                         discoverer.Value.GetType().FullName);
 
-                var discovererFromDeprecatedLocations = DiscovererEnumerator.IsDiscovererFromDeprecatedLocations(discoverer);
+                var discovererFromDeprecatedLocations = IsDiscovererFromDeprecatedLocations(discoverer);
                 if (discovererFromDeprecatedLocations)
                 {
                     logger.SendMessage(TestMessageLevel.Warning,
@@ -311,7 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             var sourcesString = string.Join(" ", sources);
 
             // Print warning on no tests.
-            if (string.IsNullOrEmpty(testCaseFilter) == false)
+            if (!string.IsNullOrEmpty(testCaseFilter))
             {
                 var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
 
@@ -329,7 +328,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         sourcesString));
             }
         }
-
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
         {
@@ -400,7 +398,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                                                 Path.GetExtension(source),
                                                 StringComparer.OrdinalIgnoreCase))
                                        select source).ToList(); // ToList is required to actually execute the query
-
 
                 // Update the source list for which no matching source is available.
                 if (matchingSources.Any())
@@ -499,6 +496,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return null;
             }
         }
-
     }
 }

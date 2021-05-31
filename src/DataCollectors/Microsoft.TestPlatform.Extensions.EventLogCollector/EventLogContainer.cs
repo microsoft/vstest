@@ -182,7 +182,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                         for (;
                             this.nextEntryIndexToCollect <= mostRecentIndexInLog;
-                            this.nextEntryIndexToCollect = this.nextEntryIndexToCollect + 1)
+                            this.nextEntryIndexToCollect++)
                         {
                             int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
                             EventLogEntry nextEntry = this.eventLog.Entries[nextEntryIndexInCurrentLog];

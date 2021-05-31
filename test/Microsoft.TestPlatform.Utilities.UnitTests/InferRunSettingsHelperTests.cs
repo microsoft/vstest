@@ -25,6 +25,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 		private readonly Framework frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
 		private readonly Framework frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
 		private readonly Framework frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
+		private const string multiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
 		public InferRunSettingsHelperTests()
 		{
@@ -404,11 +405,11 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sb.AppendLine(GetSourceIncompatibleMessage("x64net47.exe"));
 			sb.AppendLine(GetSourceIncompatibleMessage("x86net45.dll"));
 
-			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), multiTargettingForwardLink);
 			#endregion
 
 			string warningMessage = string.Empty;
-			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet47, sourceArchitectures, sourceFrameworks, out warningMessage);
+			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, Constants.DefaultPlatform, frameworkNet47, sourceArchitectures, sourceFrameworks, out warningMessage);
 
 			// None of the DLLs passed are compatible to the chosen settings
 			Assert.AreEqual(0, compatibleSources.Count());
@@ -428,10 +429,10 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sb.AppendLine();
 			sb.AppendLine(GetSourceIncompatibleMessage("x64net45.exe"));
 
-			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+			var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), multiTargettingForwardLink);
 
 			string warningMessage = string.Empty;
-			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
+			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
 			// only "x86net45.dll" is the compatible source
 			Assert.AreEqual(1, compatibleSources.Count());
@@ -445,7 +446,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sourceFrameworks["x86net45.dll"] = frameworkNet45;
 
 			string warningMessage = string.Empty;
-			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
+			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
 			// only "x86net45.dll" is the compatible source
 			Assert.AreEqual(1, compatibleSources.Count());
@@ -459,7 +460,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 			sourceFrameworks["x64net45.exe"] = frameworkNet45;
 
 			string warningMessage = string.Empty;
-			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Architecture.X64, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
+			var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Architecture.X64, Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
 			Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
 		}
@@ -665,9 +666,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 					</RunSettings>";
 
 			// Act and validate
-			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				runSettingsWithCodeCoverageAndInlineTestSettingsXml), "Invalid response");
-			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
 		}
 
@@ -698,9 +699,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 				</RunSettings>";
 
 			// Act and validate
-			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml), "Invalid response");
-			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
 		}
 
@@ -728,9 +729,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 				</RunSettings>";
 
 			// Act and validate
-			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml), "Invalid response");
-			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
 		}
 
@@ -763,9 +764,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 				</RunSettings>";
 
 			// Act and validate
-			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml), "Invalid response");
-			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
 		}
 
@@ -798,9 +799,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 				</RunSettings>";
 
 			// Act and validate
-			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml), "Invalid response");
-			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+			Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsIncompatibleWithTestSettings(
 				ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml)), "Invalid response");
 		}
 

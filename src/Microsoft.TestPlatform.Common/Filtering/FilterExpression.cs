@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             else
             {
-                Debug.Assert(false, "ProcessOperator called for Unexpected operator.");
+                Debug.Fail("ProcessOperator called for Unexpected operator.");
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Empty));
             }
         }
@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         /// <param name="propertyValueProvider"> The property Value Provider.</param>
         /// <returns> True if evaluation is successful. </returns>
-        internal bool Evaluate(Func<string, Object> propertyValueProvider)
+        internal bool Evaluate(Func<string, object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 

@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
-        private Object localExtensionData;
+        private object localExtensionData;
 
         private Guid defaultId = Guid.Empty;
         private Guid id;
@@ -54,16 +54,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </param>
         public TestCase(string fullyQualifiedName, Uri executorUri, string source)
         {
-            ValidateArg.NotNullOrEmpty(fullyQualifiedName, "fullyQualifiedName");
-            ValidateArg.NotNull(executorUri, "executorUri");
-            ValidateArg.NotNullOrEmpty(source, "source");
+            ValidateArg.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
+            ValidateArg.NotNull(executorUri, nameof(executorUri));
+            ValidateArg.NotNullOrEmpty(source, nameof(source));
 
             this.FullyQualifiedName = fullyQualifiedName;
             this.ExecutorUri = executorUri;
             this.Source = source;
             this.LineNumber = -1;
         }
-
         #endregion
 
         #region Properties
@@ -72,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
-        public Object LocalExtensionData
+        public object LocalExtensionData
         {
             get { return localExtensionData; }
             set { localExtensionData = value; }
@@ -92,6 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     {
                         this.defaultId = this.GetTestId();
                     }
+
                     return this.defaultId;
                 }
 
@@ -110,17 +110,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string FullyQualifiedName
         {
-            get
-            {
-                return this.fullyQualifiedName;
-            }
-            set
-            {
-                this.fullyQualifiedName = value;
+            get => fullyQualifiedName;
 
-                // defaultId should be reset as it is based on FullyQualifiedName and Source.
-                this.defaultId = Guid.Empty;
-            }
+            // defaultId should be reset as it is based on FullyQualifiedName and Source.
+            set => SetVariableAndResetId(ref fullyQualifiedName, value);
         }
 
         /// <summary>
@@ -131,7 +124,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return string.IsNullOrEmpty(this.displayName) ? this.FullyQualifiedName : this.displayName;
+                if (string.IsNullOrEmpty(this.displayName))
+                {
+                    return this.GetFullyQualifiedName();
+                }
+
+                return this.displayName;
             }
             set
             {
@@ -196,12 +194,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <inheritdoc/>
-        public override string ToString()
-        {
-            return this.FullyQualifiedName;
-        }
-
         #endregion
 
         #region private methods
@@ -234,8 +226,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // do nothing
             }
 
-            string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;
+            // We still need to handle parameters in the case of a Theory or TestGroup of test cases that are only
+            // distinguished by parameters.
+            var testcaseFullName = this.ExecutorUri + source;
+
+            // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
+            testcaseFullName += this.GetFullyQualifiedName();
+
             return EqtHash.GuidFromString(testcaseFullName);
+        }
+
+        private void SetVariableAndResetId<T>(ref T variable, T value)
+        {
+            variable = value;
+            this.defaultId = Guid.Empty;
+        }
+
+        private void SetPropertyAndResetId<T>(TestProperty property, T value)
+        {
+            SetPropertyValue(property, value);
+            this.defaultId = Guid.Empty;
         }
 
         #endregion
@@ -248,7 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {
@@ -277,24 +287,37 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         protected override void ProtectedSetPropertyValue(TestProperty property, object value)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {
                 case "TestCase.CodeFilePath":
-                    this.CodeFilePath = (string)value; return;
+                    this.CodeFilePath = value as string;
+                    return;
+
                 case "TestCase.DisplayName":
-                    this.DisplayName = (string)value; return;
+                    this.DisplayName = value as string;
+                    return;
+
                 case "TestCase.ExecutorUri":
-                    this.ExecutorUri = value as Uri ?? new Uri((string)value); return;
+                    this.ExecutorUri = value as Uri ?? new Uri(value as string);
+                    return;
+
                 case "TestCase.FullyQualifiedName":
-                    this.FullyQualifiedName = (string)value; return;
+                    this.FullyQualifiedName = value as string;
+                    return;
+
                 case "TestCase.Id":
-                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
+                    this.Id = value is Guid ? (Guid)value : Guid.Parse(value as string);
+                    return;
+
                 case "TestCase.LineNumber":
-                    this.LineNumber = (int)value; return;
+                    this.LineNumber = (int)value;
+                    return;
+
                 case "TestCase.Source":
-                    this.Source = (string)value; return;
+                    this.Source = value as string;
+                    return;
             }
 
             // It is a custom test case property. Should be set in the TestObject store.
@@ -302,6 +325,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         #endregion
+
+        #region ManagedName and ManagedType implementations
+
+        private static readonly TestProperty ManagedTypeProperty = TestProperty.Register("TestCase.ManagedType", "ManagedType", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
+        private static readonly TestProperty ManagedMethodProperty = TestProperty.Register("TestCase.ManagedMethod", "ManagedMethod", string.Empty, string.Empty, typeof(string), o => !string.IsNullOrWhiteSpace(o as string), TestPropertyAttributes.Hidden, typeof(TestCase));
+
+        private bool ContainsManagedMethodAndType => !string.IsNullOrWhiteSpace(ManagedMethod) && !string.IsNullOrWhiteSpace(ManagedType);
+
+        private string ManagedType
+        {
+            get => GetPropertyValue<string>(ManagedTypeProperty, null);
+            set => SetPropertyAndResetId(ManagedTypeProperty, value);
+        }
+
+        private string ManagedMethod
+        {
+            get => GetPropertyValue<string>(ManagedMethodProperty, null);
+            set => SetPropertyAndResetId(ManagedMethodProperty, value);
+        }
+
+        private string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
+
+        #endregion
+
+        /// <inheritdoc/>
+        public override string ToString() => this.GetFullyQualifiedName();
     }
 
     /// <summary>
@@ -325,25 +374,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Id = TestProperty.Register("TestCase.Id", IdLabel, string.Empty, string.Empty, typeof(Guid), ValidateGuid, TestPropertyAttributes.Hidden, typeof(TestCase));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty FullyQualifiedName = TestProperty.Register("TestCase.FullyQualifiedName", FullyQualifiedNameLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty DisplayName = TestProperty.Register("TestCase.DisplayName", NameLabel, string.Empty, string.Empty, typeof(string), ValidateDisplay, TestPropertyAttributes.None, typeof(TestCase));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ExecutorUri = TestProperty.Register("TestCase.ExecutorUri", ExecutorUriLabel, string.Empty, string.Empty, typeof(Uri), ValidateExecutorUri, TestPropertyAttributes.Hidden, typeof(TestCase));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Source = TestProperty.Register("TestCase.Source", SourceLabel, typeof(string), typeof(TestCase));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty CodeFilePath = TestProperty.Register("TestCase.CodeFilePath", FilePathLabel, typeof(string), typeof(TestCase));
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty LineNumber = TestProperty.Register("TestCase.LineNumber", LineNumberLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
 
         internal static TestProperty[] Properties { get; } =
@@ -373,7 +409,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return value != null;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", Justification = "Required to validate the input value.")]
         private static bool ValidateGuid(object value)
         {
             try

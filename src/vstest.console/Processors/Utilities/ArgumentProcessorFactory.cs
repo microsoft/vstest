@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (String.IsNullOrWhiteSpace(argument))
             {
-                throw new ArgumentException("Cannot be null or empty", "argument");
+                throw new ArgumentException("Cannot be null or empty", nameof(argument));
             }
             Contract.EndContractBlock();
 
@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (arguments == null || arguments.Length == 0)
             {
-                throw new ArgumentException("Cannot be null or empty", "argument");
+                throw new ArgumentException("Cannot be null or empty", nameof(arguments));
             }
             Contract.EndContractBlock();
 
@@ -243,7 +243,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new ListLoggersArgumentProcessor(),
                 new ListSettingsProvidersArgumentProcessor(),
                 new ListFullyQualifiedTestsArgumentProcessor(),
-                new ListTestsTargetPathArgumentProcessor()
+                new ListTestsTargetPathArgumentProcessor(),
+                new EnvironmentArgumentProcessor()
         };
 
         /// <summary>

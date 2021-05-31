@@ -20,9 +20,35 @@ namespace vstest.console.UnitTests.Processors
         private TestableRunSettingsProvider settingsProvider;
         private CLIRunSettingsArgumentExecutor executor;
         private CommandLineOptions commandLineOptions;
-        private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
-        private const string RunSettingsWithDeploymentDisabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
-        private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
+        private readonly string DefaultRunSettings = string.Join(Environment.NewLine, 
+        "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"</RunSettings>");
+
+        private readonly string RunSettingsWithDeploymentDisabled = string.Join(Environment.NewLine,
+            "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+            "<RunSettings>",
+            "  <DataCollectionRunSettings>",
+            "    <DataCollectors />",
+            "  </DataCollectionRunSettings>",
+            "  <MSTest>",
+            "    <DeploymentEnabled>False</DeploymentEnabled>",
+            "  </MSTest>",
+            "</RunSettings>");
+
+        private readonly string RunSettingsWithDeploymentEnabled = string.Join(Environment.NewLine,
+            "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+            "<RunSettings>",
+            "  <DataCollectionRunSettings>",
+            "    <DataCollectors />",
+            "  </DataCollectionRunSettings>",
+            "  <MSTest>",
+            "    <DeploymentEnabled>True</DeploymentEnabled>",
+            "  </MSTest>",
+            "</RunSettings>");
 
         [TestInitialize]
         public void Init()
@@ -60,7 +86,8 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CLIRunSettingsArgumentProcessorCapabilities();
 
             Assert.AreEqual("--", capabilities.CommandName);
-            Assert.AreEqual("RunSettings arguments:" + Environment.NewLine + "      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after \"-- \". Note the space after --. " + Environment.NewLine + "      Use a space to separate multiple [name]=[value]." + Environment.NewLine + "      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments", capabilities.HelpContentResourceName);
+            var expected = "RunSettings arguments:\r\n      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after \"-- \". Note the space after --. \r\n      Use a space to separate multiple [name]=[value].\r\n      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments";
+            Assert.AreEqual(expected.NormalizeLineEndings().ShowWhiteSpace(), capabilities.HelpContentResourceName.NormalizeLineEndings().ShowWhiteSpace());
 
             Assert.AreEqual(HelpContentPriority.CLIRunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.IsFalse(capabilities.IsAction);
@@ -165,7 +192,15 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize(args);
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>F&gt;a&gt;&lt;l&lt;se</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"  <MSTest>",
+"    <DeploymentEnabled>F&gt;a&gt;&lt;l&lt;se</DeploymentEnabled>",
+"  </MSTest>",
+"</RunSettings>"), settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -222,7 +257,16 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize(args);
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>\r\n    </DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"  <MSTest>",
+"    <DeploymentEnabled>",
+"    </DeploymentEnabled>",
+"  </MSTest>",
+"</RunSettings>"), settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -248,7 +292,7 @@ namespace vstest.console.UnitTests.Processors
             runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
-            var args = new string[] { $"RunConfiguration.TargetPlatform={Architecture.ARM.ToString()}" };
+            var args = new string[] { $"RunConfiguration.TargetPlatform={nameof(Architecture.ARM)}" };
             this.executor.Initialize(args);
 
             Assert.IsTrue(this.commandLineOptions.ArchitectureSpecified);
@@ -334,16 +378,48 @@ namespace vstest.console.UnitTests.Processors
         private static readonly List<object[]> validTestCases = new List<object[]>
         {
             new object[] { "TestRunParameters.Parameter(name=\"weburl\",value=\"&><\")" ,
-             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"&amp;&gt;&lt;\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+             string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"  <TestRunParameters>",
+"    <Parameter name=\"weburl\" value=\"&amp;&gt;&lt;\" />",
+"  </TestRunParameters>",
+"</RunSettings>")
             },
             new object[] { "TestRunParameters.Parameter(name=\"weburl\",value=\"http://localhost//abc\")" ,
-             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+             string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"  <TestRunParameters>",
+"    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />",
+"  </TestRunParameters>",
+"</RunSettings>")
             },
             new object[] { "TestRunParameters.Parameter(name= \"a_sf123_12\",value= \"2324346a!@#$%^*()_+-=':;.,/?{}[]|\")" ,
-             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"a_sf123_12\" value=\"2324346a!@#$%^*()_+-=':;.,/?{}[]|\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+             string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"  <TestRunParameters>",
+"    <Parameter name=\"a_sf123_12\" value=\"2324346a!@#$%^*()_+-=':;.,/?{}[]|\" />",
+"  </TestRunParameters>",
+"</RunSettings>")
             },
             new object[] { "TestRunParameters.Parameter(name = \"weburl\" , value = \"http://localhost//abc\")" ,
-             "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <TestRunParameters>\r\n    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />\r\n  </TestRunParameters>\r\n</RunSettings>"
+             string.Join(Environment.NewLine, "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+"<RunSettings>",
+"  <DataCollectionRunSettings>",
+"    <DataCollectors />",
+"  </DataCollectionRunSettings>",
+"  <TestRunParameters>",
+"    <Parameter name=\"weburl\" value=\"http://localhost//abc\" />",
+"  </TestRunParameters>",
+"</RunSettings>")
             },
         };
         #endregion

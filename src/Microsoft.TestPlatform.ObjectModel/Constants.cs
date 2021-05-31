@@ -116,6 +116,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string LoggerConfigurationNameLower = "configuration";
 
         /// <summary>
+        /// Name of TreatNoTestsAsError parameter
+        /// </summary>
+        public const string TreatNoTestsAsError = "TreatNoTestsAsError";
+
+        /// <summary>
         /// Name of RunConfiguration settings node in RunSettings.
         /// </summary>
         public const string RunConfigurationSettingsName = "RunConfiguration";
@@ -168,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The default protocol version
         /// </summary>
-        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 3 };
+        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 5 };
 
         /// <summary>
         /// The minimum protocol version that has debug support
@@ -183,7 +188,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Default results directory.
         /// </summary>
-        public static readonly string DefaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
+        public static readonly string DefaultResultsDirectory =
+#if NETSTANDARD1_0
+            Path.Combine(".", ResultsDirectoryName);
+#else
+            Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
+#endif
 
         /// <summary>
         /// Default treatment of error from test adapters.
@@ -194,7 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The default execution thread apartment state.
         /// </summary>
         [CLSCompliant(false)]
-#if NET451
+#if NETFRAMEWORK
         // Keeping default STA thread for desktop tests for UI/Functional test scenarios
         public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.STA;
 #else

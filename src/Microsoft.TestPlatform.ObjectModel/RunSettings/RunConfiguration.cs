@@ -3,14 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Xml;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test settings.
@@ -307,6 +307,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.TargetFrameworkSet = true;
             }
         }
+        /// <summary>
+        /// Gets or sets value indicating exit code when no tests are discovered or executed
+        /// </summary>
+        public bool TreatNoTestsAsError 
+        { 
+            get; 
+            set; 
+        }
 
         /// <summary>
         /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
@@ -316,7 +324,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                switch(this.framework?.Name)
+                switch (this.framework?.Name)
                 {
                     case Constants.DotNetFramework35:
                         return FrameworkVersion.Framework35;
@@ -498,6 +506,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion
 
+#if !NETSTANDARD1_0
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
@@ -594,8 +603,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 root.AppendChild(dotnetHostPath);
             }
 
+            if (this.TreatNoTestsAsError)
+            {
+                XmlElement treatAsError = doc.CreateElement(nameof(TreatNoTestsAsError));
+                treatAsError.InnerText = this.TreatNoTestsAsError.ToString();
+                root.AppendChild(treatAsError);
+            }
+
             return root;
         }
+#endif
 
         /// <summary>
         /// Loads RunConfiguration from XmlReader.
@@ -604,7 +621,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         public static RunConfiguration FromXml(XmlReader reader)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
             var runConfiguration = new RunConfiguration();
             var empty = reader.IsEmptyElement;
 
@@ -623,7 +640,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
 
                             string resultsDir = reader.ReadElementContentAsString();
-                            if(string.IsNullOrEmpty(resultsDir))
+                            if (string.IsNullOrEmpty(resultsDir))
                             {
                                 throw new SettingsException(
                                    string.Format(
@@ -754,7 +771,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             bool disableParallelizationCheck;
                             if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))
                             {
-                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableParallelizationValueString, elementName));
                             }
                             runConfiguration.DisableParallelization = disableParallelizationCheck;
@@ -847,8 +864,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "SolutionDirectory":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             string solutionDirectory = reader.ReadElementContentAsString();
+
+#if !NETSTANDARD1_0
                             solutionDirectory = Environment.ExpandEnvironmentVariables(solutionDirectory);
-                            if (string.IsNullOrEmpty(solutionDirectory) || !Directory.Exists(solutionDirectory))
+#endif
+
+                            if (string.IsNullOrEmpty(solutionDirectory)
+#if !NETSTANDARD1_0
+                                || !Directory.Exists(solutionDirectory)
+#endif
+                            )
                             {
                                 if (EqtTrace.IsErrorEnabled)
                                 {
@@ -894,10 +919,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TestCaseFilter = reader.ReadElementContentAsString();
                             break;
-                            
+
                         case "DotNetHostPath":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.DotnetHostPath = reader.ReadElementContentAsString();
+                            break;
+                        case "TreatNoTestsAsError":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            string treatNoTestsAsErrorValueString = reader.ReadElementContentAsString();
+                            bool treatNoTestsAsError;
+                            if (!bool.TryParse(treatNoTestsAsErrorValueString, out treatNoTestsAsError))
+                            {
+                                throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, treatNoTestsAsErrorValueString, elementName));
+                            }
+                            runConfiguration.TreatNoTestsAsError = treatNoTestsAsError;
                             break;
 
                         default:

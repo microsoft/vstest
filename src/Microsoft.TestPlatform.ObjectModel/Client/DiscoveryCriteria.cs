@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </param>
         public DiscoveryCriteria(IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, TimeSpan discoveredTestEventTimeout, string runSettings)
         {
-            ValidateArg.NotNullOrEmpty(sources, "sources");
+            ValidateArg.NotNullOrEmpty(sources, nameof(sources));
             if (frequencyOfDiscoveredTestsEvent <= 0)
             {
                 throw new ArgumentOutOfRangeException(

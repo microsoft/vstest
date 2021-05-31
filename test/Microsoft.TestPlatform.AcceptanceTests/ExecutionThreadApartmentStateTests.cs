@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [TestCategory("Windows-Review")]
     public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     {
         [TestMethod]
@@ -13,12 +14,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void UITestShouldPassIfApartmentStateIsSTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /testcasefilter:UITestMethod");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -26,14 +30,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WarningShouldBeShownWhenValueIsSTAForNetCore(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest2 -- RunConfiguration.ExecutionThreadApartmentState=STA");
             this.InvokeVsTest(arguments);
             this.StdOutputContains("ExecutionThreadApartmentState option not supported for framework:");
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -41,13 +48,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void UITestShouldFailWhenDefaultApartmentStateIsMTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /testcasefilter:UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=MTA");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
@@ -56,14 +66,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /tests:UITestWithSleep1,UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=STA RunConfiguration.TestSessionTimeout=2000");
             this.InvokeVsTest(arguments);
             this.StdOutputContains("Canceling test run: test run timeout of");
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
     }
 }

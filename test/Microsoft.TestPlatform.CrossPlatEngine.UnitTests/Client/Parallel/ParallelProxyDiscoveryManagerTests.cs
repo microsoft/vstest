@@ -122,6 +122,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(2, processedSources.Count, "All Sources must be processed.");
         }
 
+        /// <summary>
+        ///  Create ParallelProxyDiscoveryManager with parallel level 1 and two sources,
+        ///  Overall discovery should stop, if aborting was requested
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryTestsShouldStopDiscoveryIfAbortionWasRequested()
+        {
+            // Since the hosts are aborted, total aggregated tests sent across will be -1
+            var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
+            this.createdMockManagers.Add(discoveryManagerMock);
+            var parallelDiscoveryManager = this.SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
+
+            Task.Run(() =>
+            {
+                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
+                parallelDiscoveryManager.Abort();
+            });
+
+            Assert.IsTrue(this.discoveryCompleted.Wait(taskTimeout), "Test discovery not completed.");
+            Assert.AreEqual(1, processedSources.Count, "One source should be processed.");
+        }
+
         [TestMethod]
         public void DiscoveryTestsShouldProcessAllSourceIfOneDiscoveryManagerIsStarved()
         {

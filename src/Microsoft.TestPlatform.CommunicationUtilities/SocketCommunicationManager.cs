@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopClient()
         {
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else
@@ -370,8 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 catch (IOException ioException)
                 {
-                    var socketException = ioException.InnerException as SocketException;
-                    if (socketException != null
+                    if (ioException.InnerException is SocketException socketException
                         && socketException.SocketErrorCode == SocketError.TimedOut)
                     {
                         EqtTrace.Info(

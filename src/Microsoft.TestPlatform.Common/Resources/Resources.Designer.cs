@@ -10,8 +10,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
     using System;
-    
-    
+    using System.Reflection;
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -205,6 +206,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Inner exception:.
+        /// </summary>
+        internal static string InnerException {
+            get {
+                return ResourceManager.GetString("InnerException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: Invalid Condition &apos;{0}&apos;.
         /// </summary>
         internal static string InvalidCondition {
@@ -345,6 +355,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string SettingsProviderNotFound {
             get {
                 return ResourceManager.GetString("SettingsProviderNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stack trace:.
+        /// </summary>
+        internal static string StackTrace {
+            get {
+                return ResourceManager.GetString("StackTrace", resourceCulture);
             }
         }
         

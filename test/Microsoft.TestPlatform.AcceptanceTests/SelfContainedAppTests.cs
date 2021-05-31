@@ -4,12 +4,14 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
+
+    using System.IO;
 
     [TestClass]
     public class SelfContainedAppTests : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows-Review")]
         // this is core 3.1 only, full framework and netcoreapp2.1 don't "publish" automatically during build
         // but if you run it on 2.1 it will pass because we execute the test normally
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useNetCore21Target: false, useNetCore31Target: true)]
@@ -20,13 +22,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // that will fail if we run the testhost.exe from the .nuget location, but will work when we run it from the output folder
             // see https://github.com/dotnet/runtime/issues/3569#issuecomment-595820524 and below for description of how it works
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             // the app is published to win10-x64 because of the runtime identifier in the project
-            var assemblyPath = this.BuildMultipleAssemblyPath(@"win10-x64\SelfContainedAppTestProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var assemblyPath = this.BuildMultipleAssemblyPath($@"win10-x64{Path.DirectorySeparatorChar}SelfContainedAppTestProject.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(passedTestsCount: 1, 0, 0);
+            TryRemoveDirectory(resultsDir);
         }
     }
 }

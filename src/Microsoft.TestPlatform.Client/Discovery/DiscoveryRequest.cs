@@ -267,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     // Raise onDiscoveredTests event if there are some tests in the last chunk.
                     // (We don't want to send the tests in the discovery complete event so that programming on top of
                     // RS client is easier i.e. user does not have to listen on discovery complete event.)
-                    if (lastChunk != null && lastChunk.Count() > 0)
+                    if (lastChunk != null && lastChunk.Any())
                     {
                         var discoveredTestsEvent = new DiscoveredTestsEventArgs(lastChunk);
                         this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
@@ -395,8 +395,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         {
             // Note: Deserialize rawMessage only if required.
 
-            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
-                    this.dataSerializer.DeserializeMessage(rawMessage) : null;
+            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn 
+                          ? this.dataSerializer.DeserializeMessage(rawMessage) 
+                          : null;
 
             if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
             {
@@ -462,9 +463,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
                 }
 
-                if (message is VersionedMessage)
+                if (message is VersionedMessage message1)
                 {
-                    var version = ((VersionedMessage)message).Version;
+                    var version = message1.Version;
 
                     rawMessage = this.dataSerializer.SerializePayload(
                         MessageType.DiscoveryComplete,

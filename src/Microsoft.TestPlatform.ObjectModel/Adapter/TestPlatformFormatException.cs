@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     /// Exception thrown on parsing error in user provided filter expression.
     /// This can happen when filter has invalid format or has unsupported properties.
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     public class TestPlatformFormatException : Exception
@@ -55,14 +55,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         {
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization constructor.
         /// </summary>
         protected TestPlatformFormatException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            ValidateArg.NotNull(info, "info");
+            ValidateArg.NotNull(info, nameof(info));
             // Save the basic properties.
             this.FilterValue = info.GetString("FilterValue");
         }
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
             private set;
         }
 
-#if NET451
+#if NETFRAMEWORK
         /// <summary>
         /// Serialization helper.
         /// </summary>
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         {
             if (info == null)
             {
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException(nameof(info));
             }
 
             base.GetObjectData(info, context);

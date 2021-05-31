@@ -26,6 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
+        internal const string DataCollectorsCorProfiler = "VS.TestPlatform.DataCollector.CorProfiler";
+
+        internal const string DataCollectorsCoreClrProfiler = "VS.TestPlatform.DataCollector.CoreClrProfiler";
+
         public static string RunState = "VS.TestRun.RunState";
 
         public static string NumberOfSourcesSentForRun = "VS.TestRun.NumberOfSources";
@@ -54,6 +58,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // In case of parallel it will be sum of all time taken by an adapter to run tests in different execution process
         public static string TimeTakenToRunTestsByAnAdapter = "VS.TestRun.TimeTakenToRun";
 
+        // Reports details for MSTestV1. Reports just the count when TPv1 is used. 
+        // Reports legacy when the legacy runner TMI / TPv0 is used.
+        // Adds an extension when an extension (tips) is used. 
+        // eg:- VS.TestRun.TotalTestsRunByMSTestv1 - a unit test using TPv1 and MSTestV1
+        // eg:- VS.TestRun.TotalTestsRunByMSTestv1.legacy - a unit test using TPv0 and MSTestV1
+        // eg:- VS.TestRun.TotalTestsRunByMSTestv1.legacy.extension.codedui - a coded ui test using TPv0 and MSTestV1 
+        // Counts in this metric are not subtracted from the TotalTestsRanByAdapter. This metrics just 
+        // provides more insight into what was actually executed.
+        public static string TotalTestsRunByMSTestv1 = "VS.TestRun.TotalTestsRunByMSTestv1";
+
         // Total number of adapter discovered on the machine.
         public static string NumberOfAdapterDiscoveredDuringExecution = "VS.TestRun.AdaptersDiscoveredCount";
 
@@ -67,6 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string TotalTestsDiscovered = "VS.TestDiscovery.TotalTests";
 
         public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled";
+
+        public static string ParallelEnabledDuringStartTestSession = "VS.StartTestSession.ParallelEnabled";
 
         // All the times are in sec
         public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";
@@ -90,9 +106,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string NumberOfAdapterUsedToDiscoverTests = "VS.TestDiscovery.AdaptersUsedCount";
 
+        // *********************Attachments Processing****************************
+        public static string NumberOfAttachmentsSentForProcessing = "VS.AttachmentsProcessing.InitialAttachmentsCount";
+
+        public static string NumberOfAttachmentsAfterProcessing = "VS.AttachmentsProcessing.FinalAttachmentsCount";
+
+        public static string TimeTakenInSecForAttachmentsProcessing = "VS.AttachmentsProcessing.TotalTimeTakenInSec";
+        public static string AttachmentsProcessingState = "VS.AttachmentsProcessing.State";
+
         // **************Events Name **********************************
         public static string TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession";
 
         public static string TestExecutionCompleteEvent = "vs/testplatform/testrunsession";
+
+        public static string TestAttachmentsProcessingCompleteEvent = "vs/testplatform/testattachmentsprocessingsession";
+
+        public static string StartTestSessionCompleteEvent = "vs/testplatform/starttestsession";
     }
 }

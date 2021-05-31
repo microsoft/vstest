@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(fileExtension))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "fileExtension");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(fileExtension));
             }
 
             FileExtension = fileExtension;

@@ -57,6 +57,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private int testHostId;
 
+        private string temp = Path.GetTempPath();
+
         public DotnetTestHostManagerTests()
         {
             this.mockTestHostLauncher = new Mock<ITestHostLauncher>();
@@ -66,8 +68,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockEnvironment = new Mock<IEnvironment>();
             this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
-            string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
-            this.defaultTestHostPath = @"\tmp\testhost.dll";
+            string defaultSourcePath = Path.Combine(this.temp, "test.dll");
+            this.defaultTestHostPath = Path.Combine(this.temp, "testhost.dll");
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
@@ -81,6 +83,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
             this.mockFileHelper.Setup(ph => ph.Exists(this.defaultTestHostPath)).Returns(true);
+
+            this.mockTestHostLauncher
+                .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+                .Returns(Process.GetCurrentProcess().Id);
+
+            this.mockTestHostLauncher
+                .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
+                .Returns(Process.GetCurrentProcess().Id);
 
             this.defaultTestProcessStartInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { defaultSourcePath }, null, this.defaultConnectionInfo);
         }
@@ -185,7 +195,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
-            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client" + " --parentprocessid 101");
+            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client --parentprocessid 101");
         }
 
         [TestMethod]
@@ -292,6 +302,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestHostProcessStartInfoShouldUseTestHostExeFromNugetIfNotFoundInSourceLocation()
         {
             var testhostExePath = "testhost.exe";
@@ -299,7 +310,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
             this.mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x64\\testhost.exe")).Returns(true);
             this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var sourcePath = Path.Combine(this.temp, "test.dll");
 
             string runtimeConfigFileContent =
 @"{
@@ -345,12 +356,12 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 }";
 
             MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
             MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
             string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
             this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
@@ -361,14 +372,15 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestHostProcessStartInfoShouldUseTestHostX86ExeFromNugetIfNotFoundInSourceLocation()
         {
             var testhostExePath = "testhost.x86.exe";
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
             this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(false);
-            this.mockFileHelper.Setup(ph => ph.Exists("C:\\packages\\microsoft.testplatform.testhost\\15.0.0-Dev\\build\\netcoreapp2.1\\x86\\testhost.x86.exe")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists($"C:\\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost\\15.0.0-Dev{Path.DirectorySeparatorChar}build\\netcoreapp2.1\\x86\\testhost.x86.exe")).Returns(true);
             this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var sourcePath = Path.Combine(this.temp, "test.dll");
 
             string runtimeConfigFileContent =
 @"{
@@ -414,14 +426,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 }";
 
             MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
             MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
             this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
@@ -484,6 +496,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         public void GetTestHostProcessStartInfoOnWindowsForValidPathReturnsFullPathOfDotnetHost()
         {
             // To validate the else part, set current process to exe other than dotnet
@@ -492,7 +505,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 #if !NET451
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
@@ -519,7 +532,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
@@ -544,11 +557,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeSourceDirectoryAsWorkingDirectory()
         {
             // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
-            this.mockFileHelper.Setup(ph => ph.Exists(@"\tmp\testhost.dll")).Returns(true);
+            var sourcePath = Path.Combine(this.temp, "test.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "testhost.dll"))).Returns(true);
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
-            Assert.AreEqual($"{Path.DirectorySeparatorChar}tmp", startInfo.WorkingDirectory);
+            Assert.AreEqual(Path.GetDirectoryName(this.temp), startInfo.WorkingDirectory);
         }
 
         [TestMethod]
@@ -619,10 +632,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
         {
             // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
-            string expectedTestHostPath = @"\tmp\testhost.dll";
+            var sourcePath = Path.Combine(this.temp, "test.dll");
+            string expectedTestHostPath = Path.Combine(this.temp, "testhost.dll");
             this.mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
@@ -633,10 +646,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfRunConfigDevFileNotFound()
         {
             // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
-            string expectedTestHostPath = @"\tmp\testhost.dll";
+            var sourcePath = Path.Combine(this.temp, "test.dll");
+            string expectedTestHostPath = Path.Combine(this.temp, "testhost.dll");
             this.mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
@@ -647,7 +660,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromDepsFile()
         {
             // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var sourcePath = Path.Combine(this.temp, "test.dll");
 
             string runtimeConfigFileContent =
 @"{
@@ -693,14 +706,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 }";
 
             MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
             MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
             this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
@@ -712,7 +725,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfNugetpathDoesntExist()
         {
             // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var sourcePath = Path.Combine(this.temp, "test.dll");
 
             string runtimeConfigFileContent =
 @"{
@@ -758,17 +771,17 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 }";
 
             MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
             MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
             this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(false);
 
-            string testHostPath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "testhost.dll");
+            string testHostPath = Path.Combine(this.temp, "testhost.dll");
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
@@ -779,7 +792,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldSkipInvalidAdditionalProbingPaths()
         {
             // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var sourcePath = Path.Combine(this.temp, "test.dll");
 
             string runtimeConfigFileContent =
 @"{
@@ -826,14 +839,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 }";
 
             MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.runtimeconfig.dev.json"), FileMode.Open, FileAccess.Read)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.runtimeconfig.dev.json"))).Returns(true);
 
             MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
-            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.GetStream(Path.Combine(this.temp, "test.deps.json"), FileMode.Open, FileAccess.Read)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists(Path.Combine(this.temp, "test.deps.json"))).Returns(true);
 
-            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            string testHostFullPath = $@"C:\packages{Path.DirectorySeparatorChar}microsoft.testplatform.testhost/15.0.0-Dev{Path.DirectorySeparatorChar}lib/netstandard1.5/testhost.dll";
             this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);

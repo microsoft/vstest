@@ -4,14 +4,17 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using System;
     using System.Collections.Generic;
     using System.IO;
 
     [TestClass]
+    [TestCategory("Windows")]
     public class DisableAppdomainTests : AcceptanceTestBase
     {
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         public void DisableAppdomainTest(RunnerInfo runnerInfo)
         {
@@ -24,6 +27,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows")]
         [NetFullTargetFrameworkDataSource]
         public void NewtonSoftDependencyWithDisableAppdomainTest(RunnerInfo runnerInfo)
         {
@@ -47,16 +51,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "DisableAppDomain", "true" }
                                                  };
 
+            var resultsDir = GetResultsDirectory();
             var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
             var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
             var arguments = PrepareArguments(
                 testAssembly,
                 string.Empty,
                 GetRunsettingsFilePath(runConfigurationDictionary),
-                this.FrameworkArgValue);
+                this.FrameworkArgValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(passedTestCount, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)

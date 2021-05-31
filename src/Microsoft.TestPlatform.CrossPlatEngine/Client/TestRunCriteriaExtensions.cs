@@ -52,7 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private static bool TryCheckTestSourceDifferFromPackage(ITestRuntimeProvider testRuntimeProvider,
             IEnumerable<string> inputPackages, out IEnumerable<string> actualTestSources)
         {
-
             actualTestSources = testRuntimeProvider.GetTestSources(inputPackages);
 
             // For netcore/fullclr both packages and sources are same thing,

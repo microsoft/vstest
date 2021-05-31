@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -153,6 +154,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             // Initialize diag logging.
             InitializeDiagLogging(diagFilePath, diagParameters);
+
+            // Write version to the log here, because that is the 
+            // first place where we know if we log or not.
+            EqtTrace.Verbose($"Version: {Product.Version}");
         }
 
         /// <summary>
@@ -200,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Get trace level from diag parameters.
-            var traceLevelExists = diagParameters.TryGetValue(TraceLevelParam, out string traceLevelStr);
+            var traceLevelExists = diagParameters.TryGetValue(TraceLevelParam, out var traceLevelStr);
             if (traceLevelExists && Enum.TryParse(traceLevelStr, true, out PlatformTraceLevel traceLevel))
             {
                 return traceLevel;

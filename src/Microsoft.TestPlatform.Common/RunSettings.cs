@@ -69,13 +69,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         {
             if (StringUtilities.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, nameof(settingsName));
             }
 
             // Try and lookup the settings provider.
             ISettingsProvider result = null;
-            LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> provider;
-            this.settings.TryGetValue(settingsName, out provider);
+            this.settings.TryGetValue(settingsName, out var provider);
 
             // If a provider was found, return it.
             if (provider != null)
@@ -208,8 +207,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must not fail on crash in loading settings.")]
         private void LoadSection(XmlReader reader, SettingsProviderExtensionManager settingsExtensionManager)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
-            ValidateArg.NotNull<SettingsProviderExtensionManager>(settingsExtensionManager, "settingsExtensionManager");
+            ValidateArg.NotNull(reader, nameof(reader));
+            ValidateArg.NotNull(settingsExtensionManager, nameof(settingsExtensionManager));
 
             // Check for duplicate settings
             if (this.settings.ContainsKey(reader.Name))

@@ -25,14 +25,39 @@ namespace TestPlatform.Common.UnitTests.Utilities
         }
 
         [TestMethod]
-        public void GetExceptionMessageShouldReturnFormattedExceptionMessageWithInnerExceptionDetails()
+        public void GetExceptionMessageShouldReturnExceptionMessageContainingAllExceptionMessages()
         {
             var innerException = new Exception("Bad stuff internally");
             var innerException2 = new Exception("Bad stuff internally 2", innerException);
             var exception = new ArgumentException("Some bad stuff", innerException2);
-            var expectedMessage = exception.Message + Environment.NewLine + innerException2.Message
-                                  + Environment.NewLine + innerException.Message; 
-            Assert.AreEqual(expectedMessage, ExceptionUtilities.GetExceptionMessage(exception));
+            
+            var message = ExceptionUtilities.GetExceptionMessage(exception);
+            StringAssert.Contains(message, exception.Message);
+            StringAssert.Contains(message, innerException.Message);
+            StringAssert.Contains(message, innerException.Message);
+        }
+
+        [TestMethod]
+        public void GetExceptionMessageShouldReturnExceptionMessageContainingStackTrace()
+        {
+            var message = ExceptionUtilities.GetExceptionMessage(GetExceptionWithStackTrace());
+            StringAssert.Contains(message, "Stack trace:");
+            // this test is where it or
+            StringAssert.Contains(message, "ExceptionUtilitiesTests.GetExceptionWithStackTrace");
+        }
+
+        private Exception GetExceptionWithStackTrace()
+        {
+            try
+            {
+                var innerException = new Exception("Bad stuff internally");
+                var innerException2 = new Exception("Bad stuff internally 2", innerException);
+                throw new ArgumentException("Some bad stuff", innerException2);
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
     }
 }

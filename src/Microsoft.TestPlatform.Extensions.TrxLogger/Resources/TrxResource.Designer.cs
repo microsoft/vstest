@@ -88,6 +88,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot get find an available filename for {0} using timestamp format &apos;{2}&apos; at {1}..
+        /// </summary>
+        internal static string Common_CannotGetNextTimestampFileName {
+            get {
+                return ResourceManager.GetString("Common_CannotGetNextTimestampFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to deployment item &apos;{0}&apos;.
         /// </summary>
         internal static string Common_DeploymentItem {

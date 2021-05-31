@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     /// Base exception for all Rocksteady service exceptions
     /// </summary>
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         public static Exception ConvertException(FaultException faultEx)
         {
-            ValidateArg.NotNull(faultEx, "faultEx");
+            ValidateArg.NotNull(faultEx, nameof(faultEx));
             if (faultEx.Code == null || faultEx.Code.Name == null)
             {
                 return new TestPlatformException(faultEx.Message, faultEx);
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     }
 #endif
 
-#if NET451
+#if NETFRAMEWORK
     [Serializable]
 #endif
     [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]

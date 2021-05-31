@@ -130,6 +130,46 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             return cpuCount;
         }
+        /// <summary>
+        /// Gets the value of TreatNoTestsAsError parameter from runsettings file
+        /// </summary>
+        /// <param name="runSettings">Runsetting string value</param>
+        /// <returns>The value of TreatNoTestsAsError</returns>
+        public static bool GetTreatNoTestsAsError(string runSettings)
+        {
+            bool treatNoTestsAsError = false;
+
+            if (runSettings != null)
+            {
+                try
+                {
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+                    treatNoTestsAsError = GetTreatNoTestsAsError(runConfiguration);
+                }
+                catch (SettingsException se)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("RunSettingsUtilities.GetTreatNoTestsAsError: Unable to get the value of TreatNoTestsAsError from runsettings: Error {0}", se);
+                    }
+                }
+            }
+
+            return treatNoTestsAsError;
+        }
+
+        private static bool GetTreatNoTestsAsError(RunConfiguration runConfiguration)
+        {
+            bool treatNoTestsAsError = false;
+
+            if (runConfiguration != null)
+            {
+                treatNoTestsAsError = runConfiguration.TreatNoTestsAsError;
+            }
+
+            return treatNoTestsAsError;
+        }
+
 
         /// <summary>
         /// Gets the test adapters path from the run configuration

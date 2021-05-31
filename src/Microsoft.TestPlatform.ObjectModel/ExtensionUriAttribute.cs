@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(extensionUri))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "extensionUri");
+                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, nameof(extensionUri));
             }
 
             ExtensionUri = extensionUri;

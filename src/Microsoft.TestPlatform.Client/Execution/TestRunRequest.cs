@@ -40,12 +40,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         /// Sync object for various operations
         /// </summary>
-        private object syncObject = new Object();
+        private object syncObject = new object();
 
         /// <summary>
         /// Sync object for cancel operation
         /// </summary>
-        private object cancelSyncObject = new Object();
+        private object cancelSyncObject = new object();
 
         /// <summary>
         /// The run completion event which will be signaled on completion of test run.
@@ -190,12 +190,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
+                EqtTrace.Verbose(string.Format("TestRunRequest.OnTestSessionTimeout: calling cancellation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
             }
 
-            string message = String.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
-            var testMessagePayload = new CommunicationObjectModel.TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
-            var rawMessage = this.dataSerializer.SerializePayload(CommunicationObjectModel.MessageType.TestMessage, testMessagePayload);
+            string message = string.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
 
             this.HandleLogMessage(TestMessageLevel.Error, message);
             this.HandleRawMessage(rawMessage);
@@ -215,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             }
 
             if (this.State != TestRunState.InProgress
-                && !(this.State == TestRunState.Completed
+                        && !(this.State == TestRunState.Completed
                         || this.State == TestRunState.Canceled
                         || this.State == TestRunState.Aborted))
             {
@@ -622,9 +622,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
                 }
 
-                if (message is VersionedMessage)
+                if (message is VersionedMessage message1)
                 {
-                    var version = ((VersionedMessage)message).Version;
+                    var version = message1.Version;
 
                     rawMessage = this.dataSerializer.SerializePayload(
                         MessageType.ExecutionComplete,
@@ -664,8 +664,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public bool AttachDebuggerToProcess(int pid)
         {
             return this.testRunCriteria.TestHostLauncher is ITestHostLauncher2 launcher
-                ? launcher.AttachDebuggerToProcess(pid)
-                : false;
+                    && launcher.AttachDebuggerToProcess(pid);
         }
 
         /// <summary>

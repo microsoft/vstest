@@ -81,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Verbose("LengthPrefixCommunicationChannel.Dispose: Dispose reader and writer.");
             this.reader.Dispose();
             this.writer.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

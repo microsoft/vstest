@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
         private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
         private const string EnvironmentVariablesNodePath = @"/RunSettings/RunConfiguration/EnvironmentVariables";
-        private const string multiTargettingForwardLink = @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409";
+        private const string multiTargettingForwardLink = @"https://aka.ms/tp/vstest/multitargetingdoc?view=vs-2019";
 
         // To make things compatible for older runsettings
         private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
@@ -134,7 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return updatedRunSettingsXml;
         }
 
-
         /// <summary>
         /// Updates the run settings XML with the specified values.
         /// </summary>
@@ -150,9 +149,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             // when runsettings specifies platform, that takes precedence over the user specified platform via command line arguments.
             var shouldUpdatePlatform = true;
-            string nodeXml;
 
-            TryGetPlatformXml(runSettingsNavigator, out nodeXml);
+            TryGetPlatformXml(runSettingsNavigator, out var nodeXml);
             if (!string.IsNullOrEmpty(nodeXml))
             {
                 architecture = (Architecture)Enum.Parse(typeof(Architecture), nodeXml, true);
@@ -230,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         /// <param name="runsettings">RunSettings used for the run</param>
         /// <returns>True if an incompatible collector is found</returns>
-        public static bool AreRunSettingsCollectorsInCompatibleWithTestSettings(string runsettings)
+        public static bool AreRunSettingsCollectorsIncompatibleWithTestSettings(string runsettings)
         {
             // If there's no embedded testsettings.. bail out
             if (!IsTestSettingsEnabled(runsettings))
@@ -435,7 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
         {
-            ValidateArg.NotNull(runSettingsNavigator, "runSettingsNavigator");
+            ValidateArg.NotNull(runSettingsNavigator, nameof(runSettingsNavigator));
 
             deviceXml = null;
             XPathNavigator targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);
@@ -522,8 +520,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
             {
-                string nodeXml;
-                if (!TryGetPlatformXml(runSettingsNavigator, out nodeXml))
+                if (!TryGetPlatformXml(runSettingsNavigator, out var nodeXml))
                 {
                     throw new XmlException(
                         string.Format(
@@ -584,7 +581,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             string resultsDirectory)
         {
             var childNode = xmlDocument.SelectSingleNode(ResultsDirectoryNodePath);
-            if (null != childNode)
+            if (childNode != null)
             {
                 resultsDirectory = childNode.InnerXml;
             }
@@ -657,7 +654,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
         /// </summary>
-        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Architecture defaultArchitecture, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
         {
             incompatibleSettingWarning = string.Empty;
             List<String> compatibleSources = new List<String>();
@@ -687,7 +684,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (incompatiblityFound)
             {
-                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, defaultArchitecture, warnings.ToString(), multiTargettingForwardLink);
             }
 
             return compatibleSources;
@@ -704,7 +701,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
         }
 
-
         /// <summary>
         /// Returns true if source Platform is incompatible with target platform.
         /// </summary>
@@ -715,8 +711,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 return false;
             }
-
+            if (targetPlatform == Architecture.X64 && !Is64BitOperatingSystem())
+            {
+                return true;
+            }
             return sourcePlatform != targetPlatform;
+
+            bool Is64BitOperatingSystem()
+            {
+#if !NETSTANDARD1_3
+                return Environment.Is64BitOperatingSystem;
+#else
+                // In the absence of APIs to check, assume the majority case
+                return true;
+#endif
+            }
         }
 
         /// <summary>

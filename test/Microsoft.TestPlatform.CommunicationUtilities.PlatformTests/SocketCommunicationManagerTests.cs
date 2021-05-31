@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.tcpListener.Stop();
-#if NET451
+#if NETFRAMEWORK
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else
@@ -51,6 +51,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 #endif
             this.communicationManager.StopServer();
             this.communicationManager.StopClient();
+            GC.SuppressFinalize(this);
         }
 
         #region Server tests

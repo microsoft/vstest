@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Interface for data collectors add-ins that choose to handle attachment(s) generated
     /// </summary>
+    [Obsolete("Interface is deprecated. Please use IDataCollectorAttachmentProcessor instead")]
     public interface IDataCollectorAttachments
     {
         /// <summary>

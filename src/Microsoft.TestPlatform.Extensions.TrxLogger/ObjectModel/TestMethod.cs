@@ -14,10 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     internal sealed class TestMethod : IXmlTestStore
     {
         private string className;
-
         private string name; // test method name
-
-
         private bool isValid;
 
         public TestMethod(string name, string className)
@@ -48,7 +45,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 return this.className;
             }
-
         }
 
         /// <summary>

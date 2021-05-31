@@ -13,7 +13,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Moq;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class VsTestConsoleWrapperTests
@@ -53,6 +56,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(100));
         }
 
         [TestMethod]
@@ -176,7 +180,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleWrapper.RunTests(this.testSources, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -188,7 +192,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                             null,
                             new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -201,7 +205,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                             options,
                             new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", options, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -213,7 +217,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestRunEventsHandler>().Object,
                 new Mock<ITestHostLauncher>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
         }
 
         [TestMethod]
@@ -232,6 +236,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     this.testSources,
                     "RunSettings",
                     options,
+                    null,
                     It.IsAny<ITestRunEventsHandler>(),
                     It.IsAny<ITestHostLauncher>()),
                     Times.Once);
@@ -242,7 +247,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleWrapper.RunTests(this.testCases, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -250,7 +255,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleWrapper.RunTests(this.testCases, "RunSettings", null, new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -260,7 +265,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.consoleWrapper.RunTests(this.testCases, "RunSettings", options, new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", options, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -272,7 +277,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestRunEventsHandler>().Object,
                 new Mock<ITestHostLauncher>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
         }
 
         [TestMethod]
@@ -285,7 +290,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestRunEventsHandler>().Object,
                 new Mock<ITestHostLauncher>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", null, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
         }
 
         [TestMethod]
@@ -300,7 +305,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestRunEventsHandler>().Object,
                 new Mock<ITestHostLauncher>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", options, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task ProcessTestRunAttachmentsAsyncShouldSucceed()
+        {
+            var attachments = new Collection<AttachmentSet>();
+            var cancellationToken = new CancellationToken();
+
+            await this.consoleWrapper.ProcessTestRunAttachmentsAsync(
+                attachments,
+                null,
+                true,
+                true,
+                new Mock<ITestRunAttachmentsProcessingEventsHandler>().Object,
+                cancellationToken);
+
+            this.mockRequestSender.Verify(rs => rs.ProcessTestRunAttachmentsAsync(attachments, true, It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), cancellationToken));
         }
 
         [TestMethod]

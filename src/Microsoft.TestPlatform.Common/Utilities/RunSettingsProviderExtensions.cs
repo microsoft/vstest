@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             ValidateArg.NotNull(data, nameof(data));
 
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
-            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(xmlDocument, key, data);
+            UpdateRunSettingsXmlDocument(xmlDocument, key, data);
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <returns></returns>
         public static Match GetTestRunParameterNodeMatch(this IRunSettingsProvider runSettingsProvider, string node)
         {
-            var attrName = $"(?<{AttributeNameString}>\\w+)";
+            var attrName = $"(?<{AttributeNameString}>[\\w.:-]+)";
             var attrValue = $"(?<{AttributeValueString}>.+)";
             Regex regex = new Regex($"{Constants.TestRunParametersName}.{ParameterString}\\(name\\s*=\\s*\"{attrName}\"\\s*,\\s*value\\s*=\\s*\"{attrValue}\"\\)");
             Match match = regex.Match(node);
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             ValidateArg.NotNull(xml, nameof(xml));
 
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
-            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
+            UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         internal static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
         {
-            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
+            var node = GetXmlNode(xmlDocument, key) ?? CreateNode(xmlDocument, key);
             node.InnerText = data;
         }
 
@@ -226,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 var settingsXml = runSettingsProvider.ActiveRunSettings.SettingsXml;
 
-#if NET451
+#if NETFRAMEWORK
                 using (var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { XmlResolver = null, CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
 #else
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
             else
             {
-#if NET451
+#if NETFRAMEWORK
                 doc = (XmlDocument) XmlRunSettingsUtilities.CreateDefaultRunSettings();
 #else
                 using (

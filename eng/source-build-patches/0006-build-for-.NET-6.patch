@@ -1,0 +1,189 @@
+From 80d24c9102802bf1e16c7b5bca5884b639ca2f0f Mon Sep 17 00:00:00 2001
+From: Tom Deseyn <tom.deseyn@gmail.com>
+Date: Thu, 12 Nov 2020 15:35:12 +0100
+Subject: [PATCH] vstest: build for .NET 6
+
+---
+ scripts/build.sh                                            | 4 ++--
+ .../Microsoft.TestPlatform.PlatformAbstractions.csproj      | 6 +++++-
+ .../Hosting/DotnetTestHostManager.cs                        | 2 +-
+ src/datacollector/datacollector.csproj                      | 2 +-
+ src/package/nuspec/Microsoft.TestPlatform.Build.csproj      | 2 +-
+ src/package/nuspec/Microsoft.TestPlatform.CLI.csproj        | 2 +-
+ src/package/nuspec/TestPlatform.CLI.nuspec                  | 2 +-
+ src/package/package/package.csproj                          | 2 +-
+ src/testhost.x86/testhost.x86.csproj                        | 2 +-
+ src/testhost/testhost.csproj                                | 5 +++--
+ src/vstest.console/vstest.console.csproj                    | 5 +++--
+ 11 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/scripts/build.sh b/scripts/build.sh
+index e4454a5d..a8dcbddb 100755
+--- a/scripts/build.sh
++++ b/scripts/build.sh
+@@ -120,7 +120,7 @@ DOTNET_CLI_VERSION="5.0.100-rc.1.20380.12"
+ TPB_Solution="TestPlatform.sln"
+ TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
+ TPB_TargetFramework="net451"
+-TPB_TargetFrameworkCore="netcoreapp2.1"
++TPB_TargetFrameworkCore="net6.0"
+ TPB_Configuration=$CONFIGURATION
+ TPB_TargetRuntime=$TARGET_RUNTIME
+ TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION_SUFFIX)
+@@ -338,7 +338,7 @@ function publish_package()
+ 
+     log "publish_package: Complete. Elapsed $(( SECONDS - start ))s."
+     
+-    publishplatformatbstractions
++    # publishplatformatbstractions
+ }
+ 
+ function publishplatformatbstractions()
+diff --git a/src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj b/src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj
+index e112259a..73b35c87 100644
+--- a/src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj
++++ b/src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj
+@@ -10,7 +10,7 @@
+     <RootNamespace>Microsoft.TestPlatform.PlatformAbstractions</RootNamespace>
+     <TargetFrameworks>net45;net451;netcoreapp1.0;netcoreapp2.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.0;netstandard1.3;netstandard2.0;netcoreapp2.1</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+ 
+     <!-- This causes a build error on netcoreapp1.0 -->
+diff --git a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs b/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
+index eb4149d6..33a13411 100644
+--- a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
++++ b/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
+@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
+                         // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
+                         var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
+                         var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent.Parent.Parent;
+-                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
++                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
+ 
+                         if (this.fileHelper.Exists(testHostExeNugetPath))
+                         {
+diff --git a/src/datacollector/datacollector.csproj b/src/datacollector/datacollector.csproj
+index 24e3df7c..bb6d3631 100644
+--- a/src/datacollector/datacollector.csproj
++++ b/src/datacollector/datacollector.csproj
+@@ -10,7 +10,7 @@
+     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+     <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472</TargetFrameworks>
+     <TargetFrameworks Condition=" '$(OS)' != 'WINDOWS_NT' ">$(TargetFrameworks);net451</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+     <WarningsAsErrors>true</WarningsAsErrors>
+     <PlatformTarget Condition="$(TargetFramework.StartsWith('net4'))">AnyCPU</PlatformTarget>
+     <OutputType>Exe</OutputType>
+diff --git a/src/package/nuspec/Microsoft.TestPlatform.Build.csproj b/src/package/nuspec/Microsoft.TestPlatform.Build.csproj
+index fdc693f5..c9bc263e 100644
+--- a/src/package/nuspec/Microsoft.TestPlatform.Build.csproj
++++ b/src/package/nuspec/Microsoft.TestPlatform.Build.csproj
+@@ -1,7 +1,7 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+     <OutputType>Exe</OutputType>
+-    <TargetFramework>netcoreapp1.0</TargetFramework>
++    <TargetFramework>net6.0</TargetFramework>
+     <NuspecFile>TestPlatform.Build.nuspec</NuspecFile>
+     <NuspecProperties>version=$(Version)</NuspecProperties>
+ 
+diff --git a/src/package/nuspec/Microsoft.TestPlatform.CLI.csproj b/src/package/nuspec/Microsoft.TestPlatform.CLI.csproj
+index b668cb39..2b74bcc5 100644
+--- a/src/package/nuspec/Microsoft.TestPlatform.CLI.csproj
++++ b/src/package/nuspec/Microsoft.TestPlatform.CLI.csproj
+@@ -1,7 +1,7 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+     <OutputType>Exe</OutputType>
+-    <TargetFramework>netcoreapp1.0</TargetFramework>
++    <TargetFramework>net6.0</TargetFramework>
+     <NuspecFile>TestPlatform.CLI.nuspec</NuspecFile>
+     <NuspecProperties>version=$(Version)</NuspecProperties>
+ 
+diff --git a/src/package/nuspec/TestPlatform.CLI.nuspec b/src/package/nuspec/TestPlatform.CLI.nuspec
+index ce0da806..018ba30e 100644
+--- a/src/package/nuspec/TestPlatform.CLI.nuspec
++++ b/src/package/nuspec/TestPlatform.CLI.nuspec
+@@ -21,6 +21,6 @@
+     <!-- Add a third party notice file -->
+     <file src="ThirdPartyNotices.txt" target="" />
+     
+-    <file src="netcoreapp2.1\**\*.*" exclude="**\*.pdb" target="contentFiles\any\netcoreapp2.1" />
++    <file src="net6.0\**\*.*" exclude="**\*.pdb" target="contentFiles\any\net6.0" />
+   </files>
+ </package>
+diff --git a/src/package/package/package.csproj b/src/package/package/package.csproj
+index 4b39d121..febb3848 100644
+--- a/src/package/package/package.csproj
++++ b/src/package/package/package.csproj
+@@ -6,7 +6,7 @@
+   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+   <PropertyGroup>
+     <TargetFrameworks>net451;netcoreapp2.1</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+     <AssemblyName>package</AssemblyName>
+     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+diff --git a/src/testhost.x86/testhost.x86.csproj b/src/testhost.x86/testhost.x86.csproj
+index 535a6e6a..a3ef5cee 100644
+--- a/src/testhost.x86/testhost.x86.csproj
++++ b/src/testhost.x86/testhost.x86.csproj
+@@ -9,7 +9,7 @@
+   <PropertyGroup>
+     <AssemblyName>testhost.x86</AssemblyName>
+     <TargetFrameworks>netcoreapp2.1;netcoreapp1.0;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1;netcoreapp1.0</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+     <WarningsAsErrors>true</WarningsAsErrors>
+     <PlatformTarget>AnyCPU</PlatformTarget>
+     <Prefer32Bit>true</Prefer32Bit>
+diff --git a/src/testhost/testhost.csproj b/src/testhost/testhost.csproj
+index c239485d..152b8ae0 100644
+--- a/src/testhost/testhost.csproj
++++ b/src/testhost/testhost.csproj
+@@ -9,11 +9,12 @@
+   <PropertyGroup>
+     <AssemblyName>testhost</AssemblyName>
+     <TargetFrameworks>netcoreapp2.1;netcoreapp1.0;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1;netcoreapp1.0</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
++    <TargetFramework>net6.0</TargetFramework>
+     <OutputType>Exe</OutputType>
+     <ApplicationManifest>app.manifest</ApplicationManifest>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1' AND '$(TargetFramework)' != 'netcoreapp1.0'">
++  <PropertyGroup Condition="'$(TargetFramework)' != 'net6.0' ">
+     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+     <TargetName Condition="'$(TargetFramework)' != 'net451'">$(AssemblyName).$(TargetFramework)</TargetName>
+diff --git a/src/vstest.console/vstest.console.csproj b/src/vstest.console/vstest.console.csproj
+index ea970a60..f7448391 100644
+--- a/src/vstest.console/vstest.console.csproj
++++ b/src/vstest.console/vstest.console.csproj
+@@ -7,7 +7,8 @@
+   <PropertyGroup>
+     <AssemblyName>vstest.console</AssemblyName>
+     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
++    <UseAppHost>false</UseAppHost>
+     <WarningsAsErrors>true</WarningsAsErrors>
+     <OutputType>Exe</OutputType>
+     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
+@@ -15,7 +16,7 @@
+     <ApplicationManifest>app.manifest</ApplicationManifest>
+     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CommandLine</RootNamespace>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
++  <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
+     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+   </PropertyGroup>
+   <ItemGroup>
+-- 
+2.26.2
+

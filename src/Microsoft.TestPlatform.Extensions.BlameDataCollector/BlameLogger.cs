@@ -95,8 +95,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new ArgumentNullException(nameof(sender));
             }
 
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunCompleteEventArgs>(e, nameof(e));
 
             if (!e.IsAborted)
             {
@@ -107,12 +107,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             // Gets the faulty test cases if test aborted
             var testCaseNames = this.GetFaultyTestCaseNames(e);
-            if (testCaseNames.Count() == 0)
+            if (!testCaseNames.Any())
             {
                 return;
             }
-
-            this.output.Error(false, Resources.Resources.AbortedTestRun);
 
             StringBuilder sb = new StringBuilder();
             foreach (var tcn in testCaseNames)
@@ -120,7 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 sb.Append(tcn).Append(Environment.NewLine);
             }
 
-            this.output.Error(false, sb.ToString());
+            this.output.Error(false, Resources.Resources.AbortedTestRun, sb.ToString());
         }
 
         #endregion
@@ -152,8 +150,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         var testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
                         if (testCaseList.Count > 0)
                         {
-                            var testcase = testCaseList.Last();
-                            faultyTestCaseNames.Add(testcase.FullyQualifiedName);
+                            var testcases = testCaseList.Where(t => !t.IsCompleted).Select(t => t.FullyQualifiedName).ToList();
+                            faultyTestCaseNames.AddRange(testcases);
                         }
                     }
                 }

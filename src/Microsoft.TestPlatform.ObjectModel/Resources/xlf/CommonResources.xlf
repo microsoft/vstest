@@ -7,8 +7,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
-</source>
+        <source>Test run detected DLL(s) which were built for different framework and platform versions. Following DLL(s) do not match current settings, which are {0} framework and {1} platform.{2}Go to {3} for more details on managing these settings.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">

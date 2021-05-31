@@ -3,7 +3,7 @@
 
 namespace TestPlatform.CoreUtilities.UnitTests
 {
-#if NET451
+#if NETFRAMEWORK
     using System.Diagnostics;
 #endif
     using System.IO;
@@ -27,7 +27,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
             {
                 Directory.CreateDirectory(dirPath);
                 logFile = Path.Combine(dirPath, "trace.log");
-
             }
             catch(Exception ex)
             {
@@ -46,7 +45,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsVerboseEnabled()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -57,7 +56,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsErrorEnabled()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Error;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Error;
@@ -68,7 +67,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsInfoEnabled()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -79,7 +78,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsWarningEnabled()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Warning;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
@@ -90,7 +89,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteError()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Error;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Error;
@@ -102,7 +101,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteWarning()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Warning;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
@@ -114,7 +113,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteVerbose()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -126,7 +125,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteInfo()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -138,7 +137,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldNotWriteVerboseIfTraceLevelIsInfo()
         {
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -155,13 +154,13 @@ namespace TestPlatform.CoreUtilities.UnitTests
         public void TraceShouldNotWriteIfDoNotInitializationIsSetToTrue()
         {
             EqtTrace.DoNotInitailize = true;
-#if NET451
+#if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
 #endif
             EqtTrace.Info("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue");
-            Assert.IsTrue(!ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
+            Assert.IsFalse(ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
         }
 
         private string ReadLogFile()

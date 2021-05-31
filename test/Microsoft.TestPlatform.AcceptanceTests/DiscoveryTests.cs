@@ -4,7 +4,13 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
+    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -49,15 +55,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
+            var resultsDir = GetResultsDirectory();
+
             try
             {
                 AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
                 var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
-                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
+                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
                 arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
                 this.InvokeVsTest(arguments);
 
@@ -67,6 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             finally
             {
                 File.Delete(this.dummyFilePath);
+                TryRemoveDirectory(resultsDir);
             }
         }
 
@@ -76,19 +87,46 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var assetFullPath = this.GetAssetFullPath("SimpleTestProject2.dll");
-            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
-            arguments = string.Concat(arguments, " /listtests" );
+            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            arguments = string.Concat(arguments, " /listtests");
             arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");
             arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
             this.InvokeVsTest(arguments);
 
             StringAssert.Contains(this.StdOut, "Warning: No test matches the given testcase filter `NonExistTestCaseName` in");
-
             StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
-
             this.ExitCodeEquals(0);
+
+            TryRemoveDirectory(resultsDir);
+        }
+
+        [TestMethod]
+        public void TypesToLoadAttributeTests()
+        {
+            var environment = new IntegrationTestEnvironment();
+            var extensionsDirectory = environment.ExtensionsDirectory;
+            var extensionsToVerify = new Dictionary<string, string[]>
+            {
+                {"Microsoft.TestPlatform.Extensions.EventLogCollector.dll", new[] { "Microsoft.TestPlatform.Extensions.EventLogCollector.EventLogDataCollector"} },
+                {"Microsoft.TestPlatform.Extensions.BlameDataCollector.dll", new[] { "Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameLogger", "Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameCollector" } },
+                {"Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll", new[] { "Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.HtmlLogger" } },
+                {"Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", new[] { "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.TrxLogger" } },
+                {"Microsoft.TestPlatform.TestHostRuntimeProvider.dll", new[] { "Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting.DefaultTestHostManager", "Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting.DotnetTestHostManager" } }
+            };
+
+            foreach (var extension in extensionsToVerify.Keys)
+            {
+                var assemblyFile = Path.Combine(extensionsDirectory, extension);
+                var assembly = Assembly.LoadFrom(assemblyFile);
+
+                var expected = extensionsToVerify[extension];
+                var actual = TypesToLoadUtilities.GetTypesToLoad(assembly).Select(i => i.FullName).ToArray();
+
+                CollectionAssert.AreEquivalent(expected, actual, $"Specified types using TypesToLoadAttribute in \"{extension}\" assembly doesn't match the expected.");
+            }
         }
     }
 }

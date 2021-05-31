@@ -10,15 +10,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
     {
@@ -163,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.runSettingsManager = runSettingsProvider;
             this.output = output;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
+            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.DiscoveryRequest_OnDiscoveredTests);
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
@@ -218,6 +219,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Now that tests are discovered and filtered, we run only those selected tests.
             this.ExecuteSelectedTests();
 
+            bool treatNoTestsAsError = RunSettingsUtilities.GetTreatNoTestsAsError(effectiveRunSettings);
+
+            if (treatNoTestsAsError && this.selectedTestCases.Count == 0)
+            {
+                return ArgumentProcessorResult.Fail;
+            }
+
             return ArgumentProcessorResult.Success;
         }
 
@@ -248,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (this.selectedTestCases.Count > 0)
             {
-                if (this.undiscoveredFilters.Count() != 0)
+                if (this.undiscoveredFilters.Count != 0)
                 {
                     string missingFilters = string.Join(", ", this.undiscoveredFilters);
                     string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, this.discoveredTestCount, missingFilters);
@@ -291,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void discoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
+        private void DiscoveryRequest_OnDiscoveredTests(object sender, DiscoveredTestsEventArgs args)
         {
             this.discoveredTestCount += args.DiscoveredTestCases.Count();
             foreach (var testCase in args.DiscoveredTestCases)

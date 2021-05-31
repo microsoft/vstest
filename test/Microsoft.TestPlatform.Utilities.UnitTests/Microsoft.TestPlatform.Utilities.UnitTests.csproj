@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
@@ -23,6 +24,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DefaultCodeCoverageConfig.xml" />

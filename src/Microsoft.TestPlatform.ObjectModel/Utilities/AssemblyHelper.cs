@@ -3,20 +3,21 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
-#if NET451
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
     /// <summary>
     /// Implementation of finding assembly references using "managed route", i.e. Assembly.Load.
     /// </summary>
     public static class AssemblyHelper
     {
+#if NETFRAMEWORK
         private static Version defaultVersion = new Version();
         private static Version version45 = new Version("4.5");
 
@@ -25,13 +26,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Only assembly name and public key token are match. Version is ignored for matching.
         /// Returns null if not able to check if source references assembly.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public static bool? DoesReferencesAssembly(string source, AssemblyName referenceAssembly)
         {
             try
             {
-                ValidateArg.NotNullOrEmpty(source, "source");
-                ValidateArg.NotNull(referenceAssembly, "referenceAssembly");
+                ValidateArg.NotNullOrEmpty(source, nameof(source));
+                ValidateArg.NotNull(referenceAssembly, nameof(referenceAssembly));
 
                 Debug.Assert(!string.IsNullOrEmpty(source));
 
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <returns></returns>
         public static KeyValuePair<Architecture, FrameworkVersion> GetFrameworkVersionAndArchitectureForSource(string testSource)
         {
-            ValidateArg.NotNullOrEmpty(testSource, "testSource");
+            ValidateArg.NotNullOrEmpty(testSource, nameof(testSource));
 
             var sourceDirectory = Path.GetDirectoryName(testSource);
             var setupInfo = new AppDomainSetup();
@@ -119,9 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     false, BindingFlags.Default, null,
                     null, null, null);
 
-                string procArchType;
-                string frameworkVersion;
-                worker.GetPlatformAndFrameworkSettings(testSource, out procArchType, out frameworkVersion);
+                worker.GetPlatformAndFrameworkSettings(testSource, out var procArchType, out var frameworkVersion);
 
                 Architecture targetPlatform = (Architecture)Enum.Parse(typeof(Architecture), procArchType);
                 FrameworkVersion targetFramework = FrameworkVersion.Framework45;
@@ -159,7 +157,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 }
             }
         }
-
 
         /// <summary>
         /// Returns the full name (AssemblyName.FullName) of the referenced assemblies by the assembly on the specified path.
@@ -340,6 +337,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 }
             }
         }
-    }
 #endif
+
+        public static IEnumerable<Attribute> GetCustomAttributes(this Assembly assembly, string fullyQualifiedName)
+        {
+            ValidateArg.NotNull(assembly, nameof(assembly));
+            ValidateArg.NotNullOrWhiteSpace(fullyQualifiedName, nameof(fullyQualifiedName));
+
+            if(assembly.GetType(fullyQualifiedName) is Type attribute)
+            {
+                return assembly.GetCustomAttributes(attribute);
+            }
+
+            return assembly
+                .GetCustomAttributes()
+                .Where(i => i.GetType().FullName == fullyQualifiedName);
+        }
+    }
 }

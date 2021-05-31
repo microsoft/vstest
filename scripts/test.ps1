@@ -111,7 +111,7 @@ $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
 $Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
 $Script:TPT_RunSettingsFile = Join-Path (Get-Item (Split-Path $MyInvocation.MyCommand.Path)) "vstest-codecoverage.runsettings"
-$Script:TPT_NSTraceDataCollectorPath = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$Script:TPT_Configuration\netstandard2.0"
+$Script:TPT_NSTraceDataCollectorPath = Join-Path $env:TP_OUT_DIR "$Script:TPT_Configuration\Microsoft.CodeCoverage"
 
 #
 # Capture error state in any step globally to modify return code
@@ -207,6 +207,7 @@ function Invoke-Test
             }
             else
             {
+                Write-Log ".. . $testContainerName test container found. ($testOutputPath)"
                 $testContainers += ,"$testContainerPath"
             }
         }

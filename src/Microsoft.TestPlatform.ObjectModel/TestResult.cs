@@ -25,12 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="testCase">The test case the result is for.</param>
         public TestResult(TestCase testCase)
         {
-            if (testCase == null)
-            {
-                throw new ArgumentNullException(nameof(testCase));
-            }
-
-            this.TestCase = testCase;
+            this.TestCase = testCase ?? throw new ArgumentNullException(nameof(testCase));
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
 
@@ -191,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {
@@ -221,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         protected override void ProtectedSetPropertyValue(TestProperty property, object value)
         {
-            ValidateArg.NotNull(property, "property");
+            ValidateArg.NotNull(property, nameof(property));
 
             switch (property.Id)
             {

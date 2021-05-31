@@ -10,8 +10,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     using System;
-    
-    
+    using System.Reflection;
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Access denied while trying to create &quot;TestResults&quot; folder in mentioned location. You are getting this exception because you are running vstest.console.exe from a folder which requires having write access. To solve the issue: please  run vstest.console.exe from a folder where you have write privileges..
+        /// </summary>
+        internal static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
             }
         }
         
@@ -79,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details..
+        ///   Looks up a localized string similar to Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/main/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details..
         /// </summary>
         internal static string DeprecatedAdapterPath {
             get {
@@ -196,6 +205,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find an available proxy to deque..
+        /// </summary>
+        internal static string NoAvailableProxyForDeque {
+            get {
+                return ResourceManager.GetString("NoAvailableProxyForDeque", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
         /// </summary>
         internal static string NoDotnetExeFound {
@@ -223,6 +241,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Proxy with id {0} is not managed by the current session manager..
+        /// </summary>
+        internal static string NoSuchProxyId {
+            get {
+                return ResourceManager.GetString("NoSuchProxyId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No test matches the given testcase filter `{0}` in {1}.
         /// </summary>
         internal static string NoTestsAvailableForGivenTestCaseFilter {
@@ -246,6 +273,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string OldTestHostIsGettingUsed {
             get {
                 return ResourceManager.GetString("OldTestHostIsGettingUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Proxy with id {0} is already available and cannot be re-enqueued..
+        /// </summary>
+        internal static string ProxyIsAlreadyAvailable {
+            get {
+                return ResourceManager.GetString("ProxyIsAlreadyAvailable", resourceCulture);
             }
         }
         

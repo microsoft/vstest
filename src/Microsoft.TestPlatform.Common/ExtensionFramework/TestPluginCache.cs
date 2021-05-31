@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
-#if NET451
+#if NETFRAMEWORK
     using System.Threading;
 #endif
     using System;
@@ -179,10 +179,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     this.TestExtensions = new TestExtensions();
                 }
 
-                this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+                this.TestExtensions.AddExtension(pluginInfos);
 
                 // Set the cache bool to true.
-                this.TestExtensions.SetTestExtensionsCacheStatus<TPluginInfo>();
+                this.TestExtensions.SetTestExtensionsCacheStatusToTrue<TPluginInfo>();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.LogExtensions();
             }
-#if NET451
+#if NETFRAMEWORK
             catch (ThreadAbortException)
             {
                 // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
@@ -529,7 +529,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 try
                 {
-                    EqtTrace.Verbose("CurrentDomain_AssemblyResolve: Resolving assembly '{0}'.", args.Name);
+                    EqtTrace.Verbose("CurrentDomainAssemblyResolve: Resolving assembly '{0}'.", args.Name);
 
                     if (this.resolvedAssemblies.TryGetValue(args.Name, out assembly))
                     {

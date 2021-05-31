@@ -11,14 +11,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using System.Globalization;
     using System.Linq;
     using System.Text;
-
+    using System.Xml.XPath;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
+    using NuGet.Frameworks;
     using CommandLineResources = Resources.Resources;
-
     /// <summary>
     /// Logger for sending output to the console.
     /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
@@ -35,21 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Prefix used for formatting the result output
         /// </summary>
         private const string TestResultPrefix = "  ";
-
-        /// <summary>
-        /// Unicode for tick
-        /// </summary>
-        private const char PassedTestIndicator = '\u221a';
-
-        /// <summary>
-        /// Indicator for failed tests
-        /// </summary>
-        private const char FailedTestIndicator = 'X';
-
-        /// <summary>
-        /// Indicated skipped and not run tests
-        /// </summary>
-        private const char SkippedTestIndicator = '!';
 
         /// <summary>
         /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
@@ -96,6 +80,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string ExecutionIdPropertyIdentifier = "ExecutionId";
 
+        // Figure out the longest result string (+1 for ! where applicable), so we don't 
+        // get misaligned output on non-english systems
+        private static int LongestResultIndicator = new[]
+        {
+            CommandLineResources.FailedTestIndicator.Length + 1,
+            CommandLineResources.PassedTestIndicator.Length + 1,
+            CommandLineResources.SkippedTestIndicator.Length + 1,
+            CommandLineResources.None.Length
+        }.Max();
+
         #endregion
 
         internal enum Verbosity
@@ -111,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Level of verbosity
         /// </summary>
-#if NET451
+#if NETFRAMEWORK
         private Verbosity verbosityLevel = Verbosity.Normal;
 #else
         // Keep default verbosity for x-plat command line as minimal
@@ -119,7 +113,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 #endif
 
         private bool testRunHasErrorMessages = false;
-        private ConcurrentDictionary<Guid, TestOutcome> leafExecutionIdAndTestOutcomePairDictionary = new ConcurrentDictionary<Guid, TestOutcome>();
+
+        /// <summary>
+        /// Framework on which the test runs.
+        /// </summary>
+        private string targetFramework;
 
         #endregion
 
@@ -163,6 +161,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public Verbosity VerbosityLevel => verbosityLevel;
 
+        /// <summary>
+        /// Tracks leaf test outcomes per source. This is needed to correctly count hierarchical tests as well as 
+        /// tracking counts per source for the minimal and quiet output.
+        /// </summary>
+        private ConcurrentDictionary<Guid, MinimalTestResult> LeafTestResults { get; set; }
+
         #endregion
 
         #region ITestLoggerWithParameters
@@ -176,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             if (events == null)
             {
-                throw new ArgumentNullException("events");
+                throw new ArgumentNullException(nameof(events));
             }
 
             if (ConsoleLogger.Output == null)
@@ -198,6 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
+            this.LeafTestResults = new ConcurrentDictionary<Guid, MinimalTestResult>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -215,23 +220,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
 
-            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosity);
+            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out var verbosity);
             if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
                 this.verbosityLevel = verbosityLevel;
             }
 
-            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
+            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out var prefix);
             if (prefixExists)
             {
                 bool.TryParse(prefix, out AppendPrefix);
             }
 
-            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out string enableProgress);
+            var progressArgExists = parameters.TryGetValue(ConsoleLogger.ProgressIndicatorParam, out var enableProgress);
             if (progressArgExists)
             {
                 bool.TryParse(enableProgress, out EnableProgress);
             }
+
+            parameters.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out this.targetFramework);
+            this.targetFramework = !string.IsNullOrEmpty(this.targetFramework) ? NuGetFramework.Parse(this.targetFramework).GetShortFolderName() : this.targetFramework;
 
             Initialize(events, String.Empty);
         }
@@ -414,18 +422,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Event Handlers
+       #region Event Handlers
 
         /// <summary>
         /// Called when a test run start is received
         /// </summary>
         private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunStartEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunStartEventArgs>(e, nameof(e));
 
             // Print all test containers.
-            Output.WriteLine(string.Empty, OutputLevel.Information);
             Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
             if (verbosityLevel == Verbosity.Detailed)
             {
@@ -441,8 +448,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestRunMessageEventArgs>(e, nameof(e));
 
             switch (e.Level)
             {
@@ -506,8 +513,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestResultHandler(object sender, TestResultEventArgs e)
         {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestResultEventArgs>(e, "e");
+            ValidateArg.NotNull<object>(sender, nameof(sender));
+            ValidateArg.NotNull<TestResultEventArgs>(e, nameof(e));
 
             var testDisplayName = e.Result.DisplayName;
 
@@ -525,12 +532,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var executionId = GetExecutionId(e.Result);
             var parentExecutionId = GetParentExecutionId(e.Result);
 
-            if (parentExecutionId != Guid.Empty && leafExecutionIdAndTestOutcomePairDictionary.ContainsKey(parentExecutionId))
+            if (parentExecutionId != Guid.Empty)
             {
-                leafExecutionIdAndTestOutcomePairDictionary.TryRemove(parentExecutionId, out _);
+                // Not checking the result value.
+                // This would return false if the id did not exist,
+                // or true if it did exist. In either case the id is not in the dictionary
+                // which is our goal.
+                LeafTestResults.TryRemove(parentExecutionId, out _);
             }
 
-            leafExecutionIdAndTestOutcomePairDictionary.TryAdd(executionId, e.Result.Outcome);
+            if (!LeafTestResults.TryAdd(executionId, new MinimalTestResult(e.Result)))
+            {
+                // This would happen if the key already exists. This should not happen, because we are 
+                // inserting by GUID key, so this would mean an error in our code.
+                throw new InvalidOperationException($"ExecutionId {executionId} already exists.");
+            }
 
             switch (e.Result.Outcome)
             {
@@ -544,7 +560,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         // Pause the progress indicator before displaying test result information
                         this.progressIndicator?.Pause();
 
-                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
+                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (this.verbosityLevel == Verbosity.Detailed)
                         {
@@ -567,7 +583,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         // Pause the progress indicator before displaying test result information
                         this.progressIndicator?.Pause();
 
-                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
+                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         DisplayFullInformation(e.Result);
 
@@ -584,7 +600,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             // Pause the progress indicator before displaying test result information
                             this.progressIndicator?.Pause();
 
-                            Output.Write(string.Format("{0}{1} ", TestResultPrefix, PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
+                            Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
                             Output.WriteLine(testDisplayName, OutputLevel.Information);
                             if (this.verbosityLevel == Verbosity.Detailed)
                             {
@@ -608,7 +624,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         // Pause the progress indicator before displaying test result information
                         this.progressIndicator?.Pause();
 
-                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
+                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, CommandLineResources.SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (this.verbosityLevel == Verbosity.Detailed)
                         {
@@ -633,28 +649,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var time = new List<string>();
             if (duration.Hours > 0)
             {
-                time.Add(duration.Hours + "h");
+                time.Add(duration.Hours + " h");
             }
 
             if (duration.Minutes > 0)
             {
-                time.Add(duration.Minutes + "m");
+                time.Add(duration.Minutes + " m");
             }
 
             if (duration.Hours == 0)
             {
                 if (duration.Seconds > 0)
                 {
-                    time.Add(duration.Seconds + "s");
+                    time.Add(duration.Seconds + " s");
                 }
 
-                if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                if (duration.Milliseconds > 0 && duration.Minutes == 0 && duration.Seconds == 0)
                 {
-                    time.Add(duration.Milliseconds + "ms");
+                    time.Add(duration.Milliseconds + " ms");
                 }
             }
 
-            return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
+            return time.Count == 0 ? "< 1 ms" : string.Join(" ", time);
         }
 
         /// <summary>
@@ -662,12 +678,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            var testsTotal = 0;
-            var testsPassed = 0;
-            var testsFailed = 0;
-            var testsSkipped = 0;
             // Stop the progress indicator as we are about to print the summary
             this.progressIndicator?.Stop();
+            var passedTests = 0;
+            var failedTests = 0;
+            var skippedTests = 0;
+            var totalTests = 0;
             Output.WriteLine(string.Empty, OutputLevel.Information);
 
             // Printing Run-level Attachments
@@ -685,23 +701,147 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
-            foreach (KeyValuePair<Guid, TestOutcome> entry in leafExecutionIdAndTestOutcomePairDictionary)
+            var leafTestResultsPerSource = this.LeafTestResults.Select(p => p.Value).GroupBy(r => r.TestCase.Source);
+            foreach (var sd in leafTestResultsPerSource)
             {
-                testsTotal++;
-                switch (entry.Value)
+                var source = sd.Key;
+                var sourceSummary = new SourceSummary();
+
+                var results = sd.ToArray();
+                // duration of the whole source is the difference between the test that ended last and the one that started first
+                sourceSummary.Duration = !results.Any() ? TimeSpan.Zero : results.Max(r => r.EndTime) - results.Min(r => r.StartTime);
+                foreach (var result in results)
                 {
-                    case TestOutcome.Failed:
-                        testsFailed++;
-                        break;
-                    case TestOutcome.Passed:
-                        testsPassed++;
-                        break;
-                    case TestOutcome.Skipped:
-                        testsSkipped++;
-                        break;
-                    default:
-                        break;
+                    switch (result.Outcome)
+                    {
+                        case TestOutcome.Passed:
+                            sourceSummary.TotalTests++;
+                            sourceSummary.PassedTests++;
+                            break;
+                        case TestOutcome.Failed:
+                            sourceSummary.TotalTests++;
+                            sourceSummary.FailedTests++;
+                            break;
+                        case TestOutcome.Skipped:
+                            sourceSummary.TotalTests++;
+                            sourceSummary.SkippedTests++;
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
+                if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                {
+                    TestOutcome sourceOutcome = TestOutcome.None;
+                    if (sourceSummary.FailedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Failed;
+                    }
+                    else if (sourceSummary.PassedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Passed;
+                    }
+                    else if (sourceSummary.SkippedTests > 0)
+                    {
+                        sourceOutcome = TestOutcome.Skipped;
+                    }
+
+
+                    string resultString;
+                    switch (sourceOutcome)
+                    {
+                        case TestOutcome.Failed:
+                            resultString = (CommandLineResources.FailedTestIndicator + "!").PadRight(LongestResultIndicator);
+                            break;
+                        case TestOutcome.Passed:
+                            resultString = (CommandLineResources.PassedTestIndicator + "!").PadRight(LongestResultIndicator);
+                            break;
+                        case TestOutcome.Skipped:
+                            resultString = (CommandLineResources.SkippedTestIndicator + "!").PadRight(LongestResultIndicator);
+                            break;
+                        default:
+                            resultString = CommandLineResources.None.PadRight(LongestResultIndicator);
+                            break;
+                    }
+
+                    var failed = sourceSummary.FailedTests.ToString().PadLeft(5);
+                    var passed = sourceSummary.PassedTests.ToString().PadLeft(5);
+                    var skipped = sourceSummary.SkippedTests.ToString().PadLeft(5);
+                    var total = sourceSummary.TotalTests.ToString().PadLeft(5);
+
+
+                    var frameworkString = string.IsNullOrEmpty(targetFramework)
+                        ? string.Empty
+                        : $"({targetFramework})";
+
+                    var duration = GetFormattedDurationString(sourceSummary.Duration);
+                    var sourceName = sd.Key.Split('\\').Last();
+
+                    var outputLine = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
+                        resultString,
+                        failed,
+                        passed,
+                        skipped,
+                        total,
+                        duration,
+                        sourceName,
+                        frameworkString);
+
+
+                    ConsoleColor? color = null;
+                    if (sourceOutcome == TestOutcome.Failed)
+                    {
+                        color = ConsoleColor.Red;
+                    }
+                    else if (sourceOutcome == TestOutcome.Passed)
+                    {
+                        color = ConsoleColor.Green;
+                    }
+                    else if (sourceOutcome == TestOutcome.Skipped)
+                    {
+                        color = ConsoleColor.Yellow;
+                    }
+
+                    if (color != null)
+                    {
+                        Output.Write(outputLine, OutputLevel.Information, color.Value);
+                    }
+                    else
+                    {
+                        Output.Write(outputLine, OutputLevel.Information);
+                    }
+
+                    Output.Information(false, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+                        sourceName,
+                        frameworkString);
+                }
+
+                passedTests += sourceSummary.PassedTests;
+                failedTests += sourceSummary.FailedTests;
+                skippedTests += sourceSummary.SkippedTests;
+                totalTests += sourceSummary.TotalTests;
+            }
+
+            if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+            {
+                if (e.IsCanceled)
+                {
+                    Output.Error(false, CommandLineResources.TestRunCanceled);
+                }
+                else if (e.IsAborted)
+                {
+                    if (e.Error == null)
+                    {
+                        Output.Error(false, CommandLineResources.TestRunAborted);
+                    }
+                    else
+                    {
+                        Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
+                    }
+                }
+
+                return;
             }
 
             if (e.IsCanceled)
@@ -710,38 +850,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else if (e.IsAborted)
             {
-                Output.Error(false, CommandLineResources.TestRunAborted);
+                if (e.Error == null)
+                {
+                    Output.Error(false, CommandLineResources.TestRunAborted);
+                }
+                else
+                {
+                    Output.Error(false, CommandLineResources.TestRunAbortedWithError, e.Error);
+                }
             }
-            else if (testsFailed > 0 || this.testRunHasErrorMessages)
+            else if (failedTests > 0 || this.testRunHasErrorMessages)
             {
                 Output.Error(false, CommandLineResources.TestRunFailed);
             }
-            else if (testsTotal > 0)
+            else if (totalTests > 0)
             {
                 Output.Information(false, ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
             }
 
             // Output a summary.
-            if (testsTotal > 0)
+            if (totalTests > 0)
             {
                 string totalTestsformat = (e.IsAborted || e.IsCanceled) ? CommandLineResources.TestRunSummaryForCanceledOrAbortedRun : CommandLineResources.TestRunSummaryTotalTests;
-                Output.Information(false, string.Format(CultureInfo.CurrentCulture, totalTestsformat, testsTotal));
+                Output.Information(false, string.Format(CultureInfo.CurrentCulture, totalTestsformat, totalTests));
 
-                if (testsPassed > 0)
+                if (passedTests > 0)
                 {
-                    Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, testsPassed));
+                    Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, passedTests));
                 }
-                if (testsFailed > 0)
+                if (failedTests > 0)
                 {
-                    Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, testsFailed));
+                    Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, failedTests));
                 }
-                if (testsSkipped > 0)
+                if (skippedTests > 0)
                 {
-                    Output.Information(false, ConsoleColor.Yellow, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, testsSkipped));
+                    Output.Information(false, ConsoleColor.Yellow, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, skippedTests));
                 }
             }
 
-            if (testsTotal > 0)
+            if (totalTests > 0)
             {
                 if (e.ElapsedTimeInRunningTests.Equals(TimeSpan.Zero))
                 {
@@ -767,6 +914,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
 
             Output.Warning(AppendPrefix, warningMessage);
+        }
+
+        private class MinimalTestResult
+        {
+            public MinimalTestResult(TestResult testResult)
+            {
+                TestCase = testResult.TestCase;
+                Outcome = testResult.Outcome;
+                StartTime = testResult.StartTime;
+                EndTime = testResult.EndTime;
+            }
+
+            public TestCase TestCase { get; }
+            public TestOutcome Outcome { get; }
+            public DateTimeOffset StartTime { get; }
+            public DateTimeOffset EndTime { get; }
         }
     }
 }

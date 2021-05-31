@@ -49,9 +49,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<TExtension, TMetadata>> testExtensions,
             IMessageLogger logger)
         {
-            ValidateArg.NotNull<IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>>>(unfilteredTestExtensions, "unfilteredTestExtensions");
-            ValidateArg.NotNull<IEnumerable<LazyExtension<TExtension, TMetadata>>>(testExtensions, "testExtensions");
-            ValidateArg.NotNull<IMessageLogger>(logger, "logger");
+            ValidateArg.NotNull<IEnumerable<LazyExtension<TExtension, Dictionary<string, object>>>>(unfilteredTestExtensions, nameof(unfilteredTestExtensions));
+            ValidateArg.NotNull<IEnumerable<LazyExtension<TExtension, TMetadata>>>(testExtensions, nameof(testExtensions));
+            ValidateArg.NotNull<IMessageLogger>(logger, nameof(logger));
 
             this.logger = logger;
             this.TestExtensions = testExtensions;
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <returns>The test extension or null if one was not found.</returns>
         public LazyExtension<TExtension, TMetadata> TryGetTestExtension(Uri extensionUri)
         {
-            ValidateArg.NotNull<Uri>(extensionUri, "extensionUri");
+            ValidateArg.NotNull<Uri>(extensionUri, nameof(extensionUri));
 
             this.TestExtensionByUri.TryGetValue(extensionUri, out var testExtension);
 
@@ -129,12 +129,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1057:StringUriOverloadsCallSystemUriOverloads", Justification = "Case insensitiveness needs to be supported.")]
         public LazyExtension<TExtension, TMetadata> TryGetTestExtension(string extensionUri)
         {
-            ValidateArg.NotNull<string>(extensionUri, "extensionUri");
+            ValidateArg.NotNull<string>(extensionUri, nameof(extensionUri));
 
             LazyExtension<TExtension, TMetadata> testExtension = null;
             foreach (var availableExtensionUri in this.TestExtensionByUri.Keys)
             {
-                if (string.Compare(extensionUri, availableExtensionUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(extensionUri, availableExtensionUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
                 {
                     this.TestExtensionByUri.TryGetValue(availableExtensionUri, out testExtension);
                     break;

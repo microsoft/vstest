@@ -291,8 +291,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         public void CreateDefaultRunSettingsShouldReturnABasicRunSettings()
         {
             var defaultRunSettings = XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml;
-            var expectedRunSettings =
-                "<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
+            var expectedRunSettings = string.Join(Environment.NewLine, 
+                "<RunSettings>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors />",
+                "  </DataCollectionRunSettings>",
+                "</RunSettings>"
+            );
 
             Assert.AreEqual(expectedRunSettings, defaultRunSettings);
         }

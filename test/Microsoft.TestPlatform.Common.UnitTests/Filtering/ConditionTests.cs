@@ -110,7 +110,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         [TestMethod]
         public void ParseStringWithSingleUnescapedBangThrowsFormatException1()
         {
-
             var conditionString = @"FullyQualifiedName=Test1(""!"")";
 
             Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
@@ -119,7 +118,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         [TestMethod]
         public void ParseStringWithSingleUnescapedBangThrowsFormatException2()
         {
-
             var conditionString = @"FullyQualifiedName!Test1()";
 
             Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));

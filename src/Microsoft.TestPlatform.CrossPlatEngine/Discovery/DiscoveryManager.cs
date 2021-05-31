@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // Validate the sources
                 foreach (var kvp in discoveryCriteria.AdapterSourceMap)
                 {
-                    var verifiedSources = GetValidSources(kvp.Value, this.sessionMessageLogger);
+                    var verifiedSources = GetValidSources(kvp.Value, this.sessionMessageLogger, discoveryCriteria.Package);
                     if (verifiedSources.Any())
                     {
                         verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);
@@ -189,8 +189,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="sources"> Paths to source file to look for tests in.  </param>
         /// <param name="logger">logger</param>
+        /// <param name="package">package</param>
         /// <returns> The list of verified sources. </returns>
-        internal static IEnumerable<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger)
+        internal static IEnumerable<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger, string package)
         {
             Debug.Assert(sources != null, "sources");
             var verifiedSources = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -202,10 +203,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (!File.Exists(src))
                 {
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FileNotFound, src);
-                    logger.SendMessage(TestMessageLevel.Warning, errorMessage);
+                    void SendWarning()
+                    {
+                        var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FileNotFound, src);
+                        logger.SendMessage(TestMessageLevel.Warning, errorMessage);
+                    }
 
-                    continue;
+                    if (string.IsNullOrEmpty(package))
+                    {
+                        SendWarning();
+
+                        continue;
+                    }
+
+                    // It is also possible that this is a packaged app, so the tests might be inside the package
+                    src = !Path.IsPathRooted(source) ? Path.Combine(Path.GetDirectoryName(package), source) : source;
+
+                    if (!File.Exists(src))
+                    {
+                        SendWarning();
+
+                        continue;
+                    }
                 }
 
                 if (!verifiedSources.Add(src))

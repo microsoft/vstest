@@ -10,6 +10,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    // monitoring the processes does not work correctly
+    [TestCategory("Windows-Review")]
     public class PlatformTests : AcceptanceTestBase
     {
         /// <summary>
@@ -48,11 +50,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
         {
+            var resultsDir = GetResultsDirectory();
+
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                this.testEnvironment.InIsolationValue);
+                this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, platformArg);
 
             var cts = new CancellationTokenSource();
@@ -69,6 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 numOfProcessCreatedTask.Result.Count,
                 $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
     }
 }
