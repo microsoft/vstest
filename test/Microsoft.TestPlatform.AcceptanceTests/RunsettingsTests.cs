@@ -313,6 +313,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
         {
@@ -403,6 +404,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows")]
+        [Ignore]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
         {

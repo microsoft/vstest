@@ -635,8 +635,6 @@ function Create-VsixPackage
     # Copy CUIT Related depedencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\tools\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
-    $fileToRemove = Join-Path $packageDir "Microsoft.VisualStudio.Ole.Interop.dll"
-    Remove-Item $fileToRemove -Force
 
     # Copy Interop depedencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Interop\$interopExternalsVersion\lib\net45"
