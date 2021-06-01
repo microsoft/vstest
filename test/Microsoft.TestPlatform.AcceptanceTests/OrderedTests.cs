@@ -17,6 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {

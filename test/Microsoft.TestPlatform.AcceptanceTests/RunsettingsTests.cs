@@ -367,6 +367,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
         {
@@ -433,6 +434,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
         {

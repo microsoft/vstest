@@ -206,6 +206,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore]
         [NetFullTargetFrameworkDataSource]
         public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {
