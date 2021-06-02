@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [TestMethod]
         [TestCategory("Windows-Review")]
-        [Ignore]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource]
         public void CUITRunAllTests(RunnerInfo runnerInfo)
         {
