@@ -35,7 +35,7 @@
 
     <TestPlatformExternalsVersion>16.11.31329.17</TestPlatformExternalsVersion>
     <CodeCoverageExternalsVersion>16.10.0-beta.21270.2</CodeCoverageExternalsVersion>
-    <MicrosoftFakesVersion>16.9.0-beta.20628.1</MicrosoftFakesVersion>
+    <MicrosoftFakesVersion>16.11.230815</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
