@@ -75,7 +75,7 @@ jobs:
       arguments: '-verbose -configuration $(buildConfiguration) -steps "InstallDotnet, Restore, Build, PrepareAcceptanceTests"'
       modifyEnvironment: false
       failOnStandardError: true
-      
+
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
@@ -88,7 +88,7 @@ jobs:
       arguments: '-verbose -configuration $(buildConfiguration) -p AcceptanceTests -f net451'
       modifyEnvironment: false
       failOnStandardError: true
-      
+
   - task: BatchScript@1
     displayName: 'Run Platform Tests'
     inputs:
@@ -96,7 +96,7 @@ jobs:
       arguments: '-verbose -configuration $(buildConfiguration) -p platformtests'
       modifyEnvironment: false
       failOnStandardError: true
-            
+
   - task: BatchScript@1
     displayName: 'Run Smoke Tests'
     inputs:
@@ -104,14 +104,14 @@ jobs:
       arguments: '-verbose -configuration $(buildConfiguration) -p smoke'
       modifyEnvironment: false
       failOnStandardError: true
-      
+
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **\*.trx'
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**\*.trx'
     condition: succeededOrFailed()
-    
+
 - job: OtherOSes
   dependsOn: Windows
   workspace:
@@ -145,11 +145,18 @@ jobs:
     displayName: 'Build test assets'
 
   - script: ./test.sh -c $(buildConfiguration) -p Acceptance
-    displayName: 'Acceptance tests'   
-  
+    displayName: 'Acceptance tests'
+
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/*.trx'
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
     condition: succeededOrFailed()
+
+- template: /eng/common/templates/job/source-build.yml
+  parameters:
+    platform:
+      name: Managed
+      container: mcr.microsoft.com/dotnet-buildtools/prereqs:centos-7-3e800f1-20190501005343
+      buildScript: eng/common/build.sh
