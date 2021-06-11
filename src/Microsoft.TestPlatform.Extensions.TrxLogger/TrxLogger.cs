@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="fileHelper">The file helper interface.</param>
-        protected TrxLogger(IFileHelper fileHelper) : this(new Utilities.Helpers.FileHelper(), new TrxFileHelper()) { }
+        protected TrxLogger(IFileHelper fileHelper) : this(fileHelper, new TrxFileHelper()) { }
 
         internal TrxLogger(IFileHelper fileHelper, TrxFileHelper trxFileHelper)
         {
