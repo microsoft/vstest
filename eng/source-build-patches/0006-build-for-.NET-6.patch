@@ -4,18 +4,26 @@ Date: Thu, 12 Nov 2020 15:35:12 +0100
 Subject: [PATCH] vstest: build for .NET 6
 
 ---
- scripts/build.sh                                            | 4 ++--
- .../Microsoft.TestPlatform.PlatformAbstractions.csproj      | 6 +++++-
- .../Hosting/DotnetTestHostManager.cs                        | 2 +-
- src/datacollector/datacollector.csproj                      | 2 +-
- src/package/nuspec/Microsoft.TestPlatform.Build.csproj      | 2 +-
- src/package/nuspec/Microsoft.TestPlatform.CLI.csproj        | 2 +-
- src/package/nuspec/TestPlatform.CLI.nuspec                  | 2 +-
- src/package/package/package.csproj                          | 2 +-
- src/testhost.x86/testhost.x86.csproj                        | 2 +-
- src/testhost/testhost.csproj                                | 5 +++--
- src/vstest.console/vstest.console.csproj                    | 5 +++--
- 11 files changed, 20 insertions(+), 14 deletions(-)
+ scripts/build.sh                                                        | 4 ++--
+ .../Microsoft.TestPlatform.PlatformAbstractions.csproj                  | 6 +++++-
+ .../Hosting/DotnetTestHostManager.cs                                    | 2 +-
+ src/datacollector/datacollector.csproj                                  | 2 +-
+ src/package/nuspec/Microsoft.TestPlatform.Build.csproj                  | 2 +-
+ src/package/nuspec/Microsoft.TestPlatform.CLI.csproj                    | 2 +-
+ src/package/nuspec/TestPlatform.CLI.nuspec                              | 2 +-
+ src/package/package/package.csproj                                      | 2 +-
+ src/testhost.x86/testhost.x86.csproj                                    | 2 +-
+ src/testhost/testhost.csproj                                            | 5 +++--
+ src/vstest.console/vstest.console.csproj                                | 5 +++--
+ scripts/build/TestPlatform.targets                                      | 2 ++
+ src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj  | 2 +-
+ .../Microsoft.TestPlatform.CommunicationUtilities.csproj                | 2 +-
+ .../Microsoft.TestPlatform.CoreUtilities.csproj                         | 2 +-
+ src/Microsoft.TestPlatform.CoreUtilities/Tracing/EqtTrace.cs            | 2 +-
+ .../Microsoft.TestPlatform.CrossPlatEngine.csproj                       | 2 +-
+ .../Microsoft.TestPlatform.ObjectModel.csproj                           | 2 +-
+ .../Microsoft.TestPlatform.Utilities.csproj                             | 2 +-
+ 19 files changed, 29 insertions(+), 21 deletions(-)
 
 diff --git a/scripts/build.sh b/scripts/build.sh
 index e4454a5d..a8dcbddb 100755
@@ -184,6 +192,110 @@ index ea970a60..f7448391 100644
      <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
    </PropertyGroup>
    <ItemGroup>
+diff --git a/scripts/build/TestPlatform.targets b/scripts/build/TestPlatform.targets
+index 6a3e102..44ebc82 100644
+--- a/scripts/build/TestPlatform.targets
++++ b/scripts/build/TestPlatform.targets
+@@ -2,6 +2,8 @@
+ <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <PropertyGroup>
+     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
++
++    <NoWarn>$(NoWarn);CA1416</NoWarn>
+   </PropertyGroup>
+ 
+   <!-- Static analysis dependencies -->
+diff --git a/src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj b/src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj
+index 3b73444..d99d47f 100644
+--- a/src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj
++++ b/src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj
+@@ -7,7 +7,7 @@
+   <PropertyGroup>
+     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Common</AssemblyName>
+     <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+     <WarningsAsErrors>true</WarningsAsErrors>
+   </PropertyGroup>
+   <ItemGroup>
+diff --git a/src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj b/src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj
+index 8419b36..0eb30c6 100644
+--- a/src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj
++++ b/src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj
+@@ -6,7 +6,7 @@
+   <PropertyGroup>
+     <AssemblyName>Microsoft.TestPlatform.CommunicationUtilities</AssemblyName>
+     <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+     <WarningsAsErrors>true</WarningsAsErrors>
+     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+   </PropertyGroup>
+diff --git a/src/Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities.csproj b/src/Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities.csproj
+index 9ab8e59..026ddde 100644
+--- a/src/Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities.csproj
++++ b/src/Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities.csproj
+@@ -8,7 +8,7 @@
+     <AssemblyName>Microsoft.TestPlatform.CoreUtilities</AssemblyName>
+     <TargetFrameworks>netstandard2.0;netstandard1.3;net451;net45</TargetFrameworks>
+     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3;netstandard1.0</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+diff --git a/src/Microsoft.TestPlatform.CoreUtilities/Tracing/EqtTrace.cs b/src/Microsoft.TestPlatform.CoreUtilities/Tracing/EqtTrace.cs
+index fb226a5..59b4247 100644
+--- a/src/Microsoft.TestPlatform.CoreUtilities/Tracing/EqtTrace.cs
++++ b/src/Microsoft.TestPlatform.CoreUtilities/Tracing/EqtTrace.cs
+@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+ 
+ #endif
+ 
+-#if NETSTANDARD
++#if NETSTANDARD || NET
+         public static PlatformTraceLevel TraceLevel
+         {
+             get
+diff --git a/src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj b/src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj
+index 72e7d1f..77a7a2d 100644
+--- a/src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj
++++ b/src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj
+@@ -7,7 +7,7 @@
+   <PropertyGroup>
+     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine</AssemblyName>
+     <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+     <WarningsAsErrors>true</WarningsAsErrors>
+     <!--<EnableCodeAnalysis>true</EnableCodeAnalysis>-->
+   </PropertyGroup>
+diff --git a/src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj b/src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj
+index ac7507c..f341424 100644
+--- a/src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj
++++ b/src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj
+@@ -8,7 +8,7 @@
+     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
+     <TargetFrameworks>net45;net451;netcoreapp2.1;netcoreapp1.0;netstandard2.0;netstandard1.3</TargetFrameworks>
+     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0;netstandard1.0</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3;netstandard1.0</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+     <PackageId>Microsoft.TestPlatform.ObjectModel</PackageId>
+     <CheckEolTargetFramework>false</CheckEolTargetFramework>
+   </PropertyGroup>
+diff --git a/src/Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities.csproj b/src/Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities.csproj
+index 7d14164..9787273 100644
+--- a/src/Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities.csproj
++++ b/src/Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities.csproj
+@@ -7,7 +7,7 @@
+   <PropertyGroup>
+     <AssemblyName>Microsoft.TestPlatform.Utilities</AssemblyName>
+     <TargetFrameworks>netstandard2.0;netstandard1.3;net451</TargetFrameworks>
+-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netstandard1.3</TargetFrameworks>
++    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+   </PropertyGroup>
+   <ItemGroup>
+     <EmbeddedResource Include="Resources\Resources.resx" />
 -- 
 2.26.2
 
