@@ -139,6 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         fx = new FrameworkName(Constants.DotNetFramework40);
                     }
                     else if (extension.Equals(".appx", StringComparison.OrdinalIgnoreCase)
+                        || extension.Equals(".msix", StringComparison.OrdinalIgnoreCase)
                         || extension.Equals(".appxrecipe", StringComparison.OrdinalIgnoreCase))
                     {
                         fx = new FrameworkName(Constants.DotNetFrameworkUap10);
