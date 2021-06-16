@@ -242,7 +242,7 @@ function restore_package()
         $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     else
         log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj"
-        $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version  -p:DotNetBuildFromSource=true || failed=true
+        $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj /bl:restore.binlog --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -p:DotNetBuildFromSource=true || failed=true
     fi
 
     if [ "$failed" = true ]; then
@@ -269,7 +269,7 @@ function invoke_build()
         if [[ $TP_USE_REPO_API = 0 ]]; then
             $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog || failed=true
         else
-            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true -bl:TestPlatform.binlog || failed=true
+            $dotnet build $TPB_Build_From_Source_Solution /bl:build.binlog --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true -bl:TestPlatform.binlog || failed=true
        fi
     else
         find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -318,7 +318,7 @@ function publish_package()
         for project in "${projects[@]}" ;
         do
             log ".. Package: Publish $project"
-            $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+            $dotnet publish $project /bl:publish_$project.binlog --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
         done
 
         # Copy TestHost for desktop targets
@@ -352,7 +352,7 @@ function publish_package()
     log ".. Package: Publish testhost.csproj"
     local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
     local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore
-    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    $dotnet publish $projectToPackage /bl:testhost-publish.binlog --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
@@ -423,7 +423,7 @@ function create_package()
     for i in ${projectFiles[@]}; do
         log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
         && $dotnet restore $stagingDir/${i} \
-        && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
+        && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog
     done
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."
