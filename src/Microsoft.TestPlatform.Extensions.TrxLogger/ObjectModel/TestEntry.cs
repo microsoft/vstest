@@ -52,7 +52,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
             set
             {
-                Debug.Assert(value != null, "ExecId is null");
                 this.executionId = value;
             }
         }
