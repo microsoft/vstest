@@ -324,8 +324,17 @@ function publish_package()
         # Copy TestHost for desktop targets
         local testhost=$packageDir/TestHost
         mkdir -p $testhost
-        cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-        cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
+
+        if [[ $DOTNET_BUILD_FROM_SOURCE = 0 ]]; then
+            cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
+        fi
+
+        if [[ $DOTNET_BUILD_FROM_SOURCE = 1 ]]; then
+            cp -r src/testhost/bin/$TPB_Configuration/net6.0/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net6.0/* $testhost
+        fi
+
 
         # Copy over the logger assemblies to the Extensions folder.
         local extensionsDir="$packageDir/Extensions"
