@@ -112,15 +112,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             if (rockSteadyTestResult.ErrorStackTrace != null)
                 testResult.ErrorStackTrace = rockSteadyTestResult.ErrorStackTrace;
 
-            if (rockSteadyTestResult.EndTime != null)
-                testResult.EndTime = rockSteadyTestResult.EndTime.UtcDateTime;
-
-            if (rockSteadyTestResult.StartTime != null)
-                testResult.StartTime = rockSteadyTestResult.StartTime.UtcDateTime;
-
-            if (rockSteadyTestResult.Duration != null)
-                testResult.Duration = rockSteadyTestResult.Duration;
-
             // Clear existing messages and store rocksteady result messages.
             testResult.TextMessages = null;
             UpdateResultMessages(testResult, rockSteadyTestResult);
