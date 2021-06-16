@@ -1,18 +1,17 @@
-From bdffc43338cfd0bcc56ed1a06ef473a8c9faecc9 Mon Sep 17 00:00:00 2001
+From bcb00c2086247b4ff1bccd0db2d7f3122bddf669 Mon Sep 17 00:00:00 2001
 From: Medeni Baykal <433724+Haplois@users.noreply.github.com>
-Date: Wed, 16 Jun 2021 22:07:18 +0200
+Date: Thu, 17 Jun 2021 01:08:15 +0200
 Subject: [PATCH] Build for NET 6
 
 ---
- scripts/build.sh                                             | 4 ++--
- .../Hosting/DotnetTestHostManager.cs                         | 2 +-
- src/package/nuspec/TestPlatform.CLI.nuspec                   | 2 +-
- src/package/package/package.csproj                           | 2 +-
- src/vstest.console/vstest.console.csproj                     | 5 +++--
- 5 files changed, 8 insertions(+), 7 deletions(-)
+ scripts/build.sh                                               | 2 +-
+ .../Hosting/DotnetTestHostManager.cs                           | 2 +-
+ src/package/nuspec/TestPlatform.CLI.nuspec                     | 2 +-
+ src/vstest.console/vstest.console.csproj                       | 3 ++-
+ 4 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/build.sh b/scripts/build.sh
-index aa44e9f4..af6b3a49 100755
+index aa44e9f4..48ca1cae 100755
 --- a/scripts/build.sh
 +++ b/scripts/build.sh
 @@ -142,7 +142,7 @@ DOTNET_CLI_VERSION=$_ReadGlobalVersion
@@ -24,15 +23,6 @@ index aa44e9f4..af6b3a49 100755
  TPB_Configuration=$CONFIGURATION
  TPB_TargetRuntime=$TARGET_RUNTIME
  TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION_SUFFIX)
-@@ -363,7 +363,7 @@ function publish_package()
- 
-     log "publish_package: Complete. Elapsed $(( SECONDS - start ))s."
-     
--    publishplatformatbstractions
-+    # publishplatformatbstractions
- }
- 
- function publishplatformatbstractions()
 diff --git a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs b/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
 index 55c8d8d2..22a13dd5 100644
 --- a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
@@ -58,29 +48,14 @@ index 0e72bf58..01b624c0 100644
 +    <file src="net6.0\**\*.*" exclude="**\*.pdb" target="contentFiles\any\net6.0" />
    </files>
  </package>
-diff --git a/src/package/package/package.csproj b/src/package/package/package.csproj
-index 4b39d121..4948b4a1 100644
---- a/src/package/package/package.csproj
-+++ b/src/package/package/package.csproj
-@@ -6,7 +6,7 @@
-   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
-   <PropertyGroup>
-     <TargetFrameworks>net451;netcoreapp2.1</TargetFrameworks>
--    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
-+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
-     <AssemblyName>package</AssemblyName>
-     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 diff --git a/src/vstest.console/vstest.console.csproj b/src/vstest.console/vstest.console.csproj
-index 9033f4be..5fd52d24 100644
+index 6f4b8fdd..9767ac5a 100644
 --- a/src/vstest.console/vstest.console.csproj
 +++ b/src/vstest.console/vstest.console.csproj
-@@ -7,7 +7,8 @@
-   <PropertyGroup>
+@@ -8,6 +8,7 @@
      <AssemblyName>vstest.console</AssemblyName>
      <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
--    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1</TargetFrameworks>
-+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
+     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1;net6.0</TargetFrameworks>
 +    <UseAppHost>false</UseAppHost>
      <WarningsAsErrors>true</WarningsAsErrors>
      <OutputType>Exe</OutputType>
