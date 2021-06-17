@@ -105,8 +105,7 @@ global_json_file="$TP_ROOT_DIR/global.json"
 
 
 # Set VERSION from scripts/build/TestPlatform.Settings.targets
-VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/TestPlatform.Settings.targets  | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
-
+VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/TestPlatform.Settings.targets | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
 function ReadGlobalVersion {
   local key=$1
@@ -149,6 +148,12 @@ TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
+TPB_EXTERNALS_VERSION=$(grep TestPlatformExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+TPB_CC_EXTERNALS_VERSION=$(grep CodeCoverageExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+
+if [[ $TP_USE_REPO_API = 1 ]]; then
+    TPB_TargetFrameworkCore="net6.0"
+fi
 
 #
 # Logging
@@ -298,7 +303,7 @@ function publish_package()
         $TPB_TargetFrameworkCore:$coreCLRPackageDir
     )
 
-    if [[ $DOTNET_BUILD_FROM_SOURCE = 0 ]]; then
+    if [[ $TP_USE_REPO_API = 0 ]]; then
        frameworkPackageDirMap+=( \
            $TPB_TargetFramework:$packageDir
        )
@@ -309,59 +314,130 @@ function publish_package()
         local framework="${fxpkg%%:*}"
         local packageDir="${fxpkg##*:}"
         local projects=( \
-            $TP_PACKAGE_PROJ_DIR/package.csproj \
+            $TP_ROOT_DIR/src/package/package/package.csproj \
             $TP_ROOT_DIR/src/vstest.console/vstest.console.csproj \
-            $TP_ROOT_DIR/src/datacollector/datacollector.csproj
+            $TP_ROOT_DIR/src/datacollector/datacollector.csproj \
+            $TP_ROOT_DIR/src/testhost/testhost.csproj \
+            $TP_ROOT_DIR/src/testhost.x86/testhost.x86.csproj
         )
 
         log "Package: Publish projects for $framework"
         for project in "${projects[@]}" ;
         do
-            log ".. Package: Publish $project"
-            $dotnet publish $project /bl:publish_$project.binlog --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+            if [[ $TP_USE_REPO_API = 0 ]]; then
+                log ".. Package: Publish $project"
+                $dotnet publish $project /bl:publish_$project.binlog --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+            else
+                log ".. Package: Publish $project (Source Build)"
+                $dotnet publish $project /bl:publish_$project.binlog --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true
+            fi
         done
 
         # Copy TestHost for desktop targets
         local testhost=$packageDir/TestHost
         mkdir -p $testhost
 
-        if [[ $DOTNET_BUILD_FROM_SOURCE = 0 ]]; then
+        if [[ $TP_USE_REPO_API = 0 ]]; then
             cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
             cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
-        fi
-
-        if [[ $DOTNET_BUILD_FROM_SOURCE = 1 ]]; then
+        else
             cp -r src/testhost/bin/$TPB_Configuration/net6.0/* $testhost
             cp -r src/testhost.x86/bin/$TPB_Configuration/net6.0/* $testhost
         fi
 
-
         # Copy over the logger assemblies to the Extensions folder.
         local extensionsDir="$packageDir/Extensions"
+
+        if [[ $TP_USE_REPO_API = 1 ]]; then
+            log ".. Package: mv (Source Build)"
+            local current_tfn="net6.0"
+        else
+            log ".. Package: mv"
+            local current_tfn="netstandard2.0"
+        fi
+
         # Create an extensions directory.
         mkdir -p $extensionsDir
 
+        #*************************************************************************************************************#
         # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
         # Ideally we should just be publishing the loggers to the Extensions folder.
-        loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb" "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb")
-        for i in ${loggers[@]}; do
-            mv $packageDir/${i} $extensionsDir
-        done
+        loggers=( \
+            "Microsoft.TestPlatform.Extensions.TrxLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" \
+            "Microsoft.TestPlatform.Extensions.TrxLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb" \
+            "Microsoft.TestPlatform.Extensions.HtmlLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" \
+            "Microsoft.TestPlatform.Extensions.HtmlLogger/bin/$TPB_Configuration/$current_tfn/Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb" 
+        )
 
-        # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
-        runtimeproviders=("Microsoft.TestPlatform.TestHostRuntimeProvider.dll" "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
-        for i in ${runtimeproviders[@]}; do
-            mv $packageDir/${i} $extensionsDir
+        for i in ${loggers[@]}; do
+            if [[ $TP_USE_REPO_API = 1 ]]; then
+                log ".. Package: ${i} (Source Build)"
+            else
+                log ".. Package: ${i}"
+            fi
+            mv "$TP_ROOT_DIR/src/${i}" $extensionsDir
         done
+        # TODO: move loc files too
+        #*************************************************************************************************************#
+
+        #*************************************************************************************************************#
+        #
+        blame=( \
+            "Microsoft.TestPlatform.Extensions.BlameDataCollector/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" \
+            "Microsoft.TestPlatform.Extensions.BlameDataCollector/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb" \
+            "DataCollectors/Microsoft.TestPlatform.Extensions.EventLogCollector/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.Extensions.EventLogCollector.dll" \
+            "DataCollectors/Microsoft.TestPlatform.Extensions.EventLogCollector/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.Extensions.EventLogCollector.pdb"
+        )
+        
+        for i in ${blame[@]}; do
+            if [[ $TP_USE_REPO_API = 1 ]]; then
+                log ".. Package: ${i} (Source Build)"
+            else
+                log ".. Package: ${i}"
+            fi
+            mv "$TP_ROOT_DIR/src/${i}" $extensionsDir
+        done
+        # TODO: move loc files too
+        #*************************************************************************************************************#
+        
+        #*************************************************************************************************************#
+        # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+        runtimeproviders=( \
+            "Microsoft.TestPlatform.TestHostProvider/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.TestHostRuntimeProvider.dll" \
+            "Microsoft.TestPlatform.TestHostProvider/bin/$TPB_Configuration/$current_tfn/Microsoft.TestPlatform.TestHostRuntimeProvider.pdb"
+        )
+        
+        for i in ${runtimeproviders[@]}; do
+            if [[ $TP_USE_REPO_API = 1 ]]; then
+                log ".. Package: ${i} (Source Build)"
+            else
+                log ".. Package: ${i}"
+            fi
+            mv "$TP_ROOT_DIR/src/${i}" $extensionsDir
+        done
+        # TODO: move loc files too
+        #*************************************************************************************************************#
+
+        #*************************************************************************************************************#
+        externals=( \
+            # "microsoft.internal.dia/$TPB_EXTERNALS_VERSION/tools/net451"         \ # no linux support (cp to $testhost)
+            # "microsoft.internal.dia.interop/$TPB_EXTERNALS_VERSION/tools/net451" \ # no linux support (cp to $testhost)
+            "microsoft.visualstudio.coverage.io/$TPB_CC_EXTERNALS_VERSION/lib/netstandard2.0/"
+        )
+        
+        for i in ${externals[@]}; do
+            if [[ $TP_USE_REPO_API = 1 ]]; then
+                log ".. Package: ${i} (Source Build)"
+            else
+                log ".. Package: ${i}"
+            fi
+            cp -r "${TP_PACKAGES_DIR}${i}"** "$packageDir"
+        done
+        #*************************************************************************************************************#
+
         newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
         cp $newtonsoft $packageDir
     done
-
-    # Publish TestHost for netcoreapp2.1 target
-    log ".. Package: Publish testhost.csproj"
-    local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
-    local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore
-    $dotnet publish $projectToPackage /bl:testhost-publish.binlog --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
@@ -370,24 +446,25 @@ function publish_package()
     mkdir -p $publishDirectory
     cp -r $binariesDirectory $publishDirectory
 
+    #*************************************************************************************************************#
+    #
+    assemblies=( \
+        "Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration/$current_tfn" \
+        "Microsoft.TestPlatform.ObjectModel/bin/$TPB_Configuration/$current_tfn" 
+    )
+    
+    for i in ${assemblies[@]}; do
+        if [[ $TP_USE_REPO_API = 1 ]]; then
+            log ".. Package: ${i} (Source Build)"
+        else
+            log ".. Package: ${i}"
+        fi
+        cp -r "$TP_ROOT_DIR/src/${i}" $TP_OUT_DIR/$TPB_Configuration
+    done
+    # TODO: move loc files too
+    #*************************************************************************************************************#
+    
     log "publish_package: Complete. Elapsed $(( SECONDS - start ))s."
-    
-    publishplatformatbstractions
-}
-
-function publishplatformatbstractions()
-{
-    log "Publish-PlatfromAbstractions-Internal: Started."
-    
-    local start=$SECONDS
-    local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
-    
-    local platformAbstraction="$TP_ROOT_DIR/src/Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration"
-    local platformAbstractionNetCore=$platformAbstraction/$TPB_TargetFrameworkCore
-    
-    cp -r $platformAbstractionNetCore $coreCLRPackageDir
-    
-    log "Publish-PlatfromAbstractions-Internal: Complete. Elapsed $(( SECONDS - start ))"
 }
 
 function create_package()

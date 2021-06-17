@@ -4,26 +4,11 @@ Date: Thu, 17 Jun 2021 02:35:04 +0200
 Subject: [PATCH] Build for NET 6
 
 ---
- scripts/build.sh                                            | 2 +-
  .../Hosting/DotnetTestHostManager.cs                        | 2 +-
  src/package/nuspec/TestPlatform.Build.nuspec                | 6 +++---
  src/package/nuspec/TestPlatform.CLI.nuspec                  | 2 +-
- src/vstest.console/vstest.console.csproj                    | 1 +
- 5 files changed, 7 insertions(+), 6 deletions(-)
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/build.sh b/scripts/build.sh
-index 566812a5..04b7341a 100755
---- a/scripts/build.sh
-+++ b/scripts/build.sh
-@@ -142,7 +142,7 @@ DOTNET_CLI_VERSION=$_ReadGlobalVersion
- TPB_Solution="TestPlatform.sln"
- TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
- TPB_TargetFramework="net451"
--TPB_TargetFrameworkCore="netcoreapp2.1"
-+TPB_TargetFrameworkCore="net6.0"
- TPB_Configuration=$CONFIGURATION
- TPB_TargetRuntime=$TARGET_RUNTIME
- TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION_SUFFIX)
 diff --git a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs b/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
 index 55c8d8d2..22a13dd5 100644
 --- a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
@@ -73,18 +58,5 @@ index 0e72bf58..01b624c0 100644
 +    <file src="net6.0\**\*.*" exclude="**\*.pdb" target="contentFiles\any\net6.0" />
    </files>
  </package>
-diff --git a/src/vstest.console/vstest.console.csproj b/src/vstest.console/vstest.console.csproj
-index 4199b153..850318bf 100644
---- a/src/vstest.console/vstest.console.csproj
-+++ b/src/vstest.console/vstest.console.csproj
-@@ -8,6 +8,7 @@
-     <AssemblyName>vstest.console</AssemblyName>
-     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
-     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1;net6.0</TargetFrameworks>
-+    <UseAppHost>false</UseAppHost>
-     <WarningsAsErrors>true</WarningsAsErrors>
-     <OutputType>Exe</OutputType>
-     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
--- 
 2.31.1.windows.1
 

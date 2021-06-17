@@ -11,7 +11,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="Microsoft.CSharp" />
