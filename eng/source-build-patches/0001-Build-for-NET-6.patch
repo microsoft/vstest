@@ -1,17 +1,18 @@
-From bcb00c2086247b4ff1bccd0db2d7f3122bddf669 Mon Sep 17 00:00:00 2001
+From cc24a98b1886861269afa3dae243f5eee63c70eb Mon Sep 17 00:00:00 2001
 From: Medeni Baykal <433724+Haplois@users.noreply.github.com>
-Date: Thu, 17 Jun 2021 01:08:15 +0200
+Date: Thu, 17 Jun 2021 02:35:04 +0200
 Subject: [PATCH] Build for NET 6
 
 ---
- scripts/build.sh                                               | 2 +-
- .../Hosting/DotnetTestHostManager.cs                           | 2 +-
- src/package/nuspec/TestPlatform.CLI.nuspec                     | 2 +-
- src/vstest.console/vstest.console.csproj                       | 3 ++-
- 4 files changed, 5 insertions(+), 4 deletions(-)
+ scripts/build.sh                                            | 2 +-
+ .../Hosting/DotnetTestHostManager.cs                        | 2 +-
+ src/package/nuspec/TestPlatform.Build.nuspec                | 6 +++---
+ src/package/nuspec/TestPlatform.CLI.nuspec                  | 2 +-
+ src/vstest.console/vstest.console.csproj                    | 1 +
+ 5 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/build.sh b/scripts/build.sh
-index aa44e9f4..48ca1cae 100755
+index 566812a5..04b7341a 100755
 --- a/scripts/build.sh
 +++ b/scripts/build.sh
 @@ -142,7 +142,7 @@ DOTNET_CLI_VERSION=$_ReadGlobalVersion
@@ -36,6 +37,30 @@ index 55c8d8d2..22a13dd5 100644
  
                          if (this.fileHelper.Exists(testHostExeNugetPath))
                          {
+diff --git a/src/package/nuspec/TestPlatform.Build.nuspec b/src/package/nuspec/TestPlatform.Build.nuspec
+index 3808b296..e70511ae 100644
+--- a/src/package/nuspec/TestPlatform.Build.nuspec
++++ b/src/package/nuspec/TestPlatform.Build.nuspec
+@@ -20,16 +20,16 @@
+                 commit="$CommitId$" />
+                 
+     <dependencies>
+-      <group targetFramework="netstandard2.0"></group>
++      <group targetFramework="net6.0"></group>
+     </dependencies>
+   </metadata>
+   <files>
+     <file src="Icon.png" target="" />
+     <file src="licenses\LICENSE_NET.txt" target="" />
+-    <file src="Microsoft.TestPlatform.Build\netstandard2.0\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
++    <file src="Microsoft.TestPlatform.Build\net6.0\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
+ 
+     <!-- Add localized resources -->
+-    <file src="Microsoft.TestPlatform.Build\netstandard2.0\**\*.dll" target="lib\netstandard2.0" />
++    <file src="Microsoft.TestPlatform.Build\net6.0\**\*.dll" target="lib\net6.0" />
+ 
+   </files>
+ </package>
 diff --git a/src/package/nuspec/TestPlatform.CLI.nuspec b/src/package/nuspec/TestPlatform.CLI.nuspec
 index 0e72bf58..01b624c0 100644
 --- a/src/package/nuspec/TestPlatform.CLI.nuspec
@@ -49,7 +74,7 @@ index 0e72bf58..01b624c0 100644
    </files>
  </package>
 diff --git a/src/vstest.console/vstest.console.csproj b/src/vstest.console/vstest.console.csproj
-index 6f4b8fdd..9767ac5a 100644
+index 4199b153..850318bf 100644
 --- a/src/vstest.console/vstest.console.csproj
 +++ b/src/vstest.console/vstest.console.csproj
 @@ -8,6 +8,7 @@
@@ -60,15 +85,6 @@ index 6f4b8fdd..9767ac5a 100644
      <WarningsAsErrors>true</WarningsAsErrors>
      <OutputType>Exe</OutputType>
      <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
-@@ -15,7 +16,7 @@
-     <ApplicationManifest>app.manifest</ApplicationManifest>
-     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CommandLine</RootNamespace>
-   </PropertyGroup>
--  <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
-+  <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
-     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-   </PropertyGroup>
-   <ItemGroup>
 -- 
 2.31.1.windows.1
 
