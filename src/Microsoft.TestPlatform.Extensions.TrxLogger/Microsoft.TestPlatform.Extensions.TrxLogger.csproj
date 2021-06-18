@@ -26,7 +26,10 @@
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'net6.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Security.Principal.Windows" Version="4.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,7 @@
     <AssemblyName>Microsoft.TestPlatform.TestHostRuntimeProvider</AssemblyName>
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+    <DefineConstants Condition=" '$(DotNetBuildFromSource)' == 'true' ">$(DefineConstants);DOTNET_BUILD_FROM_SOURCE</DefineConstants>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">

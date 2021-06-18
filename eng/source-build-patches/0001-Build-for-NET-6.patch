@@ -4,24 +4,10 @@ Date: Thu, 17 Jun 2021 02:35:04 +0200
 Subject: [PATCH] Build for NET 6
 
 ---
- .../Hosting/DotnetTestHostManager.cs                        | 2 +-
  src/package/nuspec/TestPlatform.Build.nuspec                | 6 +++---
  src/package/nuspec/TestPlatform.CLI.nuspec                  | 2 +-
- 3 files changed, 5 insertions(+), 3 deletions(-)
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs b/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
-index 55c8d8d2..22a13dd5 100644
---- a/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
-+++ b/src/Microsoft.TestPlatform.TestHostProvider/Hosting/DotnetTestHostManager.cs
-@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
-                         // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
-                         var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
-                         var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent.Parent.Parent;
--                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
-+                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
- 
-                         if (this.fileHelper.Exists(testHostExeNugetPath))
-                         {
 diff --git a/src/package/nuspec/TestPlatform.Build.nuspec b/src/package/nuspec/TestPlatform.Build.nuspec
 index 3808b296..e70511ae 100644
 --- a/src/package/nuspec/TestPlatform.Build.nuspec
