@@ -26,7 +26,6 @@
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
-    <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
@@ -40,7 +39,9 @@
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
+    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.221401</MicrosoftDiagnosticsNETCoreClientVersion>
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
+    <MicrosoftExtensionsFileSystemGlobbingPackageVersion>1.1.1</MicrosoftExtensionsFileSystemGlobbingPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
   </PropertyGroup>

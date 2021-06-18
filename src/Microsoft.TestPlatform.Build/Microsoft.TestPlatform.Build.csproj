@@ -7,7 +7,8 @@
   <PropertyGroup>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <AssemblyName>Microsoft.TestPlatform.Build</AssemblyName>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>

@@ -142,9 +142,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             XmlPersistence helper = new XmlPersistence();
 
-            if (this.executionId != null)
+            if (this.executionId != Guid.Empty)
                 helper.SaveGuid(element, "@executionId", this.executionId);
-            if (this.parentExecutionId != null)
+            if (this.parentExecutionId != Guid.Empty)
                 helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
 
             helper.SaveGuid(element, "@testId", this.testId);

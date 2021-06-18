@@ -823,7 +823,7 @@ function Copy-PackageItems($packageName)
     # Packages published separately are copied into their own artifacts directory
     # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
-    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    $binariesDirectory = [System.IO.Path]::Combine($env:TP_ROOT_DIR, "src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
