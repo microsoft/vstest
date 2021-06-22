@@ -38,6 +38,11 @@
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
       </group>
 
+      <group targetFramework="net6.0">
+        <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
+      </group>
+
       <group targetFramework="uap10.0">
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
         <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
@@ -93,6 +98,24 @@
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp2.1\" />
     
+    <!-- net6.0 -->
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\Microsoft.VisualStudio.TestPlatform.*.dll" target="lib\net6.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\Microsoft.TestPlatform.*.dll" target="lib\net6.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\testhost.dll" target="lib\net6.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\testhost.deps.json" target="lib\net6.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\x86\msdia140.dll" target="lib\net6.0\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\x64\msdia140.dll" target="lib\net6.0\x64\" />
+
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\net6.0\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\win7-x64\testhost.dll" target="build\net6.0\x64\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\win7-x64\testhost.exe" target="build\net6.0\x64\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\net6.0\x64\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\win7-x86\testhost.x86.dll" target="build\net6.0\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\win7-x86\testhost.x86.exe" target="build\net6.0\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\win7-x86\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\net6.0\x86\" />
+
+    <file src="Microsoft.TestPlatform.TestHost\net6.0\Microsoft.TestPlatform.TestHost.props" target="build\net6.0\" />
+
     <!-- UWP -->
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\testhost.dll" target="lib\uap10.0\" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.*.dll" target="lib\uap10.0\" />
