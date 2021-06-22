@@ -56,9 +56,13 @@
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
       </PropertyGroup>
 
-      <!-- Test projects are not discovered in test window without test container capability -->
+      <!-- 
+        Test projects are not discovered in test window without TestContainer capability.
+        Test projects are marked with TestHotReload to indicate presence of .NET6.0 test host
+        which is needed for hot reloading. 
+      -->
       <ItemGroup>
-        <ProjectCapability Include="TestContainer" />
+        <ProjectCapability Include="TestContainer;TestHotReload" />
       </ItemGroup>
 
       <!-- Test project references -->
