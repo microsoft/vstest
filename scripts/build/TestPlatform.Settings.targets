@@ -58,7 +58,7 @@
 
       <!-- Test projects are not discovered in test window without test container capability -->
       <ItemGroup>
-        <ProjectCapability Include="TestContainer" />
+        <ProjectCapability Include="TestContainer;TestHotReload" />
       </ItemGroup>
 
       <!-- Test project references -->
