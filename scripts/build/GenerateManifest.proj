@@ -1,0 +1,43 @@
+<Project>
+    <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+    <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <NETCORE_ENGINEERING_TELEMETRY>Publish</NETCORE_ENGINEERING_TELEMETRY>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <MicrosoftDotNetBuildTasksFeedFilePath Condition=" '$(MicrosoftDotNetBuildTasksFeedFilePath)' == '' ">$(NuGetPackageRoot)microsoft.dotnet.build.tasks.feed\$(MicrosoftDotNetBuildTasksFeedVersion)\tools\$(TargetFramework)\Microsoft.DotNet.Build.Tasks.Feed.dll</MicrosoftDotNetBuildTasksFeedFilePath>
+        <PackagesPath Condition=" '$(PackagesPath)' == '' ">$(ArtifactsDir)\$(Configuration)\packages\</PackagesPath>
+        <AssetManifestFilePath Condition=" '$(AssetManifestFilePath)' == '' ">$(PackagesPath)manifest\manifest.xml</AssetManifestFilePath>
+        <PackagesToPublishPattern Condition=" '$(PackagesToPublishPattern)' == '' ">$(PackagesPath)*.nupkg</PackagesToPublishPattern>
+        <FeedUrl Condition=" '$(FeedUrl)' == '' ">https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json</FeedUrl>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="'$(PackagesToPublishPattern)' != ''">
+        <ItemsToPush Remove="@(ItemsToPush)" />
+        <ItemsToPush Include="$(PackagesToPublishPattern)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ManifestBuildData Include="Location=$(FeedUrl)" />
+    </ItemGroup>
+
+    <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedFilePath)" />
+
+    <Target Name="PublishToBuildAssetRegistry">
+        <GenerateBuildManifest Artifacts="@(ItemsToPush)"
+            ItemsToSign="@(ItemsToSignPostBuild)"
+            StrongNameSignInfo="@(StrongNameSignInfo)"
+            FileSignInfo="@(FileSignInfo)"
+            FileExtensionSignInfo="@(FileExtensionSignInfo)"
+            OutputPath="$(AssetManifestFilePath)"
+            BuildId="$(BUILD_BUILDNUMBER)"
+            BuildData="@(ManifestBuildData)"
+            RepoUri="$(BUILD_REPOSITORY_URI)"
+            RepoBranch="$(BUILD_SOURCEBRANCH)"
+            RepoCommit="$(BUILD_SOURCEVERSION)" />
+    </Target>
+</Project>
