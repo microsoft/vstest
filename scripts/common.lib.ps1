@@ -151,7 +151,7 @@ function Restore-Package
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
-    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
+    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -bl:"$env:TP_OUT_DIR\log\$Configuration\external.binlog"
     Write-Log ".. .. Restore-Package: Complete."
 
     Set-ScriptFailedOnError

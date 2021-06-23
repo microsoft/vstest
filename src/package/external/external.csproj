@@ -28,6 +28,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+
   <ItemGroup>
     <!-- This csproj restore external tools required for build process -->
     <PackageReference Include="NuGet.CommandLine" Version="5.8.1" PrivateAssets="All" />
@@ -57,6 +58,7 @@
     <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
+    <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" PrivateAssets="All" />
 
     <!-- Required for resolution of desktop dependencies in non windows environment.
          We've to set to net472 since the net451 and other packages have assemblies in wrong case.
@@ -65,5 +67,6 @@
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 
-  <Target Name="CoreCompile" />                               <!-- Prevent Csc from being called -->
+  <!-- Prevent Csc from being called -->
+  <Target Name="CoreCompile" />
 </Project>
