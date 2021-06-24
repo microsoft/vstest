@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectCapability Include="TestContainer;TestHotReload" />
+    <ProjectCapability Include="TestContainer;HotReloadForTest" />
   </ItemGroup>  
  
 </Project>
