@@ -11,7 +11,6 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
-    <Prefer32Bit Condition="'$(TargetFramework)' == 'net451'">true</Prefer32Bit>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CommandLine</RootNamespace>
   </PropertyGroup>
