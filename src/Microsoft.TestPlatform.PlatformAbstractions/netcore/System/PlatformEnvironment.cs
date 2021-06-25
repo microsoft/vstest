@@ -28,6 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                         return PlatformArchitecture.ARM;
                     case System.Runtime.InteropServices.Architecture.Arm64:
                         return PlatformArchitecture.ARM64;
+
+                    // The symbolic value is only available with .NET 6
+                    // preview 6 or later, so use the numerical value for now.
+                    // case System.Runtime.InteropServices.Architecture.S390x:
+                    case (Architecture)5:
+                        return PlatformArchitecture.S390x;
                     default:
                         throw new NotSupportedException();
                 }

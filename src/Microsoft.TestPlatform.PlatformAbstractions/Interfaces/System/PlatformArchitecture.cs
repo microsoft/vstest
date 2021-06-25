@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         X86,
         X64,
         ARM,
-        ARM64
+        ARM64,
+        S390x
     }
 }
