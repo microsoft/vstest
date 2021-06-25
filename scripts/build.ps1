@@ -997,8 +997,9 @@ function Generate-Manifest
 {
     Write-Log "Generate-Manifest: Started."
 
-    $sdkTaskPath = Join-Path $env:TP_ROOT_DIR "eng\common\sdk-task.ps1"
-    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest\manifest.xml /p:ManifestBuildData="Location=https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+    $generateManifestPath = Join-Path $env:TP_ROOT_DIR "scripts\build\GenerateManifest.proj"
+    $msbuildPath = Locate-MSBuildPath
+    & $msbuildPath $generateManifestPath /t:PublishToBuildAssetRegistry /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:BUILD_BUILDNUMBER=$BuildNumber /p:Configuration=$TPB_Configuration /bl:"$env:TP_OUT_DIR\log\$Configuration\manifest-generation.binlog"
 
     Write-Log "Generate-Manifest: Completed."
 }
@@ -1097,6 +1098,9 @@ if ($Force -or $Steps -contains "Publish") {
     Publish-Package
     Create-VsixPackage
     Create-NugetPackages
+}
+
+if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
     Generate-Manifest
     Copy-PackageIntoStaticDirectory
 }
