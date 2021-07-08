@@ -252,7 +252,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         // testhost.(x86).exe is present in location {testHostNugetRoot}\build\netcoreapp2.1\{x86/x64}\{testhost.x86.exe/testhost.exe}
                         var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
                         var testHostNugetRoot = new DirectoryInfo(testHostPath).Parent.Parent.Parent;
-                        var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
+
+                        #if DOTNET_BUILD_FROM_SOURCE
+                            var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "net6.0", folderName, exeName);
+                        #else
+                            var testHostExeNugetPath = Path.Combine(testHostNugetRoot.FullName, "build", "netcoreapp2.1", folderName, exeName);
+                        #endif
 
                         if (this.fileHelper.Exists(testHostExeNugetPath))
                         {

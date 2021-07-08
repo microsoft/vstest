@@ -6,7 +6,8 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>

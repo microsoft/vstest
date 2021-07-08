@@ -632,6 +632,10 @@
       <FilesToSign Include="$(NugetOutDir)/*.nupkg">
         <Authenticode>NuGet</Authenticode>
       </FilesToSign>
+
+      <FilesToSign Include="$(NugetOutDir)/source-build/*.nupkg">
+        <Authenticode>NuGet</Authenticode>
+      </FilesToSign>
     </ItemGroup>
 
     <Message Text="Signing using authenticode certificate '%(FilesToSign.Authenticode)' for @(FilesToSign)"/>

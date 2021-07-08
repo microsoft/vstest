@@ -6,8 +6,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>SettingsMigrator</AssemblyName>
-    <TargetFramework>net451</TargetFramework>
-	<WarningsAsErrors>true</WarningsAsErrors>
+    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>

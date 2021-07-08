@@ -821,7 +821,7 @@ function Copy-PackageItems($packageName)
     # Packages published separately are copied into their own artifacts directory
     # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
-    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    $binariesDirectory = [System.IO.Path]::Combine($env:TP_ROOT_DIR, "src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
@@ -973,8 +973,9 @@ function Generate-Manifest
 {
     Write-Log "Generate-Manifest: Started."
 
-    $sdkTaskPath = Join-Path $env:TP_ROOT_DIR "eng\common\sdk-task.ps1"
-    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest\manifest.xml /p:ManifestBuildData="Location=https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+    $generateManifestPath = Join-Path $env:TP_ROOT_DIR "scripts\build\GenerateManifest.proj"
+    $msbuildPath = Locate-MSBuildPath
+    & $msbuildPath $generateManifestPath /t:PublishToBuildAssetRegistry /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:BUILD_BUILDNUMBER=$BuildNumber /p:Configuration=$TPB_Configuration /bl:"$env:TP_OUT_DIR\log\$Configuration\manifest-generation.binlog"
 
     Write-Log "Generate-Manifest: Completed."
 }
@@ -1073,6 +1074,9 @@ if ($Force -or $Steps -contains "Publish") {
     Publish-Package
     Create-VsixPackage
     Create-NugetPackages
+}
+
+if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
     Generate-Manifest
     Copy-PackageIntoStaticDirectory
 }
