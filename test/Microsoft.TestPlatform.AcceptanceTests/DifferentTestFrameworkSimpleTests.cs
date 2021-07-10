@@ -47,6 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource]
         public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
@@ -71,6 +72,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource]
         public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
         {
