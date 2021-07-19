@@ -47,8 +47,8 @@
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.Intellitrace" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Internal.Dia" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformMSDiaVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="15.8.3247" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Interop" Version="$(InteropExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Telemetry" Version="16.3.58" PrivateAssets="All" />
