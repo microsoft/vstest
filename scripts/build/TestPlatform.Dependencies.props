@@ -33,7 +33,7 @@
     <MoqVersion>4.8.3</MoqVersion>
 
     <TestPlatformExternalsVersion>17.0.0-previews-3-31516-257</TestPlatformExternalsVersion>
-    <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion>
+    <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
     <TestPlatformMSDiaVersion>17.0.0-previews-3-31515-332</TestPlatformMSDiaVersion>
     
     <CodeCoverageExternalsVersion>17.0.0-beta.21364.12</CodeCoverageExternalsVersion>
