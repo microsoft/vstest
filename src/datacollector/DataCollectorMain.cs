@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Utilities;
 
     public class DataCollectorMain
     {
@@ -99,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 EqtTrace.Verbose($"Version: { version }");
             }
 
-            SetCultureSpecifiedByUser();
+            UILanguageOverride.SetCultureSpecifiedByUser();
 
             EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", string.Join(",", args));
 
