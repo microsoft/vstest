@@ -4,15 +4,15 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Utilities
+namespace Microsoft.VisualStudio.TestPlatform.Execution
 {
-    public static class UILanguageOverride
+    internal static class UILanguageOverride
     {
-        private const string DOTNET_CLI_UI_LANGUAGE = Constants.DotNetUserSpecifiedCulture;
+        private const string DOTNET_CLI_UI_LANGUAGE = nameof(DOTNET_CLI_UI_LANGUAGE);
         private const string VSLANG = nameof(VSLANG);
         private const string PreferredUILang = nameof(PreferredUILang);
 
-        public static void SetCultureSpecifiedByUser()
+        internal static void SetCultureSpecifiedByUser()
         {
             CultureInfo language = GetOverriddenUILanguage();
             if (language == null)
@@ -43,6 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Utilities
                 catch (CultureNotFoundException) { }
             }
 
+#if NETCOREAPP1_1_OR_GREATER
             // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS 
             // language preference if we're invoked by VS. 
             string vsLang = Environment.GetEnvironmentVariable(VSLANG);
@@ -55,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Utilities
                 catch (ArgumentOutOfRangeException) { }
                 catch (CultureNotFoundException) { }
             }
-
+# endif
             return null;
         }
 
@@ -63,7 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Utilities
         {
             // Do not override any environment variables that are already set as we do not want to clobber a more granular setting with our global setting.
             SetIfNotAlreadySet(DOTNET_CLI_UI_LANGUAGE, language.Name);
+#if NETCOREAPP1_1_OR_GREATER
             SetIfNotAlreadySet(VSLANG, language.LCID.ToString()); // for tools following VS guidelines to just work in CLI
+#endif
             SetIfNotAlreadySet(PreferredUILang, language.Name); // for C#/VB targets that pass $(PreferredUILang) to compiler
         }
 

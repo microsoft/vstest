@@ -4,20 +4,19 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
-    using System.Diagnostics;
     using System.Globalization;
     using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Utilities;
 
     public class DataCollectorMain
     {
@@ -64,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         public void Run(string[] args)
         {
-            WaitForDebuggerIfEnabled();
+            DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
             // Setup logging if enabled
@@ -137,35 +136,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             StartProcessing();
         }
 
-        private void WaitForDebuggerIfEnabled()
-        {
-            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
-            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
-            {
-                while (!Debugger.IsAttached)
-                {
-                    System.Threading.Thread.Sleep(1000);
-                }
-
-                Debugger.Break();
-            }
-        }
-
-        private static void SetCultureSpecifiedByUser()
-        {
-            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
-            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
-            {
-                try
-                {
-                    CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(userCultureSpecified);
-                }
-                catch (Exception)
-                {
-                    EqtTrace.Info(string.Format("Invalid Culture Info: {0}", userCultureSpecified));
-                }
-            }
-        }
 
         private void StartProcessing()
         {
