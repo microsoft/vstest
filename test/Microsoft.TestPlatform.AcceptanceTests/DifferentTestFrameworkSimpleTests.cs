@@ -29,7 +29,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        // vstest.console is 64-bit now, do not run in process because the 32-bit native dll won't load
+        // skip .NET (Core) tests because the called methods ignores them anyway
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: false, useCoreRunner: false)]
         public void CPPRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -38,7 +40,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
+        // vstest.console is 64-bit now, run in process to test the 64-bit native dll
+        // skip .NET (Core) tests because the called methods ignores them anyway
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
         public void CPPRunAllTestExecutionPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
