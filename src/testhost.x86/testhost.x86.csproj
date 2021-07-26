@@ -15,6 +15,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>true</Prefer32Bit>
     <OutputType>Exe</OutputType>
+    <IsTestProject>false</IsTestProject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1' AND '$(TargetFramework)' != 'netcoreapp1.0' AND '$(TargetFramework)' != 'net6.0' ">

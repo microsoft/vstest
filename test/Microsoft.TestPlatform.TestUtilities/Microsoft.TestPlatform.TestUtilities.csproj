@@ -8,6 +8,7 @@
     <AssemblyName>Microsoft.TestPlatform.TestUtilities</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />

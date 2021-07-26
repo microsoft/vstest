@@ -20,6 +20,7 @@
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <IsTestProject>false</IsTestProject>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
