@@ -149,7 +149,7 @@ TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
 TPB_EXTERNALS_VERSION=$(grep TestPlatformExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
-TPB_CC_EXTERNALS_VERSION=$(grep CodeCoverageExternalsVersion $TP_ROOT_DIR/scripts/build/TestPlatform.Dependencies.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
+TPB_CC_EXTERNALS_VERSION=$(grep MicrosoftInternalCodeCoverageVersion $TP_ROOT_DIR/eng/Versions.props | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
 if [[ $TP_USE_REPO_API = 1 ]]; then
     TPB_TargetFrameworkCore="net6.0"

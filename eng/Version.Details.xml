@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
+    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.0.0-beta.21377.6">
+      <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
+      <Sha>9f99cfdee5a1d61527dd7381e5e07129c349cb5b</Sha>
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21357.3">
