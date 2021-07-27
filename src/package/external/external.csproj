@@ -41,8 +41,6 @@
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(CodeCoverageExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(CodeCoverageExternalsVersion)" PrivateAssets="All" />     
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(CodeCoverageExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Internal.CodeCoverage.InstrumentationMethod.alpine" Version="$(CodeCoverageExternalsVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Internal.CodeCoverage.InstrumentationMethod.ubuntu" Version="$(CodeCoverageExternalsVersion)" PrivateAssets="All" />    
     <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
