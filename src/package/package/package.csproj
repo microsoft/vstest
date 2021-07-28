@@ -25,6 +25,7 @@
 
     <!-- Disable warning that there are no source files. It is intentional. -->
     <NoWarn>$(NoWarn);2008</NoWarn>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">

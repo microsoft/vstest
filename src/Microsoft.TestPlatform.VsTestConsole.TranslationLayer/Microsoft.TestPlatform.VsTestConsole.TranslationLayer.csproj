@@ -9,6 +9,7 @@
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>$(BaseIntermediateOutputPath)\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.XML</DocumentationFile>

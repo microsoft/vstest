@@ -17,6 +17,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget Condition="$(TargetFramework.StartsWith('net4'))">AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>

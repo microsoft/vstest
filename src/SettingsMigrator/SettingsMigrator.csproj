@@ -12,6 +12,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <IsTestProject>false</IsTestProject>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">

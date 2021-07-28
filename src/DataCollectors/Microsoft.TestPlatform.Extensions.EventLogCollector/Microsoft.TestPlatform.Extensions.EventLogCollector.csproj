@@ -10,6 +10,7 @@
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <Reference Include="System" />
