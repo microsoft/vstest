@@ -90,11 +90,11 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>$(TestPlatformMSDiaVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia.Interop">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>$(TestPlatformMSDiaVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
