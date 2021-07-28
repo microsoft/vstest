@@ -11,7 +11,7 @@
     <!-- this version also needs to be "statically" readable because the test fixture will inspect this file for the version 
     and because during the test `dotnet test` will run and re-build some of the test projects and at that time the version 
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync --> 
-    <NETTestSdkVersion>16.10.0-dev</NETTestSdkVersion>
+    <NETTestSdkVersion>16.11.0-dev</NETTestSdkVersion>
 
     <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>
     <MSTestAdapterVersion>2.1.0</MSTestAdapterVersion>
@@ -33,7 +33,8 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
 
-    <TestPlatformExternalsVersion>16.11.31329.17</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>16.11.31527.49</TestPlatformExternalsVersion>
+    <TestPlatformMSDiaVersion>16.11.31523.174</TestPlatformMSDiaVersion>
     <CodeCoverageExternalsVersion>16.10.0-beta.21270.2</CodeCoverageExternalsVersion>
     <MicrosoftFakesVersion>16.11.230815</MicrosoftFakesVersion>
 

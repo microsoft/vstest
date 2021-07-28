@@ -502,15 +502,15 @@ function Publish-Package
 
     ################################################################################
     # Publish msdia
-    $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net451"
+    $testPlatformMSDiaVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformMSDiaVersion
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformMSDiaVersion\tools\net451"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore20PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCore10PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostUapPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
-    $microsoftInternalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformExternalsVersion\tools\net451"
+    $microsoftInternalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformMSDiaVersion\tools\net451"
     Copy-Item -Recurse $microsoftInternalDiaInterop\* $coreCLR20TestHostPackageDir -Force
 
     # Copy over the logger assemblies to the Extensions folder.
@@ -757,6 +757,7 @@ function Create-VsixPackage
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
+    $testPlatformMsDiaVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformMSDiaVersion
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
 
     # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
@@ -807,11 +808,11 @@ function Create-VsixPackage
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net451"
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformMsDiaVersion\tools\net451"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
     # Copy Microsoft.Internal.Dia.Interop
-    $internalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformExternalsVersion\tools\net451"
+    $internalDiaInterop = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia.Interop\$testPlatformMsDiaVersion\tools\net451"
     Copy-Item -Recurse $internalDiaInterop\* $packageDir -Force
 
     # Copy VsWebSite.Interop
@@ -819,7 +820,7 @@ function Create-VsixPackage
     Copy-Item -Recurse $vsWebSiteInterop\* $packageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
-    $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformExternalsVersion\tools\net451"
+    $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\$testPlatformMsDiaVersion\tools\net451"
     if (-not (Test-Path $testImpactComComponentsDir)) {
         New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
     }
