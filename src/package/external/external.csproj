@@ -118,7 +118,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="VsWebSite.Interop">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>$(VsWebSiteInteropVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace.Extensions">
