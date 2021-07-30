@@ -5,20 +5,17 @@
       <trans-unit id="HtmlFilePath">
         <source>Html test results file : {0}</source>
         <target state="translated">HTML テスト結果ファイル: {0}</target>
-        <note>
-        </note>
+        <note></note>
       </trans-unit>
       <trans-unit id="HtmlLoggerError">
         <source>Html Logger Error : {0}</source>
         <target state="translated">HTML ロガー エラー: {0}</target>
-        <note>
-        </note>
+        <note></note>
       </trans-unit>
       <trans-unit id="PrefixAndNameProvidedError">
         <source>The parameters LogFileName and LogFilePrefix cannot be given together.</source>
         <target state="translated">パラメーター LogFileName と LogFilePrefix を同時に指定することはできません。</target>
-        <note>
-        </note>
+        <note></note>
       </trans-unit>
     </body>
   </file>
