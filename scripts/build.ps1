@@ -759,6 +759,7 @@ function Create-VsixPackage
     $testPlatformExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformExternalsVersion
     $testPlatformMsDiaVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.TestPlatformMSDiaVersion
     $codeCoverageExternalsVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.CodeCoverageExternalsVersion
+    $vsWebSiteInteropVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.VsWebSiteInteropVersion
 
     # Copy Microsoft.VisualStudio.TraceDataCollector to Extensions
     $traceDataCollectorPackageDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.TraceDataCollector\$codeCoverageExternalsVersion\lib\$TPB_TargetFramework472"
@@ -816,7 +817,7 @@ function Create-VsixPackage
     Copy-Item -Recurse $internalDiaInterop\* $packageDir -Force
 
     # Copy VsWebSite.Interop
-    $vsWebSiteInterop = Join-Path $env:TP_PACKAGES_DIR "VsWebSite.Interop\$testPlatformExternalsVersion\lib\net45"
+    $vsWebSiteInterop = Join-Path $env:TP_PACKAGES_DIR "VsWebSite.Interop\$vsWebSiteInteropVersion\lib\net45"
     Copy-Item -Recurse $vsWebSiteInterop\* $packageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
