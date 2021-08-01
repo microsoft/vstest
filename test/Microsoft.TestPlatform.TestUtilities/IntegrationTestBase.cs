@@ -139,7 +139,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 Environment.SetEnvironmentVariable(env, vstestConsolePath);
                 if (arguments.Contains(".csproj"))
                 {
-                    arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" " + arguments;
+                    arguments = $@"-p:VsTestConsolePath=""{vstestConsolePath}"" -p:VSTestUseConsole=True " + arguments;
                 }
 
                 this.ExecutePatchedDotnet("test", arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);

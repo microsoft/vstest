@@ -12,10 +12,14 @@ Copyright (c) .NET Foundation. All rights reserved.
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Load Microsoft.TestPlatform.Build.Tasks.dll, this can be overridden to use a different version with $(VSTestTaskAssemblyFile) -->
   <PropertyGroup>
-    <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
-    <VSTestConsolePath Condition="$(VSTestConsolePath) == ''">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),"vstest.console.dll"))</VSTestConsolePath>
+    <VSTestTaskAssemblyFile Condition="'$(VSTestTaskAssemblyFile)' == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
+    <VSTestConsolePath Condition="'$(VSTestConsolePath)' == ''">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),"vstest.console.dll"))</VSTestConsolePath>
+    <VSTestUseConsole Condition="'$(VSTestUseConsole)' == ''">False</VSTestUseConsole>
+    <VSTestNoBuild Condition="'$(VSTestNoBuild)' == ''">False</VSTestNoBuild>
+    <_VSTestMSBuildDependsOn Condition="$(_VSTestMSBuildDependsOn) == '' And !$(VSTestNoBuild)">$(MSBuildProjectDefaultTargets)</_VSTestMSBuildDependsOn>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
+  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestForwardingTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
 
   <!--
@@ -24,11 +28,22 @@ Copyright (c) .NET Foundation. All rights reserved.
     Main entry point for running tests through vstest.console.exe
     ============================================================
   -->
-  <Target Name="VSTest" DependsOnTargets="ShowInfoMessageIfProjectHasNoIsTestProjectProperty">
-    <CallTarget Condition="'$(VSTestNoBuild)' != 'true' AND '$(IsTestProject)' == 'true'" Targets="BuildProject" />
-    
-    <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
+  <Target
+    Name="VSTest"
+    DependsOnTargets="ShowInfoMessageIfProjectHasNoIsTestProjectProperty"
+  >
+      <!-- Unloggable but colorized output (cf. https://github.com/microsoft/vstest/issues/680) -->
+      <CallTarget Targets="_VSTestConsole" Condition="$(VSTestUseConsole)" />
+      <!-- Proper MSBuild integration, but no custom colorization -->
+      <CallTarget Targets="_VSTestMSBuild" Condition="!$(VSTestUseConsole)" />
+  </Target>
 
+  <!-- Used when called from dotnet msbuild command line: uses MSBuild logs but does not allow for console colorization -->
+  <Target
+    Name="_VSTestMSBuild"
+    DependsOnTargets="$(_VSTestMSBuildDependsOn)"
+    Condition="'$(IsTestProject)' == 'true'"
+  >
     <Microsoft.TestPlatform.Build.Tasks.VSTestTask
       TestFileFullPath="$(TargetPath)"
       VSTestSetting="$([MSBuild]::ValueOrDefault($(VSTestSetting), '$(RunSettingsFilePath)'))"
@@ -53,7 +68,42 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestBlameHangTimeout="$(VSTestBlameHangTimeout)"
       VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
       VSTestNoLogo="$(VSTestNoLogo)"
-      Condition="'$(IsTestProject)' == 'true'"
+    />
+  </Target>
+
+  <!-- Used when called from dotnet test command line: does not use MSBuild logs to allow for console colorization -->
+  <Target
+    Name="_VSTestConsole"
+    Condition="'$(IsTestProject)' == 'true'"
+  >
+    <CallTarget Condition="'$(VSTestNoBuild)' != 'true' AND '$(IsTestProject)' == 'true'" Targets="BuildProject" />
+
+    <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
+
+    <Microsoft.TestPlatform.Build.Tasks.VSTestForwardingTask
+      TestFileFullPath="$(TargetPath)"
+      VSTestSetting="$([MSBuild]::ValueOrDefault($(VSTestSetting), '$(RunSettingsFilePath)'))"
+      VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
+      VSTestFramework="$(TargetFrameworkMoniker)"
+      VSTestPlatform="$(PlatformTarget)"
+      VSTestTestCaseFilter="$(VSTestTestCaseFilter)"
+      VSTestLogger="$(VSTestLogger)"
+      VSTestListTests="$(VSTestListTests)"
+      VSTestDiag="$(VSTestDiag)"
+      VSTestCLIRunSettings="$(VSTestCLIRunSettings)"
+      VSTestConsolePath="$(VSTestConsolePath)"
+      VSTestResultsDirectory="$(VSTestResultsDirectory)"
+      VSTestVerbosity="$(VSTestVerbosity)"
+      VSTestCollect="$(VSTestCollect)"
+      VSTestBlame="$(VSTestBlame)"
+      VSTestBlameCrash="$(VSTestBlameCrash)"
+      VSTestBlameCrashDumpType="$(VSTestBlameCrashDumpType)"
+      VSTestBlameCrashCollectAlways="$(VSTestBlameCrashCollectAlways)"
+      VSTestBlameHang="$(VSTestBlameHang)"
+      VSTestBlameHangDumpType="$(VSTestBlameHangDumpType)"
+      VSTestBlameHangTimeout="$(VSTestBlameHangTimeout)"
+      VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
+      VSTestNoLogo="$(VSTestNoLogo)"
     />
   </Target>
 
@@ -68,37 +118,36 @@ Copyright (c) .NET Foundation. All rights reserved.
     <MSBuild Projects ="$(MSBuildProjectFullPath)" />
     <Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask LogType="BuildCompleted" />
 
-    <Message Text="Done Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low" />
+    <Message Text="Done Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="Low" />
   </Target>
   
   <Target Name="ShowMsbuildWithParameter">
-    <Message Text="Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low"/>
-    <Message Text="Value passed to msbuild are..." Importance="low" />
-    <Message Text="Configuration = $(Configuration)" Importance="low" />
-    <Message Text="TargetFramework = $(TargetFramework)" Importance="low" />
-    <Message Text="Platform = $(PlatformTarget)" Importance="low" />
-    <Message Text="OutputPath = $(OutputPath)" Importance="low" />
+    <Message Text="Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="Low"/>
+    <Message Text="Value passed to msbuild are..." Importance="Low" />
+    <Message Text="Configuration = $(Configuration)" Importance="Low" />
+    <Message Text="TargetFramework = $(TargetFramework)" Importance="Low" />
+    <Message Text="Platform = $(PlatformTarget)" Importance="Low" />
+    <Message Text="OutputPath = $(OutputPath)" Importance="Low" />
   </Target>
   
   <Target Name="ShowCallOfVSTestTaskWithParameter">
-    <Message Text="Calling task Microsoft.TestPlatform.Build.Tasks.VSTestTask with following parameter..." Importance="low" />
-    <Message Text="TestFileFullPath = $(TargetPath)" Importance="low" />
-    <Message Text="VSTestSetting = $(VSTestSetting)" Importance="low" />
-    <Message Text="VSTestTestAdapterPath = $(VSTestTestAdapterPath)" Importance="low" />
-    <Message Text="VSTestFramework = $(TargetFrameworkMoniker)" Importance="low" />
-    <Message Text="VSTestPlatform = $(PlatformTarget)" Importance="low" />
-    <Message Text="VSTestTestCaseFilter = $(VSTestTestCaseFilter)" Importance="low" />
-    <Message Text="VSTestLogger = $(VSTestLogger)" Importance="low" />
+    <Message Text="Calling task Microsoft.TestPlatform.Build.Tasks.VSTestTask with following parameter..." Importance="Low" />
+    <Message Text="TestFileFullPath = $(TargetPath)" Importance="Low" />
+    <Message Text="VSTestSetting = $(VSTestSetting)" Importance="Low" />
+    <Message Text="VSTestTestAdapterPath = $(VSTestTestAdapterPath)" Importance="Low" />
+    <Message Text="VSTestFramework = $(TargetFrameworkMoniker)" Importance="Low" />
+    <Message Text="VSTestPlatform = $(PlatformTarget)" Importance="Low" />
+    <Message Text="VSTestTestCaseFilter = $(VSTestTestCaseFilter)" Importance="Low" />
+    <Message Text="VSTestLogger = $(VSTestLogger)" Importance="Low" />
     <Message Text="VSTestListTests = $(VSTestListTests)" Importance="low" />
-    <Message Text="VSTestDiag = $(VSTestDiag)" Importance="low" />
-    <Message Text="VSTestCLIRunSettings = $(VSTestCLIRunSettings)" Importance="low" />
-    <Message Text="VSTestResultsDirectory = $(VSTestResultsDirectory)" Importance="low" />
-    <Message Text="VSTestConsolePath = $(VSTestConsolePath)" Importance="low" />
-    <Message Text="VSTestVerbosity = $(VSTestVerbosity)" Importance="low" />
-    <Message Text="VSTestCollect = $(VSTestCollect)" Importance="low" />
-    <Message Text="VSTestBlame = $(VSTestBlame)" Importance="low" />
-    <Message Text="VSTestTraceDataCollectorDirectoryPath = $(TraceDataCollectorDirectoryPath)" Importance="low" />
-    <Message Text="VSTestNoLogo = $(VSTestNoLogo)" Importance="low" />
+    <Message Text="VSTestDiag = $(VSTestDiag)" Importance="Low" />
+    <Message Text="VSTestCLIRunSettings = $(VSTestCLIRunSettings)" Importance="Low" />
+    <Message Text="VSTestResultsDirectory = $(VSTestResultsDirectory)" Importance="Low" />
+    <Message Text="VSTestConsolePath = $(VSTestConsolePath)" Importance="Low" />
+    <Message Text="VSTestVerbosity = $(VSTestVerbosity)" Importance="Low" />
+    <Message Text="VSTestCollect = $(VSTestCollect)" Importance="Low" />
+    <Message Text="VSTestBlame = $(VSTestBlame)" Importance="Low" />
+    <Message Text="VSTestTraceDataCollectorDirectoryPath = $(TraceDataCollectorDirectoryPath)" Importance="Low" />
+    <Message Text="VSTestNoLogo = $(VSTestNoLogo)" Importance="Low" />
   </Target>
-
 </Project>
