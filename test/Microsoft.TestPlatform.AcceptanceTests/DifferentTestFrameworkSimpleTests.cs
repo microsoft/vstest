@@ -29,9 +29,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        // vstest.console is 64-bit now, do not run in process because the 32-bit native dll won't load
+        // vstest.console is x64 now, but x86 run "in process" run should still succeed by being run in x86 testhost
         // skip .NET (Core) tests because the called methods ignores them anyway
-        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: false, useCoreRunner: false)]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
         public void CPPRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

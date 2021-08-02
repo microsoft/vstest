@@ -380,13 +380,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // Return true if
             // 1) Not running in parallel;
             // 2) Data collector is not enabled;
-            // 3) Target framework is x86 or anyCpu;
+            // 3) Target framework is X64 or anyCpu;
             // 4) DisableAppDomain is false;
             // 5) Not running in design mode;
             // 6) target framework is NETFramework (Desktop test);
             if (!isParallelEnabled &&
                 !isDataCollectorEnabled &&
-                (runConfiguration.TargetPlatform == Architecture.X86 || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
+                (runConfiguration.TargetPlatform == Architecture.X64 || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
                 !runConfiguration.DisableAppDomain &&
                 !runConfiguration.DesignMode &&
                 runConfiguration.TargetFramework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
