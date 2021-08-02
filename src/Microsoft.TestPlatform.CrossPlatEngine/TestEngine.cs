@@ -386,7 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // 6) target framework is NETFramework (Desktop test);
             if (!isParallelEnabled &&
                 !isDataCollectorEnabled &&
-                (runConfiguration.TargetPlatform == Architecture.X64 || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
+                (runConfiguration.TargetPlatform == ObjectModel.Constants.DefaultPlatform || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
                 !runConfiguration.DisableAppDomain &&
                 !runConfiguration.DesignMode &&
                 runConfiguration.TargetFramework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
