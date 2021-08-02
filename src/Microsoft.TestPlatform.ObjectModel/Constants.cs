@@ -153,7 +153,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string EmptyRunSettings = @"<RunSettings></RunSettings>";
 
-        public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM ? Architecture.ARM : Architecture.X64;
+        public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM 
+            ? Architecture.ARM :
+                XmlRunSettingsUtilities.OSArchitecture == Architecture.X64
+                    ? Architecture.X64
+                    : Architecture.X86;
 
         /// <summary>
         /// Adding this for compatibility
