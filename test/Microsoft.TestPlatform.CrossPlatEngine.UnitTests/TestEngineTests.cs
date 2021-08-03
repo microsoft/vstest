@@ -229,7 +229,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <TargetPlatform>x86</TargetPlatform>
+                        <TargetPlatform>x64</TargetPlatform>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
