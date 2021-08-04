@@ -387,9 +387,9 @@
         <target state="translated">        URI : {0}</target>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
-        <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
+        <source>Invalid platform type:{0}. Valid platform types are {1}.</source>
         <note></note>
-        <target state="translated">Type de plateforme non valide : {0}. Les types de plateforme valides sont x86, x64 et ARM.</target>
+        <target state="new">Type de plateforme non valide : {0}. Les types de plateforme valides sont x86, x64 et ARM.</target>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>

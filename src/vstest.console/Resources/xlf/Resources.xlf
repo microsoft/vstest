@@ -288,7 +288,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
-        <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
+        <source>Invalid platform type:{0}. Valid platform types are {1}.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">

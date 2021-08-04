@@ -766,7 +766,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                         case "DisableParallelization":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-
+                                
                             string disableParallelizationValueString = reader.ReadElementContentAsString();
                             bool disableParallelizationCheck;
                             if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))
@@ -784,7 +784,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             try
                             {
                                 archType = (Architecture)Enum.Parse(typeof(Architecture), value, true);
-                                if (archType != Architecture.X64 && archType != Architecture.X86 && archType != Architecture.ARM)
+                                // Ensure that the parsed value is actually in the enum, and that Default or AnyCpu are not provided.
+                                if (!Enum.IsDefined(typeof(Architecture), archType) || Architecture.Default == archType || Architecture.AnyCPU == archType)
                                 {
                                     throw new SettingsException(
                                         string.Format(
