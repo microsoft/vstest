@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private string hostPackageVersion = "15.0.0";
 
         private Architecture architecture;
-
+        private Framework targetFramework;
         private bool isVersionCheckRequired = true;
 
         private string dotnetHostPath;
@@ -157,6 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             this.architecture = runConfiguration.TargetPlatform;
+            this.targetFramework = runConfiguration.TargetFramework;
             this.dotnetHostPath = runConfiguration.DotnetHostPath;
         }
 
@@ -325,7 +326,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                         if (!runtimeConfigFound)
                         {
-                            var testhostRuntimeConfig = Path.Combine(Path.GetDirectoryName(testHostNextToRunner), "testhost.runtimeconfig.json");
+                            // When runtime config is not found, we don't know which version exactly should be selected for the runtime.
+                            // This can happen when the test project is .NET (Core) but does not have EXE output type, or when the dll is native.
+                            //
+                            // When the project is .NET (Core) we can look at the TargetFramework and gather the rough version from there. We then
+                            // provide a runtime config targetting that version. It rolls forward on the minor version by default, so the latest
+                            // version that is present will be selected in that range. Same as if you had EXE and no special settings.
+                            // E.g. the dll targets netcoreapp3.1, we get 3.1 from the attribute in the Dll, and provide testhost-3.1.runtimeconfig.json
+                            // this will resolve to 3.1.17 runtime because that is the latest installed on the system.
+                            //
+                            //
+                            // In the other case, where the Dll is native, we take the a runtime config that will roll forward to the latest version
+                            // because we don't care on which version we will run, and rolling forward gives us the best chance of findind some runtime.
+                            //
+                            //
+                            // There are 2 options how to provide the runtime version. Using --runtimeconfig, and --fx-version. The --fx-version does
+                            // not roll forward even when the --roll-forward option is provided (or --roll-forward-on-no-candidate-fx for netcoreapp2.1)
+                            // and we don't know the exact version we want to use. So the only option for us is to use the runtimeconfig.json.
+                            //
+                            //
+                            // TODO: This version check is a hack, when the target framework is figured out it tries to unify to a single common framework
+                            // even if there are incompatible frameworks (e.g any .NET Framwork assembly and any .NET (Core) assembly). Those incompatibilities
+                            // will fall back to a common default framework. And that framework (stored in Framework.DefaultFramework) depends on compile time variables
+                            // so depending on the version of vstest.console you are using, you will get a different value. This value for vstest.console.exe (under VS)
+                            // is .NET Framework 4, but for vstest.console.dll (under dotnet test) is .NET Core 1.0. Those values are also valid values, so we have no idea
+                            // if user actually provided a .NET Core 1.0 dll, or we are using fallback because we are running under vstest.console, and there is conflict,
+                            // or if user provided native dll which does not have the attribute (that we read via PEReader).
+                            //
+                            // Another aspect of this is that we are unifying the dlls, so until we add per assembly data, this would be less accurate than using runtimeconfig.json
+                            // but we can work around that by 1) changing how we schedule runners, to make sure we can process more that 1 type of assembly in vstest.console and
+                            // 2) making sure we still make the project executable (and so we actually do get runtimeconfig unless the user tries hard to not make the test and EXE).
+                            var suffix = this.targetFramework.Version == "1.0.0.0" ? "latest" : $"{new Version(this.targetFramework.Version).Major}.{new Version(this.targetFramework.Version).Minor}";
+                            var testhostRuntimeConfig = Path.Combine(Path.GetDirectoryName(testHostNextToRunner), $"testhost-{suffix}.runtimeconfig.json");
                             argsToAdd = " --runtimeconfig " + testhostRuntimeConfig.AddDoubleQuote();
                             args += argsToAdd;
                             EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
