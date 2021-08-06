@@ -1,0 +1,301 @@
+version: 2
+updates:
+  - package-ecosystem: 'github-actions'
+    # default location of '.github/workflows'
+    directory: '/'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'weekly'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/datacollector'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/DataCollectors/Microsoft.TestPlatform.Extensions.EventLogCollector'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.AdapterUtilities'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Build'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Client'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Common'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.CommunicationUtilities'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.CoreUtilities'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.CrossPlatEngine'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Extensions.BlameDataCollector'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Extensions.HtmlLogger'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Extensions.TrxLogger'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.ObjectModel'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.PlatformAbstractions'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.TestHostProvider'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.Utilities'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/package/external'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/package/nuspec'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/package/package'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/package/sign'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/package/VSIXProject'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/SettingsMigrator'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/testhost'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/testhost.x86'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+  - package-ecosystem: 'nuget'
+    directory: 'src/vstest.console'
+    open-pull-requests-limit: 3
+    schedule:
+      interval: 'daily'
+    # target-branch: 'develop'
+    # assignees:
+    #   - assignee_one
+    # reviewers:
+    #   - reviewer_one
+
+# Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)
