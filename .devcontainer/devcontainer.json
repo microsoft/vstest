@@ -1,5 +1,5 @@
 {
-	"name": " Codespace",
+	"name": "vstest Codespace",
 	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:0.201.9-5.0",
 	"settings": {
 		"workbench.colorTheme": "Default Dark+",
