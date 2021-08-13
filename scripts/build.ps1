@@ -535,16 +535,16 @@ function Publish-Tests
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     Set-ScriptFailedOnError
 }
 
 function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, $selfcontained, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --runtime $runtime --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     Set-ScriptFailedOnError
 }
