@@ -80,6 +80,6 @@
          JS etc.) is risky. This can break setup authoring and cause runtime failures in workloads
          where Rolsyn is not installed. -->
     <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.0.0-beta.21413.3</MicrosoftInternalCodeCoverageVersion>
+    <MicrosoftInternalCodeCoverageVersion>17.0.0-beta.21413.6</MicrosoftInternalCodeCoverageVersion>
   </PropertyGroup>
 </Project>
