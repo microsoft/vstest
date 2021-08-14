@@ -386,10 +386,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
+        private void WarnIfDebugEnvironment()
+        {
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG")))
+            {
+                EqtTrace.Warning("VSTEST_HOST_NATIVE_DEBUG is set and will cause testhost to hang.");
+            }
+
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG")))
+            {
+                EqtTrace.Warning("VSTEST_HOST_DEBUG is set and will cause testhost to hang.");
+            }
+        }
+
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
             EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+
+            // within Visual Studio there is no information provided that
+            // the debug environment vars are set. This will make sure the
+            // log which is written before the call to the waiting testhost
+            // will signal a hang is possible so at least the logs for
+            // test platform can notify that this is happening
+            this.WarnIfDebugEnvironment();
 
             // We launch the test host process here if we're on the normal test running workflow.
             // If we're debugging and we have access to the newest version of the testhost launcher
