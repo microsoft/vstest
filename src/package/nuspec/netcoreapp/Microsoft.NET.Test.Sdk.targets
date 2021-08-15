@@ -25,6 +25,11 @@
     <GenerateProgramFile Condition="'$(GenerateProgramFile)' == ''">true</GenerateProgramFile>
   </PropertyGroup>
 
+  <!-- Overwrite the sdk's RunArguments property to support F5 debugging. -->
+  <PropertyGroup>
+    <RunArguments>test $(TargetName)</RunArguments>
+  </PropertyGroup>
+
   <!--
     ============================================================
     GenerateProgramFile
