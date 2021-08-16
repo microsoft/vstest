@@ -37,9 +37,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         VsixExtensions = 5,
 
         /// <summary>
+        /// Priority of processors related to specifying sources.
+        /// These need to be invoked before runsettings are loaded as the runsettings auto-detection requires
+        /// the test directories to be known.
+        /// </summary>
+        Sources = 6,
+
+        /// <summary>
         /// Priority of processors related to Run Settings.
         /// </summary>
-        RunSettings = 6,
+        RunSettings = 7,
 
         /// <summary>
         /// Priority of TestAdapterPathArgumentProcessor.

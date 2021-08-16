@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => true;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Sources;
 
         public override string HelpContentResourceName => CommandLineResources.ListTestsHelp;
 

@@ -36,7 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private readonly IEnumerable<IArgumentProcessor> argumentProcessors;
         private Dictionary<string, IArgumentProcessor> commandToProcessorMap;
-        private Dictionary<string, IArgumentProcessor> specialCommandToProcessorMap;
 
         #endregion
 
@@ -100,23 +99,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
-        /// <summary>
-        /// Gets a mapping between special commands and their Argument Processors.
-        /// </summary>
-        internal Dictionary<string, IArgumentProcessor> SpecialCommandToProcessorMap
-        {
-            get
-            {
-                // Build the mapping if it does not already exist.
-                if (this.specialCommandToProcessorMap == null)
-                {
-                    BuildCommandMaps();
-                }
-
-                return this.specialCommandToProcessorMap;
-            }
-        }
-
         #endregion
 
         #region Public Methods
@@ -143,13 +125,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
 
             // If an argument processor was not found for the command, then consider it as a test source argument.
-            if (argumentProcessor == null)
+            // Special commands cannot be invoked directly and are therefore ignored.
+            if (argumentProcessor == null || argumentProcessor.Metadata.Value.IsSpecialCommand)
             {
                 // Update the command pair since the command is actually the argument in the case of
                 // a test source.
                 pair = new CommandArgumentPair(TestSourceArgumentProcessor.CommandName, argument);
 
-                argumentProcessor = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
+                argumentProcessor = CommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
             }
 
             if (argumentProcessor != null)
@@ -194,19 +177,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>The default action argument processor.</returns>
         public IArgumentProcessor CreateDefaultActionArgumentProcessor()
         {
-            var argumentProcessor = SpecialCommandToProcessorMap[RunTestsArgumentProcessor.CommandName];
+            var argumentProcessor = CommandToProcessorMap[RunTestsArgumentProcessor.CommandName];
             return WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor);
         }
 
         /// <summary>
-        /// Gets the argument processors that are tagged as special and to be always executed.
+        /// Gets the distinct (by Type) argument processors that are tagged to be always executed.
         /// The Lazy's that are returned will initialize the underlying argument processor when first accessed.
         /// </summary>
-        /// <returns>The argument processors that are tagged as special and to be always executed.</returns>
+        /// <returns>The argument processors that are tagged to be always executed.</returns>
         public IEnumerable<IArgumentProcessor> GetArgumentProcessorsToAlwaysExecute()
         {
-            return SpecialCommandToProcessorMap.Values
-                .Where(lazyProcessor => lazyProcessor.Metadata.Value.IsSpecialCommand && lazyProcessor.Metadata.Value.AlwaysExecute);
+            return CommandToProcessorMap.Values
+                .Where(argProcMap => argProcMap.Metadata.Value.AlwaysExecute)
+                .GroupBy(argProcMap => argProcMap.GetType())
+                .Select(group => WrapLazyProcessorToInitializeOnInstantiation(group.First(), (string)null));
         }
 
         #endregion
@@ -253,30 +238,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private void BuildCommandMaps()
         {
             this.commandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
-            this.specialCommandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
 
             foreach (IArgumentProcessor argumentProcessor in this.argumentProcessors)
             {
-                // Add the command to the appropriate dictionary.
-                var processorsMap = argumentProcessor.Metadata.Value.IsSpecialCommand
-                                      ? this.specialCommandToProcessorMap
-                                      : this.commandToProcessorMap;
-
                 string commandName = argumentProcessor.Metadata.Value.CommandName;
-                processorsMap.Add(commandName, argumentProcessor);
+                commandToProcessorMap.Add(commandName, argumentProcessor);
 
-                // Add xplat name for the command name
-                commandName = string.Concat("--", commandName.Remove(0, 1));
-                processorsMap.Add(commandName, argumentProcessor);
-
-                if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
+                // Add xplat name for the command name. Ignore special commands
+                if (!argumentProcessor.Metadata.Value.IsSpecialCommand)
                 {
-                    string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
-                    processorsMap.Add(shortCommandName, argumentProcessor);
+                    commandName = string.Concat("--", commandName.Remove(0, 1));
+                    commandToProcessorMap.Add(commandName, argumentProcessor);
 
-                    // Add xplat short name for the command name
-                    shortCommandName = shortCommandName.Replace('/', '-');
-                    processorsMap.Add(shortCommandName, argumentProcessor);
+                    if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
+                    {
+                        string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
+                        commandToProcessorMap.Add(shortCommandName, argumentProcessor);
+
+                        // Add xplat short name for the command name
+                        shortCommandName = shortCommandName.Replace('/', '-');
+                        commandToProcessorMap.Add(shortCommandName, argumentProcessor);
+                    }
                 }
             }
         }

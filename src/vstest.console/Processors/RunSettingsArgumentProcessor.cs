@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Xml;
 
@@ -83,6 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
+        public override bool AlwaysExecute => true;
+
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.RunSettings;
 
         public override string HelpContentResourceName => CommandLineResources.RunSettingsArgumentHelp;
@@ -106,18 +109,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
+            // If no runsettings file is passed in and a single assembly is invoked,
+            // search for one in the assembly's directory.
+            if (argument == null)
             {
-                throw new CommandLineException(CommandLineResources.RunSettingsRequired);
+                if (commandLineOptions.Sources.Count() != 1 ||
+                    !AutoDetectRunSettingsFile(out argument, commandLineOptions.Sources.Single()))
+                {
+                    // No runsettings file found via auto-detection. Stopping initialization.
+                    return;
+                }
             }
-
-            if (!this.FileHelper.Exists(argument))
+            else
             {
-                throw new CommandLineException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        CommandLineResources.RunSettingsFileNotFound,
-                        argument));
+                if (string.IsNullOrWhiteSpace(argument))
+                {
+                    throw new CommandLineException(CommandLineResources.RunSettingsRequired);
+                }
+
+                if (!this.FileHelper.Exists(argument))
+                {
+                    throw new CommandLineException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            CommandLineResources.RunSettingsFileNotFound,
+                            argument));
+                }
             }
 
             Contract.EndContractBlock();
@@ -155,6 +172,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
                         exception);
             }
+        }
+
+        private static bool AutoDetectRunSettingsFile(out string runsettingsFile, string source)
+        {
+            try
+            {
+                // Search for ".runsettings" file direct matches only.
+                FileInfo[] files = new FileInfo(source).Directory.GetFiles(".runsettings");
+                runsettingsFile = files.FirstOrDefault()?.FullName;
+                if (runsettingsFile != null)
+                {
+                    EqtTrace.Verbose("Executor.Execute: Runsettings auto detection, using: {0}", runsettingsFile);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose("Failed runsettings auto-detection: {0}", ex.Message);
+            }
+
+            runsettingsFile = null;
+            return false;
         }
 
         private void ExtractFrameworkAndPlatform()
