@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Collections.Generic;
     using System.Text;
 
@@ -17,15 +18,25 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -t: Write a dump when the process terminates.
             // -ma: Full dump argument.
             // -f: Filter the exceptions.
-            StringBuilder procDumpArgument = new StringBuilder($"-accepteula -e 1 -g {(collectAlways ? "-t " : string.Empty)}");
-            if (isFullDump)
+            var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPARGS")?.Trim();
+            StringBuilder procDumpArgument;
+            if (!string.IsNullOrWhiteSpace(procdumpOverride))
             {
-                procDumpArgument.Append("-ma ");
+                procDumpArgument = new StringBuilder(procdumpOverride).Append(" ");
             }
-
-            foreach (var exceptionFilter in procDumpExceptionsList)
+            else
             {
-                procDumpArgument.Append($"-f {exceptionFilter} ");
+                procDumpArgument = new StringBuilder($"-accepteula -e 1 -g {(collectAlways ? "-t " : string.Empty)}");
+
+                if (isFullDump)
+                {
+                    procDumpArgument.Append("-ma ");
+                }
+
+                foreach (var exceptionFilter in procDumpExceptionsList)
+                {
+                    procDumpArgument.Append($"-f {exceptionFilter} ");
+                }
             }
 
             procDumpArgument.Append($"{processId} {filename}.dmp");

@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -177,6 +177,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         internal static string Seconds {
             get {
                 return ResourceManager.GetString("Seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminated process {0} - {1}, because of timeout. .
+        /// </summary>
+        internal static string Terminated {
+            get {
+                return ResourceManager.GetString("Terminated", resourceCulture);
             }
         }
         

@@ -78,6 +78,11 @@ Il test potrebbe essere l'origine dell'arresto anomalo.</target>
         <target state="translated">secondi</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="Terminatin">
+        <source>Terminated process {0} - {1}, because of timeout. </source>
+        <target state="new">Terminated process {0} - {1}, because of timeout. </target>
+        <note>{0} process id, {1} process name</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

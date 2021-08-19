@@ -297,18 +297,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public virtual void Close()
         {
+            bool? testHostExitedWithinTimeout = null;
             try
             {
                 // Do not send message if the host did not launch.
                 if (this.testHostLaunched)
                 {
+                    testHostExitedWithinTimeout = false;
                     this.RequestSender.EndSession();
 
                     // We want to give test host a chance to safely close.
                     // The upper bound for wait should be 100ms.
-                    var timeout = 100;
+                    var timeout = int.TryParse(Environment.GetEnvironmentVariable("VSTEST_TESTHOST_TIMEOUT"), out var t) ? t : 100;
                     EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
-                    this.testHostExited.Wait(timeout);
+                    testHostExitedWithinTimeout = this.testHostExited.Wait(timeout);
                 }
             }
             catch (Exception ex)
@@ -320,8 +322,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             finally
             {
                 this.initialized = false;
-
-                EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
+                if (testHostExitedWithinTimeout == false)
+                {
+                    EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
+                }
 
                 // Please clean up test host.
                 this.TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
