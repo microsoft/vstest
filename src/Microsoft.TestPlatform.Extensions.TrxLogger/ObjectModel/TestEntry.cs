@@ -35,9 +35,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="catId">Category Id. This gets into .</param>
         public TestEntry(TestId testId, TestListCategoryId catId)
         {
-            Debug.Assert(testId != null, "testId is null");
-
-            // CatId can be null.
             this.testId = testId;
             this.categoryId = catId;
         }
@@ -55,7 +52,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
             set
             {
-                Debug.Assert(value != null, "ExecId is null");
                 this.executionId = value;
             }
         }
@@ -69,7 +65,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
             set
             {
-                Debug.Assert(value != null, "ExecId is null");
                 this.parentExecutionId = value;
             }
         }
@@ -109,9 +104,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 return false;
             }
-
-            Debug.Assert(this.executionId != null, "this.executionId is null");
-            Debug.Assert(e.executionId != null, "e.executionId is null");
 
             if (!this.executionId.Equals(e.executionId))
             {
@@ -154,7 +146,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
             helper.SaveObject(this.testId, element, null);
             helper.SaveGuid(element, "@executionId", this.executionId);
-            if (parentExecutionId != null)
+            if (parentExecutionId != Guid.Empty)
                 helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
             helper.SaveGuid(element, "@testListId", this.categoryId.Id);
             if (this.TestEntries.Count > 0)

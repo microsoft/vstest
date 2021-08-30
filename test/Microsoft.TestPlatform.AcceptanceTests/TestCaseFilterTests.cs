@@ -206,6 +206,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource]
         public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {

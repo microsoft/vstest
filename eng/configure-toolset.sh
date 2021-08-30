@@ -6,11 +6,19 @@ function Test-FilesUseTelemetryOutput {
         'eng/common/cibuild.sh'
         'eng/common/cross/armel/tizen-build-rootfs.sh'
         'eng/common/cross/armel/tizen-fetch.sh'
+        'eng/common/cross/arm64/tizen-fetch.sh'
+        'eng/common/cross/arm64/tizen-build-rootfs.sh'
         'eng/common/cross/build-android-rootfs.sh'
         'eng/common/cross/build-rootfs.sh'
         'eng/common/darc-init.sh'
         'eng/common/msbuild.sh'
         'eng/common/performance/performance-setup.sh'
+        'eng/common/init-tools-native.sh'
+        'eng/common/internal-feed-operations.sh'
+        'eng/common/dotnet-install.sh'
+        'eng/common/native/install-cmake-test.sh'
+        'eng/common/native/common-library.sh'
+        'eng/common/native/install-cmake.sh'
     )
 
     local file_list=`grep --files-without-match --dereference-recursive --include=*.sh "Write-PipelineTelemetryError" $scriptroot`

@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Reflection;
     using System.Xml.Linq;
     using System.Collections.Generic;
+    using System.Globalization;
 
     /// <summary>
     /// Implementation for the Invoker which invokes engine in a new AppDomain
@@ -84,7 +85,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder);
 
             // Create new AppDomain
-            return AppDomain.CreateDomain("TestHostAppDomain", null, appDomainSetup);
+            var appDomain = AppDomain.CreateDomain("TestHostAppDomain", null, appDomainSetup);
+            
+            return appDomain;
         }
 
         /// <summary>
@@ -95,14 +98,15 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// <returns></returns>
         private IEngineInvoker CreateInvokerInAppDomain(AppDomain appDomain)
         {
-            // Create Custom assembly resolver in new appdomain before anything else to resolve testplatform assemblies
+            // Create CustomAssembly setup that sets a custom assembly resolver to be able to resolve TestPlatform assemblies
+            // and also sets the correct UI culture to propagate the dotnet or VS culture to the adapters running in the app domain
             appDomain.CreateInstanceFromAndUnwrap(
-                    typeof(CustomAssemblyResolver).Assembly.Location,
-                    typeof(CustomAssemblyResolver).FullName,
+                    typeof(CustomAssemblySetup).Assembly.Location,
+                    typeof(CustomAssemblySetup).FullName,
                     false,
                     BindingFlags.Default,
                     null,
-                    new object[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) },
+                    new object[] { CultureInfo.DefaultThreadCurrentUICulture?.Name, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) },
                     null,
                     null);
 
@@ -227,16 +231,22 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     }
 
     /// <summary>
-    /// Custom Assembly resolver for child app domain to resolve testplatform assemblies
+    /// Custom domain setup that sets UICulture and an Assembly resolver for child app domain to resolve testplatform assemblies    
     /// </summary>
-    internal class CustomAssemblyResolver : MarshalByRefObject
+    // The normal AppDomainInitializer api was not used to do this because it cannot load the assemblies for testhost. --JJR
+    internal class CustomAssemblySetup : MarshalByRefObject
     {
         private readonly IDictionary<string, Assembly> resolvedAssemblies;
 
         private readonly string[] resolverPaths;
 
-        public CustomAssemblyResolver(string testPlatformPath)
+        public CustomAssemblySetup(string uiCulture, string testPlatformPath)
         {
+            if (uiCulture != null)
+            {
+                CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(uiCulture);
+            }
+
             this.resolverPaths = new string[] { testPlatformPath, Path.Combine(testPlatformPath, "Extensions") };
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;

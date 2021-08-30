@@ -16,7 +16,7 @@
     <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>
     <MSTestAdapterVersion>2.1.0</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
-    
+
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.3.1</XUnitAdapterVersion>
     <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
@@ -26,25 +26,30 @@
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
-    <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
-    <MoqVersion>4.7.63</MoqVersion>
-    <TestPlatformExternalsVersion>17.0.0-previews-1-31325-360</TestPlatformExternalsVersion>
-    <CodeCoverageExternalsVersion>17.0.0-beta.21268.4</CodeCoverageExternalsVersion>
+    <MoqVersion>4.8.3</MoqVersion>
+
+    <TestPlatformExternalsVersion>17.0.0-previews-4-31622-033</TestPlatformExternalsVersion>
+    <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
+    <TestPlatformMSDiaVersion>17.0.0-previews-3-31515-332</TestPlatformMSDiaVersion>
+    
     <InteropExternalsVersion>17.0.0-preview-2-31223-026</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.0.0-beta.21179.1</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
+    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.221401</MicrosoftDiagnosticsNETCoreClientVersion>
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
+    <MicrosoftExtensionsFileSystemGlobbingPackageVersion>1.1.1</MicrosoftExtensionsFileSystemGlobbingPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" />
   <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 
 </Project>

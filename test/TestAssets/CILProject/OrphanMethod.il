@@ -1,5 +1,6 @@
 ﻿.assembly OrphanMethod {}
 .assembly extern mscorlib {}
+.assembly extern System.Core {}
 
 .method static public int32 Add(int32 x, int32 y) cil managed 
 {
