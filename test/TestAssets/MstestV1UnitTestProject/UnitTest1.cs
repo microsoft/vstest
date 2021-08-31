@@ -17,7 +17,6 @@ namespace MstestV1UnitTestProject
         /// <summary>
         /// The passing test.
         /// </summary>
-        [Priority(2)]
         [TestMethod]
         public void PassingTest1()
         {
@@ -34,7 +33,6 @@ namespace MstestV1UnitTestProject
         /// The failing test.
         /// </summary>
         [TestCategory("CategoryA")]
-        [Priority(3)]
         [TestMethod]
         public void FailingTest1()
         {
