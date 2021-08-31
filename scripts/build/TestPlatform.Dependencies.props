@@ -32,7 +32,7 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.8.3</MoqVersion>
 
-    <TestPlatformExternalsVersion>17.0.0-previews-4-31622-033</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>17.0.0-previews-4-31630-230</TestPlatformExternalsVersion>
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
     <TestPlatformMSDiaVersion>17.0.0-previews-3-31515-332</TestPlatformMSDiaVersion>
     
