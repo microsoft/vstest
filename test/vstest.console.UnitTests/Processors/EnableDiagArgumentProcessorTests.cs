@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
-            Assert.IsTrue(!EqtTrace.IsVerboseEnabled);
+            Assert.IsFalse(EqtTrace.IsVerboseEnabled);
 #if NETFRAMEWORK
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else

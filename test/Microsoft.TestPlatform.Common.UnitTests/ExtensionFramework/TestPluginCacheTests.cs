@@ -270,7 +270,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var resolutionPaths = TestPluginCache.Instance.GetResolutionPaths($@"{temp}{Path.DirectorySeparatorChar}Idonotexist.dll").Select(p => p.Replace("/", "\\")).ToList();
 
             var tpCommonDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-            var expectedPaths = new List<string> { temp, tpCommonDirectory }.Select(p => p.Replace("/", "\\").TrimEnd('\\')).ToList();
+            var expectedPaths = new List<string> { temp, tpCommonDirectory }.ConvertAll(p => p.Replace("/", "\\").TrimEnd('\\'));
 
             CollectionAssert.AreEqual(expectedPaths, resolutionPaths, $"Collection {string.Join(", ", resolutionPaths)}, is not equal to the expected collection {string.Join(", ", expectedPaths)}.");
         }
@@ -367,7 +367,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         #endregion
-
 
         private void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
         {

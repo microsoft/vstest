@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 foreach (AssemblyName referencedAssembly in assemblies)
                 {
                     // Check without version. Only name and public key token.
-                    if (string.Compare(referencedAssembly.Name, referenceAssemblyName, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Equals(referencedAssembly.Name, referenceAssemblyName, StringComparison.OrdinalIgnoreCase))
                     {
                         byte[] publicKeyToken1 = referencedAssembly.GetPublicKeyToken();
 
@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void GetPlatformAndFrameworkSettings(string path, out string procArchType, out string frameworkVersion)
         {
-            procArchType = Architecture.Default.ToString();
+            procArchType = nameof(Architecture.Default);
             frameworkVersion = String.Empty;
 
             try
@@ -188,9 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
                 var a = Assembly.ReflectionOnlyLoadFrom(path);
                 Debug.Assert(a != null);
-                PortableExecutableKinds peKind;
-                ImageFileMachine machine;
-                a.ManifestModule.GetPEKind(out peKind, out machine);
+                a.ManifestModule.GetPEKind(out var peKind, out var machine);
 
                 // conversion to string type is needed for below reason
                 // -- PortableExecutableKinds.Preferred32Bit and ImageFileMachine.ARM is available only

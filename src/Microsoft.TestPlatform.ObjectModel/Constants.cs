@@ -116,6 +116,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string LoggerConfigurationNameLower = "configuration";
 
         /// <summary>
+        /// Name of TreatNoTestsAsError parameter
+        /// </summary>
+        public const string TreatNoTestsAsError = "TreatNoTestsAsError";
+
+        /// <summary>
         /// Name of RunConfiguration settings node in RunSettings.
         /// </summary>
         public const string RunConfigurationSettingsName = "RunConfiguration";
@@ -148,7 +153,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string EmptyRunSettings = @"<RunSettings></RunSettings>";
 
-        public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM ? Architecture.ARM : Architecture.X86;
+        public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM 
+            ? Architecture.ARM :
+                XmlRunSettingsUtilities.OSArchitecture == Architecture.X64
+                    ? Architecture.X64
+                    : Architecture.X86;
 
         /// <summary>
         /// Adding this for compatibility

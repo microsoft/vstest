@@ -265,7 +265,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
                     // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
                     Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
-
                     // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
                     jobProcessed.WaitOne();
 
@@ -416,7 +415,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
             }
         }
 
-
         [TestMethod]
         [Timeout(60000)]
         public void TestDisposeUnblocksBlockedThreads()
@@ -493,8 +491,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
 
             private ManualResetEvent queueGotBlocked;
         }
-
-
 
         /// <summary>
         /// a class that inherits from job queue and over rides the WaitForQueueToEmpty to simply setting a boolean to tell

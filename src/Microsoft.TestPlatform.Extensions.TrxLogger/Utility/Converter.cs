@@ -112,13 +112,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             if (rockSteadyTestResult.ErrorStackTrace != null)
                 testResult.ErrorStackTrace = rockSteadyTestResult.ErrorStackTrace;
 
-            if (rockSteadyTestResult.EndTime != null)
+            if (rockSteadyTestResult.EndTime != default(DateTimeOffset))
                 testResult.EndTime = rockSteadyTestResult.EndTime.UtcDateTime;
 
-            if (rockSteadyTestResult.StartTime != null)
+            if (rockSteadyTestResult.StartTime != default(DateTimeOffset))
                 testResult.StartTime = rockSteadyTestResult.StartTime.UtcDateTime;
 
-            if (rockSteadyTestResult.Duration != null)
+            if (rockSteadyTestResult.Duration != default(TimeSpan))
                 testResult.Duration = rockSteadyTestResult.Duration;
 
             // Clear existing messages and store rocksteady result messages.
@@ -192,8 +192,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return collectorEntries;
         }
 
-
-        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory, 
+        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory,
             List<string> errorMessages)
         {
             List<String> resultFiles = new List<string>();
@@ -216,8 +215,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                         string errorMsg = string.Format(
                             CultureInfo.CurrentCulture,
                             TrxLoggerResources.FailureToAttach,
-                            attachmentSet.DisplayName, 
-                            e.GetType().ToString(), 
+                            attachmentSet.DisplayName,
+                            e.GetType().ToString(),
                             e);
 
                         if (EqtTrace.IsErrorEnabled)
@@ -312,7 +311,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             TestProperty tmiTestIdProperty = rockSteadyTestCase.Properties.FirstOrDefault(
                                              property => property.Id.Equals(Constants.TmiTestIdPropertyIdentifier));
 
-            if (null != tmiTestIdProperty)
+            if (tmiTestIdProperty != null)
                 testId = rockSteadyTestCase.GetPropertyValue(tmiTestIdProperty, Guid.Empty);
 
             // If tmi test id not present, picking from platform test id.
@@ -419,8 +418,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     string errorMsg = string.Format(
                         CultureInfo.CurrentCulture,
                         TrxLoggerResources.FailureToAttach,
-                        attachmentSet.DisplayName, 
-                        e.GetType().ToString(), 
+                        attachmentSet.DisplayName,
+                        e.GetType().ToString(),
                         e);
 
                     if (EqtTrace.IsErrorEnabled)
@@ -478,7 +477,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 }
 
                 string sourceFile = uriDataAttachment.Uri.LocalPath;
-                
+
                 var rooted = (Path.GetFullPath(sourceFile) == sourceFile);
                 Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
 
@@ -730,6 +729,5 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 new TestResultAggregation(runId, testId, executionId, parentExecutionId, resultName, Environment.MachineName, outcome, testType, testCategoryId, trxFileHelper) :
                 new UnitTestResult(runId, testId, executionId, parentExecutionId, resultName, Environment.MachineName, outcome, testType, testCategoryId, trxFileHelper);
         }
-
     }
 }

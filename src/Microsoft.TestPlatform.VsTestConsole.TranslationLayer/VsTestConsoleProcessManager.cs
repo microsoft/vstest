@@ -121,7 +121,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     if (envVariable.Key != null)
                     {
-                        info.EnvironmentVariables.Add(envVariable.Key.ToString(), envVariable.Value?.ToString());
+                        info.EnvironmentVariables.Add(envVariable.Key, envVariable.Value?.ToString());
                     }
                 }
             }

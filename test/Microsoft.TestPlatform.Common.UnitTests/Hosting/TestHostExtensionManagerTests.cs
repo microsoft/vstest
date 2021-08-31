@@ -24,7 +24,6 @@ namespace TestPlatform.Common.UnitTests.Logging
             {
                 var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null);
             });
-
         }
 
         [TestMethod]

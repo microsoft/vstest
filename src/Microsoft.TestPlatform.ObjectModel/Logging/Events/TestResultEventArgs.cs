@@ -20,12 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         /// </param>
         public TestResultEventArgs(TestResult result)
         {
-            if (result == null)
-            {
-                throw new ArgumentNullException(nameof(result));
-            }
-
-            this.Result = result;
+            this.Result = result ?? throw new ArgumentNullException(nameof(result));
         }
 
         #endregion

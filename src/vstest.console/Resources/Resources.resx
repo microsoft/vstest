@@ -763,4 +763,7 @@
   <data name="EnvironmentVariableXIsOverriden" xml:space="preserve">
     <value>Environment variable '{0}' was already defined, but it's overridden by -Environment argument.</value>
   </data>
+  <data name="TestRunAbortedWithError" xml:space="preserve">
+    <value>Test Run Aborted with error {0}.</value>
+  </data>
 </root>

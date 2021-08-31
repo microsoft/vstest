@@ -97,7 +97,7 @@ $issues = $log | ForEach-Object {
 
 $output = @"
 
-See the release notes [here](https://github.com/microsoft/vstest-docs/blob/master/docs/releases.md#$($v -replace '\.')).
+See the release notes [here](https://github.com/microsoft/vstest-docs/blob/main/docs/releases.md#$($v -replace '\.')).
 
 -------------------------------
 

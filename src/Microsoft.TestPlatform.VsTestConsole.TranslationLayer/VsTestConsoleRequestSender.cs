@@ -480,8 +480,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     RunSettings = runSettings,
                     HasCustomHostLauncher = testHostLauncher != null,
                     IsDebuggingEnabled = (testHostLauncher != null)
-                        ? testHostLauncher.IsDebug
-                        : false,
+                    && testHostLauncher.IsDebug,
                     TestPlatformOptions = options
                 };
 
@@ -584,7 +583,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     Sources = sources,
                     RunSettings = runSettings,
                     HasCustomHostLauncher = testHostLauncher != null,
-                    IsDebuggingEnabled = (testHostLauncher != null) ? testHostLauncher.IsDebug : false,
+                    IsDebuggingEnabled = (testHostLauncher != null) && testHostLauncher.IsDebug,
                     TestPlatformOptions = options
                 };
 
@@ -1503,8 +1502,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 var pid = this.dataSerializer.DeserializePayload<int>(message);
 
                 ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
-                    ? launcher.AttachDebuggerToProcess(pid)
-                    : false;
+                && launcher.AttachDebuggerToProcess(pid);
             }
             catch (Exception ex)
             {

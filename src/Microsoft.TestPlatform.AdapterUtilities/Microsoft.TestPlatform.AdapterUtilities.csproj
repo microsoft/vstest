@@ -3,16 +3,16 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
-  
+
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);uap10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
-    
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities</AssemblyName>
     <RootNamespace>Microsoft.TestPlatform.AdapterUtilities</RootNamespace>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
@@ -26,6 +26,12 @@
     <!-- On non windows environment, make UAP behave like desktop .NET framework -->
     <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+    <RuntimeIdentifier>any</RuntimeIdentifier>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">

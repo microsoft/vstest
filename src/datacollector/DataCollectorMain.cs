@@ -4,13 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
-    using System.Diagnostics;
     using System.Globalization;
     using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -63,12 +63,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         public void Run(string[] args)
         {
-            WaitForDebuggerIfEnabled();
+            DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
             // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out var logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
                 var isTraceLevelArgValid = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt);
@@ -100,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 EqtTrace.Verbose($"Version: { version }");
             }
 
-            SetCultureSpecifiedByUser();
+            UILanguageOverride.SetCultureSpecifiedByUser();
 
             EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", string.Join(",", args));
 
@@ -117,8 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 });
 
             // Get server port and initialize communication.
-            string portValue;
-            int port = argsDictionary.TryGetValue(PortArgument, out portValue) ? int.Parse(portValue) : 0;
+            int port = argsDictionary.TryGetValue(PortArgument, out var portValue) ? int.Parse(portValue) : 0;
 
             if (port <= 0)
             {
@@ -138,35 +136,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             StartProcessing();
         }
 
-        private void WaitForDebuggerIfEnabled()
-        {
-            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
-            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
-            {
-                while (!Debugger.IsAttached)
-                {
-                    System.Threading.Thread.Sleep(1000);
-                }
-
-                Debugger.Break();
-            }
-        }
-
-        private static void SetCultureSpecifiedByUser()
-        {
-            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
-            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
-            {
-                try
-                {
-                    CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(userCultureSpecified);
-                }
-                catch (Exception)
-                {
-                    EqtTrace.Info(string.Format("Invalid Culture Info: {0}", userCultureSpecified));
-                }
-            }
-        }
 
         private void StartProcessing()
         {

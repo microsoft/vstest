@@ -93,7 +93,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var pluginInformation = new TestLoggerPluginInformation(typeof(ValidLogger));
             var pluginInformation2 = new TestLoggerPluginInformation(typeof(ValidLogger2));
 
-            Assert.AreEqual(1, testExtensions.Keys.Where(k => k.Contains("csv")).Count());
+            Assert.AreEqual(1, testExtensions.Keys.Count(k => k.Contains("csv")));
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
         }
@@ -109,8 +109,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var pluginInformation = new DataCollectorConfig(typeof(ValidDataCollector));
 
             Assert.AreEqual(2, testExtensions.Keys.Count);
-            Assert.AreEqual(1, testExtensions.Keys.Where(k => k.Equals("datacollector://foo/bar")).Count());
-            Assert.AreEqual(1, testExtensions.Keys.Where(k => k.Equals("datacollector://foo/bar1")).Count());
+            Assert.AreEqual(1, testExtensions.Keys.Count(k => k.Equals("datacollector://foo/bar")));
+            Assert.AreEqual(1, testExtensions.Keys.Count(k => k.Equals("datacollector://foo/bar1")));
         }
 
         [TestMethod]
@@ -306,7 +306,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                 DataCollectionLogger logger,
                 DataCollectionEnvironmentContext environmentContext)
             {
-
             }
         }
 
@@ -330,7 +329,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                 DataCollectionLogger logger,
                 DataCollectionEnvironmentContext environmentContext)
             {
-
             }
         }
         #endregion

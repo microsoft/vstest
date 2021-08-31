@@ -1,0 +1,30 @@
+<Project>
+
+  <PropertyGroup>
+    <GitHubRepositoryName>vstest</GitHubRepositoryName>
+    <SourceBuildManagedOnly>true</SourceBuildManagedOnly>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BaseInnerSourceBuildCommand>./build.sh</BaseInnerSourceBuildCommand>
+
+    <InnerBuildArgs>-DotNetBuildFromSource</InnerBuildArgs>
+    <InnerBuildArgs>$(InnerBuildArgs) -DotNetCoreSdkDir $(DotNetRoot)</InnerBuildArgs>
+    <InnerBuildArgs>$(InnerBuildArgs) -c $(Configuration)</InnerBuildArgs>
+  </PropertyGroup>
+
+  <!-- TODO: Remove once all patches have been removed. -->
+  <Target Name="ApplySourceBuildPatchFiles"
+          AfterTargets="PrepareInnerSourceBuildRepoRoot"
+          BeforeTargets="RunInnerSourceBuildCommand">
+    <ItemGroup>
+      <SourceBuildPatchFile Include="$(RepositoryEngineeringDir)source-build-patches\*.patch" />
+    </ItemGroup>
+
+    <Exec
+      Command="git apply --ignore-whitespace --whitespace=nowarn &quot;%(SourceBuildPatchFile.FullPath)&quot;"
+      WorkingDirectory="$(InnerSourceBuildRepoRoot)"
+      Condition="'@(SourceBuildPatchFile)' != ''" />
+  </Target>
+
+</Project>

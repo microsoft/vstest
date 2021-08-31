@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="name">The name of the test case.</param>
         protected TestRunSettings(string name)
         {
-            ValidateArg.NotNullOrEmpty(name, "name");
+            ValidateArg.NotNullOrEmpty(name, nameof(name));
 
             this.name = name;
         }

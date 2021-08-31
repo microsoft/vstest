@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.testableTrxLogger.TestMessageHandler(new object(), default(TestRunMessageEventArgs));
+                this.testableTrxLogger.TestMessageHandler(new object(), default);
             });
         }
 
@@ -949,6 +949,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             TestCase passTestCase = CreateTestCase(testCaseName);
             var passResult = new ObjectModel.TestResult(passTestCase);
+            passResult.Outcome = TestOutcome.Passed;
 
             if (testResultMessages != null && testResultMessages.Any())
             {

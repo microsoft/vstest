@@ -30,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings)
         {
-            ValidateArg.NotNull(settingsFile, "settingsFile");
-            ValidateArg.NotNull(defaultRunSettings, "defaultRunSettings");
+            ValidateArg.NotNull(settingsFile, nameof(settingsFile));
+            ValidateArg.NotNull(defaultRunSettings, nameof(defaultRunSettings));
 
             if (IsLegacyTestSettingsFile(settingsFile) == false)
             {

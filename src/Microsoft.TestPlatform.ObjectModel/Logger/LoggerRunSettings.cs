@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </exception>
         internal static LoggerRunSettings FromXml(XmlReader reader)
         {
-            ValidateArg.NotNull(reader, "reader");
+            ValidateArg.NotNull(reader, nameof(reader));
 
             return FromXml(reader,
                 Constants.LoggersSettingName,

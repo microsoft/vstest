@@ -59,12 +59,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
+            var resultsDir = GetResultsDirectory();
+
             try
             {
                 AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
                 var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
-                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
+                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
                 arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
                 this.InvokeVsTest(arguments);
 
@@ -74,6 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             finally
             {
                 File.Delete(this.dummyFilePath);
+                TryRemoveDirectory(resultsDir);
             }
         }
 
@@ -83,19 +87,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var assetFullPath = this.GetAssetFullPath("SimpleTestProject2.dll");
-            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
-            arguments = string.Concat(arguments, " /listtests" );
+            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            arguments = string.Concat(arguments, " /listtests");
             arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");
             arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
             this.InvokeVsTest(arguments);
 
             StringAssert.Contains(this.StdOut, "Warning: No test matches the given testcase filter `NonExistTestCaseName` in");
-
             StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
-
             this.ExitCodeEquals(0);
+
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]

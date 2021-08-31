@@ -25,7 +25,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             {
                 var testLoggerExtensionManager = TestLoggerExtensionManager.Create(null);
             });
-
         }
 
         [TestMethod]

@@ -130,9 +130,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlReader reader, string dataCollectionName,
             string dataCollectorsName, string dataCollectorName)
         {
-            ValidateArg.NotNull<XmlReader>(reader, "reader");
-            ValidateArg.NotNull<string>(dataCollectorsName, "dataCollectorsName");
-            ValidateArg.NotNull<string>(dataCollectorName, "dataCollectorName");
+            ValidateArg.NotNull<XmlReader>(reader, nameof(reader));
+            ValidateArg.NotNull<string>(dataCollectorsName, nameof(dataCollectorsName));
+            ValidateArg.NotNull<string>(dataCollectorName, nameof(dataCollectorName));
 
             DataCollectionRunSettings settings = new DataCollectionRunSettings(dataCollectionName, dataCollectorsName, dataCollectorName);
             bool empty = reader.IsEmptyElement;

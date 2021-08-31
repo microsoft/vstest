@@ -195,7 +195,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
-            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client" + " --parentprocessid 101");
+            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client --parentprocessid 101");
         }
 
         [TestMethod]
@@ -250,9 +250,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoShouldUseTestHostX86ExePresentOnWindows()
+        public void GetTestHostProcessStartInfoShouldUseTestHostX64ExePresentOnWindows()
         {
-            var testhostExePath = "testhost.x86.exe";
+            var testhostExePath = "testhost.exe";
             this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);

@@ -30,6 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public void Dispose()
         {
             this.timer.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

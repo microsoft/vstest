@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+    using CommonResources = Common.Resources.Resources;
+
     /// <summary>
     /// ParallelDiscoveryEventsHandler for handling the discovery events in case of parallel discovery
     /// </summary>
@@ -121,6 +123,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // DiscoveryComplete is not true-end of the overall discovery as we only get completion of one host here
             // Always aggregate data, deserialize and raw for complete events
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+            // Do not send CancellationRequested message to Output window in IDE, as it is not useful for user
+            if (string.Equals(message.MessageType, MessageType.TestMessage)
+                && rawMessage.IndexOf(CommonResources.CancellationRequested) >= 0)
+            {
+                return;
+            }
 
             // Do not deserialize further
             if (!string.Equals(MessageType.DiscoveryComplete, message.MessageType))

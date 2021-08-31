@@ -1575,6 +1575,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Test Run Aborted with error: {0}..
+        /// </summary>
+        internal static string TestRunAbortedWithError {
+            get {
+                return ResourceManager.GetString("TestRunAbortedWithError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Test Run Canceled..
         /// </summary>
         internal static string TestRunCanceled {

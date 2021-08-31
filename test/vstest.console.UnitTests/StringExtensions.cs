@@ -26,8 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             // use mongolian vowel separator as placeholder for the newline that we add for formatting
             var placeholder = "\u180E";
             if (text.Contains(placeholder))
+            {
                 throw new InvalidOperationException(
                     "The text contains mongolian vowel separator character that we use as a placeholder.");
+            }
 
             var whiteSpaced = text
                 .Replace("\r\n", "\\r\\n\u180E")

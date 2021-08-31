@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             string runSettings,
             TestSessionInfo testSessionInfo)
         {
-            ValidateArg.NotNullOrEmpty(sources, "sources");
+            ValidateArg.NotNullOrEmpty(sources, nameof(sources));
             if (frequencyOfDiscoveredTestsEvent <= 0)
             {
                 throw new ArgumentOutOfRangeException(

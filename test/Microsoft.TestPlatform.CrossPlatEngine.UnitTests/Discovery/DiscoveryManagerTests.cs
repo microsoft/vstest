@@ -64,7 +64,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
             Assert.IsNotNull(allDiscoverers);
-            Assert.IsTrue(allDiscoverers.Count() > 0);
+            Assert.IsTrue(allDiscoverers.Any());
         }
 
         #endregion
@@ -80,6 +80,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(Directory.GetCurrentDirectory(), "imaginary.dll"));
+            mockLogger.Verify(
+                l =>
+                l.HandleLogMessage(
+                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel.Warning,
+                    errorMessage),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldLogIfTheSourceDoesNotExistIfItHasAPackage()
+        {
+            var criteria = new DiscoveryCriteria(new List<string> { "imaginary.exe" }, 100, null);
+
+            var packageName = "recipe.AppxRecipe";
+
+            var fakeDirectory = Directory.GetDirectoryRoot(typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location);
+
+            criteria.Package = Path.Combine(fakeDirectory, Path.Combine(packageName));
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
+
+            this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
+
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(fakeDirectory, "imaginary.exe"));
             mockLogger.Verify(
                 l =>
                 l.HandleLogMessage(

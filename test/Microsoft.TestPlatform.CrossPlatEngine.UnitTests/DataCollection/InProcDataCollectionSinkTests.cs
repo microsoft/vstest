@@ -35,7 +35,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var dict = ((InProcDataCollectionSink)this.dataCollectionSink).GetDataCollectionDataSetForTestCase(this.testCase.Id);
 
-            Assert.AreEqual<string>("DummyValue", dict["DummyKey"].ToString());
+            Assert.AreEqual<string>("DummyValue", dict["DummyKey"]);
         }
 
         [TestMethod]

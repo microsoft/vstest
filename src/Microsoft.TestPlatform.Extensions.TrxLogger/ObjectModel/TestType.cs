@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             if (id == Guid.Empty)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             this.typeId = id;

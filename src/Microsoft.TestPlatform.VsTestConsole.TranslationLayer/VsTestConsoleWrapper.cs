@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="vstestConsolePath">
         /// Path to the test runner <c>vstest.console.exe</c>.
         /// </param>
@@ -74,7 +74,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="vstestConsolePath">Path to the test runner <c>vstest.console.exe</c>.</param>
         /// <param name="consoleParameters">The parameters to be passed onto the runner process.</param>
         public VsTestConsoleWrapper(
@@ -92,9 +92,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
         /// </summary>
-        /// 
+        ///
         /// <remarks>Defined for testing purposes.</remarks>
-        /// 
+        ///
         /// <param name="vstestConsolePath">Path to the test runner <c>vstest.console.exe</c>.</param>
         /// <param name="dotnetExePath">Path to dotnet exe, needed for CI builds.</param>
         /// <param name="consoleParameters">The parameters to be passed onto the runner process.</param>
@@ -109,13 +109,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                   TestPlatformEventSource.Instance,
                   new ProcessHelper())
         {
-
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
         /// </summary>
-        /// 
+        ///
         /// <param name="requestSender">Sender for test messages.</param>
         /// <param name="processManager">Process manager.</param>
         /// <param name="consoleParameters">The parameters to be passed onto the runner process.</param>
@@ -661,7 +660,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 .ConfigureAwait(false);
         }
 
-
         /// <inheritdoc/>
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
@@ -876,7 +874,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
-            string runSettings, 
+            string runSettings,
             TestPlatformOptions options,
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher)
@@ -935,7 +933,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 cancellationToken).ConfigureAwait(false);
         }
         #endregion
-
 
         private void EnsureInitialized()
         {

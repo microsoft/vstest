@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public CodeCoverageTests()
         {
-            this.resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.resultsDirectory = GetResultsDirectory();
         }
 
         [TestMethod]
@@ -208,8 +208,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-                this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDirectory}", $" /Diag:{diagFileName}",
+                this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory);
+            arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}");
             arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 

@@ -57,7 +57,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private IProcessHelper processHelper;
 
-
         public DefaultEngineInvoker() : this(new TestRequestHandler(), DataCollectionTestCaseEventSender.Create(), new ProcessHelper())
         {
         }
@@ -256,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static void InitializeEqtTrace(IDictionary<string, string> argsDictionary)
         {
             // Setup logging if enabled
-            if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out var logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
 

@@ -11,9 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The program.
@@ -52,8 +52,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         // In UWP(App models) Run will act as entry point from Application end, so making this method public
         public static void Run(string[] args)
         {
-            WaitForDebuggerIfEnabled();
-            SetCultureSpecifiedByUser();
+            DebuggerBreakpoint.WaitForNativeDebugger("VSTEST_HOST_NATIVE_DEBUG");
+            DebuggerBreakpoint.WaitForDebugger("VSTEST_HOST_DEBUG");
+            UILanguageOverride.SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
             // Invoke the engine with arguments
@@ -65,8 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             IEngineInvoker invoker = null;
 #if NETFRAMEWORK
             // If Args contains test source argument, invoker Engine in new appdomain
-            string testSourcePath;
-            if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
+            if (argsDictionary.TryGetValue(TestSourceArgumentString, out var testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
             {
                 // remove the test source arg from dictionary
                 argsDictionary.Remove(TestSourceArgumentString);
@@ -82,61 +82,5 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
             return invoker ?? new DefaultEngineInvoker();
         }
-
-        private static void WaitForDebuggerIfEnabled()
-        {
-            // Check if native debugging is enabled and OS is windows.
-            var nativeDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
-
-            if (!string.IsNullOrEmpty(nativeDebugEnabled) && nativeDebugEnabled.Equals("1", StringComparison.Ordinal)
-                && new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows))
-            {
-                while (!IsDebuggerPresent())
-                {
-                    Task.Delay(1000).Wait();
-                }
-
-                DebugBreak();
-            }
-            // else check for host debugging enabled
-            else
-            {
-                var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-
-                if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    while (!Debugger.IsAttached)
-                    {
-                        Task.Delay(1000).Wait();
-                    }
-
-                    Debugger.Break();
-                }
-            }
-        }
-
-        private static void SetCultureSpecifiedByUser()
-        {
-            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
-            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
-            {
-                try
-                {
-                    CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(userCultureSpecified);
-                }
-                catch (Exception)
-                {
-                    ConsoleOutput.Instance.WriteLine(string.Format("Invalid Culture Info: {0}", userCultureSpecified), OutputLevel.Information);
-                }
-            }
-        }
-
-        // Native APIs for enabling native debugging.
-        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool IsDebuggerPresent();
-
-        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-        internal static extern void DebugBreak();
     }
 }

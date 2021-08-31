@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="items">Add these items to the collection.</param>
         public WorkItemCollection(int[] items)
         {
-            EqtAssert.ParameterNotNull(items, "items");
+            EqtAssert.ParameterNotNull(items, nameof(items));
             foreach (int i in items)
             {
                 this.Add(new WorkItem(i));
@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="item">WorkItem to be added.</param>
         public override void Add(WorkItem item)
         {
-            EqtAssert.ParameterNotNull(item, "item");
+            EqtAssert.ParameterNotNull(item, nameof(item));
             base.Add(item);
         }
 

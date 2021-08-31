@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             Assert.ThrowsException<ArgumentNullException>(() =>
            {
-               loggerEvents.RaiseTestRunMessage(default(TestRunMessageEventArgs));
+               loggerEvents.RaiseTestRunMessage(default);
            });
         }
 
@@ -233,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                loggerEvents.RaiseTestResult(default(TestResultEventArgs));
+                loggerEvents.RaiseTestResult(default);
             });
         }
 
@@ -612,28 +612,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
             loggerEvents.WaitForEventCompletion();
 
-            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
+            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
                 (CommandLineResources.PassedTestIndicator + "!").PadRight(8),
-                0.ToString().PadLeft(5), 
-                1.ToString().PadLeft(5), 
+                0.ToString().PadLeft(5),
+                1.ToString().PadLeft(5),
                 1.ToString().PadLeft(5), 2
-                .ToString().PadLeft(5), 
+                .ToString().PadLeft(5),
                 "1 m 2 s"), OutputLevel.Information), Times.Once);
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, 
-                "TestSourcePassed", 
-                expectedFramework), OutputLevel.Information), Times.Once);    
-            
-            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+                "TestSourcePassed",
+                expectedFramework), OutputLevel.Information), Times.Once);
+
+            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary,
                 (CommandLineResources.FailedTestIndicator + "!").PadRight(8),
                 1.ToString().PadLeft(5),
                 1.ToString().PadLeft(5),
                 1.ToString().PadLeft(5),
-                3.ToString().PadLeft(5), 
-                "1 h 6 m"), OutputLevel.Information), Times.Once);
+                3.ToString().PadLeft(5),
+                "1 h 2 m"), OutputLevel.Information), Times.Once);
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework, 
-                "TestSource", 
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryAssemblyAndFramework,
+                "TestSource",
                 expectedFramework), OutputLevel.Information), Times.Once);
         }
 
@@ -1171,12 +1171,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             Guid parentExecutionId = Guid.NewGuid();
             TestProperty ParentExecIdProperty = TestProperty.Register("ParentExecId", "ParentExecId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
             TestProperty ExecutionIdProperty = TestProperty.Register("ExecutionId", "ExecutionId", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
-            TestProperty TestTypeProperty = TestProperty.Register("TestType", "TestType" , typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+            TestProperty TestTypeProperty = TestProperty.Register("TestType", "TestType", typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
 
             var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
             result1.SetPropertyValue(ExecutionIdProperty, parentExecutionId);
 
-            var result2 = new ObjectModel.TestResult(testCase2) { Outcome = TestOutcome.Passed};
+            var result2 = new ObjectModel.TestResult(testCase2) { Outcome = TestOutcome.Passed };
             result2.SetPropertyValue(ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue(ParentExecIdProperty, parentExecutionId);
 
@@ -1218,16 +1218,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 DisplayName = "TestName"
             };
 
+            var duration = new TimeSpan(1, 2, 3);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Passed,
-                Duration = new TimeSpan(1, 2, 3)
+                Duration = duration,
+                StartTime = DateTime.Now - duration,
+                EndTime = DateTime.Now
             };
 
+            var duration1 = new TimeSpan(0, 0, 4, 5, 60);
             var testresult1 = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Failed,
-                Duration = new TimeSpan(0, 0, 4, 5, 60)
+                Duration = duration1, 
+                StartTime = DateTime.Now - duration1, 
+                EndTime = DateTime.Now
             };
 
             var testresult2 = new ObjectModel.TestResult(testcase)
@@ -1257,10 +1263,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 DisplayName = "TestName"
             };
 
+            var duration = new TimeSpan(0, 0, 1, 2, 3);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Passed,
-                Duration = new TimeSpan(0, 0, 1, 2, 3)
+                Duration = duration,
+                StartTime = DateTime.Now - duration,
+                EndTime = DateTime.Now
             };
 
             var testresult1 = new ObjectModel.TestResult(testcase)

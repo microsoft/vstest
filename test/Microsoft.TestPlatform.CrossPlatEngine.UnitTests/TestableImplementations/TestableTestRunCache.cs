@@ -35,6 +35,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
 
         public long TotalExecutedTests { get; set; }
 
+        public IDictionary<string, int> AdapterTelemetry => new Dictionary<string, int>();
+
         public ICollection<TestResult> GetLastChunk()
         {
             return this.TestResultList;

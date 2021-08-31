@@ -45,17 +45,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestInitialize]
         public void SetUp()
         {
-            this.resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.resultsDirectory = GetResultsDirectory();
         }
 
         [TestCleanup]
         public void CleanUp()
         {
-            Directory.Delete(resultsDirectory, true);
+            TryRemoveDirectory(resultsDirectory);
         }
 
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
         [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
         public void RunMultipleTestAssembliesWithCodeCoverage(RunnerInfo runnerInfo)
@@ -95,9 +96,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-                this.FrameworkArgValue, runnerInfo.InIsolationValue);
+                this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDirectory);
 
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDirectory}", $" /Diag:{diagFileName}", $" /EnableCodeCoverage");
+            arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /EnableCodeCoverage");
 
             trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);

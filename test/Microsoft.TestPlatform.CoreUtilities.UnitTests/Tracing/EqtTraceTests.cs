@@ -27,7 +27,6 @@ namespace TestPlatform.CoreUtilities.UnitTests
             {
                 Directory.CreateDirectory(dirPath);
                 logFile = Path.Combine(dirPath, "trace.log");
-
             }
             catch(Exception ex)
             {
@@ -161,7 +160,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
 #endif
             EqtTrace.Info("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue");
-            Assert.IsTrue(!ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
+            Assert.IsFalse(ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
         }
 
         private string ReadLogFile()

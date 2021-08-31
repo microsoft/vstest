@@ -451,7 +451,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 containingTypeSymbol: implT,
                 methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod0"),
                 managedTypeName: "TestClasses.Impl`1",
-                managedMethodName: "TestClasses.IImplementation<T>.ImplMethod0");
+                managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod0'");
         }
 
         [TestMethod]
@@ -464,7 +464,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 containingTypeSymbol: implT,
                 methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod1"),
                 managedTypeName: "TestClasses.Impl`1",
-                managedMethodName: "TestClasses.IImplementation<T>.ImplMethod1(!0)");
+                managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod1'(!0)");
         }
 
         [TestMethod]
@@ -477,7 +477,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
                 containingTypeSymbol: implT,
                 methodSymbol: implT.FindMethod("TestClasses.IImplementation<T>.ImplMethod2"),
                 managedTypeName: "TestClasses.Impl`1",
-                managedMethodName: "TestClasses.IImplementation<T>.ImplMethod2`1(!0,!!0,System.String)");
+                managedMethodName: "'TestClasses.IImplementation<T>.ImplMethod2'`1(!0,!!0,System.String)");
         }
 
         [TestMethod]
@@ -839,7 +839,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
             string expectedManagedMethodName)
         {
             // Generate the fqn for the Reflection MethodInfo
-            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName);
+            ManagedNameHelper.GetManagedName(methodInfo, out var managedTypeName, out var managedMethodName, out var hierarchyValues);
 
             Assert.AreEqual(expectedManagedTypeName, managedTypeName);
             Assert.AreEqual(expectedManagedMethodName, managedMethodName);

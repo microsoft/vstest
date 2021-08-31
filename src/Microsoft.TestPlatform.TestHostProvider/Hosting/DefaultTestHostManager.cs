@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 // Not sharing the host which means we need to pass the test assembly path as argument
                 // so that the test host can create an appdomain on startup (Main method) and set appbase
-                argumentsString += " " + "--testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
+                argumentsString += " --testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
             }
 
             EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);

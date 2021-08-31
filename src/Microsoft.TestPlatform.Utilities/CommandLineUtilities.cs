@@ -26,16 +26,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     // skip whitespace
                     while (char.IsWhiteSpace(args[index]))
                     {
-                        index += 1;
+                        index++;
                     }
 
                     // # - comment to end of line
                     if (args[index] == '#')
                     {
-                        index += 1;
+                        index++;
                         while (args[index] != '\n')
                         {
-                            index += 1;
+                            index++;
                         }
                         continue;
                     }
@@ -46,10 +46,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                         if (args[index] == '\\')
                         {
                             int cSlashes = 1;
-                            index += 1;
+                            index++;
                             while (index == args.Length && args[index] == '\\')
                             {
-                                cSlashes += 1;
+                                cSlashes++;
                             }
 
                             if (index == args.Length || args[index] != '"')
@@ -72,12 +72,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                         else if (args[index] == '"')
                         {
                             inQuotes = !inQuotes;
-                            index += 1;
+                            index++;
                         }
                         else
                         {
                             currentArg.Append(args[index]);
-                            index += 1;
+                            index++;
                         }
                     } while (!char.IsWhiteSpace(args[index]) || inQuotes);
                     argArray.Add(currentArg.ToString());

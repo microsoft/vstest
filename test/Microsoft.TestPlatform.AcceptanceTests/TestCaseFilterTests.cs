@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System.IO;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -15,15 +16,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -32,15 +35,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=Categorya\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -49,15 +54,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -66,17 +73,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(
                 arguments,
                 " /TestCaseFilter:\"FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -85,15 +94,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -102,15 +113,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
+            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -119,15 +132,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -140,15 +155,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -166,20 +183,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
             this.InvokeVsTest(arguments);
             var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest1", "MstestV1UnitTestProject.UnitTest1.PassingTest2",
                 "MstestV1UnitTestProject.UnitTest1.FailingTest2", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
-            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest1" };
+            var listOfNotDiscoveredTests = new string[] { "MstestV1UnitTestProject.UnitTest1.FailingTest1" };
             this.ValidateDiscoveredTests(listOfTests);
             this.ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
+            TryRemoveDirectory(resultsDir);
         }
 
         /// <summary>
@@ -187,6 +206,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource]
         public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {
@@ -197,21 +217,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
 
             string testAssemblyPath = this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll");
             var arguments = PrepareArguments(
                 testAssemblyPath,
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
 
             this.InvokeVsTest(arguments);
-            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest1", "MstestV1UnitTestProject.UnitTest1.PassingTest2" };
-            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest1", "MstestV1UnitTestProject.UnitTest1.FailingTest2", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
+            var listOfTests = new string[] { "MstestV1UnitTestProject.UnitTest1.PassingTest1", "MstestV1UnitTestProject.UnitTest1.PassingTest2" };
+            var listOfNotDiscoveredTests = new string[] { "MstestV1UnitTestProject.UnitTest1.FailingTest1", "MstestV1UnitTestProject.UnitTest1.FailingTest2", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
             this.ValidateDiscoveredTests(listOfTests);
             this.ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
+            TryRemoveDirectory(resultsDir);
         }
     }
 }

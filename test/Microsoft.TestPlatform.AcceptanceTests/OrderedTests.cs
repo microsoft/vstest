@@ -17,10 +17,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [TestMethod]
         [TestCategory("Windows-Review")]
+        [Ignore("Temporary ignoring, because of incomplete interop work for legacy TP")]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
+
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
             {
                 Assert.Inconclusive(" Ordered tests are not supported with .Netcore runner.");
@@ -42,7 +45,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 orderedTestFileAbsolutePath,
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
+                runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidatePassedTests("PassingTest1");
@@ -51,6 +54,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSkippedTests("FailingTest2");
             // Parent test result should fail as inner results contain failing test.
             this.ValidateSummaryStatus(2, 1, 1);
+            TryRemoveDirectory(resultsDir);
         }
     }
 }
