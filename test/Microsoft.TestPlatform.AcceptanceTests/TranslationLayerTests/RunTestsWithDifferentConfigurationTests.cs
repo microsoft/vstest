@@ -105,39 +105,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
-        public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            this.Setup();
-
-            var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
-            string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
-
-            File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
-            var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
-            var sources = new List<string>
-                              {
-                                  this.GetAssetFullPath("MstestV1UnitTestProject.dll")
-                              };
-
-            this.vstestConsoleWrapper.RunTests(
-                sources,
-                runSettings,
-                this.runEventHandler);
-
-            // Assert
-            Assert.AreEqual(5, this.runEventHandler.TestResults.Count);
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-
-            File.Delete(testsettingsFile);
-        }
-
-        [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
