@@ -9,15 +9,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
     {
         /// <inheritdoc />
-        public string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump, bool collectAlways)
+        public string BuildTriggerBasedProcDumpArgs(int processId, string filename, IEnumerable<string> procDumpExceptionsList, bool isFullDump)
         {
             // -accepteula: Auto accept end-user license agreement
+            //
             // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
+            // We use -e 1 to make sure we are able to catch StackOverflow and AccessViolationException exceptions.
             // -g: Run as a native debugger in a managed process (no interop).
+            // We use -g to be able to intercept  StackOverflow and AccessViolationException.
             // -t: Write a dump when the process terminates.
+            // Collect the dump all the time, even if CollectAlways is not enabled to produce dumps for Environment.FailFast. We will later ignore the last
+            // dump file for testhost when we know that test host did not crash.
             // -ma: Full dump argument.
             // -f: Filter the exceptions.
-            StringBuilder procDumpArgument = new StringBuilder($"-accepteula -e 1 -g {(collectAlways ? "-t " : string.Empty)}");
+            // Filter the first chance exceptions only to those that are most likely to kill the whole process.
+            StringBuilder procDumpArgument = new StringBuilder($"-accepteula -e 1 -g -t ");
             if (isFullDump)
             {
                 procDumpArgument.Append("-ma ");

@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -29,6 +30,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private string tempDirectory;
         private string dumpFileName;
         private INativeMethodsHelper nativeMethodsHelper;
+        private bool collectAlways;
+        private string outputDirectory;
+        private Process process;
+        private string outputFilePrefix;
 
         public ProcDumpCrashDumper()
             : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
@@ -71,8 +76,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways)
         {
-            var process = Process.GetProcessById(processId);
-            var outputFile = Path.Combine(outputDirectory, $"{process.ProcessName}_{process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_crashdump.dmp");
+            this.collectAlways = collectAlways;
+            this.outputDirectory = outputDirectory;
+            this.process = Process.GetProcessById(processId);
+            this.outputFilePrefix = $"{this.process.ProcessName}_{this.process.Id}_{DateTime.Now:yyyyMMddTHHmmss}_crashdump";
+            var outputFile = Path.Combine(outputDirectory, $"{this.outputFilePrefix}.dmp");
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: Attaching to process '{processId}' to dump into '{outputFile}'.");
 
             // Procdump will append .dmp at the end of the dump file. We generate this internally so it is rather a safety check.
@@ -96,8 +104,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 processId,
                 this.dumpFileName,
                 ProcDumpExceptionsList,
-                isFullDump: dumpType == DumpTypeOption.Full,
-                collectAlways: collectAlways);
+                isFullDump: dumpType == DumpTypeOption.Full);
 
             EqtTrace.Info($"ProcDumpCrashDumper.AttachToTargetProcess: Running ProcDump with arguments: '{procDumpArgs}'.");
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -138,6 +145,45 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning($"ProcDumpCrashDumper.DetachFromTargetProcess: Failed to kill proc dump process with exception {e}");
                 }
             }
+        }
+
+        public IEnumerable<string> GetDumpFiles(bool processCrashed)
+        {
+            var allDumps = this.fileHelper.DirectoryExists(this.outputDirectory)
+                ? this.fileHelper.EnumerateFiles(this.outputDirectory, SearchOption.AllDirectories, new[] { ".dmp" }).ToList()
+                : new List<string>();
+
+            // We are always collecting dump on exit even when collectAlways option is false, to make sure we collect
+            // dump for Environment.FailFast. So there always can be a dump if the process already exited. In most cases
+            // this was just a normal process exit that was not caused by an exception and user is not interested in getting that
+            // dump because it only pollutes their CI.
+            if (this.collectAlways)
+            {
+                return allDumps;
+            }
+
+            if (processCrashed)
+            {
+                return allDumps;
+            }
+
+            // There can be more dumps in the crash folder from the child processes that were .NET5 or newer and crashed
+            // get only the ones that match the path we provide to procdump. And get the last one created.
+            var allTargetProcessDumps = allDumps
+                .Where(dump => Path.GetFileNameWithoutExtension(dump)
+                .StartsWith(this.outputFilePrefix))
+                .Select(dump => new FileInfo(dump))
+                .OrderBy(dump => dump.LastWriteTime).ThenBy(dump => dump.Name)
+                .ToList();
+
+            var skippedDump = allTargetProcessDumps.LastOrDefault();
+
+            if (skippedDump != null)
+            {
+                EqtTrace.Verbose($"ProcDumpCrashDumper.GetDumpFiles: Found {allTargetProcessDumps.Count} dumps for the target process, skipping {skippedDump.Name} because we always collect a dump, even if there is no crash. But the process did not crash and user did not specify CollectAlways=true.");
+            }
+
+            return allTargetProcessDumps.Take(allTargetProcessDumps.Count - 1).Select(dump => dump.FullName).ToList();
         }
 
         /// <summary>

@@ -173,7 +173,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
             this.mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
             this.mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()));
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true)).Returns(new[] { dumpFile });
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Returns(new[] { dumpFile });
             this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set());
 
             this.blameDataCollector.Initialize(
@@ -185,7 +185,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             hangBasedDumpcollected.Wait(1000);
             this.mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, false), Times.Once);
             this.mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
         }
 
@@ -207,7 +207,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
             this.mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
             this.mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()));
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true)).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
 
             this.blameDataCollector.Initialize(
                 this.GetDumpConfigurationElement(false, false, true, 0),
@@ -218,7 +218,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             hangBasedDumpcollected.Wait(1000);
             this.mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, false), Times.Once);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
             this.mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
             this.mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()));
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true)).Returns(new[] { dumpFile });
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Returns(new[] { dumpFile });
             this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some other exception"));
 
             this.blameDataCollector.Initialize(
@@ -252,7 +252,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             hangBasedDumpcollected.Wait(1000);
             this.mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, false), Times.Once);
             this.mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
         }
 
@@ -367,7 +367,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Setup
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(It.IsAny<bool>())).Returns(new[] { this.filepath });
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(It.IsAny<bool>(), false)).Returns(new[] { this.filepath });
             this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
@@ -377,7 +377,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(It.IsAny<bool>()), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(It.IsAny<bool>(), false), Times.Once);
         }
 
         /// <summary>
@@ -419,7 +419,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Setup
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true)).Returns(new[] { this.filepath });
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Returns(new[] { this.filepath });
             this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
@@ -428,7 +428,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, false), Times.Once);
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Setup and raise events
             this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true)).Throws(new FileNotFoundException());
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Throws(new FileNotFoundException());
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
             this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new TestCase()));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));

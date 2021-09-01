@@ -214,6 +214,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Verbose("Inactivity timer is already disposed.");
             }
 
+            if (this.collectProcessDumpOnTrigger)
+            {
+                // Detach procdump from the testhost process to prevent testhost process from crashing
+                // if/when we try to kill the existing proc dump process.
+                // And also prevent collecting dump on exit of the process.
+                this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
+            }
+
             try
             {
                 Action<string> logWarning = m => this.logger.LogWarning(this.context.SessionDataCollectionContext, m);
@@ -225,18 +233,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.logger.LogError(this.context.SessionDataCollectionContext, $"Blame: Creating hang dump failed with error.", ex);
             }
 
-            if (this.collectProcessDumpOnTrigger)
-            {
-                // Detach procdump from the testhost process to prevent testhost process from crashing
-                // if/when we try to kill the existing proc dump process.
-                this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
-            }
-
             if (this.uploadDumpFiles)
             {
                 try
                 {
-                    var dumpFiles = this.processDumpUtility.GetDumpFiles();
+                    var dumpFiles = this.processDumpUtility.GetDumpFiles(false, true);
                     foreach (var dumpFile in dumpFiles)
                     {
                         try
@@ -451,8 +452,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 // If the last test crashes, it will not invoke a test case end and therefore
                 // In case of crash testStartCount will be greater than testEndCount and we need to write the sequence
-                // And send the attachment
-                if (this.testStartCount > this.testEndCount)
+                // And send the attachment. This won't indicate failure if there are 0 tests in the assembly, or when it fails in setup.
+                var processCrashedWhenRunningTests = this.testStartCount > this.testEndCount;
+                if (processCrashedWhenRunningTests)
                 {
                     var filepath = Path.Combine(this.GetTempDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
 
@@ -472,7 +474,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     try
                     {
-                        var dumpFiles = this.processDumpUtility.GetDumpFiles(warnOnNoDumpFiles: this.collectDumpAlways);
+                        var dumpFiles = this.processDumpUtility.GetDumpFiles(warnOnNoDumpFiles: this.collectDumpAlways, processCrashedWhenRunningTests);
                         foreach (var dumpFile in dumpFiles)
                         {
                             if (!string.IsNullOrEmpty(dumpFile))

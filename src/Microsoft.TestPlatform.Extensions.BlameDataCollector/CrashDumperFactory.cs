@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using NuGet.Frameworks;
 
     internal class CrashDumperFactory : ICrashDumperFactory
@@ -52,13 +53,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
 
                 EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
-                return new NetClientCrashDumper();
+                return new NetClientCrashDumper(new FileHelper());
             }
 
             if (isNet50OrNewer)
             {
                 EqtTrace.Info($"CrashDumperFactory: This is {RuntimeInformation.OSDescription} on {targetFramework} .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
-                return new NetClientCrashDumper();
+                return new NetClientCrashDumper(new FileHelper());
             }
 
             throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}, and framework: {targetFramework}.");

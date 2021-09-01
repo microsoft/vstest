@@ -51,16 +51,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         };
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles = true)
+        public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)
         {
             if (!this.wasHangDumped)
             {
                 this.crashDumper.WaitForDumpToFinish();
             }
 
-            IEnumerable<string> crashDumps = this.fileHelper.DirectoryExists(this.crashDumpDirectory)
-                ? this.fileHelper.EnumerateFiles(this.crashDumpDirectory, SearchOption.AllDirectories, new[] { ".dmp" })
-                : new List<string>();
+            if (this.crashDumpDirectory == this.hangDumpDirectory)
+            {
+                throw new InvalidOperationException("Crash dump directory and hang dump directory should not be the same.");
+            }
+
+            IEnumerable<string> crashDumps = this.crashDumper.GetDumpFiles(processCrashed);
 
             IEnumerable<string> hangDumps = this.fileHelper.DirectoryExists(this.hangDumpDirectory)
                 ? this.fileHelper.EnumerateFiles(this.hangDumpDirectory, SearchOption.TopDirectoryOnly, new[] { ".dmp" })
