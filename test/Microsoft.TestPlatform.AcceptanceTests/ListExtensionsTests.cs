@@ -21,10 +21,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             if (this.IsDesktopRunner())
             {
                 this.StdOutputContains("executor://codedwebtestadapter/v1");
-                this.StdOutputContains("executor://generictestadapter/v1");
-                this.StdOutputContains(".generictest");
-                this.StdOutputContains("executor://orderedtestadapter/v1");
-                this.StdOutputContains(".orderedtest");
                 this.StdOutputContains("executor://mstestadapter/v1");
                 this.StdOutputContains("executor://webtestadapter/v1");
                 this.StdOutputContains(".Webtest");
@@ -33,11 +29,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             else
             {
                 // There are no inbox adapters for dotnet core
-                this.StdOutputDoesNotContains("executor://codedwebtestadapter/v1");
-                this.StdOutputDoesNotContains("executor://generictestadapter/v1");
-                this.StdOutputDoesNotContains(".generictest");
-                this.StdOutputDoesNotContains("executor://orderedtestadapter/v1");
-                this.StdOutputDoesNotContains(".orderedtest");
+                this.StdOutputDoesNotContains("executor://codedwebtestadapter/v1");  
                 this.StdOutputDoesNotContains("executor://mstestadapter/v1");
                 this.StdOutputDoesNotContains("executor://webtestadapter/v1");
                 this.StdOutputDoesNotContains(".Webtest");
@@ -55,9 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (this.IsDesktopRunner())
             {
-                this.StdOutputContains("executor://CodedWebTestAdapter/v1");
-                this.StdOutputContains("executor://GenericTestAdapter/v1");
-                this.StdOutputContains("executor://OrderedTestAdapter/v1");
+                this.StdOutputContains("executor://CodedWebTestAdapter/v1");               
                 this.StdOutputContains("executor://MSTestAdapter/v1");
                 this.StdOutputContains("executor://WebTestAdapter/v1");
                 this.StdOutputContains("executor://CppUnitTestExecutor/v1");
@@ -67,8 +57,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 // There are no inbox adapters for dotnet core
                 this.StdOutputDoesNotContains("executor://CodedWebTestAdapter/v1");
-                this.StdOutputDoesNotContains("executor://GenericTestAdapter/v1");
-                this.StdOutputDoesNotContains("executor://OrderedTestAdapter/v1");
                 this.StdOutputDoesNotContains("executor://MSTestAdapter/v1");
                 this.StdOutputDoesNotContains("executor://WebTestAdapter/v1");
                 this.StdOutputDoesNotContains("executor://CppUnitTestExecutor/v1");
