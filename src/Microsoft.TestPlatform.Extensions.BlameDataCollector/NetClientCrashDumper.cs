@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -32,8 +33,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public IEnumerable<string> GetDumpFiles(bool processCrashed)
         {
             return this.fileHelper.DirectoryExists(this.outputDirectory)
-               ? this.fileHelper.EnumerateFiles(this.outputDirectory, SearchOption.AllDirectories, new[] { ".dmp" })
-               : new List<string>();
+               ? this.fileHelper.GetFiles(this.outputDirectory, "*_crashdump*.dmp", SearchOption.AllDirectories)
+               : Array.Empty<string>();
         }
 
         public void WaitForDumpToFinish()

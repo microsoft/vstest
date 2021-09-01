@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Collections.Generic;
     using System.Text;
 
@@ -23,7 +24,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -ma: Full dump argument.
             // -f: Filter the exceptions.
             // Filter the first chance exceptions only to those that are most likely to kill the whole process.
-            StringBuilder procDumpArgument = new StringBuilder($"-accepteula -e 1 -g -t ");
+
+            // Fully override parameters to procdump
+            var procdumpArgumentsFromEnv = Environment.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPARGUMENTS")?.Trim();
+
+            // Useful additional arguments are -n 100, to collect all dumps that you can, or -o to overwrite dump, or -f EXCEPTION_NAME to add exception to filter list
+            var procdumpAdditonalArgumentsFromEnv = Environment.GetEnvironmentVariable("VSTEST_DUMP_PROCDUMPADDITIONALARGUMENTS")?.Trim();
+            StringBuilder procDumpArgument = new StringBuilder($"-accepteula -e 1 -g -t {procdumpAdditonalArgumentsFromEnv}");
             if (isFullDump)
             {
                 procDumpArgument.Append("-ma ");
@@ -35,7 +42,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             procDumpArgument.Append($"{processId} {filename}.dmp");
-            var argument = procDumpArgument.ToString();
+            var argument = string.IsNullOrWhiteSpace(procdumpArgumentsFromEnv) ? procDumpArgument.ToString() : procdumpArgumentsFromEnv;
+            if (!argument.ToUpperInvariant().Contains("-accepteula".ToUpperInvariant()))
+            {
+                argument = $"-accepteula {argument}";
+            }
 
             return argument;
         }
