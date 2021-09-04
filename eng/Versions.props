@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <!-- This repo version -->
-    <VersionPrefix>17.0.0</VersionPrefix>
+    <VersionPrefix>17.1.0</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
