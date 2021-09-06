@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, testResultsDirectory, false, ".NETCoreApp,Version=v5.0", false);
 
-            var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFiles(false, false));
+            var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFiles(true, false));
             Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);
         }
     }

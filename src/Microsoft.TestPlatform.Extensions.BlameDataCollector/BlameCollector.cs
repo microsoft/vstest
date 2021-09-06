@@ -222,11 +222,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
+            var hangDumpSuccess = false;
             try
             {
                 Action<string> logWarning = m => this.logger.LogWarning(this.context.SessionDataCollectionContext, m);
                 var dumpDirectory = this.GetDumpDirectory();
                 this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, dumpDirectory, this.processFullDumpEnabled, this.targetFramework, logWarning);
+                hangDumpSuccess = true;
             }
             catch (Exception ex)
             {
@@ -237,7 +239,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 try
                 {
-                    var dumpFiles = this.processDumpUtility.GetDumpFiles(false, true);
+                    var dumpFiles = this.processDumpUtility.GetDumpFiles(true, /* if we killed it by hang dumper, we already have our dump, otherwise it might have crashed, and we want all dumps */ !hangDumpSuccess);
                     foreach (var dumpFile in dumpFiles)
                     {
                         try

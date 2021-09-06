@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // If the process was hang dumped we killed it ourselves, so it crashed when executing tests,
             // but we already have the hang dump, and should not also collect the exit dump that we got
             // from killing the process by the hang dumper.
-            IEnumerable<string> crashDumps = this.crashDumper?.GetDumpFiles(!this.wasHangDumped && processCrashed) ?? new List<string>();
+            IEnumerable<string> crashDumps = this.crashDumper?.GetDumpFiles(processCrashed) ?? new List<string>();
 
             IEnumerable<string> hangDumps = this.fileHelper.DirectoryExists(this.hangDumpDirectory)
                 ? this.fileHelper.GetFiles(this.hangDumpDirectory, "*_hangdump*.dmp", SearchOption.TopDirectoryOnly)

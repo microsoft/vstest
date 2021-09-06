@@ -367,7 +367,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Setup
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(It.IsAny<bool>(), false)).Returns(new[] { this.filepath });
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(It.IsAny<bool>(), It.IsAny<bool>())).Returns(new[] { this.filepath });
             this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
@@ -377,7 +377,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
-            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(It.IsAny<bool>(), false), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFiles(It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Setup and raise events
             this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
-            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, false)).Throws(new FileNotFoundException());
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Throws(new FileNotFoundException());
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
             this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new TestCase()));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
