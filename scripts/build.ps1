@@ -95,6 +95,7 @@ $TPB_CIBuild = $CIBuild
 $TPB_PublishTests = $PublishTestArtifacts
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 $TPB_PackageOutDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages
+$TPB_SourceBuildPackageOutDir = Join-Path $TPB_PackageOutDir "source-build"
 
 $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 
@@ -970,15 +971,21 @@ function Update-VsixVersion($vsixProjectDir)
     Write-Log "Update-VsixVersion: Completed."
 }
 
-function Generate-Manifest
+function Generate-Manifest ($PackageFolder)
 {
-    Write-Log "Generate-Manifest: Started."
+    $packagesFolderName =  [System.IO.Path]::GetFileName($PackageFolder)
+    Write-Log "Generate-Manifest ($packagesFolderName): Started."
 
     $generateManifestPath = Join-Path $env:TP_ROOT_DIR "scripts\build\GenerateManifest.proj"
     $msbuildPath = Locate-MSBuildPath
-    & $msbuildPath $generateManifestPath /t:PublishToBuildAssetRegistry /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:BUILD_BUILDNUMBER=$BuildNumber /p:Configuration=$TPB_Configuration /bl:"$env:TP_OUT_DIR\log\$Configuration\manifest-generation.binlog"
 
-    Write-Log "Generate-Manifest: Completed."
+    & $msbuildPath $generateManifestPath /t:PublishToBuildAssetRegistry /p:PackagesToPublishPattern=$PackageFolder\*.nupkg `
+                   /p:BUILD_BUILDNUMBER=$BuildNumber `
+                   /p:PackagesPath="$PackageFolder\" `
+                   /p:Configuration=$TPB_Configuration `
+                   /bl:"$env:TP_OUT_DIR\log\$Configuration\manifest-generation-$packagesFolderName.binlog"
+
+    Write-Log "Generate-Manifest ($packagesFolderName): Completed."
 }
 
 function Build-SpecificProjects
@@ -1078,7 +1085,12 @@ if ($Force -or $Steps -contains "Publish") {
 }
 
 if ($Force -or $Steps -contains "Publish" -or $Steps -contains "Manifest") {
-    Generate-Manifest
+    Generate-Manifest -PackageFolder $TPB_PackageOutDir
+    if (Test-Path $TPB_SourceBuildPackageOutDir) 
+    {
+        Generate-Manifest -PackageFolder $TPB_SourceBuildPackageOutDir
+    }
+
     Copy-PackageIntoStaticDirectory
 }
 
