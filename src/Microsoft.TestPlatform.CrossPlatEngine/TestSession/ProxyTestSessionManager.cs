@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     {
         private readonly object lockObject = new object();
         private StartTestSessionCriteria testSessionCriteria;
-        private int parallelLevel;
+        private int testhostCount;
         private bool skipDefaultAdapters;
         private TestSessionInfo testSessionInfo;
         private Func<ProxyOperationManager> proxyCreator;
@@ -34,15 +34,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// 
         /// <param name="criteria">The test session criteria.</param>
-        /// <param name="parallelLevel">The parallel level.</param>
+        /// <param name="testhostCount">The testhost count.</param>
         /// <param name="proxyCreator">The proxy creator.</param>
         public ProxyTestSessionManager(
             StartTestSessionCriteria criteria,
-            int parallelLevel,
+            int testhostCount,
             Func<ProxyOperationManager> proxyCreator)
         {
             this.testSessionCriteria = criteria;
-            this.parallelLevel = parallelLevel;
+            this.testhostCount = testhostCount;
             this.proxyCreator = proxyCreator;
 
             this.availableProxyQueue = new Queue<Guid>();
@@ -65,10 +65,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             this.testSessionInfo = new TestSessionInfo();
 
-            var taskList = new Task[this.parallelLevel];
+            var taskList = new Task[this.testhostCount];
 
             // Create all the proxies in parallel, one task per proxy.
-            for (int i = 0; i < this.parallelLevel; ++i)
+            for (int i = 0; i < this.testhostCount; ++i)
             {
                 taskList[i] = Task.Factory.StartNew(() =>
                 {
@@ -76,6 +76,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     {
                         // Create and cache the proxy.
                         var operationManagerProxy = this.proxyCreator();
+                        if (operationManagerProxy == null)
+                        {
+                            return;
+                        }
 
                         // Initialize the proxy.
                         operationManagerProxy.Initialize(this.skipDefaultAdapters);

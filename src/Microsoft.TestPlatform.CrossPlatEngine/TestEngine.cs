@@ -302,7 +302,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         };
             };
 
-            return new ProxyTestSessionManager(testSessionCriteria, parallelLevel, proxyCreator);
+            var testhostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+            var testhostCount = testhostManager.Shared ? 1 : testSessionCriteria.Sources.Count;
+
+            return new ProxyTestSessionManager(testSessionCriteria, testhostCount, proxyCreator);
         }
 
         /// <inheritdoc/>
