@@ -61,10 +61,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="PublicApi\netstandard1.0\" />
-  </ItemGroup>
   
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
