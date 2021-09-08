@@ -1,0 +1,5 @@
+﻿Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace
+Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.DoNotInitialize.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.DoNotInitialize.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.IPlatformEqtTrace.GetLogFile() -> string
+Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformEnvironment.Architecture.get -> Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture
