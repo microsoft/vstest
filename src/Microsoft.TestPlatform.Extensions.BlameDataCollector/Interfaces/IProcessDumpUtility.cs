@@ -12,10 +12,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Get generated dump files
         /// </summary>
         /// <param name="warnOnNoDumpFiles">Writes warning when no dump file is found.</param>
+        /// <param name="processCrashed">Process might have crashed. If true it crashed for sure. If false we don't know.</param>
         /// <returns>
         /// Path of dump file
         /// </returns>
-        IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles = true);
+        IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed);
 
         /// <summary>
         /// Launch proc dump process
