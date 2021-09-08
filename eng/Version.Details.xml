@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.0.0-beta.21457.1">
+    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.0.0-beta.21458.2">
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
-      <Sha>c6f0dfb55a629f53b10c5f29b0b75386dc8e0299</Sha>
+      <Sha>053a2c84f6f0ae89ab43324b928a5c90077ec5b8</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
