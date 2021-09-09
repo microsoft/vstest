@@ -32,23 +32,23 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void BuildTriggerBasedProcDumpArgsShouldCreateCorrectArgString()
         {
             var procDumpArgsBuilder = new ProcDumpArgsBuilder();
-            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, false, false);
-            Assert.AreEqual("-accepteula -e 1 -g -f a -f b 1234 dump.dmp", argString);
+            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, false);
+            Assert.AreEqual("-accepteula -e 1 -g -t -f a -f b 1234 dump.dmp", argString);
         }
 
         [TestMethod]
         public void BuildTriggerProcDumpArgsWithFullDumpEnabledShouldCreateCorrectArgString()
         {
             var procDumpArgsBuilder = new ProcDumpArgsBuilder();
-            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, true, false);
-            Assert.AreEqual("-accepteula -e 1 -g -ma -f a -f b 1234 dump.dmp", argString);
+            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, true);
+            Assert.AreEqual("-accepteula -e 1 -g -t -ma -f a -f b 1234 dump.dmp", argString);
         }
 
         [TestMethod]
         public void BuildTriggerProcDumpArgsWithAlwaysCollectShouldCreateCorrectArgString()
         {
             var procDumpArgsBuilder = new ProcDumpArgsBuilder();
-            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, true, collectAlways: true);
+            var argString = procDumpArgsBuilder.BuildTriggerBasedProcDumpArgs(this.defaultProcId, this.defaultDumpFileName, new List<string> { "a", "b" }, true);
 
             // adds -t for collect on every process exit
             Assert.AreEqual("-accepteula -e 1 -g -t -ma -f a -f b 1234 dump.dmp", argString);

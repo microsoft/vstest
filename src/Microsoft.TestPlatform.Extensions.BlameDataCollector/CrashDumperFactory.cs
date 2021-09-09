@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using NuGet.Frameworks;
 
     internal class CrashDumperFactory : ICrashDumperFactory
@@ -34,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (!isNet50OrNewer)
                 {
                     EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework} which is not net5.0 or newer, returning ProcDumpCrashDumper that uses ProcDump utility.");
-                    return new ProcDumpCrashDumper();
+                    return new ProcDumpDumper();
                 }
 
                 // On net5.0 we don't have the capability to crash dump on exit, which is useful in rare cases
@@ -48,17 +49,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 if (forceUsingProcdump)
                 {
                     EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}. Forcing the use of ProcDumpCrashDumper that uses ProcDump utility, via VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride}.");
-                    return new ProcDumpCrashDumper();
+                    return new ProcDumpDumper();
                 }
 
                 EqtTrace.Info($"CrashDumperFactory: This is Windows on {targetFramework}, returning the .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
-                return new NetClientCrashDumper();
+                return new NetClientCrashDumper(new FileHelper());
             }
 
             if (isNet50OrNewer)
             {
                 EqtTrace.Info($"CrashDumperFactory: This is {RuntimeInformation.OSDescription} on {targetFramework} .NETClient dumper which uses env variables to collect crashdumps of testhost and any child process.");
-                return new NetClientCrashDumper();
+                return new NetClientCrashDumper(new FileHelper());
             }
 
             throw new PlatformNotSupportedException($"Unsupported operating system: {RuntimeInformation.OSDescription}, and framework: {targetFramework}.");

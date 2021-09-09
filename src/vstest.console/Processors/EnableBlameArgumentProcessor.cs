@@ -233,8 +233,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (enableCrashDump)
             {
                 var dumpParameters = collectDumpParameters
-                    .Where(p => new[] { "CollectAlways", "DumpType" }.Contains(p.Key))
-                    .ToDictionary(p => p.Key, p => p.Value);
+                    .Where(p => new[] { "CollectAlways", "DumpType" }.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
+                    .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
 
                 if (!dumpParameters.ContainsKey("DumpType"))
                 {
@@ -248,8 +248,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (enableHangDump)
             {
                 var hangDumpParameters = collectDumpParameters
-                    .Where(p => new[] { "TestTimeout", "HangDumpType" }.Contains(p.Key))
-                    .ToDictionary(p => p.Key, p => p.Value);
+                    .Where(p => new[] { "TestTimeout", "HangDumpType" }.Contains(p.Key, StringComparer.OrdinalIgnoreCase))
+                    .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
 
                 if (!hangDumpParameters.ContainsKey("TestTimeout"))
                 {
