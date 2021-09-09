@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace DumpMinitool
 {
@@ -10,6 +11,7 @@ namespace DumpMinitool
     {
         static int Main(string[] args)
         {
+            DebuggerBreakpoint.WaitForDebugger("VSTEST_DUMPTOOL_DEBUG");
             Console.WriteLine($"Dump minitool: Started with arguments {string.Join(" ", args)}");
             if (args?.Length != 6)
             {
@@ -140,5 +142,32 @@ namespace DumpMinitool
         Full,
         WithHeap,
         Mini,
+    }
+
+    internal static class DebuggerBreakpoint
+    {
+        internal static void WaitForDebugger(string environmentVariable)
+        {
+            if (string.IsNullOrWhiteSpace(environmentVariable))
+            {
+                throw new ArgumentException($"'{nameof(environmentVariable)}' cannot be null or whitespace.", nameof(environmentVariable));
+            }
+
+            var debugEnabled = Environment.GetEnvironmentVariable(environmentVariable);
+            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                Console.WriteLine("Waiting for debugger attach...");
+
+                var currentProcess = Process.GetCurrentProcess();
+                Console.WriteLine("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName);
+
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                Debugger.Break();
+            }
+        }
     }
 }

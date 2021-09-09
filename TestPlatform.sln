@@ -166,7 +166,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Microsoft.TestPlatform.Exec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpMinitool", "src\DataCollectors\DumpMinitool\DumpMinitool.csproj", "{33A20B85-7024-4112-B1E7-00CD0E4A9F96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpMinitool.x86", "src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj", "{2C88C923-3D7A-4492-9241-7A489750CAB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpMinitool.x86", "src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj", "{2C88C923-3D7A-4492-9241-7A489750CAB7}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 // This is x86 OS, the current process and the target process must be x86. (Or maybe arm64, but let's not worry about that now).
                 // Just dump it using PInvoke.
-                EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x86 Windows, both processes are x86, using PInvoke dumper. ");
+                EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x86 Windows, both processes are x86, using PInvoke dumper.");
                 CollectDumpUsingMiniDumpWriteDump(process, outputFile, type);
             }
             else if (RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.X64)
@@ -130,20 +130,40 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                 if (targetProcessIs64Bit && currentProcessIs64Bit)
                 {
-                    // Both processes are the same architecture, dump it using the PInvoke call.
-                    EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x64 Windows, and both processes are x64, using PInvoke dumper. ");
+                    // Both processes are x64 architecture, dump it using the PInvoke call.
+                    EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x64 Windows, and both processes are x64, using PInvoke dumper.");
                     CollectDumpUsingMiniDumpWriteDump(process, outputFile, type);
                 }
-                else if (!currentProcessIs64Bit)
+                else if (!targetProcessIs64Bit && !currentProcessIs64Bit)
                 {
-                    throw new Exception("Current process is not 64-bit, not supported.");
+                    // Both processes are x86 architecture, dump it using the PInvoke call.
+                    EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x64 Windows, and both processes are x86, using PInvoke dumper.");
+                    CollectDumpUsingMiniDumpWriteDump(process, outputFile, type);
                 }
                 else
                 {
+                    string dumpMinitoolName;
+                    if (!currentProcessIs64Bit && targetProcessIs64Bit)
+                    {
+                        EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x64 Windows, datacollector is x86, and target process is x64, using 64-bit MiniDumptool.");
+                        dumpMinitoolName = "DumpMinitool.exe";
+                    }
+                    else
+                    {
+                        EqtTrace.Verbose($"WindowsHangDumper.CollectDump: We are on x64 Windows, datacollector is x64, and target process is x86, using 32-bit MiniDumptool.");
+                        dumpMinitoolName = "DumpMinitool.x86.exe";
+                    }
+
                     var args = $"--file \"{outputFile}\" --processId {process.Id} --dumpType {type}";
-                    EqtTrace.Info($"ProcDumpDumper.CollectDump: Running DumpMinitool.x86.exe with arguments: '{args}'.");
+                    var dumpMinitoolPath = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), dumpMinitoolName);
+                    if (!File.Exists(dumpMinitoolPath))
+                    {
+                        throw new FileNotFoundException("Could not find DumpMinitool", dumpMinitoolPath);
+                    }
+
+                    EqtTrace.Info($"ProcDumpDumper.CollectDump: Running DumpMinitool: '{dumpMinitoolPath} {args}'.");
                     var dumpMiniTool = new ProcessHelper().LaunchProcess(
-                                Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "DumpMinitool.x86.exe"),
+                                dumpMinitoolPath,
                                 args,
                                 Path.GetDirectoryName(outputFile),
                                 null,
@@ -151,7 +171,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                 null,
                                 OutputReceivedCallback) as Process;
                     dumpMiniTool.WaitForExit();
-                    EqtTrace.Info($"ProcDumpDumper.CollectDump: DumpMinitool.x86.exe exited with exitcode: '{dumpMiniTool.ExitCode}'.");
+                    EqtTrace.Info($"ProcDumpDumper.CollectDump: {dumpMinitoolName} exited with exitcode: '{dumpMiniTool.ExitCode}'.");
                 }
             }
 
