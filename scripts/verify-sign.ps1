@@ -36,7 +36,7 @@ $TPB_AssembliesPattern = @(
     "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll", 
     "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe", 
     "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll", "SettingsMigrator.exe", 
-    "Newtonsoft.Json.dll", "DumpMinitool.*"
+    "Newtonsoft.Json.dll", "DumpMinitool*.exe"
 )
 
 function Verify-Assemblies
