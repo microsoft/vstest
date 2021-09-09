@@ -397,8 +397,21 @@ function Publish-Package
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.pdb $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.exe.config $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.pdb $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\DumpMinitool.x86.exe.config $fullCLRExtensionsDir -Force
+
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.pdb $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.exe.config $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.pdb $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\DumpMinitool.x86.exe.config $coreCLRExtensionsDir -Force
     # we use this to dump processes on netcore
     Copy-Item $blameDataCollectorNetStandard\Microsoft.Diagnostics.NETCore.Client.dll $coreCLRExtensionsDir -Force
 
