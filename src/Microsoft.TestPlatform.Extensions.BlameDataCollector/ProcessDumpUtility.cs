@@ -51,20 +51,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         };
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles = true)
+        public IEnumerable<string> GetDumpFiles(bool warnOnNoDumpFiles, bool processCrashed)
         {
             if (!this.wasHangDumped)
             {
                 this.crashDumper.WaitForDumpToFinish();
             }
 
-            IEnumerable<string> crashDumps = this.fileHelper.DirectoryExists(this.crashDumpDirectory)
-                ? this.fileHelper.EnumerateFiles(this.crashDumpDirectory, SearchOption.AllDirectories, new[] { ".dmp" })
-                : new List<string>();
+            // If the process was hang dumped we killed it ourselves, so it crashed when executing tests,
+            // but we already have the hang dump, and should not also collect the exit dump that we got
+            // from killing the process by the hang dumper.
+            IEnumerable<string> crashDumps = this.crashDumper?.GetDumpFiles(processCrashed) ?? new List<string>();
 
             IEnumerable<string> hangDumps = this.fileHelper.DirectoryExists(this.hangDumpDirectory)
-                ? this.fileHelper.EnumerateFiles(this.hangDumpDirectory, SearchOption.TopDirectoryOnly, new[] { ".dmp" })
-                : new List<string>();
+                ? this.fileHelper.GetFiles(this.hangDumpDirectory, "*_hangdump*.dmp", SearchOption.TopDirectoryOnly)
+                : Array.Empty<string>();
 
             var foundDumps = new List<string>();
             foreach (var dumpPath in crashDumps.Concat(hangDumps))

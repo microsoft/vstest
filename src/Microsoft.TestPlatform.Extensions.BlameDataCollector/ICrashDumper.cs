@@ -3,6 +3,8 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System.Collections.Generic;
+
     public interface ICrashDumper
     {
         void AttachToTargetProcess(int processId, string outputDirectory, DumpTypeOption dumpType, bool collectAlways);
@@ -10,5 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         void WaitForDumpToFinish();
 
         void DetachFromTargetProcess(int processId);
+
+        IEnumerable<string> GetDumpFiles(bool processCrashed);
     }
 }
