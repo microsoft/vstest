@@ -91,19 +91,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        [DataRow("abs;dfsdc.txt;verbosity=normal", "abs")] // ; in file path is not supported
-        [DataRow("\"abst;dfsdc.txt\";verbosity=normal", "abst")] // Even though in escaped double quotes, semi colon is not supported in file path
-        [DataRow("foo", "foo")]
-        public void EnableDiagArgumentProcessorExecutorShouldThrowIfDirectoryPathIsProvided(string argument, string filePath)
-        {
-            var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagFilePath, filePath);
-
-            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
-        }
-
-        [TestMethod]
         [DataRow("abc.txt;verbosity=normal=verbose")] // Multiple '=' in parameter
         [DataRow("abc.txt;verbosity;key1=value1")] // No '=' in parameter
+        [DataRow("\"abst;dfsdc.txt\";verbosity=normal")] // Too many parameters
+        [DataRow("abs;dfsdc.txt;verbosity=normal")] // Too many parameters
         public void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument)
         {
             string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
@@ -116,6 +107,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [DataRow("abc.txt;tracelevel=info;newkey=newvalue")]
         [DataRow("\"abc.txt\";verbosity=normal;newkey=newvalue")] //escaped double quotes are allowed for file path.
         [DataRow(";;abc.txt;;;;verbosity=normal;;;;")]
+        // Files with no extension are totally valid files.
+        // When we delegate to host or datacollector we change the name in GetTimestampedLogFile
+        // Path.ChangeExtension replaces the curent extension with our new one that is timestamp and 
+        // the name of the target (e.g. host). When there is no extension it just adds it, so we do either: 
+        // log.txt -> log.host.21-09-10_12-25-41_68765_5.txt
+        // log.my.txt -> log.my.host.21-09-10_12-25-50_55183_5.txt
+        // log -> log.host.21-09-10_12-25-27_94286_5
+        [DataRow("log")]
+        [DataRow("log.log")]
         public void EnableDiagArgumentProcessorExecutorShouldNotThrowIfValidArgument(string argument)
         {
             try
@@ -192,15 +192,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         private void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument, string exceptionMessage)
         {
-            try
-            {
-                this.diagProcessor.Executor.Value.Initialize(argument);
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
-                Assert.IsTrue(e.Message.Contains(exceptionMessage));
-            }
+            var e = Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(argument));
+            StringAssert.Contains(e.Message, exceptionMessage);
         }
     }
 }
