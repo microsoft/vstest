@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the test host process.
@@ -167,6 +167,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.cancellationTokenSource.Cancel();
         }
 
+        /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            if (cancellationTokenSource.IsCancellationRequested)
+            {
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+            }
+            else
+            {
+                this.cancellationTokenSource.Cancel();
+            }
+        }
+
         private void OnReportTestCases(IEnumerable<TestCase> testCases)
         {
             UpdateTestCases(testCases, this.discoveryCriteria.Package);
@@ -279,7 +293,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
             }
         }
-
 
         private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
         {

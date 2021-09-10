@@ -29,5 +29,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// Aborts the test discovery.
         /// </summary>
         void Abort();
+
+        /// <summary>
+        /// Aborts the test discovery with eventHandler
+        /// </summary>
+        /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
+        void Abort(ITestDiscoveryEventsHandler2 eventHandler);
     }
 }

@@ -69,6 +69,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string CancelDiscovery = "TestDiscovery.Cancel";
 
         /// <summary>
+        /// Cancel Test Discovery
+        /// </summary>
+        public const string AbortDiscovery = "TestDiscovery.Abort";
+
+        /// <summary>
         /// The session start.
         /// </summary>
         public const string ExecutionInitialize = "TestExecution.Initialize";

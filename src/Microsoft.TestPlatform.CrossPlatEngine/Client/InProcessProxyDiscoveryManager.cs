@@ -95,6 +95,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort());
         }
 
+        /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort(eventHandler));
+        }
+
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var extensionsFromSource = this.testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());

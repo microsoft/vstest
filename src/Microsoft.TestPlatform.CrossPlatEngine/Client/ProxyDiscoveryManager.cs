@@ -155,6 +155,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            if (this.baseTestDiscoveryEventsHandler == null)
+            {
+                this.baseTestDiscoveryEventsHandler = eventHandler;
+            }
+
+            // Cancel fast, try to stop testhost deployment/launch
+            this.proxyOperationManager.CancellationTokenSource.Cancel();
+
+            if (this.isCommunicationEstablished)
+            {
+                this.proxyOperationManager.RequestSender.SendDiscoveryAbort();
+            }
+        }
+
+        /// <inheritdoc/>
         public void Close()
         {
             this.proxyOperationManager.Close();
