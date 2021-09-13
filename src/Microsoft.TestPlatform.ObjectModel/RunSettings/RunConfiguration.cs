@@ -766,7 +766,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                         case "DisableParallelization":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                                
+
                             string disableParallelizationValueString = reader.ReadElementContentAsString();
                             bool disableParallelizationCheck;
                             if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))

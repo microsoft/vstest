@@ -782,6 +782,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             IBaseTestEventsRegistrar registrar,
             out Framework chosenFramework)
         {
+            // Get framework from sources. 
+            // This looks like you can optimize it by moving it down to if (updateFramework), but it has a side-effect of 
+            // populating the sourceFrameworks, which is later checked when source compatibility check is done against the value
+            // that we either inferred as the common framework, or that is forced in runsettings.
+            var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+
             // See if framework is forced by runsettings. If not autodetect it.
             bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
 
@@ -789,8 +795,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // ArgumentProcessor.
             if (updateFramework)
             {
-                // Get framework from sources.
-                var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
                 InferRunSettingsHelper.UpdateTargetFramework(
                     document,
                     inferedFramework.ToString(),
