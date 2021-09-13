@@ -143,6 +143,43 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             }
         }
 
+        /// <inheritdoc/>
+        public void AbortWithEventHandler()
+        {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DiscoveryRequest.AbortWithEventHandler: Aborting.");
+            }
+
+            lock (this.syncObject)
+            {
+                if (this.disposed)
+                {
+                    throw new ObjectDisposedException("DiscoveryRequest");
+                }
+
+                if (this.discoveryInProgress)
+                {
+                    // Using DiscoveryRequest.HandleDiscoveryComplete eventHandler
+                    this.DiscoveryManager.Abort(this);
+                }
+                else
+                {
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: No operation to abort.");
+                    }
+
+                    return;
+                }
+            }
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("DiscoveryRequest.AbortWithEventHandler: Aborted.");
+            }
+        }
+
         /// <summary>
         /// Wait for discovery completion
         /// </summary>

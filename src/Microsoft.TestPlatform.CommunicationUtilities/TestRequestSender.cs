@@ -285,7 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
             }
 
-            this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.AbortDiscovery));
+            this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
         }
         #endregion
 

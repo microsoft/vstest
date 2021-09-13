@@ -485,7 +485,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     this.onAttachDebuggerAckRecieved?.Invoke(message);
                     break;
 
-                case MessageType.AbortDiscovery:
+                case MessageType.CancelDiscovery:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();
                     testHostManagerFactory.GetDiscoveryManager().Abort(new TestDiscoveryEventHandler(this));

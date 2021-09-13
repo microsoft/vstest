@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
     using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
 
+
     /// <summary>
     /// The design mode client.
     /// </summary>
@@ -226,7 +227,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.CancelDiscovery:
                             {
-                                testRequestManager.CancelDiscovery();
+                                // If testhost has old version, we should call old cancel discovery logic
+                                // to be consistent and not create regression issues
+                                if (this.protocolConfig.Version < ObjectModel.Constants.DefaultProtocolConfig.Version)
+                                {
+                                    testRequestManager.CancelDiscovery();
+                                }
+                                else
+                                {
+                                    testRequestManager.CancelDiscoveryWithEventHandler();
+                                }
                                 break;
                             }
 
