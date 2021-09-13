@@ -225,13 +225,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Remove double quotes if present.
             diagFilePathArgument = diagFilePathArgument.Replace("\"", "");
 
-            // Throw error in case diag file path is not a valid file path
-            var fileExtension = Path.GetExtension(diagFilePathArgument);
-            if (string.IsNullOrWhiteSpace(fileExtension))
-            {
-                throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagFilePath, diagFilePathArgument));
-            }
-
             // Create base directory for diag file path (if doesn't exist)
             CreateDirectoryIfNotExists(diagFilePathArgument);
 

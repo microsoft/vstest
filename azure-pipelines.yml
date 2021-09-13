@@ -140,8 +140,15 @@ jobs:
     vmImage: $[ variables['vmImage'] ]
   variables:
       buildConfiguration: 'Release'
+      VSTestRTMBuild: 'false'
   steps:
-  - script: ./build.sh -c $(buildConfiguration)
+  - script: chmod +x ./scripts/vsts-prebuild.sh 
+    displayName: 'Preparing for set version'
+
+  - script: ./scripts/vsts-prebuild.sh -build "preview-$(Build.BuildNumber)" -rtm "$(VSTestRTMBuild)" -branch "$(Build.SourceBranch)"
+    displayName: 'Set Version'
+
+  - script: ./build.sh -c $(buildConfiguration) -v "$(BuildVersionPrefix)" -vs "$(BuildVersionSuffix)" -ci true -verbose
     displayName: 'Build'
 
   - script: ./test.sh -c $(buildConfiguration) -p Unit

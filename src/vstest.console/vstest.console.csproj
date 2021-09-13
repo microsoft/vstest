@@ -8,7 +8,7 @@
   <PropertyGroup>
     <AssemblyName>vstest.console</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp2.1;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <IsTestProject>false</IsTestProject>
