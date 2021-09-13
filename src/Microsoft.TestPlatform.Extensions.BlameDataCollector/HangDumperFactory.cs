@@ -20,6 +20,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             EqtTrace.Info($"HangDumperFactory: Creating dumper for {RuntimeInformation.OSDescription} with target framework {targetFramework}.");
+            var procdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCEPROCDUMP")?.Trim();
+            var netdumpOverride = Environment.GetEnvironmentVariable("VSTEST_DUMP_FORCENETDUMP")?.Trim();
+            EqtTrace.Verbose($"HangDumperFactory: Overrides for dumpers: VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride};VSTEST_DUMP_FORCENETDUMP={netdumpOverride}");
 
             var tfm = NuGetFramework.Parse(targetFramework);
 
@@ -31,6 +34,30 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                // On some system the interop dumper will thrown AccessViolationException, add an option to force procdump.
+                var forceUsingProcdump = !string.IsNullOrWhiteSpace(procdumpOverride) && procdumpOverride != "0";
+                if (forceUsingProcdump)
+                {
+                    EqtTrace.Info($"HangDumperFactory: This is Windows on  Forcing the use of ProcDumpHangDumper that uses ProcDump utility, via VSTEST_DUMP_FORCEPROCDUMP={procdumpOverride}.");
+                    return new ProcDumpDumper();
+                }
+
+                // On some system the interop dumper will thrown AccessViolationException, add an option to force procdump.
+                var forceUsingNetdump = !string.IsNullOrWhiteSpace(netdumpOverride) && netdumpOverride != "0";
+                if (forceUsingNetdump)
+                {
+                    var isLessThan50 = tfm.Framework == ".NETCoreApp" && tfm.Version < Version.Parse("5.0.0.0");
+                    if (!isLessThan50)
+                    {
+                        EqtTrace.Info($"HangDumperFactory: This is Windows on {tfm.Framework} {tfm.Version}, VSTEST_DUMP_FORCENETDUMP={netdumpOverride} is active, forcing use of .NetClientHangDumper");
+                        return new NetClientHangDumper();
+                    }
+                    else
+                    {
+                        EqtTrace.Info($"HangDumperFactory: This is Windows on {tfm.Framework} {tfm.Version}, VSTEST_DUMP_FORCENETDUMP={netdumpOverride} is active, but only applies to .NET 5.0 and newer. Falling back to default hang dumper.");
+                    }
+                }
+
                 EqtTrace.Info($"HangDumperFactory: This is Windows, returning the default WindowsHangDumper that P/Invokes MiniDumpWriteDump.");
                 return new WindowsHangDumper(this.LogWarning);
             }

@@ -10,7 +10,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector</AssemblyName>
     <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <IsTestProject>false</IsTestProject>
@@ -26,6 +26,8 @@
   <ItemGroup>
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool.x86\DumpMinitool.x86.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\DataCollectors\DumpMinitool\DumpMinitool.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' AND '$(OS)' != 'Windows_NT' ">
     <Reference Include="System" />
