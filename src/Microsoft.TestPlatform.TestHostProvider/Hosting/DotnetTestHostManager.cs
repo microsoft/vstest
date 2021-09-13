@@ -292,8 +292,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (string.IsNullOrEmpty(testHostPath))
                 {
-                    // We still did not find testhost.dll. Try finding it next to the currently executing assembly, in folder testhost-core.
-                    var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "testhost-core", "testhost.dll");
+                    // We still did not find testhost.dll. Try finding it next to vstest.console, which is in .., b
+                    var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "testhost.dll");
                     if (System.IO.File.Exists(testHostNextToRunner))
                     {
                         EqtTrace.Verbose("DotnetTestHostManager: Found testhost.dll next to runner executable: {0}.", testHostNextToRunner);

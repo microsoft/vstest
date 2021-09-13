@@ -88,7 +88,6 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_X64_Runtime = "win7-x64"
 $TPB_X86_Runtime = "win7-x86"
-$TPB_ARM64_Runtime = "win10-arm64"
 
 # Version suffix is empty for RTM release
 $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } else { $Version }
@@ -103,7 +102,7 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
-. "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1" 
+Import-Module -Name "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1" -Scope Local
 
 # Update the version in the dependencies props to be the TPB_version version, this is not ideal but because changing how this is resolved would 
 # mean that we need to change the whole build process this is a solution with the least amount of impact, that does not require us to keep track of 
@@ -197,24 +196,19 @@ function Publish-Package
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
-    $testHostarm64Project = Join-Path $env:TP_ROOT_DIR "src\testhost.arm64\testhost.arm64.csproj"
 
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework451\$TPB_TargetRuntime")
     $testhostCore20PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
     $testhostCore20PackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
     $testhostCore20PackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
-    $testhostCore20PackageARM64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_ARM64_Runtime")
     $testhostCore20PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
     $testhostCore20PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
-    $testhostCore20PackageTempARM64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_ARM64_Runtime")
     
     $testhostCore10PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10")
     $testhostCore10PackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X64_Runtime")
     $testhostCore10PackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X86_Runtime")
-    $testhostCore10PackageARM64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_ARM64_Runtime")
     $testhostCore10PackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X64_Runtime")
     $testhostCore10PackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_X86_Runtime")
-    $testhostCore10PackageTempARM64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore10\$TPB_ARM64_Runtime")
     
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap100")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
@@ -254,11 +248,6 @@ function Publish-Package
     Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore20 $TPB_X86_Runtime false $testhostCore20PackageTempX86Dir
     Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore10 $TPB_X86_Runtime true $testhostCore10PackageTempX86Dir
     
-    Write-Log "Package: Publish testhost.arm64\testhost.arm64.csproj"
-    Publish-PackageInternal $testHostarm64Project $TPB_TargetFramework451 $testhostFullPackageDir
-    Publish-PackageWithRuntimeInternal $testHostarm64Project $TPB_TargetFrameworkCore20 $TPB_ARM64_Runtime false $testhostCore20PackageTempARM64Dir
-    Publish-PackageWithRuntimeInternal $testHostarm64Project $TPB_TargetFrameworkCore10 $TPB_ARM64_Runtime true $testhostCore10PackageTempARM64Dir
-
     # Copy the .NET multitarget testhost exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
         Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force 
@@ -273,14 +262,7 @@ function Publish-Package
         Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force 
     }
 
-    # Copy the .NET multitarget testhost.arm64 exes to destination folder (except for net451 which is the default)
-    foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
-        Copy-Item "$(Split-Path $testHostarm64Project)\bin\$TPB_Configuration\$tfm\$TPB_ARM64_Runtime\testhost.$tfm.arm64.exe" $testhostFullPackageDir\testhost.$tfm.arm64.exe -Force 
-        Copy-Item "$(Split-Path $testHostarm64Project)\bin\$TPB_Configuration\$tfm\$TPB_ARM64_Runtime\testhost.$tfm.arm64.pdb" $testhostFullPackageDir\testhost.$tfm.arm64.pdb -Force 
-        Copy-Item "$(Split-Path $testHostarm64Project)\bin\$TPB_Configuration\$tfm\$TPB_ARM64_Runtime\testhost.$tfm.arm64.exe.config" $testhostFullPackageDir\testhost.$tfm.arm64.exe.config -Force 
-    }
-
-    # Copy the .NET core x86, x64 and arm64 testhost exes from tempPublish to required folder
+    # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
     New-Item -ItemType directory -Path $testhostCore20PackageX64Dir -Force | Out-Null
     Copy-Item $testhostCore20PackageTempX64Dir\testhost* $testhostCore20PackageX64Dir -Force -Recurse
     Copy-Item $testhostCore20PackageTempX64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX64Dir -Force
@@ -288,10 +270,6 @@ function Publish-Package
     New-Item -ItemType directory -Path $testhostCore20PackageX86Dir -Force | Out-Null
     Copy-Item $testhostCore20PackageTempX86Dir\testhost.x86* $testhostCore20PackageX86Dir -Force -Recurse
     Copy-Item $testhostCore20PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageX86Dir -Force
-
-    New-Item -ItemType directory -Path $testhostCore20PackageARM64Dir -Force | Out-Null
-    Copy-Item $testhostCore20PackageTempARM64Dir\testhost.arm64* $testhostCore20PackageARM64Dir -Force -Recurse
-    Copy-Item $testhostCore20PackageTempARM64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore20PackageARM64Dir -Force
  
     New-Item -ItemType directory -Path $testhostCore10PackageX64Dir -Force | Out-Null
     Copy-Item $testhostCore10PackageTempX64Dir\testhost* $testhostCore10PackageX64Dir -Force -Recurse
@@ -300,10 +278,6 @@ function Publish-Package
     New-Item -ItemType directory -Path $testhostCore10PackageX86Dir -Force | Out-Null
     Copy-Item $testhostCore10PackageTempX86Dir\testhost.x86* $testhostCore10PackageX86Dir -Force -Recurse
     Copy-Item $testhostCore10PackageTempX86Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageX86Dir -Force
-
-    New-Item -ItemType directory -Path $testhostCore10PackageARM64Dir -Force | Out-Null
-    Copy-Item $testhostCore10PackageTempARM64Dir\testhost.arm64* $testhostCore10PackageARM64Dir -Force -Recurse
-    Copy-Item $testhostCore10PackageTempARM64Dir\Microsoft.TestPlatform.PlatformAbstractions.dll $testhostCore10PackageARM64Dir -Force
     
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
@@ -492,6 +466,16 @@ function Publish-Package
         Move-Loc-Files $fullCLRPackage451Dir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }
+
+    # Add .NET Standard CPP Test adapter
+    $cppNetStandardRunner = Join-Path $env:TP_ROOT_DIR "temp\cpp\*"
+    Copy-Item $cppNetStandardRunner $coreCLRExtensionsDir -Force
+
+    # Add standalone testhost
+    $standaloneTesthost = Join-Path $env:TP_ROOT_DIR "temp\testhost\*"
+    Copy-Item $standaloneTesthost $coreCLR20PackageDir -Force
+    Copy-Item $testhostCore20PackageDir\testhost.dll $coreCLR20PackageDir -Force
+    Copy-Item $testhostCore20PackageDir\testhost.pdb $coreCLR20PackageDir -Force
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"
@@ -1109,9 +1093,9 @@ if ($Force -or $Steps -contains "Restore") {
     Restore-Package    
 }
 
-# if ($Force -or $Steps -contains "UpdateLocalization") {
-#     Update-LocalizedResources
-# }
+if ($Force -or $Steps -contains "UpdateLocalization") {
+    Update-LocalizedResources
+}
 
 if ($Force -or $Steps -contains "Build") {
     Invoke-Build
@@ -1119,7 +1103,7 @@ if ($Force -or $Steps -contains "Build") {
 
 if ($Force -or $Steps -contains "Publish") {
     Publish-Package
-    # Create-VsixPackage
+    Create-VsixPackage
     Create-NugetPackages
 }
 

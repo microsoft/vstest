@@ -782,19 +782,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             IBaseTestEventsRegistrar registrar,
             out Framework chosenFramework)
         {
-            // Get framework from sources.
-            var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
-
-            // Get framework from runsettings.
+            // See if framework is forced by runsettings. If not autodetect it.
             bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
 
             // Update framework if required. For command line scenario update happens in
             // ArgumentProcessor.
             if (updateFramework)
             {
+                // Get framework from sources.
+                var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
                 InferRunSettingsHelper.UpdateTargetFramework(
                     document,
-                    inferedFramework?.ToString(),
+                    inferedFramework.ToString(),
                     overwrite: true);
                 chosenFramework = inferedFramework;
             }

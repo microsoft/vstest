@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         // vstest.console is x64 now, but x86 run "in process" run should still succeed by being run in x86 testhost
         // skip .NET (Core) tests because the called methods ignores them anyway
-        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: true)]
         public void CPPRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCategory("Windows-Review")]
         // vstest.console is 64-bit now, run in process to test the 64-bit native dll
         // skip .NET (Core) tests because the called methods ignores them anyway
-        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
+        [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: false, useCoreRunner: true)]
         public void CPPRunAllTestExecutionPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -133,12 +133,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void CppRunAllTests(string runnerFramework, string platform)
         {
-            if (runnerFramework.StartsWith("netcoreapp"))
-            {
-                Assert.Inconclusive("CPP tests not supported with .Netcore runner.");
-                return;
-            }
-
             var resultsDir = GetResultsDirectory();
             string assemblyRelativePathFormat =
                 @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
@@ -146,7 +140,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 ? string.Format(assemblyRelativePathFormat, platform)
                 : string.Format(assemblyRelativePathFormat, "");
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, string.Empty, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
