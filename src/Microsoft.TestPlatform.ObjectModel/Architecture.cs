@@ -11,6 +11,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         ARM,
         AnyCPU,
         ARM64,
-        S390x
     }
 }

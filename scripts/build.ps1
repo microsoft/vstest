@@ -1100,9 +1100,9 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-# if ($Force -or $Steps -contains "InstallDotnet") {
-#     Install-DotNetCli
-# }
+if ($Force -or $Steps -contains "InstallDotnet") {
+    Install-DotNetCli
+}
 
 if ($Force -or $Steps -contains "Restore") {
     Clear-Package
