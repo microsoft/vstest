@@ -235,7 +235,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				RunSettings = DefaultRunsettings
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -259,7 +259,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
 			// Verify.
-			Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
+			Assert.AreEqual(6, actualRequestData.ProtocolConfig.Version);
 		}
 
 
@@ -285,7 +285,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -334,7 +334,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -377,7 +377,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -420,7 +420,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -463,7 +463,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -518,7 +518,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -565,7 +565,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -612,7 +612,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 							</RunSettings>"
 			};
 
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
 			IRequestData actualRequestData = null;
@@ -906,7 +906,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 				Sources = new List<string>() { "a" },
 				RunSettings = DefaultRunsettings
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -933,7 +933,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 								  Sources = new List<string>() { "a" },
 								  RunSettings = DefaultRunsettings
 							  };
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1000,7 +1000,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 									</LegacySettings>
 							   </RunSettings>"
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1050,7 +1050,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 									   </MSTest>
 							   </RunSettings>"
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1098,7 +1098,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 								</MSPhoneTest>
 							</RunSettings>"
 			};
-			var mockProtocolConfig = new ProtocolConfig { Version = 5 };
+			var mockProtocolConfig = new ProtocolConfig { Version = 6 };
 			IRequestData actualRequestData = null;
 			var mockDiscoveryRequest = new Mock<ITestRunRequest>();
 			this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(

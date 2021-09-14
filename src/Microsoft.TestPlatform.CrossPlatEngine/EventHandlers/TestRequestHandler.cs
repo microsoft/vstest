@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using CrossPlatResources = CrossPlatEngine.Resources.Resources;
+    using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 
     public class TestRequestHandler : ITestRequestHandler
     {
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         // Must be in sync with the highest supported version in
         // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
-        private int highestSupportedVersion = 5;
+        private int highestSupportedVersion = 6;
 
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
