@@ -30,6 +30,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string CoverageMergeOperationName = "CoverageMergeOperation";
 
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
+        private static Assembly CodeCoverageAssembly;
+        private static object ClassInstance;
+        private static MethodInfo MergeMethodInfo;
+        private static Array MergeOperationEnumValues;
 
         public bool SupportsIncrementalProcessing => true;
 
@@ -115,19 +119,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageIOAssemblyName + ".dll");
-
-            // Get assembly, type and methods
-            Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
-            var classType = assembly.GetType($"{CodeCoverageIOAssemblyName}.{CoverageFileUtilityTypeName}");
-            var classInstance = Activator.CreateInstance(classType);
-            var types = assembly.GetTypes();
-            var mergeOperationEnum = Array.Find(types, d => d.Name == CoverageMergeOperationName);
-            var mergeOperationValues = Enum.GetValues(mergeOperationEnum);
-            var mergeMethodInfo = classType?.GetMethod(MergeMethodName, new[] { typeof(string), typeof(IList<string>), mergeOperationEnum, typeof(bool), typeof(CancellationToken) });
-
             // Invoke methods
-            var task = (Task)mergeMethodInfo.Invoke(classInstance, new object[] { files[0], files, mergeOperationValues.GetValue(0), true, cancellationToken });
+            LoadCodeCoverageAssembly();
+            var task = (Task)MergeMethodInfo.Invoke(ClassInstance, new object[] { files[0], files, MergeOperationEnumValues.GetValue(0), true, cancellationToken });
             await task.ConfigureAwait(false);
             var coverageData = task.GetType().GetProperty("Result").GetValue(task, null);
             var mergedResults = coverageData as IList<string>;
@@ -149,6 +143,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return mergedResults;
+        }
+
+        private void LoadCodeCoverageAssembly()
+        {
+            if (CodeCoverageAssembly != null)
+                return;
+
+            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageIOAssemblyName + ".dll");
+            CodeCoverageAssembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
+
+            var classType = CodeCoverageAssembly.GetType($"{CodeCoverageIOAssemblyName}.{CoverageFileUtilityTypeName}");
+            ClassInstance = Activator.CreateInstance(classType);
+
+            var types = CodeCoverageAssembly.GetTypes();
+            var mergeOperationEnum = Array.Find(types, d => d.Name == CoverageMergeOperationName);
+            MergeOperationEnumValues = Enum.GetValues(mergeOperationEnum);
+            MergeMethodInfo = classType?.GetMethod(MergeMethodName, new[] { typeof(string), typeof(IList<string>), mergeOperationEnum, typeof(bool), typeof(CancellationToken) });
         }
     }
 }
