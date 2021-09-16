@@ -35,7 +35,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
-        private readonly Guid id = Guid.NewGuid();
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
         private readonly IProcessHelper processHelper;
 
@@ -112,9 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public ITestRuntimeProvider TestHostManager { get; set; }
 
         /// <summary>
-        /// Gets the proxy operation manager id.
+        /// Gets the proxy operation manager id for proxy test session manager internal organization.
         /// </summary>
-        public Guid Id { get { return this.id; } }
+        public int Id { get; set; } = -1;
 
         /// <summary>
         /// Gets or sets the cancellation token source.

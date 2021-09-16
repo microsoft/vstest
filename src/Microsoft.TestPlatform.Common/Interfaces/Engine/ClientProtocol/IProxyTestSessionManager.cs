@@ -12,13 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface IProxyTestSessionManager
     {
         /// <summary>
-        /// Initialize the proxy.
-        /// </summary>
-        /// 
-        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
-        void Initialize(bool skipDefaultAdapters);
-
-        /// <summary>
         /// Starts the test session based on the test session criteria.
         /// </summary>
         /// 

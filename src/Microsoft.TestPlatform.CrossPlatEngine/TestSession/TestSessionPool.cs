@@ -115,11 +115,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="source">The source to be associated to this proxy.</param>
         /// <param name="runSettings">The run settings.</param>
         /// 
         /// <returns>The proxy object.</returns>
         public ProxyOperationManager TakeProxy(
             TestSessionInfo testSessionInfo,
+            string source,
             string runSettings)
         {
             ProxyTestSessionManager sessionManager = null;
@@ -133,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             //
             // This can potentially throw, but let the caller handle this as it must recover from
             // this error by creating its own proxy.
-            return sessionManager.DequeueProxy(runSettings);
+            return sessionManager.DequeueProxy(source, runSettings);
         }
 
         /// <summary>
@@ -142,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// 
         /// <param name="testSessionInfo">The test session info object.</param>
         /// <param name="proxyId">The proxy id to be returned.</param>
-        public void ReturnProxy(TestSessionInfo testSessionInfo, Guid proxyId)
+        public void ReturnProxy(TestSessionInfo testSessionInfo, int proxyId)
         {
             ProxyTestSessionManager sessionManager = null;
             lock (this.lockObject)

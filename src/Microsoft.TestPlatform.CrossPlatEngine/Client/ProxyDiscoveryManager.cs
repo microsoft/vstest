@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -25,15 +26,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
     {
-        private readonly ITestRuntimeProvider testHostManager;
-        private readonly IFileHelper fileHelper;
+        private readonly TestSessionInfo testSessionInfo = null;
+        private readonly string runSettings;
+        private readonly IRequestData backupRequestData;
+        private readonly ITestRequestSender backupTestRequestSender;
+        private readonly ITestRuntimeProvider backupTestHostManager;
 
-        private IDataSerializer dataSerializer;
+        private ITestRuntimeProvider testHostManager;
         private IRequestData requestData;
-        private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
-        private TestSessionInfo testSessionInfo = null;
-        private ProxyOperationManager proxyOperationManager;
+
+        private readonly IFileHelper fileHelper;
+        private readonly IDataSerializer dataSerializer;
         private bool isCommunicationEstablished;
+
+        private ManualResetEvent proxyOperationManagerInitializedEvent = new ManualResetEvent(false);
+        private ProxyOperationManager proxyOperationManager = null;
+        private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
         private bool skipDefaultAdapters;
 
         #region Constructors
@@ -44,19 +52,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// 
         /// <param name="testSessionInfo">The test session info.</param>
         /// <param name="runSettings">The run settings.</param>
-        public ProxyDiscoveryManager(TestSessionInfo testSessionInfo, string runSettings)
+        /// <param name="backupRequestData">
+        /// The backup request data to be used to create a proxy operation manager should acquire
+        /// an existent proxy fail.
+        /// </param>
+        /// <param name="backupTestRequestSender">
+        /// The backup test request sender to be used to create a proxy operation manager should
+        /// acquire an existent proxy fail.
+        /// </param>
+        /// <param name="backupTestHostManager">
+        /// The backup testhost manager to be used to create a proxy operation manager should
+        /// acquire an existent proxy fail.
+        /// </param>
+        public ProxyDiscoveryManager(
+            TestSessionInfo testSessionInfo,
+            string runSettings,
+            IRequestData backupRequestData,
+            ITestRequestSender backupTestRequestSender,
+            ITestRuntimeProvider backupTestHostManager)
         {
             // Filling in test session info and proxy information.
             this.testSessionInfo = testSessionInfo;
-            this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
-                this.testSessionInfo,
-                runSettings);
+            this.runSettings = runSettings;
+            this.backupRequestData = backupRequestData;
+            this.backupTestRequestSender = backupTestRequestSender;
+            this.backupTestHostManager = backupTestHostManager;
 
-            this.testHostManager = this.proxyOperationManager.TestHostManager;
+            this.requestData = null;
+            this.testHostManager = null;
             this.dataSerializer = JsonDataSerializer.Instance;
-            this.isCommunicationEstablished = false;
-            this.requestData = this.proxyOperationManager.RequestData;
             this.fileHelper = new FileHelper();
+            this.isCommunicationEstablished = false;
         }
 
         /// <summary>
@@ -102,14 +128,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             IDataSerializer dataSerializer,
             IFileHelper fileHelper)
         {
-            this.dataSerializer = dataSerializer;
-            this.testHostManager = testHostManager;
-            this.isCommunicationEstablished = false;
             this.requestData = requestData;
+            this.testHostManager = testHostManager;
+
+            this.dataSerializer = dataSerializer;
             this.fileHelper = fileHelper;
+            this.isCommunicationEstablished = false;
 
             // Create a new proxy operation manager.
             this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+            this.proxyOperationManagerInitializedEvent.Set();
         }
 
         #endregion
@@ -125,6 +153,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            if (this.proxyOperationManager == null)
+            {
+                try
+                {
+                    // In case we have an active test session, we always prefer the already
+                    // created proxies instead of the ones that need to be created on the spot.
+                    this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
+                        this.testSessionInfo,
+                        discoveryCriteria.Sources.First(),
+                        runSettings);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // If the proxy creation process based on test session info failed, then
+                    // we'll proceed with the normal creation process as if no test session
+                    // info was passed in in the first place.
+                    // 
+                    // WARNING: This should not normally happen and it raises questions
+                    // regarding the test session pool operation and consistency.
+                    EqtTrace.Warning(
+                        "ProxyDiscoveryManager creation with test session failed: {0}",
+                        ex.ToString());
+
+                    this.proxyOperationManager = new ProxyOperationManager(
+                        this.backupRequestData,
+                        this.backupTestRequestSender,
+                        this.backupTestHostManager,
+                        this);
+                }
+
+                this.proxyOperationManagerInitializedEvent.Set();
+                this.testHostManager = this.proxyOperationManager.TestHostManager;
+                this.requestData = this.proxyOperationManager.RequestData;
+            }
+
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
@@ -170,6 +233,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Abort()
         {
+            // Make sure the proxy operation manager is initialized before anything.
+            this.proxyOperationManagerInitializedEvent.WaitOne();
+
             // Cancel fast, try to stop testhost deployment/launch
             this.proxyOperationManager.CancellationTokenSource.Cancel();
             this.Close();
@@ -178,6 +244,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Close()
         {
+            // Make sure the proxy operation manager is initialized before anything.
+            this.proxyOperationManagerInitializedEvent.WaitOne();
+
             if (this.testSessionInfo == null)
             {
                 this.proxyOperationManager.Close();

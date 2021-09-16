@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -21,13 +22,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     public class ProxyTestSessionManager : IProxyTestSessionManager
     {
         private readonly object lockObject = new object();
+        private readonly object proxyOperationLockObject = new object();
         private StartTestSessionCriteria testSessionCriteria;
         private int testhostCount;
-        private bool skipDefaultAdapters;
         private TestSessionInfo testSessionInfo;
         private Func<ProxyOperationManager> proxyCreator;
-        private Queue<Guid> availableProxyQueue;
-        private IDictionary<Guid, ProxyOperationManagerContainer> proxyMap;
+        private IList<ProxyOperationManagerContainer> proxyContainerList;
+        private IDictionary<string, int> proxyMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
@@ -45,120 +46,110 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             this.testhostCount = testhostCount;
             this.proxyCreator = proxyCreator;
 
-            this.availableProxyQueue = new Queue<Guid>();
-            this.proxyMap = new Dictionary<Guid, ProxyOperationManagerContainer>();
-        }
-
-        /// <inheritdoc/>
-        public void Initialize(bool skipDefaultAdapters)
-        {
-            this.skipDefaultAdapters = skipDefaultAdapters;
+            this.proxyContainerList = new List<ProxyOperationManagerContainer>();
+            this.proxyMap = new Dictionary<string, int>();
         }
 
         /// <inheritdoc/>
         public void StartSession(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.testSessionInfo != null)
+            lock (this.lockObject)
             {
-                return;
+                if (this.testSessionInfo != null)
+                {
+                    return;
+                }
+                this.testSessionInfo = new TestSessionInfo();
             }
 
-            this.testSessionInfo = new TestSessionInfo();
-
-            var taskList = new Task[this.testhostCount];
-
             // Create all the proxies in parallel, one task per proxy.
+            var taskList = new Task[this.testhostCount];
             for (int i = 0; i < this.testhostCount; ++i)
             {
-                taskList[i] = Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        // Create and cache the proxy.
-                        var operationManagerProxy = this.proxyCreator();
-                        if (operationManagerProxy == null)
-                        {
-                            return;
-                        }
+                // The testhost count is equal to 1 because one of the following conditions
+                // holds true:
+                //     1. we're dealing with a shared testhost (e.g.: .NET Framework testhost)
+                //        that must process multiple sources within the same testhost process;
+                //     2. we're dealing with a single testhost (shared or not, it doesn't matter)
+                //        that must process a single source;
+                // Either way, no further processing of the original test source list is needed
+                // in either of those cases.
+                //
+                // Consequentely, if the testhost count is greater than one it means that the
+                // testhost is not shared (e.g.: .NET Core testhost), in which case each test
+                // source must be processed by a dedicated testhost, which is the reason we
+                // create a list with a single element, i.e. the current source to be processed.
+                var sources = (this.testhostCount == 1)
+                    ? this.testSessionCriteria.Sources
+                    : new List<string>() { this.testSessionCriteria.Sources[i] };
 
-                        // Initialize the proxy.
-                        operationManagerProxy.Initialize(this.skipDefaultAdapters);
-
-                        // Start the test host associated to the proxy.
-                        operationManagerProxy.SetupChannel(
-                            this.testSessionCriteria.Sources,
-                            this.testSessionCriteria.RunSettings,
-                            eventsHandler);
-
-                        this.EnqueueNewProxy(operationManagerProxy);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log & silently eat up the exception. It's a valid course of action to
-                        // just forfeit proxy creation. This means that anyone wishing to get a
-                        // proxy operation manager would have to create their own, on the spot,
-                        // instead of getting one already created, and this case is handled
-                        // gracefully already.
-                        EqtTrace.Error(
-                            "ProxyTestSessionManager.StartSession: Cannot create proxy. Error: {0}",
-                            ex.ToString());
-                        return;
-                    }
-                });
+                taskList[i] = Task.Factory.StartNew(() => this.SetupRawProxy(
+                    sources,
+                    this.testSessionCriteria.RunSettings,
+                    eventsHandler));
             }
 
             // Wait for proxy creation to be over.
             Task.WaitAll(taskList);
 
             // Make the session available.
-            TestSessionPool.Instance.AddSession(testSessionInfo, this);
+            TestSessionPool.Instance.AddSession(this.testSessionInfo, this);
 
             // Let the caller know the session has been created.
-            eventsHandler.HandleStartTestSessionComplete(testSessionInfo);
+            eventsHandler.HandleStartTestSessionComplete(this.testSessionInfo);
         }
 
         /// <inheritdoc/>
         public void StopSession()
         {
-            if (this.testSessionInfo == null)
+            lock (this.lockObject)
             {
-                return;
-            }
-
-            int index = 0;
-            var taskList = new Task[this.proxyMap.Count];
-
-            // Dispose of all the proxies in parallel, one task per proxy.
-            foreach (var kvp in this.proxyMap)
-            {
-                taskList[index++] = Task.Factory.StartNew(() =>
+                if (this.testSessionInfo == null)
                 {
-                    // Initiate the end session handshake with the underlying testhost.
-                    kvp.Value.Proxy.Close();
-                });
+                    return;
+                }
+                this.testSessionInfo = null;
             }
 
-            // Wait for proxy disposal to be over.
-            Task.WaitAll(taskList);
+            lock (this.proxyOperationLockObject)
+            {
+                // Dispose of all the proxies in parallel, one task per proxy.
+                int index = 0;
+                var taskList = new Task[this.proxyContainerList.Count];
+                foreach (var proxyContainer in this.proxyContainerList)
+                {
+                    taskList[index++] = Task.Factory.StartNew(() =>
+                    {
+                        // Initiate the end session handshake with the underlying testhost.
+                        proxyContainer.Proxy.Close();
+                    });
+                }
 
-            this.testSessionInfo = null;
+                // Wait for proxy disposal to be over.
+                Task.WaitAll(taskList);
+
+                this.proxyContainerList.Clear();
+                this.proxyMap.Clear();
+            }
         }
 
         /// <summary>
         /// Dequeues a proxy to be used either by discovery or execution.
         /// </summary>
         /// 
+        /// <param name="source">The source to be associated to this proxy.</param>
         /// <param name="runSettings">The run settings.</param>
         /// 
         /// <returns>The dequeued proxy.</returns>
-        public ProxyOperationManager DequeueProxy(string runSettings)
+        public ProxyOperationManager DequeueProxy(string source, string runSettings)
         {
             ProxyOperationManagerContainer proxyContainer = null;
 
-            lock (this.lockObject)
+            lock (this.proxyOperationLockObject)
             {
                 // No proxy available means the caller will have to create its own proxy.
-                if (this.availableProxyQueue.Count == 0)
+                if (!this.proxyMap.ContainsKey(source)
+                    || !this.proxyContainerList[this.proxyMap[source]].IsAvailable)
                 {
                     throw new InvalidOperationException(
                         string.Format(
@@ -180,11 +171,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                             CrossPlatResources.NoProxyMatchesDescription));
                 }
 
-                // Get the proxy id from the available queue.
-                var proxyId = this.availableProxyQueue.Dequeue();
-
                 // Get the actual proxy.
-                proxyContainer = this.proxyMap[proxyId];
+                proxyContainer = this.proxyContainerList[this.proxyMap[source]];
 
                 // Mark the proxy as unavailable.
                 proxyContainer.IsAvailable = false;
@@ -198,12 +186,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// 
         /// <param name="proxyId">The id of the proxy to be re-enqueued.</param>
-        public void EnqueueProxy(Guid proxyId)
+        public void EnqueueProxy(int proxyId)
         {
-            lock (this.lockObject)
+            lock (this.proxyOperationLockObject)
             {
                 // Check if the proxy exists.
-                if (!this.proxyMap.ContainsKey(proxyId))
+                if (proxyId < 0 || proxyId >= this.proxyContainerList.Count)
                 {
                     throw new ArgumentException(
                         string.Format(
@@ -213,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 }
 
                 // Get the actual proxy.
-                var proxyContainer = this.proxyMap[proxyId];
+                var proxyContainer = this.proxyContainerList[proxyId];
                 if (proxyContainer.IsAvailable)
                 {
                     throw new InvalidOperationException(
@@ -225,25 +213,74 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 // Mark the proxy as available.
                 proxyContainer.IsAvailable = true;
-
-                // Re-enqueue the proxy in the available queue.
-                this.availableProxyQueue.Enqueue(proxyId);
             }
         }
 
-        private void EnqueueNewProxy(ProxyOperationManager operationManagerProxy)
+        private int EnqueueNewProxy(
+            IList<string> sources,
+            ProxyOperationManagerContainer operationManagerContainer)
         {
-            lock (this.lockObject)
+            lock (this.proxyOperationLockObject)
             {
-                // Add the proxy to the map.
-                this.proxyMap.Add(
-                    operationManagerProxy.Id,
-                    new ProxyOperationManagerContainer(
-                        operationManagerProxy,
-                        available: true));
+                var index = this.proxyContainerList.Count;
 
-                // Enqueue the proxy id in the available queue.
-                this.availableProxyQueue.Enqueue(operationManagerProxy.Id);
+                // Add the proxy container to the proxy container list.
+                this.proxyContainerList.Add(operationManagerContainer);
+
+                foreach (var source in sources)
+                {
+                    // Add the proxy index to the map.
+                    this.proxyMap.Add(
+                        source,
+                        index);
+                }
+
+                return index;
+            }
+        }
+
+        private void SetupRawProxy(
+            IList<string> sources,
+            string runSettings,
+            ITestSessionEventsHandler eventsHandler)
+        {
+            try
+            {
+                // Create and cache the proxy.
+                var operationManagerProxy = this.proxyCreator();
+                if (operationManagerProxy == null)
+                {
+                    return;
+                }
+
+                // Initialize the proxy.
+                operationManagerProxy.Initialize(skipDefaultAdapters: false);
+
+                // Start the test host associated to the proxy.
+                operationManagerProxy.SetupChannel(
+                    sources,
+                    runSettings,
+                    eventsHandler);
+
+                // Associate each source in the source list with this new proxy operation
+                // container.
+                var operationManagerContainer = new ProxyOperationManagerContainer(
+                    operationManagerProxy,
+                    available: true);
+
+                operationManagerContainer.Proxy.Id = this.EnqueueNewProxy(sources, operationManagerContainer);
+            }
+            catch (Exception ex)
+            {
+                // Log & silently eat up the exception. It's a valid course of action to
+                // just forfeit proxy creation. This means that anyone wishing to get a
+                // proxy operation manager would have to create their own, on the spot,
+                // instead of getting one already created, and this case is handled
+                // gracefully already.
+                EqtTrace.Error(
+                    "ProxyTestSessionManager.StartSession: Cannot create proxy. Error: {0}",
+                    ex.ToString());
+                return;
             }
         }
     }
