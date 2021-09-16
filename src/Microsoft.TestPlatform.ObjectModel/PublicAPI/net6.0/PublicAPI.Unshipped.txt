@@ -1,1 +1,5 @@
-﻿
+﻿Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.DiscoveryCriteria(System.Collections.Generic.IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, System.TimeSpan discoveredTestEventTimeout, string runSettings, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.set -> void
