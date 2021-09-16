@@ -361,9 +361,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Make sure the proxy operation manager is initialized before anything.
             this.proxyOperationManagerInitializedEvent.WaitOne();
 
+            // In compatibility mode (no test session used) we don't share the testhost
+            // between test discovery and test run. The testhost is closed upon
+            // successfully completing the operation it was spawned for.
+            //
+            // In contrast, the new workflow (using test sessions) means we should keep
+            // the testhost alive until explicitly closed by the test session owner.
             if (this.testSessionInfo == null)
             {
-                this.proxyOperationManager?.Close();
+                this.proxyOperationManager.Close();
                 return;
             }
 

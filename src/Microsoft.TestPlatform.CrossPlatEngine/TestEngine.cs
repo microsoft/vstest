@@ -269,10 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     : new ProxyOperationManager(
                         requestData,
                         requestSender,
-                        hostManager)
-                        {
-                            CloseRequestSenderChannelOnProxyClose = true
-                        };
+                        hostManager);
             };
 
             var testhostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
