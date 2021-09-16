@@ -17,8 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         internal static readonly IList<string> DefaultAdapters = new ReadOnlyCollection<string>(new List<string>
         {
             "executor://CodedWebTestAdapter/v1",
-            "executor://GenericTestAdapter/v1",
-            "executor://OrderedTestAdapter/v1",
             "executor://MSTestAdapter/v1",
             "executor://WebTestAdapter/v1",
             "executor://CppUnitTestExecutor/v1"

@@ -9,6 +9,8 @@
     <BaseInnerSourceBuildCommand>./build.sh</BaseInnerSourceBuildCommand>
 
     <InnerBuildArgs>-DotNetBuildFromSource</InnerBuildArgs>
+    <InnerBuildArgs>$(InnerBuildArgs) -v "$(BuildVersionPrefix)"</InnerBuildArgs>
+    <InnerBuildArgs>$(InnerBuildArgs) -vs "$(BuildVersionSuffix)"</InnerBuildArgs>
     <InnerBuildArgs>$(InnerBuildArgs) -DotNetCoreSdkDir $(DotNetRoot)</InnerBuildArgs>
     <InnerBuildArgs>$(InnerBuildArgs) -c $(Configuration)</InnerBuildArgs>
   </PropertyGroup>
@@ -22,7 +24,7 @@
     </ItemGroup>
 
     <Exec
-      Command="git apply --ignore-whitespace --whitespace=nowarn &quot;%(SourceBuildPatchFile.FullPath)&quot;"
+      Command="git --work-tree=$(InnerSourceBuildRepoRoot) apply --ignore-whitespace --whitespace=nowarn &quot;%(SourceBuildPatchFile.FullPath)&quot;"
       WorkingDirectory="$(InnerSourceBuildRepoRoot)"
       Condition="'@(SourceBuildPatchFile)' != ''" />
   </Target>
