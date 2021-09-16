@@ -467,11 +467,12 @@ function Publish-Package
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }
 
-    # Add .NET Standard CPP Test adapter
-    $cppNetStandardRunner = Join-Path $env:TP_ROOT_DIR "temp\cpp\*"
-    Copy-Item $cppNetStandardRunner $coreCLRExtensionsDir -Force
+    # Copy .NET Standard CPP Test adapter
+    $testPlatformRemoteExternalsVersion = ([xml](Get-Content "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props")).Project.PropertyGroup.TestPlatformRemoteExternalsVersion
+    $testPlatformRemoteExternalsSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Remote\$testPlatformRemoteExternalsVersion\tools\netstandard\Extensions\*"
+    Copy-Item $testPlatformRemoteExternalsSourceDirectory $coreCLR20PackageDir -Force -Recurse
 
-    # Add standalone testhost
+    # Copy standalone testhost
     $standaloneTesthost = Join-Path $env:TP_ROOT_DIR "temp\testhost\*"
     Copy-Item $standaloneTesthost $coreCLR20PackageDir -Force
     Copy-Item $testhostCore20PackageDir\testhost.dll $coreCLR20PackageDir -Force
