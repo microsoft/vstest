@@ -169,6 +169,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.proxyOperationManager.RequestSender.SendDiscoveryAbort();
             }
+
+            this.Close();
         }
 
         /// <inheritdoc/>
