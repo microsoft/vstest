@@ -36,7 +36,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected XmlNode GetModuleNode(XmlNode node, string name)
         {
-            return this.GetNode(node, "module", name);
+            var moduleNode = this.GetNode(node, "module", name);
+
+            if (moduleNode == null)
+            {
+                moduleNode = this.GetNode(node, "package", name);
+            }
+
+            return moduleNode;
         }
 
         protected XmlNode GetNode(XmlNode node, string type, string name)
@@ -46,6 +53,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected XmlDocument GetXmlCoverage(string coverageResult)
         {
+            XmlDocument coverage = new XmlDocument();
+
+            if (coverageResult.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+            {
+                coverage.Load(coverageResult);
+                return coverage;
+            }
+
             var codeCoverageExe = this.GetCodeCoverageExePath();
             var output = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
 
@@ -69,14 +84,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             Assert.IsTrue(0 == analyze.ExitCode, $"Code Coverage analyze failed: {analysisOutput}");
 
-            XmlDocument coverage = new XmlDocument();
             coverage.Load(output);
             return coverage;
         }
 
         protected void AssertCoverage(XmlNode node, double expectedCoverage)
         {
-            var coverage = double.Parse(node.Attributes["block_coverage"].Value);
+            var coverage = node.Attributes["block_coverage"] != null
+                ? double.Parse(node.Attributes["block_coverage"].Value)
+                : double.Parse(node.Attributes["line-rate"].Value) * 100;
             Console.WriteLine($"Checking coverage for {node.Name} {node.Attributes["name"].Value}. Expected at least: {expectedCoverage}. Result: {coverage}");
             Assert.IsTrue(coverage > expectedCoverage, $"Coverage check failed for {node.Name} {node.Attributes["name"].Value}. Expected at least: {expectedCoverage}. Found: {coverage}");
         }
