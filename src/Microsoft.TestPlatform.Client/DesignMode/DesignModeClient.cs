@@ -29,7 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
     using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
 
-
     /// <summary>
     /// The design mode client.
     /// </summary>

@@ -407,21 +407,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         }
 
         [TestMethod]
-        public void DesignModeClientShouldCallCancelDiscoveryWithEventhandlerMethodWithNewProtocolVersion()
-        {
-            var cancelMessage = new Message { MessageType = MessageType.CancelDiscovery };
-            var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(cancelMessage).Returns(sessionEnd);
-            this.mockTestRequestManager.Setup(rm => rm.CancelDiscoveryWithEventHandler());
-
-            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
-
-            this.mockTestRequestManager.Verify(rm => rm.CancelDiscoveryWithEventHandler(), Times.Once);
-            this.mockTestRequestManager.Verify(rm => rm.CancelDiscovery(), Times.Never);
-        }
-
-        [TestMethod]
         public void DesignModeClientConnectShouldSendTestMessageAndAttachmentsProcessingCompleteOnExceptionInAttachmentsProcessing()
         {
             var payload = new TestRunAttachmentsProcessingPayload();
