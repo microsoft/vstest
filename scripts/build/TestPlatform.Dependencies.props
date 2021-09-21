@@ -36,7 +36,7 @@
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
     <TestPlatformMSDiaVersion>17.0.0-previews-3-31515-332</TestPlatformMSDiaVersion>
     <!-- Portable CPP test runner -->
-    <TestPlatformRemoteExternalsVersion>17.0.0-previews-5-31713-117</TestPlatformRemoteExternalsVersion>
+    <TestPlatformRemoteExternalsVersion>17.0.0-previews-5-31716-073</TestPlatformRemoteExternalsVersion>
     
     <InteropExternalsVersion>17.0.0-preview-2-31223-026</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.0.0-beta.21179.1</MicrosoftFakesVersion>
