@@ -11,6 +11,7 @@
     <AssemblyName>Microsoft.TestPlatform.TestHostProvider.UnitTests</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />

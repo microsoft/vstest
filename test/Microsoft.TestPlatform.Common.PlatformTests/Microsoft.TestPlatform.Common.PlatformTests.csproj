@@ -11,6 +11,7 @@
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Common.PlatformTests</AssemblyName>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />

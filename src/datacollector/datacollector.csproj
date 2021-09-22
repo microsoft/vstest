@@ -11,6 +11,7 @@
   <PropertyGroup>
     <AssemblyName>datacollector</AssemblyName>
     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetFrameworks Condition=" '$(OS)' == 'WINDOWS_NT' ">$(TargetFrameworks);net472</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'WINDOWS_NT' ">$(TargetFrameworks);net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">net6.0</TargetFrameworks>

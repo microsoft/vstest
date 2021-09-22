@@ -10,6 +10,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
     <AssemblyName>datacollector.PlatformTests</AssemblyName>
   </PropertyGroup>

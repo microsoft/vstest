@@ -11,6 +11,7 @@
 	<OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
     <AssemblyName>vstest.console.PlatformTests</AssemblyName>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />

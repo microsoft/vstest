@@ -10,6 +10,7 @@
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AcceptanceTests</AssemblyName>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="TestAssets\CodeCoverageTest\" />

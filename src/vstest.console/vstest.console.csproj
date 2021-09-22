@@ -15,6 +15,7 @@
     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.CommandLine</RootNamespace>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>

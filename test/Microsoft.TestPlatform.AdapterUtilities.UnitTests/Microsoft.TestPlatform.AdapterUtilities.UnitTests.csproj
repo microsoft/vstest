@@ -12,6 +12,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MicrosoftCodeAnalysisVersion Condition="$(MicrosoftCodeAnalysisVersion) == ''">3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
     <NoWarn>$(NoWarn);RS1024</NoWarn>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

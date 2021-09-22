@@ -9,6 +9,7 @@
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.ObjectModel.PlatformTests</AssemblyName>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />    

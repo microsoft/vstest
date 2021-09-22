@@ -4,6 +4,7 @@
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsTestProject>false</IsTestProject>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
