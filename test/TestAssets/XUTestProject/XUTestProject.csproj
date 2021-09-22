@@ -7,6 +7,7 @@
   <PropertyGroup>
     <AssemblyName>XUTestProject</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net46</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="xunit">
