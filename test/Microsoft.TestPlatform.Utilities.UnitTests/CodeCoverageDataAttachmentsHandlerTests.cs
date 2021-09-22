@@ -28,6 +28,20 @@
             coverageDataAttachmentsHandler = new CodeCoverageDataAttachmentsHandler();
         }
 
+#if NETFRAMEWORK
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            // Copying test files to correct place,
+            var assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
+            var testFilesDirectory = Path.Combine(context.DeploymentDirectory, "TestFiles");
+            Directory.CreateDirectory(testFilesDirectory);
+            var files = Directory.GetFiles(Path.Combine(assemblyPath, "TestFiles"));
+            foreach (var file in files)
+                File.Copy(file, Path.Combine(testFilesDirectory, Path.GetFileName(file)));
+        }
+#endif
+
         [TestMethod]
         public async Task HandleDataCollectionAttachmentSetsShouldReturnEmptySetWhenNoAttachmentsOrAttachmentsAreNull()
         {
@@ -81,8 +95,8 @@
             Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 2);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.Last().Uri.AbsoluteUri);
-            Assert.AreEqual("file:///" + file1Path.Replace("\\", "/"), resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
-            Assert.AreEqual("file:///" + file2Path.Replace("\\", "/"), resultAttachmentSets.First().Attachments.Last().Uri.AbsoluteUri);
+            Assert.AreEqual("file:///" + file1Path.Replace("\\", "/").Replace(" ", "%20"), resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
+            Assert.AreEqual("file:///" + file2Path.Replace("\\", "/").Replace(" ", "%20"), resultAttachmentSets.First().Attachments.Last().Uri.AbsoluteUri);
         }
 
         [TestMethod]
@@ -101,7 +115,7 @@
             Assert.IsTrue(resultAttachmentSets.Count == 1);
             Assert.IsTrue(resultAttachmentSets.First().Attachments.Count == 1);
             Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", resultAttachmentSets.First().Uri.AbsoluteUri);
-            Assert.AreEqual("file:///" + file1Path.Replace("\\", "/"), resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
+            Assert.AreEqual("file:///" + file1Path.Replace("\\", "/").Replace(" ", "%20"), resultAttachmentSets.First().Attachments.First().Uri.AbsoluteUri);
         }
 
         [TestMethod]
