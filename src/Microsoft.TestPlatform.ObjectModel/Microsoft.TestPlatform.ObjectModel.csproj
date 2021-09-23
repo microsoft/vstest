@@ -48,6 +48,7 @@
     <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
     <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+	<PackageReference Include="System.Net.Http" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
@@ -59,6 +60,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!$(TargetFramework.StartsWith('netstandard1')) AND '$(TargetFramework)' != 'uap10.0' AND '$(TargetFramework)' != 'netcoreapp1.0'">
+    <PackageReference Include="System.Net.Http" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.6.0" />
     <PackageReference Include="NuGet.Frameworks" Version="$(NuGetFrameworksVersion)" />
   </ItemGroup>
@@ -66,6 +68,7 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0'">
     <PackageReference Include="NETStandard.Library" Version="1.6.1" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+	<PackageReference Include="System.Net.Http" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
 
