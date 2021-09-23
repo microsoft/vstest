@@ -518,7 +518,6 @@
     <file src="net451\$Runtime$\TestHost\Microsoft.TestPlatform.CoreUtilities.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
     <file src="net451\$Runtime$\TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
     <file src="net451\$Runtime$\TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-    <file src="net451\$Runtime$\TestHost\Microsoft.TestPlatform.TestHost.props" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.TestPlatform.TestHost.props" />
     <file src="net451\$Runtime$\TestHost\Microsoft.TestPlatform.Utilities.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.TestPlatform.Utilities.dll" />
     <file src="net451\$Runtime$\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net451\$Runtime$\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="tools\net451\Common7\IDE\Extensions\TestPlatform\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
