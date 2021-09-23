@@ -27,7 +27,7 @@
 
     <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
 
-    <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
+    <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.8.3</MoqVersion>
