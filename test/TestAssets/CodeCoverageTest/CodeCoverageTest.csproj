@@ -8,6 +8,7 @@
   <PropertyGroup>
     <AssemblyName>CodeCoverageTest</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   
   <ItemGroup>

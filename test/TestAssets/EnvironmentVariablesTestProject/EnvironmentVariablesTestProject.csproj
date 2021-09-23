@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net451;netcoreapp2.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
