@@ -25,7 +25,7 @@
     <NUnit3AdapterVersion>3.10.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
-    <ChutzpahAdapterVersion>4.4.11</ChutzpahAdapterVersion>
+    <ChutzpahAdapterVersion>4.4.10</ChutzpahAdapterVersion>
 
     <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
