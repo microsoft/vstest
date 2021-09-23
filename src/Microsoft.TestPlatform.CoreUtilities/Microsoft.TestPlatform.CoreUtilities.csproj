@@ -32,7 +32,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' OR  '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="Microsoft.Internal.Dia.Interop" Version="$(TestPlatformMSDiaVersion)" />
-    <PackageReference Include="System.Net.Http" Version="4.3.0" />
 
     <Reference Include="System.Configuration" />
     <Reference Include="System" />
