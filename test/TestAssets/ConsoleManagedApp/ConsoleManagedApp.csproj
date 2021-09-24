@@ -5,8 +5,9 @@
 
   <PropertyGroup>
     <AssemblyName>ConsoleManagedApp</AssemblyName>
-    <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
