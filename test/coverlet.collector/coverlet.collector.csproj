@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
