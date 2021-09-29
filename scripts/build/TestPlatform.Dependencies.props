@@ -47,6 +47,9 @@
     <MicrosoftExtensionsFileSystemGlobbingPackageVersion>1.1.1</MicrosoftExtensionsFileSystemGlobbingPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
+    <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
+
+    <DependencyVersionsImported>true</DependencyVersionsImported>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" />
