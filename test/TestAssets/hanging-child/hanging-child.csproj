@@ -7,7 +7,6 @@
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
   
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
