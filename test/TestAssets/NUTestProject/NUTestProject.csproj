@@ -5,6 +5,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net451;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <AssemblyName>NUTestProject</AssemblyName>
   </PropertyGroup>
 

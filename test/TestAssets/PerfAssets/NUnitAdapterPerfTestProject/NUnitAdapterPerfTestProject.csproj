@@ -3,6 +3,8 @@
   <Import Project="..\..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
