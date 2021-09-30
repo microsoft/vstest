@@ -7,8 +7,9 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <OutputType Condition=" '$(TargetFramework)' != 'net451' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netcoreapp3.1</TargetFrameworks>
+    <OutputType Condition=" '$(TargetFramework)' != 'net451' ">Exe</OutputType>
     <AssemblyName>TranslationLayer.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>

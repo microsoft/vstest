@@ -5,8 +5,8 @@
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
+
   <PropertyGroup>
     <OutputType>library</OutputType>
     <TargetFramework>net451</TargetFramework>
