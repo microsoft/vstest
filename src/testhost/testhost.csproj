@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)src\Microsoft.TestPlatform.Execution.Shared\Microsoft.TestPlatform.Execution.Shared.projitems" Label="Shared" />
@@ -29,6 +28,7 @@
   <ItemGroup>
     <PackageReference Include="System.Diagnostics.StackTrace" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.TraceSource" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="$(SystemNetHttpVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />

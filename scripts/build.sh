@@ -507,9 +507,17 @@ function create_package()
     cp -r "$TP_PACKAGE_NUSPEC_DIR/../licenses" $stagingDir
 
     for i in ${projectFiles[@]}; do
-        log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
-        && $dotnet restore $stagingDir/${i} \
-        && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog
+        if [[ $TP_USE_REPO_API = 0 ]]; then
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version"
+
+            $dotnet restore $stagingDir/${i} \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog
+        else
+            log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version (Source Build)"
+
+            $dotnet restore $stagingDir/${i} \
+                && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version /bl:pack_$i.binlog -p:DotNetBuildFromSource=true
+        fi
     done
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."

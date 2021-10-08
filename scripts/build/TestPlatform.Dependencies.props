@@ -25,7 +25,7 @@
     <NUnit3AdapterVersion>3.10.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
-    <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
+    <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>
 
     <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
@@ -49,6 +49,9 @@
     <MicrosoftExtensionsFileSystemGlobbingPackageVersion>1.1.1</MicrosoftExtensionsFileSystemGlobbingPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
+    <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
+
+    <DependencyVersionsImported>true</DependencyVersionsImported>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" />
