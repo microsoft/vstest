@@ -384,7 +384,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 //
                 // This allows us to pick up dotnet even when it is not present on PATH, or when we are running in custom
                 // portable installation, and DOTNET_ROOT is overridden and MULTILEVEL_LOOKUP is set to 0, which would
-                // normally prevent us from finding the dotnet exexutable.
+                // normally prevent us from finding the dotnet executable.
                 //
                 // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
                 else if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
