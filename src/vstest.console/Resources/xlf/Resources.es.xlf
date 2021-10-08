@@ -389,8 +389,8 @@
         <target state="translated">        URI: {0}</target>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
-        <source>Invalid platform type:{0}. Valid platform types are {1}.</source>
-        <note></note>
+        <source>Invalid platform type: {0}. Valid platform types are {1}.</source>
+        <note>0 is the platform type e.g. x86, and 1 is a list of the built in platforms, e.g. x86, x64</note>
         <target state="new">Tipo de plataforma no válido: {0}. Los tipos de plataforma válidos son x86, x64 y ARM.</target>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">

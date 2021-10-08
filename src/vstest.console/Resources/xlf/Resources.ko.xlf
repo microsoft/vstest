@@ -387,8 +387,8 @@
         <target state="translated">        URI: {0}</target>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
-        <source>Invalid platform type:{0}. Valid platform types are {1}.</source>
-        <note></note>
+        <source>Invalid platform type: {0}. Valid platform types are {1}.</source>
+        <note>0 is the platform type e.g. x86, and 1 is a list of the built in platforms, e.g. x86, x64</note>
         <target state="new">플랫폼 형식({0})이 잘못되었습니다. 올바른 플랫폼 형식은 x86, x64, Arm입니다.</target>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">

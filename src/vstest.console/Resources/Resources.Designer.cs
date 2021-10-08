@@ -814,7 +814,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid platform type:{0}. Valid platform types are {1}..
+        ///   Looks up a localized string similar to Invalid platform type: {0}. Valid platform types are {1}..
         /// </summary>
         internal static string InvalidPlatformType {
             get {
