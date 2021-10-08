@@ -635,7 +635,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // and is running tests in an isolated machine. A second scenario is self test: test platform unit tests take a project
             // dependency on testhost (instead of nuget dependency), this drops testhost to output path.
             var testHostNextToTestProject = Path.Combine(sourceDirectory, "testhost.dll");
-            if (System.IO.File.Exists(testHostNextToTestProject))
+            if (this.fileHelper.Exists(testHostNextToTestProject))
             {
                 EqtTrace.Verbose("DotnetTestHostManager: Found testhost.dll in source directory: {0}.", testHostNextToTestProject);
                 return testHostNextToTestProject;
