@@ -631,10 +631,12 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string testhostNextToTestDll = Path.Combine(this.temp, "testhost.dll");
             this.mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
 
-            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
-
             var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var expectedTestHostPath = Path.Combine(here, "testhost.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
+
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
             StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
             var expectedAdditionalDepsPath = Path.Combine(here, "testhost.deps.json");
             StringAssert.Contains(startInfo.Arguments, $"--additional-deps \"{expectedAdditionalDepsPath}\"");
@@ -665,10 +667,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string testhostNextToTestDll = Path.Combine(this.temp, "testhost.dll");
             this.mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
 
+            var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var testhostNextToRunner = Path.Combine(here, "testhost.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostNextToRunner)).Returns(true);
+
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{tfm}</TargetFrameworkVersion></RunConfiguration></RunSettings>");
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
-            var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var expectedRuntimeConfigPath = Path.Combine(here, $"testhost-{suffix}.runtimeconfig.json");
             StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
         }
