@@ -298,7 +298,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 #else
                     var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "testhost.dll");
 #endif
-                    if (File.Exists(testHostNextToRunner))
+                    if (this.fileHelper.Exists(testHostNextToRunner))
                     {
                         EqtTrace.Verbose("DotnetTestHostManager: Found testhost.dll next to runner executable: {0}.", testHostNextToRunner);
                         testHostPath = testHostNextToRunner;
