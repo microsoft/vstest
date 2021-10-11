@@ -5,6 +5,15 @@
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
       <Sha>36767b7154f1bb473e4b5fb8c5359ce684bade59</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.248003">
+      <Uri>https://github.com/dotnet/diagnostics</Uri>
+      <Sha>f15e60ff2091bcc54a8b8de8ce4e9d7de4c5dd62</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.diagnostics" Version="5.0.248003">
+      <Uri>https://github.com/dotnet/diagnostics</Uri>
+      <Sha>f15e60ff2091bcc54a8b8de8ce4e9d7de4c5dd62</Sha>
+      <SourceBuild RepoName="diagnostics" ManagedOnly="true" />
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21427.6">
@@ -32,9 +41,9 @@
       <Uri>https://github.com/dotnet/arcade-services</Uri>
       <Sha>cd705029f2675970b42f9273ae359d0926c5e815</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="3.5.0-beta1-19606-04">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.0.0-1.21228.10">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>d2bd58c62f9104d66f415141a1a27b665c78690c</Sha>
+      <Sha>dc30dda6531fe583d015b314edc50538bb1e3b91</Sha>
     </Dependency>
     <Dependency Name="Microsoft.SourceLink" Version="1.0.0-beta2-19554-01">
       <Uri>https://github.com/dotnet/sourcelink</Uri>
