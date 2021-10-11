@@ -62,6 +62,8 @@ Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatfo
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetDotnetPath() -> string
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetMonoPath() -> string
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetNativeMuxerPath(System.IntPtr processHandle, out string path) -> bool
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetMuxerPath(System.IntPtr processHandle, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, out string path) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArg
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArgProperty
@@ -163,3 +165,5 @@ static Microsoft.VisualStudio.TestPlatform.Utilities.MulticastDelegateUtilities.
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.Parse(string time) -> System.TimeSpan
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.TryParse(string time, out System.TimeSpan result) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.WaitForQueueToGetEmpty() -> bool
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper.GetEnvironmentVariable(string variable) -> string

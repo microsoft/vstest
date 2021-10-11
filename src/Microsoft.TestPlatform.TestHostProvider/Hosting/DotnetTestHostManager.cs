@@ -380,21 +380,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     startInfo.FileName = this.dotnetHostPath;
                 }
 
-                // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
+                // If already running with the dotnet executable and the architecture is compatible, use it; otherwise pick up the dotnet available on path.
                 //
                 // This allows us to pick up dotnet even when it is not present on PATH, or when we are running in custom
                 // portable installation, and DOTNET_ROOT is overridden and MULTILEVEL_LOOKUP is set to 0, which would
                 // normally prevent us from finding the dotnet executable.
                 //
                 // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
-                else if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
-                   || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+                else if ((currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase) ||
+                         currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)) &&
+                         IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture))
                 {
+                    EqtTrace.Verbose("DotnetTestHostmanager: valid skd architecture {0}", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
                 }
                 else
                 {
-                    startInfo.FileName = this.dotnetHostHelper.GetDotnetPath();
+                    EqtTrace.Verbose($"DotnetTestHostmanager: try to find valid dotnet muxer for the architecture {this.architecture}");
+                    if (this.dotnetHostHelper.TryGetMuxerPath(
+                        this.processHelper.GetProcessHandle(Process.GetCurrentProcess().Id),
+                        TranslateToPlatformArchitecture(this.architecture),
+                        out string muxer))
+                    {
+                        startInfo.FileName = muxer;
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException($"Could not find dotnet muxer for '{this.architecture}' architecture.");
+                    }
                 }
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
@@ -422,6 +435,48 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
+
+            PlatformArchitecture TranslateToPlatformArchitecture(Architecture architecture)
+            {
+                switch (architecture)
+                {
+                    case Architecture.X86:
+                        return PlatformArchitecture.X86;
+                    case Architecture.X64:
+                        return PlatformArchitecture.X64;
+                    case Architecture.ARM:
+                        return PlatformArchitecture.ARM;
+                    case Architecture.ARM64:
+                        return PlatformArchitecture.ARM64;
+                    case Architecture.AnyCPU:
+                    case Architecture.Default:
+                    default:
+                        break;
+                }
+
+                throw new TestPlatformException($"Invalid target architecture '{architecture}'");
+            }
+
+            bool IsSameArchitecture(Architecture targetArchitecture, PlatformArchitecture platformAchitecture)
+            {
+                switch (targetArchitecture)
+                {
+                    case Architecture.X86:
+                        return platformAchitecture == PlatformArchitecture.X86;
+                    case Architecture.X64:
+                        return platformAchitecture == PlatformArchitecture.X64;
+                    case Architecture.ARM:
+                        return platformAchitecture == PlatformArchitecture.ARM;
+                    case Architecture.ARM64:
+                        return platformAchitecture == PlatformArchitecture.ARM64;
+                    case Architecture.AnyCPU:
+                    case Architecture.Default:
+                    default:
+                        break;
+                }
+
+                return false;
+            }
         }
 
         /// <inheritdoc/>

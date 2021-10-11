@@ -39,9 +39,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private readonly Mock<IFileHelper> mockFileHelper;
 
+        private readonly Mock<IWindowsRegistryHelper> mockWindowsRegistry;
+
         private readonly Mock<IMessageLogger> mockMessageLogger;
 
         private readonly Mock<IEnvironment> mockEnvironment;
+
+        private readonly Mock<IEnvironmentVariableHelper> mockEnvironmentVariable;
 
         private readonly TestRunnerConnectionInfo defaultConnectionInfo;
 
@@ -67,14 +71,17 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockMessageLogger = new Mock<IMessageLogger>();
             this.mockEnvironment = new Mock<IEnvironment>();
+            this.mockWindowsRegistry = new Mock<IWindowsRegistryHelper>();
+            this.mockEnvironmentVariable = new Mock<IEnvironmentVariableHelper>();
             this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
+            this.mockEnvironment.SetupGet(e => e.Architecture).Returns((PlatformArchitecture)Enum.Parse(typeof(PlatformArchitecture), Constants.DefaultPlatform.ToString()));
             string defaultSourcePath = Path.Combine(this.temp, "test.dll");
             this.defaultTestHostPath = Path.Combine(this.temp, "testhost.dll");
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object),
+                                         new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockWindowsRegistry.Object, this.mockEnvironmentVariable.Object),
                                          this.mockEnvironment.Object);
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
@@ -83,7 +90,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Setup a dummy current process for tests
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
+            this.mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(DefaultDotnetPath));
             this.mockFileHelper.Setup(ph => ph.Exists(this.defaultTestHostPath)).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists(DefaultDotnetPath)).Returns(true);
 
             this.mockTestHostLauncher
                 .Setup(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
@@ -496,6 +505,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Setup the first directory on PATH to return true for existence check for dotnet
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
             var acceptablePath = Path.Combine(paths[0], dotnetExeName);
+            this.mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(acceptablePath));
             this.mockFileHelper.Setup(fh => fh.Exists(acceptablePath)).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
@@ -510,6 +520,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             // To validate the else part, set current process to exe other than dotnet
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+
+            // Reset the muxer
+            this.mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(string.Empty);
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";

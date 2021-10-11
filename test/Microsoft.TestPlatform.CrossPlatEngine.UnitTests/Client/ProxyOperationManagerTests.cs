@@ -24,6 +24,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -529,7 +530,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 bool checkRequired,
                 IProcessHelper processHelper,
                 IFileHelper fileHelper,
-                IEnvironment environment) : base(processHelper, fileHelper, new DotnetHostHelper(fileHelper, environment), environment)
+                IEnvironment environment) : base(processHelper, fileHelper, new DotnetHostHelper(fileHelper, environment, new WindowsRegistryHelper(), new EnvironmentVariableHelper()), environment)
             {
                 this.isVersionCheckRequired = checkRequired;
             }

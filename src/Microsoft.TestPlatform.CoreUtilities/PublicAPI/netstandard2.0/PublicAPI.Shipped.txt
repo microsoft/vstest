@@ -108,12 +108,16 @@ Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSourc
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSource.VsTestConsoleStop() -> void
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.DotnetHostHelper() -> void
-Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.DotnetHostHelper(Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment environment) -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.DotnetHostHelper(Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment environment, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IWindowsRegistryHelper windowsRegistryHelper, Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper environmentVariableHelper) -> void
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.GetDotnetPath() -> string
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.GetMonoPath() -> string
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.TryGetNativeMuxerPath(System.IntPtr processHandle, out string path) -> bool
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.TryGetMuxerPath(System.IntPtr processHandle, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, out string path) -> bool
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetDotnetPath() -> string
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetMonoPath() -> string
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetNativeMuxerPath(System.IntPtr processHandle, out string path) -> bool
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetMuxerPath(System.IntPtr processHandle, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, out string path) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArg
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArgProperty
@@ -250,3 +254,21 @@ static Microsoft.VisualStudio.TestPlatform.Utilities.OutputExtensions.Write(this
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.Parse(string time) -> System.TimeSpan
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.TryParse(string time, out System.TimeSpan result) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.WaitForQueueToGetEmpty() -> bool
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IWindowsRegistryHelper
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IWindowsRegistryHelper.OpenBaseKey(Microsoft.Win32.RegistryHive hKey, Microsoft.Win32.RegistryView view) -> Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey.OpenSubKey(string name) -> Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey.GetValue(string name) -> object
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.WindowsRegistryHelper
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.WindowsRegistryHelper.WindowsRegistryHelper() -> void
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.WindowsRegistryHelper.OpenBaseKey(Microsoft.Win32.RegistryHive hKey, Microsoft.Win32.RegistryView view) -> Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.RegistryKeyWrapper
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.RegistryKeyWrapper.RegistryKeyWrapper(Microsoft.Win32.RegistryKey registryKey) -> void
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.RegistryKeyWrapper.OpenSubKey(string name) -> Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IRegistryKey
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.RegistryKeyWrapper.GetValue(string name) -> object
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.RegistryKeyWrapper.Dispose() -> void
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper.GetEnvironmentVariable(string variable) -> string
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.EnvironmentVariableHelper
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.EnvironmentVariableHelper.EnvironmentVariableHelper() -> void
+Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.EnvironmentVariableHelper.GetEnvironmentVariable(string variable) -> string
