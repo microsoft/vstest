@@ -27,6 +27,7 @@
 
     <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>
 
+    <!-- This version also needs to be updated in src\package\nuspec\TestPlatform.ObjectModel.nuspec -->
     <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
