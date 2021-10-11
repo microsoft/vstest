@@ -374,6 +374,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     throw new TestPlatformException("Could not find testhost");
                 }
 
+                bool forceToX64 = ForceToX64();
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
                 if (useCustomDotnetHostpath)
                 {
@@ -389,7 +390,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
                 else if ((currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase) ||
                          currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)) &&
-                         IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture))
+                         IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture) &&
+                         !forceToX64)
                 {
                     EqtTrace.Verbose("DotnetTestHostmanager: valid skd architecture {0}", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
@@ -399,7 +401,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     EqtTrace.Verbose($"DotnetTestHostmanager: try to find valid dotnet muxer for the architecture {this.architecture}");
                     if (this.dotnetHostHelper.TryGetMuxerPath(
                         this.processHelper.GetProcessHandle(Process.GetCurrentProcess().Id),
-                        TranslateToPlatformArchitecture(this.architecture),
+                        TranslateToPlatformArchitecture(forceToX64 ? Architecture.X64 : this.architecture),
                         out string muxer))
                     {
                         startInfo.FileName = muxer;
@@ -473,6 +475,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     case Architecture.Default:
                     default:
                         break;
+                }
+
+                return false;
+            }
+
+            bool ForceToX64()
+            {
+                // We need to force x64 in some scenario
+                // https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.RuntimeIdentifierInference.targets#L140-L143
+
+                // If we are running on an M1 with a native SDK and the TFM is < 6.0, we have to use a x64 apphost since there are no osx-arm64 apphosts previous to .NET 6.0.
+                if (this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.OSX &&
+                    this.platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
+                    new Version(this.targetFramework.Version).Major < 6)
+                {
+                    return true;
+                }
+
+                // If we are running on win-arm64 and the TFM is < 5.0, we have to use a x64 apphost since there are no win-arm64 apphosts previous to .NET 5.0.
+                if (this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows &&
+                    this.platformEnvironment.Architecture == PlatformArchitecture.ARM64 &&
+                    new Version(this.targetFramework.Version).Major < 5)
+                {
+                    return true;
                 }
 
                 return false;

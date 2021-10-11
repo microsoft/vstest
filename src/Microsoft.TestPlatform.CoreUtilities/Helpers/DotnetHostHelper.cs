@@ -103,6 +103,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public bool TryGetMuxerPath(IntPtr processHandle, PlatformArchitecture targetArchitecture, out string path)
         {
+            // We used similar approach of runtime resolver.
+            // https://github.com/dotnet/runtime/blob/main/src/native/corehost/fxr_resolver.cpp#L55
+
             path = null;
             bool isWinOs = environment.OperatingSystem == PlatformOperatingSystem.Windows;
             string muxerName = $"dotnet{(isWinOs ? ".exe" : "")}";
@@ -188,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName) :
 
                     this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
-                    // TODO: We have a problem here...understand
+                    // TODO: to elaborate
                     $"/usr/local/share/dotnet/{muxerName}" + ((targetArchitecture == PlatformArchitecture.X64 && environment.Architecture == PlatformArchitecture.ARM64) ? "/x64" : "") :
                     $"/usr/share/dotnet/{muxerName}";
 
