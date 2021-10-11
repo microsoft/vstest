@@ -44,8 +44,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         // framework runner not available on Linux
         [TestCategory("Windows-Review")]
-        [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
+        [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+        //[NetCoreTargetFrameworkDataSource]
         public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -68,7 +68,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             else
             {
-                this.StdErrorContains("Test Run Aborted.");
+                // This test indirectly tests that we abort when incorrect framework is forced on a DLL, the failure message with the new fallback 
+                // is uglier than then one before that suggests (incorrectly) to install Microsoft.NET.Test.Sdk into the project, which would work,
+                // but would not solve the problem. In either cases we should improve the message later.
+                this.StdErrorContains("Test Run Failed.");
             }
 
             TryRemoveDirectory(resultsDir);
