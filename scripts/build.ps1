@@ -483,6 +483,26 @@ function Publish-Package
     Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
     Copy-Item $newtonsoft $coreCLR20PackageDir -Force
 
+    # Copy .NET Standard CPP Test adapter
+    New-Item "$fullCLRPackage451Dir\TestHost" -ItemType Directory -Force | Out-Null 
+    $fullCLRTestHostDir = "$fullCLRPackage451Dir\TestHost"
+
+    $testPlatformRemoteExternalsVersion = ([xml](Get-Content "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props")).Project.PropertyGroup.TestPlatformRemoteExternalsVersion
+    $testPlatformRemoteExternalsSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Remote\$testPlatformRemoteExternalsVersion\tools\netstandard\Extensions\*"
+    Copy-Item $testPlatformRemoteExternalsSourceDirectory $coreCLR20PackageDir -Force -Recurse
+    Copy-Item $testPlatformRemoteExternalsSourceDirectory $fullCLRTestHostDir -Force -Recurse
+
+    # Copy standalone testhost
+    $standaloneTesthost = Join-Path $env:TP_ROOT_DIR "temp\testhost\*"
+    Copy-Item $standaloneTesthost $coreCLR20PackageDir -Force
+    Copy-Item $testhostCore20PackageDir\testhost.dll $coreCLR20PackageDir -Force
+    Copy-Item $testhostCore20PackageDir\testhost.pdb $coreCLR20PackageDir -Force
+
+    Get-Item "$testhostCore20PackageDir\*" | 
+        Where-Object { $_.Name -notin ("x64", "x86", "win7-x64", "win7-x86", "testhost.deps.json", "testhost.runtimeconfig.json")} | 
+        Copy-Item -Recurse -Destination $fullCLRTestHostDir -Force
+    Copy-Item $standaloneTesthost $fullCLRTestHostDir -Force
+
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 

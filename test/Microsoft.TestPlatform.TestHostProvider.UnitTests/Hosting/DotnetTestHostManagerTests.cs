@@ -8,6 +8,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
@@ -220,16 +221,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartIfDepsFileAndTestHostNotFoundShouldThrowException()
-        {
-            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
-            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
-
-            var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
-            Assert.AreEqual("Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".", ex.Message);
-        }
-
-        [TestMethod]
         public void GetTestHostProcessStartIfDepsFileNotFoundAndTestHostFoundShouldNotThrowException()
         {
             this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
@@ -237,16 +228,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
             StringAssert.Contains(startInfo.Arguments, "testhost.dll");
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartIfRuntimeConfigAndDepsFilePresentAndTestHostNotFoundEvenInTestSourceDirShouldThrowException()
-        {
-            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
-            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
-
-            var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
-            Assert.AreEqual("Unable to find testhost.dll. Please publish your test project and retry.", ex.Message);
         }
 
         [TestMethod]
@@ -639,7 +620,62 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
-            Assert.IsTrue(startInfo.Arguments.Contains(expectedTestHostPath));
+            StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFound()
+        {
+            // Absolute path to the source directory
+            var sourcePath = Path.Combine(this.temp, "test.dll");
+            string testhostNextToTestDll = Path.Combine(this.temp, "testhost.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
+
+            var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var expectedTestHostPath = Path.Combine(here, "testhost.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
+
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            StringAssert.Contains(startInfo.Arguments, expectedTestHostPath);
+            var expectedAdditionalDepsPath = Path.Combine(here, "testhost.deps.json");
+            StringAssert.Contains(startInfo.Arguments, $"--additional-deps \"{expectedAdditionalDepsPath}\"");
+            var expectedAdditionalProbingPath = here;
+            StringAssert.Contains(startInfo.Arguments, $"--additionalprobingpath \"{expectedAdditionalProbingPath}\"");
+            var expectedRuntimeConfigPath = Path.Combine(here, "testhost-latest.runtimeconfig.json");
+            StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
+        }
+
+        [TestMethod]
+
+        // we can't put in a "default" value, and we don't have other way to determine if this provided value is the
+        // runtime default or the actual value that user provided, so right now the default will use the latest, instead
+        // or the more correct 1.0, it should be okay, as that version is not supported anymore anyway
+        [DataRow("netcoreapp1.0", "latest")]
+        [DataRow("netcoreapp2.1", "2.1")]
+        [DataRow("netcoreapp3.1", "3.1")]
+        [DataRow("net5.0", "5.0")]
+
+        // net6.0 is currently the latest released version, but it still has it's own runtime config, it is not the same as
+        // "latest" which means the latest you have on system. So if you have only 5.0 SDK then net6.0 will fail because it can't find net6.0,
+        // but latest would use net5.0 because that is the latest one on your system.
+        [DataRow("net6.0", "6.0")]
+        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathNextToTestRunnerIfTesthostDllIsNoFoundAndDepsFileNotFoundWithTheCorrectTfm(string tfm, string suffix)
+        {
+            // Absolute path to the source directory
+            var sourcePath = Path.Combine(this.temp, "test.dll");
+            string testhostNextToTestDll = Path.Combine(this.temp, "testhost.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostNextToTestDll)).Returns(false);
+
+            var here = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var testhostNextToRunner = Path.Combine(here, "testhost.dll");
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostNextToRunner)).Returns(true);
+
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{tfm}</TargetFrameworkVersion></RunConfiguration></RunSettings>");
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            var expectedRuntimeConfigPath = Path.Combine(here, $"testhost-{suffix}.runtimeconfig.json");
+            StringAssert.Contains(startInfo.Arguments, $"--runtimeconfig \"{expectedRuntimeConfigPath}\"");
         }
 
         [TestMethod]

@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => this.executor.Initialize("foo"),
-                "Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.",
+                "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64.",
                 "foo");
         }
 
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => this.executor.Initialize("AnyCPU"),
-                "Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.",
+                "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64.",
                 "AnyCPU");
         }
 
