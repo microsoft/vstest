@@ -217,5 +217,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources {
                 return ResourceManager.GetString("MethodNotImplementedOnPlatform", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find &apos;{0}&apos; host for the &apos;{1}&apos; architecture.  Make sure that &apos;{0}&apos; for &apos;{1}&apos; architecture is installed on the machine.
+        /// </summary>
+        internal static string NoDotnetMuxerFoundForArchitecture
+        {
+            get
+            {
+                return ResourceManager.GetString("NoDotnetMuxerFoundForArchitecture", resourceCulture);
+            }
+        }
+
     }
 }

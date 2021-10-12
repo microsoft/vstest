@@ -43,7 +43,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                             // show up if there is mismatch with user provided platform.
                             arch = Architecture.AnyCPU;
                         }
-                        sourcePlatforms[source]=(Architecture)arch;
+                        EqtTrace.Info("Determined platform for source '{0}' is '{1}'", source, arch);
+                        sourcePlatforms[source]= arch;
 
                         if (Architecture.AnyCPU.Equals(arch))
                         {

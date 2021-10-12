@@ -602,6 +602,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     Architecture defaultArchitecture = Architecture.X86;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                         || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+                    // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
                         || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
 #if NETCOREAPP
@@ -609,7 +610,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
                         // should resolve 32-bit SDK when running from 32-bit dotnet process and 
                         // 64-bit SDK when running from 64-bit dotnet process.
-                        defaultArchitecture = Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86;
+                        // As default architecture we specify the expected test host architecture,
+                        // it can be specified by user on the command line with --arch or through runsettings.
+                        // If it now specified by user will be filled by current processor architecture;
+                        // should be the same as SDK.
+                        defaultArchitecture = runConfiguration.TargetPlatform;
+                        EqtTrace.Verbose($"Default architecture: {defaultArchitecture}");
 #else
                         // We are running in vstest.console.exe that was built against .NET
                         // Framework. This console prefers 32-bit because it needs to run as 32-bit
@@ -757,6 +763,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 sourcePlatforms,
                 defaultArchitecture);
 
+            EqtTrace.Info($"Infered platform '{inferedPlatform}'.");
+
             // Get platform from runsettings.
             bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
@@ -764,6 +772,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // ArgumentProcessor.
             if (updatePlatform)
             {
+                EqtTrace.Info($"Platform update to '{inferedPlatform}' required.");
                 InferRunSettingsHelper.UpdateTargetPlatform(
                     document,
                     inferedPlatform.ToString(),

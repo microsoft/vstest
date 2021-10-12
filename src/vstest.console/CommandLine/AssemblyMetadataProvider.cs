@@ -128,18 +128,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             Architecture arch = Architecture.AnyCPU;
             // Mapping to Architecture based on https://msdn.microsoft.com/en-us/library/system.reflection.processorarchitecture(v=vs.110).aspx
 
-            if (processorArchitecture.Equals(ProcessorArchitecture.Amd64)
-                || processorArchitecture.Equals(ProcessorArchitecture.IA64))
+            if (processorArchitecture.Equals(ProcessorArchitecture.Amd64))
+            {
+                arch = Architecture.ARM64;
+            }
+            else if (processorArchitecture.Equals(ProcessorArchitecture.IA64))
             {
                 arch = Architecture.X64;
             }
             else if (processorArchitecture.Equals(ProcessorArchitecture.X86))
             {
                 arch = Architecture.X86;
-            }else if (processorArchitecture.Equals(ProcessorArchitecture.MSIL))
+            }
+            else if (processorArchitecture.Equals(ProcessorArchitecture.MSIL))
             {
                 arch = Architecture.AnyCPU;
-            }else if (processorArchitecture.Equals(ProcessorArchitecture.Arm))
+            }
+            else if (processorArchitecture.Equals(ProcessorArchitecture.Arm))
             {
                 arch = Architecture.ARM;
             }

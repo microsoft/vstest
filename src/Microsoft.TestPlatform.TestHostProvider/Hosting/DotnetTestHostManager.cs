@@ -374,42 +374,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     throw new TestPlatformException("Could not find testhost");
                 }
 
-                bool forceToX64 = ForceToX64();
+                bool forceToX64 = SilentlyForceToX64();
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
                 if (useCustomDotnetHostpath)
                 {
                     startInfo.FileName = this.dotnetHostPath;
                 }
 
-                // If already running with the dotnet executable and the architecture is compatible, use it; otherwise pick up the dotnet available on path.
-                //
-                // This allows us to pick up dotnet even when it is not present on PATH, or when we are running in custom
-                // portable installation, and DOTNET_ROOT is overridden and MULTILEVEL_LOOKUP is set to 0, which would
-                // normally prevent us from finding the dotnet executable.
-                //
-                // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
+                // If already running with the dotnet executable and the architecture is compatible, use it; otherwise search the correct muxer architecture on disk.
                 else if ((currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase) ||
                          currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)) &&
                          IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture) &&
-                         !forceToX64)
+                         !SilentlyForceToX64())
                 {
-                    EqtTrace.Verbose("DotnetTestHostmanager: valid skd architecture {0}", this.platformEnvironment.Architecture);
+                    EqtTrace.Verbose("DotnetTestHostmanager: compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
                 }
                 else
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager: try to find valid dotnet muxer for the architecture {this.architecture}");
-                    if (this.dotnetHostHelper.TryGetMuxerPath(
-                        this.processHelper.GetProcessHandle(Process.GetCurrentProcess().Id),
-                        TranslateToPlatformArchitecture(forceToX64 ? Architecture.X64 : this.architecture),
-                        out string muxer))
+                    EqtTrace.Verbose($"DotnetTestHostmanager: searching muxer for the architecture '{this.architecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework}");
+                    if (forceToX64)
                     {
-                        startInfo.FileName = muxer;
+                        EqtTrace.Verbose($"DotnetTestHostmanager: forcing the search to x64 architecure");
                     }
-                    else
-                    {
-                        throw new FileNotFoundException($"Could not find dotnet muxer for '{this.architecture}' architecture.");
-                    }
+
+                    // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
+                    startInfo.FileName = this.dotnetHostHelper.GetDotnetPathByArchitecture(TranslateToPlatformArchitecture(forceToX64 ? Architecture.X64 : this.architecture));
                 }
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
@@ -438,9 +428,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             return startInfo;
 
-            PlatformArchitecture TranslateToPlatformArchitecture(Architecture architecture)
+            PlatformArchitecture TranslateToPlatformArchitecture(Architecture targetArchitecture)
             {
-                switch (architecture)
+                switch (targetArchitecture)
                 {
                     case Architecture.X86:
                         return PlatformArchitecture.X86;
@@ -456,7 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         break;
                 }
 
-                throw new TestPlatformException($"Invalid target architecture '{architecture}'");
+                throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
             }
 
             bool IsSameArchitecture(Architecture targetArchitecture, PlatformArchitecture platformAchitecture)
@@ -474,13 +464,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     case Architecture.AnyCPU:
                     case Architecture.Default:
                     default:
-                        break;
+                        throw new TestPlatformException($"Invalid target architecture '{targetArchitecture}'");
                 }
-
-                return false;
             }
 
-            bool ForceToX64()
+            bool SilentlyForceToX64()
             {
                 // We need to force x64 in some scenario
                 // https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.RuntimeIdentifierInference.targets#L140-L143
