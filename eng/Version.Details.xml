@@ -47,8 +47,7 @@
     </Dependency>
     <Dependency Name="Microsoft.SourceLink" Version="1.0.0-beta2-19554-01">
       <Uri>https://github.com/dotnet/sourcelink</Uri>
-      <Sha>
-      </Sha>
+      <Sha>afa9aa7032f810ad91d84857b95ad1d071192afa</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DiaSymReader.Pdb2Pdb" Version="1.1.0-beta2-21511-01">
       <Uri>https://github.com/dotnet/symreader-converter</Uri>
