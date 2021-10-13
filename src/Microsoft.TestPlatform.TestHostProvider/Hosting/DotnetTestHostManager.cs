@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -14,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyModel;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
+    using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -385,21 +387,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 else if ((currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase) ||
                          currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)) &&
                          IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture) &&
-                         !SilentlyForceToX64())
+                         !forceToX64)
                 {
                     EqtTrace.Verbose("DotnetTestHostmanager: compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
                 }
                 else
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager: searching muxer for the architecture '{this.architecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework}");
+                    PlatformArchitecture targetArchitecture = TranslateToPlatformArchitecture(this.architecture);
+                    EqtTrace.Verbose($"DotnetTestHostmanager: searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework}");
                     if (forceToX64)
                     {
                         EqtTrace.Verbose($"DotnetTestHostmanager: forcing the search to x64 architecure");
                     }
 
-                    // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
-                    startInfo.FileName = this.dotnetHostHelper.GetDotnetPathByArchitecture(TranslateToPlatformArchitecture(forceToX64 ? Architecture.X64 : this.architecture));
+                    // If we're in the edge case and we force arch we can skip check, we know that config is a valid one.
+                    if (!forceToX64)
+                    {
+                        // We validate if architecture to switch to is a valid one
+                        if (!FrameworkAndArchitectureMatrixValidator.IsValidArchitectureSwitch(this.platformEnvironment.OperatingSystem, this.platformEnvironment.Architecture, targetArchitecture))
+                        {
+                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidXArchTestRun, this.architecture, this.platformEnvironment.Architecture);
+                            throw new TestPlatformException(message);
+                        }
+
+                        // We validate if target framework is supported by switched architecture
+                        if (!FrameworkAndArchitectureMatrixValidator.IsValidFramework(this.platformEnvironment.OperatingSystem, targetArchitecture, new Version(this.targetFramework.Version)))
+                        {
+                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidFrameworkForTargetArchitecture, this.architecture);
+                            throw new TestPlatformException(message);
+                        }
+                    }
+
+                    startInfo.FileName = this.dotnetHostHelper.GetDotnetPathByArchitecture(forceToX64 ? PlatformArchitecture.X64 : targetArchitecture);
                 }
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
@@ -711,6 +731,139 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             return testHostPath;
+        }
+
+        // Informations used to fill below matrix:
+        // https://github.com/dotnet/core/blob/main/release-notes/6.0/supported-os.md
+        // https://github.com/dotnet/installer#installers-and-binaries
+        // https://dotnet.microsoft.com/download/dotnet
+        private class FrameworkAndArchitectureMatrixValidator
+        {
+            private static readonly IDictionary<PlatformOperatingSystem, SwitchArchFromTo[]> ValidArchitectureSwitch
+                = new Dictionary<PlatformOperatingSystem, SwitchArchFromTo[]>
+                {
+                    {
+                        PlatformOperatingSystem.Windows, new SwitchArchFromTo[]
+                        {
+                            new SwitchArchFromTo(PlatformArchitecture.ARM64, PlatformArchitecture.X64),
+                            new SwitchArchFromTo(PlatformArchitecture.ARM64, PlatformArchitecture.X86),
+                            new SwitchArchFromTo(PlatformArchitecture.X64, PlatformArchitecture.ARM64),
+                            new SwitchArchFromTo(PlatformArchitecture.X64, PlatformArchitecture.X86)
+                        }
+                    },
+                {
+                        PlatformOperatingSystem.OSX, new SwitchArchFromTo[]
+                        {
+                            new SwitchArchFromTo(PlatformArchitecture.ARM64, PlatformArchitecture.X64),
+                            new SwitchArchFromTo(PlatformArchitecture.X64, PlatformArchitecture.ARM64)
+                        }
+                    }
+                };
+
+            private static readonly IDictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Version[]>> SupportedFramework
+               = new Dictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Version[]>>
+               {
+                   {
+                        PlatformArchitecture.X64, new Dictionary<PlatformOperatingSystem, Version[]>
+                        {
+                            {
+                               PlatformOperatingSystem.Windows, new Version[]
+                               {
+                                 new Version(1, 0), new Version(1, 1), new Version(2, 0), new Version(2, 1),
+                                 new Version(2, 2), new Version(3, 0), new Version(3, 1), new Version(5, 0),
+                                 new Version(6, 0), new Version(7, 0)
+                               }
+                            },
+                            {
+                               PlatformOperatingSystem.OSX, new Version[]
+                               {
+                                 new Version(1, 0), new Version(1, 1), new Version(2, 0), new Version(2, 1),
+                                 new Version(2, 2), new Version(3, 0), new Version(3, 1), new Version(5, 0),
+                                 new Version(6, 0), new Version(7, 0)
+                               }
+                            }
+                        }
+                    },
+                    {
+                        PlatformArchitecture.X86, new Dictionary<PlatformOperatingSystem, Version[]>
+                        {
+                            {
+                                PlatformOperatingSystem.Windows, new Version[]
+                                {
+                                    new Version(1, 0), new Version(1, 1), new Version(2, 0), new Version(2, 1),
+                                    new Version(2, 2), new Version(3, 0), new Version(3, 1), new Version(5, 0),
+                                    new Version(6, 0), new Version(7, 0)
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlatformArchitecture.ARM64, new Dictionary<PlatformOperatingSystem, Version[]>
+                        {
+                            {
+                                PlatformOperatingSystem.Windows, new Version[]
+                                {
+                                    new Version(5, 0), new Version(6, 0), new Version(7, 0)
+                                }
+                            },
+                            {
+                                PlatformOperatingSystem.OSX, new Version[]
+                                {
+                                    new Version(6, 0), new Version(7, 0)
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlatformArchitecture.ARM, new Dictionary<PlatformOperatingSystem, Version[]>
+                        {
+                            {
+                                PlatformOperatingSystem.Windows, new Version[]
+                                {
+                                    new Version(2, 2), new Version(3, 0), new Version(3, 1)
+                                }
+                           }
+                        }
+                   }
+               };
+
+            public static bool IsValidArchitectureSwitch(PlatformOperatingSystem os, PlatformArchitecture from, PlatformArchitecture to)
+            {
+                if (!ValidArchitectureSwitch.TryGetValue(os, out SwitchArchFromTo[] switchArch))
+                {
+                    return false;
+                }
+
+                return switchArch.SingleOrDefault(x => x.From == from && x.To == to) != null;
+            }
+
+            public static bool IsValidFramework(PlatformOperatingSystem os, PlatformArchitecture target, Version frameworkVersion)
+            {
+                if (!SupportedFramework.TryGetValue(target, out IDictionary<PlatformOperatingSystem, Version[]> platformVersionMapping))
+                {
+                    return false;
+                }
+
+                if (!platformVersionMapping.TryGetValue(os, out Version[] supportedFrameworkVersion))
+                {
+                    return false;
+                }
+
+                return supportedFrameworkVersion.SingleOrDefault(x => x.Major == frameworkVersion.Major && x.Minor == frameworkVersion.Minor) != null;
+            }
+        }
+
+        private class SwitchArchFromTo
+        {
+            public SwitchArchFromTo(PlatformArchitecture from, PlatformArchitecture to)
+            {
+                this.From = from;
+                this.To = to;
+            }
+
+            public PlatformArchitecture From { get; set; }
+
+            public PlatformArchitecture To { get; set; }
         }
     }
 }

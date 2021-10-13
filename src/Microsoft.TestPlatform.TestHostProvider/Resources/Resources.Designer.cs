@@ -88,5 +88,24 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
                 return ResourceManager.GetString("SuggestPublishTestProject", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   '{0}' and '{1}' are the placeholder for the architeture name like ARM64, X64 etc...
+        /// </summary>
+        internal static string InvalidXArchTestRun
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidXArchTestRun", resourceCulture);
+            }
+        }
+
+        internal static string InvalidFrameworkForTargetArchitecture
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidFrameworkForTargetArchitecture", resourceCulture);
+            }
+        }
     }
 }
