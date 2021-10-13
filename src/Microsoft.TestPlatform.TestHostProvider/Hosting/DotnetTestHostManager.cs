@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private IDotnetHostHelper dotnetHostHelper;
         private IEnvironment platformEnvironment;
         private IProcessHelper processHelper;
-
+        private IRunSettingsHelper runsettingHelper;
         private IFileHelper fileHelper;
 
         private ITestHostLauncher customTestHostLauncher;
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
         public DotnetTestHostManager()
-            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper(), new PlatformEnvironment())
+            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper(), new PlatformEnvironment(), RunSettingsHelper.Instance)
         {
         }
 
@@ -86,16 +86,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="fileHelper">File helper instance.</param>
         /// <param name="dotnetHostHelper">DotnetHostHelper helper instance.</param>
         /// <param name="platformEnvironment">Platform Environment</param>
+        /// <param name="runsettingHelper">RunsettingHelper instance</param>
         internal DotnetTestHostManager(
             IProcessHelper processHelper,
             IFileHelper fileHelper,
             IDotnetHostHelper dotnetHostHelper,
-            IEnvironment platformEnvironment)
+            IEnvironment platformEnvironment,
+            IRunSettingsHelper runsettingHelper)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dotnetHostHelper = dotnetHostHelper;
             this.platformEnvironment = platformEnvironment;
+            this.runsettingHelper = runsettingHelper;
         }
 
         /// <inheritdoc />
@@ -378,7 +381,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 // We silently force x64 only if the target architecture is the default one and is not specified by user
                 // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
-                bool forceToX64 = SilentlyForceToX64() && RunSettingsHelper.IsDefaultTargetArchitecture;
+                bool forceToX64 = SilentlyForceToX64() && this.runsettingHelper.IsDefaultTargetArchitecture;
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
                 if (useCustomDotnetHostpath)
                 {
@@ -749,7 +752,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         => (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X64) ||
                            (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X86) ||
                            (from == PlatformArchitecture.X64 && to == PlatformArchitecture.ARM64) ||
-                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X86)
+                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X86) ||
+
+                           // This is not needed we don't expect to land here, but units sometimes lies on
+                           // running process and we need to avoid failure.
+                           // Anyway the condition is correct.
+                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X64)
                     },
                     {
                         PlatformOperatingSystem.OSX, (PlatformArchitecture from, PlatformArchitecture to)

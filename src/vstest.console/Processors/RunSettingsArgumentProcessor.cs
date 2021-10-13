@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var platformStr = this.runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
             if (Enum.TryParse<Architecture>(platformStr, true, out var architecture))
             {
-                RunSettingsHelper.IsDefaultTargetArchitecture = false;
+                RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
                 this.commandLineOptions.TargetArchitecture = architecture;
             }
         }

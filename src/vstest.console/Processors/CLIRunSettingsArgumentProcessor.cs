@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 bool success = Enum.TryParse<Architecture>(value, true, out var architecture);
                 if (success)
                 {
-                    RunSettingsHelper.IsDefaultTargetArchitecture = false;
+                    RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
                     this.commandLineOptions.TargetArchitecture = architecture;
                 }
             }

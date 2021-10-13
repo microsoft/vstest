@@ -47,6 +47,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private readonly Mock<IEnvironmentVariableHelper> mockEnvironmentVariable;
 
+        private readonly Mock<IRunSettingsHelper> mockRunsettingHelper;
+
         private readonly TestRunnerConnectionInfo defaultConnectionInfo;
 
         private readonly string[] testSource = { "test.dll" };
@@ -73,16 +75,19 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockEnvironment = new Mock<IEnvironment>();
             this.mockWindowsRegistry = new Mock<IWindowsRegistryHelper>();
             this.mockEnvironmentVariable = new Mock<IEnvironmentVariableHelper>();
+            this.mockRunsettingHelper = new Mock<IRunSettingsHelper>();
             this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
             this.mockEnvironment.SetupGet(e => e.Architecture).Returns((PlatformArchitecture)Enum.Parse(typeof(PlatformArchitecture), Constants.DefaultPlatform.ToString()));
+            this.mockRunsettingHelper.SetupGet(r => r.IsDefaultTargetArchitecture).Returns(true);
             string defaultSourcePath = Path.Combine(this.temp, "test.dll");
             this.defaultTestHostPath = Path.Combine(this.temp, "testhost.dll");
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
                                          new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockWindowsRegistry.Object, this.mockEnvironmentVariable.Object),
-                                         this.mockEnvironment.Object);
+                                         this.mockEnvironment.Object,
+                                         this.mockRunsettingHelper.Object);
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
@@ -1065,8 +1070,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 IProcessHelper processHelper,
                 IFileHelper fileHelper,
                 IDotnetHostHelper dotnetTestHostHelper,
-                IEnvironment environment)
-                : base(processHelper, fileHelper, dotnetTestHostHelper, environment)
+                IEnvironment environment,
+                IRunSettingsHelper runsettingsHelper)
+                : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper)
             {
             }
         }

@@ -42,6 +42,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IProcessHelper> mockProcessHelper;
 
+        private Mock<IRunSettingsHelper> mockRunsettingHelper;
+
         private Mock<IFileHelper> mockFileHelper;
 
         private Mock<IEnvironment> mockEnvironment;
@@ -331,7 +333,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelForDotnetHostManagerWithIsVersionCheckRequiredFalseShouldNotCheckVersionWithTestHost()
         {
             this.SetUpMocksForDotNetTestHost();
-            var testHostManager = new TestableDotnetTestHostManager(false, this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object);
+            var testHostManager = new TestableDotnetTestHostManager(false, this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockRunsettingHelper.Object);
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, testHostManager);
 
             operationManager.SetupChannel(Enumerable.Empty<string>(), this.defaultRunSettings);
@@ -343,7 +345,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelForDotnetHostManagerWithIsVersionCheckRequiredTrueShouldCheckVersionWithTestHost()
         {
             this.SetUpMocksForDotNetTestHost();
-            var testHostManager = new TestableDotnetTestHostManager(true, this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object);
+            var testHostManager = new TestableDotnetTestHostManager(true, this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockRunsettingHelper.Object);
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, testHostManager);
 
             operationManager.SetupChannel(Enumerable.Empty<string>(), this.defaultRunSettings);
@@ -483,7 +485,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockEnvironment = new Mock<IEnvironment>();
+            this.mockRunsettingHelper = new Mock<IRunSettingsHelper>();
 
+            this.mockRunsettingHelper.SetupGet(r => r.IsDefaultTargetArchitecture).Returns(true);
             this.mockProcessHelper.Setup(
                     ph =>
                         ph.LaunchProcess(
@@ -530,7 +534,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 bool checkRequired,
                 IProcessHelper processHelper,
                 IFileHelper fileHelper,
-                IEnvironment environment) : base(processHelper, fileHelper, new DotnetHostHelper(fileHelper, environment, new WindowsRegistryHelper(), new EnvironmentVariableHelper()), environment)
+                IEnvironment environment,
+                IRunSettingsHelper runsettingHelper) : base(processHelper, fileHelper, new DotnetHostHelper(fileHelper, environment, new WindowsRegistryHelper(), new EnvironmentVariableHelper()), environment, runsettingHelper)
             {
                 this.isVersionCheckRequired = checkRequired;
             }

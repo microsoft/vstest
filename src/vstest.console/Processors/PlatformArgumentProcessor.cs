@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (validPlatform)
             {
-                RunSettingsHelper.IsDefaultTargetArchitecture = false;
+                RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
                 this.commandLineOptions.TargetArchitecture = platform;
                 this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
