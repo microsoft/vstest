@@ -164,5 +164,3 @@ static Microsoft.VisualStudio.TestPlatform.Utilities.MulticastDelegateUtilities.
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.Parse(string time) -> System.TimeSpan
 static Microsoft.VisualStudio.TestPlatform.Utilities.TimeSpanParser.TryParse(string time, out System.TimeSpan result) -> bool
 virtual Microsoft.VisualStudio.TestPlatform.Utilities.JobQueue<T>.WaitForQueueToGetEmpty() -> bool
-Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper
-Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IEnvironmentVariableHelper.GetEnvironmentVariable(string variable) -> string

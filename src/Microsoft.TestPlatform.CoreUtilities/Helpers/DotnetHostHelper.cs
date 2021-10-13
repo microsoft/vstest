@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using System;
     using System.IO;
 
-    public class DotnetHostHelper : IDotnetHostHelper
+    internal class DotnetHostHelper : IDotnetHostHelper
     {
         public const string MONOEXENAME = "mono";
 

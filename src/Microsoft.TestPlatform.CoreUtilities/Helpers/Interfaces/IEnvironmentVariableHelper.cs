@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
-    public interface IEnvironmentVariableHelper
+    internal interface IEnvironmentVariableHelper
     {
         string GetEnvironmentVariable(string variable);
     }

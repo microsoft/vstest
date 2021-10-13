@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
 {
-    public class EnvironmentVariableHelper : IEnvironmentVariableHelper
+    internal class EnvironmentVariableHelper : IEnvironmentVariableHelper
     {
         public string GetEnvironmentVariable(string variable)
             => Environment.GetEnvironmentVariable(variable);

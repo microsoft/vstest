@@ -8,7 +8,7 @@ using Microsoft.Win32;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
-    public class WindowsRegistryHelper : IWindowsRegistryHelper
+    internal class WindowsRegistryHelper : IWindowsRegistryHelper
     {
         public IRegistryKey OpenBaseKey(RegistryHive hKey, RegistryView view)
         {
@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
     }
 
-    public class RegistryKeyWrapper : IRegistryKey
+    internal class RegistryKeyWrapper : IRegistryKey
     {
         private readonly RegistryKey registryKey;
 

@@ -9,12 +9,12 @@ using Microsoft.Win32;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
-    public interface IWindowsRegistryHelper
+    internal interface IWindowsRegistryHelper
     {
         IRegistryKey OpenBaseKey(RegistryHive hKey, RegistryView view);
     }
 
-    public interface IRegistryKey : IDisposable
+    internal interface IRegistryKey : IDisposable
     {
         IRegistryKey OpenSubKey(string name);
         object GetValue(string name);
