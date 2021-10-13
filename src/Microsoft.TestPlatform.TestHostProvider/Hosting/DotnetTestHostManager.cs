@@ -376,7 +376,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     throw new TestPlatformException("Could not find testhost");
                 }
 
-                bool forceToX64 = SilentlyForceToX64();
+                // We silently force x64 only if the target architecture is the default one and is not specified by user
+                // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
+                bool forceToX64 = SilentlyForceToX64() && RunSettingsHelper.IsDefaultTargetArchitecture;
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
                 if (useCustomDotnetHostpath)
                 {
@@ -739,131 +741,84 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         // https://dotnet.microsoft.com/download/dotnet
         private class FrameworkAndArchitectureMatrixValidator
         {
-            private static readonly IDictionary<PlatformOperatingSystem, SwitchArchFromTo[]> ValidArchitectureSwitch
-                = new Dictionary<PlatformOperatingSystem, SwitchArchFromTo[]>
+            private static readonly IDictionary<PlatformOperatingSystem, Func<PlatformArchitecture, PlatformArchitecture, bool>> ValidArchitectureSwitch
+                = new Dictionary<PlatformOperatingSystem, Func<PlatformArchitecture, PlatformArchitecture, bool>>()
                 {
                     {
-                        PlatformOperatingSystem.Windows, new SwitchArchFromTo[]
-                        {
-                            new SwitchArchFromTo(PlatformArchitecture.ARM64, PlatformArchitecture.X64),
-                            new SwitchArchFromTo(PlatformArchitecture.ARM64, PlatformArchitecture.X86),
-                            new SwitchArchFromTo(PlatformArchitecture.X64, PlatformArchitecture.ARM64),
-                            new SwitchArchFromTo(PlatformArchitecture.X64, PlatformArchitecture.X86)
-                        }
+                        PlatformOperatingSystem.Windows, (PlatformArchitecture from, PlatformArchitecture to)
+                        => (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X64) ||
+                           (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X86) ||
+                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.ARM64) ||
+                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X86)
                     },
-                {
-                        PlatformOperatingSystem.OSX, new SwitchArchFromTo[]
-                        {
-                            new SwitchArchFromTo(PlatformArchitecture.ARM64, PlatformArchitecture.X64),
-                            new SwitchArchFromTo(PlatformArchitecture.X64, PlatformArchitecture.ARM64)
-                        }
+                    {
+                        PlatformOperatingSystem.OSX, (PlatformArchitecture from, PlatformArchitecture to)
+                        => (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X64) ||
+                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.ARM64)
                     }
                 };
 
-            private static readonly IDictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Version[]>> SupportedFramework
-               = new Dictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Version[]>>
-               {
+            private static readonly IDictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Func<Version, bool>>> SupportedFramework
+                = new Dictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Func<Version, bool>>>
+                {
                    {
-                        PlatformArchitecture.X64, new Dictionary<PlatformOperatingSystem, Version[]>
+                        PlatformArchitecture.X64, new Dictionary<PlatformOperatingSystem, Func<Version, bool>>
+                        {
+                            { PlatformOperatingSystem.Windows, _ => true },
+                            { PlatformOperatingSystem.OSX, _ => true }
+                        }
+                    },
+                    {
+                        PlatformArchitecture.X86, new Dictionary<PlatformOperatingSystem, Func<Version, bool>>
+                        {
+                            { PlatformOperatingSystem.Windows, _ => true }
+                        }
+                    },
+                    {
+                        PlatformArchitecture.ARM64, new Dictionary<PlatformOperatingSystem, Func<Version, bool>>
                         {
                             {
-                               PlatformOperatingSystem.Windows, new Version[]
-                               {
-                                 new Version(1, 0), new Version(1, 1), new Version(2, 0), new Version(2, 1),
-                                 new Version(2, 2), new Version(3, 0), new Version(3, 1), new Version(5, 0),
-                                 new Version(6, 0), new Version(7, 0)
-                               }
+                                PlatformOperatingSystem.Windows, (Version v) => v >= new Version(5, 0)
                             },
                             {
-                               PlatformOperatingSystem.OSX, new Version[]
-                               {
-                                 new Version(1, 0), new Version(1, 1), new Version(2, 0), new Version(2, 1),
-                                 new Version(2, 2), new Version(3, 0), new Version(3, 1), new Version(5, 0),
-                                 new Version(6, 0), new Version(7, 0)
-                               }
+                                PlatformOperatingSystem.OSX, (Version v) => v >= new Version(6, 0)
                             }
                         }
                     },
                     {
-                        PlatformArchitecture.X86, new Dictionary<PlatformOperatingSystem, Version[]>
+                        PlatformArchitecture.ARM, new Dictionary<PlatformOperatingSystem,  Func<Version, bool>>
                         {
-                            {
-                                PlatformOperatingSystem.Windows, new Version[]
-                                {
-                                    new Version(1, 0), new Version(1, 1), new Version(2, 0), new Version(2, 1),
-                                    new Version(2, 2), new Version(3, 0), new Version(3, 1), new Version(5, 0),
-                                    new Version(6, 0), new Version(7, 0)
-                                }
-                            }
-                        }
-                    },
-                    {
-                        PlatformArchitecture.ARM64, new Dictionary<PlatformOperatingSystem, Version[]>
-                        {
-                            {
-                                PlatformOperatingSystem.Windows, new Version[]
-                                {
-                                    new Version(5, 0), new Version(6, 0), new Version(7, 0)
-                                }
-                            },
-                            {
-                                PlatformOperatingSystem.OSX, new Version[]
-                                {
-                                    new Version(6, 0), new Version(7, 0)
-                                }
-                            }
-                        }
-                    },
-                    {
-                        PlatformArchitecture.ARM, new Dictionary<PlatformOperatingSystem, Version[]>
-                        {
-                            {
-                                PlatformOperatingSystem.Windows, new Version[]
-                                {
-                                    new Version(2, 2), new Version(3, 0), new Version(3, 1)
-                                }
+                           {
+                                PlatformOperatingSystem.Windows, (Version v) => v >= new Version(2, 2) && v <= new Version(3, 1)
                            }
                         }
                    }
-               };
+                };
 
             public static bool IsValidArchitectureSwitch(PlatformOperatingSystem os, PlatformArchitecture from, PlatformArchitecture to)
             {
-                if (!ValidArchitectureSwitch.TryGetValue(os, out SwitchArchFromTo[] switchArch))
+                if (!ValidArchitectureSwitch.TryGetValue(os, out Func<PlatformArchitecture, PlatformArchitecture, bool> switchArch))
                 {
                     return false;
                 }
 
-                return switchArch.SingleOrDefault(x => x.From == from && x.To == to) != null;
+                return switchArch(from, to);
             }
 
             public static bool IsValidFramework(PlatformOperatingSystem os, PlatformArchitecture target, Version frameworkVersion)
             {
-                if (!SupportedFramework.TryGetValue(target, out IDictionary<PlatformOperatingSystem, Version[]> platformVersionMapping))
+                if (!SupportedFramework.TryGetValue(target, out IDictionary<PlatformOperatingSystem, Func<Version, bool>> platformVersionMapping))
                 {
                     return false;
                 }
 
-                if (!platformVersionMapping.TryGetValue(os, out Version[] supportedFrameworkVersion))
+                if (!platformVersionMapping.TryGetValue(os, out Func<Version, bool> supportedFrameworkVersion))
                 {
                     return false;
                 }
 
-                return supportedFrameworkVersion.SingleOrDefault(x => x.Major == frameworkVersion.Major && x.Minor == frameworkVersion.Minor) != null;
+                return supportedFrameworkVersion(frameworkVersion);
             }
-        }
-
-        private class SwitchArchFromTo
-        {
-            public SwitchArchFromTo(PlatformArchitecture from, PlatformArchitecture to)
-            {
-                this.From = from;
-                this.To = to;
-            }
-
-            public PlatformArchitecture From { get; set; }
-
-            public PlatformArchitecture To { get; set; }
         }
     }
 }
