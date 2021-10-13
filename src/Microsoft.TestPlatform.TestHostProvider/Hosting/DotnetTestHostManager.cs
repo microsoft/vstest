@@ -403,7 +403,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     EqtTrace.Verbose($"DotnetTestHostmanager: searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework}");
                     if (forceToX64)
                     {
-                        EqtTrace.Verbose($"DotnetTestHostmanager: forcing the search to x64 architecure");
+                        EqtTrace.Verbose($"DotnetTestHostmanager: forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
                     // If we're in the edge case and we force arch we can skip check, we know that config is a valid one.
@@ -419,7 +419,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         // We validate if target framework is supported by switched architecture
                         if (!FrameworkAndArchitectureMatrixValidator.IsValidFramework(this.platformEnvironment.OperatingSystem, targetArchitecture, new Version(this.targetFramework.Version)))
                         {
-                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidFrameworkForTargetArchitecture, this.architecture);
+                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidFrameworkForTargetArchitecture, this.architecture, this.targetFramework);
                             throw new TestPlatformException(message);
                         }
                     }

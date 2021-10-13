@@ -128,11 +128,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             Architecture arch = Architecture.AnyCPU;
             // Mapping to Architecture based on https://msdn.microsoft.com/en-us/library/system.reflection.processorarchitecture(v=vs.110).aspx
 
-            if (processorArchitecture.Equals(ProcessorArchitecture.Amd64))
-            {
-                arch = Architecture.ARM64;
-            }
-            else if (processorArchitecture.Equals(ProcessorArchitecture.IA64))
+            if (processorArchitecture.Equals(ProcessorArchitecture.Amd64)
+                || processorArchitecture.Equals(ProcessorArchitecture.IA64))
             {
                 arch = Architecture.X64;
             }
@@ -147,6 +144,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             else if (processorArchitecture.Equals(ProcessorArchitecture.Arm))
             {
                 arch = Architecture.ARM;
+            }
+            // TODO: Find a way to detect ARM64 and newer machine model, use PEReader.
+            // today we have this use case on ARM64 on Mac
+            else if (processorArchitecture.Equals(ProcessorArchitecture.None))
+            {
+                arch = Architecture.ARM64;
             }
             else
             {

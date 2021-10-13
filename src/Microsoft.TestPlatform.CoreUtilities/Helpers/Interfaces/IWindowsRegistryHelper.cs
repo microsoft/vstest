@@ -17,7 +17,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
     internal interface IRegistryKey : IDisposable
     {
         IRegistryKey OpenSubKey(string name);
+
         object GetValue(string name);
+
+        string[] GetSubKeyNames();
     }
 }
 

@@ -120,11 +120,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             {
                 envKey = $"{envVarPrefix}(x86)";
                 envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
-                if (envVar == null)
-                {
-                    envKey = envVarPrefix;
-                    envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
-                }
+
+                // Is it correct? If someone put something wrong we're runing with wrong muxer
+                // i.e. set DOTNET_ROOT with x64 and run --arch arm64 on Mac/WinArm but without global installation of arm runtime
+                // if (envVar == null)
+                // {
+                // envKey = envVarPrefix;
+                // envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
+                // }
             }
 
             if (envVar != null)
@@ -141,6 +144,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             // Try to search for global registration
             if (isWinOs)
             {
+                PlatformArchitecture? inferredPlatformAchitecture;
+                if (!TryInferNativeArchitectureOnWin(out inferredPlatformAchitecture, RegistryView.Registry32))
+                {
+                    EqtTrace.Verbose($"DotnetHostHelper: failed to infer platform architecture for Registry32 view");
+                    if (!TryInferNativeArchitectureOnWin(out inferredPlatformAchitecture, RegistryView.Registry64))
+                    {
+                        EqtTrace.Verbose($"DotnetHostHelper: failed to infer platform architecture for Registry64 view");
+                    }
+                }
+
                 // Installed version are always on 32-bit view of registry
                 // https://github.com/dotnet/designs/blob/main/accepted/2020/install-locations.md#globally-registered-install-location-new
                 // "Note that this registry key is "redirected" that means that 32-bit processes see different copy of the key then 64bit processes.
@@ -158,8 +171,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                                     string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
                                     if (installLocation != null)
                                     {
-                                        path = Path.Combine(installLocation.Trim(), muxerName);
-                                        EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using win registry in '{path}'");
+                                        // Fix current bug in installer, it creates arm64 subkey in wrong
+                                        if (inferredPlatformAchitecture != null &&
+                                             ((targetArchitecture == PlatformArchitecture.ARM64 && inferredPlatformAchitecture == PlatformArchitecture.X64) ||
+                                             (targetArchitecture == PlatformArchitecture.ARM64 && inferredPlatformAchitecture == PlatformArchitecture.X86)))
+                                        {
+                                            EqtTrace.Verbose($"DotnetHostHelper: invalid architecture found on registry '{installLocation}', inferred architecture '{inferredPlatformAchitecture}', inferred architecture {targetArchitecture}");
+                                        }
+                                        else
+                                        {
+                                            path = Path.Combine(installLocation.Trim(), muxerName);
+                                            EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using win registry in '{path}'");
+                                        }
                                     }
                                 }
                             }
@@ -174,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 // We search for architecture specific installation
                 string installLocation = $"{baseInstallLocation}install_location_{targetArchitecture.ToString().ToLower()}";
 
-                // TODO: understand if we should access to this one or only arch one
+                // We try to load archless install location file
                 if (!this.fileHelper.Exists(installLocation))
                 {
                     installLocation = $"{baseInstallLocation}install_location";
@@ -186,29 +209,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     using (StreamReader streamReader = new StreamReader(stream))
                     {
                         string content = streamReader.ReadToEnd().Trim();
-                        EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
-                        path = Path.Combine(content, muxerName);
-                        EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using '{installLocation}' in '{path}'");
+
+                        // Validate file content on MacOS
+                        if (
+                                (content.EndsWith("/x64") && targetArchitecture != PlatformArchitecture.X64) ||
+
+                                // We can't do this check because in native x64 we'll have /usr/local/share/dotnet inside the install_location
+                                // and we don't have a good way to know if we're virtualized by OS.
+                                // (content.EndsWith("dotnet") && targetArchitecture == PlatformArchitecture.X64) &&
+                                this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
+                        {
+                            EqtTrace.Verbose($"DotnetHostHelper: Invalid content found in {installLocation} content '{content}' targetArchitecture '{targetArchitecture}'");
+                        }
+                        else
+                        {
+                            EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
+                            path = Path.Combine(content, muxerName);
+                            EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using '{installLocation}' in '{path}'");
+                        }
                     }
                 }
             }
 
+            // Does this one make sense? 
             // Try on default installation location if exists
-            if (path is null)
-            {
-                path = isWinOs ?
-
-                    this.environment.Architecture == PlatformArchitecture.X86 ?
-                    Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName) :
-                    Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName) :
-
-                    this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
-                    // TODO: check if x64 assumptions is correct and if it's ok fallback to default on linux
-                    $"/usr/local/share/dotnet/{muxerName}" + ((targetArchitecture == PlatformArchitecture.X64 && environment.Architecture == PlatformArchitecture.ARM64) ? "/x64" : "") :
-                    $"/usr/share/dotnet/{muxerName}";
-
-                EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using default installation path in '{path}'");
-            }
+            // if (path is null)
+            // {
+            //     if (isWinOs)
+            //     {
+            //         path = this.environment.Architecture == PlatformArchitecture.X86 ?
+            //             Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName) :
+            //             Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
+            //     }
+            //     else
+            //     {
+            //         path = this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
+            //         // TODO: check if x64 assumptions is correct and if it's ok fallback to default on linux
+            //         $"/usr/local/share/dotnet/{muxerName}" + ((targetArchitecture == PlatformArchitecture.X64 && environment.Architecture == PlatformArchitecture.ARM64) ? "/x64" : "") :
+            //         $"/usr/share/dotnet/{muxerName}";
+            //     }
+            //     EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using default installation path in '{path}'");
+            // }
 
             if (!this.fileHelper.Exists(path))
             {
@@ -219,6 +260,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             }
 
             return path;
+
+
+            /// We try to infer native architecture using installer logic described here
+            /// https://github.com/dotnet/runtime/blob/main/src/installer/pkg/sfx/installers/host.wxs#L30
+            /// Installer creates SOFTWARE\dotnet\Setup\InstalledVersions\{arch}\sharedhost key during dotnet global installation
+            /// Should be present in all netcore versions.
+            bool TryInferNativeArchitectureOnWin(out PlatformArchitecture? platformArchitecture, RegistryView registryView)
+            {
+                platformArchitecture= null;
+                using (IRegistryKey hklm = windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, registryView))
+                {
+                    if (hklm != null)
+                    {
+                        using (IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions"))
+                        {
+                            if (dotnetInstalledVersion != null)
+                            {
+                                foreach (string subKey in dotnetInstalledVersion.GetSubKeyNames())
+                                {
+                                    using (IRegistryKey sharedHostSubkey = dotnetInstalledVersion.OpenSubKey($"{subKey}\\sharedHost"))
+                                    {
+                                        if (sharedHostSubkey != null)
+                                        {
+                                            if (Enum.TryParse(subKey, true, out PlatformArchitecture platformName))
+                                            {
+                                                platformArchitecture = platformName;
+                                                return true;
+                                            }
+                                            else
+                                            {
+                                                EqtTrace.Verbose($"DotnetHostHelper: failed to parse native architecture '{subKey}'");
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }

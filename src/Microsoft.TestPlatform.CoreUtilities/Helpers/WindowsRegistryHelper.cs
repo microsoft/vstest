@@ -37,11 +37,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
             return keyRegistry is null ? null : new RegistryKeyWrapper(keyRegistry);
         }
 
+        public string[] GetSubKeyNames()
+            => this.registryKey?.GetSubKeyNames();
+
         public void Dispose()
         {
             this.registryKey?.Dispose();
         }
-
     }
 }
 
