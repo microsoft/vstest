@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public string GetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture)
         {
-            // We used similar approach of runtime resolver.
+            // We used similar approach as the runtime resolver.
             // https://github.com/dotnet/runtime/blob/main/src/native/corehost/fxr_resolver.cpp#L55
 
             string path = null;
