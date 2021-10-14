@@ -108,6 +108,7 @@ packages
 artifacts
 [tT]ools
 
+*.dmp
 *.nupkg
 *.zip
 src/package/sign/sign.nuget.targets
