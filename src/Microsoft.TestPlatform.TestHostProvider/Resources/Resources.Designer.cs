@@ -92,11 +92,11 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         /// <summary>
         ///   '{0}' and '{1}' are the placeholder for the architeture name like ARM64, X64 etc...
         /// </summary>
-        internal static string InvalidXArchTestRun
+        internal static string InvalidArchitectureSwitch
         {
             get
             {
-                return ResourceManager.GetString("InvalidXArchTestRun", resourceCulture);
+                return ResourceManager.GetString("InvalidArchitectureSwitch", resourceCulture);
             }
         }
 
@@ -105,6 +105,14 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
             get
             {
                 return ResourceManager.GetString("InvalidFrameworkForTargetArchitecture", resourceCulture);
+            }
+        }
+
+        internal static string ArchitectureSwitchNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("ArchitectureSwitchNotSupported", resourceCulture);
             }
         }
     }

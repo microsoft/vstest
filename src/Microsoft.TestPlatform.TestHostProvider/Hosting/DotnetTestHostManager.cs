@@ -406,13 +406,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         EqtTrace.Verbose($"DotnetTestHostmanager: forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
-                    // If we're in the edge case and we force arch we can skip check, we know that config is a valid one.
+                    // If we're in the edge case and we force arch we can skip check, we know that config is a valid one
                     if (!forceToX64)
                     {
                         // We validate if architecture to switch to is a valid one
                         if (!FrameworkAndArchitectureMatrixValidator.IsValidArchitectureSwitch(this.platformEnvironment.OperatingSystem, this.platformEnvironment.Architecture, targetArchitecture))
                         {
-                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidXArchTestRun, this.architecture, this.platformEnvironment.Architecture);
+                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidArchitectureSwitch, this.architecture, this.platformEnvironment.Architecture);
                             throw new TestPlatformException(message);
                         }
 
@@ -422,6 +422,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                             string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidFrameworkForTargetArchitecture, this.architecture, this.targetFramework);
                             throw new TestPlatformException(message);
                         }
+                    }
+
+                    // We don't support architecture switch on Linux yet
+                    if (this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Unix)
+                    {
+                        string message = string.Format(CultureInfo.CurrentCulture, Resources.ArchitectureSwitchNotSupported);
+                        throw new TestPlatformException(message);
                     }
 
                     startInfo.FileName = this.dotnetHostHelper.GetDotnetPathByArchitecture(forceToX64 ? PlatformArchitecture.X64 : targetArchitecture);

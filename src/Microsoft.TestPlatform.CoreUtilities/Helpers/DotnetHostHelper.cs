@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using Microsoft.Win32;
     using System;
     using System.IO;
+    using System.Reflection.PortableExecutable;
 
     internal class DotnetHostHelper : IDotnetHostHelper
     {
@@ -25,12 +26,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         private readonly IEnvironment environment;
         private readonly IWindowsRegistryHelper windowsRegistryHelper;
         private readonly IEnvironmentVariableHelper environmentVariableHelper;
+        private readonly string muxerName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
         public DotnetHostHelper() : this(new FileHelper(), new PlatformEnvironment(), new WindowsRegistryHelper(), new EnvironmentVariableHelper())
         {
+            this.muxerName = $"dotnet{(environment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : "")}";
         }
 
         /// <summary>
@@ -103,9 +106,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             // We used similar approach as the runtime resolver.
             // https://github.com/dotnet/runtime/blob/main/src/native/corehost/fxr_resolver.cpp#L55
 
-            string path = null;
+            string path;
             bool isWinOs = environment.OperatingSystem == PlatformOperatingSystem.Windows;
-            string muxerName = $"dotnet{(isWinOs ? ".exe" : "")}";
             EqtTrace.Verbose($"DotnetHostHelper: current platform muxer '{muxerName}'");
 
             // Try to search using env vars in the order
@@ -120,14 +122,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             {
                 envKey = $"{envVarPrefix}(x86)";
                 envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
+            }
 
-                // Is it correct? If someone put something wrong we're runing with wrong muxer
-                // i.e. set DOTNET_ROOT with x64 and run --arch arm64 on Mac/WinArm but without global installation of arm runtime
-                // if (envVar == null)
-                // {
-                // envKey = envVarPrefix;
-                // envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
-                // }
+            if (envVar == null)
+            {
+                envKey = envVarPrefix;
+                envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
             }
 
             if (envVar != null)
@@ -135,123 +135,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 envVar = Path.Combine(envVar, muxerName);
                 if (this.fileHelper.Exists(envVar))
                 {
-                    path = envVar;
-                    EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using env var key '{envKey}' in '{path}'");
-                    return path;
+                    if (IsValidArchitectureMuxer(targetArchitecture, envVar))
+                    {
+                        path = envVar;
+                        EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using env var key '{envKey}' in '{path}'");
+                        return path;
+                    }
+                    else
+                    {
+                        EqtTrace.Verbose($"DotnetHostHelper: invalid muxer resolved using env var key '{envKey}' in '{envVar}'");
+                    }
                 }
             }
 
             // Try to search for global registration
             if (isWinOs)
             {
-                PlatformArchitecture? inferredPlatformAchitecture;
-                if (!TryInferNativeArchitectureOnWin(out inferredPlatformAchitecture, RegistryView.Registry32))
-                {
-                    EqtTrace.Verbose($"DotnetHostHelper: failed to infer platform architecture for Registry32 view");
-                    if (!TryInferNativeArchitectureOnWin(out inferredPlatformAchitecture, RegistryView.Registry64))
-                    {
-                        EqtTrace.Verbose($"DotnetHostHelper: failed to infer platform architecture for Registry64 view");
-                    }
-                }
-
-                // Installed version are always on 32-bit view of registry
-                // https://github.com/dotnet/designs/blob/main/accepted/2020/install-locations.md#globally-registered-install-location-new
-                // "Note that this registry key is "redirected" that means that 32-bit processes see different copy of the key then 64bit processes.
-                // So it's important that both installers and the host access only the 32-bit view of the registry."
-                using (IRegistryKey hklm = windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-                {
-                    if (hklm != null)
-                    {
-                        using (IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions"))
-                        {
-                            if (dotnetInstalledVersion != null)
-                            {
-                                using (IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLower()))
-                                {
-                                    string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
-                                    if (installLocation != null)
-                                    {
-                                        // Fix current bug in installer, it creates arm64 subkey in wrong
-                                        if (inferredPlatformAchitecture != null &&
-                                             ((targetArchitecture == PlatformArchitecture.ARM64 && inferredPlatformAchitecture == PlatformArchitecture.X64) ||
-                                             (targetArchitecture == PlatformArchitecture.ARM64 && inferredPlatformAchitecture == PlatformArchitecture.X86)))
-                                        {
-                                            EqtTrace.Verbose($"DotnetHostHelper: invalid architecture found on registry '{installLocation}', inferred architecture '{inferredPlatformAchitecture}', inferred architecture {targetArchitecture}");
-                                        }
-                                        else
-                                        {
-                                            path = Path.Combine(installLocation.Trim(), muxerName);
-                                            EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using win registry in '{path}'");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                path = GetMuxerFromGlobalRegistrationWin(targetArchitecture);
             }
             else
             {
-                string baseInstallLocation = "/etc/dotnet/";
+                path = GetMuxerFromGlobalRegistrationOnUnix(targetArchitecture);
+            }
 
-                // We search for architecture specific installation
-                string installLocation = $"{baseInstallLocation}install_location_{targetArchitecture.ToString().ToLower()}";
+            if (path != null && !IsValidArchitectureMuxer(targetArchitecture, path))
+            {
+                EqtTrace.Verbose($"DotnetHostHelper: invalid muxer resolved using global registration '{path}'");
+                path = null;
+            }
 
-                // We try to load archless install location file
-                if (!this.fileHelper.Exists(installLocation))
+            // Try on default installation location if exists
+            if (path is null)
+            {
+                if (isWinOs)
                 {
-                    installLocation = $"{baseInstallLocation}install_location";
+                    path = this.environment.Architecture == PlatformArchitecture.X64 && targetArchitecture == PlatformArchitecture.X86 ?
+                        Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName) :
+                        Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
+                }
+                else
+                {
+                    path = this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
+                    $"/usr/local/share/dotnet/{muxerName}" :
+                    $"/usr/share/dotnet/{muxerName}";
                 }
 
-                if (this.fileHelper.Exists(installLocation))
+                if (path != null && this.fileHelper.Exists(path))
                 {
-                    using (Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read))
-                    using (StreamReader streamReader = new StreamReader(stream))
+                    if (!IsValidArchitectureMuxer(targetArchitecture, path))
                     {
-                        string content = streamReader.ReadToEnd().Trim();
-
-                        // Validate file content on MacOS
-                        if (
-                                (content.EndsWith("/x64") && targetArchitecture != PlatformArchitecture.X64) ||
-
-                                // We can't do this check because in native x64 we'll have /usr/local/share/dotnet inside the install_location
-                                // and we don't have a good way to know if we're virtualized by OS.
-                                // (content.EndsWith("dotnet") && targetArchitecture == PlatformArchitecture.X64) &&
-                                this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
-                        {
-                            EqtTrace.Verbose($"DotnetHostHelper: Invalid content found in {installLocation} content '{content}' targetArchitecture '{targetArchitecture}'");
-                        }
-                        else
-                        {
-                            EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
-                            path = Path.Combine(content, muxerName);
-                            EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using '{installLocation}' in '{path}'");
-                        }
+                        EqtTrace.Verbose($"DotnetHostHelper: invalid muxer resolved using default installation path '{path}'");
+                        path = null;
+                    }
+                    else
+                    {
+                        EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using default installation path in '{path}'");
                     }
                 }
             }
 
-            // Does this one make sense? 
-            // Try on default installation location if exists
-            // if (path is null)
-            // {
-            //     if (isWinOs)
-            //     {
-            //         path = this.environment.Architecture == PlatformArchitecture.X86 ?
-            //             Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName) :
-            //             Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
-            //     }
-            //     else
-            //     {
-            //         path = this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
-            //         // TODO: check if x64 assumptions is correct and if it's ok fallback to default on linux
-            //         $"/usr/local/share/dotnet/{muxerName}" + ((targetArchitecture == PlatformArchitecture.X64 && environment.Architecture == PlatformArchitecture.ARM64) ? "/x64" : "") :
-            //         $"/usr/share/dotnet/{muxerName}";
-            //     }
-            //     EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using default installation path in '{path}'");
-            // }
-
-            if (!this.fileHelper.Exists(path))
+            if (path is null)
             {
                 string errorMessage = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, muxerName, targetArchitecture.ToString());
 
@@ -260,49 +203,178 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             }
 
             return path;
+        }
 
-
-            /// We try to infer native architecture using installer logic described here
-            /// https://github.com/dotnet/runtime/blob/main/src/installer/pkg/sfx/installers/host.wxs#L30
-            /// Installer creates SOFTWARE\dotnet\Setup\InstalledVersions\{arch}\sharedhost key during dotnet global installation
-            /// Should be present in all netcore versions.
-            bool TryInferNativeArchitectureOnWin(out PlatformArchitecture? platformArchitecture, RegistryView registryView)
+        private string GetMuxerFromGlobalRegistrationWin(PlatformArchitecture targetArchitecture)
+        {
+            // Installed version are always on 32-bit view of registry
+            // https://github.com/dotnet/designs/blob/main/accepted/2020/install-locations.md#globally-registered-install-location-new
+            // "Note that this registry key is "redirected" that means that 32-bit processes see different copy of the key then 64bit processes.
+            // So it's important that both installers and the host access only the 32-bit view of the registry."
+            using (IRegistryKey hklm = windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
             {
-                platformArchitecture= null;
-                using (IRegistryKey hklm = windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, registryView))
+                if (hklm != null)
                 {
-                    if (hklm != null)
+                    using (IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions"))
                     {
-                        using (IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions"))
+                        if (dotnetInstalledVersion != null)
                         {
-                            if (dotnetInstalledVersion != null)
+                            using (IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLower()))
                             {
-                                foreach (string subKey in dotnetInstalledVersion.GetSubKeyNames())
+                                string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
+
+                                if (installLocation != null)
                                 {
-                                    using (IRegistryKey sharedHostSubkey = dotnetInstalledVersion.OpenSubKey($"{subKey}\\sharedHost"))
-                                    {
-                                        if (sharedHostSubkey != null)
-                                        {
-                                            if (Enum.TryParse(subKey, true, out PlatformArchitecture platformName))
-                                            {
-                                                platformArchitecture = platformName;
-                                                return true;
-                                            }
-                                            else
-                                            {
-                                                EqtTrace.Verbose($"DotnetHostHelper: failed to parse native architecture '{subKey}'");
-                                                return false;
-                                            }
-                                        }
-                                    }
+                                    string path = Path.Combine(installLocation.Trim(), this.muxerName);
+                                    EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using win registry in '{path}'");
+                                    return path;
                                 }
                             }
                         }
                     }
                 }
+            }
 
+            return null;
+        }
+
+        private string GetMuxerFromGlobalRegistrationOnUnix(PlatformArchitecture targetArchitecture)
+        {
+            string baseInstallLocation = "/etc/dotnet/";
+
+            // We search for architecture specific installation
+            string installLocation = $"{baseInstallLocation}install_location_{targetArchitecture.ToString().ToLower()}";
+
+            // We try to load archless install location file
+            if (!this.fileHelper.Exists(installLocation))
+            {
+                installLocation = $"{baseInstallLocation}install_location";
+            }
+
+            if (this.fileHelper.Exists(installLocation))
+            {
+                using (Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read))
+                using (StreamReader streamReader = new StreamReader(stream))
+                {
+                    string content = streamReader.ReadToEnd().Trim();
+                    EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
+                    string path = Path.Combine(content, this.muxerName);
+                    EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using '{installLocation}' in '{path}'");
+                    return path;
+                }
+            }
+
+            return null;
+        }
+
+        private PlatformArchitecture? GetMuxerArchitectureByPEHeaderOnWin(string path)
+        {
+            try
+            {
+                using (Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
+                using (PEReader peReader = new PEReader(stream))
+                {
+                    switch (peReader.PEHeaders.CoffHeader.Machine)
+                    {
+                        case Machine.Amd64:
+                            return PlatformArchitecture.X64;
+                        case Machine.IA64:
+                            return PlatformArchitecture.X64;
+                        case Machine.Arm64:
+                            return PlatformArchitecture.ARM64;
+                        case Machine.Arm:
+                            return PlatformArchitecture.ARM;
+                        case Machine.I386:
+                            return PlatformArchitecture.X86;
+                        default:
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose($"DotnetHostHelper: failed to get architecture from PEHeader for '{path}'\n{ex}");
+            }
+
+            return null;
+        }
+
+        // See https://opensource.apple.com/source/xnu/xnu-2050.18.24/EXTERNAL_HEADERS/mach-o/loader.h
+        // https://opensource.apple.com/source/xnu/xnu-4570.41.2/osfmk/mach/machine.h.auto.html
+        private PlatformArchitecture? GetMuxerArchitectureByMachoOnMac(string path)
+        {
+            try
+            {
+                PlatformArchitecture? architecture;
+                using (var headerReader = File.OpenRead(path))
+                {
+                    var magicBytes = new byte[4];
+                    var cpuInfoBytes = new byte[4];
+                    headerReader.Read(magicBytes, 0, magicBytes.Length);
+                    headerReader.Read(cpuInfoBytes, 0, cpuInfoBytes.Length);
+
+                    var magic = BitConverter.ToUInt32(magicBytes, 0);
+                    var cpuInfo = BitConverter.ToUInt32(cpuInfoBytes, 0);
+                    switch ((MacOsCpuType)cpuInfo)
+                    {
+                        case MacOsCpuType.Arm64Magic:
+                        case MacOsCpuType.Arm64Cigam:
+                            architecture = PlatformArchitecture.ARM64;
+                            break;
+                        case MacOsCpuType.X64Magic:
+                        case MacOsCpuType.X64Cigam:
+                            architecture = PlatformArchitecture.X64;
+                            break;
+                        case MacOsCpuType.X86Magic:
+                        case MacOsCpuType.X86Cigam:
+                            architecture = PlatformArchitecture.X86;
+                            break;
+                        default:
+                            architecture = null;
+                            break;
+                    }
+
+                    return architecture;
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Verbose($"DotnetHostHelper: failed to get architecture from Mach-O for '{path}'\n{ex}");
+            }
+
+            return null;
+        }
+
+        internal enum MacOsCpuType : uint
+        {
+            Arm64Magic = 0x0100000c,
+            Arm64Cigam = 0x0c000001,
+            X64Magic = 0x01000007,
+            X64Cigam = 0x07000001,
+            X86Magic = 0x00000007,
+            X86Cigam = 0x07000000
+        }
+
+        private bool IsValidArchitectureMuxer(PlatformArchitecture targetArchitecture, string path)
+        {
+            PlatformArchitecture? muxerPlaform = null;
+            if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
+            {
+                muxerPlaform =  GetMuxerArchitectureByPEHeaderOnWin(path);
+            }
+
+            if (this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
+            {
+                muxerPlaform = GetMuxerArchitectureByMachoOnMac(path);
+            }
+
+            if (targetArchitecture != muxerPlaform)
+            {
+                EqtTrace.Verbose($"DotnetHostHelper: invalid architecture mutex, target architecture '{targetArchitecture}', actual '{muxerPlaform}'");
                 return false;
             }
+
+            return true;
         }
     }
 }

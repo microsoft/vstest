@@ -62,6 +62,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 // AssemblyName won't load the assembly into current domain.
                 var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
                 archType = MapToArchitecture(assemblyName.ProcessorArchitecture);
+
+                // AssemblyName.GetAssemblyName could not support new architecture like ARM64
+                // so in case of Architecture.AnyCPU we try to fallback to assembly metadata
+                if (archType == Architecture.AnyCPU)
+                {
+                    archType = GetArchitectureFromAssemblyMetadata(assemblyPath);
+                }
             }
             catch (Exception ex)
             {
@@ -92,6 +99,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
 
             return archType;
+        }
+
+        private Architecture GetArchitectureFromAssemblyMetadata(string path)
+        {
+            Architecture arch = Architecture.AnyCPU;
+            using (Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
+            using (PEReader peReader = new PEReader(stream))
+            {
+                switch (peReader.PEHeaders.CoffHeader.Machine)
+                {
+                    case Machine.Amd64:
+                        return Architecture.X64;
+                    case Machine.IA64:
+                        return Architecture.X64;
+                    case Machine.Arm64:
+                        return Architecture.ARM64;
+                    case Machine.Arm:
+                        return Architecture.ARM;
+                    case Machine.I386:
+                        return Architecture.X86;
+                    default:
+                        break;
+                }
+            }
+
+            return arch;
         }
 
         private static FrameworkName GetFrameworkNameFromAssemblyMetadata(Stream assemblyStream)
