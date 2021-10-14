@@ -61,14 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 // AssemblyName won't load the assembly into current domain.
                 var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
-                archType = MapToArchitecture(assemblyName.ProcessorArchitecture);
-
-                // AssemblyName.GetAssemblyName could not support new architecture like ARM64
-                // so in case of Architecture.AnyCPU we try to fallback to assembly metadata
-                if (archType == Architecture.AnyCPU)
-                {
-                    archType = GetArchitectureFromAssemblyMetadata(assemblyPath);
-                }
+                archType = MapToArchitecture(assemblyName.ProcessorArchitecture, assemblyPath);
             }
             catch (Exception ex)
             {
@@ -156,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return frameworkName;
         }
 
-        private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture)
+        private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture, string assemblyPath)
         {
             Architecture arch = Architecture.AnyCPU;
             // Mapping to Architecture based on https://msdn.microsoft.com/en-us/library/system.reflection.processorarchitecture(v=vs.110).aspx
@@ -178,11 +171,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 arch = Architecture.ARM;
             }
-            // TODO: Find a way to detect ARM64 and newer machine model, use PEReader.
-            // today we have this use case on ARM64 on Mac
             else if (processorArchitecture.Equals(ProcessorArchitecture.None))
             {
-                arch = Architecture.ARM64;
+                // In case of None we fallback to PEReader
+                // We don't use only PEReader for back compatibility.
+                // An AnyCPU returned by AssemblyName.GetAssemblyName(assemblyPath) will result in a I386 for PEReader
+                // Also MSIL processor architecture is not present in PEReader
+                // For now it should fix the issue for the missing ARM64 architecture.
+                arch = GetArchitectureFromAssemblyMetadata(assemblyPath);
             }
             else
             {
