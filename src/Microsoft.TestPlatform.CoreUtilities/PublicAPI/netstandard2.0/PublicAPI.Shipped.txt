@@ -108,7 +108,7 @@ Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSourc
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetDotnetPath() -> string
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetMonoPath() -> string
-Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetDotnetPathByArchitecture(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture) -> string
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.TryGetDotnetPathByArchitecture(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, out string muxerPath) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.EqtTrace
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArg
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArgProperty

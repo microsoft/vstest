@@ -31,6 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="architecture">Specific architecture</param>
         /// <param name="path">path to the muxer</param>
         /// <returns>true if native muxer is found</returns>
-        string GetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture);
+        bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath);
     }
 }

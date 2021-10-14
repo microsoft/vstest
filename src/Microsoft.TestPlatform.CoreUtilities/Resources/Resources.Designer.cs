@@ -228,6 +228,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources {
                 return ResourceManager.GetString("NoDotnetMuxerFoundForArchitecture", resourceCulture);
             }
         }
-
     }
 }

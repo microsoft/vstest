@@ -394,16 +394,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                          IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture) &&
                          !forceToX64)
                 {
-                    EqtTrace.Verbose("DotnetTestHostmanager: compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
+                    EqtTrace.Verbose("DotnetTestHostmanager: Compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
                 }
                 else
                 {
                     PlatformArchitecture targetArchitecture = TranslateToPlatformArchitecture(this.architecture);
-                    EqtTrace.Verbose($"DotnetTestHostmanager: searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework}");
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework} SDK architecture '{this.platformEnvironment.Architecture}'");
                     if (forceToX64)
                     {
-                        EqtTrace.Verbose($"DotnetTestHostmanager: forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
+                        EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
                     // If we're in the edge case and we force arch we can skip check, we know that config is a valid one
@@ -431,7 +431,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         throw new TestPlatformException(message);
                     }
 
-                    startInfo.FileName = this.dotnetHostHelper.GetDotnetPathByArchitecture(forceToX64 ? PlatformArchitecture.X64 : targetArchitecture);
+                    if (!this.dotnetHostHelper.TryGetDotnetPathByArchitecture(forceToX64 ? PlatformArchitecture.X64 : targetArchitecture, out string muxerPath))
+                    {
+                        string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", targetArchitecture.ToString());
+                        EqtTrace.Error(message);
+                        throw new TestPlatformException(message);
+                    }
+
+                    startInfo.FileName = muxerPath;
                 }
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
@@ -760,6 +767,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                            (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X86) ||
                            (from == PlatformArchitecture.X64 && to == PlatformArchitecture.ARM64) ||
                            (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X86) ||
+                           (from == PlatformArchitecture.X86 && to == PlatformArchitecture.X64) ||
+                           (from == PlatformArchitecture.X86 && to == PlatformArchitecture.ARM64) ||
 
                            // This is not needed we don't expect to land here, but units sometimes lies on
                            // running process and we need to avoid failure.
@@ -810,14 +819,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                    }
                 };
 
-            public static bool IsValidArchitectureSwitch(PlatformOperatingSystem os, PlatformArchitecture from, PlatformArchitecture to)
+            public static bool IsValidArchitectureSwitch(PlatformOperatingSystem os, PlatformArchitecture skd, PlatformArchitecture target)
             {
                 if (!ValidArchitectureSwitch.TryGetValue(os, out Func<PlatformArchitecture, PlatformArchitecture, bool> switchArch))
                 {
                     return false;
                 }
 
-                return switchArch(from, to);
+                return switchArch(skd, target);
             }
 
             public static bool IsValidFramework(PlatformOperatingSystem os, PlatformArchitecture target, Version frameworkVersion)

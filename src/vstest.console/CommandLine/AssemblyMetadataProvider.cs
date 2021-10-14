@@ -175,8 +175,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 // In case of None we fallback to PEReader
                 // We don't use only PEReader for back compatibility.
-                // An AnyCPU returned by AssemblyName.GetAssemblyName(assemblyPath) will result in a I386 for PEReader
-                // Also MSIL processor architecture is not present in PEReader
+                // An AnyCPU returned by AssemblyName.GetAssemblyName(assemblyPath) will result in a I386 for PEReader.
+                // Also MSIL processor architecture is missing with PEReader.
                 // For now it should fix the issue for the missing ARM64 architecture.
                 arch = GetArchitectureFromAssemblyMetadata(assemblyPath);
             }

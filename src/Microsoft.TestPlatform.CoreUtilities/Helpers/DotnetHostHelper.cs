@@ -101,14 +101,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             return false;
         }
 
-        public string GetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture)
+        public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath)
         {
             // We used similar approach as the runtime resolver.
             // https://github.com/dotnet/runtime/blob/main/src/native/corehost/fxr_resolver.cpp#L55
 
-            string path;
             bool isWinOs = environment.OperatingSystem == PlatformOperatingSystem.Windows;
-            EqtTrace.Verbose($"DotnetHostHelper: current platform muxer '{muxerName}'");
+            EqtTrace.Verbose($"DotnetHostHelper: Current platform muxer '{muxerName}'");
 
             // Try to search using env vars in the order
             // DOTNET_ROOT_{arch}
@@ -137,13 +136,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 {
                     if (IsValidArchitectureMuxer(targetArchitecture, envVar))
                     {
-                        path = envVar;
-                        EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using env var key '{envKey}' in '{path}'");
-                        return path;
+                        muxerPath = envVar;
+                        EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using env var key '{envKey}' in '{muxerPath}'");
+                        return true;
                     }
                     else
                     {
-                        EqtTrace.Verbose($"DotnetHostHelper: invalid muxer resolved using env var key '{envKey}' in '{envVar}'");
+                        EqtTrace.Verbose($"DotnetHostHelper: Invalid muxer resolved using env var key '{envKey}' in '{envVar}'");
                     }
                 }
             }
@@ -151,58 +150,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             // Try to search for global registration
             if (isWinOs)
             {
-                path = GetMuxerFromGlobalRegistrationWin(targetArchitecture);
+                muxerPath = GetMuxerFromGlobalRegistrationWin(targetArchitecture);
             }
             else
             {
-                path = GetMuxerFromGlobalRegistrationOnUnix(targetArchitecture);
+                muxerPath = GetMuxerFromGlobalRegistrationOnUnix(targetArchitecture);
             }
 
-            if (path != null && !IsValidArchitectureMuxer(targetArchitecture, path))
+            if (muxerPath != null && !IsValidArchitectureMuxer(targetArchitecture, muxerPath))
             {
-                EqtTrace.Verbose($"DotnetHostHelper: invalid muxer resolved using global registration '{path}'");
-                path = null;
+                EqtTrace.Verbose($"DotnetHostHelper: Invalid muxer resolved using global registration '{muxerPath}'");
+                muxerPath = null;
             }
 
             // Try on default installation location if exists
-            if (path is null)
+            if (muxerPath is null)
             {
                 if (isWinOs)
                 {
-                    path = this.environment.Architecture == PlatformArchitecture.X64 && targetArchitecture == PlatformArchitecture.X86 ?
+                    muxerPath = this.environment.Architecture == PlatformArchitecture.X64 && targetArchitecture == PlatformArchitecture.X86 ?
                         Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName) :
                         Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
                 }
                 else
                 {
-                    path = this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
+                    muxerPath = this.environment.OperatingSystem == PlatformOperatingSystem.OSX ?
                     $"/usr/local/share/dotnet/{muxerName}" :
                     $"/usr/share/dotnet/{muxerName}";
                 }
 
-                if (path != null && this.fileHelper.Exists(path))
+                if (muxerPath != null && this.fileHelper.Exists(muxerPath))
                 {
-                    if (!IsValidArchitectureMuxer(targetArchitecture, path))
+                    if (!IsValidArchitectureMuxer(targetArchitecture, muxerPath))
                     {
-                        EqtTrace.Verbose($"DotnetHostHelper: invalid muxer resolved using default installation path '{path}'");
-                        path = null;
+                        EqtTrace.Verbose($"DotnetHostHelper: Invalid muxer resolved using default installation path '{muxerPath}'");
+                        muxerPath = null;
                     }
                     else
                     {
-                        EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using default installation path in '{path}'");
+                        EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using default installation path in '{muxerPath}'");
                     }
                 }
             }
 
-            if (path is null)
-            {
-                string errorMessage = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, muxerName, targetArchitecture.ToString());
-
-                EqtTrace.Error(errorMessage);
-                throw new FileNotFoundException(errorMessage);
-            }
-
-            return path;
+            return muxerPath != null;
         }
 
         private string GetMuxerFromGlobalRegistrationWin(PlatformArchitecture targetArchitecture)
@@ -226,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                                 if (installLocation != null)
                                 {
                                     string path = Path.Combine(installLocation.Trim(), this.muxerName);
-                                    EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using win registry in '{path}'");
+                                    EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using win registry in '{path}'");
                                     return path;
                                 }
                             }
@@ -259,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     string content = streamReader.ReadToEnd().Trim();
                     EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
                     string path = Path.Combine(content, this.muxerName);
-                    EqtTrace.Verbose($"DotnetHostHelper: muxer resolved using '{installLocation}' in '{path}'");
+                    EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
                     return path;
                 }
             }
@@ -293,7 +284,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             }
             catch (Exception ex)
             {
-                EqtTrace.Verbose($"DotnetHostHelper: failed to get architecture from PEHeader for '{path}'\n{ex}");
+                EqtTrace.Verbose($"DotnetHostHelper: Failed to get architecture from PEHeader for '{path}'\n{ex}");
             }
 
             return null;
@@ -339,7 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             }
             catch (Exception ex)
             {
-                EqtTrace.Verbose($"DotnetHostHelper: failed to get architecture from Mach-O for '{path}'\n{ex}");
+                EqtTrace.Verbose($"DotnetHostHelper: Failed to get architecture from Mach-O for '{path}'\n{ex}");
             }
 
             return null;
@@ -370,7 +361,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
             if (targetArchitecture != muxerPlaform)
             {
-                EqtTrace.Verbose($"DotnetHostHelper: invalid architecture mutex, target architecture '{targetArchitecture}', actual '{muxerPlaform}'");
+                EqtTrace.Verbose($"DotnetHostHelper: Invalid architecture mutex, target architecture '{targetArchitecture}', actual '{muxerPlaform}'");
                 return false;
             }
 
