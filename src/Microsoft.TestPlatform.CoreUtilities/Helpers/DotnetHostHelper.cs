@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             //                  "DOTNET_ROOT(x86) is used instead when running a 32-bit executable on a 64-bit OS."
             // DOTNET_ROOT
             string envVarPrefix = "DOTNET_ROOT";
-            string envKey = $"{envVarPrefix}_{targetArchitecture.ToString().ToUpper()}";
+            string envKey = $"{envVarPrefix}_{targetArchitecture.ToString().ToUpperInvariant()}";
             string envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
             if (envVar == null && targetArchitecture == PlatformArchitecture.X86 && this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     {
                         if (dotnetInstalledVersion != null)
                         {
-                            using (IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLower()))
+                            using (IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLowerInvariant()))
                             {
                                 string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
 
@@ -234,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             string baseInstallLocation = "/etc/dotnet/";
 
             // We search for architecture specific installation
-            string installLocation = $"{baseInstallLocation}install_location_{targetArchitecture.ToString().ToLower()}";
+            string installLocation = $"{baseInstallLocation}install_location_{targetArchitecture.ToString().ToLowerInvariant()}";
 
             // We try to load archless install location file
             if (!this.fileHelper.Exists(installLocation))
