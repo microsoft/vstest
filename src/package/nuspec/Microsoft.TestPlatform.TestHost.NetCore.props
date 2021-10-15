@@ -17,7 +17,8 @@
       <Visible>False</Visible>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition=" ('$(Platform)'!= 'x86' AND '$(PlatformTarget)' != 'x86') AND '$(OS)' == 'Windows_NT'" >
+  <!-- On Windows ARM we don't have to override testhost.dll with x64 binary compilation in default config PlatformTarget = '' Platform = 'AnyCPU' if we're on 64 bit but ARM -->
+  <ItemGroup Condition=" ('$(Platform)' == 'x64' OR '$(PlatformTarget)' == 'x64' OR ( $(PROCESSOR_ARCHITECTURE.Contains('64')) AND !$(PROCESSOR_ARCHITECTURE.Contains('ARM')) ) ) AND '$(OS)' == 'Windows_NT' " >
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.exe">
       <Link>testhost.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

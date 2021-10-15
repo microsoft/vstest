@@ -190,6 +190,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             IDictionary<string, string> environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
+            EqtTrace.Verbose($"DotnetTestHostmanager: GetTestHostProcessStartInfo for platform environment '{this.platformEnvironment.Architecture}' target architecture '{this.architecture}' framework '{this.targetFramework}' OS '{this.platformEnvironment.OperatingSystem}'");
+
             var startInfo = new TestProcessStartInfo();
 
             // .NET core host manager is not a shared host. It will expect a single test source to be provided.
@@ -238,9 +240,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows because they have faster startup time. We ship them only for some platforms.
             // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the testhost.dll together with their dotnet.exe.
+            // We use dotnet.exe on Windows/ARM.
             bool testHostExeFound = false;
             if (!useCustomDotnetHostpath
-                && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+                && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                && (this.platformEnvironment.Architecture != PlatformArchitecture.ARM64 && this.platformEnvironment.Architecture != PlatformArchitecture.ARM))
             {
                 // testhost.exe is 64-bit and has no suffix other versions have architecture suffix.
                 var exeName = this.architecture == Architecture.X64 || this.architecture == Architecture.Default || this.architecture == Architecture.AnyCPU
