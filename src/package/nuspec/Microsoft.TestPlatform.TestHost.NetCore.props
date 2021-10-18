@@ -17,18 +17,20 @@
       <Visible>False</Visible>
     </Content>
   </ItemGroup>
-  <!-- On Windows ARM we don't have to override testhost.dll with x64 binary compilation in default config PlatformTarget = '' Platform = 'AnyCPU' if we're on 64 bit but ARM -->
-  <ItemGroup Condition=" ('$(Platform)' == 'x64' OR '$(PlatformTarget)' == 'x64' OR ( $(PROCESSOR_ARCHITECTURE.Contains('64')) AND !$(PROCESSOR_ARCHITECTURE.Contains('ARM')) ) ) AND '$(OS)' == 'Windows_NT' " >
+  <ItemGroup Condition=" ('$(Platform)'!= 'x86' AND '$(PlatformTarget)' != 'x86') AND '$(OS)' == 'Windows_NT'" >
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.exe">
       <Link>testhost.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
-    </Content>
+    </Content>    
+    <!-- We don't need to copy x64 version testhost.dll we are already copying testhost.dll AnyCPU(prefer x64) from /lib folder
+         in this way we won't have any problem to run it with different dotnet muxer arch.
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.dll">
       <Link>testhost.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
+    -->
     <Content Include="$(MSBuildThisFileDirectory)x64\Microsoft.TestPlatform.PlatformAbstractions.dll">
       <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
