@@ -33,7 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// </summary>
         public DotnetHostHelper() : this(new FileHelper(), new PlatformEnvironment(), new WindowsRegistryHelper(), new EnvironmentVariableHelper())
         {
-            this.muxerName = $"dotnet{(environment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : "")}";
         }
 
         /// <summary>
@@ -50,6 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             this.environment = environment;
             this.windowsRegistryHelper = windowsRegistryHelper;
             this.environmentVariableHelper = environmentVariableHelper;
+            this.muxerName = $"dotnet{(environment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : "")}";
         }
 
         /// <inheritdoc />
@@ -203,18 +203,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 // If we're on x64 SDK and target is x86 we need to search on non virtualized windows folder
                 if (this.environment.Architecture == PlatformArchitecture.X64 && targetArchitecture == PlatformArchitecture.X86)
                 {
-                    muxerPath = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName);
+                    muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName);
                 }
                 else
                 {
                     // If we're on ARM and target is x64 we expect correct installation inside x64 folder
                     if (this.environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64)
                     {
-                        muxerPath = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "x64", muxerName);
+                        muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "x64", muxerName);
                     }
                     else
                     {
-                        muxerPath = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
+                        muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", muxerName);
                     }
                 }
             }
@@ -279,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                                 if (installLocation != null)
                                 {
                                     string path = Path.Combine(installLocation.Trim(), this.muxerName);
-                                    EqtTrace.Verbose($@"DotnetHostHelper: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
+                                    EqtTrace.Verbose($@"DotnetHostHelper: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
                                     return path;
                                 }
                             }

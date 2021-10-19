@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -29,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.Win32;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -52,6 +54,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private IProcessHelper processHelper;
         private IRunSettingsHelper runsettingHelper;
         private IFileHelper fileHelper;
+        private IWindowsRegistryHelper windowsRegistryHelper;
+        private IEnvironmentVariableHelper environmentVariableHelper;
 
         private ITestHostLauncher customTestHostLauncher;
 
@@ -75,7 +79,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
         public DotnetTestHostManager()
-            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper(), new PlatformEnvironment(), RunSettingsHelper.Instance)
+            : this(
+                  new ProcessHelper(),
+                  new FileHelper(),
+                  new DotnetHostHelper(),
+                  new PlatformEnvironment(),
+                  RunSettingsHelper.Instance,
+                  new WindowsRegistryHelper(),
+                  new EnvironmentVariableHelper())
         {
         }
 
@@ -87,18 +98,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="dotnetHostHelper">DotnetHostHelper helper instance.</param>
         /// <param name="platformEnvironment">Platform Environment</param>
         /// <param name="runsettingHelper">RunsettingHelper instance</param>
+        /// <param name="windowsRegistryHelper">WindowsRegistryHelper instance</param>
+        /// <param name="environmentVariableHelper">EnvironmentVariableHelper instance</param>
         internal DotnetTestHostManager(
             IProcessHelper processHelper,
             IFileHelper fileHelper,
             IDotnetHostHelper dotnetHostHelper,
             IEnvironment platformEnvironment,
-            IRunSettingsHelper runsettingHelper)
+            IRunSettingsHelper runsettingHelper,
+            IWindowsRegistryHelper windowsRegistryHelper,
+            IEnvironmentVariableHelper environmentVariableHelper)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dotnetHostHelper = dotnetHostHelper;
             this.platformEnvironment = platformEnvironment;
             this.runsettingHelper = runsettingHelper;
+            this.windowsRegistryHelper = windowsRegistryHelper;
+            this.environmentVariableHelper = environmentVariableHelper;
         }
 
         /// <inheritdoc />
@@ -241,10 +258,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows because they have faster startup time. We ship them only for some platforms.
             // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the testhost.dll together with their dotnet.exe.
             // We use dotnet.exe on Windows/ARM.
+            // TODO: Check if we're on ARM64 win using env var PROCESSARCHITECTURE
             bool testHostExeFound = false;
             if (!useCustomDotnetHostpath
                 && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
-                && (this.platformEnvironment.Architecture != PlatformArchitecture.ARM64 && this.platformEnvironment.Architecture != PlatformArchitecture.ARM))
+
+                // testhost*.exe are build for netcoreapp2.1 and are not able to search for the correct runtime in case of x64/x86 on arm because the new logic(registry lookup)
+                // was added in since netcoreapp3.0. On arm we cannot rely on apphost and we'll use dotnet.exe muxer
+                && !IsWinOnArm())
             {
                 // testhost.exe is 64-bit and has no suffix other versions have architecture suffix.
                 var exeName = this.architecture == Architecture.X64 || this.architecture == Architecture.Default || this.architecture == Architecture.AnyCPU
@@ -404,7 +425,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 else
                 {
                     PlatformArchitecture targetArchitecture = TranslateToPlatformArchitecture(this.architecture);
-                    EqtTrace.Verbose($"DotnetTestHostmanager: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework {this.targetFramework} SDK architecture '{this.platformEnvironment.Architecture}'");
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}' SDK platform architecture '{this.platformEnvironment.Architecture}'");
                     if (forceToX64)
                     {
                         EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
@@ -467,9 +488,64 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+
+            // If we're running using custom apphost we need to set DOTNET_ROOT/DOTNET_ROOT(x86)
+            // We're setting it inside SDK to support private install scenario.
+            // i.e. I've got only private install and no global installation, in this case apphost needs to use env var to locate runtime.
+            if (testHostExeFound)
+            {
+                string prefix = "VSTEST_WINAPPHOST_";
+                string dotnetRootEnvName = $"{prefix}DOTNET_ROOT(x86)";
+                var dotnetRoot = this.environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+                if (dotnetRoot is null)
+                {
+                    dotnetRootEnvName = $"{prefix}DOTNET_ROOT";
+                    dotnetRoot = this.environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+                }
+
+                if (dotnetRoot != null)
+                {
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Found '{dotnetRootEnvName}' on env variables, value '{dotnetRoot}'");
+                    startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
+                }
+                else
+                {
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Prefix {prefix} not found on env variables");
+                }
+            }
+
             startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
+
+            bool IsWinOnArm()
+            {
+                bool isWinOnArm = false;
+                if (this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows)
+                {
+                    using (IRegistryKey hklm = this.windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32))
+                    {
+                        if (hklm != null)
+                        {
+                            using (IRegistryKey environment = hklm.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"))
+                            {
+                                if (environment != null)
+                                {
+                                    var processorArchitecture = environment.GetValue("PROCESSOR_ARCHITECTURE");
+                                    if (processorArchitecture != null)
+                                    {
+                                        EqtTrace.Verbose($"DotnetTestHostmanager: Current PROCESSOR_ARCHITECTURE from registry '{processorArchitecture}'");
+                                        isWinOnArm = processorArchitecture.ToString().ToLowerInvariant().Contains("arm");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                EqtTrace.Verbose($"DotnetTestHostmanager: Is Windows on ARM '{isWinOnArm}'");
+                return isWinOnArm;
+            }
 
             PlatformArchitecture TranslateToPlatformArchitecture(Architecture targetArchitecture)
             {

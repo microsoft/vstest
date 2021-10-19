@@ -41,6 +41,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private readonly Mock<IWindowsRegistryHelper> mockWindowsRegistry;
 
+        private readonly Mock<IEnvironmentVariableHelper> mockEnvironmentVariableHelper;
+
         private readonly Mock<IMessageLogger> mockMessageLogger;
 
         private readonly Mock<IEnvironment> mockEnvironment;
@@ -76,6 +78,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockWindowsRegistry = new Mock<IWindowsRegistryHelper>();
             this.mockEnvironmentVariable = new Mock<IEnvironmentVariableHelper>();
             this.mockRunsettingHelper = new Mock<IRunSettingsHelper>();
+            this.mockEnvironmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
             this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
             this.mockEnvironment.SetupGet(e => e.Architecture).Returns((PlatformArchitecture)Enum.Parse(typeof(PlatformArchitecture), Constants.DefaultPlatform.ToString()));
@@ -87,7 +90,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                                          this.mockFileHelper.Object,
                                          new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockWindowsRegistry.Object, this.mockEnvironmentVariable.Object),
                                          this.mockEnvironment.Object,
-                                         this.mockRunsettingHelper.Object);
+                                         this.mockRunsettingHelper.Object,
+                                         this.mockWindowsRegistry.Object,
+                                         this.mockEnvironmentVariableHelper.Object);
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
@@ -491,36 +496,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        [TestCategory("Windows")]
-        public void GetTestHostProcessStartInfoOnWindowsForValidPathReturnsFullPathOfDotnetHost()
-        {
-            // To validate the else part, set current process to exe other than dotnet
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
-
-            char separator = ';';
-            var dotnetExeName = "dotnet.exe";
-#if !NET451
-            if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win"))
-            {
-                separator = ':';
-                dotnetExeName = "dotnet";
-            }
-#endif
-
-            // Setup the first directory on PATH to return true for existence check for dotnet
-            var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
-            var acceptablePath = Path.Combine(paths[0], dotnetExeName);
-            this.mockEnvironmentVariable.Setup(ev => ev.GetEnvironmentVariable(It.IsAny<string>())).Returns(Path.GetDirectoryName(acceptablePath));
-            this.mockFileHelper.Setup(fh => fh.Exists(acceptablePath)).Returns(true);
-            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = this.GetDefaultStartInfo();
-
-            // The full path should be wrapped in quotes (in case it may contain whitespace)
-            Assert.AreEqual(acceptablePath, startInfo.FileName);
-        }
-
-        [TestMethod]
         public void GetTestHostProcessStartInfoShouldThrowExceptionWhenDotnetIsNotInstalled()
         {
             // To validate the else part, set current process to exe other than dotnet
@@ -549,7 +524,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             Action action = () => this.GetDefaultStartInfo();
 
-            Assert.ThrowsException<FileNotFoundException>(action);
+            Assert.ThrowsException<TestPlatformException>(action);
         }
 
         [TestMethod]
@@ -1071,8 +1046,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 IFileHelper fileHelper,
                 IDotnetHostHelper dotnetTestHostHelper,
                 IEnvironment environment,
-                IRunSettingsHelper runsettingsHelper)
-                : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper)
+                IRunSettingsHelper runsettingsHelper,
+                IWindowsRegistryHelper windowsRegistryHelper,
+                IEnvironmentVariableHelper environmentVariableHelper)
+                : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper, windowsRegistryHelper, environmentVariableHelper)
             {
             }
         }
