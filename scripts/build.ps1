@@ -667,7 +667,7 @@ function Create-VsixPackage
     Copy-Item $legacyDir\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll $extensionsPackageDir -Force
 
     # Copy QtAgent Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\$testPlatformExternalsVersion\tools\net451"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\17.0.31819.11\tools\net451"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Legacy data collectors Related depedencies
