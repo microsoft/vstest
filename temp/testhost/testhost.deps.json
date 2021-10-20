@@ -82,7 +82,7 @@
         "runtime": {
           "Newtonsoft.Json.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.1.19813"
+            "fileVersion": "13.0.1.19813"
           }
         }
       },

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using System.Linq;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
