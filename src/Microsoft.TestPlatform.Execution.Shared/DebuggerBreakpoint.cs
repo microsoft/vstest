@@ -27,12 +27,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Execution
                     string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
                     OutputLevel.Information);
 
-                //while (!Debugger.IsAttached)
-                //{
-                //    Thread.Sleep(1000);
-                //}
+                while (!Debugger.IsAttached)
+                {
+                    Thread.Sleep(1000);
+                }
 
-                Debugger.Launch();
+                Debugger.Break();
             }
         }
 
