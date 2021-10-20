@@ -21,9 +21,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     {
         private bool disposed = false;
 
-        private TestSessionInfo testSessionInfo;
         private readonly ITestSessionEventsHandler eventsHandler;
         private readonly IVsTestConsoleWrapper consoleWrapper;
+
+        #region Properties
+        /// <inheritdoc/>
+        public TestSessionInfo TestSessionInfo { get; private set; }
+        #endregion
 
         #region Constructors
         /// <summary>
@@ -38,7 +42,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestSessionEventsHandler eventsHandler,
             IVsTestConsoleWrapper consoleWrapper)
         {
-            this.testSessionInfo = testSessionInfo;
+            this.TestSessionInfo = testSessionInfo;
             this.eventsHandler = eventsHandler;
             this.consoleWrapper = consoleWrapper;
         }
@@ -117,7 +121,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 discoverySettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 discoveryEventsHandler);
         }
 
@@ -145,7 +149,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler);
         }
 
@@ -173,7 +177,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler);
         }
 
@@ -204,7 +208,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher);
         }
@@ -236,7 +240,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher);
         }
@@ -250,7 +254,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.testSessionInfo == null)
+            if (this.TestSessionInfo == null)
             {
                 return true;
             }
@@ -258,12 +262,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             try
             {
                 return this.consoleWrapper.StopTestSession(
-                    this.testSessionInfo,
+                    this.TestSessionInfo,
                     eventsHandler);
             }
             finally
             {
-                this.testSessionInfo = null;
+                this.TestSessionInfo = null;
             }
         }
         #endregion
@@ -295,7 +299,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 discoverySettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 discoveryEventsHandler).ConfigureAwait(false);
         }
 
@@ -323,7 +327,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler).ConfigureAwait(false);
         }
 
@@ -351,7 +355,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler).ConfigureAwait(false);
         }
 
@@ -382,7 +386,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher).ConfigureAwait(false);
         }
@@ -414,7 +418,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.testSessionInfo,
+                this.TestSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher).ConfigureAwait(false);
         }
@@ -428,7 +432,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.testSessionInfo == null)
+            if (this.TestSessionInfo == null)
             {
                 return true;
             }
@@ -436,12 +440,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             try
             {
                 return await this.consoleWrapper.StopTestSessionAsync(
-                    this.testSessionInfo,
+                    this.TestSessionInfo,
                     eventsHandler).ConfigureAwait(false);
             }
             finally
             {
-                this.testSessionInfo = null;
+                this.TestSessionInfo = null;
             }
         }
         #endregion

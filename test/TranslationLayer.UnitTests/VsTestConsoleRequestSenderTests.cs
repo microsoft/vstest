@@ -27,6 +27,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Newtonsoft.Json.Linq;
 
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+    using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 
     [TestClass]
     public class VsTestConsoleRequestSenderTests
@@ -2109,7 +2110,361 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         #endregion
 
+        #region Sessions API
+        private const int MinimumProtocolVersionWithTestSessionSupport = 5;
+        private const int TesthostPid = 5000;
 
+        [TestMethod]
+        public void StartTestSessionShouldFailIfWrongProtocolVersionIsNegotiated()
+        {
+            this.InitializeCommunication(MinimumProtocolVersionWithTestSessionSupport - 1);
+
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+
+            Assert.IsNull(this.requestSender.StartTestSession(
+                new List<string>() { "DummyTestAssembly.dll" },
+                string.Empty,
+                null,
+                mockHandler.Object,
+                null));
+
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(null), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task StartTestSessionAsyncShouldFailIfWrongProtocolVersionIsNegotiated()
+        {
+            await this.InitializeCommunicationAsync(MinimumProtocolVersionWithTestSessionSupport - 1).ConfigureAwait(false);
+
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+
+            Assert.IsNull(await this.requestSender.StartTestSessionAsync(
+                new List<string>() { "DummyTestAssembly.dll" },
+                string.Empty,
+                null,
+                mockHandler.Object,
+                null).ConfigureAwait(false));
+
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(null), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldSucceed()
+        {
+            this.InitializeCommunication();
+
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+
+            var testSessionInfo = new TestSessionInfo();
+            var ackPayload = new Payloads.StartTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo
+            };
+            var message = this.CreateMessage<Payloads.StartTestSessionAckPayload>(
+                MessageType.StartTestSessionCallback,
+                ackPayload);
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                MessageType.StartTestSession,
+                It.IsAny<Payloads.StartTestSessionPayload>(),
+                this.protocolVersion)).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(message));
+
+            Assert.AreEqual(
+                testSessionInfo,
+                this.requestSender.StartTestSession(
+                    new List<string>() { "DummyTestAssembly.dll" },
+                    string.Empty,
+                    null,
+                    mockHandler.Object,
+                    null));
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task StartTestSessionAsyncShouldSucceed()
+        {
+            await this.InitializeCommunicationAsync().ConfigureAwait(false);
+
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+
+            var testSessionInfo = new TestSessionInfo();
+            var ackPayload = new Payloads.StartTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo
+            };
+            var message = this.CreateMessage<Payloads.StartTestSessionAckPayload>(
+                MessageType.StartTestSessionCallback,
+                ackPayload);
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                MessageType.StartTestSession,
+                It.IsAny<Payloads.StartTestSessionPayload>(),
+                this.protocolVersion)).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(message));
+
+            Assert.AreEqual(
+                testSessionInfo,
+                await this.requestSender.StartTestSessionAsync(
+                    new List<string>() { "DummyTestAssembly.dll" },
+                    string.Empty,
+                    null,
+                    mockHandler.Object,
+                    null).ConfigureAwait(false));
+        }
+
+        [TestMethod]
+        public void StartTestSessionWithTesthostLauncherShouldSucceed()
+        {
+            this.InitializeCommunication();
+
+            // Setup
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+            var mockTesthostLauncher = new Mock<ITestHostLauncher>();
+            mockTesthostLauncher.Setup(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(TesthostPid);
+
+            var launchInfo = new TestProcessStartInfo();
+            var launchMessage = this.CreateMessage<TestProcessStartInfo>(
+                MessageType.CustomTestHostLaunch,
+                launchInfo);
+
+            var testSessionInfo = new TestSessionInfo();
+            var ackPayload = new Payloads.StartTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo
+            };
+            var ackMessage = this.CreateMessage<Payloads.StartTestSessionAckPayload>(
+                MessageType.StartTestSessionCallback,
+                ackPayload);
+
+            Action reconfigureAction = () =>
+            {
+                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                    .Returns(Task.FromResult(ackMessage));
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                MessageType.StartTestSession,
+                It.IsAny<Payloads.StartTestSessionPayload>(),
+                this.protocolVersion)).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                    MessageType.CustomTestHostLaunchCallback,
+                    It.IsAny<CustomHostLaunchAckPayload>(),
+                    this.protocolVersion))
+                .Callback((string messageType, object payload, int version) =>
+                {
+                    Assert.AreEqual(((CustomHostLaunchAckPayload)payload).HostProcessId, TesthostPid);
+                });
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(launchMessage))
+                .Callback(reconfigureAction);
+
+            // Act
+            Assert.AreEqual(
+                testSessionInfo,
+                this.requestSender.StartTestSession(
+                    new List<string>() { "DummyTestAssembly.dll" },
+                    string.Empty,
+                    null,
+                    mockHandler.Object,
+                    mockTesthostLauncher.Object));
+
+            // Verify
+            mockTesthostLauncher.Verify(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task StartTestSessionAsyncWithTesthostLauncherShouldSucceed()
+        {
+            await this.InitializeCommunicationAsync().ConfigureAwait(false);
+
+            // Setup
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+            var mockTesthostLauncher = new Mock<ITestHostLauncher>();
+            mockTesthostLauncher.Setup(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(TesthostPid);
+
+            var launchInfo = new TestProcessStartInfo();
+            var launchMessage = this.CreateMessage<TestProcessStartInfo>(
+                MessageType.CustomTestHostLaunch,
+                launchInfo);
+
+            var testSessionInfo = new TestSessionInfo();
+            var ackPayload = new Payloads.StartTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo
+            };
+            var ackMessage = this.CreateMessage<Payloads.StartTestSessionAckPayload>(
+                MessageType.StartTestSessionCallback,
+                ackPayload);
+
+            Action reconfigureAction = () =>
+            {
+                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                    .Returns(Task.FromResult(ackMessage));
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                MessageType.StartTestSession,
+                It.IsAny<Payloads.StartTestSessionPayload>(),
+                this.protocolVersion)).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                    MessageType.CustomTestHostLaunchCallback,
+                    It.IsAny<CustomHostLaunchAckPayload>(),
+                    this.protocolVersion))
+                .Callback((string messageType, object payload, int version) =>
+                {
+                    Assert.AreEqual(((CustomHostLaunchAckPayload)payload).HostProcessId, TesthostPid);
+                });
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(launchMessage))
+                .Callback(reconfigureAction);
+
+            // Act
+            Assert.AreEqual(
+                testSessionInfo,
+                await this.requestSender.StartTestSessionAsync(
+                    new List<string>() { "DummyTestAssembly.dll" },
+                    string.Empty,
+                    null,
+                    mockHandler.Object,
+                    mockTesthostLauncher.Object).ConfigureAwait(false));
+
+            // Verify
+            mockTesthostLauncher.Verify(tl => tl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestSessionWithTesthostLauncherAttachingToProcessShouldSucceed()
+        {
+            this.InitializeCommunication();
+
+            // Setup
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+            var mockTesthostLauncher = new Mock<ITestHostLauncher2>();
+            mockTesthostLauncher.Setup(tl => tl.AttachDebuggerToProcess(TesthostPid)).Returns(true);
+
+            var launchMessage = this.CreateMessage<int>(
+                MessageType.EditorAttachDebugger,
+                TesthostPid);
+
+            var testSessionInfo = new TestSessionInfo();
+            var ackPayload = new Payloads.StartTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo
+            };
+            var ackMessage = this.CreateMessage<Payloads.StartTestSessionAckPayload>(
+                MessageType.StartTestSessionCallback,
+                ackPayload);
+
+            Action reconfigureAction = () =>
+            {
+                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                    .Returns(Task.FromResult(ackMessage));
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                MessageType.StartTestSession,
+                It.IsAny<Payloads.StartTestSessionPayload>(),
+                this.protocolVersion)).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                    MessageType.EditorAttachDebuggerCallback,
+                    It.IsAny<EditorAttachDebuggerAckPayload>(),
+                    this.protocolVersion))
+                .Callback((string messageType, object payload, int version) =>
+                {
+                    Assert.IsTrue(((EditorAttachDebuggerAckPayload)payload).Attached);
+                });
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(launchMessage))
+                .Callback(reconfigureAction);
+
+            // Act
+            Assert.AreEqual(
+                testSessionInfo,
+                this.requestSender.StartTestSession(
+                    new List<string>() { "DummyTestAssembly.dll" },
+                    string.Empty,
+                    null,
+                    mockHandler.Object,
+                    mockTesthostLauncher.Object));
+
+            // Verify
+            mockTesthostLauncher.Verify(tl => tl.AttachDebuggerToProcess(TesthostPid), Times.Once);
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task StartTestSessionAsyncWithTesthostLauncherAttachingToProcessShouldSucceed()
+        {
+            await this.InitializeCommunicationAsync().ConfigureAwait(false);
+
+            // Setup
+            var mockHandler = new Mock<ITestSessionEventsHandler>();
+            mockHandler.Setup(mh => mh.HandleStartTestSessionComplete(It.IsAny<TestSessionInfo>())).Callback(() => { });
+            var mockTesthostLauncher = new Mock<ITestHostLauncher2>();
+            mockTesthostLauncher.Setup(tl => tl.AttachDebuggerToProcess(TesthostPid)).Returns(true);
+
+            var launchMessage = this.CreateMessage<int>(
+                MessageType.EditorAttachDebugger,
+                TesthostPid);
+
+            var testSessionInfo = new TestSessionInfo();
+            var ackPayload = new Payloads.StartTestSessionAckPayload()
+            {
+                TestSessionInfo = testSessionInfo
+            };
+            var ackMessage = this.CreateMessage<Payloads.StartTestSessionAckPayload>(
+                MessageType.StartTestSessionCallback,
+                ackPayload);
+
+            Action reconfigureAction = () =>
+            {
+                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                    .Returns(Task.FromResult(ackMessage));
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                MessageType.StartTestSession,
+                It.IsAny<Payloads.StartTestSessionPayload>(),
+                this.protocolVersion)).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(
+                    MessageType.EditorAttachDebuggerCallback,
+                    It.IsAny<EditorAttachDebuggerAckPayload>(),
+                    this.protocolVersion))
+                .Callback((string messageType, object payload, int version) =>
+                {
+                    Assert.IsTrue(((EditorAttachDebuggerAckPayload)payload).Attached);
+                });
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(launchMessage))
+                .Callback(reconfigureAction);
+
+            // Act
+            Assert.AreEqual(
+                testSessionInfo,
+                await this.requestSender.StartTestSessionAsync(
+                    new List<string>() { "DummyTestAssembly.dll" },
+                    string.Empty,
+                    null,
+                    mockHandler.Object,
+                    mockTesthostLauncher.Object).ConfigureAwait(false));
+
+            // Verify
+            mockTesthostLauncher.Verify(tl => tl.AttachDebuggerToProcess(TesthostPid), Times.Once);
+            mockHandler.Verify(mh => mh.HandleStartTestSessionComplete(testSessionInfo), Times.Once);
+        }
+        #endregion
 
         #region Private Methods
 
@@ -2127,6 +2482,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private void InitializeCommunication()
         {
+            this.InitializeCommunication(this.protocolVersion);
+        }
+
+        private void InitializeCommunication(int protocolVersion)
+        {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
@@ -2135,7 +2495,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
-            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
+            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolVersion };
 
             Action changedMessage = () =>
             {
@@ -2143,7 +2503,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(sessionConnected);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion)).Callback(changedMessage);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>())).Callback(changedMessage);
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
@@ -2177,12 +2537,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private async Task InitializeCommunicationAsync()
         {
+            await this.InitializeCommunicationAsync(this.protocolVersion);
+        }
+
+        private async Task InitializeCommunicationAsync(int protocolVersion)
+        {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
-            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
+            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolVersion };
 
             Action changedMessage = () =>
             {
@@ -2190,7 +2555,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(sessionConnected));
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion)).Callback(changedMessage);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>())).Callback(changedMessage);
 
             var portOutput = await this.requestSender.InitializeCommunicationAsync(this.WaitTimeout);
             Assert.AreEqual(dummyPortInput, portOutput, "Connection must succeed.");

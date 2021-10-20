@@ -17,6 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
     public interface ITestSession : IDisposable, ITestSessionAsync
     {
         /// <summary>
+        /// Gets the underlying test session info object.
+        /// </summary>
+        TestSessionInfo TestSessionInfo { get; }
+
+        /// <summary>
         /// Starts test discovery.
         /// </summary>
         /// 

@@ -155,16 +155,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (this.proxyOperationManager == null)
             {
-                try
-                {
-                    // In case we have an active test session, we always prefer the already
-                    // created proxies instead of the ones that need to be created on the spot.
-                    this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
-                        this.testSessionInfo,
-                        discoveryCriteria.Sources.First(),
-                        runSettings);
-                }
-                catch (InvalidOperationException ex)
+                // In case we have an active test session, we always prefer the already
+                // created proxies instead of the ones that need to be created on the spot.
+                this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
+                    this.testSessionInfo,
+                    discoveryCriteria.Sources.First(),
+                    runSettings);
+
+                if (this.proxyOperationManager == null)
                 {
                     // If the proxy creation process based on test session info failed, then
                     // we'll proceed with the normal creation process as if no test session
@@ -172,9 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // 
                     // WARNING: This should not normally happen and it raises questions
                     // regarding the test session pool operation and consistency.
-                    EqtTrace.Warning(
-                        "ProxyDiscoveryManager creation with test session failed: {0}",
-                        ex.ToString());
+                    EqtTrace.Warning("ProxyDiscoveryManager creation with test session failed.");
 
                     this.proxyOperationManager = new ProxyOperationManager(
                         this.backupRequestData,

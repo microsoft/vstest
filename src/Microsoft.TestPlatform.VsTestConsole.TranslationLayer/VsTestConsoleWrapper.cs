@@ -598,7 +598,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return await this.StartTestSessionAsync(
                 sources,
                 runSettings,
-                options: null,
+                options,
                 eventsHandler,
                 testHostLauncher: null).ConfigureAwait(false);
         }

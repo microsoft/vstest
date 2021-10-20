@@ -95,6 +95,132 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public void StartTestSessionShouldCallRequestSenderWithCorrectArguments1()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+            this.mockRequestSender.Setup(
+                rs => rs.StartTestSession(
+                    this.testSources,
+                    null,
+                    null,
+                    mockEventsHandler.Object,
+                    null))
+                .Returns(testSessionInfo);
+
+            Assert.AreEqual(
+                this.consoleWrapper.StartTestSession(
+                    this.testSources,
+                    null,
+                    mockEventsHandler.Object).TestSessionInfo,
+                testSessionInfo);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestSession(
+                    this.testSources,
+                    null,
+                    null,
+                    mockEventsHandler.Object,
+                    null),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldCallRequestSenderWithCorrectArguments2()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var testPlatformOptions = new TestPlatformOptions();
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+            this.mockRequestSender.Setup(
+                rs => rs.StartTestSession(
+                    this.testSources,
+                    null,
+                    testPlatformOptions,
+                    mockEventsHandler.Object,
+                    null))
+                .Returns(testSessionInfo);
+
+            Assert.AreEqual(
+                this.consoleWrapper.StartTestSession(
+                    this.testSources,
+                    null,
+                    testPlatformOptions,
+                    mockEventsHandler.Object).TestSessionInfo,
+                testSessionInfo);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestSession(
+                    this.testSources,
+                    null,
+                    testPlatformOptions,
+                    mockEventsHandler.Object,
+                    null),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldCallRequestSenderWithCorrectArguments3()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var testPlatformOptions = new TestPlatformOptions();
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+            var mockTesthostLauncher = new Mock<ITestHostLauncher>();
+
+            this.mockRequestSender.Setup(
+                rs => rs.StartTestSession(
+                    this.testSources,
+                    null,
+                    testPlatformOptions,
+                    mockEventsHandler.Object,
+                    mockTesthostLauncher.Object))
+                .Returns(testSessionInfo);
+
+            Assert.AreEqual(
+                this.consoleWrapper.StartTestSession(
+                    this.testSources,
+                    null,
+                    testPlatformOptions,
+                    mockEventsHandler.Object,
+                    mockTesthostLauncher.Object).TestSessionInfo,
+                testSessionInfo);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestSession(
+                    this.testSources,
+                    null,
+                    testPlatformOptions,
+                    mockEventsHandler.Object,
+                    mockTesthostLauncher.Object),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void StopTestSessionShouldCallRequestSenderWithCorrectArguments()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+            this.mockRequestSender.Setup(
+                rs => rs.StopTestSession(
+                    It.IsAny<TestSessionInfo>(),
+                    It.IsAny<ITestSessionEventsHandler>()))
+                .Returns(true);
+
+            Assert.IsTrue(
+                this.consoleWrapper.StopTestSession(
+                    testSessionInfo,
+                    mockEventsHandler.Object));
+
+            this.mockRequestSender.Verify(
+                rs => rs.StopTestSession(
+                    testSessionInfo,
+                    mockEventsHandler.Object),
+                Times.Once);
+        }
+
+        [TestMethod]
         public void InitializeExtensionsShouldCachePathToExtensions()
         {
             var pathToExtensions = new[] { "path/to/adapter" };
@@ -165,6 +291,28 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldSucceedWhenUsingSessions()
+        {
+            var testSessionInfo = new TestSessionInfo();
+
+            this.consoleWrapper.DiscoverTests(
+                this.testSources,
+                null,
+                null,
+                testSessionInfo,
+                new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+            this.mockRequestSender.Verify(
+                rs => rs.DiscoverTests(
+                    this.testSources,
+                    null,
+                    null,
+                    testSessionInfo,
+                    It.IsAny<ITestDiscoveryEventsHandler2>()),
+                Times.Once);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldThrowExceptionOnBadConnection()
         {
             this.mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
@@ -209,6 +357,28 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public void RunTestsWithSourcesShouldSucceedWhenUsingSessions()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+            this.consoleWrapper.RunTests(
+                this.testSources,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestRun(
+                    this.testSources,
+                    "RunSettings",
+                    options,
+                    testSessionInfo,
+                    It.IsAny<ITestRunEventsHandler>()),
+                Times.Once);
+        }
+
+        [TestMethod]
         public void RunTestsWithSourcesAndCustomHostShouldSucceed()
         {
             this.consoleWrapper.RunTestsWithCustomTestHost(
@@ -243,6 +413,30 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public void RunTestsWithSourcesAndACustomHostShouldSucceedWhenUsingSessions()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+            this.consoleWrapper.RunTestsWithCustomTestHost(
+                this.testSources,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestRunWithCustomHost(
+                    this.testSources,
+                    "RunSettings",
+                    options,
+                    testSessionInfo,
+                    It.IsAny<ITestRunEventsHandler>(),
+                    It.IsAny<ITestHostLauncher>()),
+                Times.Once);
+        }
+
+        [TestMethod]
         public void RunTestsWithSelectedTestsShouldSucceed()
         {
             this.consoleWrapper.RunTests(this.testCases, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
@@ -266,6 +460,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.consoleWrapper.RunTests(this.testCases, "RunSettings", options, new Mock<ITestRunEventsHandler>().Object);
 
             this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsWithSelectedTestsShouldSucceedWhenUsingSessions()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+
+            this.consoleWrapper.RunTests(
+                this.testCases,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestRun(
+                    this.testCases,
+                    "RunSettings",
+                    options,
+                    testSessionInfo,
+                    It.IsAny<ITestRunEventsHandler>()),
+                Times.Once);
         }
 
         [TestMethod]
@@ -306,6 +523,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestHostLauncher>().Object);
 
             this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", options, null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsWithSelectedTestsAndACustomHostShouldSucceedWhenUsingSessions()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+
+            this.consoleWrapper.RunTestsWithCustomTestHost(
+                this.testCases,
+                "RunSettings",
+                options,
+                testSessionInfo,
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestRunWithCustomHost(
+                    this.testCases,
+                    "RunSettings",
+                    options,
+                    testSessionInfo,
+                    It.IsAny<ITestRunEventsHandler>(),
+                    It.IsAny<ITestHostLauncher>()),
+                Times.Once);
         }
 
         [TestMethod]

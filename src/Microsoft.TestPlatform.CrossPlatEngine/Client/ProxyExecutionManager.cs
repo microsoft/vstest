@@ -177,20 +177,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (this.proxyOperationManager == null)
             {
-                try
-                {
-                    // In case we have an active test session, we always prefer the already
-                    // created proxies instead of the ones that need to be created on the spot.
-                    var sources = testRunCriteria.HasSpecificTests
-                        ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
-                        : testRunCriteria.Sources;
+                // In case we have an active test session, we always prefer the already
+                // created proxies instead of the ones that need to be created on the spot.
+                var sources = testRunCriteria.HasSpecificTests
+                    ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
+                    : testRunCriteria.Sources;
 
-                    this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
-                        this.testSessionInfo,
-                        sources.First(),
-                        runSettings);
-                }
-                catch (InvalidOperationException ex)
+                this.proxyOperationManager = TestSessionPool.Instance.TakeProxy(
+                    this.testSessionInfo,
+                    sources.First(),
+                    runSettings);
+
+                if (this.proxyOperationManager == null)
                 {
                     // If the proxy creation process based on test session info failed, then
                     // we'll proceed with the normal creation process as if no test session
@@ -198,9 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // 
                     // WARNING: This should not normally happen and it raises questions
                     // regarding the test session pool operation and consistency.
-                    EqtTrace.Warning(
-                        "ProxyDiscoveryManager creation with test session failed: {0}",
-                        ex.ToString());
+                    EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
 
                     this.proxyOperationManager = new ProxyOperationManager(
                         this.backupRequestData,

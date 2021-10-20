@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <inheritdoc/>
-        public void StartTestSession(
+        public bool StartTestSession(
             IRequestData requestData,
             StartTestSessionCriteria testSessionCriteria,
             ITestSessionEventsHandler eventsHandler)
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
             if (!runConfiguration.DesignMode)
             {
-                return;
+                return false;
             }
 
             var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
@@ -183,10 +183,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 // of this no session will be created because there's no testhost to be launched.
                 // Expecting a subsequent call to execute tests with the same set of parameters.
                 eventsHandler.HandleStartTestSessionComplete(null);
-                return;
+                return false;
             }
 
-            testSessionManager.StartSession(eventsHandler);
+            return testSessionManager.StartSession(eventsHandler);
         }
 
         /// <summary>

@@ -151,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             string runSettings,
             ITestMessageEventHandler eventHandler)
         {
+            // NOTE: Event handler is ignored here, but it is used in the overloaded method.
             return this.SetupChannel(sources, runSettings);
         }
 
