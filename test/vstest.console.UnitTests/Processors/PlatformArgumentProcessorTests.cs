@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => this.executor.Initialize("foo"),
-                "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64.",
+                "Invalid platform type: {0}. Valid platform types are x86, x64, arm, arm64.",
                 "foo");
         }
 
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => this.executor.Initialize("AnyCPU"),
-                "Invalid platform type: {0}. Valid platform types are X86, X64, ARM, ARM64.",
+                "Invalid platform type: {0}. Valid platform types are x86, x64, arm, arm64.",
                 "AnyCPU");
         }
 
@@ -106,14 +106,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.executor.Initialize("x64");
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
             Assert.AreEqual(nameof(ObjectModel.Architecture.X64), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
-        }
-
-        [TestMethod]
-        public void InitializeShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
-        {
-            executor.Initialize("ArM");
-            Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
-            Assert.AreEqual(nameof(ObjectModel.Architecture.ARM), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         #endregion
