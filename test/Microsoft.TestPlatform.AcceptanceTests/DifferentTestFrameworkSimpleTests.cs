@@ -30,20 +30,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         // vstest.console is x64 now, but x86 run "in process" run should still succeed by being run in x86 testhost
-        // skip .NET (Core) tests because the called methods ignores them anyway
+        // Skip .NET (Core) tests because we test them below.
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
-        public void CPPRunAllTestExecution(RunnerInfo runnerInfo)
+        public void CPPRunAllTestExecutionNetFramework(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x86");
         }
 
+
         [TestMethod]
         [TestCategory("Windows-Review")]
         // vstest.console is 64-bit now, run in process to test the 64-bit native dll
-        // skip .NET (Core) tests because the called methods ignores them anyway
+        // Skip .NET (Core) tests because we test them below.
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useCoreRunner: false)]
-        public void CPPRunAllTestExecutionPlatformx64(RunnerInfo runnerInfo)
+        public void CPPRunAllTestExecutionPlatformx64NetFramework(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            CppRunAllTests(runnerInfo.RunnerFramework, "x64");
+        }
+
+        [TestMethod]
+        // C++ tests cannot run in .NET Framework host under .NET Core, because we only ship .NET Standard CPP adapter in .NET Core
+        // We also don't test x86 for .NET Core, because the resolver there does not switch between x86 and x64 correctly, it just uses the parent process bitness.
+        // We run this on netcore31 and not the default netcore21 because netcore31 is the minimum tfm that has the runtime features we need, such as additionaldeps.
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false, useCoreRunner: true, useNetCore21Target: false, useNetCore31Target: true)]
+        public void CPPRunAllTestExecutionPlatformx64Net(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x64");
@@ -133,12 +145,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void CppRunAllTests(string runnerFramework, string platform)
         {
-            if (runnerFramework.StartsWith("netcoreapp"))
-            {
-                Assert.Inconclusive("CPP tests not supported with .Netcore runner.");
-                return;
-            }
-
             var resultsDir = GetResultsDirectory();
             string assemblyRelativePathFormat =
                 @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";

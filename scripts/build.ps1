@@ -73,8 +73,9 @@ if([string]::IsNullOrWhiteSpace($Version))
 #
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
-$TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
-$TPB_TestAssets_CILAssets = Join-Path $env:TP_ROOT_DIR "test\TestAssets\CILProject\CILProject.proj"
+$TPB_TestAssets = Join-Path $env:TP_ROOT_DIR "test\TestAssets\"
+$TPB_TestAssets_Solution = Join-Path $TPB_TestAssets "TestAssets.sln"
+$TPB_TestAssets_CILAssets = Join-Path $TPB_TestAssets "CILProject\CILProject.proj"
 $TPB_TargetFramework45 = "net45"
 $TPB_TargetFramework451 = "net451"
 $TPB_TargetFramework472 = "net472"
@@ -138,10 +139,16 @@ function Invoke-TestAssetsBuild
     $timer = Start-Timer
     Write-Log "Invoke-TestAssetsBuild: Start test assets build."
     $dotnetExe = Get-DotNetPath
+    $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
+    $nugetConfig = Join-Path $TPB_TestAssets "NuGet.config"
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
+    & $nugetExe sources add -Name "locally-built-testplatform-packages" -Source "$env:TP_TESTARTIFACTS\packages\" -ConfigFile "$nugetConfig"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
+    & $nugetExe sources remove -Name "locally-built-testplatform-packages" -ConfigFile "$nugetConfig"
     Write-Log ".. .. Build: Complete."
 
     Set-ScriptFailedOnError
@@ -475,6 +482,26 @@ function Publish-Package
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
     Copy-Item $newtonsoft $coreCLR20PackageDir -Force
+
+    # Copy .NET Standard CPP Test adapter
+    New-Item "$fullCLRPackage451Dir\TestHost" -ItemType Directory -Force | Out-Null 
+    $fullCLRTestHostDir = "$fullCLRPackage451Dir\TestHost"
+
+    $testPlatformRemoteExternalsVersion = ([xml](Get-Content "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props")).Project.PropertyGroup.TestPlatformRemoteExternalsVersion
+    $testPlatformRemoteExternalsSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Remote\$testPlatformRemoteExternalsVersion\tools\netstandard\Extensions\*"
+    Copy-Item $testPlatformRemoteExternalsSourceDirectory $coreCLR20PackageDir -Force -Recurse
+    Copy-Item $testPlatformRemoteExternalsSourceDirectory $fullCLRTestHostDir -Force -Recurse
+
+    # Copy standalone testhost
+    $standaloneTesthost = Join-Path $env:TP_ROOT_DIR "temp\testhost\*"
+    Copy-Item $standaloneTesthost $coreCLR20PackageDir -Force
+    Copy-Item $testhostCore20PackageDir\testhost.dll $coreCLR20PackageDir -Force
+    Copy-Item $testhostCore20PackageDir\testhost.pdb $coreCLR20PackageDir -Force
+
+    Get-Item "$testhostCore20PackageDir\*" | 
+        Where-Object { $_.Name -notin ("x64", "x86", "win7-x64", "win7-x86", "testhost.deps.json", "testhost.runtimeconfig.json")} | 
+        Copy-Item -Recurse -Destination $fullCLRTestHostDir -Force
+    Copy-Item $standaloneTesthost $fullCLRTestHostDir -Force
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
@@ -904,9 +931,6 @@ function Get-CoreCLR20TestHostPackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20\TestHost")
 }
-
-
-
 
 function Locate-MSBuildPath 
 {
