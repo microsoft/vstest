@@ -100,22 +100,6 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
             }
         }
 
-        internal static string InvalidFrameworkForTargetArchitecture
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidFrameworkForTargetArchitecture", resourceCulture);
-            }
-        }
-
-        internal static string ArchitectureSwitchNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString("ArchitectureSwitchNotSupported", resourceCulture);
-            }
-        }
-
         /// <summary>
         ///   '{0}' is the placeholder for 'dotnet.exe' or 'dotnet' value and depends on platform Windows/Unix, '{1}' is the placeholder for the architeture name like ARM64, X64 etc...
         /// </summary>

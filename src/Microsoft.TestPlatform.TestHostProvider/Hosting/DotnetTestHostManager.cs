@@ -431,31 +431,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
-                    // If we're in the edge case and we force arch we can skip check, we know that config is a valid one
-                    if (!forceToX64)
-                    {
-                        // We validate if architecture to switch to is a valid one
-                        if (!FrameworkAndArchitectureMatrixValidator.IsValidArchitectureSwitch(this.platformEnvironment.OperatingSystem, this.platformEnvironment.Architecture, targetArchitecture))
-                        {
-                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidArchitectureSwitch, this.architecture, this.platformEnvironment.Architecture);
-                            throw new TestPlatformException(message);
-                        }
-
-                        // We validate if target framework is supported by switched architecture
-                        if (!FrameworkAndArchitectureMatrixValidator.IsValidFramework(this.platformEnvironment.OperatingSystem, targetArchitecture, new Version(this.targetFramework.Version)))
-                        {
-                            string message = string.Format(CultureInfo.CurrentCulture, Resources.InvalidFrameworkForTargetArchitecture, this.architecture, this.targetFramework);
-                            throw new TestPlatformException(message);
-                        }
-                    }
-
-                    // We don't support architecture switch on Linux yet
-                    if (this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Unix)
-                    {
-                        string message = string.Format(CultureInfo.CurrentCulture, Resources.ArchitectureSwitchNotSupported);
-                        throw new TestPlatformException(message);
-                    }
-
                     if (!this.dotnetHostHelper.TryGetDotnetPathByArchitecture(forceToX64 ? PlatformArchitecture.X64 : targetArchitecture, out string muxerPath))
                     {
                         string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", targetArchitecture.ToString());
@@ -830,99 +805,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             return testHostPath;
-        }
-
-        // Informations used to fill below matrix:
-        // https://github.com/dotnet/core/blob/main/release-notes/6.0/supported-os.md
-        // https://github.com/dotnet/installer#installers-and-binaries
-        // https://dotnet.microsoft.com/download/dotnet
-        private class FrameworkAndArchitectureMatrixValidator
-        {
-            private static readonly IDictionary<PlatformOperatingSystem, Func<PlatformArchitecture, PlatformArchitecture, bool>> ValidArchitectureSwitch
-                = new Dictionary<PlatformOperatingSystem, Func<PlatformArchitecture, PlatformArchitecture, bool>>()
-                {
-                    {
-                        PlatformOperatingSystem.Windows, (PlatformArchitecture from, PlatformArchitecture to)
-                        => (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X64) ||
-                           (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X86) ||
-                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.ARM64) ||
-                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X86) ||
-                           (from == PlatformArchitecture.X86 && to == PlatformArchitecture.X64) ||
-                           (from == PlatformArchitecture.X86 && to == PlatformArchitecture.ARM64) ||
-
-                           // This is not needed we don't expect to land here, but units sometimes lies on
-                           // running process and we need to avoid failure.
-                           // Anyway the condition is correct.
-                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.X64)
-                    },
-                    {
-                        PlatformOperatingSystem.OSX, (PlatformArchitecture from, PlatformArchitecture to)
-                        => (from == PlatformArchitecture.ARM64 && to == PlatformArchitecture.X64) ||
-                           (from == PlatformArchitecture.X64 && to == PlatformArchitecture.ARM64)
-                    }
-                };
-
-            private static readonly IDictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Func<Version, bool>>> SupportedFramework
-                = new Dictionary<PlatformArchitecture, IDictionary<PlatformOperatingSystem, Func<Version, bool>>>
-                {
-                   {
-                        PlatformArchitecture.X64, new Dictionary<PlatformOperatingSystem, Func<Version, bool>>
-                        {
-                            { PlatformOperatingSystem.Windows, _ => true },
-                            { PlatformOperatingSystem.OSX, _ => true }
-                        }
-                    },
-                    {
-                        PlatformArchitecture.X86, new Dictionary<PlatformOperatingSystem, Func<Version, bool>>
-                        {
-                            { PlatformOperatingSystem.Windows, _ => true }
-                        }
-                    },
-                    {
-                        PlatformArchitecture.ARM64, new Dictionary<PlatformOperatingSystem, Func<Version, bool>>
-                        {
-                            {
-                                PlatformOperatingSystem.Windows, (Version v) => v >= new Version(5, 0)
-                            },
-                            {
-                                PlatformOperatingSystem.OSX, (Version v) => v >= new Version(6, 0)
-                            }
-                        }
-                    },
-                    {
-                        PlatformArchitecture.ARM, new Dictionary<PlatformOperatingSystem,  Func<Version, bool>>
-                        {
-                           {
-                                PlatformOperatingSystem.Windows, (Version v) => v >= new Version(2, 2) && v <= new Version(3, 1)
-                           }
-                        }
-                   }
-                };
-
-            public static bool IsValidArchitectureSwitch(PlatformOperatingSystem os, PlatformArchitecture skd, PlatformArchitecture target)
-            {
-                if (!ValidArchitectureSwitch.TryGetValue(os, out Func<PlatformArchitecture, PlatformArchitecture, bool> switchArch))
-                {
-                    return false;
-                }
-
-                return switchArch(skd, target);
-            }
-
-            public static bool IsValidFramework(PlatformOperatingSystem os, PlatformArchitecture target, Version frameworkVersion)
-            {
-                if (!SupportedFramework.TryGetValue(target, out IDictionary<PlatformOperatingSystem, Func<Version, bool>> platformVersionMapping))
-                {
-                    return false;
-                }
-
-                if (!platformVersionMapping.TryGetValue(os, out Func<Version, bool> supportedFrameworkVersion))
-                {
-                    return false;
-                }
-
-                return supportedFrameworkVersion(frameworkVersion);
-            }
         }
     }
 }
