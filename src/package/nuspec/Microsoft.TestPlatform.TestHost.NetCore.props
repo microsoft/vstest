@@ -23,14 +23,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>    
-    <!-- We don't need to copy x64 version testhost.dll we are already copying testhost.dll AnyCPU(prefer x64) from /lib folder
-         in this way we won't have any problem to run it with different dotnet muxer arch.
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.dll">
       <Link>testhost.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
-    -->
     <Content Include="$(MSBuildThisFileDirectory)x64\Microsoft.TestPlatform.PlatformAbstractions.dll">
       <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
