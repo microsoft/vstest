@@ -49,6 +49,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(1); // failing tests
         }
 
+        // We cannot run this test on Mac/Linux because we we're trying to switch the arch between x64 and x86
+        // and after --arch feature implementation we won't find correct muxer on CI.
+        [TestCategory("Windows")]
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
