@@ -19,13 +19,14 @@
         <target state="translated">"{0}" wurde nicht gefunden. Veröffentlichen Sie Ihr Testprojekt, und versuchen Sie es noch mal.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="InvalidArchitectureSwitch">
-        <source>Running tests for {0} architecture is not supported on the current platform ({1}).</source>
-        <target state="new">Running tests for {0} architecture is not supported on the current platform ({1}).</target>
-        <note>'{0}' and '{1}' are the placeholder for the architeture name like ARM64, X64 etc...</note>
-      </trans-unit>
       <trans-unit id="NoDotnetMuxerFoundForArchitecture">
-        <source>Could not find '{0}' host for the '{1}' architecture.  Make sure that '{0}' for '{1}' architecture is installed on the machine.</source>
+        <source>Could not find '{0}' host for the '{1}' architecture.
+
+You can resolve the problem by installing the '{1}' .NET SDK.
+
+The specified framework can be found at:
+  - https://dotnet.microsoft.com/download/dotnet
+</source>
         <target state="new">Could not find '{0}' host for the '{1}' architecture.  Make sure that '{0}' for '{1}' architecture is installed on the machine.</target>
         <note>'{0}' is the placeholder for 'dotnet.exe' or 'dotnet' value and depends on platform Windows/Unix, '{1}' is the placeholder for the architeture name like ARM64, X64 etc...</note>
       </trans-unit>

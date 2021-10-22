@@ -90,17 +90,6 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         }
 
         /// <summary>
-        ///   '{0}' and '{1}' are the placeholder for the architeture name like ARM64, X64 etc...
-        /// </summary>
-        internal static string InvalidArchitectureSwitch
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidArchitectureSwitch", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   '{0}' is the placeholder for 'dotnet.exe' or 'dotnet' value and depends on platform Windows/Unix, '{1}' is the placeholder for the architeture name like ARM64, X64 etc...
         /// </summary>
         internal static string NoDotnetMuxerFoundForArchitecture
