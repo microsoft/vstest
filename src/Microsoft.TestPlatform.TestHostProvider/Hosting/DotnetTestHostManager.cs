@@ -431,9 +431,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
-                    if (!this.dotnetHostHelper.TryGetDotnetPathByArchitecture(forceToX64 ? PlatformArchitecture.X64 : targetArchitecture, out string muxerPath))
+                    PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
+                    if (!this.dotnetHostHelper.TryGetDotnetPathByArchitecture(finalTargetArchitecture, out string muxerPath))
                     {
-                        string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", targetArchitecture.ToString());
+                        string message = string.Format(Resources.NoDotnetMuxerFoundForArchitecture, $"dotnet{(this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : string.Empty)}", finalTargetArchitecture.ToString());
                         EqtTrace.Error(message);
                         throw new TestPlatformException(message);
                     }
