@@ -183,6 +183,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
             }
 
+            EqtTrace.Verbose($"DotnetHostHelper: Muxer not found using DOTNET_ROOTS env vars");
+
             // Try to search for global registration
             if (isWinOs)
             {
@@ -214,6 +216,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using global registration '{muxerPath}'");
                 return true;
             }
+
+            EqtTrace.Verbose($"DotnetHostHelper: Muxer not found using global registrations");
 
             // Try on default installation location if exists
             if (isWinOs)

@@ -485,7 +485,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
                 else
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager: Prefix {prefix} not found on env variables");
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Prefix '{prefix}' not found on env variables");
                 }
             }
 
