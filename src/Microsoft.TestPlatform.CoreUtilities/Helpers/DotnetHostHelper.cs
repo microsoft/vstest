@@ -114,8 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             // DOTNET_ROOT(x86) if X86 on Win (here we cannot check if current process is WOW64 because this is SDK process arch and not real host arch so it's irrelevant)
             //                  "DOTNET_ROOT(x86) is used instead when running a 32-bit executable on a 64-bit OS."
             // DOTNET_ROOT
-            string envVarPrefix = "DOTNET_ROOT";
-            string envKey = $"{envVarPrefix}_{targetArchitecture.ToString().ToUpperInvariant()}";
+            string envKey = $"DOTNET_ROOT_{targetArchitecture.ToString().ToUpperInvariant()}";
 
             // Try on arch specific env var
             string envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
@@ -124,14 +123,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             if ((envVar == null || !this.fileHelper.DirectoryExists(envVar)) &&
                 targetArchitecture == PlatformArchitecture.X86 && this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
-                envKey = $"{envVarPrefix}(x86)";
+                envKey = $"DOTNET_ROOT(x86)";
                 envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
             }
 
             // Try on default DOTNET_ROOT
             if (envVar == null || !this.fileHelper.DirectoryExists(envVar))
             {
-                envKey = envVarPrefix;
+                envKey = "DOTNET_ROOT";
                 envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
             }
 
