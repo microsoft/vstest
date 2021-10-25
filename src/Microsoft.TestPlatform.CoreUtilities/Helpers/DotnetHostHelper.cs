@@ -322,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Verbose($@"DotnetHostHelper: Exception during '{installLocation}' muxer resolution.\n{ex}");
+                    EqtTrace.Verbose($"DotnetHostHelper: Exception during '{installLocation}' muxer resolution.\n{ex}");
                 }
             }
 
