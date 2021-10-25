@@ -26,12 +26,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         private readonly IEnvironment environment;
         private readonly IWindowsRegistryHelper windowsRegistryHelper;
         private readonly IEnvironmentVariableHelper environmentVariableHelper;
+        private readonly IProcessHelper processHelper;
         private readonly string muxerName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
-        public DotnetHostHelper() : this(new FileHelper(), new PlatformEnvironment(), new WindowsRegistryHelper(), new EnvironmentVariableHelper())
+        public DotnetHostHelper() : this(new FileHelper(), new PlatformEnvironment(), new WindowsRegistryHelper(), new EnvironmentVariableHelper(), new ProcessHelper())
         {
         }
 
@@ -43,12 +44,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             IFileHelper fileHelper,
             IEnvironment environment,
             IWindowsRegistryHelper windowsRegistryHelper,
-            IEnvironmentVariableHelper environmentVariableHelper)
+            IEnvironmentVariableHelper environmentVariableHelper,
+            IProcessHelper processHelper)
         {
             this.fileHelper = fileHelper;
             this.environment = environment;
             this.windowsRegistryHelper = windowsRegistryHelper;
             this.environmentVariableHelper = environmentVariableHelper;
+            this.processHelper = processHelper;
             this.muxerName = $"dotnet{(environment.OperatingSystem == PlatformOperatingSystem.Windows ? ".exe" : "")}";
         }
 
@@ -103,6 +106,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath)
         {
+            if (this.environment.Architecture == targetArchitecture)
+            {
+                string currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
+                if (Path.GetFileName(currentProcessFileName) != this.muxerName)
+                {
+                    EqtTrace.Verbose($"DotnetHostHelper: Target architecture same as current process architecture but muxer is not a valid one, '{currentProcessFileName}'");
+                }
+                else
+                {
+                    muxerPath = currentProcessFileName;
+                    EqtTrace.Verbose($"DotnetHostHelper: Target architecture same as current process architecture, muxer resolved using current process path '{muxerPath}'");
+                    return true;
+                }
+            }
+
             // We used similar approach as the runtime resolver.
             // https://github.com/dotnet/runtime/blob/main/src/native/corehost/fxr_resolver.cpp#L55
 

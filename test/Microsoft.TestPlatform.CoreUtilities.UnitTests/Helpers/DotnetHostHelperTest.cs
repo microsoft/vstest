@@ -26,6 +26,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         {
             string expectedMuxerLocation = platformSystem == PlatformOperatingSystem.OSX ? "/tmp/dotnet" : @"c:\dotnet.exe";
             Mock<IFileHelper> fileHelper = new Mock<IFileHelper>();
+            Mock<IProcessHelper> processHelper = new Mock<IProcessHelper>();
             Mock<IEnvironment> environmentHelper = new Mock<IEnvironment>();
             environmentHelper.SetupGet(x => x.Architecture).Returns(platformArchitecture);
             environmentHelper.SetupGet(x => x.OperatingSystem).Returns(platformSystem);
@@ -33,7 +34,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             Mock<IEnvironmentVariableHelper> environmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
             environmentVariableHelper.Setup(x => x.GetEnvironmentVariable(envVar)).Returns(expectedMuxerLocation);
 
-            var dotnetHostHelper = new DotnetHostHelper(fileHelper.Object, environmentHelper.Object, windowsRegistrytHelper.Object, environmentVariableHelper.Object);
+            var dotnetHostHelper = new DotnetHostHelper(fileHelper.Object, environmentHelper.Object, windowsRegistrytHelper.Object, environmentVariableHelper.Object, processHelper.Object);
         }
     }
 }

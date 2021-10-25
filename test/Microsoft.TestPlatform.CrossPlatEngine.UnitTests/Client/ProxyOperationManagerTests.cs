@@ -15,7 +15,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -24,12 +23,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Constants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     [TestClass]
     public class ProxyOperationManagerTests : ProxyBaseManagerTests
@@ -546,7 +543,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 IEnvironmentVariableHelper environmentVariableHelper) : base(
                     processHelper,
                     fileHelper,
-                    new DotnetHostHelper(fileHelper, environment, new WindowsRegistryHelper(), new EnvironmentVariableHelper()),
+                    new DotnetHostHelper(fileHelper, environment, windowsRegistryHelper, environmentVariableHelper, processHelper),
                     environment,
                     runsettingHelper,
                     windowsRegistryHelper,

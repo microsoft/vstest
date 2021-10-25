@@ -9,7 +9,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -88,7 +87,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockWindowsRegistry.Object, this.mockEnvironmentVariable.Object),
+                                         new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockWindowsRegistry.Object, this.mockEnvironmentVariable.Object, this.mockProcessHelper.Object),
                                          this.mockEnvironment.Object,
                                          this.mockRunsettingHelper.Object,
                                          this.mockWindowsRegistry.Object,
