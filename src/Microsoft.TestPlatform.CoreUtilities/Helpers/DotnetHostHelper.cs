@@ -120,15 +120,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             // Try on arch specific env var
             string envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
 
-            // Try on non virtualized x86 var(should happen only on x64)
-            if (envVar == null && targetArchitecture == PlatformArchitecture.X86 && this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
+            // Try on non virtualized x86 var(should happen only on non-x86 architecture)
+            if ((envVar == null || !this.fileHelper.DirectoryExists(envVar)) &&
+                targetArchitecture == PlatformArchitecture.X86 && this.environment.OperatingSystem == PlatformOperatingSystem.Windows)
             {
                 envKey = $"{envVarPrefix}(x86)";
                 envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
             }
 
             // Try on default DOTNET_ROOT
-            if (envVar == null)
+            if (envVar == null || !this.fileHelper.DirectoryExists(envVar))
             {
                 envKey = envVarPrefix;
                 envVar = this.environmentVariableHelper.GetEnvironmentVariable(envKey);
@@ -139,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 // If directory specified on env vars does not exists it's like env var doesn't exists as well.
                 if (!this.fileHelper.DirectoryExists(envVar))
                 {
-                    EqtTrace.Verbose($"DotnetHostHelper: Folder specified on env key inexistent, '{envKey}' in '{envVar}'");
+                    EqtTrace.Verbose($"DotnetHostHelper: Folder specified on env key non-existent, '{envKey}' in '{envVar}'");
                 }
                 else
                 {
@@ -200,8 +201,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             // Try on default installation location if exists
             if (isWinOs)
             {
-                // If we're on x64 SDK and target is x86 we need to search on non virtualized windows folder
-                if (this.environment.Architecture == PlatformArchitecture.X64 && targetArchitecture == PlatformArchitecture.X86)
+                // If we're on x64/arm64 SDK and target is x86 we need to search on non virtualized windows folder
+                if ((this.environment.Architecture == PlatformArchitecture.X64 || this.environment.Architecture == PlatformArchitecture.ARM64) &&
+                     targetArchitecture == PlatformArchitecture.X86)
                 {
                     muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles(x86)"), "dotnet", muxerName);
                 }
@@ -210,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     // If we're on ARM and target is x64 we expect correct installation inside x64 folder
                     if (this.environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64)
                     {
-                        muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "x64", muxerName);
+                        muxerPath = Path.Combine(this.environmentVariableHelper.GetEnvironmentVariable("ProgramFiles"), "dotnet", "x64", muxerName);
                     }
                     else
                     {
@@ -225,22 +227,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     // If we're on ARM and target is x64 we expect correct installation inside x64 folder
                     if (this.environment.Architecture == PlatformArchitecture.ARM64 && targetArchitecture == PlatformArchitecture.X64)
                     {
-                        muxerPath = Path.Combine($"/usr/local/share/dotnet/x64", muxerName);
+                        muxerPath = Path.Combine("/usr/local/share/dotnet/x64", muxerName);
                     }
                     else
                     {
-                        muxerPath = $"/usr/local/share/dotnet/{muxerName}";
+                        muxerPath = Path.Combine("/usr/local/share/dotnet", muxerName);
                     }
                 }
                 else
                 {
-                    muxerPath = $"/usr/share/dotnet/{muxerName}";
+                    muxerPath = Path.Combine("/usr/share/dotnet", muxerName);
                 }
             }
 
             if (!this.fileHelper.Exists(muxerPath))
             {
-                // If muxer doesn't exists or it's wrong we stop the search
+                // If muxer doesn't exists we stop the search
                 EqtTrace.Verbose($"DotnetHostHelper: Muxer file not found on default installation location '{muxerPath}'");
                 muxerPath = null;
                 return false;
@@ -306,14 +308,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
             if (this.fileHelper.Exists(installLocation))
             {
-                using (Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read))
-                using (StreamReader streamReader = new StreamReader(stream))
+                try
                 {
-                    string content = streamReader.ReadToEnd().Trim();
-                    EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
-                    string path = Path.Combine(content, this.muxerName);
-                    EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
-                    return path;
+                    using (Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read))
+                    using (StreamReader streamReader = new StreamReader(stream))
+                    {
+                        string content = streamReader.ReadToEnd().Trim();
+                        EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
+                        string path = Path.Combine(content, this.muxerName);
+                        EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
+                        return path;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Verbose($@"DotnetHostHelper: Exception during '{installLocation}' muxer resolution.\n{ex}");
                 }
             }
 
@@ -415,8 +424,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             {
                 muxerPlaform =  GetMuxerArchitectureByPEHeaderOnWin(path);
             }
-
-            if (this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
+            else if (this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
             {
                 muxerPlaform = GetMuxerArchitectureByMachoOnMac(path);
             }

@@ -407,17 +407,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 // We silently force x64 only if the target architecture is the default one and is not specified by user
                 // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
                 bool forceToX64 = SilentlyForceToX64() && this.runsettingHelper.IsDefaultTargetArchitecture;
+                bool isSameArchitecture = IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture);
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+                bool isRunningWithDotnetMuxer = IsRunningWithDotnetMuxer(currentProcessPath);
                 if (useCustomDotnetHostpath)
                 {
                     startInfo.FileName = this.dotnetHostPath;
                 }
 
                 // If already running with the dotnet executable and the architecture is compatible, use it; otherwise search the correct muxer architecture on disk.
-                else if ((currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase) ||
-                         currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase)) &&
-                         IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture) &&
-                         !forceToX64)
+                else if (isRunningWithDotnetMuxer && isSameArchitecture && !forceToX64)
                 {
                     EqtTrace.Verbose("DotnetTestHostmanager: Compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
@@ -493,6 +492,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
+
+            bool IsRunningWithDotnetMuxer(string currentProcessPath)
+                => currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase) ||
+                   currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase);
 
             bool IsWinOnArm()
             {
