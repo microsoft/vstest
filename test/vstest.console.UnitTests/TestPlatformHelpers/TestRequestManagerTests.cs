@@ -22,6 +22,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
 	using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -2261,6 +2262,155 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		public void CancelTestRunAttachmentsProcessingShouldSucceedIfNoRequest()
 		{
 			testRequestManager.CancelTestRunAttachmentsProcessing();
+		}
+
+		[TestMethod]
+		public void StartTestSessionShouldPassCorrectTelemetryOptedInOptionToTestPlatform()
+        {
+			this.mockTestPlatform.Setup(
+				tp => tp.StartTestSession(
+					It.IsAny<IRequestData>(),
+					It.IsAny<StartTestSessionCriteria>(),
+					It.IsAny<ITestSessionEventsHandler>()))
+				.Returns(true)
+				.Callback(
+					(IRequestData rd, StartTestSessionCriteria _, ITestSessionEventsHandler __) =>
+					{
+						Assert.IsTrue(rd.IsTelemetryOptedIn);
+					});
+
+			Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+			this.testRequestManager.StartTestSession(
+				new StartTestSessionPayload()
+				{
+					TestPlatformOptions = new TestPlatformOptions()
+					{
+						CollectMetrics = true
+					}
+				},
+				new Mock<ITestHostLauncher>().Object,
+				new Mock<ITestSessionEventsHandler>().Object,
+				this.protocolConfig);
+		}
+
+		[TestMethod]
+		public void StartTestSessionShouldUpdateSettings()
+        {
+			var payload = new StartTestSessionPayload()
+			{
+				Sources = new List<string>() { "a.dll" },
+				RunSettings =
+					@"<?xml version=""1.0"" encoding=""utf-8""?>
+					<RunSettings>
+						<RunConfiguration>
+						</RunConfiguration>
+					</RunSettings>"
+			};
+			this.commandLineOptions.IsDesignMode = true;
+
+			this.mockAssemblyMetadataProvider.Setup(
+				a => a.GetArchitecture(It.IsAny<string>()))
+				.Returns(Architecture.ARM);
+			this.mockAssemblyMetadataProvider.Setup(
+				a => a.GetFrameWork(It.IsAny<string>()))
+				.Returns(new FrameworkName(Constants.DotNetFramework46));
+
+			this.mockTestPlatform.Setup(
+				tp => tp.StartTestSession(
+					It.IsAny<IRequestData>(),
+					It.IsAny<StartTestSessionCriteria>(),
+					It.IsAny<ITestSessionEventsHandler>()))
+				.Returns(true)
+				.Callback(
+					(IRequestData _, StartTestSessionCriteria criteria, ITestSessionEventsHandler __) =>
+					{
+						Assert.IsTrue(criteria.RunSettings.Contains(Constants.DotNetFramework46));
+						Assert.IsTrue(criteria.RunSettings.Contains(nameof(Architecture.ARM)));
+					});
+
+			this.testRequestManager.StartTestSession(
+				payload,
+				new Mock<ITestHostLauncher>().Object,
+				new Mock<ITestSessionEventsHandler>().Object,
+				this.protocolConfig);
+
+			this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
+			this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
+		}
+
+		[TestMethod]
+		public void StartTestSessionShouldThrowSettingsExceptionWhenFindingIncompatibleDataCollectorsInTestSettings()
+        {
+			var settingXml = @"<RunSettings>
+									<MSTest>
+										<SettingsFile>C:\temp.testsettings</SettingsFile>
+										<ForcedLegacyMode>true</ForcedLegacyMode>
+									</MSTest>
+									<DataCollectionRunSettings>
+										<DataCollectors>
+											<DataCollector friendlyName=""DummyDataCollector1"">
+											</DataCollector>
+											<DataCollector friendlyName=""DummyDataCollector2"">
+											</DataCollector>
+										</DataCollectors>
+									</DataCollectionRunSettings>
+								</RunSettings>";
+
+			var payload = new StartTestSessionPayload()
+			{
+				Sources = new List<string>() { "a.dll" },
+				RunSettings = settingXml
+			};
+
+			this.commandLineOptions.EnableCodeCoverage = false;
+			bool exceptionThrown = false;
+
+			try
+			{
+				this.testRequestManager.StartTestSession(
+					payload,
+					new Mock<ITestHostLauncher>().Object,
+					new Mock<ITestSessionEventsHandler>().Object,
+					this.protocolConfig);
+			}
+			catch (SettingsException ex)
+			{
+				exceptionThrown = true;
+				Assert.IsTrue(ex.Message.Contains(@"<SettingsFile>C:\temp.testsettings</SettingsFile>"), ex.Message);
+			}
+
+			Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
+		}
+
+		[TestMethod]
+		public void X()
+        {
+			this.mockTestPlatform.Setup(
+				tp => tp.StartTestSession(
+					It.IsAny<IRequestData>(),
+					It.IsAny<StartTestSessionCriteria>(),
+					It.IsAny<ITestSessionEventsHandler>()))
+				.Returns(true);
+
+			this.testRequestManager.StartTestSession(
+				new StartTestSessionPayload()
+				{
+					TestPlatformOptions = new TestPlatformOptions()
+					{
+						CollectMetrics = true
+					}
+				},
+				new Mock<ITestHostLauncher>().Object,
+				new Mock<ITestSessionEventsHandler>().Object,
+				this.protocolConfig);
+
+			this.mockTestPlatformEventSource.Verify(
+				tpes => tpes.StartTestSessionStart(),
+				Times.Once());
+			this.mockTestPlatformEventSource.Verify(
+				tpes => tpes.StartTestSessionStop(),
+				Times.Once());
 		}
 
 		private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
