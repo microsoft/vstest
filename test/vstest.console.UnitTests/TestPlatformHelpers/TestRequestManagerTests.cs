@@ -2384,7 +2384,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 		}
 
 		[TestMethod]
-		public void X()
+		public void StartTestSessionShouldBeSuccessful()
         {
 			this.mockTestPlatform.Setup(
 				tp => tp.StartTestSession(

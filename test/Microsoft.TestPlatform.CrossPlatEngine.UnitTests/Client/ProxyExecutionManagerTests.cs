@@ -28,6 +28,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
     [TestClass]
     public class ProxyExecutionManagerTests : ProxyBaseManagerTests
@@ -740,6 +741,52 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Verify
             mockTestRunEventsHandler.Verify(mtdeh => mtdeh.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldAttemptToTakeProxyFromPoolIfProxyIsNull()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var testExecutionManager = new ProxyExecutionManager(
+                testSessionInfo,
+                string.Empty,
+                false,
+                this.mockRequestData.Object,
+                this.mockRequestSender.Object,
+                this.mockTestHostManager.Object);
+
+            var mockTestSessionPool = new Mock<TestSessionPool>();
+            TestSessionPool.Instance = mockTestSessionPool.Object;
+
+            try
+            {
+                var mockProxyOperationManager = new Mock<ProxyOperationManager>(
+                    this.mockRequestData.Object,
+                    this.mockRequestSender.Object,
+                    this.mockTestHostManager.Object);
+                mockTestSessionPool.Setup(
+                    tsp => tsp.TakeProxy(
+                        testSessionInfo,
+                        It.IsAny<string>(),
+                        It.IsAny<string>()))
+                    .Returns(mockProxyOperationManager.Object);
+
+                testExecutionManager.Initialize(true);
+                testExecutionManager.StartTestRun(
+                    this.mockTestRunCriteria.Object,
+                    new Mock<ITestRunEventsHandler>().Object);
+
+                mockTestSessionPool.Verify(
+                    tsp => tsp.TakeProxy(
+                        testSessionInfo,
+                        It.IsAny<string>(),
+                        It.IsAny<string>()),
+                    Times.Once);
+            }
+            finally
+            {
+                TestSessionPool.Instance = null;
+            }
         }
 
         private void SignalEvent(ManualResetEvent manualResetEvent)

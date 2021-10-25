@@ -15,6 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -505,6 +506,51 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.Abort();
 
             this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldAttemptToTakeProxyFromPoolIfProxyIsNull()
+        {
+            var testSessionInfo = new TestSessionInfo();
+            var testDiscoveryManager = new ProxyDiscoveryManager(
+                testSessionInfo,
+                string.Empty,
+                this.mockRequestData.Object,
+                this.mockRequestSender.Object,
+                this.mockTestHostManager.Object);
+
+            var mockTestSessionPool = new Mock<TestSessionPool>();
+            TestSessionPool.Instance = mockTestSessionPool.Object;
+
+            try
+            {
+                var mockProxyOperationManager = new Mock<ProxyOperationManager>(
+                    this.mockRequestData.Object,
+                    this.mockRequestSender.Object,
+                    this.mockTestHostManager.Object);
+                mockTestSessionPool.Setup(
+                    tsp => tsp.TakeProxy(
+                        testSessionInfo,
+                        It.IsAny<string>(),
+                        It.IsAny<string>()))
+                    .Returns(mockProxyOperationManager.Object);
+
+                testDiscoveryManager.Initialize(true);
+                testDiscoveryManager.DiscoverTests(
+                    discoveryCriteria,
+                    new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+                mockTestSessionPool.Verify(
+                    tsp => tsp.TakeProxy(
+                        testSessionInfo,
+                        It.IsAny<string>(),
+                        It.IsAny<string>()),
+                    Times.Once);
+            }
+            finally
+            {
+                TestSessionPool.Instance = null;
+            }
         }
 
         private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)
