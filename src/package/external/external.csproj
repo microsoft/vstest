@@ -44,7 +44,7 @@
     <PackageReference Include="Microsoft.VisualStudio.TraceDataCollector" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Coverage.IO" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />     
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MicrosoftInternalCodeCoverageVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="17.0.31822.10" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.CUIT" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Internal.Intellitrace" Version="$(TestPlatformExternalsVersion)" PrivateAssets="All" />
