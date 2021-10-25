@@ -305,9 +305,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                                     EqtTrace.Verbose($@"DotnetHostHelper: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
                                     return path;
                                 }
+                                else
+                                {
+                                    EqtTrace.Verbose($@"DotnetHostHelper: Get InstallLocation value return null");
+                                }
                             }
                         }
+                        else
+                        {
+                            EqtTrace.Verbose($@"DotnetHostHelper: Open RegistryHive.LocalMachine for RegistryView.Registry32 return null");
+                        }
                     }
+                }
+                else
+                {
+                    EqtTrace.Verbose($@"DotnetHostHelper: Open subkey SOFTWARE\dotnet\Setup\InstalledVersions return null");
                 }
             }
 
