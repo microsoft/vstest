@@ -40,13 +40,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private readonly Mock<IWindowsRegistryHelper> mockWindowsRegistry;
 
-        private readonly Mock<IEnvironmentVariableHelper> mockEnvironmentVariableHelper;
-
         private readonly Mock<IMessageLogger> mockMessageLogger;
 
         private readonly Mock<IEnvironment> mockEnvironment;
-
-        private readonly Mock<IEnvironmentVariableHelper> mockEnvironmentVariable;
 
         private readonly Mock<IRunSettingsHelper> mockRunsettingHelper;
 
@@ -55,9 +51,12 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly string[] testSource = { "test.dll" };
 
         private readonly string defaultTestHostPath;
+
         private readonly TestProcessStartInfo defaultTestProcessStartInfo;
 
         private readonly TestableDotnetTestHostManager dotnetHostManager;
+
+        private Mock<IEnvironmentVariableHelper> mockEnvironmentVariable;
 
         private string errorMessage;
 
@@ -77,7 +76,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockWindowsRegistry = new Mock<IWindowsRegistryHelper>();
             this.mockEnvironmentVariable = new Mock<IEnvironmentVariableHelper>();
             this.mockRunsettingHelper = new Mock<IRunSettingsHelper>();
-            this.mockEnvironmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
             this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
             this.mockEnvironment.SetupGet(e => e.Architecture).Returns((PlatformArchitecture)Enum.Parse(typeof(PlatformArchitecture), Constants.DefaultPlatform.ToString()));
@@ -91,7 +89,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                                          this.mockEnvironment.Object,
                                          this.mockRunsettingHelper.Object,
                                          this.mockWindowsRegistry.Object,
-                                         this.mockEnvironmentVariableHelper.Object);
+                                         this.mockEnvironmentVariable.Object);
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
@@ -880,6 +878,31 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
             Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
+        }
+
+        [TestMethod]
+        [DataRow("DOTNET_ROOT(x86)", "x86")]
+        [DataRow("DOTNET_ROOT", "x64")]
+        [DataRow("DOTNET_ROOT_WRONG", "")]
+        [TestCategory("Windows")]
+        public void GetTestHostProcessStartInfoShouldForwardDOTNET_ROOTEnvVarsForAppHost(string envVar, string expectedValue)
+        {
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.exe")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            this.mockEnvironmentVariable.Reset();
+            this.mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable($"VSTEST_WINAPPHOST_{envVar}")).Returns(expectedValue);
+
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, this.defaultConnectionInfo);
+            if (!string.IsNullOrEmpty(expectedValue))
+            {
+                Assert.AreEqual(1, startInfo.EnvironmentVariables.Count);
+                Assert.IsNotNull(startInfo.EnvironmentVariables[envVar]);
+                Assert.AreEqual(startInfo.EnvironmentVariables[envVar], expectedValue);
+            }
+            else
+            {
+                Assert.AreEqual(0, startInfo.EnvironmentVariables.Count);
+            }
         }
 
         [TestMethod]

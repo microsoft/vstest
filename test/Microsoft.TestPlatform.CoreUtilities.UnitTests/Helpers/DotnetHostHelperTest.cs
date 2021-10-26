@@ -205,13 +205,13 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             Assert.AreEqual(found ? dotnetMuxer : null, muxerPath);
         }
 
-        [TestCategory("Windows")]
         [DataTestMethod]
         [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X64, "ProgramFiles(x86)", "dotnet", true)]
         [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "ProgramFiles", @"dotnet\x64", true)]
         [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "ProgramFiles", "dotnet", true)]
         [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X86, "ProgramFiles", "dotnet", true)]
         [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "ProgramFiles", "dotnet", false)]
+        [TestCategory("Windows")]
         public void GetDotnetPathByArchitecture_DefaultInstallation_Win(PlatformArchitecture targetArchitecture, PlatformArchitecture platformArchitecture, string envVar, string subfolder, bool found)
         {
             // Arrange
