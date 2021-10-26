@@ -64,12 +64,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <PackageReference Include="NETStandard.Library" Version="1.6.1" />
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+	<PackageReference Include="NETStandard.Library" Version="1.6.0" />
+	<PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+	<PackageReference Include="System.Xml.XPath" Version="4.0.1" />
+	<PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.0.1" />
 
-    <PackageReference Include="NuGet.Frameworks" Version="4.6.4" />
+	<PackageReference Include="NuGet.Frameworks" Version="4.6.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
