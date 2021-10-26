@@ -205,6 +205,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             Assert.AreEqual(found ? dotnetMuxer : null, muxerPath);
         }
 
+        [TestCategory("Windows")]
         [DataTestMethod]
         [DataRow(PlatformArchitecture.X86, PlatformArchitecture.X64, "ProgramFiles(x86)", "dotnet", true)]
         [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "ProgramFiles", @"dotnet\x64", true)]
