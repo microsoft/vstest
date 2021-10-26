@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
     /// <summary>
-    /// RunSettingsHelper is used to globally share additional informations about the state of run settings.
+    /// RunSettingsHelper is used to globally share additional informations about the state of runsettings.
     /// </summary>
     internal class RunSettingsHelper : IRunSettingsHelper
     {

@@ -307,19 +307,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                                 }
                                 else
                                 {
-                                    EqtTrace.Verbose($@"DotnetHostHelper: Get InstallLocation value return null");
+                                    EqtTrace.Verbose($@"DotnetHostHelper: Missing registry InstallLocation");
                                 }
                             }
                         }
                         else
                         {
-                            EqtTrace.Verbose($@"DotnetHostHelper: Open RegistryHive.LocalMachine for RegistryView.Registry32 return null");
+                            EqtTrace.Verbose($@"DotnetHostHelper: Missing RegistryHive.LocalMachine for RegistryView.Registry32");
                         }
                     }
                 }
                 else
                 {
-                    EqtTrace.Verbose($@"DotnetHostHelper: Open subkey SOFTWARE\dotnet\Setup\InstalledVersions return null");
+                    EqtTrace.Verbose($@"DotnetHostHelper: Missing SOFTWARE\dotnet\Setup\InstalledVersions subkey");
                 }
             }
 
@@ -434,6 +434,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             }
             catch (Exception ex)
             {
+                // In case of failure during header reading we must fallback to the next place(default installation path)
                 EqtTrace.Verbose($"DotnetHostHelper: Failed to get architecture from Mach-O for '{path}'\n{ex}");
             }
 

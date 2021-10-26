@@ -612,7 +612,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         // 64-bit SDK when running from 64-bit dotnet process.
                         // As default architecture we specify the expected test host architecture,
                         // it can be specified by user on the command line with --arch or through runsettings.
-                        // If it now specified by user will be filled by current processor architecture;
+                        // If it's not specified by user will be filled by current processor architecture;
                         // should be the same as SDK.
                         defaultArchitecture = runConfiguration.TargetPlatform;
                         EqtTrace.Verbose($"Default architecture: {defaultArchitecture}");
