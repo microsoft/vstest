@@ -175,16 +175,22 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         }
 
         [DataTestMethod]
-        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_arm64", true)]
-        [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location_x64", true)]
-        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location", true)]
-        [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location", true)]
-        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_x64", false)]
-        public void GetDotnetPathByArchitecture_GlobalInstallation_Mac(PlatformArchitecture targetArchitecture, string install_location, bool found)
+        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_arm64", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location_x64", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.OSX)]
+
+        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_arm64", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.X64, "/etc/dotnet/install_location", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.ARM64, "/etc/dotnet/install_location_x64", false, PlatformOperatingSystem.Unix)]
+        public void GetDotnetPathByArchitecture_GlobalInstallation_Unix(PlatformArchitecture targetArchitecture, string install_location, bool found, PlatformOperatingSystem os)
         {
             // Arrange
-            string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.OSX, targetArchitecture);
-            this.environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.OSX);
+            string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(os, targetArchitecture);
+            this.environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
             this.fileHelper.Setup(x => x.Exists(install_location)).Returns(true);
             this.fileHelper.Setup(x => x.Exists(dotnetMuxer)).Returns(true);
             this.fileHelper.Setup(x => x.GetStream(install_location, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
@@ -225,21 +231,26 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         }
 
         [DataTestMethod]
-        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true)]
-        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "/usr/local/share/dotnet/x64", "", true)]
-        [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true)]
-        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", false)]
-        public void GetDotnetPathByArchitecture_DefaultInstallation_Mac(PlatformArchitecture targetArchitecture, PlatformArchitecture platformArchitecture, string expectedFolder, string subfolder, bool found)
+        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "/usr/local/share/dotnet/x64", "", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", true, PlatformOperatingSystem.OSX)]
+        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/local/share/dotnet", "", false, PlatformOperatingSystem.OSX)]
+
+        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.ARM64, "/usr/share/dotnet/x64", "", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.ARM64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
+        [DataRow(PlatformArchitecture.X64, PlatformArchitecture.X64, "/usr/share/dotnet", "", false, PlatformOperatingSystem.Unix)]
+        public void GetDotnetPathByArchitecture_DefaultInstallation_Unix(PlatformArchitecture targetArchitecture, PlatformArchitecture platformArchitecture, string expectedFolder, string subfolder, bool found, PlatformOperatingSystem os)
         {
             // Arrange
-            string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(PlatformOperatingSystem.OSX, targetArchitecture, subfolder);
-            this.environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.OSX);
+            string dotnetMuxer = muxerHelper.RenameMuxerAndReturnPath(os, targetArchitecture, subfolder);
+            this.environmentHelper.SetupGet(x => x.OperatingSystem).Returns(os);
             this.environmentHelper.Setup(x => x.Architecture).Returns(platformArchitecture);
             string expectedMuxerPath = Path.Combine(expectedFolder, "dotnet");
+            this.fileHelper.Setup(x => x.Exists(expectedMuxerPath)).Returns(true);
+            this.fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
             if (found)
             {
-                this.fileHelper.Setup(x => x.Exists(expectedMuxerPath)).Returns(true);
-                this.fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(Path.GetDirectoryName(dotnetMuxer))));
                 this.fileHelper.Setup(x => x.GetStream(expectedMuxerPath, FileMode.Open, FileAccess.Read)).Returns(File.OpenRead(dotnetMuxer));
             }
 
@@ -316,6 +327,12 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
                             throw new NotSupportedException($"Unsupported architecture '{architecture}'");
                         }
                     case PlatformOperatingSystem.Unix:
+                        {
+                            muxerPath = Path.Combine(tmpDirectory, Guid.NewGuid().ToString("N"), subfolder, "dotnet");
+                            Directory.CreateDirectory(Path.GetDirectoryName(muxerPath));
+                            File.WriteAllText(muxerPath, "not supported");
+                            break;
+                        }
                     default:
                         throw new NotSupportedException($"Unsupported OS '{platform}'");
                 }
