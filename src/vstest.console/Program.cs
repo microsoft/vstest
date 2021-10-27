@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private static void ForwardDotnetRootEnvVarToNewVersion()
         {
+            // TODO: remove this and the console writes before publishing
             var switchVars = Environment.GetEnvironmentVariable("VSTEST_TMP_SWITCH_DOTNETROOTS_ENVVARS");
             if (switchVars != null && int.Parse(switchVars) == 1)
             {

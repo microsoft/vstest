@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             IDictionary<string, string> environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
-            EqtTrace.Verbose($"DotnetTestHostmanager: GetTestHostProcessStartInfo for platform environment '{this.platformEnvironment.Architecture}' target architecture '{this.architecture}' framework '{this.targetFramework}' OS '{this.platformEnvironment.OperatingSystem}'");
+            EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: Platform environment '{this.platformEnvironment.Architecture}' target architecture '{this.architecture}' framework '{this.targetFramework}' OS '{this.platformEnvironment.OperatingSystem}'");
 
             var startInfo = new TestProcessStartInfo();
 
@@ -418,16 +418,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 // If already running with the dotnet executable and the architecture is compatible, use it; otherwise search the correct muxer architecture on disk.
                 else if (isRunningWithDotnetMuxer && isSameArchitecture && !forceToX64)
                 {
-                    EqtTrace.Verbose("DotnetTestHostmanager: Compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
+                    EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
                     startInfo.FileName = currentProcessPath;
                 }
                 else
                 {
                     PlatformArchitecture targetArchitecture = TranslateToPlatformArchitecture(this.architecture);
-                    EqtTrace.Verbose($"DotnetTestHostmanager: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}' SDK platform architecture '{this.platformEnvironment.Architecture}'");
+                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}' SDK platform architecture '{this.platformEnvironment.Architecture}'");
                     if (forceToX64)
                     {
-                        EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
+                        EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
                     PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
@@ -441,7 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     startInfo.FileName = muxerPath;
                 }
 
-                EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
+                EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Full path of testhost.dll is {0}", testHostPath);
                 args = "exec" + args;
                 args += " " + testHostPath.AddDoubleQuote();
             }
@@ -480,12 +480,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (dotnetRoot != null)
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager: Found '{dotnetRootEnvName}' on env variables, value '{dotnetRoot}'");
+                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}'");
                     startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
                 }
                 else
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager: Prefix '{prefix}' not found on env variables");
+                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
                 }
             }
 
@@ -513,7 +513,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                                     var processorArchitecture = environment.GetValue("PROCESSOR_ARCHITECTURE");
                                     if (processorArchitecture != null)
                                     {
-                                        EqtTrace.Verbose($"DotnetTestHostmanager: Current PROCESSOR_ARCHITECTURE from registry '{processorArchitecture}'");
+                                        EqtTrace.Verbose($"DotnetTestHostmanager.IsWinOnArm: Current PROCESSOR_ARCHITECTURE from registry '{processorArchitecture}'");
                                         isWinOnArm = processorArchitecture.ToString().ToLowerInvariant().Contains("arm");
                                     }
                                 }
@@ -522,7 +522,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     }
                 }
 
-                EqtTrace.Verbose($"DotnetTestHostmanager: Is Windows on ARM '{isWinOnArm}'");
+                EqtTrace.Verbose($"DotnetTestHostmanager.IsWinOnArm: Is Windows on ARM '{isWinOnArm}'");
                 return isWinOnArm;
             }
 
