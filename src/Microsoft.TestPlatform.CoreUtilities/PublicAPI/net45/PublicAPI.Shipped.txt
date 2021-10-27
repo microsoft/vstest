@@ -6,6 +6,7 @@ const Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants.TestSourcesKey
 const Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants.VstestConsoleProcessName = "vstest.console" -> string
 const Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.EnvironmentHelper.DefaultConnectionTimeout = 90 -> int
 const Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers.EnvironmentHelper.VstestConnectionTimeout = "VSTEST_CONNECTION_TIMEOUT" -> string
+const Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.MONOEXENAME = "mono" -> string
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants.Constants() -> void
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions.StringBuilderExtensions
@@ -105,6 +106,12 @@ Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSourc
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop() -> void
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSource.VsTestConsoleStart() -> void
 Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.TestPlatformEventSource.VsTestConsoleStop() -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.DotnetHostHelper() -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.DotnetHostHelper(Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces.IFileHelper fileHelper, Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces.IEnvironment environment) -> void
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.GetDotnetPath() -> string
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.GetMonoPath() -> string
+Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.DotnetHostHelper.TryGetDotnetPathByArchitecture(Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.PlatformArchitecture targetArchitecture, out string muxerPath) -> bool
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetDotnetPath() -> string
 Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces.IDotnetHostHelper.GetMonoPath() -> string

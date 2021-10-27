@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using System.IO;
     using System.Reflection.PortableExecutable;
 
-    internal class DotnetHostHelper : IDotnetHostHelper
+    public class DotnetHostHelper : IDotnetHostHelper
     {
         public const string MONOEXENAME = "mono";
 
@@ -40,7 +40,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
         /// <param name="fileHelper">File Helper</param>
-        public DotnetHostHelper(
+        /// <param name="environment">Environment Helper</param>
+        public DotnetHostHelper(IFileHelper fileHelper, IEnvironment environment) : this(fileHelper, environment, new WindowsRegistryHelper(), new EnvironmentVariableHelper(), new ProcessHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
+        /// </summary>
+        /// <param name="fileHelper">File Helper</param>
+        /// <param name="environment">Environment Helper</param>
+        /// <param name="windowsRegistryHelper">WindowsRegistry Helper</param>
+        /// <param name="environmentVariableHelper">EnvironmentVariableHelper Helper</param>
+        /// <param name="processHelper">ProcessHelper Helper</param>
+        internal DotnetHostHelper(
             IFileHelper fileHelper,
             IEnvironment environment,
             IWindowsRegistryHelper windowsRegistryHelper,
