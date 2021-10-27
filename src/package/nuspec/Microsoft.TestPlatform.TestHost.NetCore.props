@@ -22,7 +22,7 @@
       <Link>testhost.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
-    </Content>    
+    </Content>
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.dll">
       <Link>testhost.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -161,8 +161,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
                 else
                 {
-                    envVar = Path.Combine(envVar, muxerName);
-                    if (!this.fileHelper.Exists(envVar))
+                    muxerPath = Path.Combine(envVar, muxerName);
+                    if (!this.fileHelper.Exists(muxerPath))
                     {
                         // If environment variable was specified, and the directory it points at exists, but it does not contain a muxer, or the muxer is incompatible with the target architecture
                         // we stop the search to be compliant with the approach that apphost (compiled .NET executables) use to find the muxer.
@@ -178,7 +178,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                         return false;
                     }
 
-                    muxerPath = envVar;
                     EqtTrace.Verbose($"DotnetHostHelper.TryGetDotnetPathByArchitecture: Muxer compatible with '{targetArchitecture}' resolved from env variable '{envKey}' in '{muxerPath}'");
                     return true;
                 }
@@ -356,7 +355,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Verbose($"DotnetHostHelper.GetMuxerFromGlobalRegistrationOnUnix: Exception during '{installLocation}' muxer resolution.\n{ex}");
+                    EqtTrace.Error($"DotnetHostHelper.GetMuxerFromGlobalRegistrationOnUnix: Exception during '{installLocation}' muxer resolution.\n{ex}");
                 }
             }
 
@@ -389,7 +388,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             }
             catch (Exception ex)
             {
-                EqtTrace.Verbose($"DotnetHostHelper.GetMuxerArchitectureByPEHeaderOnWin: Failed to get architecture from PEHeader for '{path}'\n{ex}");
+                EqtTrace.Error($"DotnetHostHelper.GetMuxerArchitectureByPEHeaderOnWin: Failed to get architecture from PEHeader for '{path}'\n{ex}");
             }
 
             return null;
@@ -436,7 +435,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             catch (Exception ex)
             {
                 // In case of failure during header reading we must fallback to the next place(default installation path)
-                EqtTrace.Verbose($"DotnetHostHelper.GetMuxerArchitectureByMachoOnMac: Failed to get architecture from Mach-O for '{path}'\n{ex}");
+                EqtTrace.Error($"DotnetHostHelper.GetMuxerArchitectureByMachoOnMac: Failed to get architecture from Mach-O for '{path}'\n{ex}");
             }
 
             return null;
