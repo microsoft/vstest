@@ -23,7 +23,7 @@ function Verify-Nuget-Packages($packageDirectory, $version)
         "Microsoft.TestPlatform.Portable" = 604;
         "Microsoft.TestPlatform.TestHost" = 214;
         "Microsoft.TestPlatform.TranslationLayer" = 123;
-        "Microsoft.TestPlatform.Internal.Uwp" = 70;
+        "Microsoft.TestPlatform.Internal.Uwp" = 86;
     }
 
     $nugetPackages = Get-ChildItem -Filter "*$version*.nupkg" $packageDirectory | % { $_.FullName }

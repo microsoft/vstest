@@ -23,6 +23,7 @@
 
     <!-- netstandard 1.3 -->
     <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.3\" />
+    <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.pdb" target="lib\netstandard1.3\" />
     <file src="$NetStandard13Framework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\cs" />
     <file src="$NetStandard13Framework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\de" />
     <file src="$NetStandard13Framework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\es" />
@@ -38,6 +39,7 @@
     <file src="$NetStandard13Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.3\zh-Hant" />
 
     <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.3\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CoreUtilities.pdb" target="lib\netstandard1.3\" />
     <file src="$NetStandard13Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\cs" />
     <file src="$NetStandard13Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\de" />
     <file src="$NetStandard13Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\es" />
@@ -53,53 +55,69 @@
     <file src="$NetStandard13Framework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.3\zh-Hant" />
 
     <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netstandard1.3\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CrossPlatEngine.pdb" target="lib\netstandard1.3\" />
 
     <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netstandard1.3\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CommunicationUtilities.pdb" target="lib\netstandard1.3\" />
 
     <file src="$NetStandard13Framework$\Microsoft.TestPlatform.Utilities.dll" target="lib\netstandard1.3\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.Utilities.pdb" target="lib\netstandard1.3\" />
     
     <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netstandard1.3\" />
+    <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.Common.pdb" target="lib\netstandard1.3\" />
+
+    <file src="$Uap10Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.3\" />
+    <file src="$Uap10Framework$\Microsoft.TestPlatform.PlatformAbstractions.pdb" target="lib\netstandard1.3\" />
 
     <!-- /netstandard1.3 -->
 
     <!-- uap10.0 -->
-    <file src="$Uap10Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\uap10.0\" />
-    <file src="$Uap10Framework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\cs" />
-    <file src="$Uap10Framework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\de" />
-    <file src="$Uap10Framework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\es" />
-    <file src="$Uap10Framework$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\fr" />
-    <file src="$Uap10Framework$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\it" />
-    <file src="$Uap10Framework$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\ja" />
-    <file src="$Uap10Framework$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\ko" />
-    <file src="$Uap10Framework$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\pl" />
-    <file src="$Uap10Framework$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\pt-BR" />
-    <file src="$Uap10Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\ru" />
-    <file src="$Uap10Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\tr" />
-    <file src="$Uap10Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\zh-Hans" />
-    <file src="$Uap10Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\zh-Hant" />
+    <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.pdb" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\cs" />
+    <file src="$NetStandard13Framework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\de" />
+    <file src="$NetStandard13Framework$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\es" />
+    <file src="$NetStandard13Framework$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\fr" />
+    <file src="$NetStandard13Framework$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\it" />
+    <file src="$NetStandard13Framework$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\ja" />
+    <file src="$NetStandard13Framework$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\ko" />
+    <file src="$NetStandard13Framework$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\pl" />
+    <file src="$NetStandard13Framework$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\pt-BR" />
+    <file src="$NetStandard13Framework$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\ru" />
+    <file src="$NetStandard13Framework$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\tr" />
+    <file src="$NetStandard13Framework$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\zh-Hans" />
+    <file src="$NetStandard13Framework$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\uap10.0\zh-Hant" />
 
-    <file src="$Uap10Framework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\uap10.0\" />
-    <file src="$Uap10Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\cs" />
-    <file src="$Uap10Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\de" />
-    <file src="$Uap10Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\es" />
-    <file src="$Uap10Framework$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\fr" />
-    <file src="$Uap10Framework$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\it" />
-    <file src="$Uap10Framework$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\ja" />
-    <file src="$Uap10Framework$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\ko" />
-    <file src="$Uap10Framework$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\pl" />
-    <file src="$Uap10Framework$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\pt-BR" />
-    <file src="$Uap10Framework$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\ru" />
-    <file src="$Uap10Framework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\tr" />
-    <file src="$Uap10Framework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\zh-Hans" />
-    <file src="$Uap10Framework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\zh-Hant" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CoreUtilities.pdb" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\cs" />
+    <file src="$NetStandard13Framework$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\de" />
+    <file src="$NetStandard13Framework$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\es" />
+    <file src="$NetStandard13Framework$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\fr" />
+    <file src="$NetStandard13Framework$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\it" />
+    <file src="$NetStandard13Framework$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\ja" />
+    <file src="$NetStandard13Framework$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\ko" />
+    <file src="$NetStandard13Framework$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\pl" />
+    <file src="$NetStandard13Framework$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\pt-BR" />
+    <file src="$NetStandard13Framework$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\ru" />
+    <file src="$NetStandard13Framework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\tr" />
+    <file src="$NetStandard13Framework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\zh-Hans" />
+    <file src="$NetStandard13Framework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\uap10.0\zh-Hant" />
 
-    <file src="$Uap10Framework$\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CrossPlatEngine.pdb" target="lib\uap10.0\" />
 
-    <file src="$Uap10Framework$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.CommunicationUtilities.pdb" target="lib\uap10.0\" />
 
-    <file src="$Uap10Framework$\Microsoft.TestPlatform.Utilities.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.Utilities.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.TestPlatform.Utilities.pdb" target="lib\uap10.0\" />
     
-    <file src="$Uap10Framework$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\uap10.0\" />
+    <file src="$NetStandard13Framework$\Microsoft.VisualStudio.TestPlatform.Common.pdb" target="lib\uap10.0\" />
+
+    <file src="$Uap10Framework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\uap10.0\" />
+    <file src="$Uap10Framework$\Microsoft.TestPlatform.PlatformAbstractions.pdb" target="lib\uap10.0\" />
     
     <!-- /uap10.0 -->
   </files>
