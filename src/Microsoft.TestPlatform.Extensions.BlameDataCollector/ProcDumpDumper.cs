@@ -281,7 +281,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     Constants.Procdump64Process : Constants.ProcdumpProcess;
                 }
             }
-            else if (this.environment.OperatingSystem == PlatformOperatingSystem.Unix)
+            else if (this.environment.OperatingSystem == PlatformOperatingSystem.Unix || this.environment.OperatingSystem == PlatformOperatingSystem.OSX)
             {
                 filename = Constants.ProcdumpUnixProcess;
             }

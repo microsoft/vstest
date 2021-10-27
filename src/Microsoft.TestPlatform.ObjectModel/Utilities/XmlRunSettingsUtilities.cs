@@ -37,8 +37,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                         return ObjectModel.Architecture.X64;
                     case PlatformArchitecture.X86:
                         return ObjectModel.Architecture.X86;
-                    default:
+                    case PlatformArchitecture.ARM64:
+                        return ObjectModel.Architecture.ARM64;
+                    case PlatformArchitecture.ARM:
                         return ObjectModel.Architecture.ARM;
+                    default:
+                        return ObjectModel.Architecture.X64;
                 }
             }
         }
