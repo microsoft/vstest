@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                         return false;
                     }
 
-                    if (!IsValidArchitectureMuxer(targetArchitecture, envVar))
+                    if (!IsValidArchitectureMuxer(targetArchitecture, muxerPath))
                     {
                         EqtTrace.Verbose($"DotnetHostHelper: Invalid muxer resolved using env var key '{envKey}' in '{envVar}'");
                         muxerPath = null;
