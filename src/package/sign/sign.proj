@@ -205,6 +205,10 @@
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
       <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.TestPlatform.Utilities.dll" />
+      <NetStandard13AssembliesToSign Include="$(ArtifactsNS13Directory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
 
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
@@ -212,6 +216,8 @@
       <NetStandard20AssembliesToSign Include="$(ArtifactsNS20Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
 
       <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.AdapterUtilities.dll" />
+      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <UAP100AssembliesToSign Include="$(ArtifactsUAP100Directory)Microsoft.TestPlatform.PlatformAbstractions.dll" />
 
       <!-- NetCoreExtensions -->
       <Core21AssembliesToSign Include="$(ArtifactsCore21Directory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />

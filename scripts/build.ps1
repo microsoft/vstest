@@ -103,7 +103,7 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
-Import-Module -Name "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1" -Scope Local
+. "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
 
 # Update the version in the dependencies props to be the TPB_version version, this is not ideal but because changing how this is resolved would 
 # mean that we need to change the whole build process this is a solution with the least amount of impact, that does not require us to keep track of 
@@ -312,7 +312,11 @@ function Publish-Package
                 $TPB_TargetFrameworkNS10   = $netstandard10PackageDir      # netstandard1_0
                 $TPB_TargetFrameworkNS13   = $netstandard13PackageDir      # netstandard1_3
                 $TPB_TargetFrameworkNS20   = $netstandard20PackageDir      # netstandard2_0
-                $TPB_TargetFrameworkUap100 = $testhostUapPackageDir        # uap10.0
+                $TPB_TargetFrameworkUap100 = $uap100PackageDir             # uap10.0
+              }
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFrameworkUap100 = $testhostUapPackageDir        # uap10.0 - testhost
               }
 
     ################################################################################
@@ -324,7 +328,12 @@ function Publish-Package
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
+                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
+              }
+
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0 - testhost
               }
 
     ################################################################################
@@ -338,8 +347,14 @@ function Publish-Package
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
-                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
+                $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
               }
+    
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0 - testhost
+              }
+
 
     ################################################################################
     # Publish Microsoft.TestPlatform.AdapterUtilities
@@ -350,6 +365,13 @@ function Publish-Package
                 $TPB_TargetFrameworkNS10    = $netstandard10PackageDir       # netstandard1_0
                 $TPB_TargetFrameworkNS20    = $netstandard20PackageDir       # netstandard2_0
                 $TPB_TargetFrameworkUap100  = $uap100PackageDir              # uap10.0
+            }
+
+    ################################################################################
+    # Publish Microsoft.TestPlatform.CrossPlatEngine
+    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CrossPlatEngine\bin\$TPB_Configuration") `
+            -files @{
+                $TPB_TargetFrameworkNS13    = $netstandard13PackageDir       # netstandard1_3
             }
 
     ################################################################################
@@ -759,6 +781,7 @@ function Create-NugetPackages
         "TestPlatform.ObjectModel.nuspec",
         "TestPlatform.TestHost.nuspec",
         "TestPlatform.TranslationLayer.nuspec"
+        "TestPlatform.Internal.Uwp.nuspec"
     )
 
     $targetFiles = @("Microsoft.CodeCoverage.targets")
