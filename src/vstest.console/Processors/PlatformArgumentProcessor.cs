@@ -135,15 +135,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             var validPlatforms = Enum.GetValues(typeof(Architecture)).Cast<Architecture>()
                 .Where(e => e != Architecture.AnyCPU && e != Architecture.Default)
-                .Select(e => e.ToString().ToLowerInvariant())
                 .ToList();
 
-            // We do case-sensitive comparison to behave like other dotnet verbs
-            if (validPlatforms.Contains(argument, StringComparer.Ordinal))
+            Architecture platform;
+            var validPlatform = Enum.TryParse(argument, true, out platform);
+            if (validPlatform)
+            {
+                // Ensure that the case-insensitively parsed enum is in the list of valid platforms.
+                // This filters out:
+                //  - values that parse correctly but the enum does not define them (e.g. "1" parses as valid enum value 1)
+                //  - the Default or AnyCpu that are not valid target to provide via settings
+                validPlatform = validPlatforms.Contains(platform);
+            }
+
+            if (validPlatform)
             {
                 RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
-                this.commandLineOptions.TargetArchitecture = (Architecture)Enum.Parse(typeof(Architecture), argument, true);
-                this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, this.commandLineOptions.TargetArchitecture.ToString());
+                this.commandLineOptions.TargetArchitecture = platform;
+                this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
             else
             {
