@@ -51,8 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <param name="fileHelper">File Helper</param>
         /// <param name="environment">Environment Helper</param>
         /// <param name="windowsRegistryHelper">WindowsRegistry Helper</param>
-        /// <param name="environmentVariableHelper">EnvironmentVariableHelper Helper</param>
-        /// <param name="processHelper">ProcessHelper Helper</param>
+        /// <param name="environmentVariableHelper">EnvironmentVariable Helper</param>
+        /// <param name="processHelper">Process Helper</param>
         internal DotnetHostHelper(
             IFileHelper fileHelper,
             IEnvironment environment,
