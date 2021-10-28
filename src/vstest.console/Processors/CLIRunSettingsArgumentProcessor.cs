@@ -13,7 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;    
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// The argument processor for runsettings passed as argument through cli
@@ -139,14 +140,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var mergedArgs = new List<string>();
             var mergedArg = string.Empty;
             var merge = false;
-           
+
             foreach (var arg in args)
             {
                 // when we see that the parameter begins with TestRunParameters 
                 // but does not end with ") we start merging the params
                 if (arg.StartsWith("TestRunParameters", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (arg.EndsWith("\")")) {
+                    if (arg.EndsWith("\")"))
+                    {
                         // this parameter is complete
                         mergedArgs.Add(arg);
                     }
@@ -170,7 +172,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
 
                 // once we detect the end we add the whole parameter to the args
-                if (merge && arg.EndsWith("\")")) {
+                if (merge && arg.EndsWith("\")"))
+                {
                     mergedArgs.Add(mergedArg);
                     mergedArg = string.Empty;
                     merge = false;
@@ -184,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 mergedArgs.Add(mergedArg);
             }
 
-            
+
             var length = mergedArgs.Count;
 
             for (int index = 0; index < length; index++)
@@ -253,6 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 bool success = Enum.TryParse<Architecture>(value, true, out var architecture);
                 if (success)
                 {
+                    RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
                     this.commandLineOptions.TargetArchitecture = architecture;
                 }
             }
