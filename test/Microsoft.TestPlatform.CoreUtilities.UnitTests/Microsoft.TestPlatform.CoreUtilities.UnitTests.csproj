@@ -32,5 +32,13 @@
     <Reference Include="System.Runtime" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestAssets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TestAssets\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

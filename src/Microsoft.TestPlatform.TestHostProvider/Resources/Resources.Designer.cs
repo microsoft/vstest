@@ -88,5 +88,17 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
                 return ResourceManager.GetString("SuggestPublishTestProject", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   '{0}' is the placeholder for 'dotnet.exe' or 'dotnet' value and depends on platform Windows/Unix, '{1}' is the placeholder for the architeture name like ARM64, X64 etc...
+        /// </summary>
+        internal static string NoDotnetMuxerFoundForArchitecture
+        {
+            get
+            {
+                return ResourceManager.GetString("NoDotnetMuxerFoundForArchitecture", resourceCulture);
+            }
+        }
+
     }
 }
