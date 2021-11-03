@@ -94,7 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     TotalTests = discoveryDataAggregator.TotalTests,
                     IsAborted = discoveryDataAggregator.IsAborted,
-                    LastDiscoveredTests = null
+                    LastDiscoveredTests = null,
+                    FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
+                    PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
+                    NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources
                 };
 
                 // Collecting Final Discovery State
