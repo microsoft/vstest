@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
     /// Defines a test session that can be used to make async calls to the vstest.console
     /// process.
     /// </summary>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public interface ITestSessionAsync : IDisposable
     {
         /// <summary>
@@ -25,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
         /// <returns></returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -38,6 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="discoverySettings">The run settings for the discovery.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="discoveryEventsHandler">The discovery event handler.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -47,6 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <summary>
         /// Cancels the last discovery request.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         void CancelDiscovery();
 
         /// <summary>
@@ -56,6 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="sources">The list of source assemblies for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -69,6 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -82,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="testCases">The list of test cases for the test run.</param>
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -95,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -109,6 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -124,6 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -139,6 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="runSettings">The run settings for the run.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -154,6 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="options">The test platform options.</param>
         /// <param name="testRunEventsHandler">The run event handler.</param>
         /// <param name="customTestHostLauncher">The custom host launcher.</param>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -166,6 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// </summary>
         /// 
         /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task<bool> StopTestSessionAsync();
 
         /// <summary>
@@ -175,17 +188,20 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Int
         /// <param name="eventsHandler">The session event handler.</param>
         /// 
         /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task<bool> StopTestSessionAsync(
             ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Cancels the last test run.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         void CancelTestRun();
 
         /// <summary>
         /// Aborts the last test run.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         void AbortTestRun();
     }
 }

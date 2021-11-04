@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
+    using System;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -28,6 +29,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="eventsHandler">The session event handler.</param>
         /// 
         /// <returns>A test session info object.</returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -43,6 +45,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="eventsHandler">The session event handler.</param>
         /// 
         /// <returns>A test session info object.</returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -60,6 +63,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="testHostLauncher">The custom host launcher.</param>
         /// 
         /// <returns>A test session info object.</returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -75,6 +79,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="eventsHandler">The session event handler.</param>
         /// 
         /// <returns>True if the session was successfuly stopped, false otherwise.</returns>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler);

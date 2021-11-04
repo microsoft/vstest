@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
@@ -173,6 +174,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -186,6 +188,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -201,6 +204,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public ITestSession StartTestSession(
             IList<string> sources,
             string runSettings,
@@ -223,6 +227,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public bool StopTestSession(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)
@@ -576,6 +581,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
@@ -589,6 +595,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
@@ -604,6 +611,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
@@ -626,6 +634,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<bool> StopTestSessionAsync(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler)

@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         ///     string,
         ///     ITestSessionEventsHandler)"/>.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
@@ -42,6 +44,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         ///     TestPlatformOptions,
         ///     ITestSessionEventsHandler)"/>.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
@@ -57,6 +60,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         ///     ITestSessionEventsHandler,
         ///     ITestHostLauncher)"/>.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task<ITestSession> StartTestSessionAsync(
             IList<string> sources,
             string runSettings,
@@ -70,6 +74,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         ///     TestSessionInfo,
         ///     ITestSessionEventsHandler)"/>.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         Task<bool> StopTestSessionAsync(
             TestSessionInfo testSessionInfo,
             ITestSessionEventsHandler eventsHandler);

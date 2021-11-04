@@ -17,6 +17,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// Defines a test session object that can be used to make calls to the vstest.console
     /// process.
     /// </summary>
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public class TestSession : ITestSession
     {
         private bool disposed = false;
@@ -26,6 +27,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #region Properties
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public TestSessionInfo TestSessionInfo { get; private set; }
         #endregion
 
@@ -55,6 +57,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Disposes of the current instance of the <see cref="TestSession"/> class.
         /// </summary>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void Dispose()
         {
             this.Dispose(true);
@@ -80,24 +83,28 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #region ITestSession
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void AbortTestRun()
         {
             this.consoleWrapper.AbortTestRun();
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void CancelDiscovery()
         {
             this.consoleWrapper.CancelDiscovery();
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void CancelTestRun()
         {
             this.consoleWrapper.CancelTestRun();
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -111,6 +118,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -126,6 +134,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -139,6 +148,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -154,6 +164,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -167,6 +178,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -182,6 +194,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -197,6 +210,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -214,6 +228,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -229,6 +244,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -246,12 +262,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public bool StopTestSession()
         {
             return this.StopTestSession(this.eventsHandler);
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
         {
             if (this.TestSessionInfo == null)
@@ -274,6 +292,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #region ITestSessionAsync
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -289,6 +308,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -304,6 +324,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -317,6 +338,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -332,6 +354,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -345,6 +368,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -360,6 +384,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -375,6 +400,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -392,6 +418,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -407,6 +434,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -424,12 +452,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<bool> StopTestSessionAsync()
         {
             return await this.StopTestSessionAsync(this.eventsHandler).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
         {
             if (this.TestSessionInfo == null)
