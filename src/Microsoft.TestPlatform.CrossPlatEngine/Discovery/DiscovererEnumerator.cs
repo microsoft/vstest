@@ -166,8 +166,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         return;
                     }
 
-                    // Mark sources as "NotDiscovered" berfore starting discovery
-                    MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
                     this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
                 }
 
@@ -227,6 +225,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
                 var newTimeStart = DateTime.UtcNow;
+
+                // Mark sources as "NotDiscovered" before starting discovery
+                MarkSourcesWithStatus(discovererToSourcesMap[discoverer], DiscoveryStatus.NotDiscovered);
 
                 this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);
                 discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
@@ -515,7 +516,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         }
 
         /// <summary>
-        /// Marking sources with specific Dis
+        /// Marking sources with specific DiscoveryStatus
         /// </summary>
         /// <param name="sources">List of sources to mark</param>
         /// <param name="status">Status to set</param>
@@ -525,6 +526,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             foreach (var source in sources)
             {
+                // If we already marked the source as fully, no need to mark it as not discovered while iterating through adapters
+                // Such situation can create inconsistent behaviour, when we discover tests by first adapter and mark them as not discovered by the next adapter
+                // TODO : need more thinking and better styling
+                if (DiscoveredSources.ContainsKey(source))
+                {
+                    if (status == DiscoveryStatus.NotDiscovered) continue;
+                }
+
                 DiscoveredSources[source] = status;
             }
         }

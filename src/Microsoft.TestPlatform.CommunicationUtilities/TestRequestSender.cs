@@ -15,8 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using CommonResources = Resources.Resources;
+    using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 
     /// <summary>
     /// Test request sender implementation.
@@ -594,7 +594,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     case MessageType.DiscoveryComplete:
                         var discoveryCompletePayload =
                             this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
-                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
+                                                                                        discoveryCompletePayload.TotalTests,
+                                                                                        discoveryCompletePayload.IsAborted,
+                                                                                        discoveryCompletePayload.FullyDiscoveredSources,
+                                                                                        discoveryCompletePayload.PartiallyDiscoveredSources,
+                                                                                        discoveryCompletePayload.NotDiscoveredSources);
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
                         discoveryEventsHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
