@@ -106,6 +106,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.TestPlatformFormatExcept
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.TestPlatformFormatException.TestPlatformFormatException(string message, string filterValue) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.TestPlatformFormatException.TestPlatformFormatException(string message, System.Exception innerException) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.ARM64 = 5 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.AnyCPU = 4 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.ARM = 3 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture.Default = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Architecture
