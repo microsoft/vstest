@@ -19,8 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using CrossPlatResources = CrossPlatEngine.Resources.Resources;
+    using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 
     public class TestRequestHandler : ITestRequestHandler
     {
@@ -365,6 +365,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         try
                         {
+                            if (!Debugger.IsAttached) Debugger.Launch();
+                            else Debugger.Break();
+
                             this.testHostManagerFactoryReady.Wait();
                             var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
                             var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);

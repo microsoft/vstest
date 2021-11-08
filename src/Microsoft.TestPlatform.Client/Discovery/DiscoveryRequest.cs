@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
@@ -110,6 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         public void Abort()
         {
+            if (!Debugger.IsAttached) Debugger.Launch();
+            else Debugger.Break();
+
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.Abort: Aborting.");

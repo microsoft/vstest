@@ -1007,7 +1007,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                             discoveryCompletePayload.TotalTests,
-                            discoveryCompletePayload.IsAborted);
+                            discoveryCompletePayload.IsAborted,
+                            discoveryCompletePayload.FullyDiscoveredSources,
+                            discoveryCompletePayload.PartiallyDiscoveredSources,
+                            discoveryCompletePayload.NotDiscoveredSources);
 
                         // Adding metrics from vstest.console.
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
