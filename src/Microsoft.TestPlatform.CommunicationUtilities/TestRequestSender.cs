@@ -225,6 +225,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Send the protocol negotiation request. Note that we always serialize this data
                 // without any versioning in the message itself.
                 var data = this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.highestSupportedVersion);
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: Sending check version message: {0}", data);
+                }
+
                 this.channel.Send(data);
 
                 // Wait for negotiation response
@@ -250,6 +256,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 MessageType.DiscoveryInitialize,
                 pathToAdditionalExtensions,
                 this.protocolVersion);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.InitializeDiscovery: Sending initialize discovery with message: {0}", message);
+            }
+
             this.channel.Send(message);
         }
 
@@ -268,6 +280,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 MessageType.StartDiscovery,
                 discoveryCriteria,
                 this.protocolVersion);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.DiscoverTests: Sending discover tests with message: {0}", message);
+            }
+
             this.channel.Send(message);
         }
 
@@ -300,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.protocolVersion);
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initializing execution with message: {0}", message);
+                EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initialize execution with message: {0}", message);
             }
 
             this.channel.Send(message);
@@ -550,6 +568,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             MessageType.AttachDebuggerCallback,
                             result,
                             this.protocolVersion);
+
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending AttachDebugger with message: {0}", message);
+                        }
 
                         this.channel.Send(resultMessage);
 

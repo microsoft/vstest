@@ -715,12 +715,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";InvalidPlatformType" ItemType="0" PsrId="308" Leaf="true">
+      <Item ItemId=";InvalidPlatformType" ItemType="0" PsrId="308" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.]]></Val>
+          <Val><![CDATA[Invalid platform type: {0}. Valid platform types are {1}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[플랫폼 형식({0})이 잘못되었습니다. 올바른 플랫폼 형식은 x86, x64, Arm입니다.]]></Val>
+            <Val><![CDATA[{0} 플랫폼 형식이 잘못되었습니다. 올바른 플랫폼 형식은 {1}입니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>

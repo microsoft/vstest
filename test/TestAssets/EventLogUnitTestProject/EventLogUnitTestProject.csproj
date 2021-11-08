@@ -13,7 +13,7 @@
   <PropertyGroup>
     <AssemblyName>EventLogUnitTestProject</AssemblyName>
     <TargetFrameworks>net451</TargetFrameworks>
-    <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
+    <OutputType Condition="$(NetCoreAppTargetFramework) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">

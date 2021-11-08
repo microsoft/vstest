@@ -609,6 +609,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     Architecture defaultArchitecture = Architecture.X86;
                     if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                         || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+                    // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
                         || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
 #if NETCOREAPP
@@ -616,7 +617,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
                         // should resolve 32-bit SDK when running from 32-bit dotnet process and 
                         // 64-bit SDK when running from 64-bit dotnet process.
-                        defaultArchitecture = Environment.Is64BitProcess ? Architecture.X64 : Architecture.X86;
+                        // As default architecture we specify the expected test host architecture,
+                        // it can be specified by user on the command line with --arch or through runsettings.
+                        // If it's not specified by user will be filled by current processor architecture;
+                        // should be the same as SDK.
+                        defaultArchitecture = runConfiguration.TargetPlatform;
+                        EqtTrace.Verbose($"Default architecture: {defaultArchitecture}");
 #else
                         // We are running in vstest.console.exe that was built against .NET
                         // Framework. This console prefers 32-bit because it needs to run as 32-bit
@@ -764,6 +770,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 sourcePlatforms,
                 defaultArchitecture);
 
+            EqtTrace.Info($"Infered platform '{inferedPlatform}'.");
+
             // Get platform from runsettings.
             bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
@@ -771,6 +779,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // ArgumentProcessor.
             if (updatePlatform)
             {
+                EqtTrace.Info($"Platform update to '{inferedPlatform}' required.");
                 InferRunSettingsHelper.UpdateTargetPlatform(
                     document,
                     inferedPlatform.ToString(),
@@ -789,10 +798,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             IBaseTestEventsRegistrar registrar,
             out Framework chosenFramework)
         {
-            // Get framework from sources.
+            // Get framework from sources. 
+            // This looks like you can optimize it by moving it down to if (updateFramework), but it has a side-effect of 
+            // populating the sourceFrameworks, which is later checked when source compatibility check is done against the value
+            // that we either inferred as the common framework, or that is forced in runsettings.
             var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
 
-            // Get framework from runsettings.
+            // See if framework is forced by runsettings. If not autodetect it.
             bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
 
             // Update framework if required. For command line scenario update happens in
@@ -801,7 +813,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 InferRunSettingsHelper.UpdateTargetFramework(
                     document,
-                    inferedFramework?.ToString(),
+                    inferedFramework.ToString(),
                     overwrite: true);
                 chosenFramework = inferedFramework;
             }

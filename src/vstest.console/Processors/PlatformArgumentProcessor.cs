@@ -6,11 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -132,22 +133,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.PlatformTypeRequired);
             }
 
+            var validPlatforms = Enum.GetValues(typeof(Architecture)).Cast<Architecture>()
+                .Where(e => e != Architecture.AnyCPU && e != Architecture.Default)
+                .ToList();
+
             Architecture platform;
             var validPlatform = Enum.TryParse(argument, true, out platform);
             if (validPlatform)
             {
-                validPlatform = platform == Architecture.X86 || platform == Architecture.X64 || platform == Architecture.ARM;
+                // Ensure that the case-insensitively parsed enum is in the list of valid platforms.
+                // This filters out:
+                //  - values that parse correctly but the enum does not define them (e.g. "1" parses as valid enum value 1)
+                //  - the Default or AnyCpu that are not valid target to provide via settings
+                validPlatform = validPlatforms.Contains(platform);
             }
 
             if (validPlatform)
             {
+                RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
                 this.commandLineOptions.TargetArchitecture = platform;
                 this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
             else
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidPlatformType, argument));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidPlatformType, argument, string.Join(", ", validPlatforms)));
             }
 
             if (EqtTrace.IsInfoEnabled)

@@ -25,16 +25,19 @@
     <NUnit3AdapterVersion>3.10.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
-    <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
+    <ChutzpahAdapterVersion>4.4.12</ChutzpahAdapterVersion>
 
-    <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
+    <!-- This version also needs to be updated in src\package\nuspec\TestPlatform.ObjectModel.nuspec -->
+    <NuGetFrameworksVersion>5.11.0</NuGetFrameworksVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.8.3</MoqVersion>
 
-    <TestPlatformExternalsVersion>17.0.0-previews-4-31630-230</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>17.1.0-preview-1-31826-467</TestPlatformExternalsVersion>
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
     <TestPlatformMSDiaVersion>17.0.0-previews-3-31515-332</TestPlatformMSDiaVersion>
+    <!-- Portable CPP test runner -->
+    <TestPlatformRemoteExternalsVersion>17.1.0-preview-1-31807-420</TestPlatformRemoteExternalsVersion>
     
     <InteropExternalsVersion>17.0.0-preview-2-31223-026</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.0.0-beta.21179.1</MicrosoftFakesVersion>
@@ -42,11 +45,14 @@
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
-    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.221401</MicrosoftDiagnosticsNETCoreClientVersion>
+    
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingPackageVersion>1.1.1</MicrosoftExtensionsFileSystemGlobbingPackageVersion>
 
     <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
+    <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
+
+    <DependencyVersionsImported>true</DependencyVersionsImported>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" />
