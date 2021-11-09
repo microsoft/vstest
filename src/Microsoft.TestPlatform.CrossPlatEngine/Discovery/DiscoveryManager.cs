@@ -170,15 +170,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <inheritdoc/>
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
-            if (cancellationTokenSource.IsCancellationRequested)
+            if(!cancellationTokenSource.IsCancellationRequested)
             {
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+                this.Abort();
             }
-            else
-            {
-                this.cancellationTokenSource.Cancel();
-            }
+
+            // TODO : add discoveredSource dictionary from dscoveryEnumerator and put here in discoveryCompleteEventArgs
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
         }
 
         private void OnReportTestCases(IEnumerable<TestCase> testCases)
