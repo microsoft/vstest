@@ -173,6 +173,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.cancellationTokenSource.Cancel();
         }
 
+        /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            if(!cancellationTokenSource.IsCancellationRequested)
+            {
+                this.Abort();
+            }
+
+            // TODO : add discoveredSource dictionary from dscoveryEnumerator and put here in discoveryCompleteEventArgs
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
+        }
+
         private void OnReportTestCases(IEnumerable<TestCase> testCases)
         {
             UpdateTestCases(testCases, this.discoveryCriteria.Package);
@@ -285,7 +298,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
             }
         }
-
 
         private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
         {

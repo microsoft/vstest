@@ -226,7 +226,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.CancelDiscovery:
                             {
-                                testRequestManager.CancelDiscovery();
+                                // If testhost has old version, we should use old cancel logic
+                                // to be consistent and not create regression issues
+                                if (this.protocolConfig.Version < ObjectModel.Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport)
+                                {
+                                    testRequestManager.CancelDiscovery();
+                                }
+                                else
+                                {
+                                    testRequestManager.CancelDiscoveryWithEventHandler();
+                                }
                                 break;
                             }
 

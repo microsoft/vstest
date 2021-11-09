@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         // Must be in sync with the highest supported version in
         // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
-        private int highestSupportedVersion = 5;
+        private int highestSupportedVersion = 6;
 
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
@@ -490,6 +490,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 case MessageType.AttachDebuggerCallback:
                     this.onAttachDebuggerAckRecieved?.Invoke(message);
+                    break;
+
+                case MessageType.CancelDiscovery:
+                    jobQueue.Pause();
+                    this.testHostManagerFactoryReady.Wait();
+                    testHostManagerFactory.GetDiscoveryManager().Abort(new TestDiscoveryEventHandler(this));
                     break;
 
                 case MessageType.AbortTestRun:

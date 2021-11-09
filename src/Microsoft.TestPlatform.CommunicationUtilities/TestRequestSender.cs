@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         // Must be in sync with the highest supported version in
         // src/Microsoft.TestPlatform.CrossPlatEngine/EventHandlers/TestRequestHandler.cs file.
-        private int highestSupportedVersion = 5;
+        private int highestSupportedVersion = 6;
 
         private TestHostConnectionInfo connectionInfo;
 
@@ -288,6 +288,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             this.channel.Send(message);
+        }
+
+        /// <inheritdoc/>
+        public void SendDiscoveryAbort()
+        {
+            if (this.IsOperationComplete())
+            {
+                EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Operation is already complete. Skip error message.");
+                return;
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
+            }
+
+            this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
         }
         #endregion
 
