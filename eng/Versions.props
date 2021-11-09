@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <!-- This repo version -->
-    <VersionPrefix>17.0.0</VersionPrefix>
+    <VersionPrefix>17.0.1</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
@@ -80,6 +80,6 @@
          JS etc.) is risky. This can break setup authoring and cause runtime failures in workloads
          where Rolsyn is not installed. -->
     <MicrosoftCodeAnalysisVersion>3.8.0-3.20427.2</MicrosoftCodeAnalysisVersion>
-    <MicrosoftInternalCodeCoverageVersion>17.0.0-beta.21471.1</MicrosoftInternalCodeCoverageVersion>
+    <MicrosoftInternalCodeCoverageVersion>17.0.0-beta.21558.2</MicrosoftInternalCodeCoverageVersion>
   </PropertyGroup>
 </Project>
