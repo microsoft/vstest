@@ -659,6 +659,39 @@ namespace vstest.console.UnitTests.Processors
                 "  </DataCollectionRunSettings>",
                 "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
+
+        [TestMethod]
+        public void InitializeShouldUpdateConfigurationsForExistingDataCollectorInRunSettings()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings,
+                "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
+                "  <Configuration>" +
+                "    <SomeSetting>SomeValue</SomeSetting>" +
+                "  </Configuration>" +
+                "</DataCollector>");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.executor.Initialize("MyDataCollector;SomeSetting=AnotherValue");
+
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TestAdaptersPaths>c:\\AdapterFolderPath</TestAdaptersPaths>",
+                "  </RunConfiguration>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <SomeSetting>AnotherValue</SomeSetting>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
         #endregion
     }
 }

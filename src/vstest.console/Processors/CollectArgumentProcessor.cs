@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 if (keyValuePair.Length == 2)
                 {
-                    AddConfiguration(dataCollectorSettings.Configuration, keyValuePair[0], keyValuePair[1]);
+                    AddOrUpdateConfiguration(dataCollectorSettings.Configuration, keyValuePair[0], keyValuePair[1]);
                 }
                 else
                 {
@@ -194,11 +194,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
-        private static void AddConfiguration(XmlElement configuration, string configurationName, string configurationValue)
+        private static void AddOrUpdateConfiguration(XmlElement configuration, string configurationName, string configurationValue)
         {
-            XmlElement attribute = configuration.OwnerDocument.CreateElement(configurationName);
-            attribute.InnerText = configurationValue;
-            configuration.AppendChild(attribute);
+            var existingConfigurations = configuration.GetElementsByTagName(configurationName);
+
+            // Update existing configuration if present.
+            if (existingConfigurations.Count == 0)
+            {
+                XmlElement newConfiguration = configuration.OwnerDocument.CreateElement(configurationName);
+                newConfiguration.InnerText = configurationValue;
+                configuration.AppendChild(newConfiguration);
+                return;
+            }
+
+            foreach (XmlNode existingConfiguration in existingConfigurations)
+            {
+                existingConfiguration.InnerText = configurationValue;
+            }
         }
 
         /// <summary>
