@@ -36,6 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private DiscoveryCriteria discoveryCriteria;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
+        private DiscovererEnumerator discovererEnumerator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
@@ -115,6 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 if (verifiedExtensionSourceMap.Any())
                 {
                     discovererEnumerator = new DiscovererEnumerator(this.requestData, discoveryResultCache, cancellationTokenSource.Token);
+                    this.discovererEnumerator = discovererEnumerator;
                     discovererEnumerator.LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
@@ -144,8 +147,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                     // Collecting Total Tests Discovered
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
-                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false,
-                                                                                     GetFilteredSources(discovererEnumerator,DiscoveryStatus.FullyDiscovered),
+
+                    /* This is added because new aborting flow is introduced where we send CancelDiscovery message to testhost and
+                     * collect list of sources to send back to IDE. Previously vstest.console.exe just closed connection with testhost.
+                     * So now we can have scenario when discovery from adapter is almost is finished and user requested abort.
+                     * Then we can get race condition, when 2 separate flows will run inside testhost, so we dont know which one will finish discovery earlier.
+                     * To fix this here we should check if aborting was already requested, so we need to send totalTest = -1 and isAborted = true, if this flow finishes earlier
+                     * then aborting flow.
+                     */
+                    if (cancellationTokenSource.IsCancellationRequested)
+                    {
+                        totalDiscoveredTestCount = -1;
+                    }
+
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, cancellationTokenSource.IsCancellationRequested,
+                                                                                     GetFilteredSources(discovererEnumerator, DiscoveryStatus.FullyDiscovered),
                                                                                      GetFilteredSources(discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
                                                                                      GetFilteredSources(discovererEnumerator, DiscoveryStatus.NotDiscovered));                    
 
@@ -176,13 +192,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <inheritdoc/>
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
-            if(!cancellationTokenSource.IsCancellationRequested)
+            if (!cancellationTokenSource.IsCancellationRequested)
             {
                 this.Abort();
             }
 
-            // TODO : add discoveredSource dictionary from dscoveryEnumerator and put here in discoveryCompleteEventArgs
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true,
+                                                                            GetFilteredSources(this.discovererEnumerator, DiscoveryStatus.FullyDiscovered),
+                                                                            GetFilteredSources(this.discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
+                                                                            GetFilteredSources(this.discovererEnumerator, DiscoveryStatus.NotDiscovered));
+
             eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
         }
 
@@ -193,6 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             if (this.testDiscoveryEventsHandler != null)
             {
                 this.testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
+                // TODO : Handle test cases here. Mark fully discovered here if all test cases are came here
             }
             else
             {

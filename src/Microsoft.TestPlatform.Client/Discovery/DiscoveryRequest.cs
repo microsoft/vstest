@@ -111,9 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         public void Abort()
         {
-            if (!Debugger.IsAttached) Debugger.Launch();
-            else Debugger.Break();
-
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.Abort: Aborting.");

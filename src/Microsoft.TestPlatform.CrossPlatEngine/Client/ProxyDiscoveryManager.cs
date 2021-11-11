@@ -163,15 +163,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestDiscoveryEventsHandler = eventHandler;
             }
 
-            // Cancel fast, try to stop testhost deployment/launch
-            this.proxyOperationManager.CancellationTokenSource.Cancel();
-
             if (this.isCommunicationEstablished)
             {
                 this.proxyOperationManager.RequestSender.SendDiscoveryAbort();
             }
-
-            this.Close();
         }
 
         /// <inheritdoc/>

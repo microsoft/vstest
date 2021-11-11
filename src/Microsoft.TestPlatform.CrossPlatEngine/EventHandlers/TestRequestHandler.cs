@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
@@ -365,9 +364,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         try
                         {
-                            if (!Debugger.IsAttached) Debugger.Launch();
-                            else Debugger.Break();
-
                             this.testHostManagerFactoryReady.Wait();
                             var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
                             var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);

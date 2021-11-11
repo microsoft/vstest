@@ -609,15 +609,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         discoveryEventsHandler.HandleDiscoveredTests(testCases);
                         break;
                     case MessageType.DiscoveryComplete:
-                        if (!Debugger.IsAttached)
-                        {
-                            Debugger.Launch();
-                        }
-                        else
-                        {
-                            Debugger.Break();
-                        }
-
                         var discoveryCompletePayload =
                             this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
