@@ -35,6 +35,8 @@
           Condition="'$(GenerateProgramFile)' == 'true'">
 
     <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">
+      <RemoveExistingMicrosoftNETTestSdkProgram Include="@(Compile)" Condition="'%(FileName)' == 'Microsoft.NET.Test.Sdk.Program'" />
+      <Compile Remove="@(RemoveExistingMicrosoftNETTestSdkProgram)" />
       <Compile Include="$(GeneratedProgramFile)"/>
     </ItemGroup>
 
