@@ -19,6 +19,23 @@
         <target state="translated">找不到 {0}。請發佈您的測試專案並重試。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoDotnetMuxerFoundForArchitecture">
+        <source>Could not find '{0}' host for the '{1}' architecture.
+
+You can resolve the problem by installing the '{1}' .NET.
+
+The specified framework can be found at:
+  - https://aka.ms/dotnet-download
+</source>
+        <target state="translated">找不到 '{1}' 架構的 '{0}' 主機。
+
+您可以安裝 '{1}' .NET 來解決問題。
+
+指定的架構可在下列位置找到:
+  - https://aka.ms/dotnet-download
+</target>
+        <note>'{0}' is the placeholder for 'dotnet.exe' or 'dotnet' value and depends on platform Windows/Unix, '{1}' is the placeholder for the architeture name like ARM64, X64 etc...</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

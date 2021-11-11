@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 // AssemblyName won't load the assembly into current domain.
                 var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
-                archType = MapToArchitecture(assemblyName.ProcessorArchitecture);
+                archType = MapToArchitecture(assemblyName.ProcessorArchitecture, assemblyPath);
             }
             catch (Exception ex)
             {
@@ -94,6 +94,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return archType;
         }
 
+        private Architecture GetArchitectureFromAssemblyMetadata(string path)
+        {
+            Architecture arch = Architecture.AnyCPU;
+            using (Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
+            using (PEReader peReader = new PEReader(stream))
+            {
+                switch (peReader.PEHeaders.CoffHeader.Machine)
+                {
+                    case Machine.Amd64:
+                        return Architecture.X64;
+                    case Machine.IA64:
+                        return Architecture.X64;
+                    case Machine.Arm64:
+                        return Architecture.ARM64;
+                    case Machine.Arm:
+                        return Architecture.ARM;
+                    case Machine.I386:
+                        return Architecture.X86;
+                    default:
+                        break;
+                }
+            }
+
+            return arch;
+        }
+
         private static FrameworkName GetFrameworkNameFromAssemblyMetadata(Stream assemblyStream)
         {
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
@@ -123,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return frameworkName;
         }
 
-        private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture)
+        private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture, string assemblyPath)
         {
             Architecture arch = Architecture.AnyCPU;
             // Mapping to Architecture based on https://msdn.microsoft.com/en-us/library/system.reflection.processorarchitecture(v=vs.110).aspx
@@ -136,12 +162,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             else if (processorArchitecture.Equals(ProcessorArchitecture.X86))
             {
                 arch = Architecture.X86;
-            }else if (processorArchitecture.Equals(ProcessorArchitecture.MSIL))
+            }
+            else if (processorArchitecture.Equals(ProcessorArchitecture.MSIL))
             {
                 arch = Architecture.AnyCPU;
-            }else if (processorArchitecture.Equals(ProcessorArchitecture.Arm))
+            }
+            else if (processorArchitecture.Equals(ProcessorArchitecture.Arm))
             {
                 arch = Architecture.ARM;
+            }
+            else if (processorArchitecture.Equals(ProcessorArchitecture.None))
+            {
+                // In case of None we fallback to PEReader
+                // We don't use only PEReader for back compatibility.
+                // An AnyCPU returned by AssemblyName.GetAssemblyName(assemblyPath) will result in a I386 for PEReader.
+                // Also MSIL processor architecture is missing with PEReader.
+                // For now it should fix the issue for the missing ARM64 architecture.
+                arch = GetArchitectureFromAssemblyMetadata(assemblyPath);
             }
             else
             {
