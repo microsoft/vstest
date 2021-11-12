@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <param name="runSettings">The run settings.</param>
         /// 
         /// <returns>The proxy object.</returns>
-        public virtual ProxyOperationManager TakeProxy(
+        public virtual ProxyOperationManager TryTakeProxy(
             TestSessionInfo testSessionInfo,
             string source,
             string runSettings)

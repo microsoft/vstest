@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             : this(
                   sources,
                   frequencyOfRunStatsChangeEvent,
-                  true)
+                  keepAlive: true)
         {
         }
 
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   sources,
                   frequencyOfRunStatsChangeEvent,
                   keepAlive,
-                  string.Empty)
+                  testSettings: string.Empty)
         {
         }
 
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   keepAlive,
                   testSettings,
                   runStatsChangeEventTimeout,
-                  null)
+                  testHostLauncher: null)
         {
         }
 
@@ -141,8 +141,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                   testSettings,
                   runStatsChangeEventTimeout,
                   testHostLauncher,
-                  null,
-                  null)
+                  testCaseFilter: null,
+                  filterOptions: null)
         {
         }
 

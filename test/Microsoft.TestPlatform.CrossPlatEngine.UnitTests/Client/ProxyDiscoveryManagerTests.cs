@@ -512,12 +512,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldAttemptToTakeProxyFromPoolIfProxyIsNull()
         {
             var testSessionInfo = new TestSessionInfo();
+
+            Func<string, ProxyDiscoveryManager, ProxyOperationManager>
+            proxyOperationManagerCreator = (
+                string source,
+                ProxyDiscoveryManager proxyDiscoveryManager) =>
+            {
+                var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
+                    testSessionInfo,
+                    source,
+                    discoveryCriteria.RunSettings);
+
+                return proxyOperationManager;
+            };
+
             var testDiscoveryManager = new ProxyDiscoveryManager(
                 testSessionInfo,
-                string.Empty,
-                this.mockRequestData.Object,
-                this.mockRequestSender.Object,
-                this.mockTestHostManager.Object);
+                proxyOperationManagerCreator);
 
             var mockTestSessionPool = new Mock<TestSessionPool>();
             TestSessionPool.Instance = mockTestSessionPool.Object;
@@ -529,7 +540,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     this.mockRequestSender.Object,
                     this.mockTestHostManager.Object);
                 mockTestSessionPool.Setup(
-                    tsp => tsp.TakeProxy(
+                    tsp => tsp.TryTakeProxy(
                         testSessionInfo,
                         It.IsAny<string>(),
                         It.IsAny<string>()))
@@ -541,7 +552,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     new Mock<ITestDiscoveryEventsHandler2>().Object);
 
                 mockTestSessionPool.Verify(
-                    tsp => tsp.TakeProxy(
+                    tsp => tsp.TryTakeProxy(
                         testSessionInfo,
                         It.IsAny<string>(),
                         It.IsAny<string>()),

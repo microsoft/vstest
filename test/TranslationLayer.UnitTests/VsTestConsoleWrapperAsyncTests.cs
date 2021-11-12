@@ -95,6 +95,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task StartTestSessionAsyncShouldCallRequestSenderWithCorrectArguments1()
         {
             var testSessionInfo = new TestSessionInfo();
@@ -127,6 +128,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task StartTestSessionAsyncShouldCallRequestSenderWithCorrectArguments2()
         {
             var testSessionInfo = new TestSessionInfo();
@@ -161,6 +163,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task StartTestSessionAsyncShouldCallRequestSenderWithCorrectArguments3()
         {
             var testSessionInfo = new TestSessionInfo();
@@ -197,6 +200,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task StopTestSessionAsyncShouldCallRequestSenderWithCorrectArguments()
         {
             var testSessionInfo = new TestSessionInfo();

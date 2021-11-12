@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 frequencyOfDiscoveredTestsEvent,
                 discoveredTestEventTimeout,
                 runSettings,
-                null)
+                testSessionInfo: null)
         { }
 
         /// <summary>

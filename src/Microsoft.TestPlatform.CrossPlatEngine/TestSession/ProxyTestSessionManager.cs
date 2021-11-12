@@ -63,8 +63,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             // Create all the proxies in parallel, one task per proxy.
-            var taskList = new Task[2 * this.testhostCount];
-            for (int i = 0; i < taskList.Length; i += 2)
+            var taskList = new Task[this.testhostCount];
+            for (int i = 0; i < taskList.Length; ++i)
             {
                 // The testhost count is equal to 1 because one of the following conditions
                 // holds true:
@@ -81,17 +81,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 // create a list with a single element, i.e. the current source to be processed.
                 var sources = (this.testhostCount == 1)
                     ? this.testSessionCriteria.Sources
-                    : new List<string>() { this.testSessionCriteria.Sources[i / 2] };
+                    : new List<string>() { this.testSessionCriteria.Sources[i] };
 
-                var task = Task.Factory.StartNew(
-                    () => this.SetupRawProxy(
-                        sources,
-                        this.testSessionCriteria.RunSettings));
-
-                taskList[i] = task;
-                taskList[i + 1] = task.ContinueWith(res =>
+                taskList[i] = Task.Factory.StartNew(() =>
                 {
-                    if (!res.Result)
+                    if (!this.SetupRawProxy(
+                        sources,
+                        this.testSessionCriteria.RunSettings))
                     {
                         this.proxySetupFailed = true;
                     }

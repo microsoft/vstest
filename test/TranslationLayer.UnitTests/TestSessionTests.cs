@@ -17,6 +17,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Moq;
 
     [TestClass]
+    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public class TestSessionTests
     {
         private readonly string testSettings = "TestSettings";
