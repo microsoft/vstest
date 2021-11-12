@@ -16,7 +16,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             None = 0,
             Default = 1,
-            Custom = 2
+            Custom = 2,
+            XmlOutput = 3,
+            CoberturaOutput = 4
         }
 
         public string AssemblyName { get; set; }
@@ -168,6 +170,46 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.CollectCodeCoverage(runnerInfo, parameters);
         }
 
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CollectCodeCoverageSpecifyOutputFormatXml(RunnerInfo runnerInfo)
+        {
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "SimpleTestProject.dll",
+                TargetPlatform = "x64",
+                RunSettingsPath = string.Empty,
+                RunSettingsType = TestParameters.SettingsType.XmlOutput,
+                ExpectedPassedTests = 1,
+                ExpectedSkippedTests = 1,
+                ExpectedFailedTests = 1
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CollectCodeCoverageSpecifyOutputFormatCoberturaOverrideRunSettingsConfiguration(RunnerInfo runnerInfo)
+        {
+            var parameters = new TestParameters()
+            {
+                AssemblyName = "SimpleTestProject.dll",
+                TargetPlatform = "x64",
+                RunSettingsPath = Path.Combine(
+                    IntegrationTestEnvironment.TestPlatformRootDirectory,
+                    @"scripts", "vstest-codecoverage2.runsettings"),
+                RunSettingsType = TestParameters.SettingsType.CoberturaOutput,
+                ExpectedPassedTests = 1,
+                ExpectedSkippedTests = 1,
+                ExpectedFailedTests = 1
+            };
+
+            this.CollectCodeCoverage(runnerInfo, parameters);
+        }
+
         private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -185,13 +227,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
+            if (testParameters.RunSettingsType == TestParameters.SettingsType.XmlOutput)
+            {
+                Assert.IsTrue(actualCoverageFile.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase));
+            }
+            else if (testParameters.RunSettingsType == TestParameters.SettingsType.CoberturaOutput)
+            {
+                Assert.IsTrue(actualCoverageFile.EndsWith(".cobertura.xml", StringComparison.InvariantCultureIgnoreCase));
+            }
+            else
+            {
+                Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
+            }
+
             var coverageDocument = this.GetXmlCoverage(actualCoverageFile);
             if (testParameters.CheckSkipped)
             {
                 this.AssertSkippedMethod(coverageDocument);
             }
 
-            this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName);
+            this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
 
             Directory.Delete(this.resultsDirectory, true);
         }
@@ -232,6 +287,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 case TestParameters.SettingsType.Custom:
                     runSettings = $" /settings:{testParameters.RunSettingsPath}";
                     break;
+                case TestParameters.SettingsType.XmlOutput:
+                    runSettings = $" /collect:\"Code Coverage;Format=Xml\"";
+                    if (!string.IsNullOrWhiteSpace(testParameters.RunSettingsPath))
+                    {
+                        runSettings += $" /settings:{testParameters.RunSettingsPath}";
+                    }
+                    break;
+                case TestParameters.SettingsType.CoberturaOutput:
+                    runSettings = $" /collect:\"Code Coverage;Format=Cobertura\"";
+                    if (!string.IsNullOrWhiteSpace(testParameters.RunSettingsPath))
+                    {
+                        runSettings += $" /settings:{testParameters.RunSettingsPath}";
+                    }
+                    break;
             }
 
             arguments = string.Concat(arguments, runSettings);
@@ -259,13 +328,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsNotNull(testAbsFunction);
         }
 
-        private void ValidateCoverageData(XmlDocument document, string moduleName)
+        private void ValidateCoverageData(XmlDocument document, string moduleName, bool validateSourceFileNames)
         {
             var module = this.GetModuleNode(document.DocumentElement, moduleName.ToLower());
+
+            if (module == null)
+            {
+                module = this.GetModuleNode(document.DocumentElement, moduleName);
+            }
             Assert.IsNotNull(module);
 
             this.AssertCoverage(module, CodeCoverageAcceptanceTestBase.ExpectedMinimalModuleCoverage);
-            this.AssertSourceFileName(module);
+
+            // In case of cobertura report. Cobertura report has different format.
+            if (validateSourceFileNames)
+            {
+                this.AssertSourceFileName(module);
+            }
         }
 
         private void AssertSourceFileName(XmlNode module)
