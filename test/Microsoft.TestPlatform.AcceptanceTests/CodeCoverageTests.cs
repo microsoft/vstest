@@ -286,10 +286,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     runSettings = $" /settings:{testParameters.RunSettingsPath}";
                     break;
                 case TestParameters.SettingsType.XmlOutput:
-                    runSettings = $" /collect:\"Code Coverage;CovrerageFileFormat=Xml\"";
+                    runSettings = $" /collect:\"Code Coverage;Format=Xml\"";
                     break;
                 case TestParameters.SettingsType.CoberturaOutput:
-                    runSettings = $" /collect:\"Code Coverage;CovrerageFileFormat=Cobertura\"";
+                    runSettings = $" /collect:\"Code Coverage;Format=Cobertura\"";
                     break;
             }
 
