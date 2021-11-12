@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
@@ -35,8 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private ITestDiscoveryEventsHandler2 testDiscoveryEventsHandler;
         private DiscoveryCriteria discoveryCriteria;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
-        private DiscovererEnumerator discovererEnumerator;
+        private string previousSource = null;
+        private ConcurrentDictionary<string, DiscoveryStatus> DiscoveredSourcesWithStatus { get; set; } = new ConcurrentDictionary<string, DiscoveryStatus>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -93,8 +94,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 discoveryCriteria.DiscoveredTestEventTimeout,
                 this.OnReportTestCases);
 
-            DiscovererEnumerator discovererEnumerator = null;
-
             try
             {
                 this.discoveryCriteria = discoveryCriteria;
@@ -109,20 +108,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     if (verifiedSources.Any())
                     {
                         verifiedExtensionSourceMap.Add(kvp.Key, kvp.Value);
+                        // Mark all sources as NotDiscovered before actual discovery starts
+                        MarkSourcesWithStatus(verifiedSources, DiscoveryStatus.NotDiscovered);
                     }
                 }
-
 
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    discovererEnumerator = new DiscovererEnumerator(this.requestData, discoveryResultCache, cancellationTokenSource.Token);
-                    this.discovererEnumerator = discovererEnumerator;
-                    discovererEnumerator.LoadTests(
-                        verifiedExtensionSourceMap,
-                        RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
-                        discoveryCriteria.TestCaseFilter,
-                        this.sessionMessageLogger);
+                    new DiscovererEnumerator(this.requestData, discoveryResultCache,cancellationTokenSource.Token).LoadTests(
+                                                verifiedExtensionSourceMap,
+                                                RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
+                                                discoveryCriteria.TestCaseFilter,
+                                                this.sessionMessageLogger);
                 }
             }
             finally
@@ -140,6 +138,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     if (lastChunk != null)
                     {
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
+                        /* When discovery is complete we will have case that the last source which was discovered still marked as partiallyDiscovered.
+                         * So we need to mark it as fullyDiscovered.*/
+                        MarkTheLastSourceAsFullyDiscovered(lastChunk);
                     }
 
                     // Collecting Discovery State
@@ -161,9 +162,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
 
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, cancellationTokenSource.IsCancellationRequested,
-                                                                                     GetFilteredSources(discovererEnumerator, DiscoveryStatus.FullyDiscovered),
-                                                                                     GetFilteredSources(discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
-                                                                                     GetFilteredSources(discovererEnumerator, DiscoveryStatus.NotDiscovered));                    
+                                                                                     GetFilteredSources(DiscoveryStatus.FullyDiscovered),
+                                                                                     GetFilteredSources(DiscoveryStatus.PartiallyDiscovered),
+                                                                                     GetFilteredSources(DiscoveryStatus.NotDiscovered));
 
                     discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
 
@@ -198,9 +199,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
 
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true,
-                                                                            GetFilteredSources(this.discovererEnumerator, DiscoveryStatus.FullyDiscovered),
-                                                                            GetFilteredSources(this.discovererEnumerator, DiscoveryStatus.PartiallyDiscovered),
-                                                                            GetFilteredSources(this.discovererEnumerator, DiscoveryStatus.NotDiscovered));
+                                                                            GetFilteredSources(DiscoveryStatus.FullyDiscovered),
+                                                                            GetFilteredSources(DiscoveryStatus.PartiallyDiscovered),
+                                                                            GetFilteredSources(DiscoveryStatus.NotDiscovered));
 
             eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
         }
@@ -212,7 +213,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             if (this.testDiscoveryEventsHandler != null)
             {
                 this.testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
-                // TODO : Handle test cases here. Mark fully discovered here if all test cases are came here
+                // We need to mark sources based on already discovered testcases
+                MarkSourcesBasedOnDiscoveredTestCases(testCases);
             }
             else
             {
@@ -333,23 +335,86 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         }
 
         /// <summary>
+        /// Mark sources based on already discovered testCases
+        /// </summary>
+        /// <param name="testCases">List of testCases which were already discovered</param>
+        private void MarkSourcesBasedOnDiscoveredTestCases(IEnumerable<TestCase> testCases)
+        {
+            if (testCases == null || testCases.Count() == 0) return;
+
+            foreach (var testCase in testCases)
+            {
+                string currentSource = testCase.Source;
+
+                // If it is first list of testCases which was discovered, we mark sources as partiallyDiscovered
+                // Or if current source is the same as previous we mark them as partiallyDiscovered again for consistency
+                if (previousSource is null || previousSource == currentSource)
+                {
+                    MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
+                }
+                // If source is changed, we need to mark previous source as already fullyDiscovered
+                // and currentSource should be partiallyDiscovered
+                else if (previousSource != currentSource)
+                {
+                    MarkSourceWithStatus(previousSource, DiscoveryStatus.FullyDiscovered);
+                    MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
+                }
+
+                this.previousSource = currentSource;
+            }
+        }
+
+        /// <summary>
+        /// Mark the last source as fullyDiscovered
+        /// </summary>
+        /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
+        private void MarkTheLastSourceAsFullyDiscovered(IList<TestCase> lastChunk)
+        {
+            int size = lastChunk.Count;
+            var lastTestCase = lastChunk[size - 1];
+            string lastSource = lastTestCase.Source;
+            DiscoveredSourcesWithStatus[lastSource] = DiscoveryStatus.FullyDiscovered;
+        }
+
+        /// <summary>
+        /// Mark the source with particular DiscoveryStatus
+        /// </summary>
+        /// <param name="source">Sources to mark</param>
+        /// <param name="status">DiscoveryStatus to mark for source</param>
+        private void MarkSourceWithStatus(string source, DiscoveryStatus status)
+        {
+            if (source == null) return;
+            DiscoveredSourcesWithStatus[source] = status;
+        }
+
+        /// <summary>
+        /// Mark sources with particular DiscoveryStatus
+        /// </summary>
+        /// <param name="sources">List of sources to mark</param>
+        /// <param name="status">DiscoveryStatus to mark for list of sources</param>
+        private void MarkSourcesWithStatus(IEnumerable<string> sources, DiscoveryStatus status)
+        {
+            if (sources == null || sources.Count() == 0) return;
+
+            foreach (var source in sources)
+            {
+                DiscoveredSourcesWithStatus[source] = status;
+            }
+        }
+
+        /// <summary>
         /// Filters discovery sources based on discovery status condition
         /// </summary>
         /// <param name="discoveryStatus">discoveryStatus indicates if source was fully/partially/not discovered</param>
         /// <returns></returns>
-        private IReadOnlyCollection<string> GetFilteredSources(DiscovererEnumerator discovererEnumerator, DiscoveryStatus discoveryStatus)
+        private IReadOnlyCollection<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
         {
-            // If there were no sources to discover we will return empty list of all discovery statuses
-            if (discovererEnumerator == null)
+            var discoveredSources = DiscoveredSourcesWithStatus;
+
+            // If by some accident discoveredSources map is empty we will return empty list
+            if (discoveredSources == null || discoveredSources.Count == 0)
             {
                 return new List<string>();
-            }
-
-            var discoveredSources = discovererEnumerator.DiscoveredSources;
-
-            if (discoveredSources == null)
-            {
-                return null;
             }
 
             return discoveredSources.Where(source => source.Value == discoveryStatus)
