@@ -370,6 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
         private void MarkTheLastSourceAsFullyDiscovered(IList<TestCase> lastChunk)
         {
+            if (lastChunk == null || lastChunk.Count == 0) return;
             int size = lastChunk.Count;
             var lastTestCase = lastChunk[size - 1];
             string lastSource = lastTestCase.Source;
