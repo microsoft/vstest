@@ -121,6 +121,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Get collect argument list.
             var collectArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
 
+            // First argument is collector name. Remaining are key value pairs for configurations.
+            if (collectArgumentList[0].Contains("="))
+            {
+                throw new CommandLineException(exceptionMessage);
+            }
+
             if (InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
             {
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));

@@ -586,6 +586,17 @@ namespace vstest.console.UnitTests.Processors
         }
 
         [TestMethod]
+        public void InitializeShouldThrowExceptionWhenInvalidCollectorNameProvided()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize("MyDataCollector=SomeSetting"));
+        }
+
+        [TestMethod]
         public void InitializeShouldThrowExceptionWhenInvalidConfigurationsProvided()
         {
             var runsettingsString = string.Format(DefaultRunSettings, "");
