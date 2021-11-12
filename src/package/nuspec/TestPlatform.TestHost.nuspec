@@ -84,7 +84,18 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x64\msdia140.dll" target="lib\netcoreapp2.1\x64\" />
     
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp2.1\" />
-    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.dll" target="build\netcoreapp2.1\x64\" />
+    <!-- 
+          We move AnyCPU version of testhost.dll, at the moment we don't have native code that needs particular architecture inside testhost.dll.
+          This prevent possible issue related to override x64(testshost.dll) compilation inside Microsoft.TestPlatform.TestHost.NetCore.prop netcoreapp2.1\x64\testhost.dll to the bin folder
+          that contains AnyCPU version.
+          In case of -arch arm64/x86 with a x64 SDK on arm where we use only dotnet muxer+testhost.dll to do arch switch, 
+          if we copy x64 testshost.dll we'll fail to load with `arm64/dotnet.exe exec testhost.dll`.
+          Another possible way to keep x64 version if needed is to understand if we're on -arch scenario and act as expected
+          and avoid to copy testhost.dll if we're switching to a non x64 arch.
+          This means parse/understand -arch inside msbuild, not trivial, so for now we simply copy the AnyCPU version and we keep 
+          the package authoring as-is for back compatibiliy.
+    -->
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.dll" target="build\netcoreapp2.1\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.exe" target="build\netcoreapp2.1\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\Microsoft.TestPlatform.PlatformAbstractions.dll" target="build\netcoreapp2.1\x64\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.dll" target="build\netcoreapp2.1\x86\" />

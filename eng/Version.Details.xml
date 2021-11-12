@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.1.0-beta.21519.1">
+    <Dependency Name="Microsoft.Internal.CodeCoverage" Version="17.1.0-beta.21561.1">
       <Uri>https://dev.azure.com/devdiv/DevDiv/_git/vs-code-coverage</Uri>
-      <Sha>862fde06892abad7c877824d4fe8d517afd01915</Sha>
+      <Sha>3d834400e3b8cfcb3e8d97a51c7fb0b7fb4c02d9</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.21508.1">
       <Uri>https://github.com/dotnet/diagnostics</Uri>
@@ -16,26 +16,26 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.21518.1">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.21555.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c5a300999a6ab2792108190118280da36fb1991e</Sha>
+      <Sha>a7c57abb74deaee6dac921dd68f9c3c58059ebfb</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Build.Tasks.Feed" Version="7.0.0-beta.21518.1">
+    <Dependency Name="Microsoft.DotNet.Build.Tasks.Feed" Version="7.0.0-beta.21555.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c5a300999a6ab2792108190118280da36fb1991e</Sha>
+      <Sha>a7c57abb74deaee6dac921dd68f9c3c58059ebfb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.SignTool" Version="7.0.0-beta.21518.1">
+    <Dependency Name="Microsoft.DotNet.SignTool" Version="7.0.0-beta.21555.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c5a300999a6ab2792108190118280da36fb1991e</Sha>
+      <Sha>a7c57abb74deaee6dac921dd68f9c3c58059ebfb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Helix.Sdk" Version="7.0.0-beta.21518.1">
+    <Dependency Name="Microsoft.DotNet.Helix.Sdk" Version="7.0.0-beta.21555.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c5a300999a6ab2792108190118280da36fb1991e</Sha>
+      <Sha>a7c57abb74deaee6dac921dd68f9c3c58059ebfb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.SwaggerGenerator.MSBuild" Version="7.0.0-beta.21518.1">
+    <Dependency Name="Microsoft.DotNet.SwaggerGenerator.MSBuild" Version="7.0.0-beta.21555.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c5a300999a6ab2792108190118280da36fb1991e</Sha>
+      <Sha>a7c57abb74deaee6dac921dd68f9c3c58059ebfb</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Maestro.Client" Version="1.1.0-beta.20074.1">
       <Uri>https://github.com/dotnet/arcade-services</Uri>

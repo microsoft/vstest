@@ -5,9 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Collections.Generic;
-
     using System.Globalization;
     using System.IO;
+    using System.Linq;
+    using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -108,21 +110,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // 1. Disable all other data collectors. Enable only those data collectors that are explicitly specified by user.
             // 2. Check if Code Coverage Data Collector is specified in runsettings, if not add it and also set enable to true.
 
+            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.DataCollectorFriendlyNameInvalid, argument);
+
             // if argument is null or doesn't contain any element, don't do anything.
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommandLineResources.DataCollectorFriendlyNameInvalid,
-                    argument));
+                throw new CommandLineException(exceptionMessage);
+            }
+
+            // Get collect argument list.
+            var collectArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
+
+            // First argument is collector name. Remaining are key value pairs for configurations.
+            if (collectArgumentList[0].Contains("="))
+            {
+                throw new CommandLineException(exceptionMessage);
             }
 
             if (InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
             {
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
-            AddDataCollectorToRunSettings(argument, this.runSettingsManager, this.fileHelper);
+            AddDataCollectorToRunSettings(collectArgumentList, this.runSettingsManager, this.fileHelper, exceptionMessage);
         }
 
         /// <summary>
@@ -149,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        internal static void EnableDataCollectorUsingFriendlyName(string argument, DataCollectionRunSettings dataCollectionRunSettings)
+        internal static DataCollectorSettings EnableDataCollectorUsingFriendlyName(string argument, DataCollectionRunSettings dataCollectionRunSettings)
         {
             DataCollectorSettings dataCollectorSettings = null;
 
@@ -163,6 +172,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 dataCollectorSettings.IsEnabled = true;
+            }
+
+            return dataCollectorSettings;
+        }
+
+        private static void AddDataCollectorConfigurations(string[] configurations, DataCollectorSettings dataCollectorSettings, string exceptionMessage)
+        {
+            if (dataCollectorSettings.Configuration == null)
+            {
+                XmlDocument doc = new XmlDocument();
+                dataCollectorSettings.Configuration = doc.CreateElement("Configuration");
+            }
+
+            foreach (var configuration in configurations)
+            {
+                var keyValuePair = ArgumentProcessorUtilities.GetArgumentList(configuration, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
+
+                if (keyValuePair.Length == 2)
+                {
+                    AddOrUpdateConfiguration(dataCollectorSettings.Configuration, keyValuePair[0], keyValuePair[1]);
+                }
+                else
+                {
+                    throw new CommandLineException(exceptionMessage);
+                }
+            }
+        }
+
+        private static void AddOrUpdateConfiguration(XmlElement configuration, string configurationName, string configurationValue)
+        {
+            var existingConfigurations = configuration.GetElementsByTagName(configurationName);
+
+            // Update existing configuration if present.
+            if (existingConfigurations.Count == 0)
+            {
+                XmlElement newConfiguration = configuration.OwnerDocument.CreateElement(configurationName);
+                newConfiguration.InnerText = configurationValue;
+                configuration.AppendChild(newConfiguration);
+                return;
+            }
+
+            foreach (XmlNode existingConfiguration in existingConfigurations)
+            {
+                existingConfiguration.InnerText = configurationValue;
             }
         }
 
@@ -209,9 +262,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return false;
         }
 
-        internal static void AddDataCollectorToRunSettings(string argument, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
+        internal static void AddDataCollectorToRunSettings(string arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
         {
-            EnabledDataCollectors.Add(argument.ToLower());
+            AddDataCollectorToRunSettings(new string[] { arguments }, runSettingsManager, fileHelper, string.Empty);
+        }
+
+        internal static void AddDataCollectorToRunSettings(string[] arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string exceptionMessage)
+        {
+            var collectorName = arguments[0];
+            var additionalConfigurations = arguments.Skip(1).ToArray();
+            EnabledDataCollectors.Add(collectorName.ToLower());
 
             var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
             if (settings == null)
@@ -228,14 +288,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     Constants.InProcDataCollectorSettingName);
 
             // Add data collectors if not already present, enable if already present.
-            EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
+            var dataCollectorSettings = EnableDataCollectorUsingFriendlyName(collectorName, dataCollectionRunSettings);
+
+            if (additionalConfigurations.Length > 0)
+            {
+                AddDataCollectorConfigurations(additionalConfigurations, dataCollectorSettings, exceptionMessage);
+            }
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
 
-            if (string.Equals(argument, CoverletConstants.CoverletDataCollectorFriendlyName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(collectorName, CoverletConstants.CoverletDataCollectorFriendlyName, StringComparison.OrdinalIgnoreCase))
             {
                 // Add in-proc data collector to runsettings if coverlet code coverage is enabled
-                EnableCoverletInProcDataCollector(argument, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
+                EnableCoverletInProcDataCollector(collectorName, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
                 runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
             }
         }

@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -149,6 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (validPlatform)
             {
+                RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
                 this.commandLineOptions.TargetArchitecture = platform;
                 this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
