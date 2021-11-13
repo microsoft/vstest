@@ -9,7 +9,10 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <MicrosoftDotNetBuildTasksFeedFilePath Condition=" '$(MicrosoftDotNetBuildTasksFeedFilePath)' == '' ">$(NuGetPackageRoot)microsoft.dotnet.build.tasks.feed\$(MicrosoftDotNetBuildTasksFeedVersion)\tools\$(TargetFramework)\Microsoft.DotNet.Build.Tasks.Feed.dll</MicrosoftDotNetBuildTasksFeedFilePath>
+        <MicrosoftDotNetBuildTasksFeedFilePath Condition=" '$(MicrosoftDotNetBuildTasksFeedFilePath)' == '' ">$(NuGetPackageRoot)microsoft.dotnet.build.tasks.feed/$(MicrosoftDotNetBuildTasksFeedVersion)/</MicrosoftDotNetBuildTasksFeedFilePath>
+        <MicrosoftDotNetBuildTasksFeedTaskDir>$(MicrosoftDotNetBuildTasksFeedFilePath)tools/net472/</MicrosoftDotNetBuildTasksFeedTaskDir>
+        <MicrosoftDotNetBuildTasksFeedTaskDir Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MicrosoftDotNetBuildTasksFeedFilePath)tools/netcoreapp3.1/</MicrosoftDotNetBuildTasksFeedTaskDir>
+
         <PackagesPath Condition=" '$(PackagesPath)' == '' ">$(ArtifactsDir)\$(Configuration)\packages\</PackagesPath>
         <AssetManifestFilePath Condition=" '$(AssetManifestFilePath)' == '' ">$(PackagesPath)manifest\manifest.xml</AssetManifestFilePath>
         <PackagesToPublishPattern Condition=" '$(PackagesToPublishPattern)' == '' ">$(PackagesPath)*.nupkg</PackagesToPublishPattern>
@@ -25,7 +28,7 @@
         <ManifestBuildData Include="Location=$(FeedUrl)" />
     </ItemGroup>
 
-    <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedFilePath)" />
+    <UsingTask TaskName="GenerateBuildManifest" AssemblyFile="$(MicrosoftDotNetBuildTasksFeedTaskDir)Microsoft.DotNet.Build.Tasks.Feed.dll" />
 
     <Target Name="PublishToBuildAssetRegistry">
         <GenerateBuildManifest Artifacts="@(ItemsToPush)"

@@ -3,8 +3,9 @@
     <DataCollectors>
       <DataCollector friendlyName="Code Coverage" uri="datacollector://Microsoft/CodeCoverage/2.0">
         <Configuration>
-          <CodeCoverage>
-            <!-- Match assembly file paths: -->
+            <Format>Coverage</Format>
+            <CodeCoverage>
+                <!-- Match assembly file paths: -->
             <ModulePaths>
              <Exclude>
               <ModulePath>.*CodeCoverage.exe$</ModulePath>
@@ -17,11 +18,11 @@
             <CollectFromChildProcesses>True</CollectFromChildProcesses>
             <CollectAspDotNet>False</CollectAspDotNet>
 
-			<Functions>
-				<Exclude>
-					<Function>.*TestSign.*</Function>
-				</Exclude>
-			</Functions>
+            <Functions>
+                <Exclude>
+                    <Function>.*TestSign.*</Function>
+                </Exclude>
+            </Functions>
 
           </CodeCoverage>
         </Configuration>

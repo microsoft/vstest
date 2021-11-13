@@ -7,13 +7,12 @@ namespace vstest.console.UnitTests.Processors
     using System.IO;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
     using Moq;
-
     using static Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.CollectArgumentExecutor;
 
     [TestClass]
@@ -531,7 +530,7 @@ namespace vstest.console.UnitTests.Processors
             fileHelper.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
             CollectArgumentExecutor executor = new CollectArgumentExecutor(settingsProvider, fileHelper.Object);
             executor.Initialize("XPlat Code Coverage");
-            
+
             Assert.AreEqual(string.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<RunSettings>",
@@ -586,6 +585,124 @@ namespace vstest.console.UnitTests.Processors
                 "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
+        [TestMethod]
+        public void InitializeShouldThrowExceptionWhenInvalidCollectorNameProvided()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize("MyDataCollector=SomeSetting"));
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowExceptionWhenInvalidConfigurationsProvided()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            Assert.ThrowsException<CommandLineException>(() => this.executor.Initialize("MyDataCollector;SomeSetting"));
+        }
+
+        [TestMethod]
+        public void InitializeShouldCreateConfigurationsForNewDataCollectorInRunSettings()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.executor.Initialize("MyDataCollector;SomeSetting=SomeValue;AnotherSetting=AnotherValue");
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TestAdaptersPaths>c:\\AdapterFolderPath</TestAdaptersPaths>",
+                "  </RunConfiguration>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <SomeSetting>SomeValue</SomeSetting>",
+                "          <AnotherSetting>AnotherValue</AnotherSetting>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldCreateConfigurationsForExistingDataCollectorInRunSettings()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings,
+                "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
+                "  <Configuration>" +
+                "    <SomeSetting>SomeValue</SomeSetting>" +
+                "  </Configuration>" +
+                "</DataCollector>");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.executor.Initialize("MyDataCollector;AnotherSetting=AnotherValue");
+
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TestAdaptersPaths>c:\\AdapterFolderPath</TestAdaptersPaths>",
+                "  </RunConfiguration>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <SomeSetting>SomeValue</SomeSetting>",
+                "          <AnotherSetting>AnotherValue</AnotherSetting>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldUpdateConfigurationsForExistingDataCollectorInRunSettings()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings,
+                "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\">" +
+                "  <Configuration>" +
+                "    <SomeSetting>SomeValue</SomeSetting>" +
+                "  </Configuration>" +
+                "</DataCollector>");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.executor.Initialize("MyDataCollector;SomeSetting=AnotherValue");
+
+            Assert.AreEqual(string.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TestAdaptersPaths>c:\\AdapterFolderPath</TestAdaptersPaths>",
+                "  </RunConfiguration>",
+                "  <DataCollectionRunSettings>",
+                "    <DataCollectors>",
+                "      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">",
+                "        <Configuration>",
+                "          <SomeSetting>AnotherValue</SomeSetting>",
+                "        </Configuration>",
+                "      </DataCollector>",
+                "    </DataCollectors>",
+                "  </DataCollectionRunSettings>",
+                "</RunSettings>"), this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
         #endregion
     }
 }
