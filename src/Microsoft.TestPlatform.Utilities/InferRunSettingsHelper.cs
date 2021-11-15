@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return MakeRunsettingsCompatible(runsettingsXml, listOfValidRunConfigurationSettings, null);
         }
 
-        internal static string MakeRunsettingsCompatible(string runsettingsXml, HashSet<string> listOfValidRunConfigurationSettings, HashSet<string> listOfInValidRunConfigurationSettings)
+        private static string MakeRunsettingsCompatible(string runsettingsXml, HashSet<string> listOfValidRunConfigurationSettings, HashSet<string> listOfInValidRunConfigurationSettings)
         {
             var updatedRunSettingsXml = runsettingsXml;
 
