@@ -368,7 +368,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach (var arg in this.VSTestCollect)
                 {
-                    if (arg.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase))
+                    // Argument value could be CodeCoverage;a=b;c=d.
+                    // Split arg with ; and compare with the first token.
+                    var tokens = arg.Split(';');
+
+                    if (arg.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase) ||
+                        tokens[0].Equals("Code Coverage", StringComparison.OrdinalIgnoreCase))
                     {
                         isCollectCodeCoverageEnabled = true;
                     }
