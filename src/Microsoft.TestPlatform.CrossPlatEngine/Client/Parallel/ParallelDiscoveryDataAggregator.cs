@@ -41,10 +41,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         public long TotalTests { get; private set; }
 
+        #endregion
+
+        #region Internal Properties
+
         /// <summary>
         /// Dictionary which stores source with corresponding discoveryStatus
         /// </summary>
         internal ConcurrentDictionary<string, DiscoveryStatus> SourceStatusMap = new ConcurrentDictionary<string, DiscoveryStatus>();
+
+        /// <summary>
+        /// Indicates if discovery complete payload already sent back to IDE
+        /// </summary>
+        internal bool IsMessageSent { get; set; }
 
         #endregion
 
@@ -162,10 +171,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             }
         }
 
+        /// <summary>
+        /// Aggregate value indicating if we already sent message to IDE
+        /// </summary>
+        /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
+        public void AggregateIsMessageSent(bool isMessageSent)
+        {
+            this.IsMessageSent = this.IsMessageSent || isMessageSent;
+        }
+
+        /// <summary>
+        /// Returning sources with particular discovery status
+        /// </summary>
+        /// <param name="status">Status to filter</param>
+        /// <returns></returns>
         public ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
         {
-            if(SourceStatusMap == null || SourceStatusMap.IsEmpty) return new List<string>();
- 
+            if (SourceStatusMap == null || SourceStatusMap.IsEmpty) return new List<string>();
+
             return SourceStatusMap.Where(source => source.Value == status)
                                   .Select(source => source.Key).ToList();
         }

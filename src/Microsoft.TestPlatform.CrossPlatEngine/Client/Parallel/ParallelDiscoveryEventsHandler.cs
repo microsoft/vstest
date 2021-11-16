@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
-    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -12,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
+    using System.Collections.Generic;
     using CommonResources = Common.Resources.Resources;
 
     /// <summary>
@@ -32,8 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IRequestData requestData;
 
-        private bool alreadySent = false;
-        private object rawSendLock = new object();
+        private readonly object sendMessageLock = new object();
 
         public ParallelDiscoveryEventsHandler(IRequestData requestData,
             IProxyDiscoveryManager proxyDiscoveryManager,
@@ -117,20 +115,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
                 testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
-                // In case of abort scenario, we need to send raw message to IDE only once after abortion.
-                // All other testhost which will finish after shouldn't send raw message
-                if (!alreadySent)
-                {
-                    lock (rawSendLock)
-                    {
-                        if(!alreadySent)
-                        {
-                            // we have to send raw messages as we block the discovery complete actual raw messages
-                            this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
-                            alreadySent = true;
-                        }
-                    }
-                }
+                // Sending discovery complete message to IDE
+                this.SendMessage(discoveryDataAggregator, testDiscoveryCompletePayload);
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
                                                                                      this.discoveryDataAggregator.IsAborted,
@@ -187,6 +173,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        }
+
+        /// <summary>
+        /// Sending discovery complete message to IDE
+        /// </summary>
+        /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
+        /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
+        private void SendMessage(ParallelDiscoveryDataAggregator discoveryDataAggregator, DiscoveryCompletePayload testDiscoveryCompletePayload)
+        {
+            // In case of abort scenario, we need to send raw message to IDE only once after abortion.
+            // All other testhost which will finish after shouldn't send raw message
+            if (!discoveryDataAggregator.IsMessageSent)
+            {
+                lock (sendMessageLock)
+                {
+                    if (!discoveryDataAggregator.IsMessageSent)
+                    {
+                        // we have to send raw messages as we block the discovery complete actual raw messages
+                        this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                        discoveryDataAggregator.AggregateIsMessageSent(true);
+                    }
+                }
+            }
         }
     }
 }
