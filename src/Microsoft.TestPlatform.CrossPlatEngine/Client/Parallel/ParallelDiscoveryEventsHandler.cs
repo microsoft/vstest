@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
-
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -32,6 +31,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private IDataSerializer dataSerializer;
 
         private IRequestData requestData;
+
+        private bool alreadySent = false;
+        private object rawSendLock = new object();
 
         public ParallelDiscoveryEventsHandler(IRequestData requestData,
             IProxyDiscoveryManager proxyDiscoveryManager,
@@ -78,6 +80,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Aggregate Discovery Data Metrics
             discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
 
+            // Aggregate fully, partially and not discovered sources
+            discoveryDataAggregator.AggregateFullyDiscoveredSources(discoveryCompleteEventArgs.FullyDiscoveredSources);
+            discoveryDataAggregator.AggregatePartiallyDiscoveredSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources);
+
             // Do not send TestDiscoveryComplete to actual test discovery handler
             // We need to see if there are still sources left - let the parallel manager decide
             var parallelDiscoveryComplete = this.parallelProxyDiscoveryManager.HandlePartialDiscoveryComplete(
@@ -88,6 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (parallelDiscoveryComplete)
             {
+                var fullyDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered) as IReadOnlyCollection<string>;
+                var partiallyDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered) as IReadOnlyCollection<string>;
+                var notDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered) as IReadOnlyCollection<string>;
+
                 // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
                 // To send a raw message - we need to create raw message from an aggregated payload object
                 var testDiscoveryCompletePayload = new DiscoveryCompletePayload()
@@ -95,9 +105,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     TotalTests = discoveryDataAggregator.TotalTests,
                     IsAborted = discoveryDataAggregator.IsAborted,
                     LastDiscoveredTests = null,
-                    FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
-                    PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
-                    NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources
+                    FullyDiscoveredSources = fullyDiscovered,
+                    PartiallyDiscoveredSources = partiallyDiscovered,
+                    NotDiscoveredSources = notDiscovered
                 };
 
                 // Collecting Final Discovery State
@@ -107,13 +117,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
                 testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
-                // we have to send raw messages as we block the discovery complete actual raw messages
-                this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                // In case of abort scenario, we need to send raw message to IDE only once after abortion.
+                // All other testhost which will finish after shouldn't send raw message
+                if (!alreadySent)
+                {
+                    lock (rawSendLock)
+                    {
+                        if(!alreadySent)
+                        {
+                            // we have to send raw messages as we block the discovery complete actual raw messages
+                            this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                            alreadySent = true;
+                        }
+                    }
+                }
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
-                    this.discoveryDataAggregator.IsAborted);
-                finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
+                                                                                     this.discoveryDataAggregator.IsAborted,
+                                                                                     fullyDiscovered,
+                                                                                     partiallyDiscovered,
+                                                                                     notDiscovered);
 
+                finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
                 // send actual test discovery complete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
             }

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -39,6 +40,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Aggregate total test count
         /// </summary>
         public long TotalTests { get; private set; }
+
+        /// <summary>
+        /// Dictionary which stores source with corresponding discoveryStatus
+        /// </summary>
+        internal ConcurrentDictionary<string, DiscoveryStatus> SourceStatusMap = new ConcurrentDictionary<string, DiscoveryStatus>();
 
         #endregion
 
@@ -126,6 +132,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Aggregate fully discovered sources,coming from different test hosts, into one list
+        /// </summary>
+        /// <param name="fullyDiscoveredSources">Fully discovered sources</param>
+        public void AggregateFullyDiscoveredSources(IReadOnlyCollection<string> fullyDiscoveredSources)
+        {
+            if (fullyDiscoveredSources == null || fullyDiscoveredSources.Count == 0) return;
+
+            foreach (string source in fullyDiscoveredSources)
+            {
+                SourceStatusMap[source] = DiscoveryStatus.FullyDiscovered;
+            }
+        }
+
+        /// <summary>
+        /// Aggregate partially discovered sources,coming from different test hosts, into one list
+        /// </summary>
+        /// <param name="partiallyDiscoveredSources">Parially discovered sources</param>
+        public void AggregatePartiallyDiscoveredSources(IReadOnlyCollection<string> partiallyDiscoveredSources)
+        {
+            if (partiallyDiscoveredSources == null || partiallyDiscoveredSources.Count == 0) return;
+
+            foreach (string source in partiallyDiscoveredSources)
+            {
+                SourceStatusMap[source] = DiscoveryStatus.PartiallyDiscovered;
+            }
+        }
+
+        public ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
+        {
+            if(SourceStatusMap == null || SourceStatusMap.IsEmpty) return new List<string>();
+ 
+            return SourceStatusMap.Where(source => source.Value == status)
+                                  .Select(source => source.Key).ToList();
         }
 
         #endregion

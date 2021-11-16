@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     /// <summary>

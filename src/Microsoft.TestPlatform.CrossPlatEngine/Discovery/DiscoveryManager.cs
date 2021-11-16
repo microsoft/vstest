@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     if (lastChunk != null)
                     {
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
-                        /* When discovery is complete we will have case that the last source which was discovered still marked as partiallyDiscovered.
+                        /* When discovery is complete we will have case that the last discovered source is still marked as partiallyDiscovered.
                          * So we need to mark it as fullyDiscovered.*/
                         MarkTheLastSourceAsFullyDiscovered(lastChunk);
                     }
@@ -354,7 +354,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
                 // If source is changed, we need to mark previous source as already fullyDiscovered
                 // and currentSource should be partiallyDiscovered
-                else if (previousSource != currentSource)
+                else if (currentSource != previousSource)
                 {
                     MarkSourceWithStatus(previousSource, DiscoveryStatus.FullyDiscovered);
                     MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
