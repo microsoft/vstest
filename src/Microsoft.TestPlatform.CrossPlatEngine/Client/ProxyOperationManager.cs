@@ -380,6 +380,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 updatedRunSettingsXml = InferRunSettingsHelper.MakeRunsettingsCompatible(runsettingsXml);
             }
 
+            // We can remove "TargetPlatform" because is not needed, process is already in a "specific" target platform after test host process start,
+            // so the default architecture is always the correct one.
+            // This allow us to support new architecture enumeration without the need to update old test sdk.
+            updatedRunSettingsXml = InferRunSettingsHelper.RemoveTargetPlatformElement(updatedRunSettingsXml);
+
             return updatedRunSettingsXml;
         }
 
