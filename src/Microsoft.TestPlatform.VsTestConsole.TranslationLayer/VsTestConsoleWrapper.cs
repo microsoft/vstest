@@ -215,15 +215,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerStartTestSessionStart();
 
             this.EnsureInitialized();
-            return new TestSession(
-                this.requestSender.StartTestSession(
-                    sources,
-                    runSettings,
-                    options,
-                    eventsHandler,
-                    testHostLauncher),
+
+            var testSessionInfo = this.requestSender.StartTestSession(
+                sources,
+                runSettings,
+                options,
                 eventsHandler,
-                this);
+                testHostLauncher);
+
+            return (testSessionInfo != null)
+                ? new TestSession(
+                    testSessionInfo,
+                    eventsHandler,
+                    this)
+                : null;
         }
 
         /// <inheritdoc/>
@@ -622,15 +627,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerStartTestSessionStart();
 
             await this.EnsureInitializedAsync().ConfigureAwait(false);
-            return new TestSession(
-                await this.requestSender.StartTestSessionAsync(
-                    sources,
-                    runSettings,
-                    options,
-                    eventsHandler,
-                    testHostLauncher).ConfigureAwait(false),
+
+            var testSessionInfo = await this.requestSender.StartTestSessionAsync(
+                sources,
+                runSettings,
+                options,
                 eventsHandler,
-                this);
+                testHostLauncher).ConfigureAwait(false);
+
+            return (testSessionInfo != null)
+                ? new TestSession(
+                    testSessionInfo,
+                    eventsHandler,
+                    this)
+                : null;
         }
 
         /// <inheritdoc/>

@@ -11,7 +11,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     using System;
     using System.Reflection;
-
+ 
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find an available proxy to match the original run settings..
+        ///   Looks up a localized string similar to The runsettings changed between the time when the test session was established and the time of the current run/discovery request..
         /// </summary>
         internal static string NoProxyMatchesDescription {
             get {

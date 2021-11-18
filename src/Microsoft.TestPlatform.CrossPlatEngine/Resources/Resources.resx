@@ -217,6 +217,6 @@
     <value>No suitable test runtime provider found for this run.</value>
   </data>
   <data name="NoProxyMatchesDescription" xml:space="preserve">
-    <value>Could not find an available proxy to match the original run settings.</value>
+    <value>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</value>
   </data>
 </root>

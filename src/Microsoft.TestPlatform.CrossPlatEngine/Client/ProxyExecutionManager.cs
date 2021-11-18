@@ -41,7 +41,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly IDataSerializer dataSerializer;
         private bool isCommunicationEstablished;
 
-        private ManualResetEvent proxyOperationManagerInitializedEvent = new ManualResetEvent(false);
         private ProxyOperationManager proxyOperationManager = null;
         private ITestRunEventsHandler baseTestRunEventsHandler;
         private bool skipDefaultAdapters;
@@ -138,7 +137,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             // Create a new proxy operation manager.
             this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
-            this.proxyOperationManagerInitializedEvent.Set();
         }
 
         #endregion
@@ -167,7 +165,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     sources.First(),
                     this);
 
-                this.proxyOperationManagerInitializedEvent.Set();
                 this.testHostManager = this.proxyOperationManager.TestHostManager;
                 this.requestData = this.proxyOperationManager.RequestData;
             }
@@ -281,8 +278,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestRunEventsHandler = eventHandler;
             }
 
-            // Make sure the proxy operation manager is initialized before anything.
-            this.proxyOperationManagerInitializedEvent.WaitOne();
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
 
             // Cancel fast, try to stop testhost deployment/launch.
             this.proxyOperationManager.CancellationTokenSource.Cancel();
@@ -301,8 +301,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestRunEventsHandler = eventHandler;
             }
 
-            // Make sure the proxy operation manager is initialized before anything.
-            this.proxyOperationManagerInitializedEvent.WaitOne();
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
 
             // Cancel fast, try to stop testhost deployment/launch.
             this.proxyOperationManager.CancellationTokenSource.Cancel();
@@ -316,8 +319,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Close()
         {
-            // Make sure the proxy operation manager is initialized before anything.
-            this.proxyOperationManagerInitializedEvent.WaitOne();
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
 
             // When no test session is being used we don't share the testhost
             // between test discovery and test run. The testhost is closed upon
