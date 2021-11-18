@@ -15,3 +15,4 @@ static Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.LogFile.
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.TraceLevel.get -> System.Diagnostics.TraceLevel
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.PlatformEqtTrace.TraceLevel.set -> void
 static Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessStartInfoExtensions.AddEnvironmentVariable(this System.Diagnostics.ProcessStartInfo startInfo, string name, string value) -> void
+static Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.ProcessStartInfoExtensions.RemoveEnvironmentVariable(this System.Diagnostics.ProcessStartInfo startInfo, string name) -> void

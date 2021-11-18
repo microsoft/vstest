@@ -44,6 +44,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     }
                 }
 
+                // VSTEST_WINAPPHOST_DOTNET_ROOT is made to flow by SDK to support apphost and --arch feature
+                // we remove to not pollute host process environment variables
+                process.StartInfo.RemoveEnvironmentVariable("VSTEST_WINAPPHOST_DOTNET_ROOT");
+
                 if (outputCallBack != null)
                 {
                     process.StartInfo.RedirectStandardOutput = true;

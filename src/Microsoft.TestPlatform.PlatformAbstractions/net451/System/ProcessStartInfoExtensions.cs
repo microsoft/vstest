@@ -19,6 +19,16 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             startInfo.EnvironmentVariables[name] = value;
         }
+
+        /// <summary>
+        /// Remove environment variable that apply to this process and child processes.
+        /// </summary>
+        /// <param name="startInfo">The process start info</param>
+        /// <param name="name">Environment Variable name.</param>
+        public static void RemoveEnvironmentVariable(this ProcessStartInfo startInfo, string name)
+        {
+            startInfo.EnvironmentVariables.Remove(name);
+        }
     }
 }
 
