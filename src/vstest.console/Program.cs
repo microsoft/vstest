@@ -20,47 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public static int Main(string[] args)
         {
             DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
-            ForwardDotnetRootEnvVarToNewVersion();
             UILanguageOverride.SetCultureSpecifiedByUser();
             return new Executor(ConsoleOutput.Instance).Execute(args);
-        }
-
-        /// <summary>
-        /// Forwarding of DOTNET_ROOT/DOTNET_ROOT(x86) env vars populted by SDK, this is needed to allow to --arch feature to work
-        /// as expected. If we use old SDK and new TP it won't work without env vars forwarding.
-        /// </summary>
-        private static void ForwardDotnetRootEnvVarToNewVersion()
-        {
-            // TODO: remove this and the console writes before publishing
-            var switchVars = Environment.GetEnvironmentVariable("VSTEST_TMP_SWITCH_DOTNETROOTS_ENVVARS");
-            if (switchVars != null && int.Parse(switchVars) == 1)
-            {
-                var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
-                if (dotnetRoot != null)
-                {
-# if DEBUG
-                    Console.WriteLine($"Forwarding DOTNET_ROOT to VSTEST_WINAPPHOST_DOTNET_ROOT '{dotnetRoot}'");
-#endif
-                    Environment.SetEnvironmentVariable("DOTNET_ROOT", null);
-                    Environment.SetEnvironmentVariable("VSTEST_WINAPPHOST_DOTNET_ROOT", dotnetRoot);
-#if DEBUG
-                    Console.WriteLine($"Current DOTNET_ROOT '{Environment.GetEnvironmentVariable("DOTNET_ROOT")}'");
-#endif
-                }
-
-                var dotnetRootX86 = Environment.GetEnvironmentVariable("DOTNET_ROOT(x86)");
-                if(dotnetRootX86 != null)
-                {
-#if DEBUG
-                    Console.WriteLine($"Forwarding DOTNET_ROOT(x86) to VSTEST_WINAPPHOST_DOTNET_ROOT(x86) '{dotnetRootX86}'");
-#endif
-                    Environment.SetEnvironmentVariable("DOTNET_ROOT(x86)", null);
-                    Environment.SetEnvironmentVariable("VSTEST_WINAPPHOST_DOTNET_ROOT(x86)", dotnetRootX86);
-#if DEBUG
-                    Console.WriteLine($"Current DOTNET_ROOT(x86) '{Environment.GetEnvironmentVariable("DOTNET_ROOT(x86)")}'");
-#endif
-                }
-            }
         }
     }
 }
