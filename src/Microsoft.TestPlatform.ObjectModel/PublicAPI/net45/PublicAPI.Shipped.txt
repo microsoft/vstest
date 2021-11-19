@@ -1,4 +1,4 @@
-﻿Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.TestCanceledException.TestCanceledException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.TestCanceledException.TestCanceledException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter.TestPlatformFormatException.TestPlatformFormatException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SettingsException.SettingsException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities.SuspendCodeCoverage

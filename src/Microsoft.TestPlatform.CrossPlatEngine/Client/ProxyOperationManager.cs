@@ -35,7 +35,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
-        private readonly Guid id = Guid.NewGuid();
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
         private readonly IProcessHelper processHelper;
 
@@ -112,9 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public ITestRuntimeProvider TestHostManager { get; set; }
 
         /// <summary>
-        /// Gets the proxy operation manager id.
+        /// Gets the proxy operation manager id for proxy test session manager internal organization.
         /// </summary>
-        public Guid Id { get { return this.id; } }
+        public int Id { get; set; } = -1;
 
         /// <summary>
         /// Gets or sets the cancellation token source.
@@ -152,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             string runSettings,
             ITestMessageEventHandler eventHandler)
         {
+            // NOTE: Event handler is ignored here, but it is used in the overloaded method.
             return this.SetupChannel(sources, runSettings);
         }
 
@@ -213,10 +213,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 // Launch the test host.
-                var hostLaunchedTask = this.TestHostManager.LaunchTestHostAsync(
+                this.testHostLaunched = this.TestHostManager.LaunchTestHostAsync(
                     testHostStartInfo,
-                    this.CancellationTokenSource.Token);
-                this.testHostLaunched = hostLaunchedTask.Result;
+                    this.CancellationTokenSource.Token).Result;
 
                 if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                 {
@@ -239,9 +238,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
             var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
 
-            if ((!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal)) ||
-                (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
-                !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
+            if ((!string.IsNullOrEmpty(hostDebugEnabled)
+                    && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+                || (new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows)
+                    && !string.IsNullOrEmpty(nativeHostDebugEnabled)
+                    && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal)))
             {
                 ConsoleOutput.Instance.WriteLine(
                     CrossPlatEngineResources.HostDebuggerWarning,
@@ -259,8 +260,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // If test host does not launch then throw exception, otherwise wait for connection.
-            if (!this.testHostLaunched ||
-                !this.RequestSender.WaitForRequestHandlerConnection(
+            if (!this.testHostLaunched
+                || !this.RequestSender.WaitForRequestHandlerConnection(
                     connTimeout * 1000,
                     this.CancellationTokenSource.Token))
             {
@@ -281,7 +282,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Older test hosts are not aware of protocol version check, hence we should not be
             // sending VersionCheck message to these test hosts.
             this.CompatIssueWithVersionCheckAndRunsettings();
-
             if (this.versionCheckRequired)
             {
                 this.RequestSender.CheckVersionWithTestHost();
@@ -309,6 +309,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     var timeout = 100;
                     EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
                     this.testHostExited.Wait(timeout);
+
+                    // Closing the communication channel.
+                    this.RequestSender.Close();
                 }
             }
             catch (Exception ex)
@@ -346,6 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
+            // TODO (copoiena): If called and testhost is already running, we should restart.
             if (this.baseProxy == null)
             {
                 // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
@@ -379,6 +383,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 logMessage.Invoke(TestMessageLevel.Warning, CrossPlatEngineResources.OldTestHostIsGettingUsed);
                 updatedRunSettingsXml = InferRunSettingsHelper.MakeRunsettingsCompatible(runsettingsXml);
             }
+
+            // We can remove "TargetPlatform" because is not needed, process is already in a "specific" target platform after test host process start,
+            // so the default architecture is always the correct one.
+            // This allow us to support new architecture enumeration without the need to update old test sdk.
+            updatedRunSettingsXml = InferRunSettingsHelper.RemoveTargetPlatformElement(updatedRunSettingsXml);
 
             return updatedRunSettingsXml;
         }

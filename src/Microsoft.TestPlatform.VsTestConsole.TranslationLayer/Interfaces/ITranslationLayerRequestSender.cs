@@ -50,11 +50,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="sources">Sources for discovering tests.</param>
         /// <param name="runSettings">Run settings for discovering tests.</param>
         /// <param name="options">Options to be passed into the platform.</param>
+        /// <param name="testSessionInfo">Test session info.</param>
         /// <param name="discoveryEventsHandler">Event handler for discovery events.</param>
         void DiscoverTests(
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>

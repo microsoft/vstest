@@ -149,9 +149,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
                 var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
                 await Task.Run(() =>
-                    this.communicationManager.AcceptClientAsync(), timeoutSource.Token);
+                    this.communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
 
-                this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync();
+                this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync().ConfigureAwait(false);
                 this.handShakeComplete.Set();
             }
             catch (Exception ex)
@@ -189,6 +189,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -200,6 +201,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
+                testSessionInfo,
                 eventHandler);
         }
 
@@ -208,6 +210,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -219,7 +222,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                eventHandler);
+                testSessionInfo,
+                eventHandler).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -271,7 +275,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                null);
+                null).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -323,7 +327,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                null);
+                null).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -379,7 +383,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                customHostLauncher);
+                customHostLauncher).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -435,7 +439,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestSessionInfo = testSessionInfo
                 },
                 runEventsHandler,
-                customHostLauncher);
+                customHostLauncher).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -534,8 +538,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStartTestSessionComplete(null);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
             return null;
         }
 
@@ -632,8 +639,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStartTestSessionComplete(null);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStartTestSessionStop();
             return null;
         }
 
@@ -660,7 +670,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // after doing the start test session call. However, we should filter out requests
             // to stop such a session as soon as possible, at the request sender level.
             //
-            // We do this here instead of on the wrapper level in order to benefit of the
+            // We do this here instead of on the wrapper level in order to benefit from the
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
@@ -714,8 +724,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
             return false;
         }
 
@@ -742,7 +755,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // after doing the start test session call. However, we should filter out requests
             // to stop such a session as soon as possible, at the request sender level.
             //
-            // We do this here instead of on the wrapper level in order to benefit of the
+            // We do this here instead of on the wrapper level in order to benefit from the
             // testplatform events being fired still.
             if (testSessionInfo == null)
             {
@@ -796,8 +809,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 eventsHandler?.HandleStopTestSessionComplete(testSessionInfo, false);
             }
+            finally
+            {
+                this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
+            }
 
-            this.testPlatformEventSource.TranslationLayerStopTestSessionStop();
             return false;
         }
 
@@ -920,7 +936,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             var success = false;
             var message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
+                this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
             if (message.MessageType == MessageType.SessionConnected)
             {
@@ -929,7 +945,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     this.protocolVersion);
 
                 message = await this.communicationManager.ReceiveMessageAsync(
-                    this.processExitCancellationTokenSource.Token);
+                    this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
@@ -963,6 +979,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
@@ -973,7 +990,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         Sources = sources,
                         RunSettings = runSettings,
-                        TestPlatformOptions = options
+                        TestPlatformOptions = options,
+                        TestSessionInfo = testSessionInfo
                     },
                     this.protocolVersion);
                 var isDiscoveryComplete = false;
@@ -1058,6 +1076,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
@@ -1068,7 +1087,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         Sources = sources,
                         RunSettings = runSettings,
-                        TestPlatformOptions = options
+                        TestPlatformOptions = options,
+                        TestSessionInfo = testSessionInfo
                     },
                     this.protocolVersion);
                 var isDiscoveryComplete = false;
@@ -1080,7 +1100,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
@@ -1249,7 +1269,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync();
+                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -1431,7 +1451,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private async Task<Message> TryReceiveMessageAsync()
         {
             Message message = await this.communicationManager.ReceiveMessageAsync(
-                this.processExitCancellationTokenSource.Token);
+                this.processExitCancellationTokenSource.Token).ConfigureAwait(false);
 
             if (message == null)
             {

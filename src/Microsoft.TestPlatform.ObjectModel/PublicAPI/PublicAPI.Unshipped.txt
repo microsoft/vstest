@@ -1,4 +1,10 @@
-﻿Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest.AbortWithEventHandler() -> void
+﻿Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.DiscoveryCriteria(System.Collections.Generic.IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, System.TimeSpan discoveredTestEventTimeout, string runSettings, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo testSessionInfo) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSessionInfo.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.StartTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCriteria criteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest.AbortWithEventHandler() -> void
 const Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.MinimumProtocolVersionWithCancelDiscoveryEventHandlerSupport = 6 -> int
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.DiscoveryCompleteEventArgs(long totalTests, bool isAborted, System.Collections.Generic.IReadOnlyCollection<string> fullyDiscoveredSources, System.Collections.Generic.IReadOnlyCollection<string> partiallyDiscoveredSources, System.Collections.Generic.IReadOnlyCollection<string> notDiscoveredSources) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.FullyDiscoveredSources.get -> System.Collections.Generic.IReadOnlyCollection<string>
