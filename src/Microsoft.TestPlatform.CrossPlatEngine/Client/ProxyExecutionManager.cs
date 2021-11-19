@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -30,16 +31,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, ITestRunEventsHandler2
     {
-        private readonly ITestRuntimeProvider testHostManager;
-        private readonly IFileHelper fileHelper;
+        private readonly TestSessionInfo testSessionInfo = null;
+        Func<string, ProxyExecutionManager, ProxyOperationManager> proxyOperationManagerCreator;
 
-        private bool isCommunicationEstablished;
-        private bool skipDefaultAdapters;
-        private IDataSerializer dataSerializer;
+        private ITestRuntimeProvider testHostManager;
         private IRequestData requestData;
+
+        private readonly IFileHelper fileHelper;
+        private readonly IDataSerializer dataSerializer;
+        private bool isCommunicationEstablished;
+
+        private ProxyOperationManager proxyOperationManager = null;
         private ITestRunEventsHandler baseTestRunEventsHandler;
-        private TestSessionInfo testSessionInfo = null;
-        private bool debugEnabledForTestSession = false;
+        private bool skipDefaultAdapters;
+        private readonly bool debugEnabledForTestSession = false;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -49,11 +54,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public CancellationTokenSource CancellationTokenSource
         {
-            get { return this.ProxyOperationManager.CancellationTokenSource; }
-            set { this.ProxyOperationManager.CancellationTokenSource = value; }
+            get { return this.proxyOperationManager.CancellationTokenSource; }
+            set { this.proxyOperationManager.CancellationTokenSource = value; }
         }
-
-        protected ProxyOperationManager ProxyOperationManager { get; set; }
         #region Constructors
 
         /// <summary>
@@ -61,22 +64,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info.</param>
+        /// <param name="proxyOperationManagerCreator">The proxy operation manager creator.</param>
         /// <param name="debugEnabledForTestSession">
         /// A flag indicating if debugging should be enabled or not.
         /// </param>
-        public ProxyExecutionManager(TestSessionInfo testSessionInfo, bool debugEnabledForTestSession)
+        public ProxyExecutionManager(
+            TestSessionInfo testSessionInfo,
+            Func<string, ProxyExecutionManager, ProxyOperationManager> proxyOperationManagerCreator,
+            bool debugEnabledForTestSession)
         {
             // Filling in test session info and proxy information.
             this.testSessionInfo = testSessionInfo;
-            this.ProxyOperationManager = TestSessionPool.Instance.TakeProxy(this.testSessionInfo);
+            this.proxyOperationManagerCreator = proxyOperationManagerCreator;
+
             // This should be set to enable debugging when we have test session info available.
             this.debugEnabledForTestSession = debugEnabledForTestSession;
 
-            this.testHostManager = this.ProxyOperationManager.TestHostManager;
+            this.requestData = null;
+            this.testHostManager = null;
             this.dataSerializer = JsonDataSerializer.Instance;
-            this.isCommunicationEstablished = false;
-            this.requestData = this.ProxyOperationManager.RequestData;
             this.fileHelper = new FileHelper();
+            this.isCommunicationEstablished = false;
         }
 
         /// <summary>
@@ -128,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.fileHelper = fileHelper;
 
             // Create a new proxy operation manager.
-            this.ProxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
+            this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
         }
 
         #endregion
@@ -145,8 +153,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
-            this.baseTestRunEventsHandler = eventHandler;
+            if (this.proxyOperationManager == null)
+            {
+                // In case we have an active test session, we always prefer the already
+                // created proxies instead of the ones that need to be created on the spot.
+                var sources = testRunCriteria.HasSpecificTests
+                    ? TestSourcesUtility.GetSources(testRunCriteria.Tests)
+                    : testRunCriteria.Sources;
 
+                this.proxyOperationManager = this.proxyOperationManagerCreator(
+                    sources.First(),
+                    this);
+
+                this.testHostManager = this.proxyOperationManager.TestHostManager;
+                this.requestData = this.proxyOperationManager.RequestData;
+            }
+
+            this.baseTestRunEventsHandler = eventHandler;
             try
             {
                 if (EqtTrace.IsVerboseEnabled)
@@ -160,13 +183,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // If the test execution is with a test filter, group them by sources.
                     : testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
-                this.isCommunicationEstablished = this.ProxyOperationManager.SetupChannel(
+                this.isCommunicationEstablished = this.proxyOperationManager.SetupChannel(
                     testSources,
                     testRunCriteria.TestRunSettings);
 
                 if (this.isCommunicationEstablished)
                 {
-                    this.ProxyOperationManager.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                    this.proxyOperationManager.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
 
                     this.InitializeExtensions(testSources);
 
@@ -190,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         filterOptions: testRunCriteria.FilterOptions);
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
-                    var runsettings = this.ProxyOperationManager.RemoveNodesFromRunsettingsIfRequired(
+                    var runsettings = this.proxyOperationManager.RemoveNodesFromRunsettingsIfRequired(
                         testRunCriteria.TestRunSettings,
                         (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message); });
 
@@ -201,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             runsettings,
                             executionContext,
                             testSources);
-                        this.ProxyOperationManager.RequestSender.StartTestRun(runRequest, this);
+                        this.proxyOperationManager.RequestSender.StartTestRun(runRequest, this);
                     }
                     else
                     {
@@ -210,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             runsettings,
                             executionContext,
                             testSources);
-                        this.ProxyOperationManager.RequestSender.StartTestRun(runRequest, this);
+                        this.proxyOperationManager.RequestSender.StartTestRun(runRequest, this);
                     }
                 }
             }
@@ -255,11 +278,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestRunEventsHandler = eventHandler;
             }
 
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
             // Cancel fast, try to stop testhost deployment/launch.
-            this.ProxyOperationManager.CancellationTokenSource.Cancel();
+            this.proxyOperationManager.CancellationTokenSource.Cancel();
             if (this.isCommunicationEstablished)
             {
-                this.ProxyOperationManager.RequestSender.SendTestRunCancel();
+                this.proxyOperationManager.RequestSender.SendTestRunCancel();
             }
         }
 
@@ -272,19 +301,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestRunEventsHandler = eventHandler;
             }
 
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
             // Cancel fast, try to stop testhost deployment/launch.
-            this.ProxyOperationManager.CancellationTokenSource.Cancel();
+            this.proxyOperationManager.CancellationTokenSource.Cancel();
 
             if (this.isCommunicationEstablished)
             {
-                this.ProxyOperationManager.RequestSender.SendTestRunAbort();
+                this.proxyOperationManager.RequestSender.SendTestRunAbort();
             }
         }
 
         /// <inheritdoc/>
         public void Close()
         {
-            this.ProxyOperationManager.Close();
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
+            // When no test session is being used we don't share the testhost
+            // between test discovery and test run. The testhost is closed upon
+            // successfully completing the operation it was spawned for.
+            //
+            // In contrast, the new workflow (using test sessions) means we should keep
+            // the testhost alive until explicitly closed by the test session owner.
+            if (this.testSessionInfo == null)
+            {
+                this.proxyOperationManager.Close();
+                return;
+            }
+
+            TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.proxyOperationManager.Id);
         }
 
         /// <inheritdoc/>
@@ -302,12 +355,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
-            if (this.testSessionInfo != null)
-            {
-                // TODO (copoiena): Is returning the proxy to the pool here enough ?
-                TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.ProxyOperationManager.Id);
-            }
-
             this.baseTestRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
         }
 
@@ -343,7 +390,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-            var telemetryOptedIn = this.ProxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
+            var telemetryOptedIn = this.proxyOperationManager.RequestData.IsTelemetryOptedIn ? "true" : "false";
             testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
             return testProcessStartInfo;
         }
@@ -362,7 +409,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
         {
-            return this.ProxyOperationManager.SetupChannel(sources, runSettings);
+            return this.proxyOperationManager.SetupChannel(sources, runSettings);
         }
 
         private void LogMessage(TestMessageLevel testMessageLevel, string message)
@@ -393,7 +440,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.ProxyOperationManager.RequestSender.InitializeExecution(platformExtensions);
+                this.proxyOperationManager.RequestSender.InitializeExecution(platformExtensions);
             }
         }
     }

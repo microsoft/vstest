@@ -53,7 +53,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="requestData">
         /// The request data for providing test session services and data.
         /// </param>
-        /// <param name="testHostManager">Test host manager for the current test session.</param>
         /// <param name="testSessionCriteria">
         /// Test session criteria of the current test session.
         /// </param>
@@ -61,7 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <returns>An IProxyTestSessionManager object that can manage test sessions.</returns>
         IProxyTestSessionManager GetTestSessionManager(
             IRequestData requestData,
-            ITestRuntimeProvider testHostManager,
             StartTestSessionCriteria testSessionCriteria);
 
         /// <summary>
