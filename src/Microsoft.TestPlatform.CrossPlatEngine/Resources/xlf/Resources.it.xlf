@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="NoProxyMatchesDescription">
         <source>The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</source>
-        <target state="new">Could not find an available proxy to match the original run settings.</target>
+        <target state="new">The runsettings changed between the time when the test session was established and the time of the current run/discovery request.</target>
         <note></note>
       </trans-unit>
     </body>
