@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System;
+    using System.Diagnostics;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -77,6 +78,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            if (!Debugger.IsAttached) Debugger.Launch();
+            else Debugger.Break();
+
             this.actualDiscoveryCriteria = discoveryCriteria;
 
             // Set the enumerator for parallel yielding of sources

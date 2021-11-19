@@ -137,6 +137,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     if (lastChunk != null)
                     {
+                        if (!Debugger.IsAttached) Debugger.Launch();
+                        else Debugger.Break();
+
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                         /* When discovery is complete we will have case that the last discovered source is still marked as partiallyDiscovered.
                          * So we need to mark it as fullyDiscovered.*/
@@ -404,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         }
 
         /// <summary>
-        /// Filters discovery sources based on discovery status condition
+        /// Filter discovery sources based on discovery status condition
         /// </summary>
         /// <param name="discoveryStatus">discoveryStatus indicates if source was fully/partially/not discovered</param>
         /// <returns></returns>
