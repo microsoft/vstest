@@ -72,6 +72,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.HandleDiscoveredTests(lastChunk);
             }
 
+            // if we came here (.net core and .net frm) we should mark assemblies only here based on lastchuck and in the end send to IDE and ignore values from testhost
+
+
             // Aggregate for final discovery complete
             discoveryDataAggregator.Aggregate(totalTests, isAborted);
 
