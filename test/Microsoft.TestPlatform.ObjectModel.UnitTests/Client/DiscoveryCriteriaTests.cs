@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client
         [TestMethod]
         public void DiscoveryCriteriaSerializesToExpectedJson()
         {
-            var expectedJson = "{\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\",\"TestSessionInfo\":null}";
+            var expectedJson = "{\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\"}";
 
             var json = JsonConvert.SerializeObject(this.discoveryCriteria, Settings);
 

@@ -9,11 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
-    using CrossPlatResources = Resources.Resources;
+    using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Orchestrates test session operations for the engine communicating with the client.
@@ -21,134 +20,98 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     public class ProxyTestSessionManager : IProxyTestSessionManager
     {
         private readonly object lockObject = new object();
-        private readonly object proxyOperationLockObject = new object();
-        private volatile bool proxySetupFailed = false;
-        private StartTestSessionCriteria testSessionCriteria;
-        private int testhostCount;
-        private TestSessionInfo testSessionInfo;
+        private int parallelLevel;
+        private bool skipDefaultAdapters;
         private Func<ProxyOperationManager> proxyCreator;
-        private IList<ProxyOperationManagerContainer> proxyContainerList;
-        private IDictionary<string, int> proxyMap;
+        private Queue<Guid> availableProxyQueue;
+        private IDictionary<Guid, ProxyOperationManagerContainer> proxyMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyTestSessionManager"/> class.
         /// </summary>
         /// 
-        /// <param name="criteria">The test session criteria.</param>
-        /// <param name="testhostCount">The testhost count.</param>
+        /// <param name="parallelLevel">The parallel level.</param>
         /// <param name="proxyCreator">The proxy creator.</param>
-        public ProxyTestSessionManager(
-            StartTestSessionCriteria criteria,
-            int testhostCount,
-            Func<ProxyOperationManager> proxyCreator)
+        public ProxyTestSessionManager(int parallelLevel, Func<ProxyOperationManager> proxyCreator)
         {
-            this.testSessionCriteria = criteria;
-            this.testhostCount = testhostCount;
+            this.parallelLevel = parallelLevel;
             this.proxyCreator = proxyCreator;
 
-            this.proxyContainerList = new List<ProxyOperationManagerContainer>();
-            this.proxyMap = new Dictionary<string, int>();
+            this.availableProxyQueue = new Queue<Guid>();
+            this.proxyMap = new Dictionary<Guid, ProxyOperationManagerContainer>();
         }
 
         /// <inheritdoc/>
-        public virtual bool StartSession(ITestSessionEventsHandler eventsHandler)
+        public void Initialize(bool skipDefaultAdapters)
         {
-            lock (this.lockObject)
-            {
-                if (this.testSessionInfo != null)
-                {
-                    return false;
-                }
-                this.testSessionInfo = new TestSessionInfo();
-            }
+            this.skipDefaultAdapters = skipDefaultAdapters;
+        }
+
+        /// <inheritdoc/>
+        public void StartSession(
+            StartTestSessionCriteria criteria,
+            ITestSessionEventsHandler eventsHandler)
+        {
+            var testSessionInfo = new TestSessionInfo();
+            Task[] taskList = new Task[this.parallelLevel];
 
             // Create all the proxies in parallel, one task per proxy.
-            var taskList = new Task[this.testhostCount];
-            for (int i = 0; i < taskList.Length; ++i)
+            for (int i = 0; i < this.parallelLevel; ++i)
             {
-                // The testhost count is equal to 1 because one of the following conditions
-                // holds true:
-                //     1. we're dealing with a shared testhost (e.g.: .NET Framework testhost)
-                //        that must process multiple sources within the same testhost process;
-                //     2. we're dealing with a single testhost (shared or not, it doesn't matter)
-                //        that must process a single source;
-                // Either way, no further processing of the original test source list is needed
-                // in either of those cases.
-                //
-                // Consequentely, if the testhost count is greater than one it means that the
-                // testhost is not shared (e.g.: .NET Core testhost), in which case each test
-                // source must be processed by a dedicated testhost, which is the reason we
-                // create a list with a single element, i.e. the current source to be processed.
-                var sources = (this.testhostCount == 1)
-                    ? this.testSessionCriteria.Sources
-                    : new List<string>() { this.testSessionCriteria.Sources[i] };
-
                 taskList[i] = Task.Factory.StartNew(() =>
                 {
-                    if (!this.SetupRawProxy(
-                        sources,
-                        this.testSessionCriteria.RunSettings))
-                    {
-                        this.proxySetupFailed = true;
-                    }
+                    // Create the proxy.
+                    var operationManagerProxy = this.CreateProxy();
+
+                    // Initialize the proxy.
+                    operationManagerProxy.Initialize(this.skipDefaultAdapters);
+
+                    // Start the test host associated to the proxy.
+                    operationManagerProxy.SetupChannel(
+                        criteria.Sources,
+                        criteria.RunSettings,
+                        eventsHandler);
                 });
             }
 
             // Wait for proxy creation to be over.
             Task.WaitAll(taskList);
 
-            // Dispose of all proxies if even one of them failed during setup.
-            if (this.proxySetupFailed)
-            {
-                this.DisposeProxies();
-                return false;
-            }
-
             // Make the session available.
-            if (!TestSessionPool.Instance.AddSession(this.testSessionInfo, this))
-            {
-                this.DisposeProxies();
-                return false;
-            }
+            TestSessionPool.Instance.AddSession(testSessionInfo, this);
 
             // Let the caller know the session has been created.
-            eventsHandler.HandleStartTestSessionComplete(this.testSessionInfo);
-            return true;
+            eventsHandler.HandleStartTestSessionComplete(testSessionInfo);
         }
 
         /// <inheritdoc/>
-        public virtual bool StopSession()
+        public void StopSession()
         {
-            lock (this.lockObject)
-            {
-                if (this.testSessionInfo == null)
-                {
-                    return false;
-                }
-                this.testSessionInfo = null;
-            }
+            // TODO (copoiena): Do nothing for now because in the current implementation the
+            // testhosts are disposed of right after the test run is done. However, when we'll
+            // decide to re-use the testhosts for discovery & execution we'll perform some
+            // changes for keeping them alive indefinetely, so the responsability for killing
+            // testhosts will be with the users of the vstest.console wrapper. Then we'll need
+            // to be able to dispose of the testhosts here.
 
-            this.DisposeProxies();
-            return true;
+            // foreach (var kvp in this.proxyMap)
+            // {
+            // }
         }
 
         /// <summary>
         /// Dequeues a proxy to be used either by discovery or execution.
         /// </summary>
         /// 
-        /// <param name="source">The source to be associated to this proxy.</param>
-        /// <param name="runSettings">The run settings.</param>
-        /// 
         /// <returns>The dequeued proxy.</returns>
-        public virtual ProxyOperationManager DequeueProxy(string source, string runSettings)
+        public ProxyOperationManager DequeueProxy()
         {
             ProxyOperationManagerContainer proxyContainer = null;
 
-            lock (this.proxyOperationLockObject)
+            lock (this.lockObject)
             {
                 // No proxy available means the caller will have to create its own proxy.
-                if (!this.proxyMap.ContainsKey(source)
-                    || !this.proxyContainerList[this.proxyMap[source]].IsAvailable)
+                if (this.availableProxyQueue.Count == 0)
                 {
                     throw new InvalidOperationException(
                         string.Format(
@@ -156,22 +119,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                             CrossPlatResources.NoAvailableProxyForDeque));
                 }
 
-                // We must ensure the current run settings match the run settings from when the
-                // testhost was started. If not, throw an exception to force the caller to create
-                // its own proxy instead.
-                //
-                // TODO (copoiena): This run settings match is rudimentary. We should refine the
-                // match criteria in the future.
-                if (!this.testSessionCriteria.RunSettings.Equals(runSettings))
-                {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            CrossPlatResources.NoProxyMatchesDescription));
-                }
+                // Get the proxy id from the available queue.
+                var proxyId = this.availableProxyQueue.Dequeue();
 
                 // Get the actual proxy.
-                proxyContainer = this.proxyContainerList[this.proxyMap[source]];
+                proxyContainer = this.proxyMap[proxyId];
 
                 // Mark the proxy as unavailable.
                 proxyContainer.IsAvailable = false;
@@ -185,14 +137,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// 
         /// <param name="proxyId">The id of the proxy to be re-enqueued.</param>
-        /// 
-        /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public virtual bool EnqueueProxy(int proxyId)
+        public void EnqueueProxy(Guid proxyId)
         {
-            lock (this.proxyOperationLockObject)
+            lock (this.lockObject)
             {
                 // Check if the proxy exists.
-                if (proxyId < 0 || proxyId >= this.proxyContainerList.Count)
+                if (!this.proxyMap.ContainsKey(proxyId))
                 {
                     throw new ArgumentException(
                         string.Format(
@@ -202,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 }
 
                 // Get the actual proxy.
-                var proxyContainer = this.proxyContainerList[proxyId];
+                var proxyContainer = this.proxyMap[proxyId];
                 if (proxyContainer.IsAvailable)
                 {
                     throw new InvalidOperationException(
@@ -214,107 +164,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 // Mark the proxy as available.
                 proxyContainer.IsAvailable = true;
-            }
 
-            return true;
-        }
-
-        private int EnqueueNewProxy(
-            IList<string> sources,
-            ProxyOperationManagerContainer operationManagerContainer)
-        {
-            lock (this.proxyOperationLockObject)
-            {
-                var index = this.proxyContainerList.Count;
-
-                // Add the proxy container to the proxy container list.
-                this.proxyContainerList.Add(operationManagerContainer);
-
-                foreach (var source in sources)
-                {
-                    // Add the proxy index to the map.
-                    this.proxyMap.Add(
-                        source,
-                        index);
-                }
-
-                return index;
+                // Re-enqueue the proxy in the available queue.
+                this.availableProxyQueue.Enqueue(proxyId);
             }
         }
 
-        private bool SetupRawProxy(
-            IList<string> sources,
-            string runSettings)
+        private ProxyOperationManager CreateProxy()
         {
-            try
+            // Invoke the proxy creator.
+            var proxy = this.proxyCreator();
+
+            lock (this.lockObject)
             {
-                // Create and cache the proxy.
-                var operationManagerProxy = this.proxyCreator();
-                if (operationManagerProxy == null)
-                {
-                    return false;
-                }
+                // Add the proxy to the map.
+                this.proxyMap.Add(proxy.Id, new ProxyOperationManagerContainer(proxy, available: true));
 
-                // Initialize the proxy.
-                operationManagerProxy.Initialize(skipDefaultAdapters: false);
-
-                // Start the test host associated to the proxy.
-                if (!operationManagerProxy.SetupChannel(sources, runSettings))
-                {
-                    return false;
-                }
-
-                // Associate each source in the source list with this new proxy operation
-                // container.
-                var operationManagerContainer = new ProxyOperationManagerContainer(
-                    operationManagerProxy,
-                    available: true);
-
-                operationManagerContainer.Proxy.Id = this.EnqueueNewProxy(sources, operationManagerContainer);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // Log & silently eat up the exception. It's a valid course of action to
-                // just forfeit proxy creation. This means that anyone wishing to get a
-                // proxy operation manager would have to create their own, on the spot,
-                // instead of getting one already created, and this case is handled
-                // gracefully already.
-                EqtTrace.Error(
-                    "ProxyTestSessionManager.StartSession: Cannot create proxy. Error: {0}",
-                    ex.ToString());
+                // Enqueue the proxy id in the available queue.
+                this.availableProxyQueue.Enqueue(proxy.Id);
             }
 
-            return false;
-        }
-
-        private void DisposeProxies()
-        {
-            lock (this.proxyOperationLockObject)
-            {
-                if (this.proxyContainerList.Count == 0)
-                {
-                    return;
-                }
-
-                // Dispose of all the proxies in parallel, one task per proxy.
-                int i = 0;
-                var taskList = new Task[this.proxyContainerList.Count];
-                foreach (var proxyContainer in this.proxyContainerList)
-                {
-                    taskList[i++] = Task.Factory.StartNew(() =>
-                    {
-                        // Initiate the end session handshake with the underlying testhost.
-                        proxyContainer.Proxy.Close();
-                    });
-                }
-
-                // Wait for proxy disposal to be over.
-                Task.WaitAll(taskList);
-
-                this.proxyContainerList.Clear();
-                this.proxyMap.Clear();
-            }
+            return proxy;
         }
     }
 

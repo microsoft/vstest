@@ -60,23 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <returns>compatible runsettings</returns>
         public static string MakeRunsettingsCompatible(string runsettingsXml)
         {
-            // These are the list of valid RunConfiguration setting name which old testhost understand.
-            var listOfValidRunConfigurationSettings = new HashSet<string>
-            {
-                "TargetPlatform",
-                "TargetFrameworkVersion",
-                "TestAdaptersPaths",
-                "ResultsDirectory",
-                "SolutionDirectory",
-                "MaxCpuCount",
-                "DisableParallelization",
-                "DisableAppDomain"
-            };
-            return MakeRunsettingsCompatible(runsettingsXml, listOfValidRunConfigurationSettings, null);
-        }
-
-        private static string MakeRunsettingsCompatible(string runsettingsXml, HashSet<string> listOfValidRunConfigurationSettings, HashSet<string> listOfInValidRunConfigurationSettings)
-        {
             var updatedRunSettingsXml = runsettingsXml;
 
             if (!string.IsNullOrWhiteSpace(runsettingsXml))
@@ -97,23 +80,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     }
                     else if (runSettingsNavigator.HasChildren)
                     {
-                        if (listOfInValidRunConfigurationSettings is null)
+                        var listOfInValidRunConfigurationSettings = new List<string>();
+
+                        // These are the list of valid RunConfiguration setting name which old testhost understand.
+                        var listOfValidRunConfigurationSettings = new HashSet<string>
                         {
-                            listOfInValidRunConfigurationSettings = new HashSet<string>();
-                        }
+                            "TargetPlatform",
+                            "TargetFrameworkVersion",
+                            "TestAdaptersPaths",
+                            "ResultsDirectory",
+                            "SolutionDirectory",
+                            "MaxCpuCount",
+                            "DisableParallelization",
+                            "DisableAppDomain"
+                        };
 
                         // Find all invalid RunConfiguration Settings
                         runSettingsNavigator.MoveToFirstChild();
-                        if (listOfValidRunConfigurationSettings != null)
+                        do
                         {
-                            do
+                            if (!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
                             {
-                                if (!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
-                                {
-                                    listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
-                                }
-                            } while (runSettingsNavigator.MoveToNext());
-                        }
+                                listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
+                            }
+
+                        } while (runSettingsNavigator.MoveToNext());
 
                         // Delete all invalid RunConfiguration Settings
                         if (listOfInValidRunConfigurationSettings.Count > 0)
@@ -142,9 +133,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             return updatedRunSettingsXml;
         }
-
-        public static string RemoveTargetPlatformElement(string runsettingsXml)
-            => MakeRunsettingsCompatible(runsettingsXml, null, new HashSet<string> { "TargetPlatform" });
 
         /// <summary>
         /// Updates the run settings XML with the specified values.
@@ -342,7 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                         }
                     }
 
-                    if (legacySettingElements.Count > 0)
+                    if(legacySettingElements.Count > 0)
                     {
                         legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
                     }
@@ -362,7 +350,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 EqtTrace.Error("Error while trying to read legacy settings. Message: {0}", ex.ToString());
                 return false;

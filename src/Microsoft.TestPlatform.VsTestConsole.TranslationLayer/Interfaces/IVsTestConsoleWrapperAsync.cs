@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
@@ -22,62 +21,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.StartSession"/>.
         /// </summary>
         Task StartSessionAsync();
-
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="
-        /// IVsTestConsoleWrapper.StartTestSession(
-        ///     IList{string},
-        ///     string,
-        ///     ITestSessionEventsHandler)"/>.
-        /// </summary>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        Task<ITestSession> StartTestSessionAsync(
-            IList<string> sources,
-            string runSettings,
-            ITestSessionEventsHandler eventsHandler);
-
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="
-        /// IVsTestConsoleWrapper.StartTestSession(
-        ///     IList{string},
-        ///     string,
-        ///     TestPlatformOptions,
-        ///     ITestSessionEventsHandler)"/>.
-        /// </summary>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        Task<ITestSession> StartTestSessionAsync(
-            IList<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestSessionEventsHandler eventsHandler);
-
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="
-        /// IVsTestConsoleWrapper.StartTestSession(
-        ///     IList{string},
-        ///     string,
-        ///     TestPlatformOptions,
-        ///     ITestSessionEventsHandler,
-        ///     ITestHostLauncher)"/>.
-        /// </summary>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        Task<ITestSession> StartTestSessionAsync(
-            IList<string> sources,
-            string runSettings,
-            TestPlatformOptions options,
-            ITestSessionEventsHandler eventsHandler,
-            ITestHostLauncher testHostLauncher);
-
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="
-        /// IVsTestConsoleWrapper.StopTestSession(
-        ///     TestSessionInfo,
-        ///     ITestSessionEventsHandler)"/>.
-        /// </summary>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        Task<bool> StopTestSessionAsync(
-            TestSessionInfo testSessionInfo,
-            ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Asynchronous equivalent of <see cref="
@@ -312,6 +255,58 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             TestSessionInfo testSessionInfo,
             ITestRunEventsHandler testRunEventsHandler,
             ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="
+        /// IVsTestConsoleWrapper.StartTestSession(
+        ///     IList{string},
+        ///     string,
+        ///     ITestSessionEventsHandler)"/>.
+        /// </summary>
+        Task<ITestSession> StartTestSessionAsync(
+            IList<string> sources,
+            string runSettings,
+            ITestSessionEventsHandler eventsHandler);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="
+        /// IVsTestConsoleWrapper.StartTestSession(
+        ///     IList{string},
+        ///     string,
+        ///     TestPlatformOptions,
+        ///     ITestSessionEventsHandler)"/>.
+        /// </summary>
+        Task<ITestSession> StartTestSessionAsync(
+            IList<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestSessionEventsHandler eventsHandler);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="
+        /// IVsTestConsoleWrapper.StartTestSession(
+        ///     IList{string},
+        ///     string,
+        ///     TestPlatformOptions,
+        ///     ITestSessionEventsHandler,
+        ///     ITestHostLauncher)"/>.
+        /// </summary>
+        Task<ITestSession> StartTestSessionAsync(
+            IList<string> sources,
+            string runSettings,
+            TestPlatformOptions options,
+            ITestSessionEventsHandler eventsHandler,
+            ITestHostLauncher testHostLauncher);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="
+        /// IVsTestConsoleWrapper.StopTestSession(
+        ///     TestSessionInfo,
+        ///     ITestSessionEventsHandler)"/>.
+        /// </summary>
+        Task<bool> StopTestSessionAsync(
+            TestSessionInfo testSessionInfo,
+            ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// See <see cref="IVsTestConsoleWrapper.CancelTestRun"/>.

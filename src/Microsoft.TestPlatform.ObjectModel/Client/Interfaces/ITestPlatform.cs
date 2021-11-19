@@ -68,9 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </param>
         /// <param name="criteria">Specifies the start test session criteria.</param>
         /// <param name="eventsHandler">Events handler for handling session events.</param>
-        ///
-        /// <returns>True if the operation succeeded, false otherwise.</returns>
-        bool StartTestSession(
+        void StartTestSession(
             IRequestData requestData,
             StartTestSessionCriteria criteria,
             ITestSessionEventsHandler eventsHandler);

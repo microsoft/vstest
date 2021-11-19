@@ -414,7 +414,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                                     <Configuration>
                                                       <CLRIEInstrumentationNetCore>{useClrIeInstrumentationEngine}</CLRIEInstrumentationNetCore>
                                                       <CLRIEInstrumentationNetFramework>{useClrIeInstrumentationEngine}</CLRIEInstrumentationNetFramework>
-                                                      <Format>{outputFormat}</Format>
+                                                      <CoverageFileOutputFormats>{outputFormat}</CoverageFileOutputFormats>
                                                       <CodeCoverage>
                                                         <ModulePaths>
                                                           <Exclude>

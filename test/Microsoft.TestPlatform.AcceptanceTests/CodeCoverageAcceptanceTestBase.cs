@@ -41,11 +41,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             if (moduleNode == null)
             {
                 moduleNode = this.GetNode(node, "package", name);
-
-                if (moduleNode == null)
-                {
-                    moduleNode = this.GetNode(node, "package", Path.GetFileNameWithoutExtension(name));
-                }
             }
 
             return moduleNode;

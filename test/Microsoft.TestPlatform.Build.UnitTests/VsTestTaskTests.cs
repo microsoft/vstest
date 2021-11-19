@@ -267,19 +267,6 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
-        public void CreateArgumentShouldAddTraceCollectorDirectoryPathAsTestAdapterForCodeCoverageCollectWithExtraConfigurations()
-        {
-            const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
-            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = traceDataCollectorDirectoryPath;
-            this.vsTestTask.VSTestCollect = new string[] { "code coverage;someParameter=someValue" };
-
-            var allArguments = this.vsTestTask.CreateArgument().ToArray();
-
-            const string expectedArg = "--testAdapterPath:\"c:\\path\\to\\tracedata collector\"";
-            CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
-        }
-
-        [TestMethod]
         public void CreateArgumentShouldNotAddTraceCollectorDirectoryPathAsTestAdapterForNonCodeCoverageCollect()
         {
             const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";

@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     /// <summary>
     /// Class used to define the DiscoveryRequestPayload sent by the Vstest.console translation layers into design mode
     /// </summary>
-    [DataContract]
     public class DiscoveryRequestPayload
     {
         /// <summary>
@@ -33,11 +32,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             get;
             set;
         }
-
-        /// <summary>
-        /// Gets or sets the test session info.
-        /// </summary>
-        [DataMember]
-        public TestSessionInfo TestSessionInfo { get; set; }
     }
 }

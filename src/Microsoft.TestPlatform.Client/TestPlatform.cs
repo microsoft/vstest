@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <inheritdoc/>
-        public bool StartTestSession(
+        public void StartTestSession(
             IRequestData requestData,
             StartTestSessionCriteria testSessionCriteria,
             ITestSessionEventsHandler eventsHandler)
@@ -170,12 +170,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             this.AddExtensionAssemblies(testSessionCriteria.RunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testSessionCriteria.RunSettings);
+
+            // Update extension assemblies from source when design mode is false.
+            //
+            // TODO (copoiena): Is it possible for this code to run if we're not in design mode ?
+            // An use case for this would be when running tests with "dotnet test". Usually there's
+            // a build involved then.
             if (!runConfiguration.DesignMode)
             {
-                return false;
+                return;
             }
 
-            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testSessionCriteria);
+            // Initialize loggers.
+            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            loggerManager.Initialize(testSessionCriteria.RunSettings);
+
+            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testSessionCriteria.RunSettings);
+
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
+
+            if (testSessionCriteria.TestHostLauncher != null)
+            {
+                testHostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
+            }
+
+            var testSessionManager = this.TestEngine.GetTestSessionManager(requestData, testHostManager, testSessionCriteria);
             if (testSessionManager == null)
             {
                 // The test session manager is null because the combination of runsettings and
@@ -183,10 +203,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 // of this no session will be created because there's no testhost to be launched.
                 // Expecting a subsequent call to execute tests with the same set of parameters.
                 eventsHandler.HandleStartTestSessionComplete(null);
-                return false;
+                return;
             }
 
-            return testSessionManager.StartSession(eventsHandler);
+            testSessionManager.Initialize(false);
+            testSessionManager.StartSession(testSessionCriteria, eventsHandler);
         }
 
         /// <summary>
@@ -213,11 +234,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
         private void ThrowExceptionIfTestHostManagerIsNull(
             ITestRuntimeProvider testHostManager,
-            string settingsXml)
+            string settingXml)
         {
             if (testHostManager == null)
             {
-                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingsXml);
+                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
             }
         }

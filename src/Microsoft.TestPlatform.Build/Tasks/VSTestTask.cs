@@ -20,7 +20,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
         private VSTestForwardingApp vsTestForwardingApp;
 
         private const string vsTestAppName = "vstest.console.dll";
-        private const string CodeCovergaeString = "Code Coverage";
 
         public string TestFileFullPath
         {
@@ -369,12 +368,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach (var arg in this.VSTestCollect)
                 {
-                    // For collecting code coverage, argument value can be either "Code Coverage" or "Code Coverage;a=b;c=d".
-                    // Split the argument with ';' and compare first token value.
-                    var tokens = arg.Split(';');
-
-                    if (arg.Equals(CodeCovergaeString, StringComparison.OrdinalIgnoreCase) ||
-                        tokens[0].Equals(CodeCovergaeString, StringComparison.OrdinalIgnoreCase))
+                    if (arg.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase))
                     {
                         isCollectCodeCoverageEnabled = true;
                     }

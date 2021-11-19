@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -83,59 +82,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-                // This function is used to either take a pre-existing proxy operation manager from
-                // the test pool or to create a new proxy operation manager on the spot.
-                Func<string, ProxyDiscoveryManager, ProxyOperationManager>
-                proxyOperationManagerCreator = (
-                    string source,
-                    ProxyDiscoveryManager proxyDiscoveryManager) =>
-                {
-                    // In case we have an active test session, we always prefer the already
-                    // created proxies instead of the ones that need to be created on the spot.
-                    var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
-                        discoveryCriteria.TestSessionInfo,
-                        source,
-                        discoveryCriteria.RunSettings);
-
-                    if (proxyOperationManager == null)
-                    {
-                        // If the proxy creation process based on test session info failed, then
-                        // we'll proceed with the normal creation process as if no test session
-                        // info was passed in in the first place.
-                        // 
-                        // WARNING: This should not normally happen and it raises questions
-                        // regarding the test session pool operation and consistency.
-                        EqtTrace.Warning("ProxyDiscoveryManager creation with test session failed.");
-
-                        proxyOperationManager = new ProxyOperationManager(
-                            requestData,
-                            new TestRequestSender(requestData.ProtocolConfig, hostManager),
-                            hostManager,
-                            proxyDiscoveryManager);
-                    }
-
-                    return proxyOperationManager;
-                };
-
-                // In case we have an active test session, we always prefer the already
-                // created proxies instead of the ones that need to be created on the spot.
-                return (discoveryCriteria.TestSessionInfo != null)
-                    ? new ProxyDiscoveryManager(
-                        discoveryCriteria.TestSessionInfo,
-                        proxyOperationManagerCreator)
-                    : new ProxyDiscoveryManager(
-                        requestData,
-                        new TestRequestSender(requestData.ProtocolConfig, hostManager),
-                        hostManager);
+                return new ProxyDiscoveryManager(
+                    requestData,
+                    new TestRequestSender(requestData.ProtocolConfig, hostManager),
+                    hostManager);
             };
 
-            return (parallelLevel > 1 || !testHostManager.Shared)
-                ? new ParallelProxyDiscoveryManager(
+            return testHostManager.Shared
+                ? proxyDiscoveryManagerCreator()
+                : new ParallelProxyDiscoveryManager(
                     requestData,
                     proxyDiscoveryManagerCreator,
                     parallelLevel,
-                    sharedHosts: testHostManager.Shared)
-                : proxyDiscoveryManagerCreator();
+                    sharedHosts: testHostManager.Shared);
         }
 
         /// <inheritdoc/>
@@ -173,6 +132,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = () =>
             {
+                if (testRunCriteria.TestSessionInfo != null)
+                {
+                    try
+                    {
+                        // In case we have an active test session, data collection needs were
+                        // already taken care of when first creating the session. As a consequence
+                        // we always return this proxy instead of choosing between the vanilla
+                        // execution proxy and the one with data collection enabled.
+                        return new ProxyExecutionManager(
+                            testRunCriteria.TestSessionInfo,
+                            testRunCriteria.DebugEnabledForTestSession);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        // If the proxy creation process based on test session info failed, then
+                        // we'll proceed with the normal creation process as if no test session
+                        // info was passed in in the first place.
+                        // 
+                        // WARNING: This should not normally happen and it raises questions
+                        // regarding the test session pool operation and consistency.
+                        EqtTrace.Warning("ProxyExecutionManager failed: {0}", ex.ToString());
+                    }
+                }
+
                 // Create a new host manager, to be associated with individual
                 // ProxyExecutionManager(&POM)
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
@@ -184,50 +167,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 }
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
-
-                if (testRunCriteria.TestSessionInfo != null)
-                {
-                    // This function is used to either take a pre-existing proxy operation manager from
-                    // the test pool or to create a new proxy operation manager on the spot.
-                    Func<string, ProxyExecutionManager, ProxyOperationManager>
-                    proxyOperationManagerCreator = (
-                        string source,
-                        ProxyExecutionManager proxyExecutionManager) =>
-                    {
-                        var proxyOperationManager = TestSessionPool.Instance.TryTakeProxy(
-                            testRunCriteria.TestSessionInfo,
-                            source,
-                            testRunCriteria.TestRunSettings);
-
-                        if (proxyOperationManager == null)
-                        {
-                            // If the proxy creation process based on test session info failed, then
-                            // we'll proceed with the normal creation process as if no test session
-                            // info was passed in in the first place.
-                            // 
-                            // WARNING: This should not normally happen and it raises questions
-                            // regarding the test session pool operation and consistency.
-                            EqtTrace.Warning("ProxyExecutionManager creation with test session failed.");
-
-                            proxyOperationManager = new ProxyOperationManager(
-                                requestData,
-                                requestSender,
-                                hostManager,
-                                proxyExecutionManager);
-                        }
-
-                        return proxyOperationManager;
-                    };
-
-                    // In case we have an active test session, data collection needs were
-                    // already taken care of when first creating the session. As a consequence
-                    // we always return this proxy instead of choosing between the vanilla
-                    // execution proxy and the one with data collection enabled.
-                    return new ProxyExecutionManager(
-                        testRunCriteria.TestSessionInfo,
-                        proxyOperationManagerCreator,
-                        testRunCriteria.DebugEnabledForTestSession);
-                }
 
                 return isDataCollectorEnabled
                     ? new ProxyExecutionManagerWithDataCollection(
@@ -257,6 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc/>
         public IProxyTestSessionManager GetTestSessionManager(
             IRequestData requestData,
+            ITestRuntimeProvider testHostManager,
             StartTestSessionCriteria testSessionCriteria)
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(
@@ -284,61 +224,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Func<ProxyOperationManager> proxyCreator = () =>
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
-                if (hostManager == null)
-                {
-                    throw new TestPlatformException(
-                        string.Format(
-                            CultureInfo.CurrentCulture,
-                            Resources.Resources.NoTestHostProviderFound));
-                }
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
 
-                hostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
                 if (testSessionCriteria.TestHostLauncher != null)
                 {
                     hostManager.SetCustomLauncher(testSessionCriteria.TestHostLauncher);
                 }
 
-                var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager)
-                {
-                    CloseConnectionOnOperationComplete = false
-                };
+                var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager);
 
-                // TODO (copoiena): For now we don't support data collection alongside test
-                // sessions.
-                // 
-                // The reason for this is that, in the case of Code Coverage for example, the
-                // data collector needs to pass some environment variables to the testhost process
-                // before the testhost process is started. This means that the data collector must
-                // be running when the testhost process is spawned, however the testhost process
-                // should be spawned during build, and it's problematic to have the data collector
-                // running during build because it must instrument the .dll files that don't exist
-                // yet.
                 return isDataCollectorEnabled
-                    ? null
-                    // ? new ProxyOperationManagerWithDataCollection(
-                    //     requestData,
-                    //     requestSender,
-                    //     hostManager,
-                    //     new ProxyDataCollectionManager(
-                    //         requestData,
-                    //         testSessionCriteria.RunSettings,
-                    //         testSessionCriteria.Sources))
-                    //     {
-                    //         CloseRequestSenderChannelOnProxyClose = true
-                    //     }
+                    ? new ProxyOperationManagerWithDataCollection(
+                        requestData,
+                        requestSender,
+                        hostManager,
+                        new ProxyDataCollectionManager(
+                            requestData,
+                            testSessionCriteria.RunSettings,
+                            testSessionCriteria.Sources))
                     : new ProxyOperationManager(
                         requestData,
                         requestSender,
                         hostManager);
             };
 
-            var testhostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testSessionCriteria.RunSettings);
-            testhostManager.Initialize(TestSessionMessageLogger.Instance, testSessionCriteria.RunSettings);
-            var testhostCount = (parallelLevel > 1 || !testhostManager.Shared)
-                ? testSessionCriteria.Sources.Count
-                : 1;
-
-            return new ProxyTestSessionManager(testSessionCriteria, testhostCount, proxyCreator);
+            return new ProxyTestSessionManager(parallelLevel, proxyCreator);
         }
 
         /// <inheritdoc/>

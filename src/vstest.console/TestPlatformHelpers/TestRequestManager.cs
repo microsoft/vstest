@@ -202,8 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 discoveryPayload.Sources,
                 batchSize,
                 this.commandLineOptions.TestStatsEventTimeout,
-                runsettings,
-                discoveryPayload.TestSessionInfo)
+                runsettings)
             {
                 TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
                     ?? testCaseFilterFromRunsettings
@@ -474,10 +473,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         TestHostLauncher = testHostLauncher
                     };
 
-                    if (!this.testPlatform.StartTestSession(requestData, criteria, eventsHandler))
-                    {
-                        EqtTrace.Warning("TestRequestManager.StartTestSession: Unable to start test session.");
-                    }
+                    this.testPlatform.StartTestSession(requestData, criteria, eventsHandler);
                 }
                 finally
                 {

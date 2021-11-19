@@ -3,11 +3,9 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -17,19 +15,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// Defines a test session object that can be used to make calls to the vstest.console
     /// process.
     /// </summary>
-    [Obsolete("This API is not final yet and is subject to changes.", false)]
     public class TestSession : ITestSession
     {
-        private bool disposed = false;
-
-        private readonly ITestSessionEventsHandler eventsHandler;
-        private readonly IVsTestConsoleWrapper consoleWrapper;
-
-        #region Properties
-        /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        public TestSessionInfo TestSessionInfo { get; private set; }
-        #endregion
+        private TestSessionInfo testSessionInfo;
+        private VsTestConsoleWrapper consoleWrapper;
 
         #region Constructors
         /// <summary>
@@ -37,74 +26,36 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info object.</param>
-        /// <param name="eventsHandler">The session event handler.</param>
         /// <param name="consoleWrapper">The encapsulated console wrapper.</param>
         public TestSession(
             TestSessionInfo testSessionInfo,
-            ITestSessionEventsHandler eventsHandler,
-            IVsTestConsoleWrapper consoleWrapper)
+            VsTestConsoleWrapper consoleWrapper)
         {
-            this.TestSessionInfo = testSessionInfo;
-            this.eventsHandler = eventsHandler;
+            this.testSessionInfo = testSessionInfo;
             this.consoleWrapper = consoleWrapper;
-        }
-
-        /// <summary>
-        /// Destroys the current instance of the <see cref="TestSession"/> class.
-        /// </summary>
-        ~TestSession() => this.Dispose(false);
-
-        /// <summary>
-        /// Disposes of the current instance of the <see cref="TestSession"/> class.
-        /// </summary>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes of the current instance of the <see cref="TestSession"/> class.
-        /// </summary>
-        /// 
-        /// <param name="disposing">Indicates if managed resources should be disposed.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.StopTestSession();
-            this.disposed = true;
         }
         #endregion
 
         #region ITestSession
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void AbortTestRun()
         {
             this.consoleWrapper.AbortTestRun();
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void CancelDiscovery()
         {
             this.consoleWrapper.CancelDiscovery();
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void CancelTestRun()
         {
             this.consoleWrapper.CancelTestRun();
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
@@ -118,23 +69,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void DiscoverTests(
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
+            // TODO (copoiena): Hook into the wrapper and pass session info here.
             this.consoleWrapper.DiscoverTests(
                 sources,
                 discoverySettings,
                 options,
-                this.TestSessionInfo,
                 discoveryEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -148,7 +97,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<string> sources,
             string runSettings,
@@ -159,12 +107,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                this.testSessionInfo,
                 testRunEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -178,7 +125,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTests(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -189,12 +135,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                this.testSessionInfo,
                 testRunEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -210,7 +155,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -222,13 +166,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                this.testSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -244,7 +187,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public void RunTestsWithCustomTestHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -256,75 +198,50 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                this.testSessionInfo,
                 testRunEventsHandler,
                 customTestHostLauncher);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        public bool StopTestSession()
-        {
-            return this.StopTestSession(this.eventsHandler);
-        }
-
-        /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public bool StopTestSession(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.TestSessionInfo == null)
-            {
-                return true;
-            }
-
-            try
-            {
-                return this.consoleWrapper.StopTestSession(
-                    this.TestSessionInfo,
-                    eventsHandler);
-            }
-            finally
-            {
-                this.TestSessionInfo = null;
-            }
+            return this.consoleWrapper.StopTestSession(
+                this.testSessionInfo,
+                eventsHandler);
         }
         #endregion
 
         #region ITestSessionAsync
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
             ITestDiscoveryEventsHandler discoveryEventsHandler)
         {
             await this.DiscoverTestsAsync(
-                    sources,
-                    discoverySettings,
-                    options: null,
-                    discoveryEventsHandler:
-                        new DiscoveryEventsHandleConverter(discoveryEventsHandler))
-                .ConfigureAwait(false);
+                sources,
+                discoverySettings,
+                options: null,
+                discoveryEventsHandler: new DiscoveryEventsHandleConverter(discoveryEventsHandler));
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task DiscoverTestsAsync(
             IEnumerable<string> sources,
             string discoverySettings,
             TestPlatformOptions options,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
+            // TODO (copoiena): Hook into the wrapper and pass session info here.
             await this.consoleWrapper.DiscoverTestsAsync(
                 sources,
                 discoverySettings,
                 options,
-                this.TestSessionInfo,
-                discoveryEventsHandler).ConfigureAwait(false);
+                discoveryEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -334,11 +251,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options: null,
-                testRunEventsHandler).ConfigureAwait(false);
+                testRunEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -349,12 +265,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
-                testRunEventsHandler).ConfigureAwait(false);
+                this.testSessionInfo,
+                testRunEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -364,11 +279,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options: null,
-                testRunEventsHandler).ConfigureAwait(false);
+                testRunEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -379,12 +293,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
-                testRunEventsHandler).ConfigureAwait(false);
+                this.testSessionInfo,
+                testRunEventsHandler);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -396,11 +309,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 runSettings,
                 options: null,
                 testRunEventsHandler,
-                customTestHostLauncher).ConfigureAwait(false);
+                customTestHostLauncher);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -412,13 +324,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 sources,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                this.testSessionInfo,
                 testRunEventsHandler,
-                customTestHostLauncher).ConfigureAwait(false);
+                customTestHostLauncher);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -430,11 +341,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 runSettings,
                 options: null,
                 testRunEventsHandler,
-                customTestHostLauncher).ConfigureAwait(false);
+                customTestHostLauncher);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task RunTestsWithCustomTestHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -446,37 +356,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 testCases,
                 runSettings,
                 options,
-                this.TestSessionInfo,
+                this.testSessionInfo,
                 testRunEventsHandler,
-                customTestHostLauncher).ConfigureAwait(false);
+                customTestHostLauncher);
         }
 
         /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
-        public async Task<bool> StopTestSessionAsync()
-        {
-            return await this.StopTestSessionAsync(this.eventsHandler).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        [Obsolete("This API is not final yet and is subject to changes.", false)]
         public async Task<bool> StopTestSessionAsync(ITestSessionEventsHandler eventsHandler)
         {
-            if (this.TestSessionInfo == null)
-            {
-                return true;
-            }
-
-            try
-            {
-                return await this.consoleWrapper.StopTestSessionAsync(
-                    this.TestSessionInfo,
-                    eventsHandler).ConfigureAwait(false);
-            }
-            finally
-            {
-                this.TestSessionInfo = null;
-            }
+            return await this.consoleWrapper.StopTestSessionAsync(
+                this.testSessionInfo,
+                eventsHandler);
         }
         #endregion
     }

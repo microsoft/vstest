@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private CommandLineOptions commandLineOptions;
         private IFileHelper fileHelper;
 
-        internal const string FriendlyName = "Code Coverage";
+        private const string FriendlyName = "Code Coverage";
 
         private static string xPathSeperator = "/";
         private static string[] nodeNames = new string[] { Constants.RunSettingsName, Constants.DataCollectionRunSettingsName, Constants.DataCollectorsSettingName, Constants.DataCollectorSettingName };
