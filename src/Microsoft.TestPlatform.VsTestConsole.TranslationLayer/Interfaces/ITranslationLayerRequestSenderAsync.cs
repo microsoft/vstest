@@ -33,6 +33,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
             IEnumerable<string> sources,
             string runSettings,
             TestPlatformOptions options,
+            TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
