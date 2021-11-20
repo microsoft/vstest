@@ -12,27 +12,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface IProxyTestSessionManager
     {
         /// <summary>
-        /// Initialize the proxy.
-        /// </summary>
-        /// 
-        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
-        void Initialize(bool skipDefaultAdapters);
-
-        /// <summary>
         /// Starts the test session based on the test session criteria.
         /// </summary>
         /// 
-        /// <param name="criteria">The test session criteria.</param>
         /// <param name="eventsHandler">
         /// Event handler for handling events fired during test session management operations.
         /// </param>
-        void StartSession(
-            StartTestSessionCriteria criteria,
-            ITestSessionEventsHandler eventsHandler);
+        /// 
+        /// <returns>True if the operation succeeded, false otherwise.</returns>
+        bool StartSession(ITestSessionEventsHandler eventsHandler);
 
         /// <summary>
         /// Stops the test session.
         /// </summary>
-        void StopSession();
+        ///
+        /// <returns>True if the operation succeeded, false otherwise.</returns>
+        bool StopSession();
     }
 }

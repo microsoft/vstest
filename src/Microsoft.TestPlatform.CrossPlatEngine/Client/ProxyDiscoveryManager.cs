@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -25,16 +26,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDiscoveryEventsHandler2
     {
-        private ProxyOperationManager proxyOperationManager;
-        private readonly ITestRuntimeProvider testHostManager;
-        private IDataSerializer dataSerializer;
-        private bool isCommunicationEstablished;
+        private readonly TestSessionInfo testSessionInfo = null;
+        Func<string, ProxyDiscoveryManager, ProxyOperationManager> proxyOperationManagerCreator;
+
+        private ITestRuntimeProvider testHostManager;
         private IRequestData requestData;
+
+        private readonly IFileHelper fileHelper;
+        private readonly IDataSerializer dataSerializer;
+        private bool isCommunicationEstablished;
+
+        private ProxyOperationManager proxyOperationManager = null;
         private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
         private bool skipDefaultAdapters;
-        private readonly IFileHelper fileHelper;
 
         #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// </summary>
+        /// 
+        /// <param name="testSessionInfo">The test session info.</param>
+        /// <param name="proxyOperationManagerCreator">The proxy operation manager creator.</param>
+        public ProxyDiscoveryManager(
+            TestSessionInfo testSessionInfo,
+            Func<string, ProxyDiscoveryManager, ProxyOperationManager> proxyOperationManagerCreator)
+        {
+            // Filling in test session info and proxy information.
+            this.testSessionInfo = testSessionInfo;
+            this.proxyOperationManagerCreator = proxyOperationManagerCreator;
+
+            this.requestData = null;
+            this.testHostManager = null;
+            this.dataSerializer = JsonDataSerializer.Instance;
+            this.fileHelper = new FileHelper();
+            this.isCommunicationEstablished = false;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
@@ -55,9 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                   testHostManager,
                   JsonDataSerializer.Instance,
                   new FileHelper())
-        {
-            this.testHostManager = testHostManager;
-        }
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
@@ -81,11 +106,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             IDataSerializer dataSerializer,
             IFileHelper fileHelper)
         {
-            this.dataSerializer = dataSerializer;
-            this.testHostManager = testHostManager;
-            this.isCommunicationEstablished = false;
             this.requestData = requestData;
+            this.testHostManager = testHostManager;
+
+            this.dataSerializer = dataSerializer;
             this.fileHelper = fileHelper;
+            this.isCommunicationEstablished = false;
 
             // Create a new proxy operation manager.
             this.proxyOperationManager = new ProxyOperationManager(requestData, requestSender, testHostManager, this);
@@ -104,6 +130,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            if (this.proxyOperationManager == null)
+            {
+                this.proxyOperationManager = this.proxyOperationManagerCreator(
+                    discoveryCriteria.Sources.First(),
+                    this);
+
+                this.testHostManager = this.proxyOperationManager.TestHostManager;
+                this.requestData = this.proxyOperationManager.RequestData;
+            }
+
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
@@ -149,6 +185,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Abort()
         {
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
             // Cancel fast, try to stop testhost deployment/launch
             this.proxyOperationManager.CancellationTokenSource.Cancel();
             this.Close();
@@ -157,7 +199,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Close()
         {
-            this.proxyOperationManager.Close();
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
+            // When no test session is being used we don't share the testhost
+            // between test discovery and test run. The testhost is closed upon
+            // successfully completing the operation it was spawned for.
+            //
+            // In contrast, the new workflow (using test sessions) means we should keep
+            // the testhost alive until explicitly closed by the test session owner.
+            if (this.testSessionInfo == null)
+            {
+                this.proxyOperationManager.Close();
+                return;
+            }
+
+            TestSessionPool.Instance.ReturnProxy(this.testSessionInfo, this.proxyOperationManager.Id);
         }
 
         /// <inheritdoc/>

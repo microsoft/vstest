@@ -505,6 +505,145 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
         }
 
+        [TestMethod]
+        public void StartTestSessionShouldThrowExceptionIfTestSessionCriteriaIsNull()
+        {
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                tp.StartTestSession(
+                    new Mock<IRequestData>().Object,
+                    null,
+                    new Mock<ITestSessionEventsHandler>().Object));
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldReturnFalseIfDesignModeIsDisabled()
+        {
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+
+            var testSessionCriteria = new StartTestSessionCriteria()
+            {
+                RunSettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                    <RunSettings>
+                         <RunConfiguration>
+                           <DesignMode>false</DesignMode>
+                         </RunConfiguration>
+                    </RunSettings>"
+            };
+
+            Assert.IsFalse(
+                tp.StartTestSession(
+                    new Mock<IRequestData>().Object,
+                    testSessionCriteria,
+                    new Mock<ITestSessionEventsHandler>().Object));
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldReturnFalseIfTestSessionManagerIsNull()
+        {
+            this.testEngine.Setup(
+                te => te.GetTestSessionManager(
+                    It.IsAny<IRequestData>(),
+                    It.IsAny<StartTestSessionCriteria>()))
+                .Returns((IProxyTestSessionManager)null);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+
+            var testSessionCriteria = new StartTestSessionCriteria()
+            {
+                RunSettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                    <RunSettings>
+                         <RunConfiguration>
+                           <DesignMode>true</DesignMode>
+                         </RunConfiguration>
+                    </RunSettings>"
+            };
+
+            Assert.IsFalse(
+                tp.StartTestSession(
+                    new Mock<IRequestData>().Object,
+                    testSessionCriteria,
+                    mockEventsHandler.Object));
+
+            mockEventsHandler.Verify(
+                eh => eh.HandleStartTestSessionComplete(null),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldReturnTrueIfTestSessionManagerStartSessionReturnsTrue()
+        {
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+
+            var testSessionCriteria = new StartTestSessionCriteria()
+            {
+                RunSettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                    <RunSettings>
+                         <RunConfiguration>
+                           <DesignMode>true</DesignMode>
+                         </RunConfiguration>
+                    </RunSettings>"
+            };
+
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+            var mockTestSessionManager = new Mock<IProxyTestSessionManager>();
+            mockTestSessionManager.Setup(
+                tsm => tsm.StartSession(It.IsAny<ITestSessionEventsHandler>()))
+                .Returns(true);
+            this.testEngine.Setup(
+                te => te.GetTestSessionManager(
+                    It.IsAny<IRequestData>(),
+                    It.IsAny<StartTestSessionCriteria>()))
+                .Returns(mockTestSessionManager.Object);
+
+            Assert.IsTrue(
+               tp.StartTestSession(
+                   new Mock<IRequestData>().Object,
+                   testSessionCriteria,
+                   mockEventsHandler.Object));
+
+            mockTestSessionManager.Verify(
+                tsm => tsm.StartSession(mockEventsHandler.Object));
+        }
+
+        [TestMethod]
+        public void StartTestSessionShouldReturnFalseIfTestSessionManagerStartSessionReturnsFalse()
+        {
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+
+            var testSessionCriteria = new StartTestSessionCriteria()
+            {
+                RunSettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                    <RunSettings>
+                         <RunConfiguration>
+                           <DesignMode>true</DesignMode>
+                         </RunConfiguration>
+                    </RunSettings>"
+            };
+
+            var mockEventsHandler = new Mock<ITestSessionEventsHandler>();
+            var mockTestSessionManager = new Mock<IProxyTestSessionManager>();
+            mockTestSessionManager.Setup(
+                tsm => tsm.StartSession(It.IsAny<ITestSessionEventsHandler>()))
+                .Returns(false);
+            this.testEngine.Setup(
+                te => te.GetTestSessionManager(
+                    It.IsAny<IRequestData>(),
+                    It.IsAny<StartTestSessionCriteria>()))
+                .Returns(mockTestSessionManager.Object);
+
+            Assert.IsFalse(
+               tp.StartTestSession(
+                   new Mock<IRequestData>().Object,
+                   testSessionCriteria,
+                   mockEventsHandler.Object));
+
+            mockTestSessionManager.Verify(
+                tsm => tsm.StartSession(mockEventsHandler.Object));
+        }
+
         private void InvokeCreateDiscoveryRequest(TestPlatformOptions options = null)
         {
             this.discoveryManager.Setup(dm => dm.Initialize(false)).Verifiable();

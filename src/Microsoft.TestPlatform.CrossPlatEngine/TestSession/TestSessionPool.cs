@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// Represents the test session pool.
@@ -24,13 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSessionPool"/> class.
         /// </summary>
-        private TestSessionPool()
+        internal TestSessionPool()
         {
             this.sessionPool = new Dictionary<TestSessionInfo, ProxyTestSessionManager>();
         }
 
         /// <summary>
         /// Gets the test session pool instance.
+        /// Sets the test session pool instance for testing purposes only.
         /// </summary>
         /// 
         /// <remarks>Thread-safe singleton pattern.</remarks>
@@ -38,18 +40,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             get
             {
-                if (instance == null)
+                if (TestSessionPool.instance == null)
                 {
-                    lock (instanceLockObject)
+                    lock (TestSessionPool.instanceLockObject)
                     {
-                        if (instance == null)
+                        if (TestSessionPool.instance == null)
                         {
-                            instance = new TestSessionPool();
+                            TestSessionPool.instance = new TestSessionPool();
                         }
                     }
                 }
 
-                return instance;
+                return TestSessionPool.instance;
+            }
+            internal set
+            {
+                TestSessionPool.instance = value;
             }
         }
 
@@ -61,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <param name="proxyManager">The proxy manager object.</param>
         /// 
         /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public bool AddSession(
+        public virtual bool AddSession(
             TestSessionInfo testSessionInfo,
             ProxyTestSessionManager proxyManager)
         {
@@ -86,11 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <param name="testSessionInfo">The test session info object.</param>
         /// 
         /// <returns>True if the operation succeeded, false otherwise.</returns>
-        public bool KillSession(TestSessionInfo testSessionInfo)
+        public virtual bool KillSession(TestSessionInfo testSessionInfo)
         {
             // TODO (copoiena): What happens if some request is running for the current session ?
             // Should we stop the request as well ? Probably yes.
-            ProxyTestSessionManager proxyManager = null;
+            IProxyTestSessionManager proxyManager = null;
 
             lock (this.lockObject)
             {
@@ -106,8 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             // Kill the session.
-            proxyManager.StopSession();
-            return true;
+            return proxyManager.StopSession();
         }
 
         /// <summary>
@@ -115,22 +120,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// 
         /// <param name="testSessionInfo">The test session info object.</param>
+        /// <param name="source">The source to be associated to this proxy.</param>
+        /// <param name="runSettings">The run settings.</param>
         /// 
         /// <returns>The proxy object.</returns>
-        public ProxyOperationManager TakeProxy(TestSessionInfo testSessionInfo)
+        public virtual ProxyOperationManager TryTakeProxy(
+            TestSessionInfo testSessionInfo,
+            string source,
+            string runSettings)
         {
             ProxyTestSessionManager sessionManager = null;
             lock (this.lockObject)
             {
+                if (!this.sessionPool.ContainsKey(testSessionInfo))
+                {
+                    return null;
+                }
+
                 // Gets the session manager reference from the pool.
                 sessionManager = this.sessionPool[testSessionInfo];
             }
 
-            // Deque an actual proxy to do work.
-            //
-            // This can potentially throw, but let the caller handle this as it must recover from
-            // this error by creating its own proxy.
-            return sessionManager.DequeueProxy();
+            try
+            {
+                // Deque an actual proxy to do work.
+                return sessionManager.DequeueProxy(source, runSettings);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // If we are unable to dequeue the proxy we just eat up the exception here as
+                // it is safe to proceed.
+                // 
+                // WARNING: This should not normally happen and it raises questions regarding the
+                // test session pool operation and consistency.
+                EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -139,11 +165,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// 
         /// <param name="testSessionInfo">The test session info object.</param>
         /// <param name="proxyId">The proxy id to be returned.</param>
-        public void ReturnProxy(TestSessionInfo testSessionInfo, Guid proxyId)
+        /// 
+        /// <returns>True if the operation succeeded, false otherwise.</returns>
+        public virtual bool ReturnProxy(TestSessionInfo testSessionInfo, int proxyId)
         {
             ProxyTestSessionManager sessionManager = null;
             lock (this.lockObject)
             {
+                if (!this.sessionPool.ContainsKey(testSessionInfo))
+                {
+                    return false;
+                }
+
                 // Gets the session manager reference from the pool.
                 sessionManager = this.sessionPool[testSessionInfo];
             }
@@ -151,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             try
             {
                 // Try re-enqueueing the specified proxy.
-                sessionManager.EnqueueProxy(proxyId);
+                return sessionManager.EnqueueProxy(proxyId);
             }
             catch (InvalidOperationException ex)
             {
@@ -162,6 +195,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 // test session pool operation and consistency.
                 EqtTrace.Warning("TestSessionPool.ReturnProxy failed: {0}", ex.ToString());
             }
+
+            return false;
         }
     }
 }
