@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using System.Collections.Generic;
+    using System.Linq;
     using CommonResources = Common.Resources.Resources;
 
     /// <summary>
@@ -70,6 +71,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
                 this.HandleDiscoveredTests(lastChunk);
+                // If we come here it means that some source was already fully discovered so we can mark it
+                AggregateComingSources(discoveryDataAggregator, lastChunk);
             }
 
             // Aggregate for final discovery complete
@@ -77,10 +80,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // Aggregate Discovery Data Metrics
             discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
-
-            // Aggregate fully, partially and not discovered sources
-            discoveryDataAggregator.AggregateFullyDiscoveredSources(discoveryCompleteEventArgs.FullyDiscoveredSources);
-            discoveryDataAggregator.AggregatePartiallyDiscoveredSources(discoveryCompleteEventArgs.PartiallyDiscoveredSources);
 
             // Do not send TestDiscoveryComplete to actual test discovery handler
             // We need to see if there are still sources left - let the parallel manager decide
@@ -196,6 +195,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Getting the source name from the last chunk
+        /// </summary>
+        /// <param name="lastChunk">The last test case chunk which was discovered</param>
+        /// <returns>The source of the last test case chunk</returns>
+        private string GetTheSourceFromTheLastChunk(IEnumerable<TestCase> lastChunk)
+        {
+            if (lastChunk == null || lastChunk.Count() == 0) return string.Empty;
+
+            var chunk = lastChunk.Last();
+
+            return chunk.Source;
+        }
+
+        /// <summary>
+        /// Aggregate source as fully discovered
+        /// </summary>
+        /// <param name="discoveryDataAggregator">Aggregator to aggregate results</param>
+        /// <param name="lastChunk">Last chunk of discovered test cases</param>
+        private void AggregateComingSources(ParallelDiscoveryDataAggregator discoveryDataAggregator, IEnumerable<TestCase> lastChunk)
+        {
+            string source = GetTheSourceFromTheLastChunk(lastChunk);
+
+            discoveryDataAggregator.AggregateTheSourceAsFullyDiscovered(source);
         }
     }
 }

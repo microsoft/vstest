@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System;
-    using System.Diagnostics;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -78,9 +77,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
-            if (!Debugger.IsAttached) Debugger.Launch();
-            else Debugger.Break();
-
             this.actualDiscoveryCriteria = discoveryCriteria;
 
             // Set the enumerator for parallel yielding of sources
@@ -274,9 +270,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
             }
         }
+
         /// <summary>
         /// Mark all sources as not discovered before starting actual discovery
         /// </summary>
+        /// <param name="sources">Sources which will be discovered</param>
         private void MarkAllSourcesAsNotDiscovered(IEnumerable<string> sources)
         {
             if (sources == null || sources.Count() == 0) return;

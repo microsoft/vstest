@@ -146,36 +146,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <summary>
         /// Aggregate fully discovered sources,coming from different test hosts, into one list
         /// </summary>
-        /// <param name="fullyDiscoveredSources">Fully discovered sources</param>
-        public void AggregateFullyDiscoveredSources(IReadOnlyCollection<string> fullyDiscoveredSources)
+        /// <param name="sorce">Fully discovered source</param>
+        internal void AggregateTheSourceAsFullyDiscovered(string source)
         {
-            if (fullyDiscoveredSources == null || fullyDiscoveredSources.Count == 0) return;
+            if (source == null || source == string.Empty) return;
 
-            foreach (string source in fullyDiscoveredSources)
-            {
-                SourceStatusMap[source] = DiscoveryStatus.FullyDiscovered;
-            }
+            SourceStatusMap[source] = DiscoveryStatus.FullyDiscovered;
         }
 
         /// <summary>
         /// Aggregate partially discovered sources,coming from different test hosts, into one list
         /// </summary>
-        /// <param name="partiallyDiscoveredSources">Parially discovered sources</param>
-        public void AggregatePartiallyDiscoveredSources(IReadOnlyCollection<string> partiallyDiscoveredSources)
+        /// <param name="source">Parially discovered source</param>
+        internal void AggregateTheSourceAsPartiallyDiscovered(string source)
         {
-            if (partiallyDiscoveredSources == null || partiallyDiscoveredSources.Count == 0) return;
+            if (source == null || source == string.Empty) return;
 
-            foreach (string source in partiallyDiscoveredSources)
-            {
-                SourceStatusMap[source] = DiscoveryStatus.PartiallyDiscovered;
-            }
+            SourceStatusMap[source] = DiscoveryStatus.PartiallyDiscovered;
         }
 
         /// <summary>
         /// Aggregate value indicating if we already sent message to IDE
         /// </summary>
         /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
-        public void AggregateIsMessageSent(bool isMessageSent)
+        internal void AggregateIsMessageSent(bool isMessageSent)
         {
             this.IsMessageSent = this.IsMessageSent || isMessageSent;
         }
@@ -185,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         /// <param name="status">Status to filter</param>
         /// <returns></returns>
-        public ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
+        internal ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
         {
             if (SourceStatusMap == null || SourceStatusMap.IsEmpty) return new List<string>();
 
