@@ -109,7 +109,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
             this.discoveryAbortRequested = true;
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(eventHandler), doActionsInParallel: true);
         }
 

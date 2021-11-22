@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
@@ -489,6 +490,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     break;
 
                 case MessageType.CancelDiscovery:
+                    if (!Debugger.IsAttached) Debugger.Launch();
+                    else Debugger.Break();
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();
                     testHostManagerFactory.GetDiscoveryManager().Abort(new TestDiscoveryEventHandler(this));

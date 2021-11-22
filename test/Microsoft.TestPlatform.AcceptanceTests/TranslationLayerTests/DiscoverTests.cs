@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
@@ -141,6 +142,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Assert.
             Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
             Assert.AreEqual(3, discoveryEventHandlerForBatchSize.BatchSize);
+        }
+
+        [TestMethod]
+        [NetCoreTargetFrameworkDataSource]
+        [NetFullTargetFrameworkDataSource]
+        public void DisoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
+
+            var eventHandler2 = new DiscoveryEventHandler2();
+
+            this.vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(),
+                                                    this.GetDefaultRunSettings(),
+                                                    null,
+                                                    eventHandler2);
+
+            // Assert.
+            Assert.AreEqual(2, eventHandler2.FullyDiscoveredSources.Count);
         }
 
         [TestMethod]

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
     using CoreUtilities.Helpers;
@@ -303,6 +304,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
+            }
+
+            if (!Debugger.IsAttached)
+            {
+                Debugger.Launch();
+            }
+            else
+            {
+                Debugger.Break();
             }
 
             this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelDiscovery));

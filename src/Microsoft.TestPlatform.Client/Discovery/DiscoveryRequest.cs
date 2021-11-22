@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
@@ -160,6 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                 if (this.discoveryInProgress)
                 {
+                    if (!Debugger.IsAttached) Debugger.Launch();
+                    else Debugger.Break();
+
                     // Using DiscoveryRequest.HandleDiscoveryComplete eventHandler
                     this.DiscoveryManager.Abort(this);
                 }

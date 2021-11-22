@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -66,6 +67,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             var totalTests = discoveryCompleteEventArgs.TotalCount;
             var isAborted = discoveryCompleteEventArgs.IsAborted;
 
+            // Aggregate for final discovery complete
+            discoveryDataAggregator.Aggregate(totalTests, isAborted);
+
+            // Aggregate Discovery Data Metrics
+            discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
+
+            if (!Debugger.IsAttached) Debugger.Launch();
+            else Debugger.Break();
+
             // we get discovery complete events from each host process
             // so we cannot "complete" the actual operation until all sources are consumed
             // We should not block last chunk results while we aggregate overall discovery data
@@ -74,14 +84,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
                 this.HandleDiscoveredTests(lastChunk);
                 // If we come here it means that some source was already fully discovered so we can mark it
-                AggregateComingSources(discoveryDataAggregator, lastChunk);
+                if (!discoveryDataAggregator.IsAborted)
+                {
+                    AggregateComingSources(discoveryDataAggregator, lastChunk);
+                }
             }
-
-            // Aggregate for final discovery complete
-            discoveryDataAggregator.Aggregate(totalTests, isAborted);
-
-            // Aggregate Discovery Data Metrics
-            discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
 
             // Do not send TestDiscoveryComplete to actual test discovery handler
             // We need to see if there are still sources left - let the parallel manager decide

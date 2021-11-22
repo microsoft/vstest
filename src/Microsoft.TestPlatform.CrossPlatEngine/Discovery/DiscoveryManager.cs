@@ -187,6 +187,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <inheritdoc/>
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
+            if (!Debugger.IsAttached) Debugger.Launch();
+            else Debugger.Break();
+
             if (!cancellationTokenSource.IsCancellationRequested)
             {
                 this.Abort();

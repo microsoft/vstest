@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Net;
     using System.Threading;
@@ -1018,6 +1019,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             EqtTrace.Info(
                                 "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
                         }
+
+                        if (!Debugger.IsAttached) Debugger.Launch();
+                        else Debugger.Break();
 
                         var discoveryCompletePayload =
                             this.dataSerializer

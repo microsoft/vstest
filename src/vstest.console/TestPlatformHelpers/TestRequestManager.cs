@@ -530,6 +530,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <inheritdoc />
+        public void CancelDiscoveryWithEventHandler()
+        {
+            EqtTrace.Info("TestRequestManager.CancelDiscoveryWithEventHandler: Sending cancel request.");
+            this.currentDiscoveryRequest?.AbortWithEventHandler();
+        }
+
+        /// <inheritdoc />
         public void AbortTestRun()
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
