@@ -25,4 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             IEnumerable<TestCase> lastChunk,
             bool isAborted);
     }
+
+    /// <summary>
+    /// Enums for indicating discovery status of source
+    /// </summary>
+    public enum DiscoveryStatus
+    {
+        FullyDiscovered, // FullyDiscovered means that source was fully discovered
+        PartiallyDiscovered, // PartiallyDiscovered means that we started discovery of the source but smth happened (cancel/abort) and we stop processing it
+        NotDiscovered // Sources which were not touched during discovery
+    }
 }

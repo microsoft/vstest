@@ -50,6 +50,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         private object discoveryStatusLockObject = new object();
 
+        private object enumeratorLockObject = new object();
+
         #endregion
 
         public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
@@ -86,6 +88,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + this.availableTestSources);
             }
+
+            // One data aggregator per parallel discovery
+            this.currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
+
+            // Marking all sources as not discovered before starting actual discovery
+            this.MarkAllSourcesAsNotDiscovered(discoveryCriteria.Sources);
+
             this.DiscoverTestsPrivate(eventHandler);
         }
 
@@ -94,6 +103,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             this.discoveryAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+        }
+
+        /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            this.discoveryAbortRequested = true;
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(eventHandler), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>
@@ -182,9 +199,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Reset the discovery complete data
             this.discoveryCompletedClients = 0;
 
-            // One data aggregator per parallel discovery
-            this.currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
-
             foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
@@ -255,6 +269,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
+            }
+        }
+
+        /// <summary>
+        /// Mark all sources as not discovered before starting actual discovery
+        /// </summary>
+        /// <param name="sources">Sources which will be discovered</param>
+        private void MarkAllSourcesAsNotDiscovered(IEnumerable<string> sources)
+        {
+            if (sources == null || sources.Count() == 0) return;
+
+            lock (enumeratorLockObject)
+            {
+                foreach (string source in sources)
+                {
+                    this.currentDiscoveryDataAggregator.SourceStatusMap[source] = DiscoveryStatus.NotDiscovered;
+                }
             }
         }
     }

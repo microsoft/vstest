@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -32,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private IDataSerializer dataSerializer;
 
         private IRequestData requestData;
+
+        private readonly object sendMessageLock = new object();
 
         public ParallelDiscoveryEventsHandler(IRequestData requestData,
             IProxyDiscoveryManager proxyDiscoveryManager,
@@ -70,6 +73,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
                 this.HandleDiscoveredTests(lastChunk);
+                // If we come here it means that some source was already fully discovered so we can mark it
+                AggregateComingSources(discoveryDataAggregator, lastChunk);
             }
 
             // Aggregate for final discovery complete
@@ -88,13 +93,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (parallelDiscoveryComplete)
             {
+                var fullyDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered) as IReadOnlyCollection<string>;
+                var partiallyDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered) as IReadOnlyCollection<string>;
+                var notDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered) as IReadOnlyCollection<string>;
+
                 // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
                 // To send a raw message - we need to create raw message from an aggregated payload object
                 var testDiscoveryCompletePayload = new DiscoveryCompletePayload()
                 {
                     TotalTests = discoveryDataAggregator.TotalTests,
-                    IsAborted = discoveryDataAggregator.IsAborted,
-                    LastDiscoveredTests = null
+                    IsAborted = discoveryDataAggregator.IsAborted,      
+                    LastDiscoveredTests = null,
+                    FullyDiscoveredSources = fullyDiscovered,
+                    PartiallyDiscoveredSources = partiallyDiscovered,
+                    NotDiscoveredSources = notDiscovered
                 };
 
                 // Collecting Final Discovery State
@@ -104,11 +116,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
                 testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
-                // we have to send raw messages as we block the discovery complete actual raw messages
-                this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                // Sending discovery complete message to IDE
+                this.SendMessage(discoveryDataAggregator, testDiscoveryCompletePayload);
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
-                    this.discoveryDataAggregator.IsAborted);
+                                                                                     this.discoveryDataAggregator.IsAborted,
+                                                                                     fullyDiscovered,
+                                                                                     partiallyDiscovered,
+                                                                                     notDiscovered);
+      
                 finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // send actual test discovery complete to clients
@@ -159,6 +175,55 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        }
+
+        /// <summary>
+        /// Sending discovery complete message to IDE
+        /// </summary>
+        /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
+        /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
+        private void SendMessage(ParallelDiscoveryDataAggregator discoveryDataAggregator, DiscoveryCompletePayload testDiscoveryCompletePayload)
+        {
+            // In case of abort scenario, we need to send raw message to IDE only once after abortion.
+            // All other testhost which will finish after shouldn't send raw message
+            if (!discoveryDataAggregator.IsMessageSent)
+            {
+                lock (sendMessageLock)
+                {
+                    if (!discoveryDataAggregator.IsMessageSent)
+                    {
+                        // we have to send raw messages as we block the discovery complete actual raw messages
+                        this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                        discoveryDataAggregator.AggregateIsMessageSent(true);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Getting the source name from the last chunk
+        /// </summary>
+        /// <param name="lastChunk">The last test case chunk which was discovered</param>
+        /// <returns>The source of the last test case chunk</returns>
+        private string GetTheSourceFromTheLastChunk(IEnumerable<TestCase> lastChunk)
+        {
+            if (lastChunk == null || lastChunk.Count() == 0) return string.Empty;
+
+            var chunk = lastChunk.Last();
+
+            return chunk.Source;
+        }
+
+        /// <summary>
+        /// Aggregate source as fully discovered
+        /// </summary>
+        /// <param name="discoveryDataAggregator">Aggregator to aggregate results</param>
+        /// <param name="lastChunk">Last chunk of discovered test cases</param>
+        private void AggregateComingSources(ParallelDiscoveryDataAggregator discoveryDataAggregator, IEnumerable<TestCase> lastChunk)
+        {
+            string source = GetTheSourceFromTheLastChunk(lastChunk);
+
+            discoveryDataAggregator.AggregateTheSourceAsFullyDiscovered(source);
         }
     }
 }

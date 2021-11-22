@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -39,6 +40,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Aggregate total test count
         /// </summary>
         public long TotalTests { get; private set; }
+
+        #endregion
+
+        #region Internal Properties
+
+        /// <summary>
+        /// Dictionary which stores source with corresponding discoveryStatus
+        /// </summary>
+        internal ConcurrentDictionary<string, DiscoveryStatus> SourceStatusMap = new ConcurrentDictionary<string, DiscoveryStatus>();
+
+        /// <summary>
+        /// Indicates if discovery complete payload already sent back to IDE
+        /// </summary>
+        internal bool IsMessageSent { get; set; }
 
         #endregion
 
@@ -126,6 +141,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Aggregate fully discovered sources,coming from different test hosts, into one list
+        /// </summary>
+        /// <param name="sorce">Fully discovered source</param>
+        internal void AggregateTheSourceAsFullyDiscovered(string source)
+        {
+            if (source == null || source == string.Empty) return;
+
+            SourceStatusMap[source] = DiscoveryStatus.FullyDiscovered;
+        }
+
+        /// <summary>
+        /// Aggregate partially discovered sources,coming from different test hosts, into one list
+        /// </summary>
+        /// <param name="source">Parially discovered source</param>
+        internal void AggregateTheSourceAsPartiallyDiscovered(string source)
+        {
+            if (source == null || source == string.Empty) return;
+
+            SourceStatusMap[source] = DiscoveryStatus.PartiallyDiscovered;
+        }
+
+        /// <summary>
+        /// Aggregate value indicating if we already sent message to IDE
+        /// </summary>
+        /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
+        internal void AggregateIsMessageSent(bool isMessageSent)
+        {
+            this.IsMessageSent = this.IsMessageSent || isMessageSent;
+        }
+
+        /// <summary>
+        /// Returning sources with particular discovery status
+        /// </summary>
+        /// <param name="status">Status to filter</param>
+        /// <returns></returns>
+        internal ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
+        {
+            if (SourceStatusMap == null || SourceStatusMap.IsEmpty) return new List<string>();
+
+            return SourceStatusMap.Where(source => source.Value == status)
+                                  .Select(source => source.Key).ToList();
         }
 
         #endregion
