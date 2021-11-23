@@ -70,9 +70,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public List<TestCase> DiscoveredTestCases { get; }
 
-        public IReadOnlyCollection<string> FullyDiscoveredSources { get; private set; }
-        public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; private set; }
-        public IReadOnlyCollection<string> NotDiscoveredSources { get; private set; }
+        public IReadOnlyCollection<string> FullyDiscoveredSources { get; private set; } = new List<string>();
+        public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; private set; } = new List<string>();
+        public IReadOnlyCollection<string> NotDiscoveredSources { get; private set; } = new List<string>();
 
         public List<TestMessage> testMessages;
 
