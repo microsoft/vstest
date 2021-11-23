@@ -38,9 +38,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IRequestData requestData;
 
-        // This field indicates if abort was requested by testplatform (user)
-        private bool discoveryAbortRequested = false;
-
         #endregion
 
         #region Concurrency Keeper Objects
@@ -101,14 +98,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public void Abort()
         {
-            this.discoveryAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
-            this.discoveryAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(eventHandler), doActionsInParallel: true);
         }
 
@@ -147,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
              when testhost crashed by itself and when user requested it (f.e. through TW)
              Schedule the clean up for managers and handlers.
             */
-            if (allDiscoverersCompleted || discoveryAbortRequested)
+            if (allDiscoverersCompleted || isAborted)
             {
                 // Reset enumerators
                 this.sourceEnumerator = null;

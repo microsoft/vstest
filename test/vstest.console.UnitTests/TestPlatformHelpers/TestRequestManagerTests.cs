@@ -920,7 +920,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 			this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
 			// Verify.
-			Assert.AreEqual(5, actualRequestData.ProtocolConfig.Version);
+			Assert.AreEqual(6, actualRequestData.ProtocolConfig.Version);
 		}
 
 		[TestMethod]
