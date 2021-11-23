@@ -143,6 +143,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 runContextAttachments = GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
             }
 
+            // At the moment, we don't support running data collectors inside testhost process, so it will always be empty inside "TestRunCompleteEventArgs testRunCompleteArgs".
+            // We load invoked data collectors from data collector process inside "DataCollectionTestRunEventsHandler.HandleRawMessage" method.
             if (this.invokedDataCollectors != null && this.invokedDataCollectors.Any())
             {
                 foreach (var dataCollector in this.invokedDataCollectors)
