@@ -10,8 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Diagnostics;
     using System.Globalization;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-  
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -130,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
                     if (assembly != null)
                     {
-                        this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
+                        this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
                     }
                 }
                 catch (FileLoadException e)
@@ -158,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <typeparam name="TExtension">
         /// Type of Extensions.
         /// </typeparam>
-        private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
+        private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
@@ -192,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 foreach (var type in types)
                 {
-                    GetTestExtensionFromType(type, extension, pluginInfos);
+                    GetTestExtensionFromType(type, extension, pluginInfos, filePath);
                 }
             }
         }
@@ -215,13 +214,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private void GetTestExtensionFromType<TPluginInfo>(
             Type type,
             Type extensionType,
-            Dictionary<string, TPluginInfo> extensionCollection)
+            Dictionary<string, TPluginInfo> extensionCollection,
+            string filePath)
             where TPluginInfo : TestPluginInformation
         {
             if (extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
                 var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
                 var pluginInfo = (TPluginInfo)rawPluginInfo;
+                pluginInfo.FilePath = filePath;
 
                 if (pluginInfo == null || pluginInfo.IdentifierData == null)
                 {

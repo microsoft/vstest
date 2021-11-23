@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     {
         #region PrivateFields
 
+        private readonly string runSettingsXml;
+
         private List<string> executorUris;
 
         private List<ITestRunStatistics> testRunStatsList;
@@ -30,11 +32,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
 
-        public ParallelRunDataAggregator()
+        public ParallelRunDataAggregator(string runSettingsXml)
         {
+            this.runSettingsXml = runSettingsXml ?? throw new ArgumentNullException(nameof(runSettingsXml));
             ElapsedTime = TimeSpan.Zero;
             RunContextAttachments = new Collection<AttachmentSet>();
             RunCompleteArgsAttachments = new List<AttachmentSet>();
+            InvokedDataCollectors = new Collection<InvokedDataCollector>();
             Exceptions = new List<Exception>();
             executorUris = new List<string>();
             testRunStatsList = new List<ITestRunStatistics>();
@@ -53,6 +57,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
+        public Collection<InvokedDataCollector> InvokedDataCollectors { get; set; }
+
         public List<Exception> Exceptions { get; }
 
         public HashSet<string> ExecutorUris => new HashSet<string>(executorUris);
@@ -60,6 +66,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public bool IsAborted { get; private set; }
 
         public bool IsCanceled { get; private set; }
+
+        public string RunSettings => this.runSettingsXml;
 
         #endregion
 
@@ -137,7 +145,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
              bool isAborted,
              bool isCanceled,
              ICollection<AttachmentSet> runContextAttachments,
-             Collection<AttachmentSet> runCompleteArgsAttachments)
+             Collection<AttachmentSet> runCompleteArgsAttachments,
+             Collection<InvokedDataCollector> invokedDataCollectors)
         {
             lock (dataUpdateSyncObject)
             {
@@ -157,6 +166,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (exception != null) Exceptions.Add(exception);
                 if (executorUris != null) this.executorUris.AddRange(executorUris);
                 if (testRunStats != null) testRunStatsList.Add(testRunStats);
+
+                if (invokedDataCollectors != null && invokedDataCollectors.Count > 0)
+                {
+                    foreach (var invokedDataCollector in invokedDataCollectors)
+                    {
+                        if (!this.InvokedDataCollectors.Contains(invokedDataCollector))
+                        {
+                            this.InvokedDataCollectors.Add(invokedDataCollector);
+                        }
+                    }
+                }
             }
         }
 

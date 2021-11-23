@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void HandleRawMessageShouldGetDataCollectorAttachments()
         {
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan());
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
 
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void HandleRawMessageShouldInvokeAfterTestRunEndPassingFalseIfRequestNotCancelled()
         {
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan());
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
 
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void HandleRawMessageShouldInvokeAfterTestRunEndPassingTrueIfRequestCancelled()
         {
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan());
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
 
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
@@ -102,6 +102,37 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             this.proxyDataCollectionManager.Verify(
                 dcm => dcm.AfterTestRunEnd(true, It.IsAny<ITestRunEventsHandler>()),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldInvokeAfterTestRunEndAndReturnInvokedDataCollectors()
+        {
+            var invokedDataCollectors = new Collection<InvokedDataCollector>();
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, true));
+
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+                .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
+            this.proxyDataCollectionManager.Setup(p => p.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()))
+                .Returns(new DataCollectionResult(null, invokedDataCollectors));
+            this.mockDataSerializer.Setup(r => r.SerializePayload(It.IsAny<string>(), It.IsAny<object>())).Callback((string message, object o) =>
+            {
+                Assert.AreEqual(1, ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors.Count);
+                Assert.AreEqual(invokedDataCollectors[0], ((TestRunCompletePayload)o).TestRunCompleteArgs.InvokedDataCollectors[0]);
+            });
+
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object, CancellationToken.None);
+            testRunEventHandler.HandleRawMessage(string.Empty);
+
+            var testRunCompleteEventArgs2 = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
+            testRunEventHandler.HandleTestRunComplete(testRunCompleteEventArgs2, null, null, null);
+            Assert.AreEqual(1, testRunCompleteEventArgs2.InvokedDataCollectors.Count);
+            Assert.AreEqual(invokedDataCollectors[0], testRunCompleteEventArgs2.InvokedDataCollectors[0]);
+
+            this.proxyDataCollectionManager.Verify(
+                dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
                 Times.Once);
         }
 

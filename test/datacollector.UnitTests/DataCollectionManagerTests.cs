@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
@@ -78,6 +80,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettings);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
+            Assert.AreEqual(typeof(AttachmentProcessorDataCollector2), this.dataCollectionManager.RunDataCollectors[this.mockDataCollector.Object.GetType()].DataCollectorConfig.AttachmentsProcessorType);
+            Assert.IsTrue(this.dataCollectionManager.RunDataCollectors[this.mockDataCollector.Object.GetType()].DataCollectorConfig.Metadata.Contains(true));
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
 
@@ -244,8 +248,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorSettings = string.Format(this.defaultRunSettings,
                 string.Format(this.defaultDataCollectionSettings, "Code Coverage", "my://custom/ccdatacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty) +
                 string.Format(this.defaultDataCollectionSettings, this.friendlyName, this.uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-           
-            var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);           
+
+            var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             Assert.AreEqual(3, result.Count);
             Assert.AreEqual("clrie", result["cor_profiler"]);
@@ -353,6 +357,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var result = this.dataCollectionManager.SessionEnded();
 
             Assert.AreEqual(0, result.Count);
+        }
+
+        [TestMethod]
+        public void GetInvokedDataCollectorsShouldReturnDataCollector()
+        {
+            var dataCollectorSettingsWithNullFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, string.Empty, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
+            this.dataCollectionManager.InitializeDataCollectors(dataCollectorSettingsWithNullFriendlyName);
+            var invokedDataCollector = this.dataCollectionManager.GetInvokedDataCollectors();
+            Assert.AreEqual(1, invokedDataCollector.Count);
+            Assert.IsTrue(invokedDataCollector[0].HasAttachmentProcessor);
         }
 
         [TestMethod]
@@ -554,10 +568,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             return null;
         }
+
+        protected override DataCollectorConfig TryGetDataCollectorConfig(string extensionUri)
+        {
+            if (extensionUri.Equals("my://custom/datacollector"))
+            {
+                return new DataCollectorConfig(dataCollector.GetType());
+            }
+
+            if (extensionUri.Equals("my://custom/ccdatacollector"))
+            {
+                return new DataCollectorConfig(ccDataCollector.GetType());
+            }
+
+            return null;
+        }
     }
 
     [DataCollectorFriendlyName("CustomDataCollector")]
     [DataCollectorTypeUri("my://custom/datacollector")]
+    [DataCollectorAttachmentProcessor(typeof(AttachmentProcessorDataCollector2))]
     public abstract class DataCollector2 : DataCollector
     {
     }
@@ -566,5 +596,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [DataCollectorTypeUri("my://custom/ccdatacollector")]
     public abstract class CodeCoverageDataCollector : DataCollector
     {
+    }
+
+    public class AttachmentProcessorDataCollector2 : IDataCollectorAttachmentProcessor
+    {
+        public bool SupportsIncrementalProcessing => throw new NotImplementedException();
+
+        public IEnumerable<Uri> GetExtensionUris()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

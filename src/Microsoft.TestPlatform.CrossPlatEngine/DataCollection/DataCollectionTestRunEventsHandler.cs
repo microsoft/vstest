@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Globalization;
     using System.Linq;
     using System.Threading;
 
@@ -29,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private CancellationToken cancellationToken;
         private IDataSerializer dataSerializer;
         private Collection<AttachmentSet> dataCollectionAttachmentSets;
+        private Collection<InvokedDataCollector> invokedDataCollectors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionTestRunEventsHandler"/> class.
@@ -91,21 +91,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
-                this.dataCollectionAttachmentSets = this.proxyDataCollectionManager?.AfterTestRunEnd(this.cancellationToken.IsCancellationRequested, this);
+                var dataCollectionResult = this.proxyDataCollectionManager?.AfterTestRunEnd(this.cancellationToken.IsCancellationRequested, this);
+                this.dataCollectionAttachmentSets = dataCollectionResult?.Attachments;
+
+                var testRunCompletePayload =
+                            this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
                 if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
                 {
-                    var testRunCompletePayload =
-                            this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
-
                     GetCombinedAttachmentSets(
                         testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
                         this.dataCollectionAttachmentSets);
-
-                    rawMessage = this.dataSerializer.SerializePayload(
-                        MessageType.ExecutionComplete,
-                        testRunCompletePayload);
                 }
+
+                this.invokedDataCollectors = dataCollectionResult?.InvokedDataCollectors;
+                if (this.invokedDataCollectors?.Count > 0)
+                {
+                    foreach (var dataCollector in this.invokedDataCollectors)
+                    {
+                        testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
+                    }
+                }
+
+                rawMessage = this.dataSerializer.SerializePayload(
+                    MessageType.ExecutionComplete,
+                    testRunCompletePayload);
             }
 
             this.testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -131,6 +141,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
             {
                 runContextAttachments = GetCombinedAttachmentSets(this.dataCollectionAttachmentSets, runContextAttachments);
+            }
+
+            if (this.invokedDataCollectors != null && this.invokedDataCollectors.Any())
+            {
+                foreach (var dataCollector in this.invokedDataCollectors)
+                {
+                    testRunCompleteArgs.InvokedDataCollectors.Add(dataCollector);
+                }
             }
 
             this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);

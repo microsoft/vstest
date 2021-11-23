@@ -22,14 +22,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="isAborted">Specifies whether the test run is aborted.</param>
         /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
         /// <param name="attachmentSets">Attachment sets associated with the run.</param>
+        /// <param name="InvokedDataCollectors">Invoked data collectors</param>
         /// <param name="elapsedTime">Time elapsed in just running tests</param>
-        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime)
+        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
         {
             this.TestRunStatistics = stats;
             this.IsCanceled = isCanceled;
             this.IsAborted = isAborted;
             this.Error = error;
             this.AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
+            this.InvokedDataCollectors = invokedDataCollectors ?? new Collection<InvokedDataCollector>(); // Ensuring that invoked data collectors are not null.
             this.ElapsedTimeInRunningTests = elapsedTime;
         }
 
@@ -62,6 +64,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
+
+        /// <summary>
+        /// Gets the invoked data collectors for the test session.
+        /// </summary>
+        [DataMember]
+        public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
 
         /// <summary>
         /// Gets the time elapsed in just running the tests.

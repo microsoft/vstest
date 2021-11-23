@@ -308,7 +308,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // The upper bound for wait should be 100ms.
                     var timeout = 100;
                     EqtTrace.Verbose("ProxyOperationManager.Close: waiting for test host to exit for {0} ms", timeout);
-                    this.testHostExited.Wait(timeout);
+                    if (!this.testHostExited.Wait(timeout))
+                    {
+                        EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
+                    }
 
                     // Closing the communication channel.
                     this.RequestSender.Close();
@@ -323,8 +326,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             finally
             {
                 this.initialized = false;
-
-                EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
 
                 // Please clean up test host.
                 this.TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();

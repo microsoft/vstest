@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private bool isBoundsOnLoggerEventQueueEnabled;
 
         private TestSessionMessageLogger testSessionMessageLogger;
-#endregion
+        #endregion
 
         #region Constructor
 
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
         }
 
-#endregion
+        #endregion
 
         #region Events
 
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         public override event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
 
-#endregion
+        #endregion
 
         #region IDisposable
 
@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.loggerEventQueue.Dispose();
         }
 
-#endregion
+        #endregion
 
         #region Internal Methods
 
@@ -307,12 +307,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="isAborted">Specifies whether the test run is aborted.</param>
         /// <param name="error">Specifies the error that occurs during the test run.</param>
         /// <param name="attachmentSet">Run level attachment sets</param>
+        /// <param name="invokedDataCollectors">Invoked data collectors</param>
         /// <param name="elapsedTime">Time elapsed in just running the tests.</param>
-        internal void CompleteTestRun(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSet, TimeSpan elapsedTime)
+        internal void CompleteTestRun(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSet, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
         {
             this.CheckDisposed();
 
-            var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, elapsedTime);
+            var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, invokedDataCollectors, elapsedTime);
 
             // Sending 0 size as this event is not expected to contain any data.
             this.SafeInvokeAsync(() => this.TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
@@ -321,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.loggerEventQueue.Flush();
         }
 
-#endregion
+        #endregion
 
         #region Private Members
 
@@ -462,6 +463,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             return value;
         }
 
-#endregion
+        #endregion
     }
 }

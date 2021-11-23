@@ -346,7 +346,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 this.TestExtensions.GetTestExtensionCache<TPluginInfo>(),
                 extensionAssembly);
 
-            if (extensions != null)
+            if (extensions != null && extensions.Count > 0)
             {
                 return extensions;
             }
@@ -578,6 +578,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 var loggers = this.TestExtensions.TestLoggers != null ? string.Join(",", this.TestExtensions.TestLoggers.Keys.ToArray()) : null;
                 EqtTrace.Verbose("TestPluginCache: Loggers are '{0}'.", loggers);
+
+                var testhosts = this.TestExtensions.TestHosts != null ? string.Join(",", this.TestExtensions.TestHosts.Keys.ToArray()) : null;
+                EqtTrace.Verbose("TestPluginCache: TestHosts are '{0}'.", testhosts);
+
+                var dataCollectors = this.TestExtensions.DataCollectors != null ? string.Join(",", this.TestExtensions.DataCollectors.Keys.ToArray()) : null;
+                EqtTrace.Verbose("TestPluginCache: DataCollectors are '{0}'.", dataCollectors);
             }
         }
 

@@ -165,7 +165,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
             testLoggerManager.EnableLogging();
 
-            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan()));
 
             waitHandle.WaitOne();
             Assert.AreEqual(1, counter);
@@ -182,7 +182,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.EnableLogging();
 
             testLoggerManager.Dispose();
-            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan()));
 
             Assert.AreEqual(0, counter);
         }
@@ -197,8 +197,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
             testLoggerManager.EnableLogging();
 
-            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
-            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan())); // count should not increase because of second call.
+            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan()));
+            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, new TimeSpan())); // count should not increase because of second call.
 
             Assert.AreEqual(1, counter);
         }

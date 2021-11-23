@@ -6,8 +6,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Xml;
-
+    using System.Xml.Linq;
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -99,6 +100,62 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+
+            TryRemoveDirectory(resultsDir);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void DataCollectorAttachmentProcessor(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var resultsDir = GetResultsDirectory();
+            var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var secondAssemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+            string runSettings = this.GetRunsettingsFilePath(resultsDir);
+            string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
+            var extensionsPath = Path.Combine(
+                this.testEnvironment.TestAssetsPath,
+                Path.GetFileNameWithoutExtension("AttachmentProcessorDataCollector"),
+                "bin",
+                IntegrationTestEnvironment.BuildConfiguration,
+                this.testEnvironment.RunnerFramework);
+            var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
+
+            XElement runSettingsXml = XElement.Load(runSettings);
+
+            // Today we merge only in the case of ParallelProxyExecutionManager executor, that is chosen if:
+            // (parallelLevel > 1 || !testHostManager.Shared) -> "src\Microsoft.TestPlatform.CrossPlatEngine\TestEngine.cs" line ~248
+            // So we'll merge always in case of DotnetTestHostManager(Shared = false) or in case of DefaultTestHostManager(DisableAppDomain = true) or if MaxCpuCount > 1
+            // For NetFull test we need to have more than one test library and MaxCpuCount > 1
+            runSettingsXml.Add(new XElement("RunConfiguration", new XElement("MaxCpuCount", 2)));
+
+            // Set datacollector parameters
+            runSettingsXml.Element("DataCollectionRunSettings")
+                         .Element("DataCollectors")
+                         .Element("DataCollector")
+                         .Add(new XElement("Configuration", new XElement("MergeFile", "MergedFile.txt")));
+            runSettingsXml.Save(runSettings);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(2, 2, 2);
+
+            string mergedFile = Directory.GetFiles(resultsDir, "MergedFile.txt", SearchOption.AllDirectories).Single();
+            List<string> fileContent = new List<string>();
+            using (StreamReader streamReader = new StreamReader(mergedFile))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    string line = streamReader.ReadLine();
+                    Assert.IsTrue(line.StartsWith("SessionEnded_Handler_"));
+                    fileContent.Add(line);
+                }
+            }
+
+            Assert.AreEqual(2, fileContent.Distinct().Count());
 
             TryRemoveDirectory(resultsDir);
         }

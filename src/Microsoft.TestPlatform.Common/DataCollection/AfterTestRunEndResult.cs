@@ -20,17 +20,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <param name="attachmentSets">
         /// The collection of attachment sets.
         /// </param>
+        /// <param name="invokedDataCollectors">
+        /// The collection of the DataCollectors invoked during test session
+        /// </param>
         /// <param name="metrics">
         /// The metrics.
         /// </param>
-        public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets, IDictionary<string, object> metrics)
+        public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets,
+            Collection<InvokedDataCollector> invokedDataCollectors,
+            IDictionary<string, object> metrics)
         {
             this.AttachmentSets = attachmentSets;
+            this.InvokedDataCollectors = invokedDataCollectors;
             this.Metrics = metrics;
         }
 
         [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
+
+        [DataMember]
+        public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
 
         [DataMember]
         public IDictionary<string, object> Metrics { get; private set; }

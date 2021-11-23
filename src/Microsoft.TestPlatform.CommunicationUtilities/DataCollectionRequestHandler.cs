@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Globalization;
     using System.IO;
     using System.Net;
@@ -389,7 +390,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             }
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
-            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, this.requestData.MetricsCollection.Metrics);
+            var invokedDataCollectors = this.dataCollectionManager.GetInvokedDataCollectors();
+            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, this.requestData.MetricsCollection.Metrics);
 
             // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.

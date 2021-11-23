@@ -60,9 +60,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// The run Events Handler.
         /// </param>
         /// <returns>
-        /// The <see cref="Collection"/>.
+        /// The <see cref="DataCollectionResult"/>.
         /// </returns>
-        Collection<AttachmentSet> AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler);
+        DataCollectionResult AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler);
 
         /// <summary>
         /// Invoked after initialization of test host

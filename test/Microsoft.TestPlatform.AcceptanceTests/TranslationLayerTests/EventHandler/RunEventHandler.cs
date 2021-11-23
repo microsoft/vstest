@@ -24,6 +24,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public List<AttachmentSet> Attachments { get; private set; }
 
         /// <summary>
+        /// Gets the list of the invoked data collectors.
+        /// </summary>
+        public List<InvokedDataCollector> InvokedDataCollectors { get; private set; }
+
+        /// <summary>
         /// Gets the metrics.
         /// </summary>
         public IDictionary<string, object> Metrics { get; private set; }
@@ -45,6 +50,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.TestResults = new List<TestResult>();
             this.Errors = new List<string>();
             this.Attachments = new List<AttachmentSet>();
+            this.InvokedDataCollectors = new List<InvokedDataCollector>();
         }
 
         public void EnsureSuccess()
@@ -78,6 +84,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             if (testRunCompleteArgs.AttachmentSets != null)
             {
                 this.Attachments.AddRange(testRunCompleteArgs.AttachmentSets);
+            }
+
+            if (testRunCompleteArgs.InvokedDataCollectors != null)
+            {
+                this.InvokedDataCollectors.AddRange(testRunCompleteArgs.InvokedDataCollectors);
             }
 
             this.Metrics = testRunCompleteArgs.Metrics;

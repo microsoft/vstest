@@ -10,6 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -258,6 +260,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
+        public Collection<InvokedDataCollector> GetInvokedDataCollectors()
+        {
+            List<InvokedDataCollector> invokedDataCollector = new List<InvokedDataCollector>();
+            foreach (DataCollectorInformation dataCollectorInformation in this.RunDataCollectors.Values)
+            {
+                invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri,
+                    dataCollectorInformation.DataCollectorConfig.DataCollectorType.AssemblyQualifiedName,
+                    dataCollectorInformation.DataCollectorConfig.FilePath,
+                    dataCollectorInformation.DataCollectorConfig.HasAttachmentsProcessor()));
+            }
+
+            return new Collection<InvokedDataCollector>(invokedDataCollector);
+        }
+
+        /// <inheritdoc/>
         public void TestHostLaunched(int processId)
         {
             if (!this.isDataCollectionEnabled)
@@ -397,6 +414,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             return false;
         }
 
+        /// <summary>
+        /// Gets the DataCollectorConfig using uri.
+        /// </summary>
+        /// <param name="extensionUri">
+        /// The extension uri.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataCollectorConfig"/>.
+        /// </returns>
+        protected virtual DataCollectorConfig TryGetDataCollectorConfig(string extensionUri)
+        {
+            var extensionManager = this.dataCollectorExtensionManager;
+            foreach (var extension in extensionManager.TestExtensions)
+            {
+                if (string.Equals(extension.TestPluginInfo.IdentifierData, extensionUri, StringComparison.OrdinalIgnoreCase))
+                {
+                    return (DataCollectorConfig)extension.TestPluginInfo;
+                }
+            }
+
+            return null;
+        }
+
         protected virtual bool IsUriValid(string uri)
         {
             if (string.IsNullOrEmpty(uri))
@@ -470,7 +510,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     return;
                 }
 
-                dataCollectorConfig = new DataCollectorConfig(dataCollector.GetType());
+                dataCollectorConfig = this.TryGetDataCollectorConfig(dataCollectorUri);
 
                 // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
                 dataCollectorInfo = new DataCollectorInformation(

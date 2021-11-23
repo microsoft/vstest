@@ -51,9 +51,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </returns>
         public static DataCollectorExtensionManager Create(IMessageLogger messageLogger)
         {
-
             TestPluginManager.Instance.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
                 TestPlatformConstants.DataCollectorEndsWithPattern,
+                out var unfilteredTestExtensions,
+                out var filteredTestExtensions);
+
+            return new DataCollectorExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
+        }
+
+        /// <summary>
+        /// Gets an instance of the DataCollectorExtensionManager.
+        /// </summary>
+        /// <param name="extensionAssemblyFilePath">
+        /// File path that contains data collectors to load.
+        /// </param>
+        /// <param name="messageLogger">
+        /// The message Logger.
+        /// </param>
+        /// <returns>
+        /// The DataCollectorExtensionManager.
+        /// </returns>
+        public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, IMessageLogger messageLogger)
+        {
+            TestPluginManager.Instance.GetTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
+                extensionAssemblyFilePath,
                 out var unfilteredTestExtensions,
                 out var filteredTestExtensions);
 
@@ -75,10 +96,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="friendlyName">
         /// The friendly Name.
         /// </param>
-        public DataCollectorMetadata(string extension, string friendlyName)
+        public DataCollectorMetadata(string extension, string friendlyName, string filePath, bool hasAttachmentProcessor)
         {
             this.ExtensionUri = extension;
             this.FriendlyName = friendlyName;
+            this.FilePath = filePath;
+            this.HasAttachmentProcessor = hasAttachmentProcessor;
         }
 
         /// <summary>
@@ -94,6 +117,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets Friendly Name identifying the data collector.
         /// </summary>
         public string FriendlyName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Check if the data collector has got attachment processor registered
+        /// </summary>
+        public bool HasAttachmentProcessor
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the file path of assemblies that contains the data collector.
+        /// </summary>
+        public string FilePath
         {
             get;
             private set;

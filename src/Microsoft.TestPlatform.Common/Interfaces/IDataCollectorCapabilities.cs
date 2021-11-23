@@ -12,5 +12,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
         /// Gets the friendly name corresponding to the data collector.
         /// </summary>
         string FriendlyName { get; }
+
+        /// <summary>
+        /// Gets the file path of the assembly that contains the data collector.
+        /// </summary>
+        string FilePath { get; }
+
+        /// <summary>
+        /// Check if the data collector has got attachment processor registered.
+        /// </summary>
+        bool HasAttachmentProcessor { get; }
     }
 }
