@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;

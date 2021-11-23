@@ -102,27 +102,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         /// <summary>
-        ///  Create ParallelProxyDiscoveryManager with parallel level 1 and two source,
-        ///  Abort in any source should not stop discovery for other sources.
-        /// </summary>
-        [TestMethod]
-        public void DiscoveryTestsShouldProcessAllSourcesOnDiscoveryAbortsForAnySource()
-        {
-            // Since the hosts are aborted, total aggregated tests sent across will be -1
-            var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
-            this.createdMockManagers.Add(discoveryManagerMock);
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
-
-            Task.Run(() =>
-            {
-                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
-            });
-
-            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
-            Assert.AreEqual(2, processedSources.Count, "All Sources must be processed.");
-        }
-
-        /// <summary>
         ///  Create ParallelProxyDiscoveryManager with parallel level 1 and two sources,
         ///  Overall discovery should stop, if aborting was requested
         /// </summary>
