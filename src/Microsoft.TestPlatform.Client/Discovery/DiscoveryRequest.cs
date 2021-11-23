@@ -161,9 +161,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                 if (this.discoveryInProgress)
                 {
-                    if (!Debugger.IsAttached) Debugger.Launch();
-                    else Debugger.Break();
-
                     // Using DiscoveryRequest.HandleDiscoveryComplete eventHandler
                     this.DiscoveryManager.Abort(this);
                 }

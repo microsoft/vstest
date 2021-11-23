@@ -1020,9 +1020,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                                 "VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
                         }
 
-                        if (!Debugger.IsAttached) Debugger.Launch();
-                        else Debugger.Break();
-
                         var discoveryCompletePayload =
                             this.dataSerializer
                                 .DeserializePayload<DiscoveryCompletePayload>(message);

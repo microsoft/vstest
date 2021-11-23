@@ -73,9 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Aggregate Discovery Data Metrics
             discoveryDataAggregator.AggregateDiscoveryDataMetrics(discoveryCompleteEventArgs.Metrics);
 
-            if (!Debugger.IsAttached) Debugger.Launch();
-            else Debugger.Break();
-
             // we get discovery complete events from each host process
             // so we cannot "complete" the actual operation until all sources are consumed
             // We should not block last chunk results while we aggregate overall discovery data

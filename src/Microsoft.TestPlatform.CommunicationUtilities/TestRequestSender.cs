@@ -306,15 +306,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SendDiscoveryAbort: Sending discovery abort.");
             }
 
-            if (!Debugger.IsAttached)
-            {
-                Debugger.Launch();
-            }
-            else
-            {
-                Debugger.Break();
-            }
-
             this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelDiscovery));
         }
 
