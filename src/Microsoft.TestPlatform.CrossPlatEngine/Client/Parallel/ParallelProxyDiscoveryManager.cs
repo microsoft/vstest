@@ -38,6 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IRequestData requestData;
 
+        public bool IsAbortRequested { get; set; }
+
         #endregion
 
         #region Concurrency Keeper Objects
@@ -98,12 +100,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public void Abort()
         {
+            IsAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
+            IsAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(eventHandler), doActionsInParallel: true);
         }
 
@@ -142,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
              when testhost crashed by itself and when user requested it (f.e. through TW)
              Schedule the clean up for managers and handlers.
             */
-            if (allDiscoverersCompleted || isAborted)
+            if (allDiscoverersCompleted || IsAbortRequested)
             {
                 // Reset enumerators
                 this.sourceEnumerator = null;

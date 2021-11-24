@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                         /* When discovery is complete we will have case that the last discovered source is still marked as partiallyDiscovered.
                          * So we need to mark it as fullyDiscovered.*/
-                        MarkTheLastSourceAsFullyDiscovered(lastChunk);
+                        MarkTheLastChunkSourcesAsFullyDiscovered(lastChunk);
                     }
 
                     // Collecting Discovery State
@@ -363,13 +363,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Mark the last source as fullyDiscovered
         /// </summary>
         /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
-        private void MarkTheLastSourceAsFullyDiscovered(IList<TestCase> lastChunk)
+        private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
         {
             if (lastChunk == null || lastChunk.Count == 0) return;
-            int size = lastChunk.Count;
-            var lastTestCase = lastChunk[size - 1];
-            string lastSource = lastTestCase.Source;
-            DiscoveredSourcesWithStatus[lastSource] = DiscoveryStatus.FullyDiscovered;
+
+            var lastChunkSources = lastChunk.Select(testcase => testcase.Source);
+
+            MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
         }
 
         /// <summary>

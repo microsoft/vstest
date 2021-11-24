@@ -100,6 +100,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var partiallyDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered) as IReadOnlyCollection<string>;
                 var notDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered) as IReadOnlyCollection<string>;
 
+                // If parallel discovery completed because of abortion
+                // we need to set isAborted to true and totalTests = -1
+                if (this.parallelProxyDiscoveryManager.IsAbortRequested)
+                {
+                    discoveryDataAggregator.Aggregate(-1, true);
+                }
+
                 // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
                 // To send a raw message - we need to create raw message from an aggregated payload object
                 var testDiscoveryCompletePayload = new DiscoveryCompletePayload()

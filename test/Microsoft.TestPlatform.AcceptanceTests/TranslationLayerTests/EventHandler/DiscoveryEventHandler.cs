@@ -70,9 +70,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public List<TestCase> DiscoveredTestCases { get; }
 
-        public IReadOnlyCollection<string> FullyDiscoveredSources { get; private set; } = new List<string>();
-        public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; private set; } = new List<string>();
-        public IReadOnlyCollection<string> NotDiscoveredSources { get; private set; } = new List<string>();
+        public IReadOnlyCollection<string> FullyDiscoveredSources { get; private set; }
+        public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; private set; }
+        public IReadOnlyCollection<string> NotDiscoveredSources { get; private set; }
 
         public List<TestMessage> testMessages;
 
@@ -105,6 +105,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
 
             this.Metrics = discoveryCompleteEventArgs.Metrics;
+            this.FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
+            this.PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources;
+            this.NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources;
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
