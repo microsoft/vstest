@@ -155,17 +155,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <summary>
-        /// Aggregate partially discovered sources,coming from different test hosts, into one list
-        /// </summary>
-        /// <param name="source">Parially discovered source</param>
-        internal void AggregateTheSourceAsPartiallyDiscovered(string source)
-        {
-            if (source == null || source == string.Empty) return;
-
-            SourceStatusMap[source] = DiscoveryStatus.PartiallyDiscovered;
-        }
-
-        /// <summary>
         /// Aggregate value indicating if we already sent message to IDE
         /// </summary>
         /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>

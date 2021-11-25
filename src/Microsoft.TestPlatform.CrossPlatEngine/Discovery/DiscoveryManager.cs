@@ -138,6 +138,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     if (lastChunk != null)
                     {
+                        if (!Debugger.IsAttached) Debugger.Launch();
+                        else Debugger.Break();
+
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                         /* When discovery is complete we will have case that the last discovered source is still marked as partiallyDiscovered.
                          * So we need to mark it as fullyDiscovered.*/
@@ -360,7 +363,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         }
 
         /// <summary>
-        /// Mark the last source as fullyDiscovered
+        /// Mark the last sources as fullyDiscovered
         /// </summary>
         /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
         private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
