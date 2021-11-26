@@ -5,11 +5,49 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+#if DEBUG && !NETCOREAPP1_0
+using Nohwnd.AttachVS;
+#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.Execution
 {
     internal static class DebuggerBreakpoint
     {
+        internal static void AttachVisualStudioDebugger(string environmentVariable)
+        {
+#if !DEBUG || NETCOREAPP1_0
+            return;
+#else
+            if (string.IsNullOrWhiteSpace(environmentVariable))
+            {
+                throw new ArgumentException($"'{nameof(environmentVariable)}' cannot be null or whitespace.", nameof(environmentVariable));
+            }
+
+            var debugEnabled = Environment.GetEnvironmentVariable(environmentVariable);
+            if (!string.IsNullOrEmpty(debugEnabled) && !debugEnabled.Equals("0", StringComparison.Ordinal))
+            {
+                int? vsPid = null;
+                if(int.TryParse(debugEnabled, out int pid))
+                {
+                    // The option is used to both enable and disable wating (0 and 1)
+                    // and providing custom vs pid (any number higher than 1)
+                    vsPid = pid <= 1 ? null : (int?)pid;
+                }
+
+                if (vsPid == null)
+                {
+                    ConsoleOutput.Instance.WriteLine("Attaching Visual Studio, either a parent or the one that was started first... To specify a VS instance to use, use the PID in the option, instead of 1. No breakpoints are automatically set.", OutputLevel.Information);
+                }
+                else
+                {
+                    ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid}... No breakpoints are automatically set.", OutputLevel.Information);
+                }
+
+                AttachHelper.AttachVS(vsPid);
+            }
+#endif
+        }
+         
         internal static void WaitForDebugger(string environmentVariable)
         {
             if (string.IsNullOrWhiteSpace(environmentVariable))

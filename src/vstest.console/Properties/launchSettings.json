@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "vstest.console": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -25,10 +25,13 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Diagnostics.StackTrace" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="4.3.0" />
-    <PackageReference Include="System.Net.Http" Condition="'$(TargetFramework)' == 'netcoreapp1.0'" Version="$(SystemNetHttpVersion)" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
+    <PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
+	<ProjectReference Condition="'$(Configuration)' == 'Debug'" Include="..\Nohwnd.AttachVS\Nohwnd.AttachVS.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />

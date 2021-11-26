@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
+		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+	</PropertyGroup>
+	<Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+	
+  <PropertyGroup>
+	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	  <VersionPrefix>0.0.4</VersionPrefix>
+	  <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Nohwnd</Authors>
+    <Company>Nohwnd</Company>
+    <Description>Attach VisualStudio to the current process or to a child process.</Description>
+    <PackageTags>vs; debugging; debugger; attach;</PackageTags>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="$(MSBuildThisFileDirectory)..\Nohwnd.AttachVS.Console\bin\$(Configuration)\net472\AttachVS.exe">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+</Project>

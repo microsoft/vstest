@@ -52,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         // In UWP(App models) Run will act as entry point from Application end, so making this method public
         public static void Run(string[] args)
         {
+            DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_HOST_DEBUG_ATTACH_VS");
             DebuggerBreakpoint.WaitForNativeDebugger("VSTEST_HOST_NATIVE_DEBUG");
             DebuggerBreakpoint.WaitForDebugger("VSTEST_HOST_DEBUG");
             UILanguageOverride.SetCultureSpecifiedByUser();
