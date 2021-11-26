@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         public void Run(string[] args)
         {
-            DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACH_VS");
+            DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS");
             DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
 
 

@@ -12,9 +12,5 @@
 	  <AssemblyName>AttachVS</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Nohwnd.AttachVS\AttachVs.cs" Link="AttachVs.cs" />
-  </ItemGroup>
-
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

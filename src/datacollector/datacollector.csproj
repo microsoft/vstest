@@ -23,9 +23,6 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-	<ProjectReference Condition="'$(Configuration)' == 'Debug'" Include="..\Nohwnd.AttachVS\Nohwnd.AttachVS.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj" />

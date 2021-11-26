@@ -25,13 +25,10 @@
     <Compile Include="..\testhost.x86\TestHostTraceListener.cs" Link="TestHostTraceListener.cs" />
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup  Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
     <PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
     <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpVersion)" />	
-  </ItemGroup>
-  <ItemGroup  Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
-	  <ProjectReference Condition="'$(Configuration)' == 'Debug'" Include="..\Nohwnd.AttachVS\Nohwnd.AttachVS.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />

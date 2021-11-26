@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <returns>0 if everything was successful and 1 otherwise.</returns>
         public static int Main(string[] args)
         {
-            DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACH_VS");
+            DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_RUNNER_DEBUG_ATTACHVS");
             DebuggerBreakpoint.WaitForDebugger("VSTEST_RUNNER_DEBUG");
             UILanguageOverride.SetCultureSpecifiedByUser();
             return new Executor(ConsoleOutput.Instance).Execute(args);
