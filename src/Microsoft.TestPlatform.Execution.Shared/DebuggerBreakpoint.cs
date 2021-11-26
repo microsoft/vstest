@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Execution
             // We could call the library code directly here for .NET, and .NET Framework, but then we would also need to package it
             // together with testhost. So instead we always run the executable, and pass path to it using env variable.
 
-            var env = "ATTACHVS_PATH";
+            var env = "VSTEST_DEBUG_ATTACHVS_PATH";
             var vsAttachPath = Environment.GetEnvironmentVariable(env) ?? FindAttachVs();
 
             // Always set it so we propagate it to child processes even if it was not previously set.
