@@ -8,8 +8,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net472</TargetFrameworks>
-	  <LangVersion>preview</LangVersion>
-	  <AssemblyName>AttachVS</AssemblyName>
+    <LangVersion>preview</LangVersion>
+    <AssemblyName>AttachVS</AssemblyName>
   </PropertyGroup>
 
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />

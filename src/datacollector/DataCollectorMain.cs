@@ -66,7 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             DebuggerBreakpoint.AttachVisualStudioDebugger("VSTEST_DATACOLLECTOR_DEBUG_ATTACHVS");
             DebuggerBreakpoint.WaitForDebugger("VSTEST_DATACOLLECTOR_DEBUG");
 
-
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
 
             // Setup logging if enabled
