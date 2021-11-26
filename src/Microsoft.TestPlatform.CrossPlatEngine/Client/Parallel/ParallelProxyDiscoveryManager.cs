@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -160,27 +159,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 return true;
             }
 
-            // Discovery is not complete.
-            // First, clean up the used proxy discovery manager if the last run was aborted
-            // or this run doesn't support shared hosts (netcore tests)
-            if (!this.SharedHosts || isAborted)
+            /*  Discovery is not complete.
+                Now when both.net framework and.net core projects can run in parallel
+                we should clear manager and create new one for both cases.
+                Otherwise `proxyDiscoveryManager` instance is alredy closed by now and it will give exception
+                when trying to do some operation on it.
+            */
+            if (EqtTrace.IsVerboseEnabled)
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", this.SharedHosts, isAborted);
-                }
-
-                this.RemoveManager(proxyDiscoveryManager);
-
-                proxyDiscoveryManager = this.CreateNewConcurrentManager();
-                var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
-                                               this.requestData,
-                                               proxyDiscoveryManager,
-                                               this.currentDiscoveryEventsHandler,
-                                               this,
-                                               this.currentDiscoveryDataAggregator);
-                this.AddManager(proxyDiscoveryManager, parallelEventsHandler);
+                EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", this.SharedHosts, isAborted);
             }
+
+            this.RemoveManager(proxyDiscoveryManager);
+
+            proxyDiscoveryManager = this.CreateNewConcurrentManager();
+            var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
+                                           this.requestData,
+                                           proxyDiscoveryManager,
+                                           this.currentDiscoveryEventsHandler,
+                                           this,
+                                           this.currentDiscoveryDataAggregator);
+            this.AddManager(proxyDiscoveryManager, parallelEventsHandler);
 
             // Second, let's attempt to trigger discovery for the next source.
             this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager);
