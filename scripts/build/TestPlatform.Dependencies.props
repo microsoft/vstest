@@ -49,7 +49,7 @@
     <MicrosoftExtensionsDependencyModelPackageVersion>3.0.0-preview4-27615-11</MicrosoftExtensionsDependencyModelPackageVersion>
     <MicrosoftExtensionsFileSystemGlobbingPackageVersion>1.1.1</MicrosoftExtensionsFileSystemGlobbingPackageVersion>
 
-	<CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
+    <CoverletCoverageVersion>1.2.0</CoverletCoverageVersion>
     <SystemNetHttpVersion>4.3.4</SystemNetHttpVersion>
 
     <DependencyVersionsImported>true</DependencyVersionsImported>
