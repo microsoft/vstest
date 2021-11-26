@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System;
     using System.Collections.Concurrent;
@@ -48,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <summary>
         /// Dictionary which stores source with corresponding discoveryStatus
         /// </summary>
-        internal ConcurrentDictionary<string, DiscoveryStatus> SourceStatusMap = new ConcurrentDictionary<string, DiscoveryStatus>();
+        internal ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus = new ConcurrentDictionary<string, DiscoveryStatus>();
 
         /// <summary>
         /// Indicates if discovery complete payload already sent back to IDE
@@ -144,18 +145,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <summary>
-        /// Aggregate fully discovered sources,coming from different test hosts, into one list
+        /// Aggregate the source as fully discovered
         /// </summary>
         /// <param name="sorce">Fully discovered source</param>
-        internal void AggregateTheSourceAsFullyDiscovered(string source)
+        internal void AggregateTheSourcesWithDiscoveryStatus(IEnumerable<string> sources, DiscoveryStatus status)
         {
-            if (source == null || source == string.Empty) return;
+            if (sources == null || sources.Count() == 0) return;
 
-            SourceStatusMap[source] = DiscoveryStatus.FullyDiscovered;
+            foreach (var source in sources)
+            {
+                if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+                {
+                    EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
+                                     $"{source} is not present in SourcesWithDiscoveryStatus dictionary");
+                }
+                else
+                {
+                    SourcesWithDiscoveryStatus[source] = status;
+                }
+            }
         }
 
         /// <summary>
-        /// Aggregate value indicating if we already sent message to IDE
+        /// Aggregate the value indicating if we already sent message to IDE
         /// </summary>
         /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
         internal void AggregateIsMessageSent(bool isMessageSent)
@@ -170,10 +182,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <returns></returns>
         internal ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
         {
-            if (SourceStatusMap == null || SourceStatusMap.IsEmpty) return new List<string>();
+            if (SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.IsEmpty) return new List<string>();
 
-            return SourceStatusMap.Where(source => source.Value == status)
-                                  .Select(source => source.Key).ToList();
+            return SourcesWithDiscoveryStatus.Where(source => source.Value == status)
+                                             .Select(source => source.Key).ToList();
         }
 
         #endregion

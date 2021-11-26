@@ -62,17 +62,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public IDictionary<string, object> Metrics { get; set; }
 
         /// <summary>
-        /// Gets list of sources which were fully discovered
+        /// Gets the list of sources which were fully discovered.
         /// </summary>
         public IReadOnlyCollection<string> FullyDiscoveredSources { get; } = new List<string>();
 
         /// <summary>
-        /// Gets list of sources which were partially discovered (started discover tests, but then discovery aborted)
+        /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
         /// </summary>
         public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; } = new List<string>();
 
         /// <summary>
-        /// Gets list of sources which were not discovered at all
+        /// Gets the list of sources which were not discovered at all.
         /// </summary>
         public IReadOnlyCollection<string> NotDiscoveredSources { get; } = new List<string>();
     }

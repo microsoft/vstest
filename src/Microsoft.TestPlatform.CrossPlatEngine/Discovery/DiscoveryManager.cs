@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private DiscoveryCriteria discoveryCriteria;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private string previousSource = null;
-        private ConcurrentDictionary<string, DiscoveryStatus> DiscoveredSourcesWithStatus { get; set; } = new ConcurrentDictionary<string, DiscoveryStatus>();
+        private ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus { get; set; } = new ConcurrentDictionary<string, DiscoveryStatus>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -138,9 +138,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     if (lastChunk != null)
                     {
-                        if (!Debugger.IsAttached) Debugger.Launch();
-                        else Debugger.Break();
-
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                         /* When discovery is complete we will have case that the last discovered source is still marked as partiallyDiscovered.
                          * So we need to mark it as fullyDiscovered.*/
@@ -344,8 +341,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             {
                 string currentSource = testCase.Source;
 
-                // If it is first list of testCases which was discovered, we mark sources as partiallyDiscovered
-                // Or if current source is the same as previous we mark them as partiallyDiscovered again for consistency
+                // If it is the first list of testCases which was discovered, we mark sources as partiallyDiscovered.
+                // Or if current source is the same as previous we again mark them as partiallyDiscovered for consistency
                 if (previousSource is null || previousSource == currentSource)
                 {
                     MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
@@ -368,9 +365,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="lastChunk">Last chunk of testCases which were discovered</param>
         private void MarkTheLastChunkSourcesAsFullyDiscovered(IList<TestCase> lastChunk)
         {
-            if (lastChunk == null || lastChunk.Count == 0) return;
+            if (lastChunk == null) return;
 
             var lastChunkSources = lastChunk.Select(testcase => testcase.Source);
+
+            // When all testcases in project is dividable by 10 then lastChunk is coming as empty
+            // So we need to take the lastSource and mark it as FullyDiscovered
+            if (lastChunk.Count == 0) lastChunkSources = new List<string>() { previousSource };
 
             MarkSourcesWithStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
         }
@@ -383,7 +384,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private void MarkSourceWithStatus(string source, DiscoveryStatus status)
         {
             if (source == null) return;
-            DiscoveredSourcesWithStatus[source] = status;
+
+            if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+            {
+                EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
+            }
+            else
+            {
+                SourcesWithDiscoveryStatus[source] = status;
+            }
         }
 
         /// <summary>
@@ -397,7 +406,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             foreach (var source in sources)
             {
-                DiscoveredSourcesWithStatus[source] = status;
+                if (source == null) continue;
+
+                // It is the first time when we fill our map with sources
+                if (status == DiscoveryStatus.NotDiscovered) SourcesWithDiscoveryStatus[source] = status;
+
+                else
+                {
+                    if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+                    {
+                        EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
+                    }
+                    else
+                    {
+                        SourcesWithDiscoveryStatus[source] = status;
+                    }
+                }
             }
         }
 
@@ -408,16 +432,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <returns></returns>
         private IReadOnlyCollection<string> GetFilteredSources(DiscoveryStatus discoveryStatus)
         {
-            var discoveredSources = DiscoveredSourcesWithStatus;
-
-            // If by some accident discoveredSources map is empty we will return empty list
-            if (discoveredSources == null || discoveredSources.Count == 0)
+            // If by some accident SourcesWithDiscoveryStatus map is empty we will return empty list
+            if (SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.Count == 0)
             {
                 return new List<string>();
             }
 
-            return discoveredSources.Where(source => source.Value == discoveryStatus)
-                                    .Select(source => source.Key).ToList();
+            return SourcesWithDiscoveryStatus.Where(source => source.Value == discoveryStatus)
+                                             .Select(source => source.Key).ToList();
         }
     }
 }

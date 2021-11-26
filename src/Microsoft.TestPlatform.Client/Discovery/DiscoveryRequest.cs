@@ -160,7 +160,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                 if (this.discoveryInProgress)
                 {
-                    // Using DiscoveryRequest.HandleDiscoveryComplete eventHandler
                     this.DiscoveryManager.Abort(this);
                 }
                 else

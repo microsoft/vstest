@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
     using CoreUtilities.Helpers;

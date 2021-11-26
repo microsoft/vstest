@@ -198,6 +198,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
         {
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
             if (this.baseTestDiscoveryEventsHandler == null)
             {
                 this.baseTestDiscoveryEventsHandler = eventHandler;

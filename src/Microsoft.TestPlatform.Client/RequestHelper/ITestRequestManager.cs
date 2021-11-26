@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         void CancelDiscovery();
 
         /// <summary>
-        /// Cancels the current discovery request with discovery complete event handle
+        /// Cancels the current discovery request with discovery complete event handler
         /// </summary>
         void CancelDiscoveryWithEventHandler();
 

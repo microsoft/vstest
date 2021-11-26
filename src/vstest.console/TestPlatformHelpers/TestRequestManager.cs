@@ -525,7 +525,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <inheritdoc />
         public void CancelDiscovery()
         {
-            EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
+            EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request.");
             this.currentDiscoveryRequest?.Abort();
         }
 

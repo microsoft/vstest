@@ -281,7 +281,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 foreach (string source in sources)
                 {
-                    this.currentDiscoveryDataAggregator.SourceStatusMap[source] = DiscoveryStatus.NotDiscovered;
+                    this.currentDiscoveryDataAggregator.SourcesWithDiscoveryStatus[source] = DiscoveryStatus.NotDiscovered;
                 }
             }
         }

@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 // If we come here it means that some source was already fully discovered so we can mark it
                 if (!discoveryDataAggregator.IsAborted)
                 {
-                    AggregateComingSources(discoveryDataAggregator, lastChunk);
+                    AggregateComingSourcesAsFullyDiscovered(lastChunk, discoveryCompleteEventArgs);
                 }
             }
 
@@ -100,8 +100,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var partiallyDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered) as IReadOnlyCollection<string>;
                 var notDiscovered = discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered) as IReadOnlyCollection<string>;
 
-                // If parallel discovery completed because of abortion
-                // we need to set isAborted to true and totalTests = -1
+                // As we immediatelly return results to IDE in case of aborting
+                // we need to set isAborted = true and totalTests = -1
                 if (this.parallelProxyDiscoveryManager.IsAbortRequested)
                 {
                     discoveryDataAggregator.Aggregate(-1, true);
@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // Sending discovery complete message to IDE
-                this.SendMessage(discoveryDataAggregator, testDiscoveryCompletePayload);
+                this.SendMessage(testDiscoveryCompletePayload);
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
                                                                                      this.discoveryDataAggregator.IsAborted,
@@ -192,10 +192,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         /// <param name="discoveryDataAggregator">Discovery aggregator to know if we already sent this message</param>
         /// <param name="testDiscoveryCompletePayload">Discovery complete payload to send</param>
-        private void SendMessage(ParallelDiscoveryDataAggregator discoveryDataAggregator, DiscoveryCompletePayload testDiscoveryCompletePayload)
+        private void SendMessage(DiscoveryCompletePayload testDiscoveryCompletePayload)
         {
             // In case of abort scenario, we need to send raw message to IDE only once after abortion.
-            // All other testhost which will finish after shouldn't send raw message
+            // All other testhosts which will finish after shouldn't send raw message
             if (!discoveryDataAggregator.IsMessageSent)
             {
                 lock (sendMessageLock)
@@ -211,29 +211,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <summary>
-        /// Getting the source name from the last chunk
-        /// </summary>
-        /// <param name="lastChunk">The last test case chunk which was discovered</param>
-        /// <returns>The source of the last test case chunk</returns>
-        private string GetTheSourceFromTheLastChunk(IEnumerable<TestCase> lastChunk)
-        {
-            if (lastChunk == null || lastChunk.Count() == 0) return string.Empty;
-
-            var chunk = lastChunk.Last();
-
-            return chunk.Source;
-        }
-
-        /// <summary>
         /// Aggregate source as fully discovered
         /// </summary>
         /// <param name="discoveryDataAggregator">Aggregator to aggregate results</param>
         /// <param name="lastChunk">Last chunk of discovered test cases</param>
-        private void AggregateComingSources(ParallelDiscoveryDataAggregator discoveryDataAggregator, IEnumerable<TestCase> lastChunk)
+        private void AggregateComingSourcesAsFullyDiscovered(IEnumerable<TestCase> lastChunk, DiscoveryCompleteEventArgs discoveryCompleteEventArgs)
         {
-            string source = GetTheSourceFromTheLastChunk(lastChunk);
+            if (lastChunk == null) return;
 
-            discoveryDataAggregator.AggregateTheSourceAsFullyDiscovered(source);
+            IEnumerable<string> lastChunkSources;
+
+            // Sometimes we get lastChunk as empty list (when number of tests in project dividable by 10)
+            // Then we will take sources from discoveryCompleteEventArgs coming from testhost
+            if (lastChunk.Count() == 0)
+            {
+                lastChunkSources = discoveryCompleteEventArgs.FullyDiscoveredSources;
+            }
+            else
+            {
+                lastChunkSources = lastChunk.Select(testcase => testcase.Source);
+            }
+
+            discoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus(lastChunkSources, DiscoveryStatus.FullyDiscovered);
         }
     }
 }
