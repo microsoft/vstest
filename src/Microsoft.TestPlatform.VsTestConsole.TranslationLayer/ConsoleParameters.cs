@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 var directoryPath = Path.GetDirectoryName(value);
                 if (!string.IsNullOrEmpty(directoryPath) && !fileHelper.DirectoryExists(Path.GetDirectoryName(value)))
                 {
-                    throw new ArgumentException("LogFilePath must point to a valid directory for logging!");
+                    Directory.CreateDirectory(Path.GetDirectoryName(value));
                 }
 
                 // Ensure path is double quoted. if path has white space then it can create problem.
