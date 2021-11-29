@@ -20,7 +20,7 @@ namespace TestPlatform.Playground
             // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
             // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
             // their original build locations, to $(TargetDir)\vstest.console directory, and it's subfolders to create an executable
-            // copy of TestPlatform.
+            // copy of TestPlatform that is similar to what we ship.
             //
             // The copying might trigger only on re-build, if you see outdated dependencies, Rebuild this project instead of just Build.
             // 
