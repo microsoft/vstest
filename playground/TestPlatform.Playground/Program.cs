@@ -17,6 +17,16 @@ namespace TestPlatform.Playground
     {
         static void Main(string[] args)
         {
+            // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
+            // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
+            // their original build locations, to $(TargetDir)\vstest.console directory, and it's subfolders to create an executable
+            // copy of TestPlatform.
+            //
+            // The copying might trigger only on re-build, if you see outdated dependencies, Rebuild this project instead of just Build.
+            // 
+            // Use this as playground for your debugging of end-to-end scenarios, it will automatically attach vstest.console and teshost
+            // sub-processes. It won't stop at entry-point automatically, don't forget to set your breakpoints, or remove VSTEST_DEBUG_NOBP
+            // from the environment variables of this project.
 
             var thisAssemblyPath = Assembly.GetEntryAssembly().Location;
             var here = Path.GetDirectoryName(thisAssemblyPath);
@@ -39,7 +49,7 @@ namespace TestPlatform.Playground
                 </RunSettings>
             ";
             var sources = new[] {
-                Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll")
+                Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
             };
 
             var options = new TestPlatformOptions();
