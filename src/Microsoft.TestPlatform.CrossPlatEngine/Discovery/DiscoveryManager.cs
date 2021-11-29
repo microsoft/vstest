@@ -392,6 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             else
             {
                 SourcesWithDiscoveryStatus[source] = status;
+                EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : Marking {source} with {status} status");
             }
         }
 
@@ -415,11 +416,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     if (!SourcesWithDiscoveryStatus.ContainsKey(source))
                     {
-                        EqtTrace.Warning($"DiscoveryManager.MarkSourceWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
+                        EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus : SourcesWithDiscoveryStatus does not contain {source}");
                     }
                     else
                     {
                         SourcesWithDiscoveryStatus[source] = status;
+                        EqtTrace.Warning($"DiscoveryManager.MarkSourcesWithStatus : Marking {source} with {status} status");
                     }
                 }
             }

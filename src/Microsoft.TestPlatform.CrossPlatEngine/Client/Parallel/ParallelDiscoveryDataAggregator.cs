@@ -154,6 +154,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             foreach (var source in sources)
             {
+                if (status == DiscoveryStatus.NotDiscovered) SourcesWithDiscoveryStatus[source] = status;
+
                 if (!SourcesWithDiscoveryStatus.ContainsKey(source))
                 {
                     EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
@@ -162,6 +164,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 else
                 {
                     SourcesWithDiscoveryStatus[source] = status;
+
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
+                                         $"{source} is marked with {status} status");
+                    }
                 }
             }
         }

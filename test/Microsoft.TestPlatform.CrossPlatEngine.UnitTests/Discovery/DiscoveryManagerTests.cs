@@ -82,10 +82,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(Directory.GetCurrentDirectory(), "imaginary.dll"));
             mockLogger.Verify(
                 l =>
-                l.HandleLogMessage(
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel.Warning,
-                    errorMessage),
-                Times.Once);
+                l.HandleLogMessage(TestMessageLevel.Warning,errorMessage),Times.Once);
         }
 
         [TestMethod]
@@ -105,10 +102,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(fakeDirectory, "imaginary.exe"));
             mockLogger.Verify(
                 l =>
-                l.HandleLogMessage(
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel.Warning,
-                    errorMessage),
-                Times.Once);
+                l.HandleLogMessage(TestMessageLevel.Warning,errorMessage),Times.Once);
         }
 
         [TestMethod]
@@ -124,10 +118,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoValidSourceFoundForDiscovery, sourcesString);
             mockLogger.Verify(
                 l =>
-                l.HandleLogMessage(
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel.Warning,
-                    errorMessage),
-                Times.Once);
+                l.HandleLogMessage(TestMessageLevel.Warning,errorMessage),Times.Once);
         }
 
         [TestMethod]
@@ -151,10 +142,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DuplicateSource, sources[0]);
             mockLogger.Verify(
                 l =>
-                l.HandleLogMessage(
-                    Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel.Warning,
-                    errorMessage),
-                Times.Once);
+                l.HandleLogMessage(TestMessageLevel.Warning,errorMessage),Times.Once);
         }
 
         [TestMethod]
@@ -264,6 +252,34 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             // Verify.
             mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once"), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoveryTestsShouldSendAbortValuesCorrectlyIfAbortionHappened()
+        {
+            // Arrange
+            var sources = new List<string> { typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location };
+
+            var criteria = new DiscoveryCriteria(sources, 100, null);
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+            DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+            mockHandler.Setup(ml => ml.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+                .Callback(
+                    (DiscoveryCompleteEventArgs complete,
+                        IEnumerable<TestCase> tests) =>
+                    {
+                        receivedDiscoveryCompleteEventArgs = complete;
+                    });
+
+            // Act
+            this.discoveryManager.DiscoverTests(criteria, mockHandler.Object);
+            this.discoveryManager.Abort(mockHandler.Object);
+
+            // Assert
+            Assert.AreEqual(true, receivedDiscoveryCompleteEventArgs.IsAborted);
+            Assert.AreEqual(-1, receivedDiscoveryCompleteEventArgs.TotalCount);
         }
 
         #endregion
