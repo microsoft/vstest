@@ -54,5 +54,14 @@
     -->
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+    <!-- API that is common to all frameworks except for .NET Standard 1.0 and UAP10. -->
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Condition=" '$(TargetFramework)' != 'netstandard1.0' AND '$(TargetFramework)' != 'uap10.0' " Include="PublicAPI\net\PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
