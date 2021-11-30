@@ -49,6 +49,22 @@
     </AdditionalFiles>
   </ItemGroup>
 
+  <!-- Include PublicApi analyzers into all projects that are in our src directory, this can't use TestProject == true
+  because some projects in test and playground are not tests, but we don't want to analyze those for public apis, because
+  we don't ship them.
+  -->
+  <Choose>
+    <When Condition="$(MSBuildProjectFullPath.Contains('/src/')) OR $(MSBuildProjectFullPath.Contains('\src\'))">
+      <ItemGroup>
+        <!-- We normally don't build against net6.0, so the public api analyzer errors would only appear in CI pipeline. -->
+        <PackageReference Condition=" '$(DotNetBuildFromSource)' != 'true' " Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(RoslynPublicApiAnalyzersVersion)">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+	  </ItemGroup>
+    </When>
+  </Choose>
+
   <!-- Test project settings -->
   <Choose>
     <When Condition="$(TestProject) == 'true'"> 
