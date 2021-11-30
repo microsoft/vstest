@@ -54,7 +54,7 @@
 
     <DependencyVersionsImported>true</DependencyVersionsImported>
 
-	<RoslynPublicApiAnalyzersVersion>3.3.4-beta1.21554.2</RoslynPublicApiAnalyzersVersion>
+    <RoslynPublicApiAnalyzersVersion>3.3.4-beta1.21554.2</RoslynPublicApiAnalyzersVersion>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" />
