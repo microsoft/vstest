@@ -171,6 +171,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachVS", "src\AttachVS\AttachVS.csproj", "{8238A052-D626-49EB-A011-51DC6D0DBA30}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "playground", "playground", "{6CE2F530-582B-4695-A209-41065E103426}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestPlatform.Playground", "playground\TestPlatform.Playground\TestPlatform.Playground.csproj", "{545A88D3-1AE2-4D39-9B7C-C691768AD17F}"
 EndProject
