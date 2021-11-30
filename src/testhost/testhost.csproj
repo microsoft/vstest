@@ -51,8 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- API that is common to all frameworks that we build for. -->
-	<AdditionalFiles Include="..\testhost.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
-	<AdditionalFiles Include="..\testhost.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
+    <AdditionalFiles Include="..\testhost.x86\PublicAPI\PublicAPI.Shipped.txt" Link="PublicAPI\PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="..\testhost.x86\PublicAPI\PublicAPI.Unshipped.txt" Link="PublicAPI\PublicAPI.Unshipped.txt" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
