@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <VSSdkBuildToolsVersion>15.8.3247</VSSdkBuildToolsVersion>
@@ -33,13 +33,13 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.8.3</MoqVersion>
 
-    <TestPlatformExternalsVersion>17.1.0-preview-1-31826-467</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>17.1.0-preview-2-31925-026</TestPlatformExternalsVersion>
     <!-- <TestPlatformMSDiaVersion>$(TestPlatformExternalsVersion)</TestPlatformMSDiaVersion> -->
-    <TestPlatformMSDiaVersion>17.0.0-previews-3-31515-332</TestPlatformMSDiaVersion>
+    <TestPlatformMSDiaVersion>17.1.0-preview-2-31925-026</TestPlatformMSDiaVersion>
     <!-- Portable CPP test runner -->
-    <TestPlatformRemoteExternalsVersion>17.1.0-preview-1-31807-420</TestPlatformRemoteExternalsVersion>
+    <TestPlatformRemoteExternalsVersion>17.1.0-preview-2-31925-026</TestPlatformRemoteExternalsVersion>
     
-    <InteropExternalsVersion>17.0.0-preview-2-31223-026</InteropExternalsVersion>
+    <InteropExternalsVersion>17.1.0-preview-2-31925-026</InteropExternalsVersion>
     <MicrosoftFakesVersion>17.0.0-beta.21179.1</MicrosoftFakesVersion>
 
     <MicrosoftBuildPackageVersion>16.0.461</MicrosoftBuildPackageVersion>
