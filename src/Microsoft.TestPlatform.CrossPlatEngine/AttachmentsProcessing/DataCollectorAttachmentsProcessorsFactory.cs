@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing
 {
-    public class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
+    internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
     {
         private static Uri CoverageUri = new Uri("datacollector://microsoft/CodeCoverage/2.0");
         private const string CoverageFriendlyName = "Code Coverage";
