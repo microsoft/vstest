@@ -113,6 +113,13 @@ $dependencies = Get-Content -Raw -Encoding UTF8 $dependenciesPath
 $updatedDependencies = $dependencies -replace "<NETTestSdkVersion>.*?</NETTestSdkVersion>", "<NETTestSdkVersion>$TPB_Version</NETTestSdkVersion>"
 $updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath -NoNewline
 
+$attachVsPath = "$env:TP_ROOT_DIR\src\AttachVS\bin\Debug\net472"
+
+if ($env:PATH -notlike "*$attachVsPath") { 
+    Write-Log "Adding AttachVS to PATH"
+    $env:PATH = "$attachVsPath;$env:PATH"
+}
+
 function Invoke-Build
 {
     $timer = Start-Timer
