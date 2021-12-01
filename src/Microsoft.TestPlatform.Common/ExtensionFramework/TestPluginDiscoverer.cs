@@ -161,21 +161,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-            IEnumerable<Type> types;
+
+            List<Type> types = new List<Type>();
             Type extension = typeof(TExtension);
 
             try
             {
-                types = TypesToLoadUtilities.GetTypesToLoad(assembly);
+                MetadataReaderExtensionsHelper extensionHelper = new MetadataReaderExtensionsHelper();
+                var discoveredExtensions = extensionHelper.DiscoverTestPlatformExtensionVersionAttributeExtensions(assembly, filePath);
+                if (discoveredExtensions?.Length>0)
+                {
+                    types.AddRange(discoveredExtensions);
+                }
+            }
+            catch (Exception e)
+            {
+                EqtTrace.Warning("TestPluginDiscoverer: Failed to get types searching for 'TestPlatformExtensionVersionAttribute' from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
+            }
+
+
+            try
+            {
+                var typesToLoad = TypesToLoadUtilities.GetTypesToLoad(assembly);
+                if (typesToLoad?.Any() == true)
+                {
+                    types.AddRange(typesToLoad);
+                }
 
                 if (!types.Any())
                 {
-                    types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract);
+                    types.AddRange(assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
                 }
             }
             catch (ReflectionTypeLoadException e)
             {
-                EqtTrace.Warning("TestPluginDiscoverer: Failed to get types from assembly '{0}'.  Skipping test extension scan for this assembly.  Error: {1}", assembly.FullName, e.ToString());
+                EqtTrace.Warning("TestPluginDiscoverer: Failed to get types from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
 
                 if (e.LoaderExceptions != null)
                 {
@@ -184,7 +204,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         EqtTrace.Warning("LoaderExceptions: {0}", ex);
                     }
                 }
-                return;
             }
 
             if (types != null && types.Any())
