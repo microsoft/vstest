@@ -22,4 +22,10 @@
   <ItemGroup>
     <Compile Include="..\DumpMinitool\Program.cs" Link="Program.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- API that is common to all frameworks that we build for. -->
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
+  </ItemGroup>
 </Project>
