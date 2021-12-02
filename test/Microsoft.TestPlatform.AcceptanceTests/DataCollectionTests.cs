@@ -157,6 +157,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             Assert.AreEqual(2, fileContent.Distinct().Count());
 
+            var dataCollectorsLogs = Directory.GetFiles(resultsDir, "*.datacollector.*", SearchOption.TopDirectoryOnly);
+            Assert.AreEqual(2, dataCollectorsLogs.Distinct().Count());
+            foreach (var dataCollectorLogFile in dataCollectorsLogs)
+            {
+                string dataCollectorLog = File.ReadAllText(dataCollectorLogFile);
+                Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Unable to get extension for type 'AttachmentProcessorDataCollector.SampleDataCollector'"));
+                Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found 'AttachmentProcessorDataCollector.SampleDataCollectorV1' version '1'"));
+                Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found 'AttachmentProcessorDataCollector.SampleDataCollectorV2' version '2'"));
+                Assert.IsTrue(dataCollectorLog.Contains("TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data 'my://sample/datacollector' and type 'AttachmentProcessorDataCollector.SampleDataCollectorV1, AttachmentProcessorDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=null'; keeping the first one 'AttachmentProcessorDataCollector.SampleDataCollectorV2, AttachmentProcessorDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=null'."));
+            }
+
             TryRemoveDirectory(resultsDir);
         }
 

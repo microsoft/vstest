@@ -17,13 +17,113 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
     internal class MetadataReaderExtensionsHelper
     {
-        private static string TestPlatformExtensionVersionAttribute = "TestPlatformExtensionVersionAttribute";
+        private static string TestPlatformExtensionVersionAttribute = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypeAttribute";
+        private static string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
         private static string[] MethodsDefinition = new string[] { ".ctor", "get_Version" };
         private static Type[] EmptyTypeArray = new Type[0];
 
         public MetadataReaderExtensionsHelper()
         {
 
+        }
+
+        public Type[] DiscoverTestPlatformExtensionVersionAttributeExtensions2(Assembly assembly, string assemblyFilePath)
+        {
+            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{assembly.FullName}' file path '{assemblyFilePath}'");
+
+            List<Tuple<int, Type>> extensions = null;
+            using (var stream = new FileStream(assemblyFilePath, FileMode.Open, FileAccess.Read))
+            using (var reader = new PEReader(stream, PEStreamOptions.Default))
+            {
+                MetadataReader metadataReader = reader.GetMetadataReader();
+
+                foreach (var customAttributeHandle in metadataReader.CustomAttributes)
+                {
+                    string attributeFullName = null;
+                    try
+                    {
+                        if (customAttributeHandle.IsNil)
+                        {
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Invalid custom attribute (customAttributeHandle.IsNil)");
+                            continue;
+                        }
+
+                        if (!GetAttributeTypeAndConstructor(metadataReader, customAttributeHandle, out EntityHandle attributeType))
+                        {
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Invalid custom attribute (GetAttributeTypeAndConstructor)");
+                            continue;
+                        }
+
+                        if (!GetAttributeTypeNamespaceAndName(metadataReader, attributeType, out StringHandle namespaceHandle, out StringHandle nameHandle))
+                        {
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Invalid custom attribute (GetAttributeTypeNamespaceAndName)");
+                            continue;
+                        }
+
+                        attributeFullName = $"{metadataReader.GetString(namespaceHandle)}.{metadataReader.GetString(nameHandle)}";
+                        if (attributeFullName != TestExtensionTypesAttributeV2)
+                        {
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Invalid attribute '{attributeFullName}'");
+                            continue;
+                        }
+
+                        var customAttribute = metadataReader.GetCustomAttribute(customAttributeHandle);
+                        EntityHandle ctorHandle = customAttribute.Constructor;
+                        BlobHandle signature;
+                        switch (ctorHandle.Kind)
+                        {
+                            case HandleKind.MemberReference:
+                                signature = metadataReader.GetMemberReference((MemberReferenceHandle)ctorHandle).Signature;
+                                break;
+                            case HandleKind.MethodDefinition:
+                                signature = metadataReader.GetMethodDefinition((MethodDefinitionHandle)ctorHandle).Signature;
+                                break;
+                            default:
+                                Console.WriteLine($"MetadataReaderExtensionsHelper: Potentially invalid IL for the attribute '{attributeFullName}'");
+                                continue;
+                        }
+
+                        BlobReader signatureReader = metadataReader.GetBlobReader(signature);
+                        BlobReader valueReader = metadataReader.GetBlobReader(customAttribute.Value);
+                        const ushort Prolog = 1; // two-byte "prolog" defined by ECMA-335 (II.23.3) to be at the beginning of attribute value blobs
+                        UInt16 prolog = valueReader.ReadUInt16();
+                        if (prolog != Prolog)
+                        {
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Invalid blob attribute prolog '{prolog}'");
+                            continue;
+                        }
+
+                        string fullName = valueReader.ReadSerializedString();
+                        int version = valueReader.ReadInt32();
+
+                        try
+                        {
+                            var extensionType = assembly.GetType(fullName);
+                            if (extensionType is null)
+                            {
+                                EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Unable to get extension for type '{fullName}'");
+                                continue;
+                            }
+
+                            if (extensions is null) extensions = new List<Tuple<int, Type>>();
+                            extensions.Add(Tuple.Create(version, extensionType));
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Valid extension found '{extensionType}' version '{version}'");
+                        }
+                        catch (Exception ex)
+                        {
+                            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during type creation, extension full name: '{fullName}'\n{FormatException(ex)}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Failure during custom attribute analysis, attribute full name: {attributeFullName}\n{FormatException(ex)}");
+                    }
+                }
+            }
+
+            var finalExtensions = extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? EmptyTypeArray;
+            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Found {extensions?.Count ?? 0} extensions");
+            return finalExtensions;
         }
 
         public Type[] DiscoverTestPlatformExtensionVersionAttributeExtensions(Assembly assembly, string assemblyFilePath)
@@ -83,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 {
                     if (!attributeHandle.IsNil)
                     {
-                        if (!GetAttributeTypeAndConstructor(metadataReader, attributeHandle, out EntityHandle attributeType, out EntityHandle _))
+                        if (!GetAttributeTypeAndConstructor(metadataReader, attributeHandle, out EntityHandle attributeType))
                         {
                             EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Invalid custom attribute found for '{fullName}' (GetAttributeTypeAndConstructor)");
                             continue;
@@ -106,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         {
                             var extensionType = assembly.GetType(fullName);
                             var version = GetVersion(metadataReader, metadataReader.GetCustomAttribute(attributeHandle));
-                            if(version == int.MinValue)
+                            if (version == int.MinValue)
                             {
                                 EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Unable to read the version for '{fullName}'");
                             }
@@ -197,7 +297,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Analyze TypeDefinitionHandle '{fullName}'");
 
                     // Check the name
-                    if (typeName == TestPlatformExtensionVersionAttribute && (typeDef.Attributes & TypeAttributes.Sealed) == TypeAttributes.Sealed)
+                    if (fullName == TestPlatformExtensionVersionAttribute && (typeDef.Attributes & TypeAttributes.Sealed) == TypeAttributes.Sealed)
                     {
                         EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Valid type name found '{fullName}'");
 
@@ -326,10 +426,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         }
 
         // https://github.com/dotnet/runtime/blob/6cf529168a8dcdfb158738d46be40b1867fd1bfa/src/coreclr/tools/Common/TypeSystem/Ecma/MetadataExtensions.cs#L150
-        private bool GetAttributeTypeAndConstructor(MetadataReader metadataReader, CustomAttributeHandle attributeHandle,
-           out EntityHandle attributeType, out EntityHandle attributeCtor)
+        private bool GetAttributeTypeAndConstructor(MetadataReader metadataReader, CustomAttributeHandle attributeHandle, out EntityHandle attributeType)
         {
-            attributeCtor = metadataReader.GetCustomAttribute(attributeHandle).Constructor;
+            var attributeCtor = metadataReader.GetCustomAttribute(attributeHandle).Constructor;
 
             if (attributeCtor.Kind == HandleKind.MemberReference)
             {

@@ -8,7 +8,6 @@ namespace AttachmentProcessorDataCollector
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
-    using System.Net.Mail;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -20,7 +19,11 @@ namespace AttachmentProcessorDataCollector
     [DataCollectorFriendlyName("SampleDataCollector")]
     [DataCollectorTypeUri("my://sample/datacollector")]
     [DataCollectorAttachmentProcessor(typeof(SampleDataCollectorAttachmentProcessor))]
-    public class SampleDataCollector : DataCollector
+    public class SampleDataCollectorV2 : SampleDataCollectorV1 { }
+
+    [DataCollectorFriendlyName("SampleDataCollector")]
+    [DataCollectorTypeUri("my://sample/datacollector")]
+    public class SampleDataCollectorV1 : DataCollector
     {
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
@@ -47,7 +50,7 @@ namespace AttachmentProcessorDataCollector
         }
     }
 
-    public class SampleDataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
+    public class SampleDataCollectorAttachmentProcessor : IConfigurableDataCollectorAttachmentProcessor
     {
         public bool SupportsIncrementalProcessing => true;
 

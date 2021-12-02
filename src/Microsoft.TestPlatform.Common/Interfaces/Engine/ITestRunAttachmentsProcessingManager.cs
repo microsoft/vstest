@@ -48,6 +48,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="invokedDataCollector">List of invoked data collectors</param>
         /// <returns>List of attachments processors</returns>
-        IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors);
+        IReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors);
     }
 }

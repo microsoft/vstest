@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
             var logger = CreateMessageLogger(eventsHandler);
-            IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray());
+            IReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor> dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray());
             for (int i = 0; i < dataCollectorAttachmentsProcessors.Count; i++)
             {
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors.ElementAt(i);

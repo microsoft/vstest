@@ -598,7 +598,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     {
     }
 
-    public class AttachmentProcessorDataCollector2 : IDataCollectorAttachmentProcessor
+    public class AttachmentProcessorDataCollector2 : IConfigurableDataCollectorAttachmentProcessor
     {
         public bool SupportsIncrementalProcessing => throw new NotImplementedException();
 

@@ -335,7 +335,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             }
         }
 
-        public class DataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
+        public class DataCollectorAttachmentProcessor : IConfigurableDataCollectorAttachmentProcessor
         {
             public bool SupportsIncrementalProcessing => throw new NotImplementedException();
 

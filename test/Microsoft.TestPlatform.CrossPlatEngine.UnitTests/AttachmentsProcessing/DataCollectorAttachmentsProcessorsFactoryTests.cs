@@ -180,7 +180,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         }
     }
 
-    public class DataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
+    public class DataCollectorAttachmentProcessor : IConfigurableDataCollectorAttachmentProcessor
     {
         public bool SupportsIncrementalProcessing => throw new NotImplementedException();
 
@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         }
     }
 
-    public class DataCollectorAttachmentProcessor2 : IDataCollectorAttachmentProcessor
+    public class DataCollectorAttachmentProcessor2 : IConfigurableDataCollectorAttachmentProcessor
     {
         public bool SupportsIncrementalProcessing => throw new NotImplementedException();
 

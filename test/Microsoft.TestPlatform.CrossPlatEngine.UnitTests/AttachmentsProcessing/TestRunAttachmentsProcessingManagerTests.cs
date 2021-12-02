@@ -31,8 +31,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         private readonly Mock<IRequestData> mockRequestData;
         private readonly Mock<IMetricsCollection> mockMetricsCollection;
         private readonly Mock<ITestPlatformEventSource> mockEventSource;
-        private readonly Mock<IDataCollectorAttachmentProcessor> mockAttachmentHandler1;
-        private readonly Mock<IDataCollectorAttachmentProcessor> mockAttachmentHandler2;
+        private readonly Mock<IConfigurableDataCollectorAttachmentProcessor> mockAttachmentHandler1;
+        private readonly Mock<IConfigurableDataCollectorAttachmentProcessor> mockAttachmentHandler2;
         private readonly Mock<IDataCollectorAttachmentsProcessorsFactory> mockDataCollectorAttachmentsProcessorsFactory;
         private readonly Mock<ITestRunAttachmentsProcessingEventsHandler> mockEventsHandler;
         private readonly TestRunAttachmentsProcessingManager manager;
@@ -45,15 +45,15 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockRequestData.Setup(r => r.MetricsCollection).Returns(mockMetricsCollection.Object);
 
             mockEventSource = new Mock<ITestPlatformEventSource>();
-            mockAttachmentHandler1 = new Mock<IDataCollectorAttachmentProcessor>();
-            mockAttachmentHandler2 = new Mock<IDataCollectorAttachmentProcessor>();
+            mockAttachmentHandler1 = new Mock<IConfigurableDataCollectorAttachmentProcessor>();
+            mockAttachmentHandler2 = new Mock<IConfigurableDataCollectorAttachmentProcessor>();
             mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
             mockDataCollectorAttachmentsProcessorsFactory = new Mock<IDataCollectorAttachmentsProcessorsFactory>();
 
             mockAttachmentHandler1.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri1) });
             mockAttachmentHandler2.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri2) });
             mockDataCollectorAttachmentsProcessorsFactory.Setup(p => p.Create(It.IsAny<InvokedDataCollector[]>()))
-            .Returns(new ReadOnlyDictionary<string, IDataCollectorAttachmentProcessor>(new Dictionary<string, IDataCollectorAttachmentProcessor>()
+            .Returns(new ReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor>(new Dictionary<string, IConfigurableDataCollectorAttachmentProcessor>()
             {
                 { "friendlyNameA", mockAttachmentHandler1.Object } , { "friendlyNameB"  ,mockAttachmentHandler2.Object }
             }));
