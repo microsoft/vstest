@@ -1,19 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
-using System.Reflection.PortableExecutable;
-using System.Text;
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Reflection.Metadata;
+    using System.Reflection.Metadata.Ecma335;
+    using System.Reflection.PortableExecutable;
+    using System.Text;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
     internal class MetadataReaderExtensionsHelper
     {
         private static string TestPlatformExtensionVersionAttribute = "TestPlatformExtensionVersionAttribute";
