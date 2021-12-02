@@ -1,0 +1,8 @@
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus.FullyDiscovered = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus.NotDiscovered = 2 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus.PartiallyDiscovered = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DiscoveryStatus
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager.IsAbortRequested.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IParallelProxyDiscoveryManager.IsAbortRequested.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IProxyDiscoveryManager.Abort(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestDiscoveryEventsHandler2 eventHandler) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol.IDiscoveryManager.Abort(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestDiscoveryEventsHandler2 eventHandler) -> void
