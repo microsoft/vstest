@@ -1,2 +1,0 @@
-Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.ProxyDiscoveryManager.Abort(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestDiscoveryEventsHandler2 eventHandler) -> void
-Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery.DiscoveryManager.Abort(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestDiscoveryEventsHandler2 eventHandler) -> void
