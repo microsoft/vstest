@@ -61,7 +61,7 @@ namespace AttachmentProcessorDataCollector
         public bool SupportsIncrementalProcessing => true;
 
         public IEnumerable<Uri> GetExtensionUris()
-            => new List<Uri>() { new Uri("my://sample/datacollector") };
+            => new List<Uri>() { new Uri(ExtensionInfo.ExtensionIdentifier) };
 
         public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
         {
