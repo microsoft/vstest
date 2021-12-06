@@ -63,6 +63,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             this.FilterOptions = filterOptions;
         }
 
+        internal string TestRunId { get; set; }
+
         #endregion
 
         #region Properties

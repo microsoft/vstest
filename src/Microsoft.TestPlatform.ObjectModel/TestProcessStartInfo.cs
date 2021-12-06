@@ -42,5 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         [DataMember]
         public IDictionary<string, string> CustomProperties { get; set; }
+
+        [DataMember]
+        internal string TestRunid { get; set; }
     }
 }

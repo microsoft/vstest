@@ -434,6 +434,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     try
                     {
+                        testRunPayload.TestRunId = Id.Next().ToString();
                         testRequestManager.ResetOptions();
 
                         // We must avoid re-launching the test host if the test run payload already
@@ -459,6 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
                             LastRunTests = null
                         };
+                        runCompletePayload.TestRunCompleteArgs.TestRunId = testRunPayload.TestRunId;
 
                         // Send run complete to translation layer
                         this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
@@ -594,5 +596,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Dispose(true);
         }
         #endregion
+
+        private static class Id
+        {
+            private static int _id;
+
+            public static int Next()
+            {
+                return Interlocked.Increment(ref _id);
+            }
+        }
     }
 }

@@ -32,5 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets the executor uris that were used to run the tests.
         /// </summary>
         public ICollection<string> ExecutorUris { get; set; }
+
+        internal string TestRunId { get; set; }
     }
 }

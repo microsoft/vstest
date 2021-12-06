@@ -19,5 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets the message.
         /// </summary>
         public string Message { get; set; }
+
+        internal string TestRunId { get; set; }
     }
 }

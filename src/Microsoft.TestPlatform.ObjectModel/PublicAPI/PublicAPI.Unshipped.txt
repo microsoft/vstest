@@ -4,3 +4,7 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestSes
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestSessionInfo
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestSessionInfo.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.StartTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCriteria criteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler eventsHandler) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunRequestPayload.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunRequestPayload.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunId.set -> void

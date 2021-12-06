@@ -43,5 +43,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public IEnumerable<TestCase> ActiveTests { get; private set; }
+
+        /// <summary>
+        /// Gets or sets TestRunId.
+        /// </summary>
+        [DataMember]
+        internal string TestRunId { get; private set; }
     }
 }

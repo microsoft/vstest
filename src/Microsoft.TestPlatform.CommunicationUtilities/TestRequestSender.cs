@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
@@ -59,6 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private TestHostConnectionInfo connectionInfo;
 
         private ITestRuntimeProvider runtimeProvider;
+        private object testRunId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
@@ -312,6 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
         {
+            this.testRunId = runCriteria.TestExecutionContext.TestRunId;
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
             {
@@ -502,6 +505,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 {
                     EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
                 }
+
+                // Modify the raw message text to set the id so we can corelate the request with the response
+                rawMessage = rawMessage.Replace($"\"{nameof(TestExecutionContext.TestRunId)}\":-1", $"\"{nameof(TestExecutionContext.TestRunId)}\":{this.testRunId}");
 
                 // Send raw message first to unblock handlers waiting to send message to IDEs
                 testRunEventsHandler.HandleRawMessage(rawMessage);
