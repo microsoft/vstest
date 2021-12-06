@@ -25,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestPluginDiscoverer
     {
         private static HashSet<string> UnloadableFiles = new HashSet<string>();
+        private readonly MetadataReaderExtensionsHelper extensionHelper = new MetadataReaderExtensionsHelper();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
@@ -167,8 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             try
             {
-                MetadataReaderExtensionsHelper extensionHelper = new MetadataReaderExtensionsHelper();
-                var discoveredExtensions = extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
+                var discoveredExtensions = this.extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
                 if (discoveredExtensions?.Length > 0)
                 {
                     types.AddRange(discoveredExtensions);
@@ -178,7 +178,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 EqtTrace.Warning("TestPluginDiscoverer: Failed to get types searching for 'TestPlatformExtensionVersionAttribute' from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
             }
-
 
             try
             {
