@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             try
             {
                 MetadataReaderExtensionsHelper extensionHelper = new MetadataReaderExtensionsHelper();
-                var discoveredExtensions = extensionHelper.DiscoverTestPlatformExtensionVersionAttributeExtensions2(assembly, filePath);
+                var discoveredExtensions = extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
                 if (discoveredExtensions?.Length > 0)
                 {
                     types.AddRange(discoveredExtensions);

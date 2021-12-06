@@ -16,13 +16,19 @@ namespace AttachmentProcessorDataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+    internal class ExtensionInfo
+    {
+        public const string ExtensionType = "DataCollector";
+        public const string ExtensionIdentifier = "my://sample/datacollector";
+    }
+
     [DataCollectorFriendlyName("SampleDataCollector")]
-    [DataCollectorTypeUri("my://sample/datacollector")]
+    [DataCollectorTypeUri(ExtensionInfo.ExtensionIdentifier)]
     [DataCollectorAttachmentProcessor(typeof(SampleDataCollectorAttachmentProcessor))]
     public class SampleDataCollectorV2 : SampleDataCollectorV1 { }
 
     [DataCollectorFriendlyName("SampleDataCollector")]
-    [DataCollectorTypeUri("my://sample/datacollector")]
+    [DataCollectorTypeUri(ExtensionInfo.ExtensionIdentifier)]
     public class SampleDataCollectorV1 : DataCollector
     {
         private DataCollectionSink dataCollectionSink;

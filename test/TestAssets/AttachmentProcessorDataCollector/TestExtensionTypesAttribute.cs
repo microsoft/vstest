@@ -5,9 +5,8 @@ using AttachmentProcessorDataCollector;
 using Microsoft.VisualStudio.TestPlatform;
 
 [assembly: TestExtensionTypes(typeof(SampleDataCollectorV1))]
-[assembly: TestExtensionTypesV2("AttachmentProcessorDataCollector.SampleDataCollector", 0)]
-[assembly: TestExtensionTypesV2("AttachmentProcessorDataCollector.SampleDataCollectorV1", 1)]
-[assembly: TestExtensionTypesV2("AttachmentProcessorDataCollector.SampleDataCollectorV2", 2, "unused")]
+[assembly: TestExtensionTypesV2(ExtensionInfo.ExtensionType, ExtensionInfo.ExtensionIdentifier, typeof(SampleDataCollectorV1), 1, "futureUnused")]
+[assembly: TestExtensionTypesV2(ExtensionInfo.ExtensionType, ExtensionInfo.ExtensionIdentifier, typeof(SampleDataCollectorV2), 2)]
 
 namespace Microsoft.VisualStudio.TestPlatform
 {
@@ -27,19 +26,17 @@ namespace Microsoft.VisualStudio.TestPlatform
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = true)]
     internal sealed class TestExtensionTypesV2Attribute : Attribute
     {
-        public int Version { get; set; }
-        public string FullName { get; }
+        public string ExtensionType { get; }
+        public string ExtensionIdentifier { get; }
+        public Type ExtensionImplementation { get; }
+        public int Version { get; }
 
-        public TestExtensionTypesV2Attribute(string fullName, int version)
+        public TestExtensionTypesV2Attribute(string extensionType, string extensionIdentifier, Type extensionImplementation, int version, string unused = null)
         {
-            this.FullName = fullName;
-            this.Version =version;
-        }
-
-        public TestExtensionTypesV2Attribute(string fullName, int version, string unused)
-        {
-            this.FullName = fullName;
-            this.Version =version;
+            ExtensionType = extensionType;
+            ExtensionIdentifier = extensionIdentifier;
+            ExtensionImplementation = extensionImplementation;
+            Version = version;
         }
     }
 }
