@@ -10,12 +10,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TestPlatform.Playground
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
             // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
@@ -49,11 +50,18 @@ namespace TestPlatform.Playground
                 </RunSettings>
             ";
             var sources = new[] {
-                Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll")
+                Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
+                Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll")
             };
 
-            var options = new TestPlatformOptions();
-            r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher());
+            var tasks = new List<Task>();
+            foreach (var source in sources)
+            {
+                var options = new TestPlatformOptions();
+                tasks.Add(  Task.Run(() =>  r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher())));
+            }
+
+            await Task.WhenAll(tasks);
         }
 
         public class TestRunHandler : ITestRunEventsHandler
@@ -75,12 +83,12 @@ namespace TestPlatform.Playground
 
             public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
             {
-                Console.WriteLine($"[COMPLETE]: err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+                Console.WriteLine($"[COMPLETE]: id: { testRunCompleteArgs.TestRunId } err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
             }
 
             public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
             {
-                Console.WriteLine($"[PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
+                Console.WriteLine($"[PROGRESS - NEW RESULTS]: id: { testRunChangedArgs.TestRunId } {WriteTests(testRunChangedArgs.NewTestResults)}");
             }
 
             public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)

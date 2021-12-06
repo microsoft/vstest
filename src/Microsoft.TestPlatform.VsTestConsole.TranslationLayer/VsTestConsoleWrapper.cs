@@ -41,6 +41,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool sessionStarted;
 
+        private readonly SemaphoreSlim initializing = new SemaphoreSlim(1, 1);
+
         /// <summary>
         /// Path to additional extensions to reinitialize vstest.console
         /// </summary>
@@ -955,23 +957,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void EnsureInitialized()
         {
-            if (!this.vstestConsoleProcessManager.IsProcessInitialized())
+            try
             {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
-                this.StartSession();
-                this.sessionStarted = this.WaitForConnection();
-
-                if (this.sessionStarted)
+                this.initializing.Wait();
+                if (!this.vstestConsoleProcessManager.IsProcessInitialized())
                 {
-                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
-                    this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
+                    this.StartSession();
+                    this.sessionStarted = this.WaitForConnection();
+
+                    if (this.sessionStarted)
+                    {
+                        EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
+                        this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+                    }
+                }
+
+                if (!this.sessionStarted && this.requestSender != null)
+                {
+                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started.");
+                    this.sessionStarted = this.WaitForConnection();
                 }
             }
-
-            if (!this.sessionStarted && this.requestSender != null)
+            finally
             {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started.");
-                this.sessionStarted = this.WaitForConnection();
+                this.initializing.Release();
             }
         }
 

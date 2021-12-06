@@ -1,0 +1,2 @@
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestMessagePayload.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestMessagePayload.TestRunId.set -> void

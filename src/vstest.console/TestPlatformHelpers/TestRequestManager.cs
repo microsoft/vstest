@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+    using System.Collections.Concurrent;
 
     /// <summary>
     /// Defines the test request manger which can fire off discovery and test run requests.
@@ -59,22 +60,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private IProcessHelper processHelper;
         private ITestRunAttachmentsProcessingManager attachmentsProcessingManager;
 
+        private int runId = 0;
+        private int discoveryId = 0;
+
         /// <summary>
         /// Maintains the current active execution request.
-        /// Assumption: There can only be one active execution request.
         /// </summary>
-        private ITestRunRequest currentTestRunRequest;
+        private ConcurrentDictionary<int, ITestRunRequest> testRunRequests = new ConcurrentDictionary<int, ITestRunRequest>();
 
         /// <summary>
         /// Maintains the current active discovery request.
-        /// Assumption: There can only be one active discovery request.
         /// </summary>
-        private IDiscoveryRequest currentDiscoveryRequest;
+        private ConcurrentDictionary<int, IDiscoveryRequest> discoveryRequests = new ConcurrentDictionary<int, IDiscoveryRequest>();
 
         /// <summary>
         /// Maintains the current active test run attachments processing cancellation token source.
         /// Assumption: There can only be one active attachments processing request.
         /// </summary>
+        //TODO: !
         private CancellationTokenSource currentAttachmentsProcessingCancellationTokenSource;
 
         #region Constructor
@@ -209,45 +212,48 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     ?? testCaseFilterFromRunsettings
             };
 
-            // Make sure to run the run request inside a lock as the below section is not thread-safe.
-            // There can be only one discovery or execution request at a given point in time.
-            lock (this.syncObject)
+
+            // Grab an id so we can have a simple way of referring back to the request
+            // if it fails and we end up in finally.
+            var id = Interlocked.Increment(ref this.discoveryId);
+            try
             {
-                try
+                EqtTrace.Info("TestRequestManager.DiscoverTests: Synchronization context taken");
+                var discoveryRequest = this.testPlatform.CreateDiscoveryRequest(
+                    requestData,
+                    criteria,
+                    discoveryPayload.TestPlatformOptions);
+                if (!this.discoveryRequests.TryAdd(id, discoveryRequest))
                 {
-                    EqtTrace.Info("TestRequestManager.DiscoverTests: Synchronization context taken");
-
-                    this.currentDiscoveryRequest = this.testPlatform.CreateDiscoveryRequest(
-                        requestData,
-                        criteria,
-                        discoveryPayload.TestPlatformOptions);
-                    discoveryEventsRegistrar?.RegisterDiscoveryEvents(this.currentDiscoveryRequest);
-
-                    // Notify start of discovery start.
-                    this.testPlatformEventSource.DiscoveryRequestStart();
-
-                    // Start the discovery of tests and wait for completion.
-                    this.currentDiscoveryRequest.DiscoverAsync();
-                    this.currentDiscoveryRequest.WaitForCompletion();
+                    // This should never happen because we atomically increment the id, but let's have it in case I am wrong.
+                    throw new InvalidOperationException($"Discovery request with id '{id}' already exists.");
                 }
-                finally
+
+                discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
+
+                // Notify start of discovery start.
+                this.testPlatformEventSource.DiscoveryRequestStart();
+
+                // Start the discovery of tests and wait for completion.
+                discoveryRequest.DiscoverAsync();
+                discoveryRequest.WaitForCompletion();
+            }
+            finally
+            {
+                if (this.discoveryRequests.TryRemove(id, out var discoveryRequest))
                 {
-                    if (this.currentDiscoveryRequest != null)
-                    {
-                        // Dispose the discovery request and unregister for events.
-                        discoveryEventsRegistrar?.UnregisterDiscoveryEvents(currentDiscoveryRequest);
-                        this.currentDiscoveryRequest.Dispose();
-                        this.currentDiscoveryRequest = null;
-                    }
-
-                    EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
-                    this.testPlatformEventSource.DiscoveryRequestStop();
-
-                    // Posts the discovery complete event.
-                    this.metricsPublisher.Result.PublishMetrics(
-                        TelemetryDataConstants.TestDiscoveryCompleteEvent,
-                        requestData.MetricsCollection.Metrics);
+                    // Dispose the discovery request and unregister for events.
+                    discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
+                    discoveryRequest.Dispose();
                 }
+
+                EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
+                this.testPlatformEventSource.DiscoveryRequestStop();
+
+                // Posts the discovery complete event.
+                this.metricsPublisher.Result.PublishMetrics(
+                    TelemetryDataConstants.TestDiscoveryCompleteEvent,
+                    requestData.MetricsCollection.Metrics);
             }
         }
 
@@ -355,6 +361,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                       && testRunRequestPayload.DebuggingEnabled);
             }
 
+            runCriteria.TestRunId = testRunRequestPayload.TestRunId;
+
             // Run tests.
             try
             {
@@ -363,7 +371,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     runCriteria,
                     testRunEventsRegistrar,
                     testRunRequestPayload.TestPlatformOptions);
-                EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
+                 EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
             }
             finally
             {
@@ -518,22 +526,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <inheritdoc />
         public void CancelTestRun()
         {
-            EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
-            this.currentTestRunRequest?.CancelAsync();
+            EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request to all run requests.");
+            var requests = this.testRunRequests?.ToList();
+            foreach (var request in requests)
+            {
+                EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request to run {0}.", request.Key);
+                request.Value?.CancelAsync();
+            }
         }
 
         /// <inheritdoc />
         public void CancelDiscovery()
         {
-            EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
-            this.currentDiscoveryRequest?.Abort();
+            EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request all discovery requests.");
+            var requests = this.discoveryRequests?.ToList();
+            foreach (var request in requests)
+            {
+                EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request to discovery {0}.", request.Key);
+                request.Value?.Abort();
+            }
         }
 
         /// <inheritdoc />
         public void AbortTestRun()
         {
-            EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
-            this.currentTestRunRequest?.Abort();
+            EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request to all run requests.");
+            var requests = this.testRunRequests?.ToList();
+            foreach (var request in requests)
+            {
+                EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request to run {0}.", request.Key);
+                request.Value?.Abort();
+            }
         }
 
         /// <inheritdoc/>
@@ -889,46 +912,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             ITestRunEventsRegistrar testRunEventsRegistrar,
             TestPlatformOptions options)
         {
-            // Make sure to run the run request inside a lock as the below section is not thread-safe.
-            // TranslationLayer can process faster as it directly gets the raw un-serialized messages
-            // whereas below logic needs to deserialize and do some cleanup.
-            // While this section is cleaning up, TranslationLayer can trigger run causing multiple
-            // threads to run the below section at the same time.
-            lock (this.syncObject)
+            var id = Interlocked.Increment(ref runId);
+            try
             {
-                try
+                var runRequest = this.testPlatform.CreateTestRunRequest(
+                    requestData,
+                    testRunCriteria,
+                    options);
+
+                if (!this.testRunRequests.TryAdd(id, runRequest))
                 {
-                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(
-                        requestData,
-                        testRunCriteria,
-                        options);
-
-                    this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
-                    testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
-
-                    this.testPlatformEventSource.ExecutionRequestStart();
-
-                    this.currentTestRunRequest.ExecuteAsync();
-
-                    // Wait for the run completion event
-                    this.currentTestRunRequest.WaitForCompletion();
+                    // This should never happen because we atomically increment the id, but let's have it in case I am wrong.
+                    throw new InvalidOperationException($"Discovery request with id '{id}' already exists.");
                 }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
-                    testRunResultAggregator.MarkTestRunFailed();
-                    throw;
-                }
-                finally
-                {
-                    if (this.currentTestRunRequest != null)
-                    {
-                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
-                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 
-                        this.currentTestRunRequest.Dispose();
-                        this.currentTestRunRequest = null;
-                    }
+                this.testRunResultAggregator.RegisterTestRunEvents(runRequest);
+                testRunEventsRegistrar?.RegisterTestRunEvents(runRequest);
+
+                this.testPlatformEventSource.ExecutionRequestStart();
+
+                runRequest.ExecuteAsync();
+
+                // Wait for the run completion event
+                runRequest.WaitForCompletion();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
+                testRunResultAggregator.MarkTestRunFailed();
+                throw;
+            }
+            finally
+            {
+                if (this.testRunRequests.TryRemove(id, out var runRequest))
+                {
+                    this.testRunResultAggregator.UnregisterTestRunEvents(runRequest);
+                    testRunEventsRegistrar?.UnregisterTestRunEvents(runRequest);
+
+                    runRequest.Dispose();
                 }
             }
         }

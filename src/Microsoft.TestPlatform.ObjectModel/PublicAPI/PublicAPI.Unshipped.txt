@@ -8,3 +8,10 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunRequestPayload.Tes
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunRequestPayload.TestRunId.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunId.get -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.BaseTestRunCriteria.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.BaseTestRunCriteria.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestRunMessageEventArgs.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestRunMessageEventArgs.TestRunId.set -> void

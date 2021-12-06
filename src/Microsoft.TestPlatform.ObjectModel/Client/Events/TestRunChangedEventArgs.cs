@@ -48,6 +48,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Gets or sets TestRunId.
         /// </summary>
         [DataMember]
-        internal string TestRunId { get; private set; }
+        public string TestRunId { get; private set; }
     }
 }

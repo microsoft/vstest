@@ -828,6 +828,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         [DataMember]
         public TimeSpan RunStatsChangeEventTimeout { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the TestRunId
+        /// </summary>
+        [DataMember]
+        public string TestRunId { get; set; }
+
         protected bool Equals(BaseTestRunCriteria other)
         {
             return this.KeepAlive == other.KeepAlive

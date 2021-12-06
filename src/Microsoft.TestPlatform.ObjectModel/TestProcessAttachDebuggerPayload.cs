@@ -26,6 +26,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public int ProcessID { get; set; }
 
-        internal string TestRunId { get; set; }
+        /// <summary>
+        /// Gets or Sets the TestRunId.
+        /// </summary>
+        [DataMember]
+        public string TestRunId { get; set; }
     }
 }
