@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -16,15 +17,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
     internal class MetadataReaderExtensionsHelper
     {
-        private static string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
-        private static Type[] EmptyTypeArray = new Type[0];
+        private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
+        private static readonly ConcurrentDictionary<string, Assembly> assemblyCache = new ConcurrentDictionary<string, Assembly>();
+        private static readonly Type[] emptyTypeArray = new Type[0];
 
         public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
         {
             EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{loadedAssembly.FullName}' file path '{assemblyFilePath}'");
 
 #if !NETSTANDARD1_3
-            Assembly assemblyToAnalyze = Assembly.Load(File.ReadAllBytes(assemblyFilePath));
+            // Cache assembly, in VS scenario vstest.console is not unloaded so we don't want to load same asm more times.
+            Assembly assemblyToAnalyze = assemblyCache.GetOrAdd(assemblyFilePath, Assembly.Load(File.ReadAllBytes(assemblyFilePath)));
 #else 
             Assembly assemblyToAnalyze = loadedAssembly;
 #endif
@@ -144,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 }
             }
 
-            return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? EmptyTypeArray;
+            return extensions?.OrderByDescending(t => t.Item1).Select(t => t.Item2).ToArray() ?? emptyTypeArray;
         }
 
         private string FormatException(Exception ex)
