@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -40,7 +41,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private readonly ITestPlatformEventSource testPlatformEventSource;
 
         private readonly ManualResetEvent handShakeComplete = new ManualResetEvent(false);
-
+        private readonly ConcurrentDictionary<string, ITestSessionEventsHandler> sessionEventHandlers = new ConcurrentDictionary<string, ITestSessionEventsHandler>();
+        private readonly ConcurrentDictionary<string, ITestRunEventsHandler> testRunEventHandlers = new ConcurrentDictionary<string, ITestRunEventsHandler>();
+        private readonly ConcurrentDictionary<string, ITestHostLauncher> customHostLaunchers = new ConcurrentDictionary<string, ITestHostLauncher>();
+        private readonly ConcurrentDictionary<string, ITestDiscoveryEventsHandler2> testRunDiscoveryHandlers = new ConcurrentDictionary<string, ITestDiscoveryEventsHandler2>();
         private bool handShakeSuccessful = false;
 
         private int protocolVersion = 5;
@@ -484,6 +488,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestPlatformOptions = options
                 };
 
+                var id = Id.Next().ToString();
+
+                payload.TestRunId = id;
+
+                if (!this.sessionEventHandlers.TryAdd(id, eventsHandler))
+                {
+                    throw new InvalidOperationException($"Adding session hancler under unique id {id} did not succeed, this should never happen.");
+                }
+
+                if (!this.customHostLaunchers.TryAdd(id, testHostLauncher))
+                {
+                    throw new InvalidOperationException($"Adding launcher under unique id {id} did not succeed, this should never happen.");
+                }
+
                 this.communicationManager.SendMessage(
                     MessageType.StartTestSession,
                     payload,
@@ -498,22 +516,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         case MessageType.StartTestSessionCallback:
                             var ackPayload = this.dataSerializer
                                 .DeserializePayload<StartTestSessionAckPayload>(message);
-                            eventsHandler?.HandleStartTestSessionComplete(
+                            var handler = this.sessionEventHandlers[id];
+                            handler?.HandleStartTestSessionComplete(
                                 ackPayload.TestSessionInfo);
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(testHostLauncher, message);
+                            this.HandleCustomHostLaunch(message);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(testHostLauncher, message);
+                            this.AttachDebuggerToProcess(message);
                             break;
 
                         case MessageType.TestMessage:
                             var testMessagePayload = this.dataSerializer
                                 .DeserializePayload<TestMessagePayload>(message);
-                            eventsHandler?.HandleLogMessage(
+                            var handler2 = this.sessionEventHandlers[id];
+                            handler2?.HandleLogMessage(
                                 testMessagePayload.MessageLevel,
                                 testMessagePayload.Message);
                             break;
@@ -606,11 +626,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(testHostLauncher, message);
+                            this.HandleCustomHostLaunch(message);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(testHostLauncher, message);
+                            this.AttachDebuggerToProcess(message);
                             break;
 
                         case MessageType.TestMessage:
@@ -981,8 +1001,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
+            var id = Id.Next().ToString();
+            if (!this.testRunDiscoveryHandlers.TryAdd(id, eventHandler))
+            {
+                throw new InvalidOperationException($"Adding handler under unique id {id} did not succeed, this should never happen.");
+            }
+
             try
             {
+
                 this.communicationManager.SendMessage(
                     MessageType.StartDiscovery,
                     new DiscoveryRequestPayload()
@@ -990,7 +1017,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         Sources = sources,
                         RunSettings = runSettings,
                         TestPlatformOptions = options,
-                        TestSessionInfo = testSessionInfo
+                        TestSessionInfo = testSessionInfo,
+                        TestRunId = id,
                     },
                     this.protocolVersion);
                 var isDiscoveryComplete = false;
@@ -1009,7 +1037,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         var testCases = this.dataSerializer
                             .DeserializePayload<IEnumerable<TestCase>>(message);
 
-                        eventHandler.HandleDiscoveredTests(testCases);
+                        //var handler = this.testRunDiscoveryHandlers[testCases.TestRunId];
+                        //handler.HandleDiscoveredTests(testCases);
                     }
                     else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                     {
@@ -1029,8 +1058,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         // Adding metrics from vstest.console.
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                        var handler = this.testRunDiscoveryHandlers[discoveryCompletePayload.TestRunId];
 
-                        eventHandler.HandleDiscoveryComplete(
+                        handler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
                             discoveryCompletePayload.LastDiscoveredTests);
                         isDiscoveryComplete = true;
@@ -1039,6 +1069,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         var testMessagePayload = this.dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
+                        var handler = this.testRunDiscoveryHandlers[testMessagePayload.TestRunId];
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -1159,12 +1190,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void SendMessageAndListenAndReportTestResults(
             string messageType,
-            object payload,
+            TestRunRequestPayload payload,
             ITestRunEventsHandler eventHandler,
             ITestHostLauncher customHostLauncher)
         {
             try
             {
+                var id = Id.Next().ToString();
+                if (!this.testRunEventHandlers.TryAdd(id, eventHandler))
+                {
+                    throw new InvalidOperationException($"Adding handler under unique id {id} did not succeed, this should never happen.");
+                }
+
+                if (!this.customHostLaunchers.TryAdd(id, customHostLauncher))
+                {
+                    throw new InvalidOperationException($"Adding launcher under unique id {id} did not succeed, this should never happen.");
+                }
+
+
+                payload.TestRunId = id;
                 this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
                 var isTestRunComplete = false;
 
@@ -1177,12 +1221,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     var message = this.TryReceiveMessage();
 
+
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
                         var testRunChangedArgs = this.dataSerializer
                             .DeserializePayload<TestRunChangedEventArgs>(
                             message);
-                        eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
+
+                        var handler = this.testRunEventHandlers[id];
+                        handler.HandleTestRunStatsChange(testRunChangedArgs);
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                     {
@@ -1194,8 +1241,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var testRunCompletePayload = this.dataSerializer
                             .DeserializePayload<TestRunCompletePayload>(message);
-
-                        eventHandler.HandleTestRunComplete(
+                        var handler = this.testRunEventHandlers[id];
+                        handler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
                             testRunCompletePayload.LastRunTests,
                             testRunCompletePayload.RunAttachments,
@@ -1206,17 +1253,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         var testMessagePayload = this.dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
-                        eventHandler.HandleLogMessage(
+                        var handler = this.testRunEventHandlers[id];
+                        handler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(customHostLauncher, message);
+                        this.HandleCustomHostLaunch(message);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(customHostLauncher, message);
+                        this.AttachDebuggerToProcess(message);
                     }
                 }
             }
@@ -1295,11 +1343,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(customHostLauncher, message);
+                        this.HandleCustomHostLaunch(message);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(customHostLauncher, message);
+                        this.AttachDebuggerToProcess(message);
                     }
                 }
             }
@@ -1452,7 +1500,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return message;
         }
 
-        private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
+        private void HandleCustomHostLaunch(Message message)
         {
             var ackPayload = new CustomHostLaunchAckPayload()
             {
@@ -1465,8 +1513,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 var testProcessStartInfo = this.dataSerializer
                     .DeserializePayload<TestProcessStartInfo>(message);
 
-                ackPayload.HostProcessId = customHostLauncher != null
-                    ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
+                var hostLauncher = this.customHostLaunchers[testProcessStartInfo.TestRunId];
+                ackPayload.HostProcessId = hostLauncher != null
+                    ? hostLauncher.LaunchTestHost(testProcessStartInfo)
                     : -1;
             }
             catch (Exception ex)
@@ -1489,7 +1538,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
         }
 
-        private void AttachDebuggerToProcess(ITestHostLauncher customHostLauncher, Message message)
+        private void AttachDebuggerToProcess(Message message)
         {
             var ackPayload = new EditorAttachDebuggerAckPayload()
             {
@@ -1501,6 +1550,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 var pid = this.dataSerializer.DeserializePayload<int>(message);
 
+                // TODO: we just grab first here, but need TestRunId, how do I figure this out?
+                var customHostLauncher = this.customHostLaunchers.First().Value;
                 ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
                 && launcher.AttachDebuggerToProcess(pid);
             }

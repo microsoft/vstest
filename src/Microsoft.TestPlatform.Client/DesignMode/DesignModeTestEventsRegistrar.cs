@@ -63,4 +63,53 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
         }
     }
+
+    internal class IdentifiableDesignModeTestEventsRegistrar : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar
+    {
+        private string testRunId;
+        private IDesignModeClient designModeClient;
+
+        public IdentifiableDesignModeTestEventsRegistrar(IDesignModeClient designModeClient, string testRunId)
+        {
+            this.testRunId = testRunId;
+            this.designModeClient = designModeClient;
+        }
+
+
+        public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
+        {
+            discoveryRequest.OnRawMessageReceived += OnRawMessageReceived;
+        }
+
+        public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
+        {
+            discoveryRequest.OnRawMessageReceived -= OnRawMessageReceived;
+        }
+
+        public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
+        {
+            testRunRequest.OnRawMessageReceived += OnRawMessageReceived;
+        }
+
+        public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
+        {
+            testRunRequest.OnRawMessageReceived -= OnRawMessageReceived;
+        }
+
+        /// <summary>
+        /// RawMessage received handler for getting rawmessages directly from the host
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="rawMessage">RawMessage from the testhost</param>
+        private void OnRawMessageReceived(object sender, string rawMessage)
+        {
+            // rawMessage = rawMessage.Replace($"\"{nameof(TestRunCompleteEventArgs.TestRunId)}\":null", $"\"{nameof(TestRunCompleteEventArgs.TestRunId)}\":{($"\"{this.testRunId}\"") ?? "null"}");
+            this.designModeClient.SendRawMessage(rawMessage);
+        }
+
+        public void LogWarning(string message)
+        {
+            this.designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
+        }
+    }
 }

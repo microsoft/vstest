@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             IFileHelper filehelper,
             TestRuntimeProviderManager testHostProviderManager)
         {
-            this.TestEngine = testEngine;
+             this.TestEngine = testEngine;
             this.fileHelper = filehelper;
             this.testHostProviderManager = testHostProviderManager;
         }

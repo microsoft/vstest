@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
@@ -1020,4 +1021,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return true;
         }
     }
+
+    internal static class Id
+    {
+        private static int _id;
+
+        public static int Next()
+        {
+            return Interlocked.Increment(ref _id);
+        }
+    }
+
 }

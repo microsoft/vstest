@@ -40,6 +40,8 @@ namespace TestPlatform.Playground
                 TraceLevel = TraceLevel.Verbose,
             };
 
+            EqtTrace.InitializeTrace(Path.Combine(here, "logs", "wrapper.log.txt"), PlatformTraceLevel.Verbose);
+
             var r = new VsTestConsoleWrapper(console, consoleOptions);
 
             var sourceSettings = @"
@@ -50,45 +52,71 @@ namespace TestPlatform.Playground
                 </RunSettings>
             ";
             var sources = new[] {
-                Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"),
-                Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll")
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472")),
+                // (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48")),
             };
 
             var tasks = new List<Task>();
-            foreach (var source in sources)
+            foreach (var (source, handler) in sources)
             {
                 var options = new TestPlatformOptions();
-                tasks.Add(  Task.Run(() =>  r.RunTestsWithCustomTestHost(sources, sourceSettings, options, new TestRunHandler(), new DebuggerTestHostLauncher())));
+                tasks.Add(Task.Run(() => r.RunTestsWithCustomTestHost(new[] { source }, sourceSettings, options, handler, new DebuggerTestHostLauncher())));
             }
 
             await Task.WhenAll(tasks);
+
+            var tasks2 = new List<Task>();
+            foreach (var (source, handler) in sources)
+            {
+                var options = new TestPlatformOptions();
+                tasks2.Add(Task.Run(() => r.DiscoverTests(new[] { source }, sourceSettings, options, handler)));
+            }
+
+            await Task.WhenAll(tasks2);
+            await Task.Delay(1000);
         }
 
-        public class TestRunHandler : ITestRunEventsHandler
+        public class TestRunHandler : ITestRunEventsHandler, ITestDiscoveryEventsHandler2
         {
+            private string _name;
 
-            public TestRunHandler()
+            public TestRunHandler(string name)
             {
+                _name = name;
+            }
+
+            public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+            {
+                Console.WriteLine($"{_name} [DISCOVERED]: {WriteTests(discoveredTestCases)}");
+            }
+
+            public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+            {
+                Console.WriteLine($"{_name} [DISCOVERED]: id: { discoveryCompleteEventArgs.TestRunId } {WriteTests(lastChunk)}");
             }
 
             public void HandleLogMessage(TestMessageLevel level, string message)
             {
-                Console.WriteLine($"[{level.ToString().ToUpper()}]: {message}");
+                Console.WriteLine($"{_name} [{level.ToString().ToUpper()}]: {message}");
+                if (level == TestMessageLevel.Error)
+                {
+
+                }
             }
 
             public void HandleRawMessage(string rawMessage)
             {
-                Console.WriteLine($"[MESSAGE]: { rawMessage}");
+                Console.WriteLine($"{_name} [MESSAGE]: { rawMessage}");
             }
 
             public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
             {
-                Console.WriteLine($"[COMPLETE]: id: { testRunCompleteArgs.TestRunId } err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+                Console.WriteLine($"{_name} [COMPLETE]: id: { testRunCompleteArgs.TestRunId } err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
             }
 
             public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
             {
-                Console.WriteLine($"[PROGRESS - NEW RESULTS]: id: { testRunChangedArgs.TestRunId } {WriteTests(testRunChangedArgs.NewTestResults)}");
+                Console.WriteLine($"{_name} [PROGRESS - NEW RESULTS]: id: { testRunChangedArgs.TestRunId } {WriteTests(testRunChangedArgs.NewTestResults)}");
             }
 
             public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
@@ -108,7 +136,7 @@ namespace TestPlatform.Playground
                     return null;
                 }
 
-                return "\t" + string.Join("\n\t", testCases.Select(r => r.DisplayName));
+                return "\t" + string.Join("\n\t", testCases.Select(r => $"{r.Source} - {r.DisplayName}"));
 
             }
         }

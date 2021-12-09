@@ -209,7 +209,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 discoveryPayload.TestSessionInfo)
             {
                 TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
-                    ?? testCaseFilterFromRunsettings
+                    ?? testCaseFilterFromRunsettings,
+                TestRunId = discoveryPayload.TestRunId,
             };
 
 

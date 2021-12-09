@@ -246,6 +246,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.WriteAndFlushToChannel(serializedObject);
         }
 
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public void SendMessage(string messageType, MessageMetadata metadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            var serializedObject = this.dataSerializer.SerializeMessage(messageType, metadata);
+            this.WriteAndFlushToChannel(serializedObject);
+        }
+
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public void SendMessage(string messageType, object payload, MessageMetadata metadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            var serializedObject = this.dataSerializer.SerializePayload(messageType, payload, metadata);
+            this.WriteAndFlushToChannel(serializedObject);
+        }
+
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public void SendRawMessage(string rawMessage, MessageMetadata metadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            var serializedObject = this.dataSerializer.SerializePayload("RawMessageWithMetadata", rawMessage, metadata);
+            this.WriteAndFlushToChannel(serializedObject);
+        }
+
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public T DeserializePayload<T>(Message message, out MessageMetadata metadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            return this.dataSerializer.DeserializePayload<T>(message, out metadata);
+        }
+
         /// <summary>
         ///  Writes message to the binary writer with payload
         /// </summary>
@@ -266,6 +297,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendMessage(string messageType, object payload, int version)
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload, version);
+            this.WriteAndFlushToChannel(rawMessage);
+        }
+
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public void SendMessage<T>(string messageType, T payload, MessageMetadata metadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload, metadata);
             this.WriteAndFlushToChannel(rawMessage);
         }
 

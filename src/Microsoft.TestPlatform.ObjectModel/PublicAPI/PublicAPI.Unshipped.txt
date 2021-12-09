@@ -15,3 +15,15 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessAttachDebuggerPayload
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs.TestRunId.get -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestRunMessageEventArgs.TestRunId.get -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestRunMessageEventArgs.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionAckPayload.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads.StartTestSessionPayload.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryRequestPayload.TestRunId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestRunId.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCriteria.TestRunId.set -> void

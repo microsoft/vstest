@@ -184,5 +184,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public TestSessionInfo TestSessionInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TestRunId.
+        /// </summary>
+        [DataMember]
+        public string TestRunId { get; set; }
+
     }
 }

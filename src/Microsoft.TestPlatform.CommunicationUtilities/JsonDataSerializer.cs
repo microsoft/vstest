@@ -89,6 +89,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <summary>
+        /// Deserialize the <see cref="Message.Payload"/> for a message.
+        /// </summary>
+        /// <param name="message">A <see cref="Message"/> object.</param>
+        /// <param name="messageMetadata">When message contains additional info, such as version, or destination. This object will hold it. Otherwise it will be MessageMetadata.Empty.</param>
+        /// <typeparam name="T">Payload type.</typeparam>
+        /// <returns>The deserialized payload.</returns>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public T DeserializePayload<T>(Message message, out MessageMetadata messageMetadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            var versionedMessage = message as VersionedMessage;
+            messageMetadata = versionedMessage != null ? new MessageMetadata(versionedMessage.Version, versionedMessage.Recipient) : MessageMetadata.Empty;
+            var payloadSerializer = this.GetPayloadSerializer(versionedMessage?.Version);
+            return this.Deserialize<T>(payloadSerializer, message.Payload);
+        }
+
+        /// <summary>
         /// Deserialize raw JSON to an object using the default serializer.
         /// </summary>
         /// <param name="json">JSON string.</param>
@@ -109,6 +126,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public string SerializeMessage(string messageType)
         {
             return this.Serialize(serializer, new Message { MessageType = messageType });
+        }
+
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public string SerializeMessage(string messageType, MessageMetadata metadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            return this.SerializePayload(messageType, null, metadata);
         }
 
         /// <summary>
@@ -136,6 +160,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             return version > 1 ?
                 this.Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                this.Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+        }
+
+        /// <summary>
+        /// Serialize a message with payload.
+        /// </summary>
+        /// <param name="messageType">Type of the message.</param>
+        /// <param name="payload">Payload for the message.</param>
+        /// <returns>Serialized message.</returns>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+#pragma warning disable SA1618 // Generic type parameters must be documented
+#pragma warning disable SA1611 // Element parameters must be documented
+        public string SerializePayload(string messageType, object payload, MessageMetadata metadata)
+#pragma warning restore SA1611 // Element parameters must be documented
+#pragma warning restore SA1618 // Generic type parameters must be documented
+#pragma warning restore RS0016 // Add public types and members to the declared API
+        {
+            var version = metadata.Version;
+            var payloadSerializer = this.GetPayloadSerializer(version);
+            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
+
+            return version > 1 ?
+                this.Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload, Recipient = metadata.Recipient }) :
                 this.Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
         }
 

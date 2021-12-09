@@ -67,6 +67,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendMessage(string messageType);
 
         /// <summary>
+        /// Writes message to the binary writer.
+        /// </summary>
+        /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
+        /// <param name="metadata">Additional metadata to attach to the message, that are be used to figure out how to deliver the message, such as version or the recepient.</param>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        void SendMessage(string messageType, MessageMetadata metadata);
+#pragma warning restore RS0016 // Add public types and members to the declared API
+
+        /// <summary>
         /// Reads message from the binary reader
         /// </summary>
         /// <returns>Returns message read from the binary reader</returns>
@@ -108,12 +117,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendMessage(string messageType, object payload);
 
         /// <summary>
-        ///  Writes message to the binary writer with payload
+        ///  Writes message to the binary writer with payload, and a version
         /// </summary>
         /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
         /// <param name="payload">payload to be sent</param>
         /// <param name="version">version to be sent</param>
         void SendMessage(string messageType, object payload, int version);
+
+        /// <summary>
+        ///  Writes message to the binary writer with payload, and a version
+        /// </summary>
+        /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
+        /// <param name="payload">payload to be sent</param>
+        /// <param name="metadata">Additional metadata to attach to the message, that are be used to figure out how to deliver the message, such as version or the recepient.</param>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+#pragma warning disable SA1618 // Generic type parameters must be documented
+        void SendMessage<T>(string messageType, T payload, MessageMetadata metadata);
+#pragma warning restore SA1618 // Generic type parameters must be documented
+#pragma warning restore RS0016 // Add public types and members to the declared API
 
         /// <summary>
         /// Send serialized raw message
@@ -122,11 +143,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendRawMessage(string rawMessage);
 
         /// <summary>
+        /// Send serialized raw message
+        /// </summary>
+        /// <param name="rawMessage">serialized message</param>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+#pragma warning disable SA1611 // Element parameters must be documented
+        void SendRawMessage(string rawMessage, MessageMetadata metadata);
+#pragma warning restore SA1611 // Element parameters must be documented
+#pragma warning restore RS0016 // Add public types and members to the declared API
+
+        /// <summary>
         /// Deserializes the Message into actual TestPlatform objects
         /// </summary>
         /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
         /// <param name="message"> Message object </param>
         /// <returns> TestPlatform object </returns>
         T DeserializePayload<T>(Message message);
+
+        /// <summary>
+        /// Deserializes the Message into actual TestPlatform objects
+        /// </summary>
+        /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
+        /// <param name="message"> Message object </param>
+        /// <returns> TestPlatform object </returns>
+#pragma warning disable SA1611 // Element parameters must be documented
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        T DeserializePayload<T>(Message message, out MessageMetadata metadata);
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#pragma warning restore SA1611 // Element parameters must be documented
     }
 }

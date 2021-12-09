@@ -27,6 +27,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+    public interface IRequestId
+#pragma warning restore RS0016 // Add public types and members to the declared API
+    {
+#pragma warning disable CS3008 // Identifier is not CLS-compliant
+#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        string ___requestId { get; }
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#pragma warning restore IDE1006 // Naming Styles
+#pragma warning restore CS3008 // Identifier is not CLS-compliant
+    }
+
+    /// <summary>
     /// Extensions for <see cref="IRequest"/>.
     /// </summary>
     public static class RequestExtensions

@@ -13,5 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Gets or sets the version of the message
         /// </summary>
         public int Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets an id of the consumer this message is meant for.
+        /// </summary>
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        public string Recipient { get; set; }
+#pragma warning restore RS0016 // Add public types and members to the declared API
     }
 }

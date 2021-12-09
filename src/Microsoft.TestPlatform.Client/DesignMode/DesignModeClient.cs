@@ -434,7 +434,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     try
                     {
-                        testRunPayload.TestRunId = Id.Next().ToString();
                         testRequestManager.ResetOptions();
 
                         // We must avoid re-launching the test host if the test run payload already
@@ -447,7 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                     testRunPayload.DebuggingEnabled)
                                 : null;
 
-                        testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                        testRequestManager.RunTests(testRunPayload, customLauncher, new IdentifiableDesignModeTestEventsRegistrar(this, testRunPayload.TestRunId), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
@@ -476,7 +475,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     try
                     {
                         testRequestManager.ResetOptions();
-                        testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                        testRequestManager.DiscoverTests(discoveryRequestPayload, new IdentifiableDesignModeTestEventsRegistrar(this, discoveryRequestPayload.TestRunId), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
@@ -596,15 +595,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Dispose(true);
         }
         #endregion
-
-        private static class Id
-        {
-            private static int _id;
-
-            public static int Next()
-            {
-                return Interlocked.Increment(ref _id);
-            }
-        }
     }
 }
