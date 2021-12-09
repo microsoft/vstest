@@ -13,14 +13,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
     internal class MetadataReaderExtensionsHelper
     {
         private static string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";
         private static Type[] EmptyTypeArray = new Type[0];
 
-        public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly assembly, string assemblyFilePath)
+        public Type[] DiscoverTestExtensionTypesV2Attribute(Assembly loadedAssembly, string assemblyFilePath)
         {
-            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{assembly.FullName}' file path '{assemblyFilePath}'");
+            EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Discovering extensions inside assembly '{loadedAssembly.FullName}' file path '{assemblyFilePath}'");
+
+#if !NETSTANDARD1_3
+            Assembly assemblyToAnalyze = Assembly.Load(File.ReadAllBytes(assemblyFilePath));
+#else 
+            Assembly assemblyToAnalyze = loadedAssembly;
+#endif
 
             List<Tuple<int, Type>> extensions = null;
             using (var stream = new FileStream(assemblyFilePath, FileMode.Open, FileAccess.Read))
@@ -112,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                                 int version = valueReader.ReadInt32();
                                 try
                                 {
-                                    var extensionType = assembly.GetType(extensionImplementation);
+                                    var extensionType = assemblyToAnalyze.GetType(extensionImplementation);
                                     if (extensionType is null)
                                     {
                                         EqtTrace.Verbose($"MetadataReaderExtensionsHelper: Unable to get extension type for '{extensionImplementation}'");
