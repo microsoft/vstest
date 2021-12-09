@@ -210,7 +210,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
                     ?? testCaseFilterFromRunsettings,
-                TestRunId = discoveryPayload.TestRunId,
             };
 
 
@@ -361,8 +360,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   debugEnabledForTestSession: testRunRequestPayload.TestSessionInfo != null
                                       && testRunRequestPayload.DebuggingEnabled);
             }
-
-            runCriteria.TestRunId = testRunRequestPayload.TestRunId;
 
             // Run tests.
             try

@@ -16,8 +16,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads
         /// </summary>
         [DataMember]
         public TestSessionInfo TestSessionInfo { get; set; }
-
-        [DataMember]
-        public string TestRunId { get; set; }
     }
 }

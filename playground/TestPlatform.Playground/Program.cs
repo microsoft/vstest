@@ -53,7 +53,7 @@ namespace TestPlatform.Playground
             ";
             var sources = new[] {
                 (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472")),
-                // (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48")),
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48")),
             };
 
             var tasks = new List<Task>();
@@ -68,7 +68,7 @@ namespace TestPlatform.Playground
             var tasks2 = new List<Task>();
             foreach (var (source, handler) in sources)
             {
-                var options = new TestPlatformOptions();
+                var options = new TestPlatformOptions { };
                 tasks2.Add(Task.Run(() => r.DiscoverTests(new[] { source }, sourceSettings, options, handler)));
             }
 
@@ -92,7 +92,7 @@ namespace TestPlatform.Playground
 
             public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
             {
-                Console.WriteLine($"{_name} [DISCOVERED]: id: { discoveryCompleteEventArgs.TestRunId } {WriteTests(lastChunk)}");
+                Console.WriteLine($"{_name} [DISCOVERED]: {WriteTests(lastChunk)}");
             }
 
             public void HandleLogMessage(TestMessageLevel level, string message)
@@ -111,12 +111,12 @@ namespace TestPlatform.Playground
 
             public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
             {
-                Console.WriteLine($"{_name} [COMPLETE]: id: { testRunCompleteArgs.TestRunId } err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+                Console.WriteLine($"{_name} [COMPLETE]: err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
             }
 
             public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
             {
-                Console.WriteLine($"{_name} [PROGRESS - NEW RESULTS]: id: { testRunChangedArgs.TestRunId } {WriteTests(testRunChangedArgs.NewTestResults)}");
+                Console.WriteLine($"{_name} [PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
             }
 
             public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)

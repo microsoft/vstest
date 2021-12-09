@@ -52,13 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         /// </summary>
         [DataMember]
         public TestMessageLevel Level { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the TestRunId.
-        /// </summary>
-        [DataMember]
-        
-        public string TestRunId { get; set; }
         #endregion
     }
 }

@@ -119,7 +119,6 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunica
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.SendMessage(string messageType) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.SendMessage(string messageType, object payload) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.SendMessage(string messageType, object payload, int version) -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.SendRawMessage(string rawMessage) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.SetupClientAsync(System.Net.IPEndPoint endpoint) -> System.Threading.Tasks.Task
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.StopClient() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.StopServer() -> void
@@ -295,7 +294,6 @@ Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationMa
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.SendMessage(string messageType) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.SendMessage(string messageType, object payload) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.SendMessage(string messageType, object payload, int version) -> void
-Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.SendRawMessage(string rawMessage) -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.SetupClientAsync(System.Net.IPEndPoint endpoint) -> System.Threading.Tasks.Task
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.SocketCommunicationManager() -> void
 Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.SocketCommunicationManager.StopClient() -> void

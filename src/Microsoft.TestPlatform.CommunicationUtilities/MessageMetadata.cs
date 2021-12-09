@@ -16,7 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public string Recipient { get; }
 
-        internal static MessageMetadata Empty { get; } = new MessageMetadata(0, null);
+#pragma warning disable SA1204 // Static elements must appear before instance elements
+        public static MessageMetadata Empty { get; } = new MessageMetadata(0, null);
+#pragma warning restore SA1204 // Static elements must appear before instance elements
     }
 #pragma warning restore RS0016 // Add public types and members to the declared API
 }

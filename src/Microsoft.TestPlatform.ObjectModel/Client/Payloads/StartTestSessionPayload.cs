@@ -41,11 +41,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads
         /// </summary>
         [DataMember]
         public TestPlatformOptions TestPlatformOptions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the TestRunId.
-        /// </summary>
-        [DataMember]
-        public string TestRunId { get; set; }
     }
 }

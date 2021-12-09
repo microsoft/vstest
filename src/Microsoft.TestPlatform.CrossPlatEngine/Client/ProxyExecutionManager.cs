@@ -212,8 +212,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         testCaseFilter: testRunCriteria.TestCaseFilter,
                         filterOptions: testRunCriteria.FilterOptions);
 
-                    executionContext.TestRunId = testRunCriteria.TestRunId;
-
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                     var runsettings = this.proxyOperationManager.RemoveNodesFromRunsettingsIfRequired(
                         testRunCriteria.TestRunSettings,

@@ -181,9 +181,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var payloadSerializer = this.GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
-            return version > 1 ?
-                this.Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload, Recipient = metadata.Recipient }) :
-                this.Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+            if (version <= 1)
+            {
+                throw new InvalidOperationException("Message with metadata must carry version and can't be returned using Protocol version 1.");
+            }
+
+            return this.Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload, Recipient = metadata.Recipient });
         }
 
         /// <summary>

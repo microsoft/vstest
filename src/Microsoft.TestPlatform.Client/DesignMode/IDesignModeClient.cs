@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -45,13 +46,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// Send the raw messages to IDE
         /// </summary>
         /// <param name="rawMessage"></param>
-        void SendRawMessage(string rawMessage);
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        void SendRawMessage(string rawMessage, MessageMetadata messageMetadata);
+#pragma warning restore RS0016 // Add public types and members to the declared API
 
         /// <summary>
         /// Send the test session messages to IDE
         /// </summary>
         /// <param name="level">Level for the message</param>
         /// <param name="message">Actual message string</param>
-        void SendTestMessage(TestMessageLevel level, string message);
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        void SendTestMessage(TestMessageLevel level, string message, MessageMetadata messageMetadata);
+#pragma warning restore RS0016 // Add public types and members to the declared API
     }
 }

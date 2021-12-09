@@ -74,8 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             testCaseFilter: testRunCriteria.TestCaseFilter,
                             filterOptions: testRunCriteria.FilterOptions);
 
-                executionContext.TestRunId = testRunCriteria.TestRunId;
-
                 // Initialize extension before execution
                 this.InitializeExtensions(testPackages);
 

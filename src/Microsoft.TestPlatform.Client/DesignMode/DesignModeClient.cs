@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     using CommunicationUtilitiesResources = CommunicationUtilities.Resources.Resources;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// The design mode client.
@@ -170,29 +171,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.ExtensionsInitialize:
                             {
                                 // Do not filter the Editor/IDE provided extensions by name
-                                var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
+                                var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
                                 testRequestManager.InitializeExtensions(extensionPaths, skipExtensionFilters: true);
                                 break;
                             }
 
                         case MessageType.StartTestSession:
                             {
-                                var testSessionPayload = this.communicationManager.DeserializePayload<StartTestSessionPayload>(message);
+                                var testSessionPayload = this.communicationManager.DeserializePayload<StartTestSessionPayload>(message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
                                 this.StartTestSession(testSessionPayload, testRequestManager);
                                 break;
                             }
 
                         case MessageType.StopTestSession:
                             {
-                                var testSessionInfo = this.communicationManager.DeserializePayload<TestSessionInfo>(message);
+                                var testSessionInfo = this.communicationManager.DeserializePayload<TestSessionInfo>(message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
                                 this.StopTestSession(testSessionInfo);
                                 break;
                             }
 
                         case MessageType.StartDiscovery:
                             {
-                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
-                                this.StartDiscovery(discoveryPayload, testRequestManager);
+                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
+                                this.StartDiscovery(discoveryPayload, testRequestManager, metadata.Recipient);
                                 break;
                             }
 
@@ -201,8 +206,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             {
                                 var testRunPayload =
                                     this.communicationManager.DeserializePayload<TestRunRequestPayload>(
-                                        message);
-                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true);
+                                        message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
+                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: true, metadata.Recipient);
                                 break;
                             }
 
@@ -211,15 +217,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             {
                                 var testRunPayload =
                                     this.communicationManager.DeserializePayload<TestRunRequestPayload>(
-                                        message);
-                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false);
+                                        message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
+                                this.StartTestRun(testRunPayload, testRequestManager, shouldLaunchTesthost: false, metadata.Recipient);
                                 break;
                             }
 
                         case MessageType.TestRunAttachmentsProcessingStart:
                             {
                                 var testRunAttachmentsProcessingPayload =
-                                    this.communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message);
+                                    this.communicationManager.DeserializePayload<TestRunAttachmentsProcessingPayload>(message, out var metadata);
+                                var hasMetadata = metadata != MessageMetadata.Empty;
                                 this.StartTestRunAttachmentsProcessing(testRunAttachmentsProcessingPayload, testRequestManager);
                                 break;
                             }
@@ -377,16 +385,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// Send the raw messages to IDE
         /// </summary>
         /// <param name="rawMessage"></param>
-        public void SendRawMessage(string rawMessage)
+        public void SendRawMessage(string rawMessage, MessageMetadata messageMetadata)
         {
-            this.communicationManager.SendRawMessage(rawMessage);
+            this.communicationManager.SendRawMessage(rawMessage, messageMetadata);
         }
 
         /// <inheritdoc />
-        public void SendTestMessage(TestMessageLevel level, string message)
+        public void SendTestMessage(TestMessageLevel level, string message, MessageMetadata messageMetadata)
         {
             var payload = new TestMessagePayload { MessageLevel = level, Message = message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+            this.communicationManager.SendMessage(MessageType.TestMessage, payload, messageMetadata);
         }
 
         /// <summary>
@@ -407,18 +415,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             {
                 case TestMessageLevel.Error:
                     EqtTrace.Error(e.Message);
-                    SendTestMessage(e.Level, e.Message);
+                    SendTestMessage(e.Level, e.Message, MessageMetadata.Empty);
                     break;
                 case TestMessageLevel.Warning:
                     EqtTrace.Warning(e.Message);
-                    SendTestMessage(e.Level, e.Message);
+                    SendTestMessage(e.Level, e.Message, MessageMetadata.Empty);
                     break;
 
                 case TestMessageLevel.Informational:
                     EqtTrace.Info(e.Message);
 
                     if (EqtTrace.IsInfoEnabled)
-                        SendTestMessage(e.Level, e.Message);
+                        SendTestMessage(e.Level, e.Message, MessageMetadata.Empty);
                     break;
 
                
@@ -427,7 +435,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             }
         }
 
-        private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool shouldLaunchTesthost)
+        private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool shouldLaunchTesthost, string recipient)
         {
             Task.Run(
                 () =>
@@ -446,28 +454,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                     testRunPayload.DebuggingEnabled)
                                 : null;
 
-                        testRequestManager.RunTests(testRunPayload, customLauncher, new IdentifiableDesignModeTestEventsRegistrar(this, testRunPayload.TestRunId), this.protocolConfig);
+                        testRequestManager.RunTests(testRunPayload, customLauncher, new IdentifiableDesignModeTestEventsRegistrar(this, recipient), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                        var metadata = new MessageMetadata(this.protocolConfig.Version, recipient);
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, metadata);
                         var runCompletePayload = new TestRunCompletePayload()
                         {
                             TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
                             LastRunTests = null
                         };
-                        runCompletePayload.TestRunCompleteArgs.TestRunId = testRunPayload.TestRunId;
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+                        this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload, metadata);
                     }
                 });
         }
 
-        private void StartDiscovery(DiscoveryRequestPayload discoveryRequestPayload, ITestRequestManager testRequestManager)
+        private void StartDiscovery(DiscoveryRequestPayload discoveryRequestPayload, ITestRequestManager testRequestManager, string recipient)
         {
             Task.Run(
                 () =>
@@ -475,14 +483,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     try
                     {
                         testRequestManager.ResetOptions();
-                        testRequestManager.DiscoverTests(discoveryRequestPayload, new IdentifiableDesignModeTestEventsRegistrar(this, discoveryRequestPayload.TestRunId), this.protocolConfig);
+                        testRequestManager.DiscoverTests(discoveryRequestPayload, new IdentifiableDesignModeTestEventsRegistrar(this, recipient), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
 
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
-                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, new MessageMetadata(this.protocolConfig.Version, recipient));
 
                         var payload = new DiscoveryCompletePayload()
                         {
@@ -492,7 +500,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         };
 
                         // Send run complete to translation layer
-                        this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
+                        this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload, new MessageMetadata(this.protocolConfig.Version, recipient));
                     }
                 });
         }

@@ -75,11 +75,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public IDictionary<string, object> Metrics { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the TestRunId
-        /// </summary>
-        [DataMember]
-        public string TestRunId { get; set; }
     }
 }

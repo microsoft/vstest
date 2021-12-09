@@ -490,8 +490,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 var id = Id.Next().ToString();
 
-                payload.TestRunId = id;
-
                 if (!this.sessionEventHandlers.TryAdd(id, eventsHandler))
                 {
                     throw new InvalidOperationException($"Adding session hancler under unique id {id} did not succeed, this should never happen.");
@@ -1001,10 +999,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             TestSessionInfo testSessionInfo,
             ITestDiscoveryEventsHandler2 eventHandler)
         {
-            var id = Id.Next().ToString();
-            if (!this.testRunDiscoveryHandlers.TryAdd(id, eventHandler))
+            var sender = Id.Next().ToString();
+            if (!this.testRunDiscoveryHandlers.TryAdd(sender, eventHandler))
             {
-                throw new InvalidOperationException($"Adding handler under unique id {id} did not succeed, this should never happen.");
+                throw new InvalidOperationException($"Adding handler under unique id {sender} did not succeed, this should never happen.");
             }
 
             try
@@ -1018,9 +1016,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         RunSettings = runSettings,
                         TestPlatformOptions = options,
                         TestSessionInfo = testSessionInfo,
-                        TestRunId = id,
                     },
-                    this.protocolVersion);
+                    new MessageMetadata(this.protocolVersion, sender));
                 var isDiscoveryComplete = false;
 
                 // Cycle through the messages that vstest.console sends.
@@ -1031,6 +1028,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 while (!isDiscoveryComplete)
                 {
                     var message = this.TryReceiveMessage();
+
+                    var versionedMessage = message as VersionedMessage;
+                    // we are forwarding messages to this server, when we do that we don't know the content of the message
+                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
+                    // then into one more message that has the metadata.
+                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
+                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                    {
+                        // the original message is replaced with the wrapped message
+                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
+                    }
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
@@ -1050,7 +1058,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var discoveryCompletePayload =
                             this.dataSerializer
-                                .DeserializePayload<DiscoveryCompletePayload>(message);
+                                .DeserializePayload<DiscoveryCompletePayload>(message, out var metadata);
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                             discoveryCompletePayload.TotalTests,
@@ -1058,7 +1066,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         // Adding metrics from vstest.console.
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
-                        var handler = this.testRunDiscoveryHandlers[discoveryCompletePayload.TestRunId];
+                        var handler = this.testRunDiscoveryHandlers[metadata.Recipient ?? recipient];
 
                         handler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
@@ -1068,8 +1076,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
                         var testMessagePayload = this.dataSerializer
-                            .DeserializePayload<TestMessagePayload>(message);
-                        var handler = this.testRunDiscoveryHandlers[testMessagePayload.TestRunId];
+                            .DeserializePayload<TestMessagePayload>(message, out var metadata);
+                        var handler = this.testRunDiscoveryHandlers[metadata.Recipient ?? recipient];
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -1196,20 +1204,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                var id = Id.Next().ToString();
-                if (!this.testRunEventHandlers.TryAdd(id, eventHandler))
+                var sender = Id.Next().ToString();
+                if (!this.testRunEventHandlers.TryAdd(sender, eventHandler))
                 {
-                    throw new InvalidOperationException($"Adding handler under unique id {id} did not succeed, this should never happen.");
+                    throw new InvalidOperationException($"Adding handler under unique id {sender} did not succeed, this should never happen.");
                 }
 
-                if (!this.customHostLaunchers.TryAdd(id, customHostLauncher))
+                if (!this.customHostLaunchers.TryAdd(sender, customHostLauncher))
                 {
-                    throw new InvalidOperationException($"Adding launcher under unique id {id} did not succeed, this should never happen.");
+                    throw new InvalidOperationException($"Adding launcher under unique id {sender} did not succeed, this should never happen.");
                 }
 
-
-                payload.TestRunId = id;
-                this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
+                this.communicationManager.SendMessage(messageType, payload, new MessageMetadata(this.protocolVersion, sender));
                 var isTestRunComplete = false;
 
                 // Cycle through the messages that vstest.console sends.
@@ -1220,7 +1226,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 while (!isTestRunComplete)
                 {
                     var message = this.TryReceiveMessage();
-
+                    var versionedMessage = message as VersionedMessage;
+                    // we are forwarding messages to this server, when we do that we don't know the content of the message
+                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
+                    // then into one more message that has the metadata.
+                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
+                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                    {
+                        // the original message is replaced with the wrapped message
+                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
+                    }
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -1228,7 +1243,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             .DeserializePayload<TestRunChangedEventArgs>(
                             message);
 
-                        var handler = this.testRunEventHandlers[id];
+                        var handler = this.testRunEventHandlers[recipient];
                         handler.HandleTestRunStatsChange(testRunChangedArgs);
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
@@ -1241,7 +1256,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var testRunCompletePayload = this.dataSerializer
                             .DeserializePayload<TestRunCompletePayload>(message);
-                        var handler = this.testRunEventHandlers[id];
+                        var handler = this.testRunEventHandlers[recipient];
                         handler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
                             testRunCompletePayload.LastRunTests,
@@ -1253,7 +1268,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         var testMessagePayload = this.dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
-                        var handler = this.testRunEventHandlers[id];
+                        var handler = this.testRunEventHandlers[recipient];
                         handler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -1451,7 +1466,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
                 eventHandler.HandleLogMessage(
                     TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestRunAttachmentsProcessing);               
+                    TranslationLayerResources.AbortedTestRunAttachmentsProcessing);
                 eventHandler.HandleTestRunAttachmentsProcessingComplete(
                     new TestRunAttachmentsProcessingCompleteEventArgs(false, exception),
                     null);
@@ -1471,7 +1486,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private Message TryReceiveMessage()
         {
-            Message message = null;
+            Message message;
             var receiverMessageTask = this.communicationManager.ReceiveMessageAsync(
                 this.processExitCancellationTokenSource.Token);
             receiverMessageTask.Wait();
@@ -1511,9 +1526,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             try
             {
                 var testProcessStartInfo = this.dataSerializer
-                    .DeserializePayload<TestProcessStartInfo>(message);
+                    .DeserializePayload<TestProcessStartInfo>(message, out var metadata);
 
-                var hostLauncher = this.customHostLaunchers[testProcessStartInfo.TestRunId];
+                var hostLauncher = this.customHostLaunchers[metadata.Recipient];
                 ackPayload.HostProcessId = hostLauncher != null
                     ? hostLauncher.LaunchTestHost(testProcessStartInfo)
                     : -1;

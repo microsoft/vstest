@@ -7,24 +7,13 @@ Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.HandlePar
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.LaunchCustomHost(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo testProcessStartInfo, System.Threading.CancellationToken cancellationToken) -> int
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.onAttachDebuggerAckRecieved -> System.Action<Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message>
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.onCustomTestHostLaunchAckReceived -> System.Action<Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Message>
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.SendRawMessage(string rawMessage) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.SendTestMessage(Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel level, string message) -> void
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.TestRunMessageHandler(object sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestRunMessageEventArgs e) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar.DesignModeTestEventsRegistrar(Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient designModeClient) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar.LogWarning(string message) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar.RegisterDiscoveryEvents(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest discoveryRequest) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar.RegisterTestRunEvents(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunRequest testRunRequest) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar.UnregisterDiscoveryEvents(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IDiscoveryRequest discoveryRequest) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestEventsRegistrar.UnregisterTestRunEvents(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunRequest testRunRequest) -> void
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestHostLauncherFactory
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient.AttachDebuggerToProcess(int pid, System.Threading.CancellationToken cancellationToken) -> bool
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient.ConnectToClientAndProcessRequests(int port, Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager testRequestManager) -> void
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient.HandleParentProcessExit() -> void
 Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient.LaunchCustomHost(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProcessStartInfo defaultTestHostStartInfo, System.Threading.CancellationToken cancellationToken) -> int
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient.SendRawMessage(string rawMessage) -> void
-Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient.SendTestMessage(Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestMessageLevel level, string message) -> void
 Microsoft.VisualStudio.TestPlatform.Client.Discovery.DiscoveryRequest
 Microsoft.VisualStudio.TestPlatform.Client.Discovery.DiscoveryRequest.Abort() -> void
 Microsoft.VisualStudio.TestPlatform.Client.Discovery.DiscoveryRequest.DiscoverAsync() -> void
