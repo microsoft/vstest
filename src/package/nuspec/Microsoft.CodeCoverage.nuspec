@@ -67,11 +67,11 @@
     
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\libCoverageInstrumentationMethod.so"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\libCoverageInstrumentationMethod.so" />
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\libInstrumentationEngine.so"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\libInstrumentationEngine.so" />
-    <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\ProductionBreakpoints_x64.config"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\ProductionBreakpoints_x64.config" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\ubuntu\x64\VanguardInstrumentationProfiler_x64.config"	target="build\netstandard1.0\InstrumentationEngine\ubuntu\x64\VanguardInstrumentationProfiler_x64.config" />
 
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\libCoverageInstrumentationMethod.so"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\libCoverageInstrumentationMethod.so" />
     <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\libInstrumentationEngine.so"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\libInstrumentationEngine.so" />
-    <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\ProductionBreakpoints_x64.config"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\ProductionBreakpoints_x64.config" />
+    <file src="Microsoft.CodeCoverage\InstrumentationEngine\alpine\x64\VanguardInstrumentationProfiler_x64.config"	target="build\netstandard1.0\InstrumentationEngine\alpine\x64\VanguardInstrumentationProfiler_x64.config" />
 
     <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp1.0\" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net45\" />
