@@ -52,47 +52,61 @@ namespace TestPlatform.Playground
                 </RunSettings>
             ";
             var sources = new[] {
-                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472")),
-                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48")),
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472"), new DebuggerTestHostLauncher("net472")),
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48"), new DebuggerTestHostLauncher("net48")),
             };
 
             var tasks = new List<Task>();
-            foreach (var (source, handler) in sources)
+            foreach (var (source, handler, launcher) in sources)
             {
                 var options = new TestPlatformOptions();
-                tasks.Add(Task.Run(() => r.RunTestsWithCustomTestHost(new[] { source }, sourceSettings, options, handler, new DebuggerTestHostLauncher())));
+                tasks.Add(Task.Run(() => r.RunTestsWithCustomTestHost(new[] { source }, sourceSettings, options, handler, launcher)));
             }
 
             await Task.WhenAll(tasks);
 
             var tasks2 = new List<Task>();
-            foreach (var (source, handler) in sources)
+            foreach (var (source, handler, launcher) in sources)
             {
                 var options = new TestPlatformOptions { };
-                tasks2.Add(Task.Run(() => r.DiscoverTests(new[] { source }, sourceSettings, options, handler)));
+                tasks2.Add(Task.Run(() =>
+                {
+                    r.DiscoverTests(new[] { source }, sourceSettings, options, handler);
+                    r.RunTestsWithCustomTestHost(handler.DiscoveredTests, sourceSettings, options, handler, launcher);
+                }));
             }
 
             await Task.WhenAll(tasks2);
+
             await Task.Delay(1000);
         }
 
-        public class TestRunHandler : ITestRunEventsHandler, ITestDiscoveryEventsHandler2
+        public class TestRunHandler : ITestRunEventsHandler2, ITestDiscoveryEventsHandler2
         {
             private string _name;
+            public List<TestCase> DiscoveredTests = new List<TestCase>();
 
             public TestRunHandler(string name)
             {
                 _name = name;
             }
 
+            public bool AttachDebuggerToProcess(int pid)
+            {
+                Console.WriteLine($"{_name} [ATTACH DEBUGGER]");
+                return false;
+            }
+
             public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
             {
                 Console.WriteLine($"{_name} [DISCOVERED]: {WriteTests(discoveredTestCases)}");
+                DiscoveredTests.AddRange(discoveredTestCases);
             }
 
             public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
             {
                 Console.WriteLine($"{_name} [DISCOVERED]: {WriteTests(lastChunk)}");
+                DiscoveredTests.AddRange(lastChunk ?? new List<TestCase>());
             }
 
             public void HandleLogMessage(TestMessageLevel level, string message)
@@ -121,6 +135,7 @@ namespace TestPlatform.Playground
 
             public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
             {
+                Console.WriteLine($"{_name} [LAUNCH WITH DEBUGGER]");
                 throw new NotImplementedException();
             }
 
@@ -143,25 +158,37 @@ namespace TestPlatform.Playground
 
         internal class DebuggerTestHostLauncher : ITestHostLauncher2
         {
+            private string _name;
+
+            public DebuggerTestHostLauncher(string name)
+            {
+                this._name = name;
+            }
+
             public bool IsDebug => true;
 
             public bool AttachDebuggerToProcess(int pid)
             {
+                Console.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
                 return true;
             }
 
             public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
             {
+                Console.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
+                var process = Process.GetProcessById(pid);
                 return true;
             }
 
             public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
             {
+                Console.WriteLine($"{_name} [LAUNCH TESTHOST] for {defaultTestHostStartInfo.FileName } { defaultTestHostStartInfo.Arguments }");
                 return 1;
             }
 
             public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
             {
+                Console.WriteLine($"{_name} [LAUNCH TESTHOST] for {defaultTestHostStartInfo.FileName } { defaultTestHostStartInfo.Arguments }");
                 return 1;
             }
         }
