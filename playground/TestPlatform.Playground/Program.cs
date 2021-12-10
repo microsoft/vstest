@@ -72,7 +72,8 @@ namespace TestPlatform.Playground
                 tasks2.Add(Task.Run(() =>
                 {
                     r.DiscoverTests(new[] { source }, sourceSettings, options, handler);
-                    r.RunTestsWithCustomTestHost(handler.DiscoveredTests, sourceSettings, options, handler, launcher);
+                    var tests = handler.DiscoveredTests;
+                    r.RunTestsWithCustomTestHost(tests, sourceSettings, options, handler, launcher);
                 }));
             }
 
@@ -176,7 +177,6 @@ namespace TestPlatform.Playground
             public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
             {
                 Console.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
-                var process = Process.GetProcessById(pid);
                 return true;
             }
 

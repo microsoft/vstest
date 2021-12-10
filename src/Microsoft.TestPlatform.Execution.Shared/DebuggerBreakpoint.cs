@@ -76,7 +76,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Execution
             {
                 throw new InvalidOperationException($"Cannot start tool, path {vsAttachPath} does not exist.");
             }
-            var attachVsProcess = Process.Start(vsAttachPath, $"{process.Id} {vsPid}");
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = vsAttachPath,
+                Arguments = $"{process.Id} {vsPid}",
+                CreateNoWindow = true, 
+                UseShellExecute = false,
+            };
+            var attachVsProcess = Process.Start(startInfo);
             attachVsProcess.WaitForExit();
 
             return attachVsProcess.ExitCode == 0;

@@ -508,6 +508,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 while (true)
                 {
                     var message = this.TryReceiveMessage();
+                    var versionedMessage = message as VersionedMessage;
+                    // we are forwarding messages to this server, when we do that we don't know the content of the message
+                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
+                    // then into one more message that has the metadata.
+                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
+                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                    {
+                        // the original message is replaced with the wrapped message
+                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
+                    }
 
                     switch (message.MessageType)
                     {
@@ -520,11 +530,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(message);
+                            this.HandleCustomHostLaunch(message, recipient);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(message);
+                            this.AttachDebuggerToProcess(message, recipient);
                             break;
 
                         case MessageType.TestMessage:
@@ -613,6 +623,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 while (true)
                 {
                     var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    var versionedMessage = message as VersionedMessage;
+                    // we are forwarding messages to this server, when we do that we don't know the content of the message
+                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
+                    // then into one more message that has the metadata.
+                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
+                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                    {
+                        // the original message is replaced with the wrapped message
+                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
+                    }
 
                     switch (message.MessageType)
                     {
@@ -624,11 +644,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(message);
+                            this.HandleCustomHostLaunch(message, recipient);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(message);
+                            this.AttachDebuggerToProcess(message, recipient);
                             break;
 
                         case MessageType.TestMessage:
@@ -1275,11 +1295,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(message);
+                        this.HandleCustomHostLaunch(message, recipient);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(message);
+                        this.AttachDebuggerToProcess(message, recipient);
                     }
                 }
             }
@@ -1322,7 +1342,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = await this.TryReceiveMessageAsync().ConfigureAwait(false);
+                    var message = await this.TryReceiveMessageAsync();
+                    var versionedMessage = message as VersionedMessage;
+                    // we are forwarding messages to this server, when we do that we don't know the content of the message
+                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
+                    // then into one more message that has the metadata.
+                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
+                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                    {
+                        // the original message is replaced with the wrapped message
+                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
+                    }
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -1358,11 +1388,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(message);
+                        this.HandleCustomHostLaunch(message, recipient);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(message);
+                        this.AttachDebuggerToProcess(message, recipient);
                     }
                 }
             }
@@ -1515,7 +1545,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return message;
         }
 
-        private void HandleCustomHostLaunch(Message message)
+        private void HandleCustomHostLaunch(Message message, string recipient)
         {
             var ackPayload = new CustomHostLaunchAckPayload()
             {
@@ -1526,9 +1556,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             try
             {
                 var testProcessStartInfo = this.dataSerializer
-                    .DeserializePayload<TestProcessStartInfo>(message, out var metadata);
+                    .DeserializePayload<TestProcessStartInfo>(message);
 
-                var hostLauncher = this.customHostLaunchers[metadata.Recipient];
+                var hostLauncher = this.customHostLaunchers[recipient];
                 ackPayload.HostProcessId = hostLauncher != null
                     ? hostLauncher.LaunchTestHost(testProcessStartInfo)
                     : -1;
@@ -1553,7 +1583,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
         }
 
-        private void AttachDebuggerToProcess(Message message)
+        private void AttachDebuggerToProcess(Message message, string recipient)
         {
             var ackPayload = new EditorAttachDebuggerAckPayload()
             {
@@ -1565,8 +1595,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 var pid = this.dataSerializer.DeserializePayload<int>(message);
 
-                // TODO: we just grab first here, but need TestRunId, how do I figure this out?
-                var customHostLauncher = this.customHostLaunchers.First().Value;
+                var customHostLauncher = this.customHostLaunchers[recipient];
                 ackPayload.Attached = customHostLauncher is ITestHostLauncher2 launcher
                 && launcher.AttachDebuggerToProcess(pid);
             }
