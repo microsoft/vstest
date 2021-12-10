@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             {
                                 var testSessionPayload = this.communicationManager.DeserializePayload<StartTestSessionPayload>(message, out var metadata);
                                 var hasMetadata = metadata != MessageMetadata.Empty;
-                                this.StartTestSession(testSessionPayload, testRequestManager);
+                                this.StartTestSession(testSessionPayload, testRequestManager, metadata.Recipient);
                                 break;
                             }
 
@@ -343,8 +343,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             }
         }
 
+
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
+        {
+            return AttachDebuggerToProcess(pid, null, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public bool AttachDebuggerToProcess(int pid, string recipient, CancellationToken cancellationToken)
         {
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
@@ -364,7 +371,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     waitHandle.Set();
                 };
 
-                this.communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid);
+                this.communicationManager.SendMessage(MessageType.EditorAttachDebugger, pid, new MessageMetadata (this.protocolConfig.Version, recipient));
 
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
@@ -447,11 +454,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         // We must avoid re-launching the test host if the test run payload already
                         // contains test session info. Test session info being present is an indicative
                         // of an already running test host spawned by a start test session call.
+
+                        // REVIEW - this is caching the launcher, so we can get different recipient cached, but we want this to be unique per run, so we can call back to the correct launcher
                         var customLauncher =
                             shouldLaunchTesthost && testRunPayload.TestSessionInfo == null
                                 ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(
                                     this,
-                                    testRunPayload.DebuggingEnabled)
+                                    testRunPayload.DebuggingEnabled, recipient)
                                 : null;
 
                         testRequestManager.RunTests(testRunPayload, customLauncher, new IdentifiableDesignModeTestEventsRegistrar(this, recipient), this.protocolConfig);
@@ -532,7 +541,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 });
         }
 
-        private void StartTestSession(StartTestSessionPayload payload, ITestRequestManager requestManager)
+        private void StartTestSession(StartTestSessionPayload payload, ITestRequestManager requestManager, string recipient)
         {
             Task.Run(() =>
             {
@@ -541,7 +550,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 try
                 {
                     var customLauncher = payload.HasCustomHostLauncher
-                        ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.IsDebuggingEnabled)
+                        ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, payload.IsDebuggingEnabled, recipient)
                         : null;
 
                     requestManager.ResetOptions();

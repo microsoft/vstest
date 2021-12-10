@@ -73,6 +73,11 @@ namespace TestPlatform.Playground
                 {
                     r.DiscoverTests(new[] { source }, sourceSettings, options, handler);
                     var tests = handler.DiscoveredTests;
+                    if (!tests.Any())
+                    {
+                        // REview: the second discovery can get cancelled to early. This is task that will probably be solved by fixing the cancellation in the translation layer sender and how it receives messages.
+                        // or maybe it calls cancel when it is done, and everything is just cancelled.
+                    }
                     r.RunTestsWithCustomTestHost(tests, sourceSettings, options, handler, launcher);
                 }));
             }

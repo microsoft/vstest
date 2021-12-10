@@ -70,7 +70,6 @@ Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing.TestRunA
 Microsoft.VisualStudio.TestPlatform.Client.TestRunAttachmentsProcessing.TestRunAttachmentsProcessingEventsHandler.TestRunAttachmentsProcessingEventsHandler(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager communicationManager) -> void
 static Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.Initialize() -> void
 static Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.Instance.get -> Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient
-static Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(Microsoft.VisualStudio.TestPlatform.Client.DesignMode.IDesignModeClient designModeClient, bool debuggingEnabled) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces.ITestHostLauncher
 static Microsoft.VisualStudio.TestPlatform.Client.TestPlatformFactory.GetTestPlatform() -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform
 virtual Microsoft.VisualStudio.TestPlatform.Client.DesignMode.DesignModeClient.Dispose(bool disposing) -> void
 virtual Microsoft.VisualStudio.TestPlatform.Client.Execution.TestRunRequest.HandleTestRunStatsChange(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs testRunChangedArgs) -> void

@@ -13,14 +13,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     internal class DesignModeTestHostLauncher : ITestHostLauncher2
     {
         private readonly IDesignModeClient designModeClient;
+        private readonly string recipient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeTestHostLauncher"/> class.
         /// </summary>
         /// <param name="designModeClient">Design mode client instance.</param>
-        public DesignModeTestHostLauncher(IDesignModeClient designModeClient)
+        public DesignModeTestHostLauncher(IDesignModeClient designModeClient, string recipient)
         {
             this.designModeClient = designModeClient;
+            this.recipient = recipient;
         }
 
         /// <inheritdoc/>
@@ -29,13 +31,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid)
         {
-            return this.designModeClient.AttachDebuggerToProcess(pid, CancellationToken.None);
+            return this.designModeClient.AttachDebuggerToProcess(pid, this.recipient, CancellationToken.None);
         }
 
         /// <inheritdoc/>
         public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
         {
-            return this.designModeClient.AttachDebuggerToProcess(pid, cancellationToken);
+            return this.designModeClient.AttachDebuggerToProcess(pid, this.recipient, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -57,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     internal class DesignModeDebugTestHostLauncher : DesignModeTestHostLauncher
     {
         /// <inheritdoc/>
-        public DesignModeDebugTestHostLauncher(IDesignModeClient designModeClient) : base(designModeClient)
+        public DesignModeDebugTestHostLauncher(IDesignModeClient designModeClient, string recipient) : base(designModeClient, recipient)
         {
         }
 
