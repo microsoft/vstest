@@ -196,6 +196,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 EqtTrace.Warning("TestPluginDiscoverer: Failed to get types from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
 
+                if (e.Types?.Length > 0)
+                {
+                    types.AddRange(e.Types.Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
+                }
+
                 if (e.LoaderExceptions != null)
                 {
                     foreach (var ex in e.LoaderExceptions)

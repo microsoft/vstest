@@ -15,6 +15,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+    /* Expected attriute shape
+
+        namespace Microsoft.VisualStudio.TestPlatform
+        {
+            using System;
+
+            [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = true)]
+            internal sealed class TestExtensionTypesV2Attribute : Attribute
+            {
+                public string ExtensionType { get; }
+                public string ExtensionIdentifier { get; }
+                public Type ExtensionImplementation { get; }
+                public int Version { get; }
+
+                public TestExtensionTypesV2Attribute(string extensionType, string extensionIdentifier, Type extensionImplementation, int version)
+                {
+                    ExtensionType = extensionType;
+                    ExtensionIdentifier = extensionIdentifier;
+                    ExtensionImplementation = extensionImplementation;
+                    Version = version;
+                }
+            }
+        }
+
+    */
     internal class MetadataReaderExtensionsHelper
     {
         private const string TestExtensionTypesAttributeV2 = "Microsoft.VisualStudio.TestPlatform.TestExtensionTypesV2Attribute";

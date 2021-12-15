@@ -65,18 +65,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="extensionAssemblyFilePath">
         /// File path that contains data collectors to load.
         /// </param>
+        /// <param name="skipCache">
+        /// Skip the extensions cache.
+        /// </param>
         /// <param name="messageLogger">
         /// The message Logger.
         /// </param>
         /// <returns>
         /// The DataCollectorExtensionManager.
         /// </returns>
-        public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, IMessageLogger messageLogger)
+        public static DataCollectorExtensionManager Create(string extensionAssemblyFilePath, bool skipCache, IMessageLogger messageLogger)
         {
             TestPluginManager.Instance.GetTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
                 extensionAssemblyFilePath,
                 out var unfilteredTestExtensions,
-                out var filteredTestExtensions);
+                out var filteredTestExtensions,
+                skipCache);
 
             return new DataCollectorExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }

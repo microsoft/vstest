@@ -330,6 +330,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="extensionAssembly">
         /// The extension assembly.
         /// </param>
+        /// <param name="skipCache">
+        /// Skip the extensions cache.
+        /// </param>
         /// <typeparam name="TPluginInfo">
         /// Type of Test plugin info.
         /// </typeparam>
@@ -339,28 +342,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <returns>
         /// The <see cref="Dictionary"/>.
         /// </returns>
-        internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
+        internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly, bool skipCache = false) where TPluginInfo : TestPluginInformation
         {
-            // Check if extensions from this assembly have already been discovered.
-            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
-                this.TestExtensions.GetTestExtensionCache<TPluginInfo>(),
-                extensionAssembly);
-
-            if (extensions != null && extensions.Count > 0)
+            if (skipCache)
             {
-                return extensions;
+                return this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
             }
-
-            var pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
-
-            // Add extensions discovered to the cache.
-            if (this.TestExtensions == null)
+            else
             {
-                this.TestExtensions = new TestExtensions();
-            }
+                // Check if extensions from this assembly have already been discovered.
+                var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(
+                    this.TestExtensions.GetTestExtensionCache<TPluginInfo>(),
+                    extensionAssembly);
 
-            this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
-            return pluginInfos;
+                if (extensions != null && extensions.Count > 0)
+                {
+                    return extensions;
+                }
+
+                var pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
+
+                // Add extensions discovered to the cache.
+                if (this.TestExtensions == null)
+                {
+                    this.TestExtensions = new TestExtensions();
+                }
+
+                this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+                return pluginInfos;
+            }
         }
 
         /// <summary>
@@ -491,9 +501,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 this.SetupAssemblyResolver(extensionPath);
             }
 
-            var discoverer = new TestPluginDiscoverer();
-
-            return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
+            return new TestPluginDiscoverer().GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
         }
 
         protected void SetupAssemblyResolver(string extensionAssembly)

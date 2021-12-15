@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             IDictionary<string, Tuple<string, IConfigurableDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IConfigurableDataCollectorAttachmentProcessor>>();
             bool addCodeCoverageAttachmentProcessors = true;
 
-            if (invokedDataCollectors != null)
+            if (invokedDataCollectors?.Length > 0)
             {
                 // We order files by filename descending so in case of the same collector from the same nuget but with different versions, we'll run the newer version.
                 // i.e. C:\Users\xxx\.nuget\packages\coverlet.collector
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         continue;
                     }
 
-                    var dataCollectorExtensionManager = DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, TestSessionMessageLogger.Instance);
+                    var dataCollectorExtensionManager = DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance);
                     var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
                     if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
                     {
