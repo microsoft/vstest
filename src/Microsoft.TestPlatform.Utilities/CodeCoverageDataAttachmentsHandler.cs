@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-    public class CodeCoverageDataAttachmentsHandler : IConfigurableDataCollectorAttachmentProcessor
+    public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProcessor
     {
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
         private const string CoverageFileExtension = ".coverage";

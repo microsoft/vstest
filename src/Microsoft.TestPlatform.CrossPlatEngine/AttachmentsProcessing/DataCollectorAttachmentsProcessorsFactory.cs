@@ -19,9 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
         private const string CoverageFriendlyName = "Code Coverage";
         private static ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new ConcurrentDictionary<string, DataCollectorExtensionManager>();
 
-        public IReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors)
+        public IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors)
         {
-            IDictionary<string, Tuple<string, IConfigurableDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IConfigurableDataCollectorAttachmentProcessor>>();
+            IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
             bool addCodeCoverageAttachmentProcessors = true;
 
             if (invokedDataCollectors?.Length > 0)
@@ -47,10 +47,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                     if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
                     {
                         Type attachmentProcessorType = ((DataCollectorConfig)dataCollectorExtension.TestPluginInfo).AttachmentsProcessorType;
-                        IConfigurableDataCollectorAttachmentProcessor dataCollectorAttachmentProcessorInstance = null;
+                        IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessorInstance = null;
                         try
                         {
-                            dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IConfigurableDataCollectorAttachmentProcessor>(attachmentProcessorType);
+                            dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
                         }
                         catch (Exception ex)
                         {
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
 
                         if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
                         {
-                            datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IConfigurableDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
+                            datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
 
                             // If we found inside an extension the CodeCoverage attachment processor we use it(the most up to date) and we won't add the default one inside TP.
                             if (invokedDataCollector.Uri.AbsoluteUri == CoverageUri.AbsoluteUri)
@@ -76,19 +76,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                 }
             }
 
+            // TODO: we can add it always as last processor...in case of error of newer one at least this one will run
             if (addCodeCoverageAttachmentProcessors)
             {
-                datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IConfigurableDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
+                datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
             }
 
-            var finalDatacollectorsAttachmentsProcessors = new Dictionary<string, IConfigurableDataCollectorAttachmentProcessor>();
+            var finalDatacollectorsAttachmentsProcessors = new Dictionary<string, IDataCollectorAttachmentProcessor>();
             foreach (var attachementProcessor in datacollectorsAttachmentsProcessors)
             {
                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: valid data collector attachment processor found: '{attachementProcessor.Value.Item2.GetType().AssemblyQualifiedName}'");
                 finalDatacollectorsAttachmentsProcessors.Add(attachementProcessor.Value.Item1, attachementProcessor.Value.Item2);
             }
 
-            return new ReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor>(finalDatacollectorsAttachmentsProcessors);
+            return new ReadOnlyDictionary<string, IDataCollectorAttachmentProcessor>(finalDatacollectorsAttachmentsProcessors);
         }
     }
 }

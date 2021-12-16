@@ -104,9 +104,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
             var logger = CreateMessageLogger(eventsHandler);
-            IReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor> dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray());
+            IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray());
             for (int i = 0; i < dataCollectorAttachmentsProcessors.Count; i++)
             {
+                // TODO: We don't want have all or nothing...if one fails we skip it
+                // Add units: first failing(second merge) and all failing(no change to attachments)
+
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors.ElementAt(i);
                 int attachmentsHandlerIndex = i + 1;
 

@@ -56,7 +56,7 @@ namespace AttachmentProcessorDataCollector
         }
     }
 
-    public class SampleDataCollectorAttachmentProcessor : IConfigurableDataCollectorAttachmentProcessor
+    public class SampleDataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
     {
         public bool SupportsIncrementalProcessing => true;
 
