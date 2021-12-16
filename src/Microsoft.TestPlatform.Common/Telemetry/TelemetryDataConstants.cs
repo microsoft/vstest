@@ -112,7 +112,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string NumberOfAttachmentsAfterProcessing = "VS.AttachmentsProcessing.FinalAttachmentsCount";
 
         public static string TimeTakenInSecForAttachmentsProcessing = "VS.AttachmentsProcessing.TotalTimeTakenInSec";
+
         public static string AttachmentsProcessingState = "VS.AttachmentsProcessing.State";
+
+        // *********************Data collectors****************************
+        public static string InvokedDataCollector = "VS.DataCollectors.InvokedDataCollector";
 
         // **************Events Name **********************************
         public static string TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession";

@@ -391,6 +391,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
             var invokedDataCollectors = this.dataCollectionManager.GetInvokedDataCollectors();
+            if (invokedDataCollectors != null && invokedDataCollectors.Count > 0)
+            {
+                foreach (var invokedDataCollector in invokedDataCollectors)
+                {
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollector, invokedDataCollector);
+                }
+            }
+
             var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, this.requestData.MetricsCollection.Metrics);
 
             // Dispose all datacollectors before sending attachments to vstest.console process.
