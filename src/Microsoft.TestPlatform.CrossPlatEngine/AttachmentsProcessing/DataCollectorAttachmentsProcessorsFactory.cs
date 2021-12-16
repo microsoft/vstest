@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
     {
         private static Uri CoverageUri = new Uri("datacollector://microsoft/CodeCoverage/2.0");
         private const string CoverageFriendlyName = "Code Coverage";
+        private static ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new ConcurrentDictionary<string, DataCollectorExtensionManager>();
 
         public IReadOnlyDictionary<string, IConfigurableDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors)
         {
@@ -39,7 +41,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         continue;
                     }
 
-                    var dataCollectorExtensionManager = DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance);
+                    // We cache extension locally by file path
+                    var dataCollectorExtensionManager = dataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
                     var dataCollectorExtension = dataCollectorExtensionManager.TryGetTestExtension(invokedDataCollector.Uri);
                     if (dataCollectorExtension?.Metadata.HasAttachmentProcessor == true)
                     {
@@ -58,6 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         {
                             datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IConfigurableDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
 
+                            // If we found inside an extension the CodeCoverage attachment processor we use it(the most up to date) and we won't add the default one inside TP.
                             if (invokedDataCollector.Uri.AbsoluteUri == CoverageUri.AbsoluteUri)
                             {
                                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Attachment data processor for data collector with friendly name '{CoverageFriendlyName}' found '{attachmentProcessorType.AssemblyQualifiedName}' inside '{invokedDataCollector.FilePath}'");
