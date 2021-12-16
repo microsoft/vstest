@@ -15,14 +15,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
 {
     internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
     {
-        private static Uri CoverageUri = new Uri("datacollector://microsoft/CodeCoverage/2.0");
         private const string CoverageFriendlyName = "Code Coverage";
         private static ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new ConcurrentDictionary<string, DataCollectorExtensionManager>();
 
         public IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors)
         {
             IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
-            bool addCodeCoverageAttachmentProcessors = true;
 
             if (invokedDataCollectors?.Length > 0)
             {
@@ -60,13 +58,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
                         {
                             datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
-
-                            // If we found inside an extension the CodeCoverage attachment processor we use it(the most up to date) and we won't add the default one inside TP.
-                            if (invokedDataCollector.Uri.AbsoluteUri == CoverageUri.AbsoluteUri)
-                            {
-                                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Attachment data processor for data collector with friendly name '{CoverageFriendlyName}' found '{attachmentProcessorType.AssemblyQualifiedName}' inside '{invokedDataCollector.FilePath}'");
-                                addCodeCoverageAttachmentProcessors = false;
-                            }
                         }
                     }
                     else
@@ -76,11 +67,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                 }
             }
 
-            // TODO: we can add it always as last processor...in case of error of newer one at least this one will run
-            if (addCodeCoverageAttachmentProcessors)
-            {
-                datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
-            }
+            // We provide the implementation of CodeCoverageDataAttachmentsHandler through nuget package, but in case of absent registration or if for some reason
+            // the attachment processor from package fails we fallback to the default implementation.
+            datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
 
             var finalDatacollectorsAttachmentsProcessors = new Dictionary<string, IDataCollectorAttachmentProcessor>();
             foreach (var attachementProcessor in datacollectorsAttachmentsProcessors)

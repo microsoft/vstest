@@ -689,6 +689,132 @@ $@"
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()));
         }
 
+        [TestMethod]
+        public async Task ProcessTestRunAttachmentsAsync_ShouldNotConsumeAttachmentsIfProcessorFails()
+        {
+            // arrange
+            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            {
+                new AttachmentSet(new Uri(uri1), "uri1_input_1")
+            };
+            inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file1", "Sample1"));
+            inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file2", "Sample2"));
+            inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file3", "Sample3"));
+
+
+            mockAttachmentHandler1.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri1) });
+            mockAttachmentHandler2.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri1) });
+
+            bool firstProcessorFailed = false;
+
+            mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
+            .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
+            {
+                try
+                {
+                    throw new Exception("Processor exception");
+                }
+                catch
+                {
+                    firstProcessorFailed = true;
+                    throw;
+                }
+            });
+
+            ICollection<AttachmentSet> output = new List<AttachmentSet>
+            {
+                new AttachmentSet(new Uri(uri1), "uri1_input_1")
+            };
+            output.Single().Attachments.Add(UriDataAttachment.CreateFrom("file4", "Merged"));
+
+            mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
+            .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
+            {
+                // assert
+                Assert.IsTrue(firstProcessorFailed);
+                Assert.AreEqual(1, i1.Count);
+                Assert.AreEqual(3, i1.Single().Attachments.Count);
+                for (int i = 0; i < i1.Single().Attachments.Count; i++)
+                {
+                    Assert.AreEqual(inputAttachments.Single().Attachments[i], i1.Single().Attachments[i]);
+                }
+
+                return Task.FromResult(output);
+            });
+
+            // act
+            await manager.ProcessTestRunAttachmentsAsync(null, mockRequestData.Object, inputAttachments, new List<InvokedDataCollector>(), mockEventsHandler.Object, cancellationTokenSource.Token);
+
+            // assert
+            mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once());
+            mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once());
+            VerifyCompleteEvent(false, false, output.ToArray());
+        }
+
+        [TestMethod]
+        public async Task ProcessTestRunAttachmentsAsync_ShouldNotConsumeAttachmentsIfAllProcessorsFail()
+        {
+            // arrange
+            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            {
+                new AttachmentSet(new Uri(uri1), "uri1_input_1")
+            };
+            inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file1", "Sample1"));
+            inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file2", "Sample2"));
+            inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file3", "Sample3"));
+
+
+            mockAttachmentHandler1.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri1) });
+            mockAttachmentHandler2.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri1) });
+
+            bool firstProcessorFailed = false;
+            mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
+            .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
+            {
+                try
+                {
+                    throw new Exception("Processor exception");
+                }
+                catch
+                {
+                    firstProcessorFailed = true;
+                    throw;
+                }
+            });
+
+            bool secondProcessorFailed = false;
+            mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
+            .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
+            {
+                try
+                {
+                    // assert
+                    Assert.IsTrue(firstProcessorFailed);
+                    Assert.AreEqual(1, i1.Count);
+                    Assert.AreEqual(3, i1.Single().Attachments.Count);
+                    for (int i = 0; i < i1.Single().Attachments.Count; i++)
+                    {
+                        Assert.AreEqual(inputAttachments.Single().Attachments[i], i1.Single().Attachments[i]);
+                    }
+                    throw new Exception("Processor exception");
+                }
+                catch
+                {
+                    secondProcessorFailed = true;
+                    throw;
+                }
+            });
+
+            // act
+            await manager.ProcessTestRunAttachmentsAsync(null, mockRequestData.Object, inputAttachments, new List<InvokedDataCollector>(), mockEventsHandler.Object, cancellationTokenSource.Token);
+
+            // assert
+            Assert.IsTrue(firstProcessorFailed && secondProcessorFailed);
+            mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once());
+            mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once());
+            VerifyCompleteEvent(false, false, inputAttachments.ToArray());
+        }
+
         private void VerifyMetrics(int inputCount, int outputCount, string status = "Completed")
         {
             mockEventSource.Verify(s => s.TestRunAttachmentsProcessingStart(inputCount));

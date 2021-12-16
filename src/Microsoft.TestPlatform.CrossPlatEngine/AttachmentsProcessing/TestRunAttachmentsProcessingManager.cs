@@ -107,50 +107,63 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray());
             for (int i = 0; i < dataCollectorAttachmentsProcessors.Count; i++)
             {
-                // TODO: We don't want have all or nothing...if one fails we skip it
-                // Add units: first failing(second merge) and all failing(no change to attachments)
-
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors.ElementAt(i);
                 int attachmentsHandlerIndex = i + 1;
 
-                ICollection<Uri> attachmentProcessorUris = dataCollectorAttachmentsProcessor.Value.GetExtensionUris()?.ToList();
-                if (attachmentProcessorUris != null && attachmentProcessorUris.Any())
+                // We run processor code inside a try/catch because we want to continue with the others in case of failure.
+                Collection<AttachmentSet> attachmentsBackup = null;
+                try
                 {
-                    var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachmentProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
-                    if (attachmentsToBeProcessed.Any())
+                    // We temporarily save the attachments to process because, in case of processor exception,
+                    // we'll restore the attachmentSets to make those available to other processors.
+                    attachmentsBackup = new Collection<AttachmentSet>(attachments.ToList());
+
+                    ICollection<Uri> attachmentProcessorUris = dataCollectorAttachmentsProcessor.Value.GetExtensionUris()?.ToList();
+                    if (attachmentProcessorUris != null && attachmentProcessorUris.Any())
                     {
-                        foreach (var attachment in attachmentsToBeProcessed)
+                        var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachmentProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
+                        if (attachmentsToBeProcessed.Any())
                         {
-                            attachments.Remove(attachment);
-                        }
-
-                        IProgress<int> progressReporter = new Progress<int>((int progress) =>
-                            eventsHandler?.HandleTestRunAttachmentsProcessingProgress(
-                                new TestRunAttachmentsProcessingProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Count)));
-
-                        XmlElement configuration = null;
-                        var collectorConfiguration = dataCollectionRunSettings?.DataCollectorSettingsList.SingleOrDefault(c => c.FriendlyName == dataCollectorAttachmentsProcessor.Key);
-                        if (collectorConfiguration != null && collectorConfiguration.IsEnabled)
-                        {
-                            configuration = collectorConfiguration.Configuration;
-                        }
-
-                        EqtTrace.Info($"TestRunAttachmentsProcessingManager: invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.Value.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
-                        ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.Value.ProcessAttachmentSetsAsync(
-                            configuration,
-                            new Collection<AttachmentSet>(attachmentsToBeProcessed),
-                            progressReporter,
-                            logger,
-                            cancellationToken).ConfigureAwait(false);
-
-                        if (processedAttachments != null && processedAttachments.Any())
-                        {
-                            foreach (var attachment in processedAttachments)
+                            foreach (var attachment in attachmentsToBeProcessed)
                             {
-                                attachments.Add(attachment);
+                                attachments.Remove(attachment);
+                            }
+
+                            IProgress<int> progressReporter = new Progress<int>((int progress) =>
+                                eventsHandler?.HandleTestRunAttachmentsProcessingProgress(
+                                    new TestRunAttachmentsProcessingProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Count)));
+
+                            XmlElement configuration = null;
+                            var collectorConfiguration = dataCollectionRunSettings?.DataCollectorSettingsList.SingleOrDefault(c => c.FriendlyName == dataCollectorAttachmentsProcessor.Key);
+                            if (collectorConfiguration != null && collectorConfiguration.IsEnabled)
+                            {
+                                configuration = collectorConfiguration.Configuration;
+                            }
+
+                            EqtTrace.Info($"TestRunAttachmentsProcessingManager: invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.Value.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
+                            ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.Value.ProcessAttachmentSetsAsync(
+                                configuration,
+                                new Collection<AttachmentSet>(attachmentsToBeProcessed),
+                                progressReporter,
+                                logger,
+                                cancellationToken).ConfigureAwait(false);
+
+                            if (processedAttachments != null && processedAttachments.Any())
+                            {
+                                foreach (var attachment in processedAttachments)
+                                {
+                                    attachments.Add(attachment);
+                                }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
+
+                    // Restore the attachment sets for the others attachment processors.
+                    attachments = attachmentsBackup;
                 }
             }
 
