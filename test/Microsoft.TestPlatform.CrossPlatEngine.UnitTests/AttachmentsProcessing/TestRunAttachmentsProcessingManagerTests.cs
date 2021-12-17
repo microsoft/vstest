@@ -52,11 +52,12 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
 
             mockAttachmentHandler1.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri1) });
             mockAttachmentHandler2.Setup(h => h.GetExtensionUris()).Returns(new[] { new Uri(uri2) });
-            mockDataCollectorAttachmentsProcessorsFactory.Setup(p => p.Create(It.IsAny<InvokedDataCollector[]>()))
-            .Returns(new ReadOnlyDictionary<string, IDataCollectorAttachmentProcessor>(new Dictionary<string, IDataCollectorAttachmentProcessor>()
+            mockDataCollectorAttachmentsProcessorsFactory.Setup(p => p.Create(It.IsAny<InvokedDataCollector[]>(), It.IsAny<IMessageLogger>()))
+            .Returns(new DataCollectorAttachmentProcessor[]
             {
-                { "friendlyNameA", mockAttachmentHandler1.Object } , { "friendlyNameB"  ,mockAttachmentHandler2.Object }
-            }));
+               new DataCollectorAttachmentProcessor( "friendlyNameA", mockAttachmentHandler1.Object ),
+               new DataCollectorAttachmentProcessor( "friendlyNameB"  ,mockAttachmentHandler2.Object )
+            });
 
             manager = new TestRunAttachmentsProcessingManager(mockEventSource.Object, mockDataCollectorAttachmentsProcessorsFactory.Object);
 
@@ -231,15 +232,15 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             await manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
-            VerifyCompleteEvent(false, true, inputAttachments[0]);
+            VerifyCompleteEvent(false, false, inputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>()), Times.Never);
-            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, "exception message"), Times.Once);
+            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, "exception message"), Times.Never);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUris());
-            mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Once);
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Failed");
+            VerifyMetrics(inputCount: 1, outputCount: 1);
         }
 
         [TestMethod]
@@ -260,11 +261,11 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result.Contains(inputAttachments[0]));
             mockAttachmentHandler1.Verify(h => h.GetExtensionUris());
-            mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Never);
+            mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Once);
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            VerifyMetrics(inputCount: 1, outputCount: 1, status: "Failed");
+            VerifyMetrics(inputCount: 1, outputCount: 1);
         }
 
         [TestMethod]

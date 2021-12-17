@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -16,9 +17,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
     internal class DataCollectorAttachmentsProcessorsFactory : IDataCollectorAttachmentsProcessorsFactory
     {
         private const string CoverageFriendlyName = "Code Coverage";
-        private static ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new ConcurrentDictionary<string, DataCollectorExtensionManager>();
+        private static readonly ConcurrentDictionary<string, DataCollectorExtensionManager> dataCollectorExtensionManagerCache = new ConcurrentDictionary<string, DataCollectorExtensionManager>();
 
-        public IReadOnlyDictionary<string, IDataCollectorAttachmentProcessor> Create(InvokedDataCollector[] invokedDataCollectors)
+        public DataCollectorAttachmentProcessor[] Create(InvokedDataCollector[] invokedDataCollectors, IMessageLogger logger)
         {
             IDictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>> datacollectorsAttachmentsProcessors = new Dictionary<string, Tuple<string, IDataCollectorAttachmentProcessor>>();
 
@@ -53,9 +54,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         catch (Exception ex)
                         {
                             EqtTrace.Error($"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
+                            logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
                         }
 
-                        if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
+                        if (dataCollectorAttachmentProcessorInstance != null)
                         {
                             datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
                         }
@@ -69,16 +71,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
 
             // We provide the implementation of CodeCoverageDataAttachmentsHandler through nuget package, but in case of absent registration or if for some reason
             // the attachment processor from package fails we fallback to the default implementation.
-            datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
+            if (!datacollectorsAttachmentsProcessors.ContainsKey(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName))
+            {
+                datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
+            }
 
-            var finalDatacollectorsAttachmentsProcessors = new Dictionary<string, IDataCollectorAttachmentProcessor>();
+            var finalDatacollectorsAttachmentsProcessors = new List<DataCollectorAttachmentProcessor>();
             foreach (var attachementProcessor in datacollectorsAttachmentsProcessors)
             {
                 EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: valid data collector attachment processor found: '{attachementProcessor.Value.Item2.GetType().AssemblyQualifiedName}'");
-                finalDatacollectorsAttachmentsProcessors.Add(attachementProcessor.Value.Item1, attachementProcessor.Value.Item2);
+                finalDatacollectorsAttachmentsProcessors.Add(new DataCollectorAttachmentProcessor(attachementProcessor.Value.Item1, attachementProcessor.Value.Item2));
             }
 
-            return new ReadOnlyDictionary<string, IDataCollectorAttachmentProcessor>(finalDatacollectorsAttachmentsProcessors);
+            return finalDatacollectorsAttachmentsProcessors.ToArray();
         }
     }
 }

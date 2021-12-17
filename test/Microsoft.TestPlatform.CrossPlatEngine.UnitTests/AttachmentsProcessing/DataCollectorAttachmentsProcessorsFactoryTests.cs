@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
@@ -42,18 +43,18 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
             invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData2"), typeof(SampleData2Collector).AssemblyQualifiedName, typeof(SampleData2Collector).Assembly.Location, true));
             invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData3"), typeof(SampleData3Collector).AssemblyQualifiedName, typeof(SampleData3Collector).Assembly.Location, true));
             // act
-            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray());
+            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
 
             // assert
-            Assert.AreEqual(3, dataCollectorAttachmentsProcessors.Count);
+            Assert.AreEqual(3, dataCollectorAttachmentsProcessors.Length);
 
-            Assert.IsTrue(dataCollectorAttachmentsProcessors.ContainsKey("Sample"));
-            Assert.IsTrue(dataCollectorAttachmentsProcessors.ContainsKey("SampleData3"));
-            Assert.IsTrue(dataCollectorAttachmentsProcessors.ContainsKey("Code Coverage"));
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "Sample") == 1);
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "SampleData3") == 1);
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "Code Coverage") == 1);
 
-            Assert.AreEqual(typeof(DataCollectorAttachmentProcessor).AssemblyQualifiedName, dataCollectorAttachmentsProcessors["Sample"].GetType().AssemblyQualifiedName);
-            Assert.AreEqual(typeof(DataCollectorAttachmentProcessor2).AssemblyQualifiedName, dataCollectorAttachmentsProcessors["SampleData3"].GetType().AssemblyQualifiedName);
-            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors["Code Coverage"].GetType().AssemblyQualifiedName);
+            Assert.AreEqual(typeof(DataCollectorAttachmentProcessor).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
+            Assert.AreEqual(typeof(DataCollectorAttachmentProcessor2).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
+            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[2].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
 
         [DataTestMethod]
@@ -62,11 +63,11 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         public void Create_EmptyOrNullInvokedDataCollector_ShouldReturnCodeCoverageDataAttachmentsHandler(bool empty)
         {
             // act
-            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(empty ? new InvokedDataCollector[0] : null);
+            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(empty ? new InvokedDataCollector[0] : null, null);
 
             //assert
-            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count);
-            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors["Code Coverage"].GetType().AssemblyQualifiedName);
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Length);
+            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
 
         [TestMethod]
@@ -77,26 +78,27 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
             invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData4"), typeof(SampleData4Collector).AssemblyQualifiedName, typeof(SampleData4Collector).Assembly.Location, true));
 
             // act
-            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray());
+            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
 
             // assert
-            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count);
-            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors["Code Coverage"].GetType().AssemblyQualifiedName);
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Length);
+            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
 
         [TestMethod]
-        public void Create_ShouldNotAddTwoTimeCodeCoverageDataAttachmentsHandler()
+        public void Create_ShouldAddTwoTimeCodeCoverageDataAttachmentsHandler()
         {
             // arrange
             List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>();
             invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://microsoft/CodeCoverage/2.0"), typeof(SampleData5Collector).AssemblyQualifiedName, typeof(SampleData5Collector).Assembly.Location, true));
 
             // act
-            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray());
+            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
 
             // assert
-            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count);
-            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors["SampleData5"].GetType().AssemblyQualifiedName);
+            Assert.AreEqual(2, dataCollectorAttachmentsProcessors.Length);
+            Assert.AreEqual(typeof(DataCollectorAttachmentProcessorCodeCoverage).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
+            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
     }
 
@@ -164,9 +166,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         }
     }
 
-    [DataCollectorFriendlyName("SampleData5")]
+    [DataCollectorFriendlyName("Code Coverage")]
     [DataCollectorTypeUri("datacollector://microsoft/CodeCoverage/2.0")]
-    [DataCollectorAttachmentProcessor(typeof(CodeCoverageDataAttachmentsHandler))]
+    [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessorCodeCoverage))]
     public class SampleData5Collector : DataCollector
     {
         public override void Initialize(
@@ -177,6 +179,21 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
             DataCollectionEnvironmentContext environmentContext)
         {
 
+        }
+    }
+
+    public class DataCollectorAttachmentProcessorCodeCoverage : IDataCollectorAttachmentProcessor
+    {
+        public bool SupportsIncrementalProcessing => true;
+
+        public IEnumerable<Uri> GetExtensionUris()
+        {
+            yield return new Uri("datacollector://microsoft/CodeCoverage/2.0");
+        }
+
+        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(attachments);
         }
     }
 

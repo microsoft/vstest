@@ -115,9 +115,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string AttachmentsProcessingState = "VS.AttachmentsProcessing.State";
 
-        // *********************Data collectors****************************
-        public static string InvokedDataCollector = "VS.DataCollectors.InvokedDataCollector";
-
         // **************Events Name **********************************
         public static string TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession";
 
