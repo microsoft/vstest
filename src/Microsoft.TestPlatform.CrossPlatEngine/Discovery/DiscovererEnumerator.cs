@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Utilities;
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CrossPlatEngineResources = Resources.Resources;
 
     /// <summary>
     /// Enumerates through all the discoverers.
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             ref double totalAdaptersUsed,
             ref double totalTimeTakenByAdapters)
         {
-            if (!DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType))
+            if (!TryToLoadDiscoverer(discoverer, logger, out var discovererType))
             {
                 // Fail to instantiate the discoverer type.
                 return;

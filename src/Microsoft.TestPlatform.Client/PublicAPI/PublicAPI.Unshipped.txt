@@ -1,0 +1,2 @@
+Microsoft.VisualStudio.TestPlatform.Client.Discovery.DiscoveryRequest.AbortWithEventHandler() -> void
+Microsoft.VisualStudio.TestPlatform.Client.RequestHelper.ITestRequestManager.CancelDiscoveryWithEventHandler() -> void

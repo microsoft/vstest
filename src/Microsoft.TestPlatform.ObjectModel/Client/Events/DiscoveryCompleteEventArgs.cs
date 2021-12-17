@@ -17,6 +17,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         /// <param name="totalTests">Total tests which got discovered</param>
         /// <param name="isAborted">Specifies if discovery has been aborted.</param>
+        /// <param name="fullyDiscoveredSources">List of fully discovered sources</param>
+        /// <param name="partiallyDiscoveredSources">List of partially discovered sources</param>
+        /// <param name="notDiscoveredSources">List of not discovered sources</param>
+        public DiscoveryCompleteEventArgs(long totalTests, bool isAborted,
+                                          IReadOnlyCollection<string> fullyDiscoveredSources,
+                                          IReadOnlyCollection<string> partiallyDiscoveredSources,
+                                          IReadOnlyCollection<string> notDiscoveredSources) : this(totalTests, isAborted)
+        {
+            FullyDiscoveredSources = fullyDiscoveredSources;
+            PartiallyDiscoveredSources = partiallyDiscoveredSources;
+            NotDiscoveredSources = notDiscoveredSources;
+        }
+
+        /// <summary>
+        /// Constructor for creating event args object
+        /// </summary>
+        /// <param name="totalTests">Total tests which got discovered</param>
+        /// <param name="isAborted">Specifies if discovery has been aborted.</param>
         public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
         {
             // This event is always raised from the client side, while the total count of tests is maintained
@@ -42,5 +60,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Metrics
         /// </summary>
         public IDictionary<string, object> Metrics { get; set; }
+
+        /// <summary>
+        /// Gets the list of sources which were fully discovered.
+        /// </summary>
+        public IReadOnlyCollection<string> FullyDiscoveredSources { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets the list of sources which were partially discovered (started discover tests, but then discovery aborted).
+        /// </summary>
+        public IReadOnlyCollection<string> PartiallyDiscoveredSources { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets the list of sources which were not discovered at all.
+        /// </summary>
+        public IReadOnlyCollection<string> NotDiscoveredSources { get; } = new List<string>();
     }
 }

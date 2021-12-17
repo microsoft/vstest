@@ -49,5 +49,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Aborts the discovery request
         /// </summary>
         void Abort();
+
+        /// <summary>
+        /// Aborts the discovery request with event handler
+        /// </summary>
+        void AbortWithEventHandler();
     }
 }

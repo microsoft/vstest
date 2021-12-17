@@ -11,6 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface IParallelProxyDiscoveryManager : IParallelOperationManager, IProxyDiscoveryManager
     {
         /// <summary>
+        /// Indicates if user requested an abortion
+        /// </summary>
+        bool IsAbortRequested { get; set; }
+
+        /// <summary>
         /// Handles Partial Discovery Complete event coming from a specific concurrent proxy discovery manager
         /// Each concurrent proxy discovery manager will signal the parallel discovery manager when its complete
         /// </summary>
@@ -24,5 +29,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             long totalTests,
             IEnumerable<TestCase> lastChunk,
             bool isAborted);
+    }
+
+    /// <summary>
+    /// Enums for indicating discovery status of source
+    /// </summary>
+    public enum DiscoveryStatus
+    {
+        FullyDiscovered, // Indicates that source was fully discovered
+        PartiallyDiscovered, // Indicates that we started discovery of the source but something happened (cancel/abort) and we stopped processing it
+        NotDiscovered // Indicates the sources which were not touched during discovery
     }
 }

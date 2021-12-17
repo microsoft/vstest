@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
+    using CrossPlatResources = CrossPlatEngine.Resources.Resources;
+    using ObjectModelConstants = TestPlatform.ObjectModel.Constants;
 
     public class TestRequestHandler : ITestRequestHandler
     {
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         // Must be in sync with the highest supported version in
         // src/Microsoft.TestPlatform.CommunicationUtilities/TestRequestSender.cs file.
-        private int highestSupportedVersion = 5;
+        private int highestSupportedVersion = 6;
 
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
@@ -204,7 +204,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         TotalTests = discoveryCompleteEventArgs.TotalCount,
                         LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
                         IsAborted = discoveryCompleteEventArgs.IsAborted,
-                        Metrics = discoveryCompleteEventArgs.Metrics
+                        Metrics = discoveryCompleteEventArgs.Metrics,
+                        FullyDiscoveredSources = discoveryCompleteEventArgs.FullyDiscoveredSources,
+                        PartiallyDiscoveredSources = discoveryCompleteEventArgs.PartiallyDiscoveredSources,
+                        NotDiscoveredSources = discoveryCompleteEventArgs.NotDiscoveredSources
                     },
                     this.protocolVersion);
             this.SendData(data);
@@ -483,6 +486,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 case MessageType.AttachDebuggerCallback:
                     this.onAttachDebuggerAckRecieved?.Invoke(message);
+                    break;
+
+                case MessageType.CancelDiscovery:
+                    jobQueue.Pause();
+                    this.testHostManagerFactoryReady.Wait();
+                    testHostManagerFactory.GetDiscoveryManager().Abort(new TestDiscoveryEventHandler(this));
                     break;
 
                 case MessageType.AbortTestRun:

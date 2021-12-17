@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -194,6 +193,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Cancel fast, try to stop testhost deployment/launch
             this.proxyOperationManager.CancellationTokenSource.Cancel();
             this.Close();
+        }
+
+        /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            // Do nothing if the proxy is not initialized yet.
+            if (this.proxyOperationManager == null)
+            {
+                return;
+            }
+
+            if (this.baseTestDiscoveryEventsHandler == null)
+            {
+                this.baseTestDiscoveryEventsHandler = eventHandler;
+            }
+
+            if (this.isCommunicationEstablished)
+            {
+                this.proxyOperationManager.RequestSender.SendDiscoveryAbort();
+            }
         }
 
         /// <inheritdoc/>

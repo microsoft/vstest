@@ -4,6 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -39,6 +41,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Aggregate total test count
         /// </summary>
         public long TotalTests { get; private set; }
+
+        #endregion
+
+        #region Internal Properties
+
+        /// <summary>
+        /// Dictionary which stores source with corresponding discoveryStatus
+        /// </summary>
+        internal ConcurrentDictionary<string, DiscoveryStatus> SourcesWithDiscoveryStatus = new ConcurrentDictionary<string, DiscoveryStatus>();
+
+        /// <summary>
+        /// Indicates if discovery complete payload already sent back to IDE
+        /// </summary>
+        internal bool IsMessageSent { get; set; }
 
         #endregion
 
@@ -126,6 +142,58 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Aggregate the source as fully discovered
+        /// </summary>
+        /// <param name="sorce">Fully discovered source</param>
+        internal void AggregateTheSourcesWithDiscoveryStatus(IEnumerable<string> sources, DiscoveryStatus status)
+        {
+            if (sources == null || sources.Count() == 0) return;
+
+            foreach (var source in sources)
+            {
+                if (status == DiscoveryStatus.NotDiscovered) SourcesWithDiscoveryStatus[source] = status;
+
+                if (!SourcesWithDiscoveryStatus.ContainsKey(source))
+                {
+                    EqtTrace.Warning($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
+                                     $"{source} is not present in SourcesWithDiscoveryStatus dictionary");
+                }
+                else
+                {
+                    SourcesWithDiscoveryStatus[source] = status;
+
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info($"ParallelDiscoveryDataAggregator.AggregateTheSourcesWithDiscoveryStatus : " +
+                                         $"{source} is marked with {status} status");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Aggregate the value indicating if we already sent message to IDE
+        /// </summary>
+        /// <param name="isMessageSent">Boolean value if we already sent message to IDE</param>
+        internal void AggregateIsMessageSent(bool isMessageSent)
+        {
+            this.IsMessageSent = this.IsMessageSent || isMessageSent;
+        }
+
+        /// <summary>
+        /// Returning sources with particular discovery status
+        /// </summary>
+        /// <param name="status">Status to filter</param>
+        /// <returns></returns>
+        internal ICollection<string> GetSourcesWithStatus(DiscoveryStatus status)
+        {
+            if (SourcesWithDiscoveryStatus == null || SourcesWithDiscoveryStatus.IsEmpty) return new List<string>();
+
+            return SourcesWithDiscoveryStatus.Where(source => source.Value == status)
+                                             .Select(source => source.Key).ToList();
         }
 
         #endregion

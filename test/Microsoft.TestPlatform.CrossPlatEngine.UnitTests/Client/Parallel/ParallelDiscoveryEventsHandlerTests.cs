@@ -149,6 +149,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void HandleDiscoveryCompleteShouldCallConvertToRawMessageAndSendOnceIfDiscoveryIsComplete()
+        {
+            string payload = "DiscoveryComplete";
+            int totalTests = 10;
+            bool aborted = false;
+
+            this.mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
+                    this.mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(true);
+
+            this.mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
+
+            // Act
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, It.IsAny<List<string>>(), It.IsAny<List<string>>(), It.IsAny<List<string>>());
+            this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+
+            // Verify
+            this.mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
+            this.mockTestDiscoveryEventsHandler.Verify(mt => mt.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
+        }
+
+        [TestMethod]
         public void HandleDiscoveryTestsShouldJustPassOnTheEventToDiscoveryEventsHandler()
         {
             var tests = new List<TestCase>();

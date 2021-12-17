@@ -37,8 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IRequestData requestData;
 
-        // This field indicates if abort was requested by testplatform (user)
-        private bool discoveryAbortRequested = false;
+        public bool IsAbortRequested { get; set; }
 
         #endregion
 
@@ -48,6 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// LockObject to update discovery status in parallel
         /// </summary>
         private object discoveryStatusLockObject = new object();
+
+        private object enumeratorLockObject = new object();
 
         #endregion
 
@@ -85,14 +86,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + this.availableTestSources);
             }
+
+            // One data aggregator per parallel discovery
+            this.currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
+
+            // Marking all sources as not discovered before starting actual discovery
+            this.MarkAllSourcesAsNotDiscovered(discoveryCriteria.Sources);
+
             this.DiscoverTestsPrivate(eventHandler);
         }
 
         /// <inheritdoc/>
         public void Abort()
         {
-            this.discoveryAbortRequested = true;
+            IsAbortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+        }
+
+        /// <inheritdoc/>
+        public void Abort(ITestDiscoveryEventsHandler2 eventHandler)
+        {
+            IsAbortRequested = true;
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(eventHandler), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>
@@ -130,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
              when testhost crashed by itself and when user requested it (f.e. through TW)
              Schedule the clean up for managers and handlers.
             */
-            if (allDiscoverersCompleted || discoveryAbortRequested)
+            if (allDiscoverersCompleted || IsAbortRequested)
             {
                 // Reset enumerators
                 this.sourceEnumerator = null;
@@ -180,9 +195,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // Reset the discovery complete data
             this.discoveryCompletedClients = 0;
-
-            // One data aggregator per parallel discovery
-            this.currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
 
             foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
@@ -254,6 +266,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
+            }
+        }
+
+        /// <summary>
+        /// Mark all sources as not discovered before starting actual discovery
+        /// </summary>
+        /// <param name="sources">Sources which will be discovered</param>
+        private void MarkAllSourcesAsNotDiscovered(IEnumerable<string> sources)
+        {
+            if (sources == null || sources.Count() == 0) return;
+
+            lock (enumeratorLockObject)
+            {
+                foreach (string source in sources)
+                {
+                    this.currentDiscoveryDataAggregator.SourcesWithDiscoveryStatus[source] = DiscoveryStatus.NotDiscovered;
+                }
             }
         }
     }

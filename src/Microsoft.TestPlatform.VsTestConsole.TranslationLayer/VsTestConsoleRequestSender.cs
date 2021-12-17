@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+    using TranslationLayerResources = VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
     /// <summary>
     /// Vstest console request sender for sending requests to vstest.console.exe
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 5;
+        private int protocolVersion = 6;
 
         /// <summary>
         /// Used to cancel blocking tasks associated with the vstest.console process.
@@ -1025,7 +1025,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                             discoveryCompletePayload.TotalTests,
-                            discoveryCompletePayload.IsAborted);
+                            discoveryCompletePayload.IsAborted,
+                            discoveryCompletePayload.FullyDiscoveredSources,
+                            discoveryCompletePayload.PartiallyDiscoveredSources,
+                            discoveryCompletePayload.NotDiscoveredSources);
 
                         // Adding metrics from vstest.console.
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
@@ -1051,7 +1054,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(
                     TestMessageLevel.Error,
                     TranslationLayerResources.AbortedTestsDiscovery);
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, new List<string>(), new List<string>(), new List<string>());
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions.
@@ -1115,7 +1118,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(
                             discoveryCompletePayload.TotalTests,
-                            discoveryCompletePayload.IsAborted);
+                            discoveryCompletePayload.IsAborted,
+                            discoveryCompletePayload.FullyDiscoveredSources,
+                            discoveryCompletePayload.PartiallyDiscoveredSources,
+                            discoveryCompletePayload.NotDiscoveredSources);
 
                         // Adding Metrics from VsTestConsole
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
@@ -1143,7 +1149,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestMessageLevel.Error,
                     TranslationLayerResources.AbortedTestsDiscovery);
 
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, new List<string>(), new List<string>(), new List<string>());
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions.

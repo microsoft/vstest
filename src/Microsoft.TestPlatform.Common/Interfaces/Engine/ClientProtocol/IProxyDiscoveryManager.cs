@@ -29,6 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         void Abort();
 
         /// <summary>
+        /// Aborts discovery operation with EventHandler.
+        /// </summary>
+        /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
+        void Abort(ITestDiscoveryEventsHandler2 eventHandler);
+
+        /// <summary>
         /// Closes the current test operation.
         /// Send a EndSession message to close the test host and channel gracefully.
         /// </summary>
