@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         try
                         {
                             dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
-                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} succeded");
+                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' succeded");
                         }
                         catch (Exception ex)
                         {
@@ -63,6 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
                         {
                             datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
+                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}' from file '{invokedDataCollector.FilePath}' added to the 'run list'");
                         }
                     }
                     else
@@ -77,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             if (!datacollectorsAttachmentsProcessors.ContainsKey(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName))
             {
                 datacollectorsAttachmentsProcessors.Add(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(CoverageFriendlyName, new CodeCoverageDataAttachmentsHandler()));
+                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Collector attachment processor '{typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName}' for the data collector with friendly name '{CoverageFriendlyName}' added to the 'run list'");
             }
 
             var finalDatacollectorsAttachmentsProcessors = new List<DataCollectorAttachmentProcessor>();
