@@ -1,14 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Reflection;
-using TestPlatform.Common.UnitTests.Utilities;
-
-[assembly: TestExtensionTypesV2("ExcentionType", "ExtensionIdentified", typeof(ExtensionV1), 1)]
-[assembly: TestExtensionTypesV2("ExcentionType", "ExtensionIdentified", typeof(ExtensionV2), 2)]
 
 namespace TestPlatform.Common.UnitTests.Utilities
 {
@@ -20,42 +18,31 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void MetadataReaderHelper_GetCollectorExtensionTypes()
         {
-            var types = metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.GetExecutingAssembly(), Assembly.GetExecutingAssembly().Location);
-            Assert.AreEqual(typeof(ExtensionV2).AssemblyQualifiedName, types[0].AssemblyQualifiedName);
-            Assert.AreEqual(typeof(ExtensionV1).AssemblyQualifiedName, types[1].AssemblyQualifiedName);
+            string testAssetsPath = GetTestAssetsFolder();
+            var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
+            var types = metadataReaderHelper.DiscoverTestExtensionTypesV2Attribute(Assembly.LoadFile(dataCollectorFilePath), dataCollectorFilePath);
+            Assert.IsTrue(types.Any(), $"File {dataCollectorFilePath}");
+            Assert.IsTrue(types[0].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV2"), $"File {dataCollectorFilePath}");
+            Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[0].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");
+            Assert.IsTrue(types[1].AssemblyQualifiedName.StartsWith("AttachmentProcessorDataCollector.SampleDataCollectorV1"), $"File {dataCollectorFilePath}");
+            Assert.AreEqual(dataCollectorFilePath.Replace("/", @"\"), types[1].Assembly.Location.Replace("/", @"\"), $"File {dataCollectorFilePath}");
         }
-    }
 
-    public class ExtensionV2 : ExtensionV1
-    {
-
-    }
-
-    public class ExtensionV1
-    {
-
-    }
-}
-
-
-namespace Microsoft.VisualStudio.TestPlatform
-{
-    using System;
-
-    [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = true)]
-    internal sealed class TestExtensionTypesV2Attribute : Attribute
-    {
-        public string ExtensionType { get; }
-        public string ExtensionIdentifier { get; }
-        public Type ExtensionImplementation { get; }
-        public int Version { get; }
-
-        public TestExtensionTypesV2Attribute(string extensionType, string extensionIdentifier, Type extensionImplementation, int version, string futureUse = null)
+        private string GetTestAssetsFolder()
         {
-            ExtensionType = extensionType;
-            ExtensionIdentifier = extensionIdentifier;
-            ExtensionImplementation = extensionImplementation;
-            Version = version;
+            string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            while (true)
+            {
+                if (File.Exists(Path.Combine(current, "TestPlatform.sln")))
+                {
+                    return Path.Combine(current, @"test/TestAssets");
+                }
+                current = Path.GetDirectoryName(current);
+                if (current == Path.GetPathRoot(current))
+                {
+                    throw new Exception("Repo root path not tound");
+                }
+            }
         }
     }
 }

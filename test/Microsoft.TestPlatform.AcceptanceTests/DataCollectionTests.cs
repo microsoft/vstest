@@ -121,7 +121,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Path.GetFileNameWithoutExtension("AttachmentProcessorDataCollector"),
                 "bin",
                 IntegrationTestEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework);
+                "netstandard2.0");
             var arguments = PrepareArguments(new string[] { assemblyPath, secondAssemblyPath }, null, runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
@@ -164,7 +164,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 string dataCollectorLog = File.ReadAllText(dataCollectorLogFile);
                 Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found: extension type 'DataCollector' identifier 'my://sample/datacollector' implementation 'AttachmentProcessorDataCollector.SampleDataCollectorV1' version '1'"));
                 Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found: extension type 'DataCollector' identifier 'my://sample/datacollector' implementation 'AttachmentProcessorDataCollector.SampleDataCollectorV2' version '2'"));
-                Assert.IsTrue(dataCollectorLog.Contains("TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data 'my://sample/datacollector' and type 'AttachmentProcessorDataCollector.SampleDataCollectorV1, AttachmentProcessorDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=null'; keeping the first one 'AttachmentProcessorDataCollector.SampleDataCollectorV2, AttachmentProcessorDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=null'."));
+                Assert.IsTrue(dataCollectorLog.Contains("TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data 'my://sample/datacollector' and type 'AttachmentProcessorDataCollector.SampleDataCollectorV1, AttachmentProcessorDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'; keeping the first one 'AttachmentProcessorDataCollector.SampleDataCollectorV2, AttachmentProcessorDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'."));
             }
 
             TryRemoveDirectory(resultsDir);

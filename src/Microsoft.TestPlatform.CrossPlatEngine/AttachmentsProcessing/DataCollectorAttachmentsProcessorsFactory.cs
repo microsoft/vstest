@@ -1,4 +1,11 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -6,11 +13,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing
 {
@@ -32,13 +34,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                 // /3.1.0
                 foreach (var invokedDataCollector in invokedDataCollectors.OrderByDescending(d => d.FilePath))
                 {
-                    EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
-
                     // We'll merge using only one AQN in case of more "same processors" in different assembly.
-                    if (!invokedDataCollector.HasAttachmentProcessor || datacollectorsAttachmentsProcessors.ContainsKey(invokedDataCollector.AssemblyQualifiedName))
+                    if (!invokedDataCollector.HasAttachmentProcessor)
                     {
                         continue;
                     }
+
+                    EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Analyzing data collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} HasAttachmentProcessor: {invokedDataCollector.HasAttachmentProcessor}");
 
                     // We cache extension locally by file path
                     var dataCollectorExtensionManager = dataCollectorExtensionManagerCache.GetOrAdd(invokedDataCollector.FilePath, DataCollectorExtensionManager.Create(invokedDataCollector.FilePath, true, TestSessionMessageLogger.Instance));
@@ -50,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                         try
                         {
                             dataCollectorAttachmentProcessorInstance = TestPluginManager.CreateTestExtension<IDataCollectorAttachmentProcessor>(attachmentProcessorType);
+                            EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Creation of collector attachment processor Uri: {invokedDataCollector.Uri} AssemblyQualifiedName: {invokedDataCollector.AssemblyQualifiedName} FilePath: {invokedDataCollector.FilePath} succeded");
                         }
                         catch (Exception ex)
                         {
@@ -57,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                             logger?.SendMessage(TestMessageLevel.Error, $"DataCollectorAttachmentsProcessorsFactory: Failed during the creation of data collector attachment processor '{attachmentProcessorType.AssemblyQualifiedName}'\n{ex}");
                         }
 
-                        if (dataCollectorAttachmentProcessorInstance != null)
+                        if (dataCollectorAttachmentProcessorInstance != null && !datacollectorsAttachmentsProcessors.ContainsKey(attachmentProcessorType.AssemblyQualifiedName))
                         {
                             datacollectorsAttachmentsProcessors.Add(attachmentProcessorType.AssemblyQualifiedName, new Tuple<string, IDataCollectorAttachmentProcessor>(dataCollectorExtension.Metadata.FriendlyName, dataCollectorAttachmentProcessorInstance));
                         }

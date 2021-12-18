@@ -3,6 +3,14 @@
 
 namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachmentsProcessorsFactoryTests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Xml;
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -10,12 +18,6 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Xml;
 
     [TestClass]
     public class DataCollectorAttachmentsProcessorsFactoryTests
@@ -48,9 +50,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
             // assert
             Assert.AreEqual(3, dataCollectorAttachmentsProcessors.Length);
 
-            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "Sample") == 1);
-            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "SampleData3") == 1);
-            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "Code Coverage") == 1);
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "Sample"));
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "SampleData3"));
+            Assert.AreEqual(1, dataCollectorAttachmentsProcessors.Count(x => x.FriendlyName == "Code Coverage"));
 
             Assert.AreEqual(typeof(DataCollectorAttachmentProcessor).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
             Assert.AreEqual(typeof(DataCollectorAttachmentProcessor2).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
@@ -97,133 +99,165 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
 
             // assert
             Assert.AreEqual(2, dataCollectorAttachmentsProcessors.Length);
-            Assert.AreEqual(typeof(DataCollectorAttachmentProcessorCodeCoverage).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
+            Assert.AreEqual(typeof(DataCollectorAttachmentProcessor).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
             Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
-    }
 
-    [DataCollectorFriendlyName("Sample")]
-    [DataCollectorTypeUri("datacollector://Sample")]
-    [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor))]
-    public class SampleDataCollector : DataCollector
-    {
-        public override void Initialize(
-            XmlElement configurationElement,
-            DataCollectionEvents events,
-            DataCollectionSink dataSink,
-            DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
+        [TestMethod]
+        public void Create_ShouldLoadOrderingByFilePath()
         {
+            // arrange
+            // We cannot cleanup at the end because assembly will be copied into tmp directory and loaded
+            string testAssetsPath = GetTestAssetsFolder();
+            var dataCollectorFilePath = Directory.GetFiles(testAssetsPath, "AttachmentProcessorDataCollector.dll", SearchOption.AllDirectories).Where(x => x.Contains("bin")).Single();
+            string tmpDir = Path.Combine(Path.GetTempPath(), nameof(Create_ShouldLoadOrderingByFilePath));
+            Directory.CreateDirectory(tmpDir);
+            string version1 = Path.Combine(tmpDir, "1.0.0");
+            Directory.CreateDirectory(version1);
+            File.Copy(dataCollectorFilePath, Path.Combine(version1, Path.GetFileName(dataCollectorFilePath)), true);
+            string version2 = Path.Combine(tmpDir, "1.0.1");
+            Directory.CreateDirectory(version2);
+            File.Copy(dataCollectorFilePath, Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), true);
 
-        }
-    }
+            List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>();
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("my://sample/datacollector"), "AttachmentProcessorDataCollector.SampleDataCollectorV2", Path.Combine(version1, Path.GetFileName(dataCollectorFilePath)), true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("my://sample/datacollector"), "AttachmentProcessorDataCollector.SampleDataCollectorV2", Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), true));
 
-    [DataCollectorFriendlyName("SampleData2")]
-    [DataCollectorTypeUri("datacollector://SampleData2")]
-    [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor))]
-    public class SampleData2Collector : DataCollector
-    {
-        public override void Initialize(
-            XmlElement configurationElement,
-            DataCollectionEvents events,
-            DataCollectionSink dataSink,
-            DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
-        {
+            // act
+            var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
 
-        }
-    }
-
-    [DataCollectorFriendlyName("SampleData3")]
-    [DataCollectorTypeUri("datacollector://SampleData3")]
-    [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor2))]
-    public class SampleData3Collector : DataCollector
-    {
-        public override void Initialize(
-            XmlElement configurationElement,
-            DataCollectionEvents events,
-            DataCollectionSink dataSink,
-            DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
-        {
-
-        }
-    }
-
-    [DataCollectorFriendlyName("SampleData4")]
-    [DataCollectorTypeUri("datacollector://SampleData4")]
-    [DataCollectorAttachmentProcessor(typeof(string))]
-    public class SampleData4Collector : DataCollector
-    {
-        public override void Initialize(
-            XmlElement configurationElement,
-            DataCollectionEvents events,
-            DataCollectionSink dataSink,
-            DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
-        {
-
-        }
-    }
-
-    [DataCollectorFriendlyName("Code Coverage")]
-    [DataCollectorTypeUri("datacollector://microsoft/CodeCoverage/2.0")]
-    [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessorCodeCoverage))]
-    public class SampleData5Collector : DataCollector
-    {
-        public override void Initialize(
-            XmlElement configurationElement,
-            DataCollectionEvents events,
-            DataCollectionSink dataSink,
-            DataCollectionLogger logger,
-            DataCollectionEnvironmentContext environmentContext)
-        {
-
-        }
-    }
-
-    public class DataCollectorAttachmentProcessorCodeCoverage : IDataCollectorAttachmentProcessor
-    {
-        public bool SupportsIncrementalProcessing => true;
-
-        public IEnumerable<Uri> GetExtensionUris()
-        {
-            yield return new Uri("datacollector://microsoft/CodeCoverage/2.0");
+            // assert
+            Assert.AreEqual(2, dataCollectorAttachmentsProcessors.Length);
+            Assert.AreEqual("AttachmentProcessorDataCollector.SampleDataCollectorAttachmentProcessor, AttachmentProcessorDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
+            Assert.AreEqual(Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().Assembly.Location);
+            Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
 
-        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        private string GetTestAssetsFolder()
         {
-            return Task.FromResult(attachments);
-        }
-    }
-
-    public class DataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
-    {
-        public bool SupportsIncrementalProcessing => throw new NotImplementedException();
-
-        public IEnumerable<Uri> GetExtensionUris()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class DataCollectorAttachmentProcessor2 : IDataCollectorAttachmentProcessor
-    {
-        public bool SupportsIncrementalProcessing => throw new NotImplementedException();
-
-        public IEnumerable<Uri> GetExtensionUris()
-        {
-            throw new NotImplementedException();
+            string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            while (true)
+            {
+                if (File.Exists(Path.Combine(current, "TestPlatform.sln")))
+                {
+                    return Path.Combine(current, @"test/TestAssets");
+                }
+                current = Path.GetDirectoryName(current);
+                if (current == Path.GetPathRoot(current))
+                {
+                    throw new Exception("Repo root path not tound");
+                }
+            }
         }
 
-        public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+        [DataCollectorFriendlyName("Sample")]
+        [DataCollectorTypeUri("datacollector://Sample")]
+        [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor))]
+        public class SampleDataCollector : DataCollector
         {
-            throw new NotImplementedException();
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        [DataCollectorFriendlyName("SampleData2")]
+        [DataCollectorTypeUri("datacollector://SampleData2")]
+        [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor))]
+        public class SampleData2Collector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        [DataCollectorFriendlyName("SampleData3")]
+        [DataCollectorTypeUri("datacollector://SampleData3")]
+        [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor2))]
+        public class SampleData3Collector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        [DataCollectorFriendlyName("SampleData4")]
+        [DataCollectorTypeUri("datacollector://SampleData4")]
+        [DataCollectorAttachmentProcessor(typeof(string))]
+        public class SampleData4Collector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        [DataCollectorFriendlyName("SampleData5")]
+        [DataCollectorTypeUri("datacollector://microsoft/CodeCoverage/2.0")]
+        [DataCollectorAttachmentProcessor(typeof(DataCollectorAttachmentProcessor))]
+        public class SampleData5Collector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        public class DataCollectorAttachmentProcessor : IDataCollectorAttachmentProcessor
+        {
+            public bool SupportsIncrementalProcessing => throw new NotImplementedException();
+
+            public IEnumerable<Uri> GetExtensionUris()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class DataCollectorAttachmentProcessor2 : IDataCollectorAttachmentProcessor
+        {
+            public bool SupportsIncrementalProcessing => throw new NotImplementedException();
+
+            public IEnumerable<Uri> GetExtensionUris()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<ICollection<AttachmentSet>> ProcessAttachmentSetsAsync(XmlElement configurationElement, ICollection<AttachmentSet> attachments, IProgress<int> progressReporter, IMessageLogger logger, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

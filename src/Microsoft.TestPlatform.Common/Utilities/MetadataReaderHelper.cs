@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
 #if !NETSTANDARD1_3
             // Cache assembly, in VS scenario vstest.console is not unloaded so we don't want to load same asm more times.
-            Assembly assemblyToAnalyze = assemblyCache.GetOrAdd(assemblyFilePath, Assembly.Load(File.ReadAllBytes(assemblyFilePath)));
+            Assembly assemblyToAnalyze = assemblyCache.GetOrAdd(assemblyFilePath, Assembly.LoadFile(assemblyFilePath));
 #else 
             Assembly assemblyToAnalyze = loadedAssembly;
 #endif
