@@ -140,7 +140,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
             {
                 if (File.Exists(Path.Combine(current, "TestPlatform.sln")))
                 {
-                    return Path.Combine(current, @"test/TestAssets");
+                    string testAssetsPath = Path.Combine(current, @"test/TestAssets");
+                    Assert.IsTrue(Directory.Exists(testAssetsPath), $"Directory not found '{testAssetsPath}'");
+                    return testAssetsPath;
                 }
                 current = Path.GetDirectoryName(current);
                 if (current == Path.GetPathRoot(current))
