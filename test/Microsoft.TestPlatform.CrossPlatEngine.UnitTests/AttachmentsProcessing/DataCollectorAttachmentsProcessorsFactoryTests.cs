@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
@@ -128,7 +129,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
 
             // assert
             Assert.AreEqual(2, dataCollectorAttachmentsProcessors.Length);
-            Assert.AreEqual("AttachmentProcessorDataCollector.SampleDataCollectorAttachmentProcessor, AttachmentProcessorDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
+            Assert.IsTrue(Regex.IsMatch(dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName, @"AttachmentProcessorDataCollector\.SampleDataCollectorAttachmentProcessor, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null"));
             Assert.AreEqual(Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), dataCollectorAttachmentsProcessors[0].DataCollectorAttachmentProcessorInstance.GetType().Assembly.Location);
             Assert.AreEqual(typeof(CodeCoverageDataAttachmentsHandler).AssemblyQualifiedName, dataCollectorAttachmentsProcessors[1].DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName);
         }
