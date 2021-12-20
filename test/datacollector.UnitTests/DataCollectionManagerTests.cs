@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.IO;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
@@ -573,12 +573,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             if (extensionUri.Equals("my://custom/datacollector"))
             {
-                return new DataCollectorConfig(dataCollector.GetType());
+                var dc = new DataCollectorConfig(dataCollector.GetType());
+                dc.FilePath = Path.GetTempFileName();
+                return dc;
             }
 
             if (extensionUri.Equals("my://custom/ccdatacollector"))
             {
-                return new DataCollectorConfig(ccDataCollector.GetType());
+                var dc = new DataCollectorConfig(ccDataCollector.GetType());
+                dc.FilePath = Path.GetTempFileName();
+                return dc;
             }
 
             return null;
