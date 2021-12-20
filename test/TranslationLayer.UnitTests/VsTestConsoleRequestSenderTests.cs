@@ -1924,7 +1924,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.requestSender.ProcessTestRunAttachmentsAsync(
                 new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
                 Constants.EmptyRunSettings,
                 true,
                 mockHandler.Object,
@@ -1963,7 +1963,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.requestSender.ProcessTestRunAttachmentsAsync(
                 new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
                 Constants.EmptyRunSettings,
                 true,
                 mockHandler.Object,
@@ -2008,7 +2008,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.requestSender.ProcessTestRunAttachmentsAsync(
                 new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
                 Constants.EmptyRunSettings,
                 false,
                 mockHandler.Object,
@@ -2061,7 +2061,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.requestSender.ProcessTestRunAttachmentsAsync(
                 new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
                 Constants.EmptyRunSettings,
                 false,
                 mockHandler.Object,
@@ -2110,7 +2110,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.requestSender.ProcessTestRunAttachmentsAsync(
                 new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
                 Constants.EmptyRunSettings,
                 false,
                 mockHandler.Object,
@@ -2151,7 +2151,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             await this.requestSender.ProcessTestRunAttachmentsAsync(
                 new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
-                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
                 Constants.EmptyRunSettings,
                 true,
                 mockHandler.Object,

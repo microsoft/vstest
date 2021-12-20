@@ -877,9 +877,10 @@ virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.Properties.ge
 virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.ProtectedGetPropertyValue(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty property, object defaultValue) -> object
 virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.ProtectedSetPropertyValue(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty property, object value) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector
-Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.InvokedDataCollector(System.Uri uri, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.InvokedDataCollector(System.Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Equals(Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector other) -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.AssemblyQualifiedName.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.FriendlyName.get -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.FilePath.get -> string
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.HasAttachmentProcessor.get -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Uri.get -> System.Uri

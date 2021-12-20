@@ -42,9 +42,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         {
             // arrange
             List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>();
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://Sample"), typeof(SampleDataCollector).AssemblyQualifiedName, typeof(SampleDataCollector).Assembly.Location, true));
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData2"), typeof(SampleData2Collector).AssemblyQualifiedName, typeof(SampleData2Collector).Assembly.Location, true));
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData3"), typeof(SampleData3Collector).AssemblyQualifiedName, typeof(SampleData3Collector).Assembly.Location, true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://Sample"), "Sample", typeof(SampleDataCollector).AssemblyQualifiedName, typeof(SampleDataCollector).Assembly.Location, true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData2"), "SampleData2", typeof(SampleData2Collector).AssemblyQualifiedName, typeof(SampleData2Collector).Assembly.Location, true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData3"), "SampleData3", typeof(SampleData3Collector).AssemblyQualifiedName, typeof(SampleData3Collector).Assembly.Location, true));
             // act
             var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
 
@@ -78,7 +78,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         {
             // arrange
             List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>();
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData4"), typeof(SampleData4Collector).AssemblyQualifiedName, typeof(SampleData4Collector).Assembly.Location, true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://SampleData4"), "SampleData4", typeof(SampleData4Collector).AssemblyQualifiedName, typeof(SampleData4Collector).Assembly.Location, true));
 
             // act
             var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
@@ -93,7 +93,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
         {
             // arrange
             List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>();
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://microsoft/CodeCoverage/2.0"), typeof(SampleData5Collector).AssemblyQualifiedName, typeof(SampleData5Collector).Assembly.Location, true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://microsoft/CodeCoverage/2.0"), "SampleData5", typeof(SampleData5Collector).AssemblyQualifiedName, typeof(SampleData5Collector).Assembly.Location, true));
 
             // act
             var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);
@@ -121,8 +121,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollectorAttachme
             File.Copy(dataCollectorFilePath, Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), true);
 
             List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>();
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("my://sample/datacollector"), "AttachmentProcessorDataCollector.SampleDataCollectorV2", Path.Combine(version1, Path.GetFileName(dataCollectorFilePath)), true));
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("my://sample/datacollector"), "AttachmentProcessorDataCollector.SampleDataCollectorV2", Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("my://sample/datacollector"), "sample", "AttachmentProcessorDataCollector.SampleDataCollectorV2", Path.Combine(version1, Path.GetFileName(dataCollectorFilePath)), true));
+            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("my://sample/datacollector"), "sample", "AttachmentProcessorDataCollector.SampleDataCollectorV2", Path.Combine(version2, Path.GetFileName(dataCollectorFilePath)), true));
 
             // act
             var dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollectors.ToArray(), null);

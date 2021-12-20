@@ -86,14 +86,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var invokedDataCollectors = new Collection<InvokedDataCollector>()
             {
-                new InvokedDataCollector(new Uri("datacollector://sample"),typeof(string).AssemblyQualifiedName,typeof(string).Assembly.Location,false)
+                new InvokedDataCollector(new Uri("datacollector://sample"),"sample", typeof(string).AssemblyQualifiedName,typeof(string).Assembly.Location,false)
             };
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors);
             Assert.AreEqual(1, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have data.");
 
             var invokedDataCollectors2 = new Collection<InvokedDataCollector>()
             {
-                new InvokedDataCollector(new Uri("datacollector://sample2"),typeof(int).AssemblyQualifiedName,typeof(int).Assembly.Location,false)
+                new InvokedDataCollector(new Uri("datacollector://sample2"),"sample2", typeof(int).AssemblyQualifiedName,typeof(int).Assembly.Location,false)
             };
             aggregator.Aggregate(null, null, null, TimeSpan.Zero, false, false, null, null, invokedDataCollectors2);
             Assert.AreEqual(2, aggregator.InvokedDataCollectors.Count, "InvokedDataCollectors List must have aggregated data.");

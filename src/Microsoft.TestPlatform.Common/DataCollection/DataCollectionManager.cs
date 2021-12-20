@@ -266,6 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             foreach (DataCollectorInformation dataCollectorInformation in this.RunDataCollectors.Values)
             {
                 invokedDataCollector.Add(new InvokedDataCollector(dataCollectorInformation.DataCollectorConfig.TypeUri,
+                    dataCollectorInformation.DataCollectorConfig.FriendlyName,
                     dataCollectorInformation.DataCollectorConfig.DataCollectorType.AssemblyQualifiedName,
                     dataCollectorInformation.DataCollectorConfig.FilePath,
                     dataCollectorInformation.DataCollectorConfig.HasAttachmentsProcessor()));

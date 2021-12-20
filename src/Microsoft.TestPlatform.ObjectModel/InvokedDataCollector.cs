@@ -15,12 +15,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="assemblyQualifiedName">Data collector assembly qualified name</param>
         /// <param name="filePath">Data collector file path</param>
         /// <param name="hasAttachmentProcessor">True if data collector registers an attachment processor</param>
-        public InvokedDataCollector(Uri uri, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
+        public InvokedDataCollector(Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
         {
-            this.Uri = uri;
-            this.AssemblyQualifiedName = assemblyQualifiedName;
-            this.FilePath = filePath;
+            this.Uri = uri ?? throw new ArgumentException(nameof(uri));
+            this.AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentException(nameof(assemblyQualifiedName)); ;
+            this.FilePath = filePath ?? throw new ArgumentException(nameof(filePath)); ;
             this.HasAttachmentProcessor = hasAttachmentProcessor;
+            this.FriendlyName = friendlyName ?? throw new ArgumentException(nameof(friendlyName)); ;
         }
 
         /// <summary>
@@ -28,6 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         [DataMember]
         public Uri Uri { get; private set; }
+
+        /// <summary>
+        /// DataCollector FriednlyName.
+        /// </summary>
+        [DataMember]
+        public string FriendlyName { get; private set; }
 
         /// <summary>
         /// AssemblyQualifiedName of data collector.
@@ -61,6 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return this.HasAttachmentProcessor == other.HasAttachmentProcessor &&
                 this.Uri.AbsoluteUri == other.Uri.AbsoluteUri &&
+                this.FriendlyName == other.FriendlyName &&
                 this.AssemblyQualifiedName == other.AssemblyQualifiedName &&
                 this.FilePath == other.FilePath;
         }
@@ -82,6 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             unchecked
             {
                 var hashCode = this.Uri.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.FriendlyName.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.AssemblyQualifiedName.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.FilePath != null ? this.FilePath.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.HasAttachmentProcessor.GetHashCode();
@@ -94,6 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         /// <returns>String representation</returns>
         public override string ToString()
-            => $"Uri: '{Uri}' AssemblyQualifiedName: '{AssemblyQualifiedName}' FilePath: '{FilePath}' HasAttachmentProcessor: '{HasAttachmentProcessor}'";
+            => $"Uri: '{Uri}' FriendlyName: '{FriendlyName}' AssemblyQualifiedName: '{AssemblyQualifiedName}' FilePath: '{FilePath}' HasAttachmentProcessor: '{HasAttachmentProcessor}'";
     }
 }

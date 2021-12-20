@@ -644,11 +644,11 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
 
             List<InvokedDataCollector> invokedDataCollectors = new List<InvokedDataCollector>
             {
-                new InvokedDataCollector(new Uri(uri1), typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false)
+                new InvokedDataCollector(new Uri(uri1),withConfig ? "friendlyNameA" : "friendlyNameB", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false)
             };
 
             string runSettingsXml =
-$@"
+    $@"
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
@@ -663,25 +663,25 @@ $@"
 ";
 
             mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
-            .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
-            {
+                .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
+                {
                 // assert
                 if (withConfig)
-                {
-                    Assert.IsNotNull(configurationElement);
-                    Assert.AreEqual("<ConfigSample>Value</ConfigSample>", configurationElement.InnerXml);
-                }
-                else
-                {
-                    Assert.IsNull(configurationElement);
-                }
+                    {
+                        Assert.IsNotNull(configurationElement);
+                        Assert.AreEqual("<ConfigSample>Value</ConfigSample>", configurationElement.InnerXml);
+                    }
+                    else
+                    {
+                        Assert.IsNull(configurationElement);
+                    }
 
-                ICollection<AttachmentSet> outputAttachments = new List<AttachmentSet>
-                {
+                    ICollection<AttachmentSet> outputAttachments = new List<AttachmentSet>
+                    {
                     new AttachmentSet(new Uri(uri2), "uri2_output")
-                };
-                return Task.FromResult(outputAttachments);
-            });
+                    };
+                    return Task.FromResult(outputAttachments);
+                });
 
             // act
             await manager.ProcessTestRunAttachmentsAsync(runSettingsXml, mockRequestData.Object, inputAttachments, invokedDataCollectors, mockEventsHandler.Object, cancellationTokenSource.Token);
@@ -731,8 +731,8 @@ $@"
             mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
             .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
-                // assert
-                Assert.IsTrue(firstProcessorFailed);
+            // assert
+            Assert.IsTrue(firstProcessorFailed);
                 Assert.AreEqual(1, i1.Count);
                 Assert.AreEqual(3, i1.Single().Attachments.Count);
                 for (int i = 0; i < i1.Single().Attachments.Count; i++)
@@ -789,8 +789,8 @@ $@"
             {
                 try
                 {
-                    // assert
-                    Assert.IsTrue(firstProcessorFailed);
+                // assert
+                Assert.IsTrue(firstProcessorFailed);
                     Assert.AreEqual(1, i1.Count);
                     Assert.AreEqual(3, i1.Single().Attachments.Count);
                     for (int i = 0; i < i1.Single().Attachments.Count; i++)
