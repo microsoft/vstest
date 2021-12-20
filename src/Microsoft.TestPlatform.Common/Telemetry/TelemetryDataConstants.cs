@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
-        internal const string InvokedDataCollector = "VS.TestRun.InvokedDataCollector";
+        internal const string InvokedDataCollectors = "VS.TestRun.InvokedDataCollectors";
 
         internal const string DataCollectorsCorProfiler = "VS.TestPlatform.DataCollector.CorProfiler";
 
