@@ -18,10 +18,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public InvokedDataCollector(Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor)
         {
             this.Uri = uri ?? throw new ArgumentException(nameof(uri));
+            this.FriendlyName = friendlyName ?? throw new ArgumentException(nameof(friendlyName));
             this.AssemblyQualifiedName = assemblyQualifiedName ?? throw new ArgumentException(nameof(assemblyQualifiedName)); ;
             this.FilePath = filePath ?? throw new ArgumentException(nameof(filePath)); ;
             this.HasAttachmentProcessor = hasAttachmentProcessor;
-            this.FriendlyName = friendlyName ?? throw new ArgumentException(nameof(friendlyName)); ;
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public Uri Uri { get; private set; }
 
         /// <summary>
-        /// DataCollector FriednlyName.
+        /// DataCollector FriendlyName.
         /// </summary>
         [DataMember]
         public string FriendlyName { get; private set; }
