@@ -393,9 +393,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
             var invokedDataCollectors = this.dataCollectionManager.GetInvokedDataCollectors();
 
-            // For the invoked collectors we report the same information as ProxyDataCollectionManager.cs line ~416
-            var invokedDataCollectorsForMetrics = invokedDataCollectors.Select(x => new { x.Uri, x.FriendlyName, x.HasAttachmentProcessor }.ToString());
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollectors, string.Join(",", invokedDataCollectorsForMetrics.ToArray()));
+            if (invokedDataCollectors != null && invokedDataCollectors.Any())
+            {
+                // For the invoked collectors we report the same information as ProxyDataCollectionManager.cs line ~416
+                var invokedDataCollectorsForMetrics = invokedDataCollectors.Select(x => new { x.Uri, x.FriendlyName, x.HasAttachmentProcessor }.ToString());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollectors, string.Join(",", invokedDataCollectorsForMetrics.ToArray()));
+            }
 
             var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, this.requestData.MetricsCollection.Metrics);
 
