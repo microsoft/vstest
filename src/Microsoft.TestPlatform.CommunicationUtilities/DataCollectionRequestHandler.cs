@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Globalization;
     using System.IO;
     using System.Linq;
