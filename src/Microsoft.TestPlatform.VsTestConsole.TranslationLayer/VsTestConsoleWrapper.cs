@@ -940,7 +940,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             string processingSettings,
             bool isLastBatch,
             bool collectMetrics,
-            ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
+            ITestRunAttachmentsProcessingEventsHandler eventsHandler,
             CancellationToken cancellationToken)
         {
             this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStart();
@@ -951,7 +951,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 invokedDataCollectors,
                 processingSettings,
                 collectMetrics,
-                testSessionEventsHandler,
+                eventsHandler,
                 cancellationToken).ConfigureAwait(false);
         }
 
