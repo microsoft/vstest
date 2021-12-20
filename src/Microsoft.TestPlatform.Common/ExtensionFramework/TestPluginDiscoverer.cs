@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     if (EqtTrace.IsErrorEnabled)
                     {
                         EqtTrace.Error(
-                        "TryGetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
+                        "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
                     }
                     return;
                 }
@@ -260,12 +260,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
                 {
                     EqtTrace.Warning(
-                    "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}' and type '{1}'; keeping the first one '{2}'.",
-                            pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, extensionCollection[pluginInfo.IdentifierData].AssemblyQualifiedName);
+                    "GetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}' and type '{1}' inside file '{2}'; keeping the first one '{3}'.",
+                            pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath, extensionCollection[pluginInfo.IdentifierData].AssemblyQualifiedName);
                 }
                 else
                 {
                     extensionCollection.Add(pluginInfo.IdentifierData, pluginInfo);
+                    EqtTrace.Info("GetTestExtensionFromType: Register extension with identifier data '{0}' and type '{1}' inside file '{2}'",
+                        pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath);
                 }
             }
         }
