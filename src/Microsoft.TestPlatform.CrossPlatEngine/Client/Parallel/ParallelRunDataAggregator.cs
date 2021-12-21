@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (executorUris != null) this.executorUris.AddRange(executorUris);
                 if (testRunStats != null) testRunStatsList.Add(testRunStats);
 
-                if (invokedDataCollectors != null && invokedDataCollectors.Count > 0)
+                if (invokedDataCollectors?.Count > 0)
                 {
                     foreach (var invokedDataCollector in invokedDataCollectors)
                     {

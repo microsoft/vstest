@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -11,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// <summary>
     /// Creates and return a list of available attachments processor
     /// </summary>
-    internal interface IDataCollectorAttachmentsProcessorsFactory
+    public interface IDataCollectorAttachmentsProcessorsFactory
     {
         /// <summary>
         /// Creates and return a list of available attachments processor
@@ -25,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// <summary>
     /// Registered data collector attachment processor
     /// </summary>
-    internal class DataCollectorAttachmentProcessor
+    public class DataCollectorAttachmentProcessor
     {
         /// <summary>
         /// Data collector FriendlyName
