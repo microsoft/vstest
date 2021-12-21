@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
     using Microsoft.TestPlatform.TestUtilities;
@@ -164,7 +165,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 string dataCollectorLog = File.ReadAllText(dataCollectorLogFile);
                 Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found: extension type 'DataCollector' identifier 'my://sample/datacollector' implementation 'AttachmentProcessorDataCollector.SampleDataCollectorV1' version '1'"));
                 Assert.IsTrue(dataCollectorLog.Contains("MetadataReaderExtensionsHelper: Valid extension found: extension type 'DataCollector' identifier 'my://sample/datacollector' implementation 'AttachmentProcessorDataCollector.SampleDataCollectorV2' version '2'"));
-                Assert.IsTrue(dataCollectorLog.Contains("TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data 'my://sample/datacollector' and type 'AttachmentProcessorDataCollector.SampleDataCollectorV1, AttachmentProcessorDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'; keeping the first one 'AttachmentProcessorDataCollector.SampleDataCollectorV2, AttachmentProcessorDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'."));
+                Assert.IsTrue(Regex.IsMatch(dataCollectorLog, @"GetTestExtensionFromType: Register extension with identifier data 'my://sample/datacollector' and type 'AttachmentProcessorDataCollector\.SampleDataCollectorV2, AttachmentProcessorDataCollector, Version=.*, Culture=neutral, PublicKeyToken=null' inside file '.*AttachmentProcessorDataCollector\.dll'"));
             }
 
             TryRemoveDirectory(resultsDir);
