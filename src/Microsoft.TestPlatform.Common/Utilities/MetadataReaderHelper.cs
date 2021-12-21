@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    /* Expected attriute shape
+    /* Expected attribute shape
 
         namespace Microsoft.VisualStudio.TestPlatform
         {
@@ -38,7 +38,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 }
             }
         }
-
     */
     internal class MetadataReaderExtensionsHelper
     {
