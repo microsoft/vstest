@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         public Type AttachmentsProcessorType { get; private set; }
 
         /// <summary>
-        /// Check if collector registers an attachement processor.
+        /// Check if collector registers an attachment processor.
         /// </summary>
         /// <returns>True if collector registers an attachment processor.</returns>
         public bool HasAttachmentsProcessor() => AttachmentsProcessorType != null;
