@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return new object[] { this.TypeUri.ToString(), this.FriendlyName, this.FilePath, this.AttachmentsProcessorType != null };
+                return new object[] { this.TypeUri.ToString(), this.FriendlyName, this.AttachmentsProcessorType != null };
             }
         }
 

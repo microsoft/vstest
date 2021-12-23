@@ -100,11 +100,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="friendlyName">
         /// The friendly Name.
         /// </param>
-        public DataCollectorMetadata(string extension, string friendlyName, string filePath, bool hasAttachmentProcessor)
+        public DataCollectorMetadata(string extension, string friendlyName, bool hasAttachmentProcessor)
         {
             this.ExtensionUri = extension;
             this.FriendlyName = friendlyName;
-            this.FilePath = filePath;
             this.HasAttachmentProcessor = hasAttachmentProcessor;
         }
 
@@ -130,15 +129,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Check if the data collector has got attachment processor registered
         /// </summary>
         public bool HasAttachmentProcessor
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets the file path of assemblies that contains the data collector.
-        /// </summary>
-        public string FilePath
         {
             get;
             private set;

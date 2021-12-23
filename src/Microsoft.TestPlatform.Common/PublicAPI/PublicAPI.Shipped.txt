@@ -21,11 +21,10 @@ Microsoft.VisualStudio.TestPlatform.Common.Exceptions.InvalidLoggerException
 Microsoft.VisualStudio.TestPlatform.Common.Exceptions.InvalidLoggerException.InvalidLoggerException(string message) -> void
 Microsoft.VisualStudio.TestPlatform.Common.Exceptions.InvalidLoggerException.InvalidLoggerException(string message, System.Exception innerException) -> void
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata
-Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.DataCollectorMetadata(string extension, string friendlyName, string filePath, bool hasAttachmentProcessor) -> void
+Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.DataCollectorMetadata(string extension, string friendlyName, bool hasAttachmentProcessor) -> void
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.ExtensionUri.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.FriendlyName.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.HasAttachmentProcessor.get -> bool
-Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.DataCollectorMetadata.FilePath.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestLoggerMetadata
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestLoggerMetadata.ExtensionUri.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestLoggerMetadata.FriendlyName.get -> string
@@ -80,7 +79,6 @@ Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IBaseTestEventsRegistrar
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IBaseTestEventsRegistrar.LogWarning(string message) -> void
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities.FriendlyName.get -> string
-Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities.FilePath.get -> string
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.IDataCollectorCapabilities.HasAttachmentProcessor.get -> bool
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.ISettingsProviderCapabilities
 Microsoft.VisualStudio.TestPlatform.Common.Interfaces.ISettingsProviderCapabilities.SettingsName.get -> string
@@ -298,9 +296,3 @@ virtual Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.TestPlugin
 virtual Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.IdentifierData.get -> string
 virtual Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities.TestPluginInformation.Metadata.get -> System.Collections.Generic.ICollection<object>
 virtual Microsoft.VisualStudio.TestPlatform.Common.Hosting.TestRuntimeProviderManager.GetTestHostManagerByRunConfiguration(string runConfiguration) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Host.ITestRuntimeProvider
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DataCollectorAttachmentProcessor
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DataCollectorAttachmentProcessor.DataCollectorAttachmentProcessor(string friendlyName, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.IDataCollectorAttachmentProcessor dataCollectorAttachmentProcessor) -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DataCollectorAttachmentProcessor.DataCollectorAttachmentProcessorInstance.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.IDataCollectorAttachmentProcessor
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DataCollectorAttachmentProcessor.FriendlyName.get -> string
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IDataCollectorAttachmentsProcessorsFactory
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.IDataCollectorAttachmentsProcessorsFactory.Create(Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector[] invokedDataCollectors, Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.IMessageLogger logger) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.DataCollectorAttachmentProcessor[]

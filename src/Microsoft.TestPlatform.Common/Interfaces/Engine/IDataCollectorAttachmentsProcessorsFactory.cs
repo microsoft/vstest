@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// <summary>
     /// Creates and return a list of available attachments processor
     /// </summary>
-    public interface IDataCollectorAttachmentsProcessorsFactory
+    internal interface IDataCollectorAttachmentsProcessorsFactory
     {
         /// <summary>
         /// Creates and return a list of available attachments processor
@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// <summary>
     /// Registered data collector attachment processor
     /// </summary>
-    public class DataCollectorAttachmentProcessor
+    internal class DataCollectorAttachmentProcessor
     {
         /// <summary>
         /// Data collector FriendlyName
