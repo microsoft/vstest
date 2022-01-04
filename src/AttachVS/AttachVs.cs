@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 
-namespace Nohwnd.AttachVS
+namespace Microsoft.TestPlatform.AttachVS
 {
     internal class DebuggerUtility
     {
@@ -24,9 +23,7 @@ namespace Nohwnd.AttachVS
                 }
                 var process = Process.GetProcessById(pid.Value);
                 Trace($"Using pid: {pid} to get parent VS.");
-                var vs = GetVsFromPid(vsPid != null
-                    ? Process.GetProcessById(vsPid.Value)
-                    : Process.GetProcessById(process.Id));
+                var vs = GetVsFromPid(Process.GetProcessById(vsPid ?? process.Id));
 
                 if (vs != null)
                 {
@@ -117,6 +114,7 @@ namespace Nohwnd.AttachVS
                         object dte, dbg, lps;
                         runninObjectTable.GetObject(moniker[0], out dte);
 
+                        // The COM object can be busy, we retry few times, hoping that it won't be busy next time.
                         for (var i = 0; i < 10; i++)
                         {
                             try
@@ -138,7 +136,7 @@ namespace Nohwnd.AttachVS
                             }
                             catch (COMException ex)
                             {
-                                Trace($"ComException: Tetrying in 250ms.\n{ex}");
+                                Trace($"ComException: Retrying in 250ms.\n{ex}");
                                 Thread.Sleep(250);
                             }
                         }
@@ -199,24 +197,17 @@ namespace Nohwnd.AttachVS
                 return true;
             }
 
-            try
+            var isVs = process.ProcessName.Equals("devenv", StringComparison.InvariantCultureIgnoreCase);
+            if (isVs)
             {
-                var isVs = process.ProcessName.Equals("devenv", StringComparison.InvariantCultureIgnoreCase);
-                if (isVs)
-                {
-                    Trace($"Process {process.ProcessName} ({process.Id}) is VS.");
-                }
-                else
-                {
-                    Trace($"Process {process.ProcessName} ({process.Id}) is not VS.");
-                }
+                Trace($"Process {process.ProcessName} ({process.Id}) is VS.");
+            }
+            else
+            {
+                Trace($"Process {process.ProcessName} ({process.Id}) is not VS.");
+            }
 
-                return isVs;
-            }
-            catch
-            {
-                return true;
-            }
+            return isVs;
         }
 
         private static bool IsCorrectParent(Process currentProcess, Process parent)
@@ -229,12 +220,9 @@ namespace Nohwnd.AttachVS
                 {
                     return true;
                 }
-                else
-                {
-                    Trace($"Process {parent.ProcessName} ({parent.Id}) is not a valid parent because it started after the current process.");
-                    return false;
-                }
 
+                Trace($"Process {parent.ProcessName} ({parent.Id}) is not a valid parent because it started after the current process.");
+                return false;
             }
             catch
             {

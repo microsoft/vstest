@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Nohwnd.AttachVS.Console
+namespace Microsoft.TestPlatform.AttachVS
 {
     internal class Program
     {
