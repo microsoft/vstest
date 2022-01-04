@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
@@ -35,7 +35,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent"  Condition=" '$(OS)' != 'WINDOWS_NT' ">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent"  Condition=" '$(OS)' == 'WINDOWS_NT' ">
     <Exec Command="xcopy /i /y $(MSBuildProjectDirectory)\..\..\src\vstest.console\bin\Debug\net451\win7-x64\ $(TargetDir)\vstest.console\&#xD;&#xA;xcopy /i /y $(MSBuildProjectDirectory)\..\..\src\testhost\bin\Debug\net451\win7-x64\ $(TargetDir)\vstest.console\&#xD;&#xA;xcopy /i /y $(MSBuildProjectDirectory)\..\..\src\Microsoft.TestPlatform.TestHostProvider\bin\Debug\net451\ $(TargetDir)\vstest.console\Extensions\&#xD;&#xA;xcopy /i /y $(MSBuildProjectDirectory)\..\..\src\testhost.x86\bin\Debug\net472\win7-x86 $(TargetDir)\vstest.console\TestHost\" />
   </Target>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
