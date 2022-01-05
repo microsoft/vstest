@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Microsoft.TestPlatform.AttachVS
@@ -7,6 +8,8 @@ namespace Microsoft.TestPlatform.AttachVS
     {
         static void Main(string[] args)
         {
+            Trace.Listeners.Add(new ConsoleTraceListener());
+
             int? pid = ParsePid(args, position: 0);
             int? vsPid = ParsePid(args, position: 1);
 
