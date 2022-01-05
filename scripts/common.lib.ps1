@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft. All rights reserved.
 
 $ErrorActionPreference = "Stop"
+$script:ScriptFailedCommands = @()
+$script:ScriptFailed = $false
 
 #
 # Git Branch
@@ -51,15 +53,25 @@ $env:DOTNET_CLI_VERSION = $GlobalJson.tools.dotnet
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
 
-function Write-Log ([string] $message)
-{
+function Write-Log {
+    param (
+        [string] $message,
+        [ValidateSet("Success", "Error")]
+        [string]
+        $Level = "Success"
+    )
+    
     $currentColor = $Host.UI.RawUI.ForegroundColor
-    $Host.UI.RawUI.ForegroundColor = "Green"
-    if ($message)
-    {
-        Write-Output "... $message"
+    try {
+        $Host.UI.RawUI.ForegroundColor = if ("Success" -eq $Level) { "Green" } else { "Red" }
+        if ($message)
+        {
+            Write-Output "... $message"
+        }
     }
-    $Host.UI.RawUI.ForegroundColor = $currentColor
+    finally {
+        $Host.UI.RawUI.ForegroundColor = $currentColor
+    }
 }
 
 function Write-VerboseLog([string] $message)
@@ -124,12 +136,12 @@ function Install-DotNetCli
     Get-ChildItem "Env:\dotnet_*"
     
     "`n`n---- x64 dotnet"
-    & "$env:DOTNET_ROOT\dotnet.exe" --info
+    Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" "--info"
 
     "`n`n---- x86 dotnet"
     # avoid erroring out because we don't have the sdk for x86 that global.json requires
     try {
-        & "${env:DOTNET_ROOT(x86)}\dotnet.exe" --info 2> $null
+        Invoke-Exe "${env:DOTNET_ROOT(x86)}\dotnet.exe" "--info" 2> $null
     } catch {}
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -151,11 +163,8 @@ function Restore-Package
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
-    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -bl:"$env:TP_OUT_DIR\log\$Configuration\external.binlog"
+    Invoke-Exe $dotnetExe "restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -bl:""$env:TP_OUT_DIR\log\$Configuration\external.binlog"""
     Write-Log ".. .. Restore-Package: Complete."
-
-    Set-ScriptFailedOnError
-
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -186,14 +195,16 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
 
 function Set-ScriptFailedOnError
 {
+    param ($Command, $Arguments)
     if ($lastExitCode -eq 0) {
         return
     }
 
     if ($FailFast -eq $true) {
-        Write-Error "Build failed. Stopping as fail fast is set."
+        Write-Error "Build failed. Stopping as fail fast is set.`nFailed command: $Command $Arguments`nExit code: $LASTEXITCODE"
     }
 
+    $script:ScriptFailedCommands += "$Command $Arguments"
     $Script:ScriptFailed = $true
 }
 
@@ -202,5 +213,19 @@ function PrintAndExit-OnError([System.String] $output)
     if ($? -eq $false){
         Write-Error $output
         Exit 1
+    }
+}
+
+function Invoke-Exe {
+    param (
+        [Parameter(Mandatory)]
+        [string] $Command,
+        [string] $Arguments,
+        [int[]] $IgnoreExitCode
+    )
+    Write-Verbose "Invoking: $Command $Arguments"
+    & $Command ($Arguments -split ' ')
+    if ($IgnoreExitCode -notcontains $LASTEXITCODE) {
+        Set-ScriptFailedOnError -Command $Command -Arguments $Arguments
     }
 }
