@@ -15,13 +15,13 @@ namespace Microsoft.TestPlatform.AttachVS
         {
             try
             {
-                Trace($"Starting with pid '{pid}', and vsPid '{vsPid}'");
                 if (pid == null)
                 {
                     Trace($"FAIL: Pid is null.");
                     return false;
                 }
                 var process = Process.GetProcessById(pid.Value);
+                Trace($"Starting with pid '{pid}({process?.ProcessName})', and vsPid '{vsPid}'");
                 Trace($"Using pid: {pid} to get parent VS.");
                 var vs = GetVsFromPid(Process.GetProcessById(vsPid ?? process.Id));
 
@@ -266,7 +266,7 @@ namespace Microsoft.TestPlatform.AttachVS
 
         private static void Trace(string message, [CallerMemberName] string methodName = null)
         {
-            System.Diagnostics.Trace.WriteLine($"{methodName}: {message}");
+            System.Diagnostics.Trace.WriteLine($"[AttachVS]{methodName}: {message}");
         }
 
         [StructLayout(LayoutKind.Sequential)]
