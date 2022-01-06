@@ -146,10 +146,10 @@ function Invoke-TestAssetsBuild
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
-    Invoke-Exe -IgnoreExitCode 1 $nugetExe "sources add -Name ""locally-built-testplatform-packages"" -Source ""$env:TP_TESTARTIFACTS\packages\"" -ConfigFile ""$nugetConfig"""
+    Invoke-Exe -IgnoreExitCode 1 $nugetExe "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
     Invoke-Exe $dotnetExe "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$($env:TP_ROOT_DIR)\TestAssets.binlog"""
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
-    Invoke-Exe $nugetExe "sources remove -Name ""locally-built-testplatform-packages"" -ConfigFile ""$nugetConfig"""
+    Invoke-Exe -IgnoreExitCode 1 $nugetExe "sources remove -Name ""locally-built-testplatform-packages"" -ConfigFile ""$nugetConfig"""
     Write-Log ".. .. Build: Complete."
     Write-Log "Invoke-TestAssetsBuild: Complete. {$(Get-ElapsedTime($timer))}"
 }
