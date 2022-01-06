@@ -54,6 +54,8 @@ Param(
     [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests")
 )
 
+$ErrorActionPreference = 'Stop'
+
 . $PSScriptRoot\common.lib.ps1
 
 # Set Version from scripts/build/TestPlatform.Settings.targets, when we are running locally and not providing the version as the parameter 
@@ -100,9 +102,6 @@ $TPB_SourceBuildPackageOutDir = Join-Path $TPB_PackageOutDir "source-build"
 
 $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 
-# Capture error state in any step globally to modify return code
-$Script:ScriptFailed = $false
-
 . "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
 
 # Update the version in the dependencies props to be the TPB_version version, this is not ideal but because changing how this is resolved would 
@@ -127,17 +126,13 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog
+    Invoke-Exe $dotnetExe "build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:TestPlatform.binlog"
+    Write-Host -ForegroundColor Yellow $LASTEXITCODE
     Write-Log ".. .. Build: Complete."
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_CILAssets"
-    Write-Verbose "$dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\CILAssets.binlog"
+    Invoke-Exe $dotnetExe "build $TPB_TestAssets_CILAssets --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$($env:TP_ROOT_DIR)\CILAssets.binlog"""
     Write-Log ".. .. Build: Complete."
-
-    Set-ScriptFailedOnError
-
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -151,15 +146,11 @@ function Invoke-TestAssetsBuild
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- add NuGet source"
-    & $nugetExe sources add -Name "locally-built-testplatform-packages" -Source "$env:TP_TESTARTIFACTS\packages\" -ConfigFile "$nugetConfig"
-    Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
-    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:"$($env:TP_ROOT_DIR)\TestAssets.binlog"
+    Invoke-Exe -IgnoreExitCode 1 $nugetExe "sources add -Name ""locally-built-testplatform-packages"" -Source $env:TP_TESTARTIFACTS\packages\ -ConfigFile ""$nugetConfig"""
+    Invoke-Exe $dotnetExe "build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -bl:""$($env:TP_ROOT_DIR)\TestAssets.binlog"""
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution -- remove NuGet source"
-    & $nugetExe sources remove -Name "locally-built-testplatform-packages" -ConfigFile "$nugetConfig"
+    Invoke-Exe -IgnoreExitCode 1 $nugetExe "sources remove -Name ""locally-built-testplatform-packages"" -ConfigFile ""$nugetConfig"""
     Write-Log ".. .. Build: Complete."
-
-    Set-ScriptFailedOnError
-
     Write-Log "Invoke-TestAssetsBuild: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -299,16 +290,12 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -Recurse
 
-    Set-ScriptFailedOnError
-
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework472 $fullDestDir
     
     New-Item -ItemType directory -Path $fullCLRPackage451Dir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullCLRPackage451Dir -Force -Recurse
 
-    Set-ScriptFailedOnError
-    
     ################################################################################
     # Publish Microsoft.TestPlatform.ObjectModel
 
@@ -608,18 +595,12 @@ function Publish-Tests
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
-
-    Set-ScriptFailedOnError
+    Invoke-Exe $dotnetExe "publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
 }
 
 function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, $selfcontained, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
-
-    Set-ScriptFailedOnError
+    Invoke-Exe $dotnetExe "publish $packagename --configuration $TPB_Configuration --framework $framework --runtime $runtime --self-contained $selfcontained --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
 }
 
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
@@ -750,8 +731,7 @@ function Create-VsixPackage
         Update-VsixVersion $vsixProjectDir
 
         # Build vsix project to get TestPlatform.vsix
-        Write-Verbose "$msbuildPath $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
-        & $msbuildPath "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
+        Invoke-Exe $msbuildPath """$vsixProjectDir\TestPlatform.csproj"" -p:Configuration=$Configuration"
     }
     else
     { 
@@ -852,9 +832,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$uap10Nuget`;BranchName=$TPB_BRANCH`;CommitId=$TPB_COMMIT $additionalArgs
-
-        Set-ScriptFailedOnError
+        Invoke-Exe $nugetExe "pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version;JsonNetVersion=$JsonNetVersion;Runtime=$TPB_TargetRuntime;NetCoreTargetFramework=$TPB_TargetFrameworkCore20;FakesPackageDir=$FakesPackageDir;NetStandard10Framework=$TPB_TargetFrameworkNS10;NetStandard13Framework=$TPB_TargetFrameworkNS13;NetStandard20Framework=$TPB_TargetFrameworkNS20;Uap10Framework=$uap10Nuget;BranchName=$TPB_BRANCH;CommitId=$TPB_COMMIT $additionalArgs"
     }
 
     # Verifies that expected number of files gets shipped in nuget packages.
@@ -933,11 +911,7 @@ function Update-LocalizedResources
     }
 
     $localizationProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "Localize\Localize.proj"
-    Write-Verbose "& $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true -nodeReuse:False"
-    & $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true -nodeReuse:False
-
-    Set-ScriptFailedOnError
-
+    Invoke-Exe $dotnetExe "msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true -nodeReuse:False"
     Write-Log ".. Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -1009,13 +983,11 @@ function Locate-VsInstallPath
    Try
    {
        if ($TPB_CIBuild) {
-           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath"
-           $vsInstallPath = & $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = Invoke-Exe $vswhere "-version ""(15.0"" -products * -requires $requiredPackageIds -property installationPath"
        }
        else {
            # Allow using pre release versions of VS for dev builds
-           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath"
-           $vsInstallPath = & $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath
+           $vsInstallPath = Invoke-Exe $vswhere "-version ""(15.0"" -prerelease -products * -requires $requiredPackageIds -property installationPath"
        }
    }
    Catch [System.Management.Automation.MethodInvocationException]
@@ -1063,11 +1035,7 @@ function Generate-Manifest ($PackageFolder)
     $generateManifestPath = Join-Path $env:TP_ROOT_DIR "scripts\build\GenerateManifest.proj"
     $msbuildPath = Locate-MSBuildPath
 
-    & $msbuildPath $generateManifestPath /t:PublishToBuildAssetRegistry /p:PackagesToPublishPattern=$PackageFolder\*.nupkg `
-                   /p:BUILD_BUILDNUMBER=$BuildNumber `
-                   /p:PackagesPath="$PackageFolder\" `
-                   /p:Configuration=$TPB_Configuration `
-                   /bl:"$env:TP_OUT_DIR\log\$Configuration\manifest-generation-$packagesFolderName.binlog"
+    Invoke-Exe $msbuildPath "$generateManifestPath /t:PublishToBuildAssetRegistry /p:PackagesToPublishPattern=$PackageFolder\*.nupkg /p:BUILD_BUILDNUMBER=$BuildNumber /p:PackagesPath=""$PackageFolder"" /p:Configuration=$TPB_Configuration /bl:""$env:TP_OUT_DIR\log\$Configuration\manifest-generation-$packagesFolderName.binlog"""
 
     Write-Log "Generate-Manifest ($packagesFolderName): Completed."
 }
@@ -1103,9 +1071,9 @@ function Build-SpecificProjects
     foreach($ProjectToBuild in $ProjectsToBuild) {
         Write-Log "Building Project $ProjectToBuild"
         # Restore and Build
-        $output = & $dotnetPath restore $ProjectToBuild
+        $output = Invoke-Exe $dotnetPath "restore $ProjectToBuild"
         PrintAndExit-OnError $output
-        $output = & $dotnetPath build $ProjectToBuild
+        $output = Invoke-Exe $dotnetPath "build $ProjectToBuild"
         PrintAndExit-OnError $output
 
         if (-Not ($ProjectToBuild.FullName -contains "$($env:TP_ROOT_DIR)$([IO.Path]::DirectorySeparatorChar)src")) {
@@ -1182,7 +1150,13 @@ if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
     Publish-PatchedDotnet
     Invoke-TestAssetsBuild
     Publish-Tests
-}
+} 
  
-Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
-if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
+
+if ($Script:ScriptFailed) {
+    Write-Log "Build failed. {$(Get-ElapsedTime($timer))}" -Level "Error"
+    Exit 1 
+} else { 
+    Write-Log "Build succeeded. {$(Get-ElapsedTime($timer))}"
+    Exit 0 
+}
