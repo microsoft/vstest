@@ -508,7 +508,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 rm => rm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
                     null,
-                    It.IsAny<DesignModeTestEventsRegistrar>(),
+                    It.IsAny<IdentifiableDesignModeTestEventsRegistrar>(),
                 It.IsAny<ProtocolConfig>())).Throws(new Exception());
 
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
@@ -532,7 +532,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 rm => rm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
                     null,
-                    It.IsAny<DesignModeTestEventsRegistrar>(),
+                    It.IsAny<IdentifiableDesignModeTestEventsRegistrar>(),
                 It.IsAny<ProtocolConfig>())).Throws(new TestPlatformException("Hello world"));
 
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
@@ -718,7 +718,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             var testPayload = new TestMessagePayload { MessageLevel = ObjectModel.Logging.TestMessageLevel.Error, Message = "DummyMessage" };
 
-            this.designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message);
+            this.designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message, MessageMetadata.Empty);
 
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
         }

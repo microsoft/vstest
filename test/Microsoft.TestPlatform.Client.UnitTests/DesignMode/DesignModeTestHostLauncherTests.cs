@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         public void DesignModeTestHostLauncherLaunchTestHostShouldCallDesignModeClientToLaunchCustomHost()
         {
             var mockDesignModeClient = new Mock<IDesignModeClient>();
-            var launcher = new DesignModeTestHostLauncher(mockDesignModeClient.Object);
+            var launcher = new DesignModeTestHostLauncher(mockDesignModeClient.Object, null);
             Assert.IsFalse(launcher.IsDebug, "Default launcher must not implement debug launcher interface.");
 
             var testProcessStartInfo = new TestProcessStartInfo();
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         public void DesignModeDebugTestHostLauncherLaunchTestHostShouldCallDesignModeClientToLaunchCustomHost()
         {
             var mockDesignModeClient = new Mock<IDesignModeClient>();
-            var launcher = new DesignModeDebugTestHostLauncher(mockDesignModeClient.Object);
+            var launcher = new DesignModeDebugTestHostLauncher(mockDesignModeClient.Object, null);
             Assert.IsTrue(launcher.IsDebug, "Debug launcher must implement debug launcher interface.");
 
             var testProcessStartInfo = new TestProcessStartInfo();
