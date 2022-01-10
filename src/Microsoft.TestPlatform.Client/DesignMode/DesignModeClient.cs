@@ -454,8 +454,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         // We must avoid re-launching the test host if the test run payload already
                         // contains test session info. Test session info being present is an indicative
                         // of an already running test host spawned by a start test session call.
-
-                        // REVIEW - this is caching the launcher, so we can get different recipient cached, but we want this to be unique per run, so we can call back to the correct launcher
                         var customLauncher =
                             shouldLaunchTesthost && testRunPayload.TestSessionInfo == null
                                 ? DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(

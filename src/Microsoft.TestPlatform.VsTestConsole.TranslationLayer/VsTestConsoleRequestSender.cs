@@ -1273,17 +1273,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         this.AttachDebuggerToProcess(message, sender);
                     }
-                    else if (string.Equals(MessageType.AttachDebugger, message.MessageType))
-                    {
-                        // There is some race condition or condition in the vstest.console. if we don't run any command previously then,
-                        // this will get invoked followed by EditorAttachDebugger. But if we run something before (our first tasks for example),
-                        // then only this will get triggered, and we don't handle it normally, so the execution won't continue... weird.
-                        this.AttachDebuggerToProcess(message, sender);
-                    }
-                    else
-                    {
-
-                    }
                 }
             }
             catch (Exception exception)
