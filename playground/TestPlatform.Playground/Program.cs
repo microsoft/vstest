@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -90,7 +91,8 @@ namespace TestPlatform.Playground
         public class TestRunHandler : ITestRunEventsHandler2, ITestDiscoveryEventsHandler2
         {
             private string _name;
-            public List<TestCase> DiscoveredTests = new List<TestCase>();
+            public ConcurrentBag<TestCase> _discoveredTests = new ConcurrentBag<TestCase>();
+            public List<TestCase> DiscoveredTests { get; } = new List<TestCase>();
 
             public TestRunHandler(string name)
             {

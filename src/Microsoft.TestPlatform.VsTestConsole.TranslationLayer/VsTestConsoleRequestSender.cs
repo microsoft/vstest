@@ -53,6 +53,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// Used to cancel blocking tasks associated with the vstest.console process.
         /// </summary>
         private CancellationTokenSource processExitCancellationTokenSource;
+        private ConcurrentDictionary<string, BlockingCollection<Message>> recipientQueues = new System.Collections.Concurrent.ConcurrentDictionary<string, BlockingCollection<Message>>();
+        private object spinnerLock = new object();
+        private Task spinner;
 
         #region Constructor
 
@@ -507,17 +510,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 while (true)
                 {
-                    var message = this.TryReceiveMessage();
-                    var versionedMessage = message as VersionedMessage;
-                    // we are forwarding messages to this server, when we do that we don't know the content of the message
-                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
-                    // then into one more message that has the metadata.
-                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
-                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
-                    {
-                        // the original message is replaced with the wrapped message
-                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
-                    }
+                    var message = this.TryRecieveMessageForRecipient(id);
 
                     switch (message.MessageType)
                     {
@@ -530,11 +523,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             return ackPayload.TestSessionInfo;
 
                         case MessageType.CustomTestHostLaunch:
-                            this.HandleCustomHostLaunch(message, recipient);
+                            this.HandleCustomHostLaunch(message, id);
                             break;
 
                         case MessageType.EditorAttachDebugger:
-                            this.AttachDebuggerToProcess(message, recipient);
+                            this.AttachDebuggerToProcess(message, id);
                             break;
 
                         case MessageType.TestMessage:
@@ -1047,18 +1040,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
-                    var message = this.TryReceiveMessage();
-
-                    var versionedMessage = message as VersionedMessage;
-                    // we are forwarding messages to this server, when we do that we don't know the content of the message
-                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
-                    // then into one more message that has the metadata.
-                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
-                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
-                    {
-                        // the original message is replaced with the wrapped message
-                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
-                    }
+                    var message = this.TryRecieveMessageForRecipient(sender);
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
@@ -1086,7 +1068,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         // Adding metrics from vstest.console.
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
-                        var handler = this.testRunDiscoveryHandlers[metadata.Recipient ?? recipient];
+                        var handler = this.testRunDiscoveryHandlers[metadata.Recipient ?? sender];
 
                         handler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
@@ -1097,7 +1079,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         var testMessagePayload = this.dataSerializer
                             .DeserializePayload<TestMessagePayload>(message, out var metadata);
-                        var handler = this.testRunDiscoveryHandlers[metadata.Recipient ?? recipient];
+                        var handler = this.testRunDiscoveryHandlers[metadata.Recipient ?? sender];
                         eventHandler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
@@ -1245,17 +1227,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = this.TryReceiveMessage();
-                    var versionedMessage = message as VersionedMessage;
-                    // we are forwarding messages to this server, when we do that we don't know the content of the message
-                    // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
-                    // then into one more message that has the metadata.
-                    string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
-                    if (versionedMessage.MessageType == "RawMessageWithMetadata")
-                    {
-                        // the original message is replaced with the wrapped message
-                        message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
-                    }
+                    var message = this.TryRecieveMessageForRecipient(sender);
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -1263,7 +1235,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             .DeserializePayload<TestRunChangedEventArgs>(
                             message);
 
-                        var handler = this.testRunEventHandlers[recipient];
+                        var handler = this.testRunEventHandlers[sender];
                         handler.HandleTestRunStatsChange(testRunChangedArgs);
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
@@ -1276,7 +1248,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                         var testRunCompletePayload = this.dataSerializer
                             .DeserializePayload<TestRunCompletePayload>(message);
-                        var handler = this.testRunEventHandlers[recipient];
+                        var handler = this.testRunEventHandlers[sender];
                         handler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
                             testRunCompletePayload.LastRunTests,
@@ -1288,18 +1260,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     {
                         var testMessagePayload = this.dataSerializer
                             .DeserializePayload<TestMessagePayload>(message);
-                        var handler = this.testRunEventHandlers[recipient];
+                        var handler = this.testRunEventHandlers[sender];
                         handler.HandleLogMessage(
                             testMessagePayload.MessageLevel,
                             testMessagePayload.Message);
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        this.HandleCustomHostLaunch(message, recipient);
+                        this.HandleCustomHostLaunch(message, sender);
                     }
                     else if (string.Equals(MessageType.EditorAttachDebugger, message.MessageType))
                     {
-                        this.AttachDebuggerToProcess(message, recipient);
+                        this.AttachDebuggerToProcess(message, sender);
+                    }
+                    else if (string.Equals(MessageType.AttachDebugger, message.MessageType))
+                    {
+                        // There is some race condition or condition in the vstest.console. if we don't run any command previously then,
+                        // this will get invoked followed by EditorAttachDebugger. But if we run something before (our first tasks for example),
+                        // then only this will get triggered, and we don't handle it normally, so the execution won't continue... weird.
+                        this.AttachDebuggerToProcess(message, sender);
+                    }
+                    else
+                    {
+
                     }
                 }
             }
@@ -1511,6 +1494,47 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             finally
             {
                 this.testPlatformEventSource.TranslationLayerTestRunAttachmentsProcessingStop();
+            }
+        }
+
+        private Message TryRecieveMessageForRecipient(string recipient)
+        {
+            EnsureSpinning();
+            var queue = this.recipientQueues.GetOrAdd(recipient, _ => new BlockingCollection<Message>());
+            return queue.Take();
+        }
+
+        private void EnsureSpinning()
+        {
+            lock (this.spinnerLock)
+            {
+                if (this.spinner == null || this.spinner.IsCompleted)
+                {
+                    this.spinner = Task.Run(() =>
+                    {
+                        while (true)
+                        {
+                            var message = this.TryReceiveMessage();
+                            var versionedMessage = message as VersionedMessage;
+                            // we are forwarding messages to this server, when we do that we don't know the content of the message
+                            // we just forward it without deserializing. To allow those messages to be sent to a recepient, we wrap
+                            // then into one more message that has the metadata.
+                            string recipient = versionedMessage != null ? versionedMessage.Recipient : null;
+                            if (versionedMessage.MessageType == "RawMessageWithMetadata")
+                            {
+                                // the original message is replaced with the wrapped message
+                                message = dataSerializer.DeserializeMessage(versionedMessage.Payload.ToString());
+                            }
+
+                            if (!this.recipientQueues.TryGetValue(recipient, out var queue))
+                            {
+                                throw new InvalidOperationException($"Recipient {recipient} does not have a queue.");
+                            }
+                            
+                            queue.Add(message);
+                        }
+                    });
+                }
             }
         }
 

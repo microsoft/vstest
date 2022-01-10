@@ -376,7 +376,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </returns>
         public async Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken)
         {
-            var str = await Task.Run(() => this.TryReceiveRawMessage(cancellationToken));
+            var str = await this.TryReceiveRawMessageAsync(cancellationToken);
             return str;
         }
 
@@ -391,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             return this.dataSerializer.DeserializePayload<T>(message);
         }
 
-        private string TryReceiveRawMessage(CancellationToken cancellationToken)
+        private Task<string> TryReceiveRawMessageAsync(CancellationToken cancellationToken)
         {
             string str = null;
             bool success = false;
@@ -433,7 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
 
-            return str;
+            return Task.FromResult(str);
         }
 
         /// <summary>
