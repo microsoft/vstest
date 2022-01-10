@@ -14,6 +14,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     [DataContract]
     public class TestRunCompleteEventArgs : EventArgs
     {
+        // We have more than one ctor for backward-compatibility reason but we don't want to add dependency on Newtosoft([JsonContstructor])
+        // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm
+        private TestRunCompleteEventArgs()
+        {
+
+        }
+
         /// <summary>
         /// Default constructor.
         /// </summary>
