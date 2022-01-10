@@ -20,6 +20,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <param name="attachmentSets">
         /// The collection of attachment sets.
         /// </param>
+        /// <param name="metrics">
+        /// The metrics.
+        /// </param>
+        public AfterTestRunEndResult(Collection<AttachmentSet> attachmentSets, IDictionary<string, object> metrics)
+            : this(attachmentSets, new Collection<InvokedDataCollector>(), metrics)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AfterTestRunEndResult"/> class.
+        /// </summary>
+        /// <param name="attachmentSets">
+        /// The collection of attachment sets.
+        /// </param>
         /// <param name="invokedDataCollectors">
         /// The collection of the DataCollectors invoked during test session
         /// </param>

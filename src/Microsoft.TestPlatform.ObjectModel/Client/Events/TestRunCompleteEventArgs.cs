@@ -22,6 +22,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="isAborted">Specifies whether the test run is aborted.</param>
         /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
         /// <param name="attachmentSets">Attachment sets associated with the run.</param>
+        /// <param name="elapsedTime">Time elapsed in just running tests</param>
+        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime)
+            : this(stats, isCanceled, isAborted, error, attachmentSets, null, elapsedTime)
+        { }
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="stats">The final stats for the test run. This parameter is only set for communications between the test host and the clients (like VS)</param>
+        /// <param name="isCanceled">Specifies whether the test run is canceled.</param>
+        /// <param name="isAborted">Specifies whether the test run is aborted.</param>
+        /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
+        /// <param name="attachmentSets">Attachment sets associated with the run.</param>
         /// <param name="InvokedDataCollectors">Invoked data collectors</param>
         /// <param name="elapsedTime">Time elapsed in just running tests</param>
         public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)

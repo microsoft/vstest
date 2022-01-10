@@ -100,6 +100,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="friendlyName">
         /// The friendly Name.
         /// </param>
+        public DataCollectorMetadata(string extension, string friendlyName)
+            : this(extension, friendlyName, false)
+        { }
+
+        /// <summary>
+        /// Constructor for DataCollectorMetadata
+        /// </summary>
+        /// <param name="extension">
+        /// Uri identifying the data collector.
+        /// </param>
+        /// <param name="friendlyName">
+        /// The friendly Name.
+        /// <param name="hasAttachmentProcessor">
+        /// Indicates if the current data collector registers an attachment processor
+        /// </param>
         public DataCollectorMetadata(string extension, string friendlyName, bool hasAttachmentProcessor)
         {
             this.ExtensionUri = extension;
