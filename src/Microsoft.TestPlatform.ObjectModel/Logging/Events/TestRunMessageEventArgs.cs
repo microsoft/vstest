@@ -52,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         /// </summary>
         [DataMember]
         public TestMessageLevel Level { get; set; }
+
         #endregion
     }
 }

@@ -43,7 +43,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="pid">Process ID of the process to which the debugger should be attached.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><see cref="true"/> if the debugger was successfully attached to the requested process, <see cref="false"/> otherwise.</returns>
+#pragma warning disable RS0016 // Add public types and members to the declared API
         bool AttachDebuggerToProcess(int pid, string recipient, CancellationToken cancellationToken);
+#pragma warning restore RS0016 // Add public types and members to the declared API
 
         /// <summary>
         /// Handles parent process exit

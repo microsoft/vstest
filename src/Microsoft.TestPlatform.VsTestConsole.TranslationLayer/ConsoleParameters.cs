@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 var directoryPath = Path.GetDirectoryName(value);
                 if (!string.IsNullOrEmpty(directoryPath) && !fileHelper.DirectoryExists(directoryPath))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(value));
+                    Directory.CreateDirectory(directoryPath);
                 }
 
                 // Ensure path is double quoted. if path has white space then it can create problem.

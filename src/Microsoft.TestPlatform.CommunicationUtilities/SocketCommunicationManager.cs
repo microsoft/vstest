@@ -312,7 +312,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Send serialized raw message
         /// </summary>
         /// <param name="rawMessage">serialized message</param>
+#pragma warning disable RS0016 // Add public types and members to the declared API
         public void SendRawMessage(string rawMessage)
+#pragma warning restore RS0016 // Add public types and members to the declared API
         {
             this.WriteAndFlushToChannel(rawMessage);
         }

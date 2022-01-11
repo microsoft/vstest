@@ -351,7 +351,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         }
 
         /// <inheritdoc/>
+#pragma warning disable RS0016 // Add public types and members to the declared API
         public bool AttachDebuggerToProcess(int pid, string recipient, CancellationToken cancellationToken)
+#pragma warning restore RS0016 // Add public types and members to the declared API
         {
             // If an attach request is issued but there is no support for attaching on the other
             // side of the communication channel, we simply return and let the caller know the
@@ -392,13 +394,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// Send the raw messages to IDE
         /// </summary>
         /// <param name="rawMessage"></param>
+#pragma warning disable RS0016 // Add public types and members to the declared API
         public void SendRawMessage(string rawMessage, MessageMetadata messageMetadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
         {
             this.communicationManager.SendRawMessage(rawMessage, messageMetadata);
         }
 
         /// <inheritdoc />
+#pragma warning disable RS0016 // Add public types and members to the declared API
         public void SendTestMessage(TestMessageLevel level, string message, MessageMetadata messageMetadata)
+#pragma warning restore RS0016 // Add public types and members to the declared API
         {
             var payload = new TestMessagePayload { MessageLevel = level, Message = message };
             this.communicationManager.SendMessage(MessageType.TestMessage, payload, messageMetadata);

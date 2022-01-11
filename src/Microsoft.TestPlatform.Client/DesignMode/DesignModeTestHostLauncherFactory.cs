@@ -11,7 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     /// </summary>
     public static class DesignModeTestHostLauncherFactory
     {
+#pragma warning disable RS0016 // Add public types and members to the declared API
         public static ITestHostLauncher GetCustomHostLauncherForTestRun(IDesignModeClient designModeClient, bool debuggingEnabled, string recipient)
+#pragma warning restore RS0016 // Add public types and members to the declared API
         {
             if (!debuggingEnabled)
             {

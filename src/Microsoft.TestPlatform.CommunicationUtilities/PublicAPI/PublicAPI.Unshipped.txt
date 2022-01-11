@@ -1,0 +1,1 @@
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ICommunicationManager.SendRawMessage(string rawMessage) -> void
