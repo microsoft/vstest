@@ -110,7 +110,7 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
-    & $dotnetInstallScript -Channel 6.0 -Quality Preview -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -Channel 6.0 -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
     
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.30' -Channel '2.1' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
