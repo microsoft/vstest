@@ -831,8 +831,7 @@ function Create-NugetPackages
             $uap10Nuget = $testhostUapPackageDir
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        Invoke-Exe $nugetExe "pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version;JsonNetVersion=$JsonNetVersion;Runtime=$TPB_TargetRuntime;NetCoreTargetFramework=$TPB_TargetFrameworkCore20;FakesPackageDir=$FakesPackageDir;NetStandard10Framework=$TPB_TargetFrameworkNS10;NetStandard13Framework=$TPB_TargetFrameworkNS13;NetStandard20Framework=$TPB_TargetFrameworkNS20;Uap10Framework=$uap10Nuget;BranchName=$TPB_BRANCH;CommitId=$TPB_COMMIT $additionalArgs"
+        Invoke-Exe $nugetExe "pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version``;JsonNetVersion=$JsonNetVersion``;Runtime=$TPB_TargetRuntime``;NetCoreTargetFramework=$TPB_TargetFrameworkCore20``;FakesPackageDir=$FakesPackageDir``;NetStandard10Framework=$TPB_TargetFrameworkNS10``;NetStandard13Framework=$TPB_TargetFrameworkNS13``;NetStandard20Framework=$TPB_TargetFrameworkNS20``;Uap10Framework=$uap10Nuget``;BranchName=$TPB_BRANCH``;CommitId=$TPB_COMMIT $additionalArgs"
     }
 
     # Verifies that expected number of files gets shipped in nuget packages.
@@ -960,6 +959,7 @@ function Locate-MSBuildPath
 
     Write-Verbose "found msbuild : '$($msbuildPath -join "','")'"
     $msBuild = $msBuildPath | Select-Object -First 1
+    
     Write-Verbose "msbuildPath is : '$($msbuildPath -join "','")'"
     if ($null -eq $msBuild -or 0 -eq $msBuild.Count) { 
         throw "MSBuild not found."

@@ -224,7 +224,8 @@ function Invoke-Exe {
         [int[]] $IgnoreExitCode
     )
     Write-Verbose "Invoking: $Command $Arguments"
-    & $Command ($Arguments -split ' ')
+    ([ScriptBlock]::Create("$Command $Arguments")).Invoke()
+    
     if ($IgnoreExitCode -notcontains $LASTEXITCODE) {
         Set-ScriptFailedOnError -Command $Command -Arguments $Arguments
     }
