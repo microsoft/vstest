@@ -18,7 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
         private TestRunCompleteEventArgs()
         {
-
+            this.AttachmentSets = new Collection<AttachmentSet>();
+            this.InvokedDataCollectors = new Collection<InvokedDataCollector>();
         }
 
         /// <summary>
