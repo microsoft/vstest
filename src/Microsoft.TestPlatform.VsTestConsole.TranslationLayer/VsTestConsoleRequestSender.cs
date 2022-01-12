@@ -495,7 +495,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 if (!this.sessionEventHandlers.TryAdd(id, eventsHandler))
                 {
-                    throw new InvalidOperationException($"Adding session hancler under unique id {id} did not succeed, this should never happen.");
+                    throw new InvalidOperationException($"Adding session handler under unique id {id} did not succeed, this should never happen.");
                 }
 
                 if (!this.customHostLaunchers.TryAdd(id, testHostLauncher))
