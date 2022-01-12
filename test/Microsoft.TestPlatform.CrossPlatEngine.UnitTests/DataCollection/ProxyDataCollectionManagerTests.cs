@@ -225,26 +225,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void AfterTestRunEndShouldReturnAttachments(bool telemetryOptedIn)
         {
             var attachments = new Collection<AttachmentSet>();
+            var invokedDataCollectors = new Collection<InvokedDataCollector>();
             var dispName = "MockAttachments";
             var uri = new Uri("Mock://Attachments");
             var attachmentSet = new AttachmentSet(uri, dispName);
             attachments.Add(attachmentSet);
             this.mockRequestData.Setup(m => m.IsTelemetryOptedIn).Returns(telemetryOptedIn);
 
-            var metrics = new Dictionary<string, object>() 
+            var metrics = new Dictionary<string, object>()
             {
                 {"key", "value"}
             };
 
-            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, metrics));
+            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(new AfterTestRunEndResult(attachments, invokedDataCollectors, metrics));
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.IsNotNull(result[0]);
-            Assert.AreEqual(dispName, result[0].DisplayName);
-            Assert.AreEqual(uri, result[0].Uri);
+            Assert.AreEqual(1, result.Attachments.Count);
+            Assert.IsNotNull(result.Attachments[0]);
+            Assert.AreEqual(dispName, result.Attachments[0].DisplayName);
+            Assert.AreEqual(uri, result.Attachments[0].Uri);
 
             if (telemetryOptedIn)
             {

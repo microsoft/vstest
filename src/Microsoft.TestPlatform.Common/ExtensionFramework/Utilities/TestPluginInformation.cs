@@ -50,5 +50,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             get;
             private set;
         }
+
+        /// <summary>
+        /// Gets the file path of the plugin
+        /// </summary>
+        public string FilePath
+        {
+            get;
+            internal set;
+        }
     }
 }

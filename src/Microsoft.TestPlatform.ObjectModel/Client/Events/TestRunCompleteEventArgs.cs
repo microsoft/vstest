@@ -14,6 +14,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     [DataContract]
     public class TestRunCompleteEventArgs : EventArgs
     {
+        // We have more than one ctor for backward-compatibility reason but we don't want to add dependency on Newtosoft([JsonConstructor])
+        // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
+        private TestRunCompleteEventArgs()
+        {
+            this.AttachmentSets = new Collection<AttachmentSet>();
+            this.InvokedDataCollectors = new Collection<InvokedDataCollector>();
+        }
+
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -24,12 +32,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="attachmentSets">Attachment sets associated with the run.</param>
         /// <param name="elapsedTime">Time elapsed in just running tests</param>
         public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime)
+            : this(stats, isCanceled, isAborted, error, attachmentSets, null, elapsedTime)
+        { }
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="stats">The final stats for the test run. This parameter is only set for communications between the test host and the clients (like VS)</param>
+        /// <param name="isCanceled">Specifies whether the test run is canceled.</param>
+        /// <param name="isAborted">Specifies whether the test run is aborted.</param>
+        /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
+        /// <param name="attachmentSets">Attachment sets associated with the run.</param>
+        /// <param name="InvokedDataCollectors">Invoked data collectors</param>
+        /// <param name="elapsedTime">Time elapsed in just running tests</param>
+        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, Collection<InvokedDataCollector> invokedDataCollectors, TimeSpan elapsedTime)
         {
             this.TestRunStatistics = stats;
             this.IsCanceled = isCanceled;
             this.IsAborted = isAborted;
             this.Error = error;
             this.AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
+            this.InvokedDataCollectors = invokedDataCollectors ?? new Collection<InvokedDataCollector>(); // Ensuring that invoked data collectors are not null.
             this.ElapsedTimeInRunningTests = elapsedTime;
         }
 
@@ -62,6 +85,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
+
+        /// <summary>
+        /// Gets the invoked data collectors for the test session.
+        /// </summary>
+        [DataMember]
+        public Collection<InvokedDataCollector> InvokedDataCollectors { get; private set; }
 
         /// <summary>
         /// Gets the time elapsed in just running the tests.

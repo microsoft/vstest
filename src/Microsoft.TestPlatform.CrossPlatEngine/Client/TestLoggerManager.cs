@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error,
-                        e.AttachmentSets, e.ElapsedTimeInRunningTests);
+                        e.AttachmentSets, e.InvokedDataCollectors, e.ElapsedTimeInRunningTests);
                 }
                 finally
                 {

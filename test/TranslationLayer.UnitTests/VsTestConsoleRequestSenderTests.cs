@@ -28,6 +28,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
     using Payloads = Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
+    using NuGet.Frameworks;
 
     [TestClass]
     public class VsTestConsoleRequestSenderTests
@@ -687,7 +688,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     Assert.IsTrue(c.IsCancellationRequested);
                 }).Returns(Task.FromResult((Message)null));
 
-            mockHandler.Setup(mh => mh.HandleDiscoveryComplete( It.IsAny<DiscoveryCompleteEventArgs>(), null)).Callback(() => manualEvent.Set());
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null)).Callback(() => manualEvent.Set());
 
             this.requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), null, mockHandler.Object);
 
@@ -730,7 +731,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -759,7 +760,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -792,7 +793,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null,
@@ -847,7 +848,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null,
@@ -947,7 +948,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1011,7 +1012,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1075,7 +1076,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1124,7 +1125,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1213,7 +1214,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.InitializeCommunication();
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -1240,7 +1241,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             await this.InitializeCommunicationAsync();
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -1274,7 +1275,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1328,7 +1329,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1385,7 +1386,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
             var payload = new TestRunCompletePayload()
@@ -1441,7 +1442,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
             var payload = new TestRunCompletePayload()
@@ -1497,7 +1498,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(
@@ -1554,7 +1555,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(
@@ -1608,7 +1609,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1670,7 +1671,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1729,7 +1730,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var p2 = new TestProcessStartInfo() { FileName = "Y" };
             var message1 = CreateMessage(MessageType.CustomTestHostLaunch, p1);
             var message2 = CreateMessage(MessageType.CustomTestHostLaunch, p2);
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var completepayload = new TestRunCompletePayload()
             {
                 ExecutorUris = null,
@@ -1768,7 +1769,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var p2 = new TestProcessStartInfo() { FileName = "Y" };
             var message1 = CreateMessage(MessageType.CustomTestHostLaunch, p1);
             var message2 = CreateMessage(MessageType.CustomTestHostLaunch, p2);
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var completepayload = new TestRunCompletePayload()
             {
                 ExecutorUris = null,
@@ -1838,7 +1839,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var manualEvent = new ManualResetEvent(false);
             var sources = new List<string> { "1.dll" };
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
             var payload = new TestRunCompletePayload()
             {
@@ -1869,7 +1870,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var sources = new List<string> { "1.dll" };
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
             var payload = new TestRunCompletePayload()
             {
@@ -1904,9 +1905,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
             var payload = new TestRunAttachmentsProcessingCompletePayload()
-            { 
+            {
                 AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(false, null),
-                Attachments = new AttachmentSet[0] 
+                Attachments = new AttachmentSet[0]
             };
 
             var attachmentsProcessingComplete = new Message()
@@ -1915,8 +1916,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 Payload = JToken.FromObject(payload)
             };
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
+            {
+                Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
+                Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            });
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(
+                new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                Constants.EmptyRunSettings,
+                true,
+                mockHandler.Object,
+                CancellationToken.None);
 
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
@@ -1931,19 +1943,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
 
-            var payload = new TestRunAttachmentsProcessingCompletePayload() 
+            var payload = new TestRunAttachmentsProcessingCompletePayload()
             {
                 AttachmentsProcessingCompleteEventArgs = new TestRunAttachmentsProcessingCompleteEventArgs(true, new Exception("msg")),
-                Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") } 
+                Attachments = new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }
             };
             var attachmentsProcessingComplete = new Message()
             {
                 MessageType = MessageType.TestRunAttachmentsProcessingComplete,
                 Payload = JToken.FromObject(payload)
             };
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, CancellationToken.None);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
+            {
+                Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
+                Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            });
+
+            await this.requestSender.ProcessTestRunAttachmentsAsync(
+                new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                Constants.EmptyRunSettings,
+                true,
+                mockHandler.Object,
+                CancellationToken.None);
 
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
@@ -1974,10 +1998,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var message = CreateMessage(MessageType.TestMessage, mpayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
+            {
+                Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
+                Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            });
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete)));
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(
+                new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                Constants.EmptyRunSettings,
+                false,
+                mockHandler.Object,
+                CancellationToken.None);
 
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
@@ -2015,11 +2050,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 Payload = JToken.FromObject(progressPayload)
             };
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingProgress));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
+            {
+                Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
+                Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            });
 
             mockHandler.Setup(mh => mh.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>())).Callback(
                 () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete)));
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(
+                new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                Constants.EmptyRunSettings,
+                false,
+                mockHandler.Object,
+                CancellationToken.None);
 
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel), Times.Never);
@@ -2051,13 +2097,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var message = CreateMessage(MessageType.TestMessage, mpayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
+            {
+                Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
+                Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            });
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(() =>
             {
                 cts.Cancel();
                 this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
             });
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, false, mockHandler.Object, cts.Token);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(
+                new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                Constants.EmptyRunSettings,
+                false,
+                mockHandler.Object,
+                cts.Token);
 
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel));
@@ -2086,8 +2143,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(attachmentsProcessingComplete));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).Callback((string _, object o) =>
+            {
+                Assert.AreEqual(Constants.EmptyRunSettings, ((TestRunAttachmentsProcessingPayload)o).RunSettings);
+                Assert.AreEqual(1, ((TestRunAttachmentsProcessingPayload)o).InvokedDataCollectors.Count());
+            });
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") }, true, mockHandler.Object, cts.Token);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(
+                new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "a") },
+                new List<InvokedDataCollector>() { new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, false) },
+                Constants.EmptyRunSettings,
+                true,
+                mockHandler.Object,
+                cts.Token);
 
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>()));
             mockCommunicationManager.Verify(c => c.SendMessage(MessageType.TestRunAttachmentsProcessingCancel));
@@ -2101,7 +2169,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAttachmentsProcessingStart, It.IsAny<object>())).Throws(new IOException());
 
-            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }, false, mockHandler.Object, CancellationToken.None);
+            await this.requestSender.ProcessTestRunAttachmentsAsync(new List<AttachmentSet> { new AttachmentSet(new Uri("http://www.bing.com"), "out") }, new List<InvokedDataCollector>(), Constants.EmptyRunSettings, false, mockHandler.Object, CancellationToken.None);
 
             mockHandler.Verify(mh => mh.HandleTestRunAttachmentsProcessingComplete(It.Is<TestRunAttachmentsProcessingCompleteEventArgs>(a => !a.IsCanceled && a.Error is IOException), null), Times.Once, "Attachments Processing Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
@@ -2519,7 +2587,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()

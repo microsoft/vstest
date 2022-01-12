@@ -662,6 +662,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     aborted,
                     exception,
                     attachments,
+                    // Today we don't offer an extension to run collectors for test adapters.
+                    new Collection<InvokedDataCollector>(),
                     elapsedTime);
                 testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
 

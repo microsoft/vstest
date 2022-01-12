@@ -18,6 +18,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public IEnumerable<AttachmentSet> Attachments { get; set; }
 
         /// <summary>
+        /// Collection of the invoked data collectors.
+        /// </summary>
+        [DataMember]
+        public IEnumerable<InvokedDataCollector> InvokedDataCollectors { get; set; }
+
+        /// <summary>
+        /// Gets or sets the settings used for the test run request.
+        /// </summary>
+        [DataMember]
+        public string RunSettings { get; set; }
+
+        /// <summary>
         ///  Gets or sets whether Metrics should be collected or not.
         /// </summary>
         [DataMember]

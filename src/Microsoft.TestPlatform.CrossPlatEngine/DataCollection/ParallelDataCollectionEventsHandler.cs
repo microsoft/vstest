@@ -56,13 +56,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (parallelRunComplete)
             {
-                runDataAggregator.RunContextAttachments = attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(requestData, runDataAggregator.RunContextAttachments, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
+                runDataAggregator.RunContextAttachments = attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(runDataAggregator.RunSettings, requestData, runDataAggregator.RunContextAttachments, runDataAggregator.InvokedDataCollectors, cancellationToken).Result ?? runDataAggregator.RunContextAttachments;
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    runDataAggregator.RunContextAttachments,
+                    this.runDataAggregator.RunContextAttachments,
+                    this.runDataAggregator.InvokedDataCollectors,
                     this.runDataAggregator.ElapsedTime);
 
                 // Add Metrics from Test Host

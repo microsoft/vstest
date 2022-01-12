@@ -8,49 +8,50 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing
 {
     /// <summary>
     /// Orchestrates test run attachments processing operations.
     /// </summary>
-    public class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessingManager
+    internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessingManager
     {
         private static string AttachmentsProcessingCompleted = "Completed";
         private static string AttachmentsProcessingCanceled = "Canceled";
         private static string AttachmentsProcessingFailed = "Failed";
 
         private readonly ITestPlatformEventSource testPlatformEventSource;
-        private readonly IDataCollectorAttachmentProcessor[] dataCollectorAttachmentsProcessors;
+        private readonly IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunAttachmentsProcessingManager"/> class.
         /// </summary>
-        public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource, params IDataCollectorAttachmentProcessor[] dataCollectorAttachmentsProcessors)
+        public TestRunAttachmentsProcessingManager(ITestPlatformEventSource testPlatformEventSource, IDataCollectorAttachmentsProcessorsFactory dataCollectorAttachmentsProcessorsFactory)
         {
             this.testPlatformEventSource = testPlatformEventSource ?? throw new ArgumentNullException(nameof(testPlatformEventSource));
-            this.dataCollectorAttachmentsProcessors = dataCollectorAttachmentsProcessors ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentsProcessors));
+            this.dataCollectorAttachmentsProcessorsFactory = dataCollectorAttachmentsProcessorsFactory ?? throw new ArgumentNullException(nameof(dataCollectorAttachmentsProcessorsFactory));
         }
 
         /// <inheritdoc/>
-        public async Task ProcessTestRunAttachmentsAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+        public async Task ProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
         {
-            await InternalProcessTestRunAttachmentsAsync(requestData, new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken).ConfigureAwait(false);
+            await InternalProcessTestRunAttachmentsAsync(runSettingsXml, requestData, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, eventHandler, cancellationToken).ConfigureAwait(false);
         }
         /// <inheritdoc/>
-        public Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(IRequestData requestData, IEnumerable<AttachmentSet> attachments, CancellationToken cancellationToken)
+        public Task<Collection<AttachmentSet>> ProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, IEnumerable<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, CancellationToken cancellationToken)
         {
-            return InternalProcessTestRunAttachmentsAsync(requestData, new Collection<AttachmentSet>(attachments.ToList()), null, cancellationToken);
+            return InternalProcessTestRunAttachmentsAsync(runSettingsXml, requestData, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, null, cancellationToken);
         }
 
-        private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(IRequestData requestData, Collection<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
+        private async Task<Collection<AttachmentSet>> InternalProcessTestRunAttachmentsAsync(string runSettingsXml, IRequestData requestData, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventHandler, CancellationToken cancellationToken)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -58,13 +59,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             {
                 testPlatformEventSource.TestRunAttachmentsProcessingStart(attachments?.Count ?? 0);
                 requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing, attachments?.Count ?? 0);
-                
-                cancellationToken.ThrowIfCancellationRequested();                
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var taskCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
                 using (cancellationToken.Register(() => taskCompletionSource.TrySetCanceled()))
                 {
-                    Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(new Collection<AttachmentSet>(attachments.ToList()), eventHandler, cancellationToken));
+                    Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, new Collection<AttachmentSet>(attachments.ToList()), invokedDataCollector, eventHandler, cancellationToken));
 
                     var completedTask = await Task.WhenAny(task, taskCompletionSource.Task).ConfigureAwait(false);
 
@@ -96,39 +97,74 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             }
         }
 
-        private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(Collection<AttachmentSet> attachments, ITestRunAttachmentsProcessingEventsHandler eventsHandler, CancellationToken cancellationToken)
+        private async Task<Collection<AttachmentSet>> ProcessAttachmentsAsync(string runSettingsXml, Collection<AttachmentSet> attachments, IEnumerable<InvokedDataCollector> invokedDataCollector, ITestRunAttachmentsProcessingEventsHandler eventsHandler, CancellationToken cancellationToken)
         {
             if (attachments == null || !attachments.Any()) return attachments;
+            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runSettingsXml);
 
             var logger = CreateMessageLogger(eventsHandler);
-
+            var dataCollectorAttachmentsProcessors = this.dataCollectorAttachmentsProcessorsFactory.Create(invokedDataCollector?.ToArray(), logger);
             for (int i = 0; i < dataCollectorAttachmentsProcessors.Length; i++)
             {
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
                 int attachmentsHandlerIndex = i + 1;
 
-                ICollection<Uri> attachmentProcessorUris = dataCollectorAttachmentsProcessor.GetExtensionUris()?.ToList();
-                if (attachmentProcessorUris != null && attachmentProcessorUris.Any())
+                // We run processor code inside a try/catch because we want to continue with the others in case of failure.
+                Collection<AttachmentSet> attachmentsBackup = null;
+                try
                 {
-                    var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachmentProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
-                    if (attachmentsToBeProcessed.Any())
+                    // We temporarily save the attachments to process because, in case of processor exception,
+                    // we'll restore the attachmentSets to make those available to other processors.
+                    // NB. attachments.ToList() is done on purpose we need a new ref list.
+                    attachmentsBackup = new Collection<AttachmentSet>(attachments.ToList());
+
+                    ICollection<Uri> attachmentProcessorUris = dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetExtensionUris()?.ToList();
+                    if (attachmentProcessorUris != null && attachmentProcessorUris.Any())
                     {
-                        foreach (var attachment in attachmentsToBeProcessed)
+                        var attachmentsToBeProcessed = attachments.Where(dataCollectionAttachment => attachmentProcessorUris.Any(uri => uri.Equals(dataCollectionAttachment.Uri))).ToArray();
+                        if (attachmentsToBeProcessed.Any())
                         {
-                            attachments.Remove(attachment);
-                        }
+                            foreach (var attachment in attachmentsToBeProcessed)
+                            {
+                                attachments.Remove(attachment);
+                            }
 
-                        IProgress<int> progressReporter = new Progress<int>((int progress) => 
-                            eventsHandler?.HandleTestRunAttachmentsProcessingProgress(
-                                new TestRunAttachmentsProcessingProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
+                            IProgress<int> progressReporter = new Progress<int>((int progress) =>
+                                eventsHandler?.HandleTestRunAttachmentsProcessingProgress(
+                                    new TestRunAttachmentsProcessingProgressEventArgs(attachmentsHandlerIndex, attachmentProcessorUris, progress, dataCollectorAttachmentsProcessors.Length)));
 
-                        ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.ProcessAttachmentSetsAsync(new Collection<AttachmentSet>(attachmentsToBeProcessed), progressReporter, logger, cancellationToken).ConfigureAwait(false);
+                            XmlElement configuration = null;
+                            var collectorConfiguration = dataCollectionRunSettings?.DataCollectorSettingsList.SingleOrDefault(c => c.FriendlyName == dataCollectorAttachmentsProcessor.FriendlyName);
+                            if (collectorConfiguration != null && collectorConfiguration.IsEnabled)
+                            {
+                                configuration = collectorConfiguration.Configuration;
+                            }
 
-                        foreach (var attachment in processedAttachments)
-                        {
-                            attachments.Add(attachment);
+                            EqtTrace.Info($"TestRunAttachmentsProcessingManager: invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
+                            ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.ProcessAttachmentSetsAsync(
+                                configuration,
+                                new Collection<AttachmentSet>(attachmentsToBeProcessed),
+                                progressReporter,
+                                logger,
+                                cancellationToken).ConfigureAwait(false);
+
+                            if (processedAttachments != null && processedAttachments.Any())
+                            {
+                                foreach (var attachment in processedAttachments)
+                                {
+                                    attachments.Add(attachment);
+                                }
+                            }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
+                    logger.SendMessage(TestMessageLevel.Error, e.Message);
+
+                    // Restore the attachment sets for the others attachment processors.
+                    attachments = attachmentsBackup;
                 }
             }
 
@@ -136,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
         }
 
         private Collection<AttachmentSet> FinalizeOperation(IRequestData requestData, TestRunAttachmentsProcessingCompleteEventArgs completeArgs, Collection<AttachmentSet> attachments, Stopwatch stopwatch, ITestRunAttachmentsProcessingEventsHandler eventHandler)
-        {            
+        {
             testPlatformEventSource.TestRunAttachmentsProcessingStop(attachments.Count);
             requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAttachmentsAfterProcessing, attachments.Count);
             requestData.MetricsCollection.Add(TelemetryDataConstants.AttachmentsProcessingState, completeArgs.Error != null ? AttachmentsProcessingFailed : completeArgs.IsCanceled ? AttachmentsProcessingCanceled : AttachmentsProcessingCompleted);

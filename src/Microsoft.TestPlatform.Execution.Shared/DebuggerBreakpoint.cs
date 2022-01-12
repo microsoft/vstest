@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Execution
                 }
                 else
                 {
-                    ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid}... No breakpoints are automatically set.", OutputLevel.Information);
+                    ConsoleOutput.Instance.WriteLine($"Attaching Visual Studio with PID {vsPid} to the process '{Process.GetCurrentProcess().ProcessName}({Process.GetCurrentProcess().Id})'... No breakpoints are automatically set.", OutputLevel.Information);
                 }
 
                 AttachVS(Process.GetCurrentProcess(), vsPid);

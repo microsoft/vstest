@@ -167,12 +167,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="filtered">
         /// Receives test extensions filtered by Identifier data
         /// </param>
+        /// <param name="skipCache">
+        /// Skip the extensions cache.
+        /// </param>
         public void GetTestExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(
             string extensionAssembly,
             out IEnumerable<LazyExtension<IExtension, Dictionary<string, object>>> unfiltered,
-            out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
+            out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered,
+            bool skipCache = false) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {
-            var extensions = TestPluginCache.Instance.GetTestExtensions<TPluginInfo, IExtension>(extensionAssembly);
+            var extensions = TestPluginCache.Instance.GetTestExtensions<TPluginInfo, IExtension>(extensionAssembly, skipCache);
             this.GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
         }
 
