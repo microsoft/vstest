@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading;
 
 namespace MSTest1
 {
@@ -17,6 +18,7 @@ namespace MSTest1
         [TestMethod]
         public void TestMethod2()
         {
+            Thread.Sleep(2000);
             TestContext.WriteLine("io");
         }
         [TestMethod]

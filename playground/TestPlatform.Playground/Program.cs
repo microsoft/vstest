@@ -19,6 +19,7 @@ namespace TestPlatform.Playground
     {
         static async Task Main(string[] args)
         {
+            Console2.WriteLine("Start");
             // This project references TranslationLayer, vstest.console, TestHostProvider, testhost and MSTest1 projects, to make sure
             // we build all the dependencies of that are used to run tests via VSTestConsoleWrapper. It then copies the components from
             // their original build locations, to $(TargetDir)\vstest.console directory, and it's subfolders to create an executable
@@ -52,39 +53,44 @@ namespace TestPlatform.Playground
                     </RunConfiguration>
                 </RunSettings>
             ";
-            var sources = new[] {
-                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472"), new DebuggerTestHostLauncher("net472")),
-                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48"), new DebuggerTestHostLauncher("net48")),
-            };
 
             var tasks = new List<Task>();
-            foreach (var (source, handler, launcher) in sources)
+            Action<string,TestRunHandler, DebuggerTestHostLauncher> execute = (source, handler, launcher) =>
             {
                 var options = new TestPlatformOptions();
-                tasks.Add(Task.Run(() => r.RunTestsWithCustomTestHost(new[] { source }, sourceSettings, options, handler, launcher)));
+                Console2.WriteLine("Run tests");
+                r.RunTestsWithCustomTestHost(new[] { source }, sourceSettings, options, handler, launcher);
+            };
+
+            Action<string, TestRunHandler, DebuggerTestHostLauncher> discoverThenExecute = (source, handler, launcher) =>
+            {
+                Console2.WriteLine("Discover");
+                Thread.Sleep(5000);
+                var options = new TestPlatformOptions();
+                Console2.WriteLine("Discover tests");
+                r.DiscoverTests(new[] { source }, sourceSettings, options, handler);
+                var tests = handler.DiscoveredTests;
+                if (!tests.Any())
+                {
+                    // REview: the second discovery can get cancelled too early. This is task that will probably be solved by fixing the cancellation in the translation layer sender and how it receives messages.
+                    // or maybe it calls cancel when it is done, and everything is just cancelled.
+                }
+                Console2.WriteLine("Run discovered tests");
+                r.RunTestsWithCustomTestHost(tests, sourceSettings, options, handler, launcher);
+            };
+            var sources = new[] {
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472-execute"), new DebuggerTestHostLauncher("net472-execute"), execute),
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48-execute"), new DebuggerTestHostLauncher("net48-execute"), execute),
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net472", "MSTest1.dll"), new TestRunHandler("net472-discoverThenExecute"), new DebuggerTestHostLauncher("net472-discoverThenExecute"), discoverThenExecute),
+                (Path.Combine(playground, "MSTest1", "bin", "Debug", "net48", "MSTest1.dll"), new TestRunHandler("net48-discoverThenExecute"), new DebuggerTestHostLauncher("net48-discoverThenExecute"), discoverThenExecute),
+            };
+
+            foreach (var (source, handler, launcher, action) in sources)
+            {
+                tasks.Add(Task.Run(() => action(source, handler, launcher)));
             }
 
             await Task.WhenAll(tasks);
-
-            var tasks2 = new List<Task>();
-            foreach (var (source, handler, launcher) in sources)
-            {
-                var options = new TestPlatformOptions { };
-                tasks2.Add(Task.Run(() =>
-                {
-                    r.DiscoverTests(new[] { source }, sourceSettings, options, handler);
-                    var tests = handler.DiscoveredTests;
-                    if (!tests.Any())
-                    {
-                        // REview: the second discovery can get cancelled too early. This is task that will probably be solved by fixing the cancellation in the translation layer sender and how it receives messages.
-                        // or maybe it calls cancel when it is done, and everything is just cancelled.
-                    }
-                    r.RunTestsWithCustomTestHost(tests, sourceSettings, options, handler, launcher);
-                }));
-            }
-
-            await Task.WhenAll(tasks2);
-
             await Task.Delay(1000);
         }
 
@@ -101,25 +107,25 @@ namespace TestPlatform.Playground
 
             public bool AttachDebuggerToProcess(int pid)
             {
-                Console.WriteLine($"{_name} [ATTACH DEBUGGER]");
+                Console2.WriteLine($"{_name} [ATTACH DEBUGGER]");
                 return false;
             }
 
             public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
             {
-                Console.WriteLine($"{_name} [DISCOVERED]: {WriteTests(discoveredTestCases)}");
+                Console2.WriteLine($"{_name} [DISCOVERED]: {WriteTests(discoveredTestCases)}");
                 DiscoveredTests.AddRange(discoveredTestCases);
             }
 
             public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
             {
-                Console.WriteLine($"{_name} [DISCOVERED]: {WriteTests(lastChunk)}");
+                Console2.WriteLine($"{_name} [DISCOVERED]: {WriteTests(lastChunk)}");
                 DiscoveredTests.AddRange(lastChunk ?? new List<TestCase>());
             }
 
             public void HandleLogMessage(TestMessageLevel level, string message)
             {
-                Console.WriteLine($"{_name} [{level.ToString().ToUpper()}]: {message}");
+                Console2.WriteLine($"{_name} [{level.ToString().ToUpper()}]: {message}");
                 if (level == TestMessageLevel.Error)
                 {
 
@@ -128,22 +134,22 @@ namespace TestPlatform.Playground
 
             public void HandleRawMessage(string rawMessage)
             {
-                Console.WriteLine($"{_name} [MESSAGE]: { rawMessage}");
+                Console2.WriteLine($"{_name} [MESSAGE]: { rawMessage}");
             }
 
             public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
             {
-                Console.WriteLine($"{_name} [COMPLETE]: err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
+                Console2.WriteLine($"{_name} [COMPLETE]: err: { testRunCompleteArgs.Error }, lastChunk: {WriteTests(lastChunkArgs?.NewTestResults)}");
             }
 
             public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
             {
-                Console.WriteLine($"{_name} [PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
+                Console2.WriteLine($"{_name} [PROGRESS - NEW RESULTS]: {WriteTests(testRunChangedArgs.NewTestResults)}");
             }
 
             public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
             {
-                Console.WriteLine($"{_name} [LAUNCH WITH DEBUGGER]");
+                Console2.WriteLine($"{_name} [LAUNCH WITH DEBUGGER]");
                 throw new NotImplementedException();
             }
 
@@ -177,26 +183,34 @@ namespace TestPlatform.Playground
 
             public bool AttachDebuggerToProcess(int pid)
             {
-                Console.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
+                Console2.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
                 return true;
             }
 
             public bool AttachDebuggerToProcess(int pid, CancellationToken cancellationToken)
             {
-                Console.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
+                Console2.WriteLine($"{_name} [ATTACH DEBUGGER] to { Process.GetProcessById(pid).ProcessName }");
                 return true;
             }
 
             public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
             {
-                Console.WriteLine($"{_name} [LAUNCH TESTHOST] for {defaultTestHostStartInfo.FileName } { defaultTestHostStartInfo.Arguments }");
+                Console2.WriteLine($"{_name} [LAUNCH TESTHOST] for {defaultTestHostStartInfo.FileName } { defaultTestHostStartInfo.Arguments }");
                 return 1;
             }
 
             public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
             {
-                Console.WriteLine($"{_name} [LAUNCH TESTHOST] for {defaultTestHostStartInfo.FileName } { defaultTestHostStartInfo.Arguments }");
+                Console2.WriteLine($"{_name} [LAUNCH TESTHOST] for {defaultTestHostStartInfo.FileName } { defaultTestHostStartInfo.Arguments }");
                 return 1;
+            }
+        }
+
+        static class Console2
+        {
+            public static void WriteLine(string text)
+            {
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fffff}] {text}");
             }
         }
     }
