@@ -166,7 +166,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
-            this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            this.attachmentGuid = Guid.NewGuid().ToString("N");
 
             if (this.collectProcessDumpOnTestHostHang)
             {
