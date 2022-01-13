@@ -421,7 +421,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         SendTestMessage(e.Level, e.Message);
                     break;
 
-               
+
                 default:
                     throw new NotSupportedException($"Test message level '{e.Level}' is not supported.");
             }
@@ -456,7 +456,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
                         var runCompletePayload = new TestRunCompletePayload()
                         {
-                            TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
+                            TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, null, TimeSpan.MinValue),
                             LastRunTests = null
                         };
 

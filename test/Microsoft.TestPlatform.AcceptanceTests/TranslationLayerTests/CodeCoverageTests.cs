@@ -109,9 +109,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource]
+        [NetFullTargetFrameworkDataSource()]
         [NetCoreTargetFrameworkDataSource]
-        public async Task TestRunWithCodeCoverageAndAttachmentsProcessing(RunnerInfo runnerInfo)
+        public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithInvokedDataCollectors(RunnerInfo runnerInfo)
+            => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, true);
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource()]
+        [NetCoreTargetFrameworkDataSource]
+        public async Task TestRunWithCodeCoverageAndAttachmentsProcessingWithoutInvokedDataCollectors(RunnerInfo runnerInfo)
+            => await TestRunWithCodeCoverageAndAttachmentsProcessingInternal(runnerInfo, false);
+
+        private async Task TestRunWithCodeCoverageAndAttachmentsProcessingInternal(RunnerInfo runnerInfo, bool withInvokedDataCollectors)
         {
             // arrange
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -122,9 +131,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(
+                runEventHandler.Attachments,
+                withInvokedDataCollectors ? runEventHandler.InvokedDataCollectors : null,
+                withInvokedDataCollectors ? this.GetCodeCoverageRunSettings(1) : null,
+                true,
+                true,
+                testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -171,9 +187,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -218,9 +235,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(9, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(3, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(3, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -267,9 +285,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -320,9 +339,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(12, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(4, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(4, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
@@ -373,8 +393,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
+            Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, null, true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // act
             this.vstestConsoleWrapper?.EndSession();

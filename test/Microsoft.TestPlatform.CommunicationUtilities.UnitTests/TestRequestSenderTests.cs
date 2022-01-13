@@ -582,7 +582,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.MaxValue),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };
@@ -606,7 +606,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.MaxValue),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };
@@ -704,7 +704,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.MaxValue),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };

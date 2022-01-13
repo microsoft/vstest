@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     curentArgs.IsCanceled,
                     curentArgs.IsAborted,
                     this.messageProcessingUnrecoverableError,
-                    curentArgs.AttachmentSets, curentArgs.ElapsedTimeInRunningTests
+                    curentArgs.AttachmentSets, curentArgs.InvokedDataCollectors, curentArgs.ElapsedTimeInRunningTests
                     );
             }
             var data = this.dataSerializer.SerializePayload(

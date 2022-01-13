@@ -936,6 +936,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task ProcessTestRunAttachmentsAsync(
             IEnumerable<AttachmentSet> attachments,
+            IEnumerable<InvokedDataCollector> invokedDataCollectors,
             string processingSettings,
             bool isLastBatch,
             bool collectMetrics,
@@ -947,10 +948,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             await this.EnsureInitializedAsync().ConfigureAwait(false);
             await requestSender.ProcessTestRunAttachmentsAsync(
                 attachments,
+                invokedDataCollectors,
+                processingSettings,
                 collectMetrics,
                 testSessionEventsHandler,
                 cancellationToken).ConfigureAwait(false);
         }
+
+        /// <inheritdoc/>
+        public Task ProcessTestRunAttachmentsAsync(
+            IEnumerable<AttachmentSet> attachments,
+            string processingSettings,
+            bool isLastBatch,
+            bool collectMetrics,
+            ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
+            CancellationToken cancellationToken)
+            => ProcessTestRunAttachmentsAsync(attachments, Enumerable.Empty<InvokedDataCollector>(), processingSettings, isLastBatch, collectMetrics, testSessionEventsHandler, cancellationToken);
+
         #endregion
 
         private void EnsureInitialized()

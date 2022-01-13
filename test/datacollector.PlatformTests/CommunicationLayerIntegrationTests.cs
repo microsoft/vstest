@@ -70,11 +70,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
 
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-                var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
+                var dataCollectionResult = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
 
-                Assert.AreEqual("CustomDataCollector", attachments[0].DisplayName);
-                Assert.AreEqual("my://custom/datacollector", attachments[0].Uri.ToString());
-                Assert.IsTrue(attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
+                Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments[0].DisplayName);
+                Assert.AreEqual("my://custom/datacollector", dataCollectionResult.Attachments[0].Uri.ToString());
+                Assert.IsTrue(dataCollectionResult.Attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
             }
         }
 

@@ -32,6 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             this.DataCollectorType = type;
             this.TypeUri = GetTypeUri(type);
             this.FriendlyName = GetFriendlyName(type);
+            this.AttachmentsProcessorType = GetAttachmentsProcessors(type);
         }
 
         /// <summary>
@@ -63,9 +64,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             get
             {
-                return new object[] { this.TypeUri.ToString(), this.FriendlyName };
+                return new object[] { this.TypeUri.ToString(), this.FriendlyName, this.AttachmentsProcessorType != null };
             }
         }
+
+        /// <summary>
+        /// Gets attachments processor
+        /// </summary>
+        public Type AttachmentsProcessorType { get; private set; }
+
+        /// <summary>
+        /// Check if collector registers an attachment processor.
+        /// </summary>
+        /// <returns>True if collector registers an attachment processor.</returns>
+        public bool HasAttachmentsProcessor() => AttachmentsProcessorType != null;
 
         /// <summary>
         /// Gets the Type Uri for the data collector.
@@ -86,6 +98,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             return typeUri;
+        }
+
+        /// <summary>
+        /// Gets the attachment processor for the data collector.
+        /// </summary>
+        /// <param name="dataCollectorType">The data collector to get the attachment processor for.</param>
+        /// <returns>Type of the attachment processor.</returns>
+        private static Type GetAttachmentsProcessors(Type dataCollectorType)
+        {
+            Type attachmentsProcessor = null;
+            var attachmenstProcessors = GetAttributes(dataCollectorType, typeof(DataCollectorAttachmentProcessorAttribute));
+            if (attachmenstProcessors != null && attachmenstProcessors.Length > 0)
+            {
+                var attachmenstProcessorsAttribute = (DataCollectorAttachmentProcessorAttribute)attachmenstProcessors[0];
+                if (attachmenstProcessorsAttribute.Type != null)
+                {
+                    attachmentsProcessor = attachmenstProcessorsAttribute.Type;
+                }
+            }
+
+            return attachmentsProcessor;
         }
 
         /// <summary>

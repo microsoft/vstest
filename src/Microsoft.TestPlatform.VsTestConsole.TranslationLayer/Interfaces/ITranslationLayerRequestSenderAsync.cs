@@ -136,11 +136,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </summary>
         /// 
         /// <param name="attachments">Collection of attachments.</param>
+        /// <param name="invokedDataCollectors">Collection of invoked data collectors.</param>
+        /// <param name="runSettings">RunSettings configuration</param>
         /// <param name="collectMetrics">Enables metrics collection.</param>
         /// <param name="testRunAttachmentsProcessingCompleteEventsHandler">Events handler.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         Task ProcessTestRunAttachmentsAsync(
             IEnumerable<AttachmentSet> attachments,
+            IEnumerable<InvokedDataCollector> invokedDataCollectors,
+            string runSettings,
             bool collectMetrics,
             ITestRunAttachmentsProcessingEventsHandler testRunAttachmentsProcessingCompleteEventsHandler,
             CancellationToken cancellationToken);

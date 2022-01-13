@@ -310,7 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
                 {
-                    TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MinValue)
+                    TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.MinValue)
                 });
 
             this.testRunRequest.HandleRawMessage(string.Empty);
@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
-            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
@@ -348,7 +348,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
-            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
                 .Returns(new TestRunCompletePayload()
@@ -388,7 +388,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
             var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
-            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
 
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
@@ -453,7 +453,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                     "A")
             };
             var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
-            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
 
             testRunRequest.ExecuteAsync();
@@ -466,7 +466,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         [TestMethod]
         public void HandleTestRunCompleteShouldInvokeHandleTestRunCompleteOfLoggerManager()
         {
-            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null,
                 null, TimeSpan.FromSeconds(0));
 
             testRunRequest.ExecuteAsync();
@@ -499,6 +499,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 false,
                 null,
                 null,
+                null,
                 TimeSpan.FromSeconds(0));
             testRunCompeleteEventsArgs.Metrics = dict;
 
@@ -528,6 +529,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 false,
                 null,
                 null,
+                null,
                 TimeSpan.FromSeconds(0));
 
             // Act
@@ -555,6 +557,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 false,
                 null,
                 null,
+                null,
                 TimeSpan.FromSeconds(0));
 
             // Act
@@ -580,6 +583,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                 false,
                 null,
                 null,
+                null,
                 TimeSpan.FromSeconds(0));
 
             // Act
@@ -597,7 +601,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
             this.testRunRequest.ExecuteAsync();
 
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0)), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, null, TimeSpan.FromSeconds(0)), null, null, null);
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -389,7 +390,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             }
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
-            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, this.requestData.MetricsCollection.Metrics);
+            var invokedDataCollectors = this.dataCollectionManager.GetInvokedDataCollectors();
+
+            if (invokedDataCollectors != null && invokedDataCollectors.Any())
+            {
+                // For the invoked collectors we report the same information as ProxyDataCollectionManager.cs line ~416
+                var invokedDataCollectorsForMetrics = invokedDataCollectors.Select(x => new { x.Uri, x.FriendlyName, x.HasAttachmentProcessor }.ToString());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.InvokedDataCollectors, string.Join(",", invokedDataCollectorsForMetrics.ToArray()));
+            }
+
+            var afterTestRunEndResult = new AfterTestRunEndResult(attachmentsets, invokedDataCollectors, this.requestData.MetricsCollection.Metrics);
 
             // Dispose all datacollectors before sending attachments to vstest.console process.
             // As datacollector process exits itself on parent process(vstest.console) exits.
