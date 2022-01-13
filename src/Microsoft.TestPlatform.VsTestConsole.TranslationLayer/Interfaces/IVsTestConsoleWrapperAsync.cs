@@ -334,9 +334,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// </param>
         /// <param name="collectMetrics">Enables metrics collection (used for telemetry).</param>
         /// <param name="eventsHandler">Event handler to receive session complete event.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>        
+        /// <param name="cancellationToken">Cancellation token.</param>
         Task ProcessTestRunAttachmentsAsync(
             IEnumerable<AttachmentSet> attachments,
+            string processingSettings,
+            bool isLastBatch,
+            bool collectMetrics,
+            ITestRunAttachmentsProcessingEventsHandler eventsHandler,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets back all attachments to test platform for additional processing (for example merging).
+        /// </summary>
+        /// 
+        /// <param name="attachments">Collection of attachments.</param>
+        /// <param name="invokedDataCollectors">Collection of invoked data collectors.</param>
+        /// <param name="processingSettings">XML processing settings.</param>
+        /// <param name="isLastBatch">
+        /// Indicates that all test executions are done and all data is provided.
+        /// </param>
+        /// <param name="collectMetrics">Enables metrics collection (used for telemetry).</param>
+        /// <param name="eventsHandler">Event handler to receive session complete event.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task ProcessTestRunAttachmentsAsync(
+            IEnumerable<AttachmentSet> attachments,
+            IEnumerable<InvokedDataCollector> invokedDataCollectors,
             string processingSettings,
             bool isLastBatch,
             bool collectMetrics,

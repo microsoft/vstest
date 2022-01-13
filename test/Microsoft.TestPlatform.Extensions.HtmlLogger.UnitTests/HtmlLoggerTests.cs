@@ -389,7 +389,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 {
                 }).Returns(new Mock<Stream>().Object);
 
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             Assert.AreEqual(4, this.htmlLogger.TestRunDetails.Summary.TotalTests, "summary should keep track of total tests");
             Assert.AreEqual(1, this.htmlLogger.TestRunDetails.Summary.FailedTests, "summary should keep track of failed tests");
@@ -412,7 +412,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
 
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
             Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("TestResult"));
         }
 
@@ -430,7 +430,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
 
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
             Assert.IsFalse(this.htmlLogger.HtmlFilePath.Contains("__"));
         }
 
@@ -448,7 +448,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
 
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
             Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("sample_net451"));
         }
 
@@ -469,7 +469,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             }).Returns(new Mock<Stream>().Object);
 
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
         }
@@ -487,7 +487,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.ThrowsException<KeyNotFoundException>(() => this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero)));
+            Assert.ThrowsException<KeyNotFoundException>(() => this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero)));
         }
 
         [TestMethod]
@@ -513,7 +513,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 }).Returns(new Mock<Stream>().Object);
 
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
         }
@@ -530,7 +530,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             });
 
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             this.mockFileHelper.Verify(x => x.Delete(It.IsAny<string>()), Times.Once);
         }
@@ -547,7 +547,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 }).Returns(new Mock<Stream>().Object);
 
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             this.mockHtmlTransformer.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
@@ -563,7 +563,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 }).Returns(new Mock<Stream>().Object);
 
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             this.mockXmlSerializer.Verify(x => x.WriteObject(It.IsAny<Stream>(), It.IsAny<TestRunDetails>()), Times.Once);
             Assert.IsTrue(htmlLogger.XmlFilePath.Contains(".xml"));
@@ -577,7 +577,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             {
             }).Returns(new Mock<Stream>().Object);
 
-            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
             Assert.AreEqual(0, this.htmlLogger.TestRunDetails.Summary.TotalTests);
             Assert.AreEqual(0, this.htmlLogger.TestRunDetails.Summary.PassPercentage);

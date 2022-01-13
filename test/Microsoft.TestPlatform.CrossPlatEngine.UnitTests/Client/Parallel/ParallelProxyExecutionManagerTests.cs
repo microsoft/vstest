@@ -160,7 +160,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfDataCollectionEnabled()
         {
-            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, null, TimeSpan.Zero);
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
@@ -175,12 +175,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfDataCollectionEnabledAndCreatorWithDataCollection()
         {
-            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, null, TimeSpan.Zero);
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             var proxyDataCollectionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
-            var managers = new List<Mock<ProxyExecutionManagerWithDataCollection>>();            
+            var managers = new List<Mock<ProxyExecutionManagerWithDataCollection>>();
             this.proxyManagerFunc = () =>
             {
                 this.proxyManagerFuncCalled = true;
@@ -195,13 +195,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.IsTrue(this.proxyManagerFuncCalled);
 
             var handler = parallelExecutionManager.GetHandlerForGivenManager(managers.Last().Object);
-            Assert.IsTrue(handler is ParallelDataCollectionEventsHandler);            
+            Assert.IsTrue(handler is ParallelDataCollectionEventsHandler);
         }
 
         [TestMethod]
         public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfIsAbortedIsTrue()
         {
-            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, null, TimeSpan.Zero);
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2, setupTestCases: true);
@@ -362,7 +362,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             }
 
                             var completeArgs = new TestRunCompleteEventArgs(new
-                                TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, timespan);
+                                TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, new Collection<InvokedDataCollector>(), timespan);
                             handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
                         });
             }
@@ -478,6 +478,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 new TestRunStatistics(new Dictionary<TestOutcome, long>()),
                 isCanceled,
                 isAborted,
+                null,
                 null,
                 null,
                 TimeSpan.FromMilliseconds(1));

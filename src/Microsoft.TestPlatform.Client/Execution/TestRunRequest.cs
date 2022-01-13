@@ -431,6 +431,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.Error,
                             // This is required as TMI adapter is sending attachments as List which cannot be type casted to Collection.
                             runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
+                            runCompleteArgs.InvokedDataCollectors,
                             this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests)
@@ -587,6 +588,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         testRunCompletePayload.TestRunCompleteArgs.IsAborted,
                         testRunCompletePayload.TestRunCompleteArgs.Error,
                         testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
+                        testRunCompletePayload.TestRunCompleteArgs.InvokedDataCollectors,
                         this.runRequestTimeTracker.Elapsed);
                 this.LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
             }

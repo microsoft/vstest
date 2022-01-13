@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
 
             loggerEvents.EnableEvents();
             // Send the test run complete event.
-            loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan());
+            loggerEvents.CompleteTestRun(null, false, false, null, null, null, new TimeSpan());
 
             var waitSuccess = waitHandle.WaitOne(500);
             Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
@@ -206,7 +206,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
 
             Assert.ThrowsException<ObjectDisposedException>(() =>
             {
-                loggerEvents.CompleteTestRun(null, true, false, null, null, new TimeSpan());
+                loggerEvents.CompleteTestRun(null, true, false, null, null, null, new TimeSpan());
             });
         }
 

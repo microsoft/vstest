@@ -68,16 +68,22 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <summary>
         /// Prepare arguments for <c>vstest.console.exe</c>.
         /// </summary>
-        /// <param name="testAssembly">Name of the test assembly.</param>
+        /// <param name="testAssemblies">List of test assemblies.</param>
         /// <param name="testAdapterPath">Path to test adapter.</param>
         /// <param name="runSettings">Text of run settings.</param>
         /// <param name="framework"></param>
         /// <param name="inIsolation"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
+        public static string PrepareArguments(string[] testAssemblies, string testAdapterPath, string runSettings,
             string framework, string inIsolation = "", string resultsDirectory = null)
         {
-            var arguments = testAssembly.AddDoubleQuote();
+            var arguments = "";
+            foreach (var path in testAssemblies)
+            {
+                arguments += path.AddDoubleQuote() + " ";
+            }
+
+            arguments = arguments.Trim();
 
             if (!string.IsNullOrWhiteSpace(testAdapterPath))
             {
@@ -112,6 +118,20 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             return arguments;
         }
+
+        /// <summary>
+        /// Prepare arguments for <c>vstest.console.exe</c>.
+        /// </summary>
+        /// <param name="testAssembly">Name of the test assembly.</param>
+        /// <param name="testAdapterPath">Path to test adapter.</param>
+        /// <param name="runSettings">Text of run settings.</param>
+        /// <param name="framework"></param>
+        /// <param name="inIsolation"></param>
+        /// <returns>Command line arguments string.</returns>
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
+            string framework, string inIsolation = "", string resultsDirectory = null)
+            => PrepareArguments(new string[] { testAssembly }, testAdapterPath, runSettings, framework, inIsolation, resultsDirectory);
+
 
         /// <summary>
         /// Invokes <c>vstest.console</c> with specified arguments.
