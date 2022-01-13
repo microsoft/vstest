@@ -26,6 +26,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
+        internal const string InvokedDataCollectors = "VS.TestRun.InvokedDataCollectors";
+
         internal const string DataCollectorsCorProfiler = "VS.TestPlatform.DataCollector.CorProfiler";
 
         internal const string DataCollectorsCoreClrProfiler = "VS.TestPlatform.DataCollector.CoreClrProfiler";
@@ -112,6 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string NumberOfAttachmentsAfterProcessing = "VS.AttachmentsProcessing.FinalAttachmentsCount";
 
         public static string TimeTakenInSecForAttachmentsProcessing = "VS.AttachmentsProcessing.TotalTimeTakenInSec";
+
         public static string AttachmentsProcessingState = "VS.AttachmentsProcessing.State";
 
         // **************Events Name **********************************

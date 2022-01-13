@@ -870,12 +870,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public Task ProcessTestRunAttachmentsAsync(
             IEnumerable<AttachmentSet> attachments,
+            IEnumerable<InvokedDataCollector> invokedDataCollectors,
+            string runSettings,
             bool collectMetrics,
             ITestRunAttachmentsProcessingEventsHandler testSessionEventsHandler,
             CancellationToken cancellationToken)
         {
             return this.SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
                 attachments,
+                invokedDataCollectors,
+                runSettings,
                 collectMetrics,
                 testSessionEventsHandler,
                 cancellationToken);
@@ -1227,7 +1231,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestMessageLevel.Error,
                     TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(
-                    null, false, true, exception, null, TimeSpan.Zero);
+                    null, false, true, exception, null, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions.
@@ -1310,7 +1314,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     TestMessageLevel.Error,
                     TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(
-                    null, false, true, exception, null, TimeSpan.Zero);
+                    null, false, true, exception, null, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
                 // Earlier we were closing the connection with vstest.console in case of exceptions.
@@ -1326,6 +1330,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private async Task SendMessageAndListenAndReportAttachmentsProcessingResultAsync(
             IEnumerable<AttachmentSet> attachments,
+            IEnumerable<InvokedDataCollector> invokedDataCollectors,
+            string runSettings,
             bool collectMetrics,
             ITestRunAttachmentsProcessingEventsHandler eventHandler,
             CancellationToken cancellationToken)
@@ -1335,6 +1341,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 var payload = new TestRunAttachmentsProcessingPayload
                 {
                     Attachments = attachments,
+                    InvokedDataCollectors = invokedDataCollectors,
+                    RunSettings = runSettings,
                     CollectMetrics = collectMetrics
                 };
 
@@ -1403,7 +1411,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Error("Aborting Test Session End Operation: {0}", exception);
                 eventHandler.HandleLogMessage(
                     TestMessageLevel.Error,
-                    TranslationLayerResources.AbortedTestRunAttachmentsProcessing);               
+                    TranslationLayerResources.AbortedTestRunAttachmentsProcessing);
                 eventHandler.HandleTestRunAttachmentsProcessingComplete(
                     new TestRunAttachmentsProcessingCompleteEventArgs(false, exception),
                     null);

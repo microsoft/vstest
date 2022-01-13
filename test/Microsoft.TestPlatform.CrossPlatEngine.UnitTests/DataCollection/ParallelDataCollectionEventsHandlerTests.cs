@@ -15,6 +15,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
+    using Constants = VisualStudio.TestPlatform.ObjectModel.Constants;
 
     [TestClass]
     public class ParallelDataCollectionEventsHandlerTests
@@ -40,7 +41,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             mockTestRunAttachmentsProcessingManager = new Mock<ITestRunAttachmentsProcessingManager>();
             cancellationTokenSource = new CancellationTokenSource();
             parallelDataCollectionEventsHandler = new ParallelDataCollectionEventsHandler(mockRequestData.Object, mockProxyExecutionManager.Object, mockTestRunEventsHandler.Object,
-                mockParallelProxyExecutionManager.Object, new ParallelRunDataAggregator(), mockTestRunAttachmentsProcessingManager.Object, cancellationTokenSource.Token);
+                mockParallelProxyExecutionManager.Object, new ParallelRunDataAggregator(Constants.EmptyRunSettings), mockTestRunAttachmentsProcessingManager.Object, cancellationTokenSource.Token);
 
             mockParallelProxyExecutionManager.Setup(m => m.HandlePartialRunComplete(It.IsAny<IProxyExecutionManager>(), It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>())).Returns(true);
         }
@@ -61,14 +62,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 new AttachmentSet(new Uri(uri1), "uri1_input1")
             };
 
-            mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(outputAttachments));
+            mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<InvokedDataCollector>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(outputAttachments));
 
             // act
-            parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
+            parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
 
             // assert
             mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(outputAttachments[0])), It.IsAny<ICollection<string>>()));
-            mockTestRunAttachmentsProcessingManager.Verify(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
+            mockTestRunAttachmentsProcessingManager.Verify(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), It.IsAny<ICollection<InvokedDataCollector>>(), cancellationTokenSource.Token));
         }
 
         [TestMethod]
@@ -82,14 +83,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 new AttachmentSet(new Uri(uri3), "uri3_input1")
             };
 
-            mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
+            mockTestRunAttachmentsProcessingManager.Setup(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<InvokedDataCollector>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((Collection<AttachmentSet>)null));
 
             // act
-            parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
+            parallelDataCollectionEventsHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.FromSeconds(1)), null, inputAttachments, null);
 
             // assert
             mockTestRunEventsHandler.Verify(h => h.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 3), It.IsAny<ICollection<string>>()));
-            mockTestRunAttachmentsProcessingManager.Verify(f => f.ProcessTestRunAttachmentsAsync(mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), cancellationTokenSource.Token));
+            mockTestRunAttachmentsProcessingManager.Verify(f => f.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, It.Is<ICollection<AttachmentSet>>(a => a.Count == 3), It.IsAny<ICollection<InvokedDataCollector>>(), cancellationTokenSource.Token));
         }
     }
 }

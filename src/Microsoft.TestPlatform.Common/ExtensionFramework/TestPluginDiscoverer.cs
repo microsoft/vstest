@@ -10,8 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Diagnostics;
     using System.Globalization;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-  
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -26,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestPluginDiscoverer
     {
         private static HashSet<string> UnloadableFiles = new HashSet<string>();
+        private readonly MetadataReaderExtensionsHelper extensionHelper = new MetadataReaderExtensionsHelper();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class.
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
                     if (assembly != null)
                     {
-                        this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
+                        this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
                     }
                 }
                 catch (FileLoadException e)
@@ -158,25 +158,48 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <typeparam name="TExtension">
         /// Type of Extensions.
         /// </typeparam>
-        private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
+        private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath) where TPluginInfo : TestPluginInformation
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-            IEnumerable<Type> types;
+
+            List<Type> types = new List<Type>();
             Type extension = typeof(TExtension);
 
             try
             {
-                types = TypesToLoadUtilities.GetTypesToLoad(assembly);
+                var discoveredExtensions = this.extensionHelper.DiscoverTestExtensionTypesV2Attribute(assembly, filePath);
+                if (discoveredExtensions?.Length > 0)
+                {
+                    types.AddRange(discoveredExtensions);
+                }
+            }
+            catch (Exception e)
+            {
+                EqtTrace.Warning("TestPluginDiscoverer: Failed to get types searching for 'TestPlatformExtensionVersionAttribute' from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
+            }
+
+            try
+            {
+                var typesToLoad = TypesToLoadUtilities.GetTypesToLoad(assembly);
+                if (typesToLoad?.Any() == true)
+                {
+                    types.AddRange(typesToLoad);
+                }
 
                 if (!types.Any())
                 {
-                    types = assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract);
+                    types.AddRange(assembly.GetTypes().Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
                 }
             }
             catch (ReflectionTypeLoadException e)
             {
-                EqtTrace.Warning("TestPluginDiscoverer: Failed to get types from assembly '{0}'.  Skipping test extension scan for this assembly.  Error: {1}", assembly.FullName, e.ToString());
+                EqtTrace.Warning("TestPluginDiscoverer: Failed to get types from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
+
+                if (e.Types?.Length > 0)
+                {
+                    types.AddRange(e.Types.Where(type => type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract));
+                }
 
                 if (e.LoaderExceptions != null)
                 {
@@ -185,14 +208,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         EqtTrace.Warning("LoaderExceptions: {0}", ex);
                     }
                 }
-                return;
             }
 
             if (types != null && types.Any())
             {
                 foreach (var type in types)
                 {
-                    GetTestExtensionFromType(type, extension, pluginInfos);
+                    GetTestExtensionFromType(type, extension, pluginInfos, filePath);
                 }
             }
         }
@@ -215,20 +237,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private void GetTestExtensionFromType<TPluginInfo>(
             Type type,
             Type extensionType,
-            Dictionary<string, TPluginInfo> extensionCollection)
+            Dictionary<string, TPluginInfo> extensionCollection,
+            string filePath)
             where TPluginInfo : TestPluginInformation
         {
             if (extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
                 var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
                 var pluginInfo = (TPluginInfo)rawPluginInfo;
+                pluginInfo.FilePath = filePath;
 
                 if (pluginInfo == null || pluginInfo.IdentifierData == null)
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
                         EqtTrace.Error(
-                        "TryGetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
+                        "GetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
                     }
                     return;
                 }
@@ -236,12 +260,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
                 {
                     EqtTrace.Warning(
-                    "TryGetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}'; keeping the first one.",
-                            pluginInfo.IdentifierData);
+                    "GetTestExtensionFromType: Discovered multiple test extensions with identifier data '{0}' and type '{1}' inside file '{2}'; keeping the first one '{3}'.",
+                            pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath, extensionCollection[pluginInfo.IdentifierData].AssemblyQualifiedName);
                 }
                 else
                 {
                     extensionCollection.Add(pluginInfo.IdentifierData, pluginInfo);
+                    EqtTrace.Info("GetTestExtensionFromType: Register extension with identifier data '{0}' and type '{1}' inside file '{2}'",
+                        pluginInfo.IdentifierData, pluginInfo.AssemblyQualifiedName, filePath);
                 }
             }
         }

@@ -66,5 +66,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// Collection of session attachmentSet.
         /// </returns>
         Collection<AttachmentSet> SessionEnded(bool isCancelled);
+
+        /// <summary>
+        /// Return a collections of the invoked data collectors
+        /// </summary>
+        /// <returns>Collection of data collectors.</returns>
+        Collection<InvokedDataCollector> GetInvokedDataCollectors();
     }
 }

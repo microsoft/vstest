@@ -558,17 +558,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         public async Task ProcessTestRunAttachmentsAsyncShouldSucceed()
         {
             var attachments = new Collection<AttachmentSet>();
+            var invokedDataCollectors = new Collection<InvokedDataCollector>();
             var cancellationToken = new CancellationToken();
 
             await this.consoleWrapper.ProcessTestRunAttachmentsAsync(
                 attachments,
-                null,
+                invokedDataCollectors,
+                Constants.EmptyRunSettings,
                 true,
                 true,
                 new Mock<ITestRunAttachmentsProcessingEventsHandler>().Object,
                 cancellationToken);
 
-            this.mockRequestSender.Verify(rs => rs.ProcessTestRunAttachmentsAsync(attachments, true, It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), cancellationToken));
+            this.mockRequestSender.Verify(rs => rs.ProcessTestRunAttachmentsAsync(attachments, invokedDataCollectors, Constants.EmptyRunSettings, true, It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), cancellationToken));
         }
 
         [TestMethod]

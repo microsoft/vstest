@@ -8,6 +8,7 @@
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,6 +18,7 @@
     public class CodeCoverageDataAttachmentsHandlerTests
     {
         private readonly Mock<IProgress<int>> mockProgressReporter;
+        private readonly XmlElement configurationElement;
         private readonly CodeCoverageDataAttachmentsHandler coverageDataAttachmentsHandler;
         private readonly string _filePrefix;
 
@@ -26,6 +28,9 @@
 
         public CodeCoverageDataAttachmentsHandlerTests()
         {
+            var doc = new XmlDocument();
+            doc.LoadXml("<configurationElement/>");
+            configurationElement = doc.DocumentElement;
             mockProgressReporter = new Mock<IProgress<int>>();
             coverageDataAttachmentsHandler = new CodeCoverageDataAttachmentsHandler();
 #if NETFRAMEWORK
@@ -54,12 +59,12 @@
         {
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet>();
             ICollection<AttachmentSet> resultAttachmentSets = await
-                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
 
-            resultAttachmentSets = await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(null, mockProgressReporter.Object, null, CancellationToken.None);
+            resultAttachmentSets = await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, null, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 0);
@@ -75,7 +80,7 @@
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
             ICollection<AttachmentSet> resultAttachmentSets = await
-                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 1);
@@ -95,7 +100,7 @@
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
             ICollection<AttachmentSet> resultAttachmentSets = await
-                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 1);
@@ -116,7 +121,7 @@
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
             ICollection<AttachmentSet> resultAttachmentSets = await
-                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 1);
@@ -133,7 +138,7 @@
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet };
             ICollection<AttachmentSet> resultAttachmentSets = await
-                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 1);
@@ -154,7 +159,7 @@
 
             Collection<AttachmentSet> attachment = new Collection<AttachmentSet> { attachmentSet, attachmentSet1 };
             ICollection<AttachmentSet> resultAttachmentSets = await
-                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, CancellationToken.None);
+                coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, CancellationToken.None);
 
             Assert.IsNotNull(resultAttachmentSets);
             Assert.IsTrue(resultAttachmentSets.Count == 2);
@@ -176,7 +181,7 @@
                 attachmentSet
             };
 
-            await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(attachment, mockProgressReporter.Object, null, cts.Token));
+            await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () => await coverageDataAttachmentsHandler.ProcessAttachmentSetsAsync(configurationElement, attachment, mockProgressReporter.Object, null, cts.Token));
 
             Assert.AreEqual(2, attachment.Count);
 

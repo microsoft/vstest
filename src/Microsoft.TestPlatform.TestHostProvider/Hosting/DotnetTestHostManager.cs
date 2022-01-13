@@ -258,7 +258,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // Try find testhost.exe (or the architecture specific version). We ship those ngened executables for Windows because they have faster startup time. We ship them only for some platforms.
             // When user specified path to dotnet.exe don't try to find the exexutable, because we will always use the testhost.dll together with their dotnet.exe.
             // We use dotnet.exe on Windows/ARM.
-            // TODO: Check if we're on ARM64 win using env var PROCESSARCHITECTURE
             bool testHostExeFound = false;
             if (!useCustomDotnetHostpath
                 && this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
@@ -480,7 +479,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (dotnetRoot != null)
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}'");
+                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}', forwarding to '{dotnetRootEnvName.Replace(prefix, string.Empty)}'");
                     startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
                 }
                 else

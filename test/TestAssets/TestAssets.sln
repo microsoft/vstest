@@ -90,6 +90,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "problematic-child", "proble
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParametrizedTestProject", "ParametrizedTestProject\ParametrizedTestProject.csproj", "{CA82D2B3-CCF7-4F68-8840-286BA2D5B23B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AttachmentProcessorDataCollector", "AttachmentProcessorDataCollector\AttachmentProcessorDataCollector.csproj", "{16F51720-29D0-472A-93FA-2604D61991B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -592,6 +594,18 @@ Global
 		{CA82D2B3-CCF7-4F68-8840-286BA2D5B23B}.Release|x64.Build.0 = Release|Any CPU
 		{CA82D2B3-CCF7-4F68-8840-286BA2D5B23B}.Release|x86.ActiveCfg = Release|Any CPU
 		{CA82D2B3-CCF7-4F68-8840-286BA2D5B23B}.Release|x86.Build.0 = Release|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Debug|x64.Build.0 = Debug|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Release|x64.ActiveCfg = Release|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Release|x64.Build.0 = Release|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{16F51720-29D0-472A-93FA-2604D61991B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

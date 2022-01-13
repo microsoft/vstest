@@ -93,9 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                       IsTelemetryOptedIn(),
                       CommandLineOptions.Instance.IsDesignMode),
                   new ProcessHelper(),
-                  new TestRunAttachmentsProcessingManager(
-                      TestPlatformEventSource.Instance,
-                      new CodeCoverageDataAttachmentsHandler()))
+                  new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()))
         {
         }
 
@@ -400,8 +398,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.currentAttachmentsProcessingCancellationTokenSource = new CancellationTokenSource();
 
                     Task task = this.attachmentsProcessingManager.ProcessTestRunAttachmentsAsync(
+                        attachmentsProcessingPayload.RunSettings,
                         requestData,
                         attachmentsProcessingPayload.Attachments,
+                        attachmentsProcessingPayload.InvokedDataCollectors,
                         attachmentsProcessingEventsHandler,
                         this.currentAttachmentsProcessingCancellationTokenSource.Token);
                     task.Wait();

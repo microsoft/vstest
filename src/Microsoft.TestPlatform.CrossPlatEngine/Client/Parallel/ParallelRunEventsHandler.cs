@@ -75,6 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
                     new Collection<AttachmentSet>(this.runDataAggregator.RunCompleteArgsAttachments),
+                    new Collection<InvokedDataCollector>(this.runDataAggregator.InvokedDataCollectors),
                     this.runDataAggregator.ElapsedTime);
 
                 // Collect Final RunState
@@ -112,7 +113,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 testRunCompleteArgs.IsAborted,
                 testRunCompleteArgs.IsCanceled,
                 runContextAttachments,
-                testRunCompleteArgs.AttachmentSets);
+                testRunCompleteArgs.AttachmentSets,
+                testRunCompleteArgs.InvokedDataCollectors);
 
             // Aggregate Run Data Metrics
             this.runDataAggregator.AggregateRunDataMetrics(testRunCompleteArgs.Metrics);
@@ -153,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
             // Do not deserialize further - just send if not execution complete
-            if(!string.Equals(MessageType.ExecutionComplete, message.MessageType))
+            if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
                 this.actualRunEventsHandler.HandleRawMessage(rawMessage);
             }

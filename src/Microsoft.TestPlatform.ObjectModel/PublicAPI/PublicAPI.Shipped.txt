@@ -324,8 +324,12 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcess
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.Attachments.get -> System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.Attachments.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.InvokedDataCollectors.get -> System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector>
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.InvokedDataCollectors.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.CollectMetrics.get -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.CollectMetrics.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.RunSettings.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.RunSettings.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingPayload.TestRunAttachmentsProcessingPayload() -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs.AttachmentProcessorsCount.get -> long
@@ -339,6 +343,9 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs.N
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs.TestRunChangedEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics stats, System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult> newTestResults, System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase> activeTests) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunChangedEventArgs.TestRunStatistics.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunCompleteEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics stats, bool isCanceled, bool isAborted, System.Exception error, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> attachmentSets, System.TimeSpan elapsedTime) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunCompleteEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics stats, bool isCanceled, bool isAborted, System.Exception error, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> attachmentSets, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector> invokedDataCollectors, System.TimeSpan elapsedTime) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.InvokedDataCollectors.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.AttachmentSets.get -> System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.ElapsedTimeInRunningTests.get -> System.TimeSpan
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.Error.get -> System.Exception
@@ -346,7 +353,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.IsCanceled.get -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.Metrics.get -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.Metrics.set -> void
-Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunCompleteEventArgs(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics stats, bool isCanceled, bool isAborted, System.Exception error, System.Collections.ObjectModel.Collection<Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet> attachmentSets, System.TimeSpan elapsedTime) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs.TestRunStatistics.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestRunStatistics
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCriteria.AdapterSourceMap.get -> System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>
@@ -871,3 +877,14 @@ static readonly Microsoft.VisualStudio.TestPlatform.ObjectModel.UapConstants.Uap
 virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.Properties.get -> System.Collections.Generic.IEnumerable<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty>
 virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.ProtectedGetPropertyValue(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty property, object defaultValue) -> object
 virtual Microsoft.VisualStudio.TestPlatform.ObjectModel.TestObject.ProtectedSetPropertyValue(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty property, object value) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.InvokedDataCollector(System.Uri uri, string friendlyName, string assemblyQualifiedName, string filePath, bool hasAttachmentProcessor) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Equals(Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector other) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.AssemblyQualifiedName.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.FriendlyName.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.FilePath.get -> string
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.HasAttachmentProcessor.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Uri.get -> System.Uri
+override Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.Equals(object obj) -> bool
+override Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.GetHashCode() -> int
+override Microsoft.VisualStudio.TestPlatform.ObjectModel.InvokedDataCollector.ToString() -> string
