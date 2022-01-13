@@ -136,12 +136,12 @@ function Install-DotNetCli
     Get-ChildItem "Env:\dotnet_*"
     
     "`n`n---- x64 dotnet"
-    Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" "--info"
+    Invoke-Exe "$env:DOTNET_ROOT\dotnet.exe" -Arguments "--info"
 
     "`n`n---- x86 dotnet"
     # avoid erroring out because we don't have the sdk for x86 that global.json requires
     try {
-        Invoke-Exe "${env:DOTNET_ROOT(x86)}\dotnet.exe" "--info" 2> $null
+        (Invoke-Exe "${env:DOTNET_ROOT(x86)}\dotnet.exe" -Arguments "--info") 2> $null
     } catch {}
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -161,9 +161,7 @@ function Restore-Package
     $timer = Start-Timer
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
-
-    Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
-    Invoke-Exe $dotnetExe "restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -bl:""$env:TP_OUT_DIR\log\$Configuration\external.binlog"""
+    Invoke-Exe $dotnetExe -Arguments "restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version -bl:""$env:TP_OUT_DIR\log\$Configuration\external.binlog"""
     Write-Log ".. .. Restore-Package: Complete."
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -221,11 +219,147 @@ function Invoke-Exe {
         [Parameter(Mandatory)]
         [string] $Command,
         [string] $Arguments,
-        [int[]] $IgnoreExitCode
+        [int[]] $IgnoreExitCode,
+        [switch] $CaptureOutput
     )
-    Write-Verbose "Invoking: $Command $Arguments"
-    & $Command ($Arguments -split ' ')
-    if ($IgnoreExitCode -notcontains $LASTEXITCODE) {
+    Write-Verbose "Invoking: > $Command $Arguments"
+    Write-Verbose "          > Ignored exit-codes: 0, $($IgnoreExitCode -join ', ')"
+
+    $workingDirectory = [System.IO.Path]::GetDirectoryName($Command)
+    $process = Start-InlineProcess -Path $Command -Arguments $Arguments -WorkingDirectory $workingDirectory -SuppressOutput:$CaptureOutput.IsPresent
+    $exitCode = $process.ExitCode
+
+    Write-Verbose "Done. Exit code: $exitCode"
+
+    if ($exitCode -ne 0 -and ($IgnoreExitCode -notcontains $exitCode)) {
+        if($CaptureOutput)
+        {
+            $process.StdErr
+        }  
         Set-ScriptFailedOnError -Command $Command -Arguments $Arguments
+    }
+    
+    if($CaptureOutput)
+    {
+        $process.StdOut
+    }  
+}
+
+Add-Type -TypeDefinition @'
+using System;
+using System.Text;
+using System.Collections.Generic;
+
+public class ProcessOutputter { 
+    private readonly ConsoleColor _color;
+    private readonly List<string> _output;
+    private int nullCount = 0;
+
+    public ProcessOutputter (ConsoleColor color, bool suppressOutput = false) { 
+        _color = color;
+        _output = new List<string>();
+
+        OutputHandler = (s, e) => {
+            AppendLine(e.Data);
+
+            if (!suppressOutput) {
+                var fg = Console.ForegroundColor;
+                try
+                {
+                    Console.ForegroundColor = _color;
+                    Console.WriteLine(e.Data);
+                }
+                finally
+                { 
+                    Console.ForegroundColor = fg;
+                }
+            }
+        };
+    }
+    
+    public ProcessOutputter () { 
+        _output = new List<string>();
+        OutputHandler = (s, e) => AppendLine(e.Data);
+    }
+
+    public System.Diagnostics.DataReceivedEventHandler OutputHandler { get; private set; }
+    public IEnumerable<string> Output { get { return _output; } }
+
+    private void AppendLine(string line) {
+        if (string.IsNullOrEmpty(line)) {
+            nullCount++;
+            return;
+        }
+
+        while (nullCount > 0) {
+            --nullCount;
+            _output.Add(string.Empty);
+        }
+        
+        _output.Add(line);
+    }
+}
+'@
+
+function Start-InlineProcess {
+    param (
+        [string]
+        $Path,
+
+        [string]
+        $WorkingDirectory,
+
+        [string]
+        $Arguments,
+
+        [switch]
+        $Elevate,
+
+        [switch] 
+        $SuppressOutput
+    )
+    
+    $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $processInfo.FileName = $Path
+    $processInfo.Arguments = $Arguments
+    $processInfo.WorkingDirectory = $WorkingDirectory
+    
+    $processInfo.RedirectStandardError = $true
+    $processInfo.RedirectStandardOutput = $true
+    $processInfo.UseShellExecute = $false
+
+    if ($Elevate) {
+        $processInfo.Verb = "runas"
+    }
+
+    $outputHandler = [ProcessOutputter]::new("White", $SuppressOutput.IsPresent)
+    $errorHandler = [ProcessOutputter]::new("Red", $SuppressOutput.IsPresent)
+    $outputDataReceived = $outputHandler.OutputHandler
+    $errorDataReceivedEvent = $errorHandler.OutputHandler
+
+    $process = New-Object System.Diagnostics.Process
+    $process.EnableRaisingEvents = $true
+    $process.add_OutputDataReceived($outputDataReceived)
+    $process.add_ErrorDataReceived($errorDataReceivedEvent)
+
+    try {
+        $process.StartInfo = $processInfo
+        if (-not $process.Start()) {
+            return $null
+        }
+        $process.BeginOutputReadLine()
+        $process.BeginErrorReadLine()
+        $process.WaitForExit()
+
+        return @{
+            ExitCode = $process.ExitCode
+            StdOut = $outputHandler.Output
+            StdErr = $errorHandler.Output
+        }
+    }
+    finally {
+        $process.remove_OutputDataReceived($outputDataReceived)
+        $process.remove_ErrorDataReceived($errorDataReceived)
+        $process.Dispose()
     }
 }
