@@ -23,6 +23,17 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             return Process.GetProcessById(processId).Handle;
         }
+
+        /// <inheritdoc/>
+        public PlatformArchitecture GetCurrentProcessArchitecture()
+        {
+            if (IntPtr.Size == 8)
+            {
+                return PlatformArchitecture.X64;
+            }
+
+            return PlatformArchitecture.X86;
+        }
     }
 }
 
