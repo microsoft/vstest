@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
         public bool TryGetDotnetPathByArchitecture(PlatformArchitecture targetArchitecture, out string muxerPath)
         {
-            if (this.environment.Architecture == targetArchitecture)
+            if (this.processHelper.GetCurrentProcessArchitecture() == targetArchitecture)
             {
                 string currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
                 if (Path.GetFileName(currentProcessFileName) != this.muxerName)

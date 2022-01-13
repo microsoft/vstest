@@ -34,6 +34,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
             environmentHelper.SetupGet(x => x.Architecture).Returns(PlatformArchitecture.X64);
             processHelper.Setup(x => x.GetCurrentProcessFileName()).Returns(finalMuxerPath);
+            processHelper.Setup(x => x.GetCurrentProcessArchitecture()).Returns(PlatformArchitecture.X64);
 
             // Act & Assert
             Assert.IsTrue(dotnetHostHelper.TryGetDotnetPathByArchitecture(PlatformArchitecture.X64, out string muxerPath));
