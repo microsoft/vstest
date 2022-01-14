@@ -187,17 +187,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
-        public PlatformArchitecture GetCurrentProcessArchitecture()
-        {
-            if (IntPtr.Size == 8)
-            {
-                return PlatformArchitecture.X64;
-            }
-
-            return PlatformArchitecture.X86;
-        }
-
-        /// <inheritdoc/>
         public string GetNativeDllDirectory()
         {
             var osArchitecture = new PlatformEnvironment().Architecture;

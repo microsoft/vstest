@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     public partial class ProcessHelper : IProcessHelper
@@ -25,6 +26,29 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             // An IntPtr representing the value of the handle field.
             // If the handle has been marked invalid with SetHandleAsInvalid, this method still returns the original handle value, which can be a stale value.
             return Process.GetProcessById(processId).SafeHandle.DangerousGetHandle();
+        }
+
+        public PlatformArchitecture GetCurrentProcessArchitecture()
+        {
+            switch (RuntimeInformation.ProcessArchitecture)
+            {
+                case Architecture.X86:
+                    return PlatformArchitecture.X86;
+                case Architecture.X64:
+                    return PlatformArchitecture.X64;
+                case Architecture.Arm:
+                    return PlatformArchitecture.ARM;
+                case Architecture.Arm64:
+                    return PlatformArchitecture.ARM64;
+
+                // The symbolic value is only available with .NET 6
+                // preview 6 or later, so use the numerical value for now.
+                // case System.Runtime.InteropServices.Architecture.S390x:
+                case (Architecture)5:
+                    return PlatformArchitecture.S390x;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

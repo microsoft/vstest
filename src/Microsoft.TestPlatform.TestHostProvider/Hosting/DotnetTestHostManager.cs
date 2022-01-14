@@ -406,7 +406,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 // We silently force x64 only if the target architecture is the default one and is not specified by user
                 // through --arch or runsettings or -- RunConfiguration.TargetPlatform=arch
                 bool forceToX64 = SilentlyForceToX64() && this.runsettingHelper.IsDefaultTargetArchitecture;
-                bool isSameArchitecture = IsSameArchitecture(this.architecture, this.platformEnvironment.Architecture);
+                EqtTrace.Verbose($"DotnetTestHostmanager: Current process architetcure '{this.processHelper.GetCurrentProcessArchitecture()}'");
+                bool isSameArchitecture = IsSameArchitecture(this.architecture, this.processHelper.GetCurrentProcessArchitecture());
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
                 bool isRunningWithDotnetMuxer = IsRunningWithDotnetMuxer(currentProcessPath);
                 if (useCustomDotnetHostpath)
@@ -423,10 +424,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 else
                 {
                     PlatformArchitecture targetArchitecture = TranslateToPlatformArchitecture(this.architecture);
-                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}' SDK platform architecture '{this.platformEnvironment.Architecture}'");
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Searching muxer for the architecture '{targetArchitecture}', OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}' SDK platform architecture '{this.platformEnvironment.Architecture}'");
                     if (forceToX64)
                     {
-                        EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
+                        EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{this.runsettingHelper.IsDefaultTargetArchitecture}' OS '{this.platformEnvironment.OperatingSystem}' framework '{this.targetFramework}'");
                     }
 
                     PlatformArchitecture finalTargetArchitecture = forceToX64 ? PlatformArchitecture.X64 : targetArchitecture;
@@ -440,7 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     startInfo.FileName = muxerPath;
                 }
 
-                EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Full path of testhost.dll is {0}", testHostPath);
+                EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
                 args = "exec" + args;
                 args += " " + testHostPath.AddDoubleQuote();
             }
