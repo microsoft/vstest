@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         private readonly string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common".Replace('\\', Path.DirectorySeparatorChar);
         private readonly string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools".Replace('\\', Path.DirectorySeparatorChar);
 
-        protected readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
+        protected static readonly bool IsWindows = System.Environment.OSVersion.Platform.ToString().StartsWith("Win");
 
         public enum UnitTestFramework
         {
@@ -142,7 +142,6 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
             this.FormatStandardOutCome();
         }
-
 
         /// <summary>
         /// Invokes our local copy of dotnet that is patched with artifacts from the build with specified arguments.
@@ -596,7 +595,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
-        private void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
+        protected void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null, string workingDirectory = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -611,12 +610,17 @@ namespace Microsoft.TestPlatform.TestUtilities
                 process.StartInfo.FileName = path;
                 process.StartInfo.Arguments = args;
                 process.StartInfo.UseShellExecute = false;
-                //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
                 process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+
+                if (workingDirectory != null)
+                {
+                    process.StartInfo.WorkingDirectory = workingDirectory;
+                }
+
                 if (environmentVariables != null)
                 {
                     foreach (var variable in environmentVariables)
@@ -756,12 +760,34 @@ namespace Microsoft.TestPlatform.TestUtilities
             // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
             // that is cleaned up after every job. This is preferable to use over 
             // just the normal temp. 
-            var temp = Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
+            var temp = GetTempPath();
             var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
             Directory.CreateDirectory(directoryPath);
 
             return directoryPath;
         }
+
+        protected static string GetTempPath() => Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
+
+        protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
+        {
+            if (architecture != "X86" && architecture != "X64")
+            {
+                throw new NotSupportedException(nameof(architecture));
+            }
+
+            string path = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "tools",
+                architecture == "X86" ?
+                "dotnet_x86" :
+                $"dotnet",
+                $"dotnet{(IsWindows ? ".exe" : "")}");
+
+            Assert.IsTrue(File.Exists(path));
+
+            return path;
+        }
+
+        protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
 
         protected static void TryRemoveDirectory(string directory)
         {

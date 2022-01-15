@@ -111,7 +111,9 @@ function Install-DotNetCli
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -Channel 6.0 -InstallDir $dotnetInstallPath -Version $env:DOTNET_CLI_VERSION
-    
+
+    & $dotnetInstallScript -Channel 6.0 -InstallDir "${dotnetInstallPath}_x86" -Version $env:DOTNET_CLI_VERSION -Architecture x86 -NoPath
+
     & $dotnetInstallScript -InstallDir "$dotnetInstallPath" -Runtime 'dotnet' -Version '2.1.30' -Channel '2.1' -Architecture x64 -NoPath
     $env:DOTNET_ROOT= $dotnetInstallPath
 
