@@ -143,12 +143,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             // Verify switch using csproj
-            ExecuteApplication($"{privateX64Installation}/dotnet", $"test {projectPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication($"{privateX64Installation}/dotnet", $"test {buildAssemblyPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch x64", out stdOut, out stdError, out exitCode, env, projectDirectory);
             AssertSwitch(stdOut);
 
             void AssertSwitch(string output)
@@ -185,12 +185,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(stdOut.Contains("ProcessArchitecture: X64"), "Unexpected ProcessArchitecture");
 
             // Verify switch using csproj
-            ExecuteApplication($"{privateX64Installation}/dotnet", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication($"{privateX64Installation}/dotnet", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
             AssertSwitch(stdOut);
 
             void AssertSwitch(string output)
@@ -240,12 +240,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             // Verify switch using csproj
-            ExecuteApplication($"{privateX64Installation}/dotnet", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {projectPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
             AssertSwitch(stdOut);
 
             // Verify switch using test container
             var buildAssemblyPath = GetAssetFullPath("ArchitectureSwitch.dll", "net6.0");
-            ExecuteApplication($"{privateX64Installation}/dotnet", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
+            ExecuteApplication($"{privateX64Installation}/{GetMuxerName}", $"test {buildAssemblyPath} --framework net6.0 --arch arm64", out stdOut, out stdError, out exitCode, env, projectDirectory);
             AssertSwitch(stdOut);
 
             void AssertSwitch(string output)
