@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Collections.Generic;
     using System.IO;
     using System.Threading;
-
+    using System.Threading.Tasks;
     using global::TestPlatform.TestUtilities;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnerInfo runnerInfo)
+        public async Task CommandLineRunSettingsShouldWinAmongAllOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -63,16 +63,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
+            await this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         /// <summary>
-        /// Command line run settings should have high precedence btween cli runsettings and cli switches.
+        /// Command line run settings should have high precedence between cli runsettings and cli switches.
         /// </summary>
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnerInfo runnerInfo)
+        public async Task CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -94,7 +94,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(null, runSettingsArgs, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
+            await this.RunTestWithRunSettings(null, runSettingsArgs, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnerInfo runnerInfo)
+        public async Task CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                  };
             var additionalArgs = "/Platform:x86";
 
-            this.RunTestWithRunSettings(runConfigurationDictionary, null, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
+            await this.RunTestWithRunSettings(runConfigurationDictionary, null, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         #endregion
@@ -131,7 +131,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunSettingsWithoutParallelAndPlatformX86(RunnerInfo runnerInfo)
+        public async Task RunSettingsWithoutParallelAndPlatformX86(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -146,13 +146,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessNames, expectedNumOfProcessCreated);
+            await this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessNames, expectedNumOfProcessCreated);
         }
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunSettingsParamsAsArguments(RunnerInfo runnerInfo)
+        public async Task RunSettingsParamsAsArguments(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -170,13 +170,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(null, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
+            await this.RunTestWithRunSettings(null, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunSettingsAndRunSettingsParamsAsArguments(RunnerInfo runnerInfo)
+        public async Task RunSettingsAndRunSettingsParamsAsArguments(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -201,13 +201,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
+            await this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunSettingsWithParallelAndPlatformX64(RunnerInfo runnerInfo)
+        public async Task RunSettingsWithParallelAndPlatformX64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -228,7 +228,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings()},
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedProcessCreated);
+            await this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedProcessCreated);
         }
 
         [TestMethod]
@@ -546,7 +546,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return runsettingsPath;
         }
 
-        private void RunTestWithRunSettings(Dictionary<string, string> runConfigurationDictionary,
+        private async Task RunTestWithRunSettings(Dictionary<string, string> runConfigurationDictionary,
             string runSettingsArgs, string additionalArgs, IEnumerable<string> testhostProcessNames, int expectedNumOfProcessCreated)
         {
             var resultsDir = GetResultsDirectory();
@@ -574,14 +574,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            var numOfProcessCreatedTask = await NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
                 testhostProcessNames);
 
             this.InvokeVsTest(arguments);
             cts.Cancel();
 
-            var processesCreated = numOfProcessCreatedTask.Result;
+            var processesCreated = numOfProcessCreatedTask;
             // assert
             Assert.AreEqual(
                 expectedNumOfProcessCreated,

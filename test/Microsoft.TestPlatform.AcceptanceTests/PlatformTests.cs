@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System.Threading;
-
+    using System.Threading.Tasks;
     using global::TestPlatform.TestUtilities;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,12 +20,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
+        public async Task RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x64";
-            this.RunTestExecutionWithPlatform(platformArg, "testhost", 1);
+            await RunTestExecutionWithPlatform(platformArg, "testhost", 1);
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
+        public async Task RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x86";
-            this.RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
+            await RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
         }
 
         private void SetExpectedParams(ref int expectedNumOfProcessCreated, ref string testhostProcessName, string desktopHostProcessName)
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             expectedNumOfProcessCreated = 1;
         }
 
-        private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
+        private async Task RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
         {
             var resultsDir = GetResultsDirectory();
 
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, platformArg);
 
             var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            var numOfProcessCreatedTask = await NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
                 testhostProcessName);
 
@@ -70,8 +70,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
+                numOfProcessCreatedTask.Count,
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Count} ({ string.Join(", ", numOfProcessCreatedTask) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(1, 1, 1);
             TryRemoveDirectory(resultsDir);
         }

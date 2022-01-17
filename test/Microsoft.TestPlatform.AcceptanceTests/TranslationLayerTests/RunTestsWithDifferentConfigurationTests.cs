@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Linq;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The Run Tests using VsTestConsoleWrapper API's
@@ -64,7 +65,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
+        public async Task RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
@@ -81,7 +82,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             int expectedNumOfProcessCreated = 2;
 
             var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            var numOfProcessCreatedTask = await NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
                 testHostNames);
 
@@ -100,8 +101,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
+                numOfProcessCreatedTask.Count,
+                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Count} ({ string.Join(", ", numOfProcessCreatedTask) })");
         }
 
         [TestMethod]
@@ -140,7 +141,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void RunTestsWithX64Source(RunnerInfo runnerInfo)
+        public async Task RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
@@ -155,7 +156,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var testhostProcessNames = new[] { "testhost", "dotnet" };
 
             var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            var numOfProcessCreatedTask = await NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts, testhostProcessNames);
 
             this.vstestConsoleWrapper.RunTests(
@@ -169,7 +170,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Assert
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            var numberOfProcessCreated = numOfProcessCreatedTask.Result;
+            var numberOfProcessCreated = numOfProcessCreatedTask;
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
                 numberOfProcessCreated.Count,

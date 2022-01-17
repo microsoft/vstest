@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.IO;
     using System.Threading;
-
+    using System.Threading.Tasks;
     using global::TestPlatform.TestUtilities;
 
     using Microsoft.TestPlatform.TestUtilities;
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         [DoNotParallelize]
-        public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
+        public async Task RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var resultsDir = GetResultsDirectory();
@@ -74,7 +74,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var testhostProcessNames = new[] { "testhost.x86", "dotnet" };
 
             var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
+            var numOfProcessCreatedTask = await NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
                 testhostProcessNames);
 
@@ -83,8 +83,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             cts.Cancel();
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
+                numOfProcessCreatedTask.Count,
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Count} ({ string.Join(", ", numOfProcessCreatedTask) })");
             this.ValidateSummaryStatus(2, 2, 2);
             this.ExitCodeEquals(1); // failing tests
             TryRemoveDirectory(resultsDir);
