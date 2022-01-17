@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             {
                 EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessTestRunAttachmentsAsync: " + e);
 
-                eventHandler?.HandleLogMessage(TestMessageLevel.Error, e.Message);
+                eventHandler?.HandleLogMessage(TestMessageLevel.Error, e.ToString());
                 return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, e), attachments, stopwatch, eventHandler);
             }
         }
@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                 catch (Exception e)
                 {
                     EqtTrace.Error("TestRunAttachmentsProcessingManager: Exception in ProcessAttachmentsAsync: " + e);
-                    logger.SendMessage(TestMessageLevel.Error, e.Message);
+                    logger.SendMessage(TestMessageLevel.Error, e.ToString());
 
                     // Restore the attachment sets for the others attachment processors.
                     attachments = attachmentsBackup;
