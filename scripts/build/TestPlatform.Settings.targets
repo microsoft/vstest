@@ -54,7 +54,8 @@
   we don't ship them.
   -->
   <Choose>
-    <When Condition="$(MSBuildProjectFullPath.Contains('/src/')) OR $(MSBuildProjectFullPath.Contains('\src\'))">
+    <!-- Use relative path between the project and the root to avoid including the analyzer if the path above the root contains 'src' (e.g. C:\src\vstest). -->
+    <When Condition="$([MSBuild]::MakeRelative($(TestPlatformRoot), $(MSBuildProjectFullPath)).Contains('/src/')) OR $([MSBuild]::MakeRelative($(TestPlatformRoot), $(MSBuildProjectFullPath)).Contains('\src\'))">
       <ItemGroup>
         <!-- We normally don't build against net6.0, so the public api analyzer errors would only appear in CI pipeline. -->
         <PackageReference Condition=" '$(DotNetBuildFromSource)' != 'true' " Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(RoslynPublicApiAnalyzersVersion)">
