@@ -6,6 +6,7 @@
     at the start of new iteration to the goal number. This is also used to version the local packages. This version needs to be statically
     readable when we read the file as xml, don't move it to a .props file, unless you change the build server process -->
     <TPVersionPrefix>17.2.0</TPVersionPrefix>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
@@ -37,7 +38,7 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
-  </PropertyGroup> 
+  </PropertyGroup>
 
   <!-- Package dependency versions -->
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" Condition=" '$(DependencyVersionsImported)' != 'true' "/>
@@ -62,13 +63,13 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-	    </ItemGroup>
+      </ItemGroup>
     </When>
   </Choose>
 
   <!-- Test project settings -->
   <Choose>
-    <When Condition="$(TestProject) == 'true'"> 
+    <When Condition="$(TestProject) == 'true'">
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
       </PropertyGroup>
