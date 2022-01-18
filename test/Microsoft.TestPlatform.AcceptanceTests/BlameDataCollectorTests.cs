@@ -131,7 +131,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        // net5.0 does not suppord dump on exit
+        // net5.0 does not support dump on exit
         [NetCoreRunner("net452;net472;netcoreapp3.1")]
         // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]
@@ -150,7 +150,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        // net5.0 does not suppord dump on exit
+        // net5.0 does not support dump on exit
         [NetCoreRunner("net452;net472;netcoreapp3.1")]
         // should make no difference, keeping for easy debug
         // [NetFrameworkRunner("net452;net472;netcoreapp3.1")]

@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         /// <summary>
-        /// Command line run settings should have high precedence btween cli runsettings and cli switches.
+        /// Command line run settings should have high precedence between cli runsettings and cli switches.
         /// </summary>
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
