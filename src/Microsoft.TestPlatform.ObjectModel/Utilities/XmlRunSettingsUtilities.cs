@@ -104,20 +104,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             var friendlyNameList = new List<string>();
             if (!string.IsNullOrWhiteSpace(runsettingsXml))
             {
-                using (var stream = new StringReader(runsettingsXml))
-                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                using var stream = new StringReader(runsettingsXml);
+                using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var runSettingsNavigator = document.CreateNavigator();
+                var nodes = runSettingsNavigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+
+                foreach (XPathNavigator dataCollectorNavigator in nodes)
                 {
-                    var document = new XmlDocument();
-                    document.Load(reader);
-
-                    var runSettingsNavigator = document.CreateNavigator();
-                    var nodes = runSettingsNavigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
-
-                    foreach (XPathNavigator dataCollectorNavigator in nodes)
-                    {
-                        var friendlyName = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
-                        friendlyNameList.Add(friendlyName);
-                    }
+                    var friendlyName = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
+                    friendlyNameList.Add(friendlyName);
                 }
             }
 
@@ -273,29 +271,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             try
             {
-                using (var stringReader = new StringReader(runSettingsXml))
+                using var stringReader = new StringReader(runSettingsXml);
+                var reader = XmlReader.Create(stringReader, ReaderSettings);
+
+                // read to the fist child
+                XmlReaderUtilities.ReadToRootNode(reader);
+                reader.ReadToNextElement();
+
+                // Read till we reach DC element or reach EOF
+                while (!string.Equals(reader.Name, Constants.DataCollectionRunSettingsName) && !reader.EOF)
                 {
-                    var reader = XmlReader.Create(stringReader, ReaderSettings);
-
-                    // read to the fist child
-                    XmlReaderUtilities.ReadToRootNode(reader);
-                    reader.ReadToNextElement();
-
-                    // Read till we reach DC element or reach EOF
-                    while (!string.Equals(reader.Name, Constants.DataCollectionRunSettingsName) && !reader.EOF)
-                    {
-                        reader.SkipToNextElement();
-                    }
-
-                    // If reached EOF => DC element not there
-                    if (reader.EOF)
-                    {
-                        return null;
-                    }
-
-                    // Reached here => DC element present.
-                    return DataCollectionRunSettings.FromXml(reader);
+                    reader.SkipToNextElement();
                 }
+
+                // If reached EOF => DC element not there
+                if (reader.EOF)
+                {
+                    return null;
+                }
+
+                // Reached here => DC element present.
+                return DataCollectionRunSettings.FromXml(reader);
             }
             catch (XmlException ex)
             {
@@ -321,29 +317,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
 
             runSettingsXml = runSettingsXml.Trim();
-            using (StringReader stringReader1 = new StringReader(runSettingsXml))
+            using StringReader stringReader1 = new StringReader(runSettingsXml);
+            XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
+
+            // read to the fist child
+            XmlReaderUtilities.ReadToRootNode(reader);
+            reader.ReadToNextElement();
+
+            // Read till we reach In Proc IDC element or reach EOF
+            while (!string.Equals(reader.Name, Constants.InProcDataCollectionRunSettingsName) && !reader.EOF)
             {
-                XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
-
-                // read to the fist child
-                XmlReaderUtilities.ReadToRootNode(reader);
-                reader.ReadToNextElement();
-
-                // Read till we reach In Proc IDC element or reach EOF
-                while (!string.Equals(reader.Name, Constants.InProcDataCollectionRunSettingsName) && !reader.EOF)
-                {
-                    reader.SkipToNextElement();
-                }
-
-                // If reached EOF => IDC element not there
-                if (reader.EOF)
-                {
-                    return null;
-                }
-
-                // Reached here => In Proc IDC element present.
-                return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
+                reader.SkipToNextElement();
             }
+
+            // If reached EOF => IDC element not there
+            if (reader.EOF)
+            {
+                return null;
+            }
+
+            // Reached here => In Proc IDC element present.
+            return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
         }
 
 #endif
@@ -404,27 +398,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             {
                 try
                 {
-                    using (var stringReader = new StringReader(settingsXml))
+                    using var stringReader = new StringReader(settingsXml);
+                    XmlReader reader = XmlReader.Create(stringReader, ReaderSettings);
+
+                    // read to the fist child
+                    XmlReaderUtilities.ReadToRootNode(reader);
+                    reader.ReadToNextElement();
+
+                    // Read till we reach nodeName element or reach EOF
+                    while (!string.Equals(reader.Name, nodeName, StringComparison.OrdinalIgnoreCase)
+                            &&
+                            !reader.EOF)
                     {
-                        XmlReader reader = XmlReader.Create(stringReader, ReaderSettings);
+                        reader.SkipToNextElement();
+                    }
 
-                        // read to the fist child
-                        XmlReaderUtilities.ReadToRootNode(reader);
-                        reader.ReadToNextElement();
-
-                        // Read till we reach nodeName element or reach EOF
-                        while (!string.Equals(reader.Name, nodeName, StringComparison.OrdinalIgnoreCase)
-                                &&
-                                !reader.EOF)
-                        {
-                            reader.SkipToNextElement();
-                        }
-
-                        if (!reader.EOF)
-                        {
-                            // read nodeName element.
-                            return nodeParser(reader);
-                        }
+                    if (!reader.EOF)
+                    {
+                        // read nodeName element.
+                        return nodeParser(reader);
                     }
                 }
                 catch (XmlException ex)

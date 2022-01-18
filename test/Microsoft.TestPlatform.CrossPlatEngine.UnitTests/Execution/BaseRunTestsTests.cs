@@ -686,8 +686,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             TestRunCompleteEventArgs receivedRunCompleteArgs = null;
             var mockMetricsCollector = new Mock<IMetricsCollection>();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add("DummyMessage", "DummyValue");
+            var dict = new Dictionary<string, object>
+            {
+                { "DummyMessage", "DummyValue" }
+            };
 
             // Setup mocks.
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
@@ -723,8 +725,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, object>();
-            dict.Add("DummyMessage", "DummyValue");
+            var dict = new Dictionary<string, object>
+            {
+                { "DummyMessage", "DummyValue" }
+            };
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
                                               {

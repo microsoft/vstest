@@ -36,13 +36,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             var data = value as string;
             if (data != null)
             {
-                using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(data)))
-                {
-                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(string[]));
-                    var strings = serializer.ReadObject(stream) as string[];
+                using var stream = new MemoryStream(Encoding.Unicode.GetBytes(data));
+                var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(string[]));
+                var strings = serializer.ReadObject(stream) as string[];
 
-                    return strings;
-                }
+                return strings;
             }
 
             return null;

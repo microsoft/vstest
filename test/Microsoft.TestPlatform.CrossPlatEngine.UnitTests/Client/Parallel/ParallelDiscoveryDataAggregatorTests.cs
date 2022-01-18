@@ -60,8 +60,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TotalTestsDiscovered, 2);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TotalTestsDiscovered, 2 }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -77,8 +79,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, .02091 }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -94,8 +98,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenInSecByAllAdapters, .02091 }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -111,8 +117,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, .02091 }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -128,8 +136,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.DiscoveryState, "Completed");
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.DiscoveryState, "Completed" }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -170,8 +180,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TotalTestsByAdapter, 2);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TotalTestsByAdapter, 2 }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -187,9 +199,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, object>();
-            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV1", .02091);
-            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV2", .02091);
+            var dict = new Dictionary<string, object>
+            {
+                { TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV1", .02091 },
+                { TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV2", .02091 }
+            };
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
 

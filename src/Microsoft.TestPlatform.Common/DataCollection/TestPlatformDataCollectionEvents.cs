@@ -26,13 +26,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         internal TestPlatformDataCollectionEvents()
         {
-            this.eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(4);
-
-            this.eventArgsToEventInvokerMap[typeof(TestHostLaunchedEventArgs)] = this.OnTestHostLaunched;
-            this.eventArgsToEventInvokerMap[typeof(SessionStartEventArgs)] = this.OnSessionStart;
-            this.eventArgsToEventInvokerMap[typeof(SessionEndEventArgs)] = this.OnSessionEnd;
-            this.eventArgsToEventInvokerMap[typeof(TestCaseStartEventArgs)] = this.OnTestCaseStart;
-            this.eventArgsToEventInvokerMap[typeof(TestCaseEndEventArgs)] = this.OnTestCaseEnd;
+            this.eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(4)
+            {
+                [typeof(TestHostLaunchedEventArgs)] = this.OnTestHostLaunched,
+                [typeof(SessionStartEventArgs)] = this.OnSessionStart,
+                [typeof(SessionEndEventArgs)] = this.OnSessionEnd,
+                [typeof(TestCaseStartEventArgs)] = this.OnTestCaseStart,
+                [typeof(TestCaseEndEventArgs)] = this.OnTestCaseEnd
+            };
         }
 
         /// <summary>

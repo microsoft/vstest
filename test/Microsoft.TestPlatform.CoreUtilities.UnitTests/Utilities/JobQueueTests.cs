@@ -187,17 +187,15 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void ThrowsWhenBeingDisposedWhileQueueIsPaused()
         {
-            using (var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
+            using var queue = new JobQueue<string>(GetEmptyProcessHandler<string>(), "dp", int.MaxValue, int.MaxValue, false, (message) => { });
+            queue.Pause();
+
+            Assert.ThrowsException<InvalidOperationException>(() =>
             {
-                queue.Pause();
+                queue.Dispose();
+            });
 
-                Assert.ThrowsException<InvalidOperationException>(() =>
-                {
-                    queue.Dispose();
-                });
-
-                queue.Resume();
-            }
+            queue.Resume();
         }
 
         [TestMethod]
@@ -211,16 +209,14 @@ namespace TestPlatform.CoreUtilities.UnitTests
             };
 
             // Queue several jobs and verify they have been processed when wait returns.
-            using (var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { }))
-            {
-                queue.QueueJob("dp", 0);
-                queue.QueueJob("dp", 0);
-                queue.QueueJob("dp", 0);
+            using var queue = new JobQueue<string>(processHandler, "dp", int.MaxValue, int.MaxValue, false, (message) => { });
+            queue.QueueJob("dp", 0);
+            queue.QueueJob("dp", 0);
+            queue.QueueJob("dp", 0);
 
-                queue.Flush();
+            queue.Flush();
 
-                Assert.AreEqual(3, jobsProcessed);
-            }
+            Assert.AreEqual(3, jobsProcessed);
         }
 
         [TestMethod]
@@ -240,42 +236,40 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 }
             };
 
-            using (JobQueueWrapper queue = new JobQueueWrapper(processHandler, 5, int.MaxValue, true, allowJobProcessingHandlerToProceed))
+            using JobQueueWrapper queue = new JobQueueWrapper(processHandler, 5, int.MaxValue, true, allowJobProcessingHandlerToProceed);
+            // run the same thing multiple times to ensure that the queue isn't in a erroneous state after being blocked.
+            for (int i = 0; i < 10; i++)
             {
-                // run the same thing multiple times to ensure that the queue isn't in a erroneous state after being blocked.
-                for (int i = 0; i < 10; i++)
-                {
-                    queue.QueueJob("job1", 0);
-                    queue.QueueJob("job2", 0);
-                    queue.QueueJob("job3", 0);
-                    queue.QueueJob("job4", 0);
-                    queue.QueueJob("job5", 0);
+                queue.QueueJob("job1", 0);
+                queue.QueueJob("job2", 0);
+                queue.QueueJob("job3", 0);
+                queue.QueueJob("job4", 0);
+                queue.QueueJob("job5", 0);
 
-                    // At this point only 5 jobs have been queued. Even if all are still in queue, still the need to block shouldn't have
-                    // risen. So queue.enteredBlockingMethod would be false.
-                    Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
+                // At this point only 5 jobs have been queued. Even if all are still in queue, still the need to block shouldn't have
+                // risen. So queue.enteredBlockingMethod would be false.
+                Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
 
-                    queue.QueueJob("job6", 0);
-                    queue.QueueJob("job7", 0);
-                    queue.QueueJob("job8", 0);
-                    queue.QueueJob("job9", 0);
-                    queue.QueueJob("job10", 0);
-                    queue.QueueJob("job11", 0);
+                queue.QueueJob("job6", 0);
+                queue.QueueJob("job7", 0);
+                queue.QueueJob("job8", 0);
+                queue.QueueJob("job9", 0);
+                queue.QueueJob("job10", 0);
+                queue.QueueJob("job11", 0);
 
-                    // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
-                    Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
+                // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
+                Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
-                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
-                    jobProcessed.WaitOne();
+                // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
+                jobProcessed.WaitOne();
 
-                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
-                    // allowJobProcessingHandlerToProceed is reset to block the handler again in next iteration.
-                    queue.IsEnqueueBlocked = false;
-                    allowJobProcessingHandlerToProceed.Reset();
+                // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
+                // allowJobProcessingHandlerToProceed is reset to block the handler again in next iteration.
+                queue.IsEnqueueBlocked = false;
+                allowJobProcessingHandlerToProceed.Reset();
 
-                    // if we reach here it means that the queue was successfully blocked at some point in between job6 and job11
-                    // and subsequently unblocked.
-                }
+                // if we reach here it means that the queue was successfully blocked at some point in between job6 and job11
+                // and subsequently unblocked.
             }
         }
 
@@ -296,42 +290,40 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 }
             };
 
-            using (JobQueueWrapper queue = new JobQueueWrapper(processHandler, int.MaxValue, 40, true, allowJobProcessingHandlerToProceed))
+            using JobQueueWrapper queue = new JobQueueWrapper(processHandler, int.MaxValue, 40, true, allowJobProcessingHandlerToProceed);
+            // run the same thing multiple times to ensure that the queue isn't in a erroneous state after being blocked.
+            for (int i = 0; i < 10; i++)
             {
-                // run the same thing multiple times to ensure that the queue isn't in a erroneous state after being blocked.
-                for (int i = 0; i < 10; i++)
-                {
-                    queue.QueueJob("job1", 8);
-                    queue.QueueJob("job2", 8);
-                    queue.QueueJob("job3", 8);
-                    queue.QueueJob("job4", 8);
-                    queue.QueueJob("job5", 8);
+                queue.QueueJob("job1", 8);
+                queue.QueueJob("job2", 8);
+                queue.QueueJob("job3", 8);
+                queue.QueueJob("job4", 8);
+                queue.QueueJob("job5", 8);
 
-                    // At this point exactly 80 bytes have been queued. Even if all are still in queue, still the need to block shouldn't
-                    // have risen. So queue.enteredBlockingMethod would be false.
-                    Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
+                // At this point exactly 80 bytes have been queued. Even if all are still in queue, still the need to block shouldn't
+                // have risen. So queue.enteredBlockingMethod would be false.
+                Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
 
-                    queue.QueueJob("job6", 8);
-                    queue.QueueJob("job7", 8);
-                    queue.QueueJob("job8", 8);
-                    queue.QueueJob("job9", 8);
-                    queue.QueueJob("job10", 10);
-                    queue.QueueJob("job11", 10);
+                queue.QueueJob("job6", 8);
+                queue.QueueJob("job7", 8);
+                queue.QueueJob("job8", 8);
+                queue.QueueJob("job9", 8);
+                queue.QueueJob("job10", 10);
+                queue.QueueJob("job11", 10);
 
-                    // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
-                    Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
+                // By this point surely the queue would have blocked at least once, hence setting queue.enteredBlockingMethod true.
+                Assert.IsTrue(queue.IsEnqueueBlocked, "Did not enter the over-ridden blocking method");
 
-                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
-                    jobProcessed.WaitOne();
+                // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
+                jobProcessed.WaitOne();
 
-                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
-                    // allowJobProcessingHandlerToProceed is reset to block the handler again in next iteration.
-                    queue.IsEnqueueBlocked = false;
-                    allowJobProcessingHandlerToProceed.Reset();
+                // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
+                // allowJobProcessingHandlerToProceed is reset to block the handler again in next iteration.
+                queue.IsEnqueueBlocked = false;
+                allowJobProcessingHandlerToProceed.Reset();
 
-                    // if we reach here it means that the queue was successfully blocked at some point in between job6 and job11
-                    // and subsequently unblocked.
-                }
+                // if we reach here it means that the queue was successfully blocked at some point in between job6 and job11
+                // and subsequently unblocked.
             }
         }
 
@@ -352,38 +344,36 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 }
             };
 
-            using (JobQueueWrapper queue = new JobQueueWrapper(processHandler, 2, int.MaxValue, false, allowJobProcessingHandlerToProceed))
+            using JobQueueWrapper queue = new JobQueueWrapper(processHandler, 2, int.MaxValue, false, allowJobProcessingHandlerToProceed);
+            // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
+            for (int i = 0; i < 10; i++)
             {
-                // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
-                for (int i = 0; i < 10; i++)
-                {
-                    queue.QueueJob("job1", 0);
-                    queue.QueueJob("job2", 0);
+                queue.QueueJob("job1", 0);
+                queue.QueueJob("job2", 0);
 
-                    // At this point only 2 jobs have been queued. Even if all are still in queue, still the need to block shouldn't have
-                    // risen. So queue.enteredBlockingMethod would be false regardless of the blocking disabled or not.
-                    Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
+                // At this point only 2 jobs have been queued. Even if all are still in queue, still the need to block shouldn't have
+                // risen. So queue.enteredBlockingMethod would be false regardless of the blocking disabled or not.
+                Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method at a wrong time.");
 
-                    queue.QueueJob("job3", 0);
-                    queue.QueueJob("job4", 0);
-                    queue.QueueJob("job5", 0);
+                queue.QueueJob("job3", 0);
+                queue.QueueJob("job4", 0);
+                queue.QueueJob("job5", 0);
 
-                    // queue.enteredBlockingMethod should still be false as the queue should not have blocked.
-                    Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method though blocking is disabled.");
+                // queue.enteredBlockingMethod should still be false as the queue should not have blocked.
+                Assert.IsFalse(queue.IsEnqueueBlocked, "Entered the over-ridden blocking method though blocking is disabled.");
 
-                    // allow handlers to proceed.
-                    allowJobProcessingHandlerToProceed.Set();
+                // allow handlers to proceed.
+                allowJobProcessingHandlerToProceed.Set();
 
-                    // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
-                    jobProcessed.WaitOne();
+                // We wait till all jobs are finished, so that for the next iteration the queue is in a deterministic state.
+                jobProcessed.WaitOne();
 
-                    // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
-                    // allowJobProcessingHandlerToProceed is reset to allow blocking the handler again in next iteration.
-                    queue.IsEnqueueBlocked = false;
-                    allowJobProcessingHandlerToProceed.Reset();
+                // queue.enteredBlockingMethod is set to false to check it again in next iteration. Also
+                // allowJobProcessingHandlerToProceed is reset to allow blocking the handler again in next iteration.
+                queue.IsEnqueueBlocked = false;
+                allowJobProcessingHandlerToProceed.Reset();
 
-                    // if we reach here it means that the queue was never blocked.
-                }
+                // if we reach here it means that the queue was never blocked.
             }
         }
 
@@ -398,20 +388,18 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 jobProcessed.Set();
             };
 
-            using (JobQueueNonBlocking queue = new JobQueueNonBlocking(processHandler))
+            using JobQueueNonBlocking queue = new JobQueueNonBlocking(processHandler);
+            // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
+            for (var i = 0; i < 10; i++)
             {
-                // run the same thing multiple times to ensure that the queue isn't in a erroneous state after first run.
-                for (var i = 0; i < 10; i++)
-                {
-                    // we try to enqueue a job of size greater than bound on the queue. It should be queued without blocking as
-                    // we check whether or not the queue size has exceeded the limit before actually queuing.
-                    queue.QueueJob("job1", 8);
+                // we try to enqueue a job of size greater than bound on the queue. It should be queued without blocking as
+                // we check whether or not the queue size has exceeded the limit before actually queuing.
+                queue.QueueJob("job1", 8);
 
-                    // if queue.EnteredBlockingMethod is true, the enqueuing entered the overridden blocking method. This was not
-                    // intended.
-                    Assert.IsFalse(queue.EnteredBlockingMethod, "Entered the over-ridden blocking method.");
-                    jobProcessed.WaitOne();
-                }
+                // if queue.EnteredBlockingMethod is true, the enqueuing entered the overridden blocking method. This was not
+                // intended.
+                Assert.IsFalse(queue.EnteredBlockingMethod, "Entered the over-ridden blocking method.");
+                jobProcessed.WaitOne();
             }
         }
 
@@ -421,37 +409,35 @@ namespace TestPlatform.CoreUtilities.UnitTests
         {
             var allowJobProcessingHandlerToProceed = new ManualResetEvent(false);
 
-            using (var gotBlocked = new ManualResetEvent(false))
+            using var gotBlocked = new ManualResetEvent(false);
+            var job1Running = new ManualResetEvent(false);
+
+            // process handler for the jobs in queue. It blocks on a job till the test method sets the
+            // event allowHandlerToProceed.
+            Action<string> processHandler = (job) =>
             {
-                var job1Running = new ManualResetEvent(false);
+                if (job.Equals("job1", StringComparison.OrdinalIgnoreCase))
+                    job1Running.Set();
 
-                // process handler for the jobs in queue. It blocks on a job till the test method sets the
-                // event allowHandlerToProceed.
-                Action<string> processHandler = (job) =>
-                {
-                    if (job.Equals("job1", StringComparison.OrdinalIgnoreCase))
-                        job1Running.Set();
+                allowJobProcessingHandlerToProceed.WaitOne();
+            };
 
-                    allowJobProcessingHandlerToProceed.WaitOne();
-                };
+            var jobQueue = new JobQueueWrapper(processHandler, 1, int.MaxValue, true, gotBlocked);
 
-                var jobQueue = new JobQueueWrapper(processHandler, 1, int.MaxValue, true, gotBlocked);
+            var queueThread = new Thread(
+                source =>
+                    {
+                        jobQueue.QueueJob("job1", 0);
+                        job1Running.WaitOne();
+                        jobQueue.QueueJob("job2", 0);
+                        jobQueue.QueueJob("job3", 0);
+                        allowJobProcessingHandlerToProceed.Set();
+                    });
+            queueThread.Start();
 
-                var queueThread = new Thread(
-                    source =>
-                        {
-                            jobQueue.QueueJob("job1", 0);
-                            job1Running.WaitOne();
-                            jobQueue.QueueJob("job2", 0);
-                            jobQueue.QueueJob("job3", 0);
-                            allowJobProcessingHandlerToProceed.Set();
-                        });
-                queueThread.Start();
-
-                gotBlocked.WaitOne();
-                jobQueue.Dispose();
-                queueThread.Join();
-            }
+            gotBlocked.WaitOne();
+            jobQueue.Dispose();
+            queueThread.Join();
         }
 
         #region Implementation

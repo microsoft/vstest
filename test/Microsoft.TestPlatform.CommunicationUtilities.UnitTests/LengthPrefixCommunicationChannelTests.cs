@@ -74,15 +74,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
         public async Task SendShouldFlushTheStream()
         {
             // A buffered stream doesn't immediately flush, it waits until buffer is filled in
-            using (var bufferedStream = new BufferedStream(this.stream, 2048))
-            {
-                var communicationChannel = new LengthPrefixCommunicationChannel(bufferedStream);
+            using var bufferedStream = new BufferedStream(this.stream, 2048);
+            var communicationChannel = new LengthPrefixCommunicationChannel(bufferedStream);
 
-                await communicationChannel.Send("a");
+            await communicationChannel.Send("a");
 
-                SeekToBeginning(this.stream);
-                Assert.AreEqual("a", this.reader.ReadString());
-            }
+            SeekToBeginning(this.stream);
+            Assert.AreEqual("a", this.reader.ReadString());
         }
 
         [TestMethod]

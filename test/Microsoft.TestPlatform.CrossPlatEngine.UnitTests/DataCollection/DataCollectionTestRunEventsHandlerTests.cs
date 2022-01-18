@@ -108,8 +108,10 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void HandleRawMessageShouldInvokeAfterTestRunEndAndReturnInvokedDataCollectors()
         {
-            var invokedDataCollectors = new Collection<InvokedDataCollector>();
-            invokedDataCollectors.Add(new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, true));
+            var invokedDataCollectors = new Collection<InvokedDataCollector>
+            {
+                new InvokedDataCollector(new Uri("datacollector://sample"), "sample", typeof(string).AssemblyQualifiedName, typeof(string).Assembly.Location, true)
+            };
 
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new Collection<InvokedDataCollector>(), new TimeSpan());
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });

@@ -604,79 +604,77 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             var executableName = Path.GetFileName(path);
 
-            using (Process process = new Process())
+            using Process process = new Process();
+            Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
+            process.StartInfo.FileName = path;
+            process.StartInfo.Arguments = args;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+            process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+
+            if (workingDirectory != null)
             {
-                Console.WriteLine($"IntegrationTestBase.Execute: Starting {executableName}");
-                process.StartInfo.FileName = path;
-                process.StartInfo.Arguments = args;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-                process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+                process.StartInfo.WorkingDirectory = workingDirectory;
+            }
 
-                if (workingDirectory != null)
+            if (environmentVariables != null)
+            {
+                foreach (var variable in environmentVariables)
                 {
-                    process.StartInfo.WorkingDirectory = workingDirectory;
-                }
-
-                if (environmentVariables != null)
-                {
-                    foreach (var variable in environmentVariables)
+                    if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key))
                     {
-                        if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key))
-                        {
-                            process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
-                        }
-                        else
-                        {
-                            process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
-                        }
+                        process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
+                    }
+                    else
+                    {
+                        process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
                     }
                 }
-
-                var stdoutBuffer = new StringBuilder();
-                var stderrBuffer = new StringBuilder();
-                process.OutputDataReceived += (sender, eventArgs) =>
-                {
-                    stdoutBuffer.AppendLine(eventArgs.Data);
-                };
-
-                process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
-
-                Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
-                Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
-                {
-                    Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
-                    process.Kill();
-                }
-                else
-                {
-                    // Ensure async buffers are flushed
-                    process.WaitForExit();
-                }
-
-                stopwatch.Stop();
-
-                Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
-
-                stdError = stderrBuffer.ToString();
-                stdOut = stdoutBuffer.ToString();
-                exitCode = process.ExitCode;
-
-                Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
-                Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
-                Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
             }
+
+            var stdoutBuffer = new StringBuilder();
+            var stderrBuffer = new StringBuilder();
+            process.OutputDataReceived += (sender, eventArgs) =>
+            {
+                stdoutBuffer.AppendLine(eventArgs.Data);
+            };
+
+            process.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.AppendLine(eventArgs.Data);
+
+            Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", process.StartInfo.FileName);
+            Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", process.StartInfo.Arguments);
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes
+            {
+                Console.WriteLine($"IntegrationTestBase.Execute: Timed out waiting for {executableName}. Terminating the process.");
+                process.Kill();
+            }
+            else
+            {
+                // Ensure async buffers are flushed
+                process.WaitForExit();
+            }
+
+            stopwatch.Stop();
+
+            Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
+
+            stdError = stderrBuffer.ToString();
+            stdOut = stdoutBuffer.ToString();
+            exitCode = process.ExitCode;
+
+            Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
+            Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
+            Console.WriteLine($"IntegrationTestBase.Execute: Stopped {executableName}. Exit code = {0}", exitCode);
         }
 
         private void FormatStandardOutCome()

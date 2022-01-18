@@ -68,44 +68,41 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void AnalyzeEventsData()
         {
 #if NETFRAMEWORK
-            using (var source = new ETWTraceEventSource(this.perfDataFileName))
-            {
-                // Open the file
-                var parser = new DynamicTraceEventParser(source);
-                parser.All += delegate(TraceEvent data)
+            using var source = new ETWTraceEventSource(this.perfDataFileName);
+            // Open the file
+            var parser = new DynamicTraceEventParser(source);
+            parser.All += delegate (TraceEvent data) {
+                try
+                {
+                    if (data.ProviderName.Equals("TestPlatform") && !data.EventName.Equals("ManifestData"))
                     {
-                        try
-                        {
-                            if (data.ProviderName.Equals("TestPlatform") && !data.EventName.Equals("ManifestData"))
-                            {
-                                Console.WriteLine("Received Event : {0}", data.ToString());
-                                var key = data.ProcessID + "_" + data.ThreadID.ToString() + "_" + data.TaskName;
+                        Console.WriteLine("Received Event : {0}", data.ToString());
+                        var key = data.ProcessID + "_" + data.ThreadID.ToString() + "_" + data.TaskName;
 
-                                if (!testPlatformTaskMap.ContainsKey(key))
-                                {
-                                    var list = new List<TestPlatformTask> { CreateTestPlatformTask(data) };
-                                    testPlatformTaskMap.Add(key, list);
-                                }
-                                else
-                                {
-                                    if (data.Opcode == TraceEventOpcode.Start)
-                                    {
-                                        testPlatformTaskMap[key].Add(CreateTestPlatformTask(data));
-                                    }
-                                    else
-                                    {
-                                        UpdateTask(testPlatformTaskMap[key].Last(), data);
-                                    }
-                                }
+                        if (!testPlatformTaskMap.ContainsKey(key))
+                        {
+                            var list = new List<TestPlatformTask> { CreateTestPlatformTask(data) };
+                            testPlatformTaskMap.Add(key, list);
+                        }
+                        else
+                        {
+                            if (data.Opcode == TraceEventOpcode.Start)
+                            {
+                                testPlatformTaskMap[key].Add(CreateTestPlatformTask(data));
+                            }
+                            else
+                            {
+                                UpdateTask(testPlatformTaskMap[key].Last(), data);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.ToString());
-                        }
-                    };
-                source.Process(); // Read the file, processing the callbacks.
-            }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            };
+            source.Process(); // Read the file, processing the callbacks.
 #endif
         }
 

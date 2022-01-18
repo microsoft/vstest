@@ -183,15 +183,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             try
             {
-                using (var file = File.OpenRead(xmlFilePath))
-                using (var reader = XmlReader.Create(file))
+                using var file = File.OpenRead(xmlFilePath);
+                using var reader = XmlReader.Create(file);
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                    }
-
-                    return true;
                 }
+
+                return true;
             }
             catch (XmlException)
             {

@@ -294,77 +294,75 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             try
             {
                 //get the input stream
-                using (Stream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                using Stream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+                bool validImage = true;
+
+                BinaryReader reader = new BinaryReader(fs);
+                //PE Header starts @ 0x3C (60). Its a 4 byte header.
+                fs.Position = 0x3C;
+                peHeader = reader.ReadUInt32();
+
+                // Check if the offset is invalid
+                if (peHeader > fs.Length - 5)
                 {
-                    bool validImage = true;
+                    validImage = false;
+                }
+                if (validImage)
+                {
+                    //Moving to PE Header start location...
+                    fs.Position = peHeader;
 
-                    BinaryReader reader = new BinaryReader(fs);
-                    //PE Header starts @ 0x3C (60). Its a 4 byte header.
-                    fs.Position = 0x3C;
-                    peHeader = reader.ReadUInt32();
-
-                    // Check if the offset is invalid
-                    if (peHeader > fs.Length - 5)
+                    UInt32 signature = reader.ReadUInt32(); //peHeaderSignature
+                                                            // 0x00004550 is the letters "PE" followed by two terminating zeros.
+                    if (signature != 0x00004550)
                     {
                         validImage = false;
                     }
+
                     if (validImage)
                     {
-                        //Moving to PE Header start location...
-                        fs.Position = peHeader;
+                        //Read the image file header.
+                        machine = reader.ReadUInt16();
+                        reader.ReadUInt16(); //NumberOfSections
+                        reader.ReadUInt32(); //TimeDateStamp
+                        reader.ReadUInt32(); //PointerToSymbolTable
+                        reader.ReadUInt32(); //NumberOfSymbols
+                        reader.ReadUInt16(); //SizeOfOptionalHeader
+                        reader.ReadUInt16(); //Characteristics
 
-                        UInt32 signature = reader.ReadUInt32(); //peHeaderSignature
-                        // 0x00004550 is the letters "PE" followed by two terminating zeros.
-                        if (signature != 0x00004550)
+                        // magic number.32bit or 64bit assembly.
+                        UInt16 magic = reader.ReadUInt16();
+                        if (magic != 0x010B && magic != 0x020B)
                         {
                             validImage = false;
                         }
+                    }
 
-                        if (validImage)
+                    if (validImage)
+                    {
+                        switch (machine)
                         {
-                            //Read the image file header.
-                            machine = reader.ReadUInt16();
-                            reader.ReadUInt16(); //NumberOfSections
-                            reader.ReadUInt32(); //TimeDateStamp
-                            reader.ReadUInt32(); //PointerToSymbolTable
-                            reader.ReadUInt32(); //NumberOfSymbols
-                            reader.ReadUInt16(); //SizeOfOptionalHeader
-                            reader.ReadUInt16(); //Characteristics
+                            case IMAGE_FILE_MACHINE_I386:
+                                archType = "X86";
+                                break;
 
-                            // magic number.32bit or 64bit assembly.
-                            UInt16 magic = reader.ReadUInt16();
-                            if (magic != 0x010B && magic != 0x020B)
-                            {
-                                validImage = false;
-                            }
+                            case IMAGE_FILE_MACHINE_AMD64:
+                            case IMAGE_FILE_MACHINE_IA64:
+                                archType = "X64";
+                                break;
+
+                            case IMAGE_FILE_MACHINE_ARM:
+                            case IMAGE_FILE_MACHINE_THUMB:
+                            case IMAGE_FILE_MACHINE_ARMNT:
+                                archType = "ARM";
+                                break;
                         }
-
-                        if (validImage)
+                    }
+                    else
+                    {
+                        if (EqtTrace.IsVerboseEnabled)
                         {
-                            switch (machine)
-                            {
-                                case IMAGE_FILE_MACHINE_I386:
-                                    archType = "X86";
-                                    break;
-
-                                case IMAGE_FILE_MACHINE_AMD64:
-                                case IMAGE_FILE_MACHINE_IA64:
-                                    archType = "X64";
-                                    break;
-
-                                case IMAGE_FILE_MACHINE_ARM:
-                                case IMAGE_FILE_MACHINE_THUMB:
-                                case IMAGE_FILE_MACHINE_ARMNT:
-                                    archType = "ARM";
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            if (EqtTrace.IsVerboseEnabled)
-                            {
-                                EqtTrace.Verbose("Source path {0} is not a valid image path. Returning default proc arch type {1}.", imagePath, "AnyCPU");
-                            }
+                            EqtTrace.Verbose("Source path {0} is not a valid image path. Returning default proc arch type {1}.", imagePath, "AnyCPU");
                         }
                     }
                 }

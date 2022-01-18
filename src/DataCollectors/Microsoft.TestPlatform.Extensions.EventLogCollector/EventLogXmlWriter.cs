@@ -34,55 +34,51 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </param>
         public static void WriteEventLogEntriesToXmlFile(string xmlFilePath, List<EventLogEntry> eventLogEntries, IFileHelper fileHelper)
         {
-            using (DataTable dataTable = new DataTable())
+            using DataTable dataTable = new DataTable();
+            dataTable.Locale = CultureInfo.InvariantCulture;
+
+            // The MaxLength of the Type and Source columns must be set to allow indices to be created on them
+            DataColumn typeColumn = new DataColumn("Type", typeof(string));
+            typeColumn.MaxLength = EventLogConstants.TypeColumnMaxLength;
+            dataTable.Columns.Add(typeColumn);
+
+            dataTable.Columns.Add(new DataColumn("DateTime", typeof(DateTime)));
+
+            DataColumn sourceColumn = new DataColumn("Source", typeof(string));
+            sourceColumn.MaxLength = EventLogConstants.SourceColumnMaxLength;
+            dataTable.Columns.Add(sourceColumn);
+
+            dataTable.Columns.Add(new DataColumn("Category", typeof(string)));
+            dataTable.Columns.Add(new DataColumn("EventID", typeof(long)));
+            dataTable.Columns.Add(new DataColumn("Description", typeof(string)));
+            dataTable.Columns.Add(new DataColumn("User", typeof(string)));
+            dataTable.Columns.Add(new DataColumn("Computer", typeof(string)));
+            dataTable.ExtendedProperties.Add("TimestampColumnName", "DateTime");
+            dataTable.ExtendedProperties.Add("IndexColumnNames", "Source,Type");
+
+            foreach (EventLogEntry entry in eventLogEntries)
             {
-                dataTable.Locale = CultureInfo.InvariantCulture;
-
-                // The MaxLength of the Type and Source columns must be set to allow indices to be created on them
-                DataColumn typeColumn = new DataColumn("Type", typeof(string));
-                typeColumn.MaxLength = EventLogConstants.TypeColumnMaxLength;
-                dataTable.Columns.Add(typeColumn);
-
-                dataTable.Columns.Add(new DataColumn("DateTime", typeof(DateTime)));
-
-                DataColumn sourceColumn = new DataColumn("Source", typeof(string));
-                sourceColumn.MaxLength = EventLogConstants.SourceColumnMaxLength;
-                dataTable.Columns.Add(sourceColumn);
-
-                dataTable.Columns.Add(new DataColumn("Category", typeof(string)));
-                dataTable.Columns.Add(new DataColumn("EventID", typeof(long)));
-                dataTable.Columns.Add(new DataColumn("Description", typeof(string)));
-                dataTable.Columns.Add(new DataColumn("User", typeof(string)));
-                dataTable.Columns.Add(new DataColumn("Computer", typeof(string)));
-                dataTable.ExtendedProperties.Add("TimestampColumnName", "DateTime");
-                dataTable.ExtendedProperties.Add("IndexColumnNames", "Source,Type");
-
-                foreach (EventLogEntry entry in eventLogEntries)
-                {
-                    DataRow row = dataTable.NewRow();
-                    row["Type"] = entry.EntryType.ToString();
-                    row["DateTime"] = entry.TimeGenerated;
-                    row["Source"] = entry.Source;
-                    row["Category"] = entry.Category;
-                    row["EventID"] = entry.InstanceId;
-                    row["Description"] = entry.Message;
-                    row["User"] = entry.UserName;
-                    row["Computer"] = entry.MachineName;
-                    dataTable.Rows.Add(row);
-                }
-
-                DataSet dataSet = new DataSet();
-                dataSet.Locale = CultureInfo.InvariantCulture;
-                dataSet.Tables.Add(dataTable);
-
-                // Use UTF-16 encoding
-                StringBuilder stringBuilder = new StringBuilder();
-                using (StringWriter stringWriter = new StringWriter(stringBuilder))
-                {
-                    dataSet.WriteXml(stringWriter, XmlWriteMode.WriteSchema);
-                    fileHelper.WriteAllTextToFile(xmlFilePath, stringBuilder.ToString());
-                }
+                DataRow row = dataTable.NewRow();
+                row["Type"] = entry.EntryType.ToString();
+                row["DateTime"] = entry.TimeGenerated;
+                row["Source"] = entry.Source;
+                row["Category"] = entry.Category;
+                row["EventID"] = entry.InstanceId;
+                row["Description"] = entry.Message;
+                row["User"] = entry.UserName;
+                row["Computer"] = entry.MachineName;
+                dataTable.Rows.Add(row);
             }
+
+            DataSet dataSet = new DataSet();
+            dataSet.Locale = CultureInfo.InvariantCulture;
+            dataSet.Tables.Add(dataTable);
+
+            // Use UTF-16 encoding
+            StringBuilder stringBuilder = new StringBuilder();
+            using StringWriter stringWriter = new StringWriter(stringBuilder);
+            dataSet.WriteXml(stringWriter, XmlWriteMode.WriteSchema);
+            fileHelper.WriteAllTextToFile(xmlFilePath, stringBuilder.ToString());
         }
     }
     #endregion

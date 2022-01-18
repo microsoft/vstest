@@ -221,8 +221,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void DiscoverTestsShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, object>();
-            dict.Add("DummyMessage", "DummyValue");
+            var dict = new Dictionary<string, object>
+            {
+                { "DummyMessage", "DummyValue" }
+            };
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);

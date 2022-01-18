@@ -248,8 +248,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 return;
             }
 
-            var properties = new Dictionary<string, object>();
-            properties.Add("TestSources", TestSourcesUtility.GetSources(this.adapterSourceMap));
+            var properties = new Dictionary<string, object>
+            {
+                { "TestSources", TestSourcesUtility.GetSources(this.adapterSourceMap) }
+            };
 
             this.testCaseEventsHandler.SendSessionStart(properties);
         }

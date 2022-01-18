@@ -357,19 +357,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
         private string ReadFromStream(Stream stream)
         {
-            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
-            {
-                return reader.ReadString();
-            }
+            using var reader = new BinaryReader(stream, Encoding.UTF8, true);
+            return reader.ReadString();
         }
 
         private void WriteToStream(Stream stream, string data)
         {
-            using (var writer = new BinaryWriter(stream, Encoding.UTF8, true))
-            {
-                writer.Write(data);
-                writer.Flush();
-            }
+            using var writer = new BinaryWriter(stream, Encoding.UTF8, true);
+            writer.Write(data);
+            writer.Flush();
         }
     }
 }

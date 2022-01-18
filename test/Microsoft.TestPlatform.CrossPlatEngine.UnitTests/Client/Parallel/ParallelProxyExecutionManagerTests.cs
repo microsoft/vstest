@@ -344,11 +344,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             }
 
                             Task.Delay(100).Wait();
-                            var stats = new Dictionary<TestOutcome, long>();
-                            stats.Add(TestOutcome.Passed, 3);
-                            stats.Add(TestOutcome.Failed, 2);
-                            var runAttachments = new Collection<AttachmentSet>();
-                            runAttachments.Add(new AttachmentSet(new Uri("hello://x/"), "Hello"));
+                            var stats = new Dictionary<TestOutcome, long>
+                            {
+                                { TestOutcome.Passed, 3 },
+                                { TestOutcome.Failed, 2 }
+                            };
+                            var runAttachments = new Collection<AttachmentSet>
+                            {
+                                new AttachmentSet(new Uri("hello://x/"), "Hello")
+                            };
                             var executorUris = new List<string>() { "hello1" };
                             bool isCanceled = false;
                             bool isAborted = false;

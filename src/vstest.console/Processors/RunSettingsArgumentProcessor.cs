@@ -190,13 +190,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (!MSTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
             {
-                using (XmlReader reader = this.GetReaderForFile(runSettingsFile))
-                {
-                    var settingsDocument = new XmlDocument();
-                    settingsDocument.Load(reader);
-                    ClientUtilities.FixRelativePathsInRunSettings(settingsDocument, runSettingsFile);
-                    runSettingsDocument = settingsDocument;
-                }
+                using XmlReader reader = this.GetReaderForFile(runSettingsFile);
+                var settingsDocument = new XmlDocument();
+                settingsDocument.Load(reader);
+                ClientUtilities.FixRelativePathsInRunSettings(settingsDocument, runSettingsFile);
+                runSettingsDocument = settingsDocument;
             }
             else
             {

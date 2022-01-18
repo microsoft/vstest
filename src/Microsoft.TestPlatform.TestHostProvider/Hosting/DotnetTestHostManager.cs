@@ -502,21 +502,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 bool isWinOnArm = false;
                 if (this.platformEnvironment.OperatingSystem == PlatformOperatingSystem.Windows)
                 {
-                    using (IRegistryKey hklm = this.windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32))
+                    using IRegistryKey hklm = this.windowsRegistryHelper.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32);
+                    if (hklm != null)
                     {
-                        if (hklm != null)
+                        using IRegistryKey environment = hklm.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Environment");
+                        if (environment != null)
                         {
-                            using (IRegistryKey environment = hklm.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"))
+                            var processorArchitecture = environment.GetValue("PROCESSOR_ARCHITECTURE");
+                            if (processorArchitecture != null)
                             {
-                                if (environment != null)
-                                {
-                                    var processorArchitecture = environment.GetValue("PROCESSOR_ARCHITECTURE");
-                                    if (processorArchitecture != null)
-                                    {
-                                        EqtTrace.Verbose($"DotnetTestHostmanager.IsWinOnArm: Current PROCESSOR_ARCHITECTURE from registry '{processorArchitecture}'");
-                                        isWinOnArm = processorArchitecture.ToString().ToLowerInvariant().Contains("arm");
-                                    }
-                                }
+                                EqtTrace.Verbose($"DotnetTestHostmanager.IsWinOnArm: Current PROCESSOR_ARCHITECTURE from registry '{processorArchitecture}'");
+                                isWinOnArm = processorArchitecture.ToString().ToLowerInvariant().Contains("arm");
                             }
                         }
                     }

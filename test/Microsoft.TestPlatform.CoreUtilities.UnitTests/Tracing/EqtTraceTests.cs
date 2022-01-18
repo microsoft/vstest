@@ -168,13 +168,9 @@ namespace TestPlatform.CoreUtilities.UnitTests
             string log = null;
             try
             {
-                using (var fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                {
-                    using (var sr = new StreamReader(fs))
-                    {
-                        log = sr.ReadToEnd();
-                    }
-                }
+                using var fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var sr = new StreamReader(fs);
+                log = sr.ReadToEnd();
             }
             catch(Exception ex)
             {

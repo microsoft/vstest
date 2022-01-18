@@ -260,8 +260,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
         {
-            var properties = new Dictionary<string, object>();
-            properties.Add(Constants.TestSourcesPropertyName, sessionStartEventArgs.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName));
+            var properties = new Dictionary<string, object>
+            {
+                { Constants.TestSourcesPropertyName, sessionStartEventArgs.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName) }
+            };
             return properties;
         }
 

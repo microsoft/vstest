@@ -89,54 +89,52 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
                 var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
-                using (var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read)))
+                using var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read));
+                // At this point, the assembly should be already loaded into the load context. We query for a reference to
+                // find the types and cache the symbol information. Let the loader follow default lookup order instead of
+                // forcing load from a specific path.
+                Assembly asm;
+                try
                 {
-                    // At this point, the assembly should be already loaded into the load context. We query for a reference to
-                    // find the types and cache the symbol information. Let the loader follow default lookup order instead of
-                    // forcing load from a specific path.
-                    Assembly asm;
-                    try
-                    {
-                        asm = Assembly.Load(new PlatformAssemblyLoadContext().GetAssemblyNameFromPath(binaryPath));
-                    }
-                    catch (FileNotFoundException)
-                    {
+                    asm = Assembly.Load(new PlatformAssemblyLoadContext().GetAssemblyNameFromPath(binaryPath));
+                }
+                catch (FileNotFoundException)
+                {
 #if !NETSTANDARD1_3 && !WINDOWS_UWP && !NETCOREAPP1_0
-                        // fallback when the assembly is not loaded
-                        asm = Assembly.LoadFile(binaryPath);
+                    // fallback when the assembly is not loaded
+                    asm = Assembly.LoadFile(binaryPath);
 #else
-                        // fallback is not supported
-                        throw;
+                    // fallback is not supported
+                    throw;
 #endif
+                }
+
+                foreach (var type in asm.GetTypes())
+                {
+                    // Get declared method infos
+                    var methodInfoList = type.GetTypeInfo().DeclaredMethods;
+                    var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
+
+                    foreach (var methodInfo in methodInfoList)
+                    {
+                        var diaNavigationData = pdbReader.GetDiaNavigationData(methodInfo);
+                        if (diaNavigationData != null)
+                        {
+                            methodsNavigationData[methodInfo.Name] = diaNavigationData;
+                        }
+                        else
+                        {
+                            EqtTrace.Error(
+                                string.Format(
+                                    "Unable to find source information for method: {0} type: {1}",
+                                    methodInfo.Name,
+                                    type.FullName));
+                        }
                     }
 
-                    foreach (var type in asm.GetTypes())
+                    if (methodsNavigationData.Count != 0)
                     {
-                        // Get declared method infos
-                        var methodInfoList = type.GetTypeInfo().DeclaredMethods;
-                        var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
-
-                        foreach (var methodInfo in methodInfoList)
-                        {
-                            var diaNavigationData = pdbReader.GetDiaNavigationData(methodInfo);
-                            if (diaNavigationData != null)
-                            {
-                                methodsNavigationData[methodInfo.Name] = diaNavigationData;
-                            }
-                            else
-                            {
-                                EqtTrace.Error(
-                                    string.Format(
-                                        "Unable to find source information for method: {0} type: {1}",
-                                        methodInfo.Name,
-                                        type.FullName));
-                            }
-                        }
-
-                        if (methodsNavigationData.Count != 0)
-                        {
-                            this.methodsNavigationDataForType[type.FullName] = methodsNavigationData;
-                        }
+                        this.methodsNavigationDataForType[type.FullName] = methodsNavigationData;
                     }
                 }
             }

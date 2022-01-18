@@ -317,13 +317,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IList<string> GetCommandLineArguments(int portNumber)
         {
-            var commandlineArguments = new List<string>();
+            var commandlineArguments = new List<string>
+            {
+                PortOption,
+                portNumber.ToString(),
 
-            commandlineArguments.Add(PortOption);
-            commandlineArguments.Add(portNumber.ToString());
-
-            commandlineArguments.Add(ParentProcessIdOption);
-            commandlineArguments.Add(this.processHelper.GetCurrentProcessId().ToString());
+                ParentProcessIdOption,
+                this.processHelper.GetCurrentProcessId().ToString()
+            };
 
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
@@ -361,23 +362,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
 
-            using (var stream = new StringReader(settingsXml))
-            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            using var stream = new StringReader(settingsXml);
+            using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+            var document = new XmlDocument();
+            document.Load(reader);
+
+            var tapNode = RunSettingsProviderExtensions.GetXmlNode(document, "RunConfiguration.TestAdaptersPaths");
+
+            if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
             {
-                var document = new XmlDocument();
-                document.Load(reader);
-
-                var tapNode = RunSettingsProviderExtensions.GetXmlNode(document, "RunConfiguration.TestAdaptersPaths");
-
-                if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
-                {
-                    extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
-                }
-
-                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
-
-                return document.OuterXml;
+                extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
             }
+
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
+
+            return document.OuterXml;
         }
 
         /// <summary>

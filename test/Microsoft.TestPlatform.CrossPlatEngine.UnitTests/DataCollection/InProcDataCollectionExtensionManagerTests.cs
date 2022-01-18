@@ -203,8 +203,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerSessionStartShouldBeCalledWithCorrectTestSources()
         {
-            var properties = new Dictionary<string, object>();
-            properties.Add("TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" });
+            var properties = new Dictionary<string, object>
+            {
+                { "TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" } }
+            };
 
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
 

@@ -32,8 +32,10 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var attachmentSet = new AttachmentSet(new Uri("my://datacollector"), "mydatacollector");
             attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("my://attachment.txt"), string.Empty));
-            this.attachmentSets = new Collection<AttachmentSet>();
-            this.attachmentSets.Add(attachmentSet);
+            this.attachmentSets = new Collection<AttachmentSet>
+            {
+                attachmentSet
+            };
 
             this.testcase = new TestCase();
             this.testcase.Id = Guid.NewGuid();

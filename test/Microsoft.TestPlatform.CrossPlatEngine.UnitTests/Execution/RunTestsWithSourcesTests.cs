@@ -76,12 +76,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void BeforeRaisingTestRunCompleteShouldWarnIfNoTestsAreRun()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> {"a", "aa"});
-            adapterSourceMap.Add("b", new List<string> { "b", "ab" });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "a", "aa" } },
+                { "b", new List<string> { "b", "ab" } }
+            };
 
-            var executorUriVsSourceList = new Dictionary<Tuple<Uri, string>, IEnumerable<string>>();
-            executorUriVsSourceList.Add(new Tuple<Uri, string>(new Uri("e://d/"), "A.dll"), new List<string> {"s1.dll "});
+            var executorUriVsSourceList = new Dictionary<Tuple<Uri, string>, IEnumerable<string>>
+            {
+                { new Tuple<Uri, string>(new Uri("e://d/"), "A.dll"), new List<string> { "s1.dll " } }
+            };
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
@@ -104,8 +108,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void GetExecutorUriExtensionMapShouldReturnEmptyOnInvalidSources()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> { "a", "aa" });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "a", "aa" } }
+            };
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
@@ -126,9 +132,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             var assemblyLocation = typeof (RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location;
 
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> {"a", "aa"});
-            adapterSourceMap.Add(assemblyLocation, new List<string> {assemblyLocation});
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "a", "aa" } },
+                { assemblyLocation, new List<string> { assemblyLocation } }
+            };
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
@@ -149,9 +157,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void InvokeExecutorShouldInvokeTestExecutorWithTheSources()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> { "a", "aa" });
-            adapterSourceMap.Add("b", new List<string> { "b", "ab" });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "a", "aa" } },
+                { "b", new List<string> { "b", "ab" } }
+            };
 
             var executorUriVsSourceList = new Dictionary<Tuple<Uri, string>, IEnumerable<string>>();
             var executorUriExtensionTuple = new Tuple<Uri, string>(new Uri("e://d/"), "A.dll");
@@ -182,9 +192,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             var assemblyLocation = typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location;
 
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> { "a", "aa" });
-            adapterSourceMap.Add(assemblyLocation, new List<string> { assemblyLocation });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "a", "aa" } },
+                { assemblyLocation, new List<string> { assemblyLocation } }
+            };
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
@@ -254,8 +266,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void SendSessionStartShouldCallSessionStartWithCorrectTestSources()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> { "1.dll", "2.dll" });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "1.dll", "2.dll" } }
+            };
             var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
 
             this.runTestsInstance = new TestableRunTestsWithSources(
@@ -278,8 +292,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void SendSessionEndShouldCallSessionEnd()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("a", new List<string> { "1.dll", "2.dll" });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "a", new List<string> { "1.dll", "2.dll" } }
+            };
             var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
 
             this.runTestsInstance = new TestableRunTestsWithSources(

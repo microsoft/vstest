@@ -131,10 +131,8 @@ namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider
 
             if (string.IsNullOrEmpty(expected))
             {
-                using (var hasher = System.Security.Cryptography.SHA1.Create())
-                {
-                    expected = ToHex(hasher.ComputeHash(bytes));
-                }
+                using var hasher = System.Security.Cryptography.SHA1.Create();
+                expected = ToHex(hasher.ComputeHash(bytes));
             }
             else
             {

@@ -41,21 +41,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             try
             {
-                using (var fileStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var peReader = new PEReader(fileStream))
-                {
-                    // Resources for PEReader:
-                    // 1. https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx?id=19509
-                    // 2. https://github.com/dotnet/corefx/tree/master/src/System.Reflection.Metadata
+                using var fileStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var peReader = new PEReader(fileStream);
+                // Resources for PEReader:
+                // 1. https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx?id=19509
+                // 2. https://github.com/dotnet/corefx/tree/master/src/System.Reflection.Metadata
 
-                    var peHeaders = peReader.PEHeaders;
-                    var corHeader = peHeaders.CorHeader;
-                    var corHeaderStartOffset = peHeaders.CorHeaderStartOffset;
+                var peHeaders = peReader.PEHeaders;
+                var corHeader = peHeaders.CorHeader;
+                var corHeaderStartOffset = peHeaders.CorHeaderStartOffset;
 
-                    assemblyType = (corHeader != null && corHeaderStartOffset >= 0) ?
-                        AssemblyType.Managed :
-                        AssemblyType.Native;
-                }
+                assemblyType = (corHeader != null && corHeaderStartOffset >= 0) ?
+                    AssemblyType.Managed :
+                    AssemblyType.Native;
             }
             catch (Exception ex)
             {

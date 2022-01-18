@@ -38,15 +38,13 @@ namespace Microsoft.TestPlatform.Build.Tasks
             Tracing.Trace("VSTest: Starting vstest.console...");
             Tracing.Trace("VSTest: Arguments: " + processInfo.FileName + " " + processInfo.Arguments);
 
-            using (var activeProcess = new Process { StartInfo = processInfo })
-            {
-                activeProcess.Start();
-                this.activeProcessId = activeProcess.Id;
+            using var activeProcess = new Process { StartInfo = processInfo };
+            activeProcess.Start();
+            this.activeProcessId = activeProcess.Id;
 
-                activeProcess.WaitForExit();
-                Tracing.Trace("VSTest: Exit code: " + activeProcess.ExitCode);
-                return activeProcess.ExitCode;
-            }
+            activeProcess.WaitForExit();
+            Tracing.Trace("VSTest: Exit code: " + activeProcess.ExitCode);
+            return activeProcess.ExitCode;
         }
 
         public void Cancel()

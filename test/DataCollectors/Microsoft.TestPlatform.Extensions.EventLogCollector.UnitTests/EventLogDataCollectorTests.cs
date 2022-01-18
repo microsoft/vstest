@@ -112,9 +112,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void InitializeShouldInitializeDefaultEventLogNames()
         {
-            List<string> eventLogNames = new List<string>();
-            eventLogNames.Add("System");
-            eventLogNames.Add("Application");
+            List<string> eventLogNames = new List<string>
+            {
+                "System",
+                "Application"
+            };
 
             this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
@@ -127,9 +129,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
             @"<Configuration><Setting name=""EventLogs"" value=""MyEventName,MyEventName2"" /></Configuration>";
 
-            List<string> eventLogNames = new List<string>();
-            eventLogNames.Add("MyEventName");
-            eventLogNames.Add("MyEventName2");
+            List<string> eventLogNames = new List<string>
+            {
+                "MyEventName",
+                "MyEventName2"
+            };
 
             XmlDocument expectedXmlDoc = new XmlDocument();
             expectedXmlDoc.LoadXml(configurationString);
@@ -142,10 +146,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void InitializeShouldInitializeDefaultLogEntryTypes()
         {
-            List<EventLogEntryType> entryTypes = new List<EventLogEntryType>();
-            entryTypes.Add(EventLogEntryType.Error);
-            entryTypes.Add(EventLogEntryType.Warning);
-            entryTypes.Add(EventLogEntryType.FailureAudit);
+            List<EventLogEntryType> entryTypes = new List<EventLogEntryType>
+            {
+                EventLogEntryType.Error,
+                EventLogEntryType.Warning,
+                EventLogEntryType.FailureAudit
+            };
 
             this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
@@ -158,8 +164,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""EntryTypes"" value=""Error"" /></Configuration>";
 
-            List<EventLogEntryType> entryTypes = new List<EventLogEntryType>();
-            entryTypes.Add(EventLogEntryType.Error);
+            List<EventLogEntryType> entryTypes = new List<EventLogEntryType>
+            {
+                EventLogEntryType.Error
+            };
 
             XmlDocument expectedXmlDoc = new XmlDocument();
             expectedXmlDoc.LoadXml(configurationString);
@@ -174,8 +182,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             string configurationString =
                 @"<Configuration><Setting name=""EventSources"" value=""MyEventSource"" /></Configuration>";
 
-            List<string> eventSources = new List<string>();
-            eventSources.Add("MyEventSource");
+            List<string> eventSources = new List<string>
+            {
+                "MyEventSource"
+            };
 
             XmlDocument expectedXmlDoc = new XmlDocument();
             expectedXmlDoc.LoadXml(configurationString);

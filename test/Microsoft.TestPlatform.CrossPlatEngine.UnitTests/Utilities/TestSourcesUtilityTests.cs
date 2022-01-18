@@ -19,10 +19,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void GetSourcesShouldAggregateSourcesIfMultiplePresentInAdapterSourceMap()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("adapter1", new List<string>() { "source1.dll", "source2.dll" });
-            adapterSourceMap.Add("adapter2", new List<string>() { "source1.dll", "source3.dll" });
-            adapterSourceMap.Add("adapter3", new List<string>() { "source1.dll"});
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "adapter1", new List<string>() { "source1.dll", "source2.dll" } },
+                { "adapter2", new List<string>() { "source1.dll", "source3.dll" } },
+                { "adapter3", new List<string>() { "source1.dll" } }
+            };
 
             var sources = TestSourcesUtility.GetSources(adapterSourceMap);
             Assert.AreEqual(5, sources.Count());
@@ -66,8 +68,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void GetDefaultCodeBasePathShouldReturnDefaultDirectoryPathForAdapterSourceMap()
         {
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add("adapter1", new List<string>() { Path.Combine(temp, "folder1", "source1.dll"), Path.Combine(temp, "folder2", "source2.dll") });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "adapter1", new List<string>() { Path.Combine(temp, "folder1", "source1.dll"), Path.Combine(temp, "folder2", "source2.dll") } }
+            };
 
             var defaultCodeBase = TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap);
             Assert.AreEqual(Path.Combine(temp, "folder1"), defaultCodeBase);

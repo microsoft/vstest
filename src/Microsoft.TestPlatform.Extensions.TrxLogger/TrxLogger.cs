@@ -353,9 +353,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             helper.SaveIEnumerable(this.entries.Values, rootElement, "TestEntries", ".", "TestEntry", parameters);
 
             // Save default categories
-            List<TestListCategory> categories = new List<TestListCategory>();
-            categories.Add(TestListCategory.UncategorizedResults);
-            categories.Add(TestListCategory.AllResults);
+            List<TestListCategory> categories = new List<TestListCategory>
+            {
+                TestListCategory.UncategorizedResults,
+                TestListCategory.AllResults
+            };
             helper.SaveList(categories, rootElement, "TestLists", ".", "TestList", parameters);
 
             // Save summary
@@ -413,11 +415,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             {
                 using (var fs = File.Open(trxFileName, FileMode.Truncate))
                 {
-                    using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize, Indent = true }))
-                    {
-                        rootElement.OwnerDocument.Save(writer);
-                        writer.Flush();
-                    }
+                    using XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize, Indent = true });
+                    rootElement.OwnerDocument.Save(writer);
+                    writer.Flush();
                 }
 
                 string resultsFileMessage = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
@@ -486,7 +486,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 {
                     try
                     {
-                        using (var fs = File.Open(filePath, FileMode.CreateNew)) { }
+                        using var fs = File.Open(filePath, FileMode.CreateNew);
                     }
                     catch (IOException)
                     {

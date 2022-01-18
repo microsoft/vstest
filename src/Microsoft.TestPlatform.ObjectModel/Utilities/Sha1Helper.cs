@@ -25,12 +25,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 
             return hasher.ComputeHash(message);
 #else
-            using (HashAlgorithm provider = SHA1.Create())
-            {
-                byte[] hash = provider.ComputeHash(message);
+            using HashAlgorithm provider = SHA1.Create();
+            byte[] hash = provider.ComputeHash(message);
 
-                return hash;
-            }
+            return hash;
 #endif
         }
 

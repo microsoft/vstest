@@ -304,30 +304,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             {
                 if (hklm != null)
                 {
-                    using (IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions"))
+                    using IRegistryKey dotnetInstalledVersion = hklm.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions");
+                    if (dotnetInstalledVersion != null)
                     {
-                        if (dotnetInstalledVersion != null)
-                        {
-                            using (IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLowerInvariant()))
-                            {
-                                string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
+                        using IRegistryKey nativeArch = dotnetInstalledVersion.OpenSubKey(targetArchitecture.ToString().ToLowerInvariant());
+                        string installLocation = nativeArch?.GetValue("InstallLocation")?.ToString();
 
-                                if (installLocation != null)
-                                {
-                                    string path = Path.Combine(installLocation.Trim(), this.muxerName);
-                                    EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
-                                    return path;
-                                }
-                                else
-                                {
-                                    EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing registry InstallLocation");
-                                }
-                            }
+                        if (installLocation != null)
+                        {
+                            string path = Path.Combine(installLocation.Trim(), this.muxerName);
+                            EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Muxer resolved using win registry key 'SOFTWARE\dotnet\Setup\InstalledVersions\{targetArchitecture.ToString().ToLowerInvariant()}\InstallLocation' in '{path}'");
+                            return path;
                         }
                         else
                         {
-                            EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing RegistryHive.LocalMachine for RegistryView.Registry32");
+                            EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing registry InstallLocation");
                         }
+                    }
+                    else
+                    {
+                        EqtTrace.Verbose($@"DotnetHostHelper.GetMuxerFromGlobalRegistrationWin: Missing RegistryHive.LocalMachine for RegistryView.Registry32");
                     }
                 }
                 else
@@ -356,15 +352,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             {
                 try
                 {
-                    using (Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read))
-                    using (StreamReader streamReader = new StreamReader(stream))
-                    {
-                        string content = streamReader.ReadToEnd().Trim();
-                        EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
-                        string path = Path.Combine(content, this.muxerName);
-                        EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
-                        return path;
-                    }
+                    using Stream stream = this.fileHelper.GetStream(installLocation, FileMode.Open, FileAccess.Read);
+                    using StreamReader streamReader = new StreamReader(stream);
+                    string content = streamReader.ReadToEnd().Trim();
+                    EqtTrace.Verbose($"DotnetHostHelper: '{installLocation}' content '{content}'");
+                    string path = Path.Combine(content, this.muxerName);
+                    EqtTrace.Verbose($"DotnetHostHelper: Muxer resolved using '{installLocation}' in '{path}'");
+                    return path;
                 }
                 catch (Exception ex)
                 {
@@ -379,24 +373,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         {
             try
             {
-                using (Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
-                using (PEReader peReader = new PEReader(stream))
+                using Stream stream = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
+                using PEReader peReader = new PEReader(stream);
+                switch (peReader.PEHeaders.CoffHeader.Machine)
                 {
-                    switch (peReader.PEHeaders.CoffHeader.Machine)
-                    {
-                        case Machine.Amd64:
-                            return PlatformArchitecture.X64;
-                        case Machine.IA64:
-                            return PlatformArchitecture.X64;
-                        case Machine.Arm64:
-                            return PlatformArchitecture.ARM64;
-                        case Machine.Arm:
-                            return PlatformArchitecture.ARM;
-                        case Machine.I386:
-                            return PlatformArchitecture.X86;
-                        default:
-                            break;
-                    }
+                    case Machine.Amd64:
+                        return PlatformArchitecture.X64;
+                    case Machine.IA64:
+                        return PlatformArchitecture.X64;
+                    case Machine.Arm64:
+                        return PlatformArchitecture.ARM64;
+                    case Machine.Arm:
+                        return PlatformArchitecture.ARM;
+                    case Machine.I386:
+                        return PlatformArchitecture.X86;
+                    default:
+                        break;
                 }
             }
             catch (Exception ex)
@@ -414,36 +406,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             try
             {
                 PlatformArchitecture? architecture;
-                using (var headerReader = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read))
+                using var headerReader = this.fileHelper.GetStream(path, FileMode.Open, FileAccess.Read);
+                var magicBytes = new byte[4];
+                var cpuInfoBytes = new byte[4];
+                headerReader.Read(magicBytes, 0, magicBytes.Length);
+                headerReader.Read(cpuInfoBytes, 0, cpuInfoBytes.Length);
+
+                var magic = BitConverter.ToUInt32(magicBytes, 0);
+                var cpuInfo = BitConverter.ToUInt32(cpuInfoBytes, 0);
+                switch ((MacOsCpuType)cpuInfo)
                 {
-                    var magicBytes = new byte[4];
-                    var cpuInfoBytes = new byte[4];
-                    headerReader.Read(magicBytes, 0, magicBytes.Length);
-                    headerReader.Read(cpuInfoBytes, 0, cpuInfoBytes.Length);
-
-                    var magic = BitConverter.ToUInt32(magicBytes, 0);
-                    var cpuInfo = BitConverter.ToUInt32(cpuInfoBytes, 0);
-                    switch ((MacOsCpuType)cpuInfo)
-                    {
-                        case MacOsCpuType.Arm64Magic:
-                        case MacOsCpuType.Arm64Cigam:
-                            architecture = PlatformArchitecture.ARM64;
-                            break;
-                        case MacOsCpuType.X64Magic:
-                        case MacOsCpuType.X64Cigam:
-                            architecture = PlatformArchitecture.X64;
-                            break;
-                        case MacOsCpuType.X86Magic:
-                        case MacOsCpuType.X86Cigam:
-                            architecture = PlatformArchitecture.X86;
-                            break;
-                        default:
-                            architecture = null;
-                            break;
-                    }
-
-                    return architecture;
+                    case MacOsCpuType.Arm64Magic:
+                    case MacOsCpuType.Arm64Cigam:
+                        architecture = PlatformArchitecture.ARM64;
+                        break;
+                    case MacOsCpuType.X64Magic:
+                    case MacOsCpuType.X64Cigam:
+                        architecture = PlatformArchitecture.X64;
+                        break;
+                    case MacOsCpuType.X86Magic:
+                    case MacOsCpuType.X86Cigam:
+                        architecture = PlatformArchitecture.X86;
+                        break;
+                    default:
+                        architecture = null;
+                        break;
                 }
+
+                return architecture;
             }
             catch (Exception ex)
             {

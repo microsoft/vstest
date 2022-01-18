@@ -82,15 +82,13 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
 
             this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
 
-            using (XmlTextReader reader = new XmlTextReader(this.newRunsettingsPath))
-            {
-                reader.Namespaces = false;
-                var document = new XmlDocument();
-                document.Load(reader);
-                var root = document.DocumentElement;
-                var dataCollectorNode = root.SelectNodes(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
-                Assert.AreEqual(2, dataCollectorNode.Count, "Data collector is missing");
-            }
+            using XmlTextReader reader = new XmlTextReader(this.newRunsettingsPath);
+            reader.Namespaces = false;
+            var document = new XmlDocument();
+            document.Load(reader);
+            var root = document.DocumentElement;
+            var dataCollectorNode = root.SelectNodes(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+            Assert.AreEqual(2, dataCollectorNode.Count, "Data collector is missing");
         }
 
         [TestMethod]
@@ -128,48 +126,46 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         {
             Assert.IsTrue(File.Exists(newRunsettingsPath), "Run settings should be generated.");
 
-            using (XmlTextReader reader = new XmlTextReader(newRunsettingsPath))
-            {
-                reader.Namespaces = false;
+            using XmlTextReader reader = new XmlTextReader(newRunsettingsPath);
+            reader.Namespaces = false;
 
-                var document = new XmlDocument();
-                document.Load(reader);
-                var root = document.DocumentElement;
+            var document = new XmlDocument();
+            document.Load(reader);
+            var root = document.DocumentElement;
 
-                Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/WebTestRunConfiguration/Browser/Headers/Header"), "There should be a WebTestRunConfiguration node");
-                Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings"), "There should be a LegacySettings node");
-                Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment/DeploymentItem"), "There should be a DeploymentItem node");
+            Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/WebTestRunConfiguration/Browser/Headers/Header"), "There should be a WebTestRunConfiguration node");
+            Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings"), "There should be a LegacySettings node");
+            Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment/DeploymentItem"), "There should be a DeploymentItem node");
 
-                var scriptNode = root.SelectSingleNode(@"/RunSettings/LegacySettings/Scripts");
-                Assert.IsNotNull(scriptNode, "There should be a WebTestRunConfiguration node");
-                Assert.AreEqual(".\\setup.bat", scriptNode.Attributes["setupScript"].Value, "setupScript does not match.");
-                Assert.AreEqual(".\\cleanup.bat", scriptNode.Attributes["cleanupScript"].Value, "cleanupScript does not match.");
+            var scriptNode = root.SelectSingleNode(@"/RunSettings/LegacySettings/Scripts");
+            Assert.IsNotNull(scriptNode, "There should be a WebTestRunConfiguration node");
+            Assert.AreEqual(".\\setup.bat", scriptNode.Attributes["setupScript"].Value, "setupScript does not match.");
+            Assert.AreEqual(".\\cleanup.bat", scriptNode.Attributes["cleanupScript"].Value, "cleanupScript does not match.");
 
-                var forcedLegacyNode = root.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode");
-                Assert.IsNotNull(forcedLegacyNode, "ForcedLegacy node should be present");
-                Assert.AreEqual("true", forcedLegacyNode.InnerText, "Forced legacy should be true");
+            var forcedLegacyNode = root.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode");
+            Assert.IsNotNull(forcedLegacyNode, "ForcedLegacy node should be present");
+            Assert.AreEqual("true", forcedLegacyNode.InnerText, "Forced legacy should be true");
 
-                var executionNode = root.SelectSingleNode(@" / RunSettings/LegacySettings/Execution");
-                Assert.IsNotNull(executionNode, "There should be a Execution node");
-                Assert.AreEqual("2", executionNode.Attributes["parallelTestCount"].Value, "parallelTestCount value does not match.");
-                Assert.AreEqual("MSIL", executionNode.Attributes["hostProcessPlatform"].Value, "hostProcessPlatform value does not match.");
+            var executionNode = root.SelectSingleNode(@" / RunSettings/LegacySettings/Execution");
+            Assert.IsNotNull(executionNode, "There should be a Execution node");
+            Assert.AreEqual("2", executionNode.Attributes["parallelTestCount"].Value, "parallelTestCount value does not match.");
+            Assert.AreEqual("MSIL", executionNode.Attributes["hostProcessPlatform"].Value, "hostProcessPlatform value does not match.");
 
-                Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/Hosts"), "There should be a Hosts node");
+            Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/Hosts"), "There should be a Hosts node");
 
-                var timeoutNode = root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/Timeouts");
-                Assert.IsNotNull(timeoutNode, "There should be a Timeouts node");
-                Assert.AreEqual("120000", timeoutNode.Attributes["testTimeout"].Value, "testTimeout value does not match.");
+            var timeoutNode = root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/Timeouts");
+            Assert.IsNotNull(timeoutNode, "There should be a Timeouts node");
+            Assert.AreEqual("120000", timeoutNode.Attributes["testTimeout"].Value, "testTimeout value does not match.");
 
-                Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution/TestDirectory"), "There should be a Assembly resolution node");
+            Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution/TestDirectory"), "There should be a Assembly resolution node");
 
-                var testSessionTimeoutNode = root.SelectSingleNode(@"/RunSettings/RunConfiguration/TestSessionTimeout");
-                Assert.IsNotNull(testSessionTimeoutNode, "There should be a TestSessionTimeout node");
-                Assert.AreEqual("60000", testSessionTimeoutNode.InnerText, "Timeout value does not match.");
+            var testSessionTimeoutNode = root.SelectSingleNode(@"/RunSettings/RunConfiguration/TestSessionTimeout");
+            Assert.IsNotNull(testSessionTimeoutNode, "There should be a TestSessionTimeout node");
+            Assert.AreEqual("60000", testSessionTimeoutNode.InnerText, "Timeout value does not match.");
 
-                var dataCollectorNode = root.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
-                Assert.IsNotNull(dataCollectorNode, "There should be a DataCollector node");
-                Assert.AreEqual("Event Log", dataCollectorNode.Attributes["friendlyName"].Value, "Data collector does not match.");
-            }
+            var dataCollectorNode = root.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+            Assert.IsNotNull(dataCollectorNode, "There should be a DataCollector node");
+            Assert.AreEqual("Event Log", dataCollectorNode.Attributes["friendlyName"].Value, "Data collector does not match.");
         }
     }
 }

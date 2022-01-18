@@ -317,8 +317,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             var envVariables = this.dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
 
-            var properties = new Dictionary<string, object>();
-            properties.Add(CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources);
+            var properties = new Dictionary<string, object>
+            {
+                { CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources }
+            };
             var eventArgs = new SessionStartEventArgs(properties);
 
             var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);

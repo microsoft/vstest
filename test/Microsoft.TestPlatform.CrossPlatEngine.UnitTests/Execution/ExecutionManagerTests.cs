@@ -119,8 +119,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
 
-            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            adapterSourceMap.Add(assemblyLocation, new List<string> { assemblyLocation });
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { assemblyLocation, new List<string> { assemblyLocation } }
+            };
 
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 

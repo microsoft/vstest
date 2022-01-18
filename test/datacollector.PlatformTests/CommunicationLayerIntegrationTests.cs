@@ -49,14 +49,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, this.testSources, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher))
-            {
-                proxyDataCollectionManager.Initialize();
+            using var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, this.testSources, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher);
+            proxyDataCollectionManager.Initialize();
 
-                var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+            var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-                Assert.AreEqual(1, result.EnvironmentVariables.Count);
-            }
+            Assert.AreEqual(1, result.EnvironmentVariables.Count);
         }
 
         [TestMethod]
@@ -64,18 +62,16 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, this.testSources, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher))
-            {
-                proxyDataCollectionManager.Initialize();
+            using var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, this.testSources, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher);
+            proxyDataCollectionManager.Initialize();
 
-                proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+            proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-                var dataCollectionResult = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
+            var dataCollectionResult = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
 
-                Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments[0].DisplayName);
-                Assert.AreEqual("my://custom/datacollector", dataCollectionResult.Attachments[0].Uri.ToString());
-                Assert.IsTrue(dataCollectionResult.Attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
-            }
+            Assert.AreEqual("CustomDataCollector", dataCollectionResult.Attachments[0].DisplayName);
+            Assert.AreEqual("my://custom/datacollector", dataCollectionResult.Attachments[0].Uri.ToString());
+            Assert.IsTrue(dataCollectionResult.Attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
         }
 
         [TestMethod]
@@ -85,23 +81,21 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             var dataCollectionRequestSender = new DataCollectionRequestSender(socketCommManager, JsonDataSerializer.Instance);
             var dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper, this.runSettings);
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, this.testSources, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher))
-            {
-                proxyDataCollectionManager.Initialize();
-                proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+            using var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, this.testSources, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher);
+            proxyDataCollectionManager.Initialize();
+            proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-                var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcessId);
-                Assert.IsNotNull(result);
+            var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcessId);
+            Assert.IsNotNull(result);
 
-                socketCommManager.StopClient();
+            socketCommManager.StopClient();
 
-                var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
+            var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
 
-                Assert.IsNull(attachments);
+            Assert.IsNull(attachments);
 
-                // Give time to datacollector process to exit.
-                Assert.IsTrue(result.WaitForExit(500));
-            }
+            // Give time to datacollector process to exit.
+            Assert.IsTrue(result.WaitForExit(500));
         }
     }
 }

@@ -112,8 +112,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 throw new ArgumentOutOfRangeException(nameof(discoveredTestEventTimeout), Resources.NotificationTimeoutIsZero);
             }
 
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, sources);
+            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { Constants.UnspecifiedAdapterPath, sources }
+            };
             this.FrequencyOfDiscoveredTestsEvent = frequencyOfDiscoveredTestsEvent;
             this.DiscoveredTestEventTimeout = discoveredTestEventTimeout;
 

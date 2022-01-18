@@ -220,8 +220,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
         }
 
@@ -461,8 +463,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
@@ -511,8 +515,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
@@ -563,8 +569,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             foreach (var testResult in this.GetTestResultsObject())
@@ -673,8 +681,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
@@ -698,8 +708,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
@@ -780,8 +792,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
             var TestResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
             {
@@ -801,8 +815,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
             var TestResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
             {
@@ -822,8 +838,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             foreach (var testResult in this.GetTestResultObject(TestOutcome.Passed))
@@ -845,8 +863,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             foreach (var testResult in this.GetTestResultObject(TestOutcome.Failed))
@@ -891,8 +911,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             loggerEvents.CompleteTestRun(null, true, false, null, null, null, new TimeSpan(1, 0, 0, 0));
@@ -905,8 +927,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             foreach (var testResult in this.GetTestResultObject(TestOutcome.Failed))
@@ -924,8 +948,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             loggerEvents.CompleteTestRun(null, false, true, null, null, null, new TimeSpan(1, 0, 0, 0));
@@ -948,8 +974,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             CommandLineOptions.Instance.AddSource(testFilePath);
 
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
@@ -978,8 +1006,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             CommandLineOptions.Instance.AddSource(testFilePath);
             CommandLineOptions.Instance.AddSource(testFilePath2);
 
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "detailed");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "detailed" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
@@ -1010,8 +1040,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             CommandLineOptions.Instance.AddSource(testFilePath);
             CommandLineOptions.Instance.AddSource(testFilePath2);
 
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
@@ -1028,8 +1060,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             foreach (var testResult in this.GetTestResultObject(TestOutcome.Passed))
@@ -1053,8 +1087,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testresults = this.GetTestResultObject(TestOutcome.Failed);
@@ -1077,8 +1113,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "detailed");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "detailed" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testresults = this.GetTestResultObject(TestOutcome.Passed);
@@ -1101,8 +1139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testresults = this.GetTestResultObject(TestOutcome.Failed);
@@ -1136,8 +1176,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", verbosityLevel);
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", verbosityLevel }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var attachmentSet = new AttachmentSet(new Uri("test://uri"), "myattachmentset");
@@ -1160,8 +1202,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("verbosity", "normal");
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             TestCase testCase1 = CreateTestCase("TestCase1");

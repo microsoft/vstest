@@ -89,41 +89,39 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         private void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
         {
             string testSettingsPath = null;
-            using (XmlTextReader reader = new XmlTextReader(oldRunSettingsPath))
+            using XmlTextReader reader = new XmlTextReader(oldRunSettingsPath);
+            reader.Namespaces = false;
+
+            var runSettingsXmlDoc = new XmlDocument();
+            runSettingsXmlDoc.Load(reader);
+            var root = runSettingsXmlDoc.DocumentElement;
+
+            var testSettingsNode = root.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+
+            if (testSettingsNode != null)
             {
-                reader.Namespaces = false;
+                testSettingsPath = testSettingsNode.InnerText;
+            }
 
-                var runSettingsXmlDoc = new XmlDocument();
-                runSettingsXmlDoc.Load(reader);
-                var root = runSettingsXmlDoc.DocumentElement;
-
-                var testSettingsNode = root.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-
-                if (testSettingsNode != null)
+            if (!string.IsNullOrWhiteSpace(testSettingsPath))
+            {
+                // Expand path relative to runSettings location.
+                if (!Path.IsPathRooted(testSettingsPath))
                 {
-                    testSettingsPath = testSettingsNode.InnerText;
+                    testSettingsPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(oldRunSettingsPath), testSettingsPath));
                 }
 
-                if (!string.IsNullOrWhiteSpace(testSettingsPath))
-                {
-                    // Expand path relative to runSettings location.
-                    if (!Path.IsPathRooted(testSettingsPath))
-                    {
-                        testSettingsPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(oldRunSettingsPath), testSettingsPath));
-                    }
+                // Remove the embedded testSettings node if it exists.
+                this.RemoveEmbeddedTestSettings(runSettingsXmlDoc);
 
-                    // Remove the embedded testSettings node if it exists.
-                    this.RemoveEmbeddedTestSettings(runSettingsXmlDoc);
+                this.MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
 
-                    this.MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
-
-                    runSettingsXmlDoc.Save(newRunSettingsPath);
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.RunSettingsCreated, newRunSettingsPath));
-                }
-                else
-                {
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoEmbeddedSettings));
-                }
+                runSettingsXmlDoc.Save(newRunSettingsPath);
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.RunSettingsCreated, newRunSettingsPath));
+            }
+            else
+            {
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoEmbeddedSettings));
             }
         }
 

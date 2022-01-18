@@ -35,10 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             try
             {
-                using (var assemblyStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read))
-                {
-                    frameworkName = AssemblyMetadataProvider.GetFrameworkNameFromAssemblyMetadata(assemblyStream);
-                }
+                using var assemblyStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
+                frameworkName = AssemblyMetadataProvider.GetFrameworkNameFromAssemblyMetadata(assemblyStream);
             }
             catch (Exception ex)
             {
@@ -208,78 +206,76 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 //get the input stream
-                using (Stream fs = this.fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read))
-                using (var reader = new BinaryReader(fs))
+                using Stream fs = this.fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read);
+                using var reader = new BinaryReader(fs);
+                var validImage = true;
+
+                //PE Header starts @ 0x3C (60). Its a 4 byte header.
+                fs.Position = 0x3C;
+                peHeader = reader.ReadUInt32();
+
+                // Check if the offset is invalid
+                if (peHeader > fs.Length - 5)
                 {
-                    var validImage = true;
+                    validImage = false;
+                }
 
-                    //PE Header starts @ 0x3C (60). Its a 4 byte header.
-                    fs.Position = 0x3C;
-                    peHeader = reader.ReadUInt32();
+                if (validImage)
+                {
+                    //Moving to PE Header start location...
+                    fs.Position = peHeader;
 
-                    // Check if the offset is invalid
-                    if (peHeader > fs.Length - 5)
+                    var signature = reader.ReadUInt32(); //peHeaderSignature
+                                                         // 0x00004550 is the letters "PE" followed by two terminating zeros.
+                    if (signature != 0x00004550)
                     {
                         validImage = false;
                     }
 
                     if (validImage)
                     {
-                        //Moving to PE Header start location...
-                        fs.Position = peHeader;
+                        //Read the image file header.
+                        machine = reader.ReadUInt16();
+                        reader.ReadUInt16(); //NumberOfSections
+                        reader.ReadUInt32(); //TimeDateStamp
+                        reader.ReadUInt32(); //PointerToSymbolTable
+                        reader.ReadUInt32(); //NumberOfSymbols
+                        reader.ReadUInt16(); //SizeOfOptionalHeader
+                        reader.ReadUInt16(); //Characteristics
 
-                        var signature = reader.ReadUInt32(); //peHeaderSignature
-                        // 0x00004550 is the letters "PE" followed by two terminating zeros.
-                        if (signature != 0x00004550)
+                        // magic number.32bit or 64bit assembly.
+                        var magic = reader.ReadUInt16();
+                        if (magic != 0x010B && magic != 0x020B)
                         {
                             validImage = false;
                         }
+                    }
 
-                        if (validImage)
+                    if (validImage)
+                    {
+                        switch (machine)
                         {
-                            //Read the image file header.
-                            machine = reader.ReadUInt16();
-                            reader.ReadUInt16(); //NumberOfSections
-                            reader.ReadUInt32(); //TimeDateStamp
-                            reader.ReadUInt32(); //PointerToSymbolTable
-                            reader.ReadUInt32(); //NumberOfSymbols
-                            reader.ReadUInt16(); //SizeOfOptionalHeader
-                            reader.ReadUInt16(); //Characteristics
+                            case IMAGE_FILE_MACHINE_I386:
+                                archType = Architecture.X86;
+                                break;
 
-                            // magic number.32bit or 64bit assembly.
-                            var magic = reader.ReadUInt16();
-                            if (magic != 0x010B && magic != 0x020B)
-                            {
-                                validImage = false;
-                            }
+                            case IMAGE_FILE_MACHINE_AMD64:
+                            case IMAGE_FILE_MACHINE_IA64:
+                                archType = Architecture.X64;
+                                break;
+
+                            case IMAGE_FILE_MACHINE_ARM:
+                            case IMAGE_FILE_MACHINE_THUMB:
+                            case IMAGE_FILE_MACHINE_ARMNT:
+                                archType = Architecture.ARM;
+                                break;
                         }
-
-                        if (validImage)
-                        {
-                            switch (machine)
-                            {
-                                case IMAGE_FILE_MACHINE_I386:
-                                    archType = Architecture.X86;
-                                    break;
-
-                                case IMAGE_FILE_MACHINE_AMD64:
-                                case IMAGE_FILE_MACHINE_IA64:
-                                    archType = Architecture.X64;
-                                    break;
-
-                                case IMAGE_FILE_MACHINE_ARM:
-                                case IMAGE_FILE_MACHINE_THUMB:
-                                case IMAGE_FILE_MACHINE_ARMNT:
-                                    archType = Architecture.ARM;
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            EqtTrace.Info(
-                                "GetArchitectureForSource: Source path {0} is not a valid image path. Returning default proc arch type: {1}.",
-                                imagePath, archType);
-                        }
+                    }
+                    else
+                    {
+                        EqtTrace.Info(
+                            "GetArchitectureForSource: Source path {0} is not a valid image path. Returning default proc arch type: {1}.",
+                            imagePath, archType);
                     }
                 }
             }

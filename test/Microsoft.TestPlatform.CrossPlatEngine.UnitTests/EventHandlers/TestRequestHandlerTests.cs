@@ -231,8 +231,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         [TestMethod]
         public void ProcessRequestsExecutionStartShouldStartExecutionWithGivenSources()
         {
-            var asm = new Dictionary<string, IEnumerable<string>>();
-            asm["mstestv2"] = new[] {"test1.dll", "test2.dll"};
+            var asm = new Dictionary<string, IEnumerable<string>>
+            {
+                ["mstestv2"] = new[] { "test1.dll", "test2.dll" }
+            };
             var testRunCriteriaWithSources = new TestRunCriteriaWithSources(asm, "runsettings", null, null);
             var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithSources, testRunCriteriaWithSources);
 

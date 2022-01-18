@@ -341,14 +341,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // Set the trace level and add the trace listener
                 if (LogFile == null)
                 {
-                    using (var process = Process.GetCurrentProcess())
-                    {
-                        // In case of parallel execution, there may be several processes with same name.
-                        // Add a process id to make the traces unique.
-                        LogFile = Path.Combine(
-                            logsDirectory,
-                            Path.GetFileNameWithoutExtension(process.MainModule.FileName) + "." + process.Id + ".TpTrace.log");
-                    }
+                    using var process = Process.GetCurrentProcess();
+
+                    // In case of parallel execution, there may be several processes with same name.
+                    // Add a process id to make the traces unique.
+                    LogFile = Path.Combine(
+                        logsDirectory,
+                        Path.GetFileNameWithoutExtension(process.MainModule.FileName) + "." + process.Id + ".TpTrace.log");
                 }
 
                 // Add a default listener
@@ -393,10 +392,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 if (string.IsNullOrEmpty(processName))
                 {
                     Debug.Fail("Could not get process name from command line, will try to use the slow way.");
-                    using (var process = Process.GetCurrentProcess())
-                    {
-                        processName = process.ProcessName;
-                    }
+                    using var process = Process.GetCurrentProcess();
+                    processName = process.ProcessName;
                 }
 
                 return processName;
@@ -414,10 +411,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             try
             {
-                using (var process = Process.GetCurrentProcess())
-                {
-                    return process.Id;
-                }
+                using var process = Process.GetCurrentProcess();
+                return process.Id;
             }
             catch (InvalidOperationException e)
             {

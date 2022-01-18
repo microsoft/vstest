@@ -110,8 +110,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 return;
             }
 
-            var properties = new Dictionary<string, object>();
-            properties.Add("TestSources", TestSourcesUtility.GetSources(this.testCases));
+            var properties = new Dictionary<string, object>
+            {
+                { "TestSources", TestSourcesUtility.GetSources(this.testCases) }
+            };
 
             this.testCaseEventsHandler.SendSessionStart(properties);
         }
@@ -137,8 +139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
                 else
                 {
-                    testList = new List<TestCase>();
-                    testList.Add(test);
+                    testList = new List<TestCase>
+                    {
+                        test
+                    };
                     result.Add(executorUriExtensionTuple, testList);
                 }
             }

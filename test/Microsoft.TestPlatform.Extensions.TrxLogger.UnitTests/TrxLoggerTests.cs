@@ -45,9 +45,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.events = new Mock<TestLoggerEvents>();
 
             this.testableTrxLogger = new TestableTrxLogger();
-            this.parameters = new Dictionary<string, string>(2);
-            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
-            this.parameters[TrxLoggerConstants.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue;
+            this.parameters = new Dictionary<string, string>(2)
+            {
+                [DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory,
+                [TrxLoggerConstants.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue
+            };
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
@@ -750,9 +752,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
             List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
-            List<String> listCategoriesExpected = new List<string>();
-            listCategoriesExpected.Add("ClassLevel");
-            listCategoriesExpected.Add("AsmLevel");
+            List<String> listCategoriesExpected = new List<string>
+            {
+                "ClassLevel",
+                "AsmLevel"
+            };
 
             CollectionAssert.AreEqual(listCategoriesExpected, listCategoriesActual);
         }
@@ -768,9 +772,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var converter = new Converter(new Mock<IFileHelper>().Object, new TrxFileHelper());
             List<string> listWorkItemsActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "WorkItemIds");
 
-            List<string> listWorkItemsExpected = new List<string>();
-            listWorkItemsExpected.Add("99999");
-            listWorkItemsExpected.Add("0");
+            List<string> listWorkItemsExpected = new List<string>
+            {
+                "99999",
+                "0"
+            };
 
             CollectionAssert.AreEqual(listWorkItemsExpected, listWorkItemsActual);
         }
@@ -807,19 +813,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
         private void ValidateDateTimeInTrx(string trxFileName)
         {
-            using (FileStream file = File.OpenRead(trxFileName))
-            {
-                using (XmlReader reader = XmlReader.Create(file))
-                {
-                    XDocument document = XDocument.Load(reader);
-                    var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
-                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
-                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
-                    var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
-                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
-                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
-                }
-            }
+            using FileStream file = File.OpenRead(trxFileName);
+            using XmlReader reader = XmlReader.Create(file);
+            XDocument document = XDocument.Load(reader);
+            var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
+            ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
+            ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
+            var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+            ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
+            ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
         }
 
         [TestMethod]
@@ -891,23 +893,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
         private void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
         {
-            using (FileStream file = File.OpenRead(trxFileName))
+            using FileStream file = File.OpenRead(trxFileName);
+            using XmlReader reader = XmlReader.Create(file);
+            XDocument document = XDocument.Load(reader);
+            var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+            if (isMstestAdapter)
             {
-                using (XmlReader reader = XmlReader.Create(file))
-                {
-                    XDocument document = XDocument.Load(reader);
-                    var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
-                    if (isMstestAdapter)
-                    {
-                        Assert.AreNotEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
-                        Assert.AreNotEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
-                    }
-                    else
-                    {
-                        Assert.AreEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
-                        Assert.AreEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
-                    }
-                }
+                Assert.AreNotEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
+                Assert.AreNotEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+            }
+            else
+            {
+                Assert.AreEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
+                Assert.AreEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
             }
         }
 

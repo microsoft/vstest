@@ -173,12 +173,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized data.</returns>
         private string Serialize<T>(JsonSerializer serializer, T data)
         {
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                serializer.Serialize(jsonWriter, data);
-                return stringWriter.ToString();
-            }
+            using var stringWriter = new StringWriter();
+            using var jsonWriter = new JsonTextWriter(stringWriter);
+            serializer.Serialize(jsonWriter, data);
+            return stringWriter.ToString();
         }
 
         /// <summary>
@@ -190,11 +188,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Deserialized data.</returns>
         private T Deserialize<T>(JsonSerializer serializer, string data)
         {
-            using (var stringReader = new StringReader(data))
-            using (var jsonReader = new JsonTextReader(stringReader))
-            {
-                return serializer.Deserialize<T>(jsonReader);
-            }
+            using var stringReader = new StringReader(data);
+            using var jsonReader = new JsonTextReader(stringReader);
+            return serializer.Deserialize<T>(jsonReader);
         }
 
         /// <summary>

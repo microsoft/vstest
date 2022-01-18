@@ -56,9 +56,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var projectPath = this.GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
-            var env = new Dictionary<string, string>();
-            env.Add("DOTNET_ROOT", null);
-            env.Add("DOTNET_MULTILEVEL_LOOKUP", "0");
+            var env = new Dictionary<string, string>
+            {
+                { "DOTNET_ROOT", null },
+                { "DOTNET_MULTILEVEL_LOOKUP", "0" }
+            };
 
             // Verify native architecture
             ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework net6.0", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
@@ -108,9 +110,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var env = new Dictionary<string, string>();
-            env["DOTNET_ROOT"] = null;
-            env["DOTNET_MULTILEVEL_LOOKUP"] = "0";
+            var env = new Dictionary<string, string>
+            {
+                ["DOTNET_ROOT"] = null,
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
+            };
 
             var projectName = "ArchitectureSwitch.csproj";
             var projectPath = this.GetProjectFullPath(projectName);
@@ -169,9 +173,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var env = new Dictionary<string, string>();
-            env["DOTNET_ROOT"] = null;
-            env["DOTNET_MULTILEVEL_LOOKUP"] = "0";
+            var env = new Dictionary<string, string>
+            {
+                ["DOTNET_ROOT"] = null,
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
+            };
             string privateInstallationMuxer = Path.Combine(privateX64Installation, GetMuxerName);
 
             var projectName = "ArchitectureSwitch.csproj";
@@ -211,9 +217,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var env = new Dictionary<string, string>();
-            env["DOTNET_ROOT"] = null;
-            env["DOTNET_MULTILEVEL_LOOKUP"] = "0";
+            var env = new Dictionary<string, string>
+            {
+                ["DOTNET_ROOT"] = null,
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
+            };
             string privateInstallationMuxer = Path.Combine(privateX64Installation, GetMuxerName);
 
             var projectName = "ArchitectureSwitch.csproj";
@@ -270,9 +278,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var projectPath = this.GetProjectFullPath(projectName);
             var projectDirectory = Path.GetDirectoryName(projectPath);
 
-            var env = new Dictionary<string, string>();
-            env["DOTNET_ROOT"] = null;
-            env["DOTNET_MULTILEVEL_LOOKUP"] = "0";
+            var env = new Dictionary<string, string>
+            {
+                ["DOTNET_ROOT"] = null,
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0"
+            };
 
             ExecuteApplication(GetDefaultDotnetMuxerLocation, $"test {projectPath} --framework {GetFrameworkVersionToForceToX64}", out string stdOut, out string stdError, out int exitCode, env, projectDirectory);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))

@@ -189,15 +189,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             var framework = Framework.DefaultFramework;
             var defaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), Constants.ResultsDirectoryName);
 
-            using (var stream = new StringReader(runSettings))
-            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
-            {
-                var document = new XmlDocument();
-                document.Load(reader);
+            using var stream = new StringReader(runSettings);
+            using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+            var document = new XmlDocument();
+            document.Load(reader);
 
-                InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(document, architecture, framework, defaultResultsDirectory);
-                return document.OuterXml;
-            }
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(document, architecture, framework, defaultResultsDirectory);
+            return document.OuterXml;
         }
 
         private static XmlNode CreateNode(XmlDocument doc, string xPath)
@@ -227,31 +225,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 var settingsXml = runSettingsProvider.ActiveRunSettings.SettingsXml;
 
 #if NETFRAMEWORK
-                using (var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { XmlResolver = null, CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                {
+                using var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { XmlResolver = null, CloseInput = true, DtdProcessing = DtdProcessing.Prohibit });
 #else
-                using (
-                    var reader = XmlReader.Create(new StringReader(settingsXml),
-                        new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                {
+                using var reader = XmlReader.Create(new StringReader(settingsXml),
+                        new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit });
 #endif
-                    doc.Load(reader);
-                }
+                doc.Load(reader);
             }
             else
             {
 #if NETFRAMEWORK
                 doc = (XmlDocument) XmlRunSettingsUtilities.CreateDefaultRunSettings();
 #else
-                using (
-                    var reader =
+                using var reader =
                         XmlReader.Create(
                             new StringReader(
                                 XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml),
-                            new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                {
-                    doc.Load(reader);
-                }
+                            new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit });
+                doc.Load(reader);
 #endif
             }
             return doc;

@@ -582,80 +582,78 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
                 // TargetFramework is full CLR. Set DesignMode based on current context.
-                using (var stream = new StringReader(runsettingsXml))
-                using (var reader = XmlReader.Create(
+                using var stream = new StringReader(runsettingsXml);
+                using var reader = XmlReader.Create(
                     stream,
-                    XmlRunSettingsUtilities.ReaderSettings))
-                {
-                    var document = new XmlDocument();
-                    document.Load(reader);
-                    var navigator = document.CreateNavigator();
-                    var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                    var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
-                        ?? new LoggerRunSettings();
+                    XmlRunSettingsUtilities.ReaderSettings);
+                var document = new XmlDocument();
+                document.Load(reader);
+                var navigator = document.CreateNavigator();
+                var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+                var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml)
+                    ?? new LoggerRunSettings();
 
-                    settingsUpdated |= this.UpdateFramework(
-                        document,
-                        navigator,
-                        sources,
-                        sourceFrameworks,
-                        registrar,
-                        out Framework chosenFramework);
+                settingsUpdated |= this.UpdateFramework(
+                    document,
+                    navigator,
+                    sources,
+                    sourceFrameworks,
+                    registrar,
+                    out Framework chosenFramework);
 
-                    // Choose default architecture based on the framework.
-                    // For .NET core, the default platform architecture should be based on the process.	
-                    Architecture defaultArchitecture = Architecture.X86;
-                    if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                        || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
+                // Choose default architecture based on the framework.
+                // For .NET core, the default platform architecture should be based on the process.	
+                Architecture defaultArchitecture = Architecture.X86;
+                if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0
                     // This is a special case for 1 version of Nuget.Frameworks that was shipped with using identifier NET5 instead of NETCoreApp5 for .NET 5.
-                        || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
+                    || chosenFramework.Name.IndexOf("net5", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
 #if NETCOREAPP
-                        // We are running in vstest.console that is either started via dotnet.exe
-                        // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
-                        // should resolve 32-bit SDK when running from 32-bit dotnet process and 
-                        // 64-bit SDK when running from 64-bit dotnet process.
-                        // As default architecture we specify the expected test host architecture,
-                        // it can be specified by user on the command line with --arch or through runsettings.
-                        // If it's not specified by user will be filled by current processor architecture;
-                        // should be the same as SDK.
-                        defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
-                            TranslateToArchitecture(processHelper.GetCurrentProcessArchitecture()) :
-                            runConfiguration.TargetPlatform;
+                    // We are running in vstest.console that is either started via dotnet.exe
+                    // or via vstest.console.exe .NET Core executable. For AnyCPU dlls this
+                    // should resolve 32-bit SDK when running from 32-bit dotnet process and 
+                    // 64-bit SDK when running from 64-bit dotnet process.
+                    // As default architecture we specify the expected test host architecture,
+                    // it can be specified by user on the command line with --arch or through runsettings.
+                    // If it's not specified by user will be filled by current processor architecture;
+                    // should be the same as SDK.
+                    defaultArchitecture = RunSettingsHelper.Instance.IsDefaultTargetArchitecture ?
+                        TranslateToArchitecture(processHelper.GetCurrentProcessArchitecture()) :
+                        runConfiguration.TargetPlatform;
 #else
-                        // We are running in vstest.console.exe that was built against .NET
-                        // Framework. This console prefers 32-bit because it needs to run as 32-bit
-                        // to be compatible with QTAgent. It runs as 32-bit both under VS and in
-                        // Developer console. Set the default architecture based on the OS
-                        // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
-                        // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
-                        // We want to find 64-bit SDK because it is more likely to be installed.
-                        defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
+                    // We are running in vstest.console.exe that was built against .NET
+                    // Framework. This console prefers 32-bit because it needs to run as 32-bit
+                    // to be compatible with QTAgent. It runs as 32-bit both under VS and in
+                    // Developer console. Set the default architecture based on the OS
+                    // architecture, to find 64-bit dotnet SDK when running AnyCPU dll on 64-bit
+                    // system, and 32-bit SDK when running AnyCPU dll on 32-bit OS.
+                    // We want to find 64-bit SDK because it is more likely to be installed.
+                    defaultArchitecture = Environment.Is64BitOperatingSystem ? Architecture.X64 : Architecture.X86;
 #endif
-                        EqtTrace.Verbose($"Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}");
-                    }
-
-                    settingsUpdated |= this.UpdatePlatform(
-                        document,
-                        navigator,
-                        sources,
-                        sourcePlatforms,
-                        defaultArchitecture,
-                        out Architecture chosenPlatform);
-                    this.CheckSourcesForCompatibility(
-                        chosenFramework,
-                        chosenPlatform,
-                        defaultArchitecture,
-                        sourcePlatforms,
-                        sourceFrameworks,
-                        registrar);
-                    settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
-                    settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
-                    settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
-                    settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
-
-                    updatedRunSettingsXml = navigator.OuterXml;
+                    EqtTrace.Verbose($"Default architecture: {defaultArchitecture} IsDefaultTargetArchitecture: {RunSettingsHelper.Instance.IsDefaultTargetArchitecture}");
                 }
+
+                settingsUpdated |= this.UpdatePlatform(
+                    document,
+                    navigator,
+                    sources,
+                    sourcePlatforms,
+                    defaultArchitecture,
+                    out Architecture chosenPlatform);
+                this.CheckSourcesForCompatibility(
+                    chosenFramework,
+                    chosenPlatform,
+                    defaultArchitecture,
+                    sourcePlatforms,
+                    sourceFrameworks,
+                    registrar);
+                settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
+                settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
+                settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
+                settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+
+                updatedRunSettingsXml = navigator.OuterXml;
             }
 
             return settingsUpdated;

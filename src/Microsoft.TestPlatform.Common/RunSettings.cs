@@ -98,11 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                 throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, settings);
             }
 
-            using (var stringReader = new StringReader(settings))
-            {
-                var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
-                this.ValidateAndSaveSettings(reader);
-            }
+            using var stringReader = new StringReader(settings);
+            var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
+            this.ValidateAndSaveSettings(reader);
         }
 
         /// <summary>
@@ -113,11 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public void InitializeSettingsProviders(string settings)
         {
-            using (var stringReader = new StringReader(settings))
-            {
-                var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
-                this.ReadRunSettings(reader);
-            }
+            using var stringReader = new StringReader(settings);
+            var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
+            this.ReadRunSettings(reader);
         }
 
         #endregion
@@ -137,11 +133,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             {
                 var dom = new XmlDocument();
                 dom.Load(reader);
-                using (var writer = new StringWriter(CultureInfo.InvariantCulture))
-                {
-                    dom.Save(writer);
-                    this.SettingsXml = writer.ToString();
-                }
+                using var writer = new StringWriter(CultureInfo.InvariantCulture);
+                dom.Save(writer);
+                this.SettingsXml = writer.ToString();
             }
             catch (Exception e)
             {

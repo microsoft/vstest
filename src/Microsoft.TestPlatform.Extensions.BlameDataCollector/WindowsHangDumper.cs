@@ -181,51 +181,49 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private static void CollectDumpUsingMiniDumpWriteDump(Process process, string outputFile, DumpTypeOption type)
         {
             // Open the file for writing
-            using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            using var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+            NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default;
+
+            NativeMethods.MINIDUMP_TYPE dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpNormal;
+            switch (type)
             {
-                NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default;
+                case DumpTypeOption.Full:
+                    dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemory |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
+                    break;
+                case DumpTypeOption.WithHeap:
+                    dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithPrivateReadWriteMemory |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
+                    break;
+                case DumpTypeOption.Mini:
+                    dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo;
+                    break;
+            }
 
-                NativeMethods.MINIDUMP_TYPE dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpNormal;
-                switch (type)
+            // Retry the write dump on ERROR_PARTIAL_COPY
+            for (int i = 0; i < 5; i++)
+            {
+                // Dump the process!
+                if (NativeMethods.MiniDumpWriteDump(process.Handle, (uint)process.Id, stream.SafeFileHandle, dumpType, ref exceptionInfo, IntPtr.Zero, IntPtr.Zero))
                 {
-                    case DumpTypeOption.Full:
-                        dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemory |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
-                        break;
-                    case DumpTypeOption.WithHeap:
-                        dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithPrivateReadWriteMemory |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
-                        break;
-                    case DumpTypeOption.Mini:
-                        dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo;
-                        break;
+                    break;
                 }
-
-                // Retry the write dump on ERROR_PARTIAL_COPY
-                for (int i = 0; i < 5; i++)
+                else
                 {
-                    // Dump the process!
-                    if (NativeMethods.MiniDumpWriteDump(process.Handle, (uint)process.Id, stream.SafeFileHandle, dumpType, ref exceptionInfo, IntPtr.Zero, IntPtr.Zero))
+                    int err = Marshal.GetHRForLastWin32Error();
+                    if (err != NativeMethods.ERROR_PARTIAL_COPY)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        int err = Marshal.GetHRForLastWin32Error();
-                        if (err != NativeMethods.ERROR_PARTIAL_COPY)
-                        {
-                            Marshal.ThrowExceptionForHR(err);
-                        }
+                        Marshal.ThrowExceptionForHR(err);
                     }
                 }
             }

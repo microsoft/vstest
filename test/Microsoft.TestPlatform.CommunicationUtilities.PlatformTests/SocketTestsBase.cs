@@ -44,18 +44,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
         protected static string ReadData(TcpClient client)
         {
-            using (BinaryReader reader = new BinaryReader(client.GetStream()))
-            {
-                return reader.ReadString();
-            }
+            using BinaryReader reader = new BinaryReader(client.GetStream());
+            return reader.ReadString();
         }
 
         protected static void WriteData(TcpClient client)
         {
-            using (BinaryWriter writer = new BinaryWriter(client.GetStream()))
-            {
-                writer.Write(DUMMYDATA);
-            }
+            using BinaryWriter writer = new BinaryWriter(client.GetStream());
+            writer.Write(DUMMYDATA);
         }
 
         protected abstract ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEventArgs);

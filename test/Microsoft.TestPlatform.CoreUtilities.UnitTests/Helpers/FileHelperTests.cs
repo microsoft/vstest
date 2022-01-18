@@ -29,13 +29,9 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         [TestMethod]
         public void GetStreamShouldAbleToGetTwoStreamSimultanouslyIfFileAccessIsRead()
         {
-            using (var stream1 = this.fileHelper.GetStream(this.tempFile, FileMode.Open, FileAccess.Read))
-            {
-                using (var stream2 =
-                    this.fileHelper.GetStream(this.tempFile, FileMode.Open, FileAccess.Read))
-                {
-                }
-            }
+            using var stream1 = this.fileHelper.GetStream(this.tempFile, FileMode.Open, FileAccess.Read);
+            using var stream2 =
+                this.fileHelper.GetStream(this.tempFile, FileMode.Open, FileAccess.Read);
         }
     }
 }

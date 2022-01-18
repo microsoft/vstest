@@ -135,10 +135,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var fileContent3 = File.ReadAllText(resultFiles[2]);
             var fileContent4 = File.ReadAllText(resultFiles[3]);
 
-            var eventIdsDics = new Dictionary<string[], bool>();
-            eventIdsDics.Add(new[] { "110", "111", "112" }, false);
-            eventIdsDics.Add(new[] { "220", "221", "222", "223" }, false);
-            eventIdsDics.Add(new[] { "330", "331", "332" }, false);
+            var eventIdsDics = new Dictionary<string[], bool>
+            {
+                { new[] { "110", "111", "112" }, false },
+                { new[] { "220", "221", "222", "223" }, false },
+                { new[] { "330", "331", "332" }, false }
+            };
 
             // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
             Assert.IsTrue(this.VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));

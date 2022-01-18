@@ -188,15 +188,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             this.CheckDisposed();
 
             // Create the wait job.
-            using (var waitEvent = new ManualResetEvent(false))
-            {
-                var waitJob = Job<T>.CreateWaitJob(waitEvent);
+            using var waitEvent = new ManualResetEvent(false);
+            var waitJob = Job<T>.CreateWaitJob(waitEvent);
 
-                // Queue the wait job and wait for it to be processed.
-                this.InternalQueueJob(waitJob);
+            // Queue the wait job and wait for it to be processed.
+            this.InternalQueueJob(waitJob);
 
-                waitEvent.WaitOne();
-            }
+            waitEvent.WaitOne();
         }
 
         /// <summary>

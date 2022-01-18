@@ -191,10 +191,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 dataCollectorNode.SetAttribute(kvp.Key, kvp.Value);
             }
 
-            using (var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create))
-            {
-                doc.Save(stream);
-            }
+            using var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+            doc.Save(stream);
         }
 
         private void VaildateDataCollectorOutput(string resultsDir)
@@ -247,10 +245,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private string GetRunsettingsFilePath(string resultsDir)
         {
             var runsettingsPath = Path.Combine(resultsDir, "test_" + Guid.NewGuid() + ".runsettings");
-            var dataCollectionAttributes = new Dictionary<string, string>();
-
-            dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
-            dataCollectionAttributes.Add("uri", "my://sample/datacollector");
+            var dataCollectionAttributes = new Dictionary<string, string>
+            {
+                { "friendlyName", "SampleDataCollector" },
+                { "uri", "my://sample/datacollector" }
+            };
 
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;

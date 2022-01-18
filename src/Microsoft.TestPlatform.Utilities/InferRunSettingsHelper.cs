@@ -81,61 +81,59 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (!string.IsNullOrWhiteSpace(runsettingsXml))
             {
-                using (var stream = new StringReader(runsettingsXml))
-                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                using var stream = new StringReader(runsettingsXml);
+                using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var runSettingsNavigator = document.CreateNavigator();
+
+                // Move navigator to RunConfiguration node
+                if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+                    !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
                 {
-                    var document = new XmlDocument();
-                    document.Load(reader);
-
-                    var runSettingsNavigator = document.CreateNavigator();
-
-                    // Move navigator to RunConfiguration node
-                    if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
-                        !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+                    EqtTrace.Error("InferRunSettingsHelper.MakeRunsettingsCompatible: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                }
+                else if (runSettingsNavigator.HasChildren)
+                {
+                    if (listOfInValidRunConfigurationSettings is null)
                     {
-                        EqtTrace.Error("InferRunSettingsHelper.MakeRunsettingsCompatible: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                        listOfInValidRunConfigurationSettings = new HashSet<string>();
                     }
-                    else if (runSettingsNavigator.HasChildren)
+
+                    // Find all invalid RunConfiguration Settings
+                    runSettingsNavigator.MoveToFirstChild();
+                    if (listOfValidRunConfigurationSettings != null)
                     {
-                        if (listOfInValidRunConfigurationSettings is null)
+                        do
                         {
-                            listOfInValidRunConfigurationSettings = new HashSet<string>();
-                        }
-
-                        // Find all invalid RunConfiguration Settings
-                        runSettingsNavigator.MoveToFirstChild();
-                        if (listOfValidRunConfigurationSettings != null)
-                        {
-                            do
+                            if (!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
                             {
-                                if (!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
-                                {
-                                    listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
-                                }
-                            } while (runSettingsNavigator.MoveToNext());
-                        }
-
-                        // Delete all invalid RunConfiguration Settings
-                        if (listOfInValidRunConfigurationSettings.Count > 0)
-                        {
-                            if (EqtTrace.IsWarningEnabled)
-                            {
-                                string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
-                                EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
+                                listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
                             }
+                        } while (runSettingsNavigator.MoveToNext());
+                    }
 
-                            // move navigator to RunConfiguration node
-                            runSettingsNavigator.MoveToParent();
-
-                            foreach (var s in listOfInValidRunConfigurationSettings)
-                            {
-                                var nodePath = RunConfigurationNodePath + "/" + s;
-                                XmlUtilities.RemoveChildNode(runSettingsNavigator, nodePath, s);
-                            }
-
-                            runSettingsNavigator.MoveToRoot();
-                            updatedRunSettingsXml = runSettingsNavigator.OuterXml;
+                    // Delete all invalid RunConfiguration Settings
+                    if (listOfInValidRunConfigurationSettings.Count > 0)
+                    {
+                        if (EqtTrace.IsWarningEnabled)
+                        {
+                            string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
+                            EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
                         }
+
+                        // move navigator to RunConfiguration node
+                        runSettingsNavigator.MoveToParent();
+
+                        foreach (var s in listOfInValidRunConfigurationSettings)
+                        {
+                            var nodePath = RunConfigurationNodePath + "/" + s;
+                            XmlUtilities.RemoveChildNode(runSettingsNavigator, nodePath, s);
+                        }
+
+                        runSettingsNavigator.MoveToRoot();
+                        updatedRunSettingsXml = runSettingsNavigator.OuterXml;
                     }
                 }
             }
@@ -312,54 +310,52 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             legacySettingsTelemetry = new Dictionary<string, string>();
             try
             {
-                using (var stream = new StringReader(runsettingsXml))
-                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                using var stream = new StringReader(runsettingsXml);
+                using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+                var document = new XmlDocument();
+                document.Load(reader);
+                var runSettingsNavigator = document.CreateNavigator();
+
+                var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings");
+                if (node == null)
                 {
-                    var document = new XmlDocument();
-                    document.Load(reader);
-                    var runSettingsNavigator = document.CreateNavigator();
+                    return false;
+                }
 
-                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings");
-                    if (node == null)
+                var childNodes = node.SelectChildren(XPathNodeType.Element);
+
+                var legacySettingElements = new List<string>();
+                while (childNodes.MoveNext())
+                {
+                    legacySettingElements.Add(childNodes.Current.Name);
+                }
+
+                foreach (var executionNodePath in ExecutionNodesPaths)
+                {
+                    var executionNode = runSettingsNavigator.SelectSingleNode(executionNodePath);
+                    if (executionNode != null)
                     {
-                        return false;
+                        legacySettingElements.Add(executionNode.Name);
                     }
+                }
 
-                    var childNodes = node.SelectChildren(XPathNodeType.Element);
+                if (legacySettingElements.Count > 0)
+                {
+                    legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
+                }
 
-                    var legacySettingElements = new List<string>();
-                    while (childNodes.MoveNext())
-                    {
-                        legacySettingElements.Add(childNodes.Current.Name);
-                    }
+                var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
+                var deploymentAttributes = GetNodeAttributes(deploymentNode);
+                if (deploymentAttributes != null)
+                {
+                    legacySettingsTelemetry.Add(DeploymentAttributesString, string.Join(", ", deploymentAttributes));
+                }
 
-                    foreach (var executionNodePath in ExecutionNodesPaths)
-                    {
-                        var executionNode = runSettingsNavigator.SelectSingleNode(executionNodePath);
-                        if (executionNode != null)
-                        {
-                            legacySettingElements.Add(executionNode.Name);
-                        }
-                    }
-
-                    if (legacySettingElements.Count > 0)
-                    {
-                        legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
-                    }
-
-                    var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
-                    var deploymentAttributes = GetNodeAttributes(deploymentNode);
-                    if (deploymentAttributes != null)
-                    {
-                        legacySettingsTelemetry.Add(DeploymentAttributesString, string.Join(", ", deploymentAttributes));
-                    }
-
-                    var executiontNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Execution");
-                    var executiontAttributes = GetNodeAttributes(executiontNode);
-                    if (executiontAttributes != null)
-                    {
-                        legacySettingsTelemetry.Add(ExecutionAttributesString, string.Join(", ", executiontAttributes));
-                    }
+                var executiontNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Execution");
+                var executiontAttributes = GetNodeAttributes(executiontNode);
+                if (executiontAttributes != null)
+                {
+                    legacySettingsTelemetry.Add(ExecutionAttributesString, string.Join(", ", executiontAttributes));
                 }
             }
             catch (Exception ex)
@@ -398,28 +394,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Dictionary<string, string> environmentVariables = null;
             try
             {
-                using (var stream = new StringReader(runSettings))
-                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                using var stream = new StringReader(runSettings);
+                using var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings);
+                var document = new XmlDocument();
+                document.Load(reader);
+                var runSettingsNavigator = document.CreateNavigator();
+
+                var node = runSettingsNavigator.SelectSingleNode(EnvironmentVariablesNodePath);
+                if (node == null)
                 {
-                    var document = new XmlDocument();
-                    document.Load(reader);
-                    var runSettingsNavigator = document.CreateNavigator();
+                    return null;
+                }
 
-                    var node = runSettingsNavigator.SelectSingleNode(EnvironmentVariablesNodePath);
-                    if (node == null)
+                environmentVariables = new Dictionary<string, string>();
+                var childNodes = node.SelectChildren(XPathNodeType.Element);
+
+                while (childNodes.MoveNext())
+                {
+                    if (!environmentVariables.ContainsKey(childNodes.Current.Name))
                     {
-                        return null;
-                    }
-
-                    environmentVariables = new Dictionary<string, string>();
-                    var childNodes = node.SelectChildren(XPathNodeType.Element);
-
-                    while (childNodes.MoveNext())
-                    {
-                        if (!environmentVariables.ContainsKey(childNodes.Current.Name))
-                        {
-                            environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
-                        }
+                        environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
                     }
                 }
             }

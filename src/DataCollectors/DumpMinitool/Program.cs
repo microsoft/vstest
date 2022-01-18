@@ -29,63 +29,61 @@ namespace DumpMinitool
 
             var process = Process.GetProcessById(processId);
 
-            using (var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            using var stream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+            NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default;
+
+            NativeMethods.MINIDUMP_TYPE dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpNormal;
+            switch (type)
             {
-                NativeMethods.MINIDUMP_EXCEPTION_INFORMATION exceptionInfo = default;
+                case DumpTypeOption.Full:
+                    dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemory |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
+                    break;
+                case DumpTypeOption.WithHeap:
+                    dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithPrivateReadWriteMemory |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
+                               NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
+                    break;
+                case DumpTypeOption.Mini:
+                    dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo;
+                    break;
+            }
 
-                NativeMethods.MINIDUMP_TYPE dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpNormal;
-                switch (type)
+            // Retry the write dump on ERROR_PARTIAL_COPY
+            for (int i = 0; i < 5; i++)
+            {
+                // Dump the process!
+                if (NativeMethods.MiniDumpWriteDump(process.Handle, (uint)process.Id, stream.SafeFileHandle, dumpType, ref exceptionInfo, IntPtr.Zero, IntPtr.Zero))
                 {
-                    case DumpTypeOption.Full:
-                        dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemory |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
-                        break;
-                    case DumpTypeOption.WithHeap:
-                        dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithPrivateReadWriteMemory |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithDataSegs |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithHandleData |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithUnloadedModules |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithFullMemoryInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo |
-                                   NativeMethods.MINIDUMP_TYPE.MiniDumpWithTokenInformation;
-                        break;
-                    case DumpTypeOption.Mini:
-                        dumpType = NativeMethods.MINIDUMP_TYPE.MiniDumpWithThreadInfo;
-                        break;
+                    Console.WriteLine("Dumped process.");
+                    return 0;
                 }
-
-                // Retry the write dump on ERROR_PARTIAL_COPY
-                for (int i = 0; i < 5; i++)
+                else
                 {
-                    // Dump the process!
-                    if (NativeMethods.MiniDumpWriteDump(process.Handle, (uint)process.Id, stream.SafeFileHandle, dumpType, ref exceptionInfo, IntPtr.Zero, IntPtr.Zero))
+                    int err = Marshal.GetHRForLastWin32Error();
+                    if (err != NativeMethods.ERROR_PARTIAL_COPY)
                     {
-                        Console.WriteLine("Dumped process.");
-                        return 0;
+                        Console.WriteLine($"Error dumping process {err}");
+                        Marshal.ThrowExceptionForHR(err);
                     }
                     else
                     {
-                        int err = Marshal.GetHRForLastWin32Error();
-                        if (err != NativeMethods.ERROR_PARTIAL_COPY)
-                        {
-                            Console.WriteLine($"Error dumping process {err}");
-                            Marshal.ThrowExceptionForHR(err);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Error dumping process, was ERROR_PARTIAL_COPY, retrying.");
-                        }
+                        Console.WriteLine($"Error dumping process, was ERROR_PARTIAL_COPY, retrying.");
                     }
                 }
-
-                Console.WriteLine($"Error dumping process after 5 retries.");
-                return 1;
             }
+
+            Console.WriteLine($"Error dumping process after 5 retries.");
+            return 1;
         }
 
         private static class NativeMethods

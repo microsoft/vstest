@@ -278,25 +278,23 @@ namespace Microsoft.TestPlatform.TestUtilities
             using (var reader = XmlReader.Create(dependencyPropsFile))
             {
                 reader.ReadToFollowing("PropertyGroup");
-                using (var props = reader.ReadSubtree())
+                using var props = reader.ReadSubtree();
+                props.MoveToContent();
+                props.Read();   // Read thru the PropertyGroup node
+                while (!props.EOF)
                 {
-                    props.MoveToContent();
-                    props.Read();   // Read thru the PropertyGroup node
-                    while (!props.EOF)
+                    if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
                     {
-                        if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
+                        if (!dependencyProps.ContainsKey(props.Name))
                         {
-                            if (!dependencyProps.ContainsKey(props.Name))
-                            {
-                                dependencyProps.Add(props.Name, props.ReadElementContentAsString());
-                            }
-                            else
-                            {
-                                dependencyProps[props.Name] = string.Join(", ", dependencyProps[props.Name], props.ReadElementContentAsString());
-                            }
+                            dependencyProps.Add(props.Name, props.ReadElementContentAsString());
                         }
-                        props.Read();
+                        else
+                        {
+                            dependencyProps[props.Name] = string.Join(", ", dependencyProps[props.Name], props.ReadElementContentAsString());
+                        }
                     }
+                    props.Read();
                 }
             }
 
