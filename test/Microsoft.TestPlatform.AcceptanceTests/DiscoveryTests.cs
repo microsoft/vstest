@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DiscoveryTests : AcceptanceTestBase
     {
-        private readonly string dummyFilePath = Path.Combine(Path.GetTempPath(), $"{System.Guid.NewGuid()}.txt");
+        private readonly string dummyFilePath = Path.Combine(GetTempPath(), $"{Guid.NewGuid()}.txt");
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]

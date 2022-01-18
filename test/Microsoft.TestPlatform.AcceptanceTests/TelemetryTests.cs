@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public TelemetryTests()
         {
-            this.resultPath = Path.GetTempPath() + "TelemetryLogs";
+            this.resultPath = GetTempPath() + "TelemetryLogs";
 
             // Get Current Opt In Status
             CurrentOptInStatus = Environment.GetEnvironmentVariable(TELEMETRY_OPTEDIN);

@@ -508,15 +508,15 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns></returns>
         public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
-            var logFileName = Path.GetFileName(Path.GetTempFileName());
-            var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
+            var logFileDir = Path.Combine(GetTempPath(), "VSTestConsoleWrapperLogs");
 
             if (!Directory.Exists(logFileDir))
             {
                 Directory.CreateDirectory(logFileDir);
             }
 
-            var logFilePath = Path.Combine(logFileDir, logFileName);
+            // Directory is already unique so there is no need to have a unique file name.
+            var logFilePath = Path.Combine(logFileDir, "log.txt");
 
             Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
@@ -757,9 +757,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// </returns>
         protected static string GetResultsDirectory()
         {
-            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
-            // that is cleaned up after every job. This is preferable to use over 
-            // just the normal temp. 
+            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path
+            // that is cleaned up after every job. This is preferable to use over
+            // just the normal temp.
             var temp = GetTempPath();
             var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
             Directory.CreateDirectory(directoryPath);

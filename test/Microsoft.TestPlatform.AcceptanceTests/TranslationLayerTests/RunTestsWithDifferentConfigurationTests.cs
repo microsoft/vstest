@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
-            var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
+            var testsettingsFile = Path.Combine(GetTempPath(), "tempsettings.testsettings");
             string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
 
             File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);

@@ -68,9 +68,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private string GetRunsettingsFilePath()
         {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
 
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunSettings>
@@ -83,32 +81,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         <DataCollectors>
             <DataCollector friendlyName=""Event Log"" >
                 <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /></Configuration>
-            </DataCollector>
-        </DataCollectors>
-      </DataCollectionRunSettings>
-    </RunSettings> ";
-
-            File.WriteAllText(runsettingsPath, runSettingsXml);
-            return runsettingsPath;
-        }
-
-        private string GetRunsettingsFilePathWithCustomSource()
-        {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
-
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
-    <RunSettings>
-      <RunConfiguration>
-        <MaxCpuCount>0</MaxCpuCount>
-        <TargetPlatform> x64 </TargetPlatform>
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
-      </RunConfiguration>
-      <DataCollectionRunSettings>
-        <DataCollectors>
-            <DataCollector friendlyName=""Event Log"" >
-                <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /><Setting name=""EventSources"" value=""CustomEventSource"" /></Configuration>
             </DataCollector>
         </DataCollectors>
       </DataCollectionRunSettings>

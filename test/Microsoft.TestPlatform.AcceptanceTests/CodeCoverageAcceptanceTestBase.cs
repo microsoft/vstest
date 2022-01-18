@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var codeCoverageExe = this.GetCodeCoverageExePath();
-            var output = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
+            var output = Path.Combine(GetTempPath(), Guid.NewGuid().ToString() + ".xml");
 
             var watch = new Stopwatch();
 

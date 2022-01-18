@@ -25,8 +25,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var testResults = GetResultsDirectory();
-            var testAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
-            var dataCollectorAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
+            var testAppDomainDetailFileName = Path.Combine(GetTempPath(), "appdomain_test.txt");
+            var dataCollectorAppDomainDetailFileName = Path.Combine(GetTempPath(), "appdomain_datacollector.txt");
 
             // Delete test output files if already exist
             File.Delete(testAppDomainDetailFileName);
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain)
         {
-            var runSettings = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+            var runSettings = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
             var inprocasm = this.testEnvironment.GetTestAsset("SimpleDataCollector.dll");
 #if !NET451
             var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);

@@ -6,9 +6,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Threading;
-
-    using global::TestPlatform.TestUtilities;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestCategory("Windows-Review")]
     public class RunsettingsTests : AcceptanceTestBase
     {
-        private string runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+        private string runsettingsPath = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
 
         [TestCleanup]
         public void TestCleanup()
@@ -216,7 +213,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var expectedProcessCreated = 2;
             if (!this.IsDesktopRunner())
             {
-                // this creates dotnet hosted vstest console and 2 testhosts one of which is hosted 
+                // this creates dotnet hosted vstest console and 2 testhosts one of which is hosted
                 // in dotnet, so we have two dotnet + 1 testhost.exe
                 expectedProcessCreated = 3;
             }
@@ -320,16 +317,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var resultsDir = GetResultsDirectory();
 
             var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
-            var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
 
             // Create the script files
             var guid = Guid.NewGuid();
             var setupScriptName = "setupScript_" + guid + ".bat";
-            var setupScriptPath = Path.Combine(Path.GetTempPath(), setupScriptName);
+            var setupScriptPath = Path.Combine(GetTempPath(), setupScriptName);
             File.WriteAllText(setupScriptPath, @"echo > %temp%\ScriptTestingFile.txt");
 
             var cleanupScriptName = "cleanupScript_" + guid + ".bat";
-            var cleanupScriptPath = Path.Combine(Path.GetTempPath(), cleanupScriptName);
+            var cleanupScriptPath = Path.Combine(GetTempPath(), cleanupScriptName);
             File.WriteAllText(cleanupScriptPath, @"del %temp%\ScriptTestingFile.txt");
 
             var runsettingsFormat = @"<RunSettings>
@@ -355,7 +351,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 0, 0);
 
             // Validate cleanup script ran
-            var scriptPath = Path.Combine(Path.GetTempPath(), "ScriptTestingFile.txt");
+            var scriptPath = Path.Combine(GetTempPath(), "ScriptTestingFile.txt");
             Assert.IsFalse(File.Exists(scriptPath));
 
             // Cleanup script files
@@ -539,9 +535,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
             CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
             return runsettingsPath;
         }
@@ -625,7 +619,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (!this.IsDesktopRunner() && !this.IsDesktopTargetFramework())
             {
-                // we create dotnet vsconsole, and 2 dotnet test hosts 
+                // we create dotnet vsconsole, and 2 dotnet test hosts
                 return 3;
             }
 

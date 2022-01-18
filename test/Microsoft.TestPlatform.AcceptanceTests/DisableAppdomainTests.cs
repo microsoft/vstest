@@ -52,8 +52,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                  };
 
             var resultsDir = GetResultsDirectory();
-            var diableAppdomainTest1 = testEnvironment.GetTestAsset("DisableAppdomainTest1.dll", "net451");
-            var diableAppdomainTest2 = testEnvironment.GetTestAsset("DisableAppdomainTest2.dll", "net451");
             var arguments = PrepareArguments(
                 testAssembly,
                 string.Empty,
@@ -68,9 +66,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
             CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
             return runsettingsPath;
         }

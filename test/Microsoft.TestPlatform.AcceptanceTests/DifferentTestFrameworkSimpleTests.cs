@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var runSettingsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".runsettings");
+            var runSettingsFilePath = Path.Combine(GetTempPath(), Guid.NewGuid() + ".runsettings");
 
             //test the iterationCount setting for WebTestRunConfiguration in run settings
             var runSettingsXml = $@"<?xml version='1.0' encoding='utf-8'?>
