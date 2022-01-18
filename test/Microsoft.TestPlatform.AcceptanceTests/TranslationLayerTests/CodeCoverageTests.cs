@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.	
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Threading;
     using System.Threading.Tasks;
     using Castle.Core.Internal;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -22,13 +22,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestCategory("Windows-Review")]
     public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
+        private TestConsoleWrapperContext wrapperContext;
         private RunEventHandler runEventHandler;
         private TestRunAttachmentsProcessingEventHandler testRunAttachmentsProcessingEventHandler;
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.wrapperContext = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
             this.testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
         }
@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             // act
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
 
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             // act
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1, true), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(1, true), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
 
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             // act
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(4), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetCodeCoverageRunSettings(4), new TestPlatformOptions { CollectMetrics = true }, this.runEventHandler);
 
             // assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
@@ -127,15 +127,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(
+            await this.wrapperContext.VsTestConsoleWrapper.ProcessTestRunAttachmentsAsync(
                 runEventHandler.Attachments,
                 withInvokedDataCollectors ? runEventHandler.InvokedDataCollectors : null,
                 withInvokedDataCollectors ? this.GetCodeCoverageRunSettings(1) : null,
@@ -183,15 +183,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.wrapperContext.VsTestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
@@ -235,16 +235,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
 
             Assert.AreEqual(9, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(3, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(3, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.wrapperContext.VsTestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
@@ -291,15 +291,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.wrapperContext.VsTestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
@@ -348,17 +348,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Cobertura"), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Cobertura"), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Cobertura"), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1, outputFormat: "Cobertura"), this.runEventHandler);
 
             Assert.AreEqual(12, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(4, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(4, this.runEventHandler.InvokedDataCollectors.Count);
 
             // act
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.wrapperContext.VsTestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
@@ -412,22 +412,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
-            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
 
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(2, this.runEventHandler.Attachments.Count);
             Assert.AreEqual(2, this.runEventHandler.InvokedDataCollectors.Count);
 
-            await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
+            await this.wrapperContext.VsTestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // act
-            this.vstestConsoleWrapper?.EndSession();
+            this.wrapperContext.VsTestConsoleWrapper?.EndSession();
 
             // Assert
             Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
 
-            this.vstestConsoleWrapper = null;
+            this.wrapperContext = null;
         }
 
         private IList<string> GetTestAssemblies()

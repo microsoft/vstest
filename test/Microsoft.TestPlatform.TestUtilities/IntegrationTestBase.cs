@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.TestUtilities
 {
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -506,7 +505,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        public TestConsoleWrapperContext GetVsTestConsoleWrapper()
         {
             var logFileDir = Path.Combine(GetTempPath(), "VSTestConsoleWrapperLogs");
 
@@ -541,7 +540,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
             vstestConsoleWrapper.StartSession();
 
-            return vstestConsoleWrapper;
+            return new TestConsoleWrapperContext(vstestConsoleWrapper, logFileDir);
         }
 
         /// <summary>
@@ -747,6 +746,24 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             return string.Join(" ", assertFullPaths);
+        }
+
+        protected static string GetDiagArg(string rootDir)
+            => " --diag:" + Path.Combine(rootDir, "log.txt");
+
+        /// <summary>
+        /// Counts the number of logs following the '*.host.*' pattern in the given folder.
+        /// </summary>
+        protected static int CountTestHostLogs(string diagLogsDir)
+            => Directory.GetFiles(diagLogsDir, "*.host.*").Length;
+
+        protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
+        {
+            var processCreatedCount = CountTestHostLogs(diagLogsDir);
+            Assert.AreEqual(
+                expectedNumOfProcessCreated,
+                processCreatedCount,
+                $"Number of {string.Join(", ", testHostProcessNames)} process created, expected: {expectedNumOfProcessCreated} actual: {processCreatedCount} {(arguments == null ? "" : "args: " + arguments)} {(runnerPath == null ? "" : "runner path: " + runnerPath)}");
         }
 
         /// <summary>

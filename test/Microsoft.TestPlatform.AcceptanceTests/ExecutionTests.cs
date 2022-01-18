@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-    using System.Threading;
 
     using global::TestPlatform.TestUtilities;
 
@@ -65,26 +64,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
-            string testhostProcessName = string.Empty;
-            // for the desktop we will run testhost.x86 in two copies, but for core 
-            // we will run a combination of testhost.x86 and dotnet, where the dotnet will be 
+            arguments += GetDiagArg(resultsDir);
+
+            // for the desktop we will run testhost.x86 in two copies, but for core
+            // we will run a combination of testhost.x86 and dotnet, where the dotnet will be
             // the test console, and sometimes it will be the test host (e.g dotnet, dotnet, testhost.x86, or dotnet, testhost.x86, testhost.x86)
             // based on the target framework
             int expectedNumOfProcessCreated = this.IsDesktopRunner() ? 2 : 3;
-            var testhostProcessNames = new[] { "testhost.x86", "dotnet" };
-
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testhostProcessNames);
+            var testHostProcessNames = new[] { "testhost.x86", "dotnet" };
 
             this.InvokeVsTest(arguments);
 
-            cts.Cancel();
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, resultsDir, testHostProcessNames);
             this.ValidateSummaryStatus(2, 2, 2);
             this.ExitCodeEquals(1); // failing tests
             TryRemoveDirectory(resultsDir);

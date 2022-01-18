@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
     using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
@@ -18,19 +17,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
+        private TestConsoleWrapperContext wrapperContext;
         private RunEventHandler runEventHandler;
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.wrapperContext = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
         }
 
 
@@ -47,7 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                   this.GetAssetFullPath("NUTestProject.dll")
                               };
 
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 sources,
                 this.GetDefaultRunSettings(),
                 this.runEventHandler);
@@ -94,9 +93,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             var sources = new List<string> { testAssemblyPath };
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(UnitTestFramework.XUnit), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+            this.wrapperContext.VsTestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 sources,
                 this.GetDefaultRunSettings(),
                 this.runEventHandler);
@@ -134,9 +133,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                               };
 
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(UnitTestFramework.Chutzpah), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+            this.wrapperContext.VsTestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 sources,
                 this.GetDefaultRunSettings(),
                 this.runEventHandler);

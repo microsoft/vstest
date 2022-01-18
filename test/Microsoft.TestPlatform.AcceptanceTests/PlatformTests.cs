@@ -3,10 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
-    using System.Threading;
-
-    using global::TestPlatform.TestUtilities;
-
+    using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -42,12 +39,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);
         }
 
-        private void SetExpectedParams(ref int expectedNumOfProcessCreated, ref string testhostProcessName, string desktopHostProcessName)
-        {
-            testhostProcessName = desktopHostProcessName;
-            expectedNumOfProcessCreated = 1;
-        }
-
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
         {
             var resultsDir = GetResultsDirectory();
@@ -57,21 +48,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
                 this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
-            arguments = string.Concat(arguments, platformArg);
 
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testhostProcessName);
-
+            arguments = string.Concat(arguments, platformArg, GetDiagArg(resultsDir));
             this.InvokeVsTest(arguments);
 
-            cts.Cancel();
-
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, resultsDir, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
             this.ValidateSummaryStatus(1, 1, 1);
             TryRemoveDirectory(resultsDir);
         }

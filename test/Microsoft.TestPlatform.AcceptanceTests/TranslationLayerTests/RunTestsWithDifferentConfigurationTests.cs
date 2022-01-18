@@ -3,8 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using global::TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,7 +11,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.IO;
     using System.Linq;
     using System.Text;
-    using System.Threading;
 
     /// <summary>
     /// The Run Tests using VsTestConsoleWrapper API's
@@ -23,19 +21,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private const string Netcoreapp = "netcoreapp";
         private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
+        private TestConsoleWrapperContext wrapperContext;
         private RunEventHandler runEventHandler;
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.wrapperContext = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
+            TryRemoveDirectory(this.wrapperContext.LogsDirPath);
         }
 
         [TestMethod]
@@ -47,9 +46,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
+            this.wrapperContext.VsTestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
                 this.runEventHandler);
@@ -80,17 +79,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var testHostNames = new[] { "testhost", "testhost.x86", "dotnet" };
             int expectedNumOfProcessCreated = 2;
 
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testHostNames);
-
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
                 runSettingsXml,
                 this.runEventHandler);
-
-            cts.Cancel();
 
             // Assert
             this.runEventHandler.EnsureSuccess();
@@ -98,10 +90,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result.Count,
-                $"Number of '{ string.Join(", ", testHostNames) }' process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result.Count} ({ string.Join(", ", numOfProcessCreatedTask.Result) })");
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.wrapperContext.LogsDirPath, testHostNames);
         }
 
         [TestMethod]
@@ -123,7 +112,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                   this.GetAssetFullPath("MstestV1UnitTestProject.dll")
                               };
 
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 sources,
                 runSettings,
                 this.runEventHandler);
@@ -154,26 +143,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             int expectedNumOfProcessCreated = 1;
             var testhostProcessNames = new[] { "testhost", "dotnet" };
 
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts, testhostProcessNames);
-
-            this.vstestConsoleWrapper.RunTests(
+            this.wrapperContext.VsTestConsoleWrapper.RunTests(
                 sources,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
                 this.runEventHandler);
 
-            cts.Cancel();
-
             // Assert
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            var numberOfProcessCreated = numOfProcessCreatedTask.Result;
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numberOfProcessCreated.Count,
-                $"Number of { string.Join(" ,", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {numberOfProcessCreated.Count} ({ string.Join(", ", numberOfProcessCreated) })");
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.wrapperContext.LogsDirPath, testhostProcessNames);
         }
 
         private IList<string> GetTestAssemblies()

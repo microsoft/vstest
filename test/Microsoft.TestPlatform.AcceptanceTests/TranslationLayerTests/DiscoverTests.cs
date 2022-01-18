@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -18,13 +17,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class DiscoverTests : AcceptanceTestBase
     {
-        private IVsTestConsoleWrapper vstestConsoleWrapper;
+        private TestConsoleWrapperContext wrapperContext;
         private DiscoveryEventHandler discoveryEventHandler;
         private DiscoveryEventHandler2 discoveryEventHandler2;
 
         public void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.wrapperContext = this.GetVsTestConsoleWrapper();
             this.discoveryEventHandler = new DiscoveryEventHandler();
             this.discoveryEventHandler2 = new DiscoveryEventHandler2();
         }
@@ -32,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestCleanup]
         public void Cleanup()
         {
-            this.vstestConsoleWrapper?.EndSession();
+            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -44,7 +43,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             this.Setup();
 
-            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
+            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
 
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
@@ -58,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.DiscoverTests(
+            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = false },
@@ -77,7 +76,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
 
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
@@ -105,7 +104,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.vstestConsoleWrapper.DiscoverTests(
+            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 runSettingsXml,
                 null,
@@ -133,7 +132,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.vstestConsoleWrapper.DiscoverTests(
+            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 runSettingsXml,
                 discoveryEventHandlerForBatchSize);
@@ -151,7 +150,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.vstestConsoleWrapper.DiscoverTests(
+            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
                 this.discoveryEventHandler);
@@ -196,11 +195,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Act
             var discoveryTask = Task.Run(() =>
             {
-                this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), discoveryEvents.Object);
+                this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), discoveryEvents.Object);
             });
 
             Task.Delay(2000).Wait();
-            vstestConsoleWrapper.CancelDiscovery();
+            wrapperContext.VsTestConsoleWrapper.CancelDiscovery();
             discoveryTask.Wait();
 
             // Assert.

@@ -556,6 +556,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            arguments += GetDiagArg(resultsDir);
 
             if (!string.IsNullOrWhiteSpace(additionalArgs))
             {
@@ -567,20 +568,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 arguments = string.Concat(arguments, " -- ", runSettingsArgs);
             }
 
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testhostProcessNames);
-
             this.InvokeVsTest(arguments);
-            cts.Cancel();
 
-            var processesCreated = numOfProcessCreatedTask.Result;
             // assert
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                processesCreated.Count,
-                $"Number of { string.Join(", ", testhostProcessNames) } process created, expected: {expectedNumOfProcessCreated} actual: {processesCreated.Count} ({ string.Join(", ", processesCreated) }) args: {arguments} runner path: {this.GetConsoleRunnerPath()}");
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, resultsDir, testhostProcessNames, arguments, this.GetConsoleRunnerPath());
             this.ValidateSummaryStatus(2, 2, 2);
 
             //cleanup
