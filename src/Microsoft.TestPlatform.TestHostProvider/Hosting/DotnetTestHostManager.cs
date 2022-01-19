@@ -418,7 +418,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 // If already running with the dotnet executable and the architecture is compatible, use it; otherwise search the correct muxer architecture on disk.
                 else if (isRunningWithDotnetMuxer && isSameArchitecture && !forceToX64)
                 {
-                    EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Compatible muxer architecture of running process '{0}'", this.platformEnvironment.Architecture);
+                    EqtTrace.Verbose("DotnetTestHostmanager.LaunchTestHostAsync: Compatible muxer architecture of running process '{0}' and target architecture '{1}'", this.processHelper.GetCurrentProcessArchitecture(), this.architecture);
                     startInfo.FileName = currentProcessPath;
                 }
                 else
