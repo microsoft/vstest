@@ -226,7 +226,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
                 new AttachmentSet(new Uri(uri1), "uri1_input")
             };
 
-            mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Throws(new Exception("exception message"));
+            var exceptionToThrow = new Exception("exception message");
+            mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>())).Throws(exceptionToThrow);
 
             // act
             await manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], mockEventsHandler.Object, cancellationTokenSource.Token);
@@ -234,7 +235,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             // assert
             VerifyCompleteEvent(false, false, inputAttachments[0]);
             mockEventsHandler.Verify(h => h.HandleTestRunAttachmentsProcessingProgress(It.IsAny<TestRunAttachmentsProcessingProgressEventArgs>()), Times.Never);
-            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, "exception message"), Times.Once);
+            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, exceptionToThrow.ToString()), Times.Once);
             mockAttachmentHandler1.Verify(h => h.GetExtensionUris());
             mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Once);
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.Is<ICollection<AttachmentSet>>(c => c.Count == 1 && c.Contains(inputAttachments[0])), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), cancellationTokenSource.Token));
