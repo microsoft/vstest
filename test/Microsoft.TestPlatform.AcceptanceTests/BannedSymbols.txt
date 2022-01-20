@@ -1,4 +1,3 @@
-﻿
-M:System.IO.Path.GetTempPath(); Use 'IntegrationTestBase.GetTempPath()' instead
+﻿M:System.IO.Path.GetTempPath(); Use 'IntegrationTestBase.GetTempPath()' instead
 M:System.Environment.SetEnvironmentVariable(System.String,System.String); Use one of the overload accepting a dictionary of environment variable instead
 M:System.Environment.SetEnvironmentVariable(System.String,System.String,System.EnvironmentVariableTarget); Use one of the overload accepting a dictionary of environment variable instead
