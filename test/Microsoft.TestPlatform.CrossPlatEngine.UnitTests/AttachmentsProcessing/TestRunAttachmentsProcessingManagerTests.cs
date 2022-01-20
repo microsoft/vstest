@@ -834,6 +834,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             await manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], mockEventsHandler.Object, cancellationTokenSource.Token);
 
             // assert
+            // We expect that first attachment is still returned as-is because not processed.
+            VerifyCompleteEvent(false, false, inputAttachments.First());
             mockAttachmentHandler1.Verify(h => h.GetExtensionUris(), Times.Never);
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
 
