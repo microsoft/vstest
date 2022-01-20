@@ -820,7 +820,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
         }
 
         [TestMethod]
-        public async Task ProcessTestRunAttachmentsAsync_ShouldSkipAttachmentIfDoesNotSupportIncrementalProcessing()
+        public async Task ProcessTestRunAttachmentsAsync_ShouldSkipAttachmentProcessorIfDoesNotSupportIncrementalProcessing()
         {
             // arrange
             List<AttachmentSet> inputAttachments = new List<AttachmentSet>
