@@ -19,13 +19,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
-            using var workingDir = new TempDirectory();
-            var trxFilePath = Path.Combine(workingDir.Path, trxFileName);
+            using var tempDir = new TempDirectory();
+            var trxFilePath = Path.Combine(tempDir.Path, trxFileName);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{workingDir.Path}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
 
             // Delete if already exists
-            TempDirectory.TryRemoveDirectory(workingDir.Path);
+            TempDirectory.TryRemoveDirectory(tempDir.Path);
 
             this.InvokeVsTest(arguments);
 

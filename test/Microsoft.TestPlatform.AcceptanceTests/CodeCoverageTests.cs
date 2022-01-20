@@ -205,10 +205,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
         {
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = this.CreateArguments(workingDir, runnerInfo, testParameters, out var trxFilePath);
+            var arguments = this.CreateArguments(tempDir, runnerInfo, testParameters, out var trxFilePath);
 
             this.InvokeVsTest(arguments);
 
@@ -217,8 +217,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testParameters.ExpectedSkippedTests,
                 testParameters.ExpectedFailedTests);
 
-            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, workingDir.Path);
-            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {workingDir.Path} trxfile: {trxFilePath}");
+            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, tempDir.Path);
+            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {tempDir.Path} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
             if (testParameters.RunSettingsType == TestParameters.SettingsType.XmlOutput)
@@ -234,7 +234,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(actualCoverageFile.EndsWith(".coverage", StringComparison.InvariantCultureIgnoreCase));
             }
 
-            var coverageDocument = this.GetXmlCoverage(actualCoverageFile, workingDir);
+            var coverageDocument = this.GetXmlCoverage(actualCoverageFile, tempDir);
             if (testParameters.CheckSkipped)
             {
                 this.AssertSkippedMethod(coverageDocument);
@@ -244,7 +244,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         private string CreateArguments(
-            TempDirectory workingDir,
+            TempDirectory tempDir,
             RunnerInfo runnerInfo,
             TestParameters testParameters,
             out string trxFilePath)
@@ -254,14 +254,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
-            string diagFileName = Path.Combine(workingDir.Path, "diaglog.txt");
+            string diagFileName = Path.Combine(tempDir.Path, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-                this.FrameworkArgValue, runnerInfo.InIsolationValue, workingDir.Path);
+                this.FrameworkArgValue, runnerInfo.InIsolationValue, tempDir.Path);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}");
             arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
-            trxFilePath = Path.Combine(workingDir.Path, Guid.NewGuid() + ".trx");
+            trxFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             var defaultRunSettingsPath = Path.Combine(

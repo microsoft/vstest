@@ -18,9 +18,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // is to not crash the process when we are running in debug, and debugger is attached
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
             var assemblyPath = this.BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             this.InvokeVsTest(arguments);
 
             // this will have failed tests when our trace listener works and crash the testhost process when it does not

@@ -24,16 +24,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-            string runSettings = this.GetRunsettingsFilePath(workingDir);
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workingDir.Path);
+            string runSettings = this.GetRunsettingsFilePath(tempDir);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(3, 0, 0);
-            this.VaildateDataCollectorOutput(workingDir);
+            this.VaildateDataCollectorOutput(tempDir);
             this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
             this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
             this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
@@ -47,10 +47,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
-            string runSettings = this.GetRunsettingsFilePath(workingDir);
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workingDir.Path);
+            string runSettings = this.GetRunsettingsFilePath(tempDir);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
             this.InvokeVsTest(arguments);
 
@@ -85,10 +85,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return runsettingsPath;
         }
 
-        private void VaildateDataCollectorOutput(TempDirectory workingDir)
+        private void VaildateDataCollectorOutput(TempDirectory tempDir)
         {
             // Verify attachments
-            var di = new DirectoryInfo(workingDir.Path);
+            var di = new DirectoryInfo(tempDir.Path);
             var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
                 .OrderBy(d => d.CreationTime)
                 .Select(d => d.FullName)

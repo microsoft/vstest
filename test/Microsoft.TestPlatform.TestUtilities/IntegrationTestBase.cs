@@ -764,7 +764,20 @@ namespace Microsoft.TestPlatform.TestUtilities
                 .Count(filePath =>
                 {
                     var firstLine = File.ReadLines(filePath).FirstOrDefault();
-                    return testHostProcessNames.Any(processName => firstLine.Contains(processName));
+                    return testHostProcessNames.Any(processName =>
+                    {
+                        var parts = processName.Split('.');
+                        if (parts.Length > 2)
+                        {
+                            throw new InvalidOperationException("");
+                        }
+
+                        var hostName = parts[0];
+                        var platformName = parts.Length > 1 ? @$"\.{parts[1]}" : string.Empty;
+
+                        var isMatch = Regex.IsMatch(firstLine, @$",\s{hostName}(?:\.net\d+)?{platformName}\.(?:exe|dll),");
+                        return isMatch;
+                    });
                 });
 
         protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)

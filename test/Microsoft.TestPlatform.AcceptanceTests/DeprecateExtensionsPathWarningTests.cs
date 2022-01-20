@@ -68,8 +68,8 @@
         [TestMethod]
         public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
         {
-            using var workingDir = new TempDirectory();
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), null, null, this.FrameworkArgValue, resultsDirectory: workingDir.Path);
+            using var tempDir = new TempDirectory();
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), null, null, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
             this.InvokeVsTest(arguments);
             this.StdOutputContains("Adapter lookup is being changed, please follow");

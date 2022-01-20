@@ -16,13 +16,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
@@ -34,13 +34,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=Categorya\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
@@ -52,13 +52,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -70,13 +70,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(
                 arguments,
                 " /TestCaseFilter:\"FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest\"");
@@ -90,13 +90,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -108,13 +108,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -126,13 +126,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -148,13 +148,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -175,13 +175,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
             this.InvokeVsTest(arguments);
@@ -208,14 +208,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             string testAssemblyPath = this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll");
             var arguments = PrepareArguments(
                 testAssemblyPath,
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+                runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
 

@@ -25,22 +25,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            using var workingDir = new TempDirectory();
-            var testAppDomainDetailFileName = Path.Combine(workingDir.Path, "appdomain_test.txt");
-            var dataCollectorAppDomainDetailFileName = Path.Combine(workingDir.Path, "appdomain_datacollector.txt");
+            using var tempDir = new TempDirectory();
+            var testAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_test.txt");
+            var dataCollectorAppDomainDetailFileName = Path.Combine(tempDir.Path, "appdomain_datacollector.txt");
 
             // Delete test output files if already exist
             File.Delete(testAppDomainDetailFileName);
             File.Delete(dataCollectorAppDomainDetailFileName);
 
-            var runsettingsFilePath = this.GetInProcDataCollectionRunsettingsFile(true, workingDir);
+            var runsettingsFilePath = this.GetInProcDataCollectionRunsettingsFile(true, tempDir);
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
                 this.FrameworkArgValue,
                 runnerInfo.InIsolationValue,
-                workingDir.Path);
+                tempDir.Path);
 
             // Sets the environment variables used by the test project and test data collector.
             var env = new Dictionary<string, string>

@@ -18,10 +18,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);

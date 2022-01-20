@@ -78,7 +78,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            var testHostNames = new[] { "testhost", "testhost.x86", "dotnet" };
+            var testHostNames = new[] { "testhost", "testhost.x86" };
             int expectedNumOfProcessCreated = 2;
 
             this.vstestConsoleWrapper.RunTests(
@@ -103,8 +103,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
-            using var workingDir = new TempDirectory();
-            var testsettingsFile = Path.Combine(workingDir.Path, "tempsettings.testsettings");
+            using var tempDir = new TempDirectory();
+            var testsettingsFile = Path.Combine(tempDir.Path, "tempsettings.testsettings");
             string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
 
             File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
 
             int expectedNumOfProcessCreated = 1;
-            var testhostProcessNames = new[] { "testhost", "dotnet" };
+            var testhostProcessNames = new[] { "testhost" };
 
             this.vstestConsoleWrapper.RunTests(
                 sources,

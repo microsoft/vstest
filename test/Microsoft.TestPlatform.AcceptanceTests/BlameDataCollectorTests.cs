@@ -29,15 +29,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
         {
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{workingDir.Path}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput(workingDir, "BlameUnitTestProject.UnitTest1.TestMethod2");
+            this.VaildateOutput(tempDir, "BlameUnitTestProject.UnitTest1.TestMethod2");
         }
 
         [TestMethod]
@@ -47,13 +47,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
         {
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{workingDir.Path}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
 
             var env = new Dictionary<string, string>
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments, env);
 
-            this.VaildateOutput(workingDir, "SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
+            this.VaildateOutput(tempDir, "SampleUnitTestProject3.UnitTest1.ExitWithStackoverFlow", validateDumpFile: true);
         }
 
         [TestMethod]
@@ -73,13 +73,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
         {
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{workingDir.Path}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
             var env = new Dictionary<string, string>
@@ -99,13 +99,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
         {
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame:CollectDump;CollectAlways=True");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{workingDir.Path}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{tempDir.Path}");
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest");
 
             var env = new Dictionary<string, string>
@@ -311,14 +311,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private void VaildateOutput(TempDirectory workingDir, string testName, bool validateDumpFile = false)
+        private void VaildateOutput(TempDirectory tempDir, string testName, bool validateDumpFile = false)
         {
             bool isSequenceAttachmentReceived = false;
             bool isDumpAttachmentReceived = false;
             bool isValid = false;
             this.StdErrorContains(testName);
             this.StdOutputContains("Sequence_");
-            var resultFiles = Directory.GetFiles(workingDir.Path, "*", SearchOption.AllDirectories);
+            var resultFiles = Directory.GetFiles(tempDir.Path, "*", SearchOption.AllDirectories);
 
             foreach (var file in resultFiles)
             {

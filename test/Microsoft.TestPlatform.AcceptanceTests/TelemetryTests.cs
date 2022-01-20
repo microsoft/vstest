@@ -48,16 +48,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
 
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
             var env = new Dictionary<string, string>
             {
-                [LOG_TELEMETRY_PATH] = workingDir.Path,
+                [LOG_TELEMETRY_PATH] = tempDir.Path,
                 [TELEMETRY_OPTEDIN] = "1",
                 [LOG_TELEMETRY] = "1",
             };
 
             this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty, env);
-            this.ValidateOutput("Execution", workingDir);
+            this.ValidateOutput("Execution", tempDir);
         }
 
         private void DiscoverTests(string runnerFramework)
@@ -70,27 +70,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
 
-            using var workingDir = new TempDirectory();
+            using var tempDir = new TempDirectory();
             var env = new Dictionary<string, string>
             {
-                [LOG_TELEMETRY_PATH] = workingDir.Path,
+                [LOG_TELEMETRY_PATH] = tempDir.Path,
                 [TELEMETRY_OPTEDIN] = "1",
                 [LOG_TELEMETRY] = "1",
             };
 
             this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, env);
-            this.ValidateOutput("Discovery", workingDir);
+            this.ValidateOutput("Discovery", tempDir);
         }
 
-        private void ValidateOutput(string command, TempDirectory workingDir)
+        private void ValidateOutput(string command, TempDirectory tempDir)
         {
-            if (!Directory.Exists(workingDir.Path))
+            if (!Directory.Exists(tempDir.Path))
             {
-                Assert.Fail("Could not find the telemetry logs folder at {0}", workingDir.Path);
+                Assert.Fail("Could not find the telemetry logs folder at {0}", tempDir.Path);
             }
 
             bool isValid = false;
-            var directory = new DirectoryInfo(workingDir.Path);
+            var directory = new DirectoryInfo(tempDir.Path);
             var file = directory.GetFiles().OrderByDescending(f => f.CreationTime).First();
 
             string[] lines = File.ReadAllLines(file.FullName);
