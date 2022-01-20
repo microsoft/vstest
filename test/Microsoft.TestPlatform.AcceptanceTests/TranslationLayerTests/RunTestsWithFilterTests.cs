@@ -3,7 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,19 +16,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunTestsWithFilterTests : AcceptanceTestBase
     {
-        private TestConsoleWrapperContext wrapperContext;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
         private void Setup()
         {
-            this.wrapperContext = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                   this.GetAssetFullPath("SimpleTestProject.dll")
                               };
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 sources,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest" },
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                   this.GetAssetFullPath("SimpleTestProject.dll")
                               };
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 sources,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName=SampleUnitTestProject.UnitTest1.PassingTest | FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest" },

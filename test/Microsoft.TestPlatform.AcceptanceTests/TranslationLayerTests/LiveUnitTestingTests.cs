@@ -3,7 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
@@ -12,13 +12,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class LiveUnitTestingTests : AcceptanceTestBase
     {
-        private TestConsoleWrapperContext wrapperContext;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler discoveryEventHandler;
         private RunEventHandler runEventHandler;
 
         public void Setup()
         {
-            this.wrapperContext = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.discoveryEventHandler = new DiscoveryEventHandler();
             this.runEventHandler = new RunEventHandler();
         }
@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestCleanup]
         public void Cleanup()
         {
-            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper?.EndSession();
         }
 
 
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.wrapperContext.VsTestConsoleWrapper.DiscoverTests(
+            this.vstestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 runSettingsXml,
                 this.discoveryEventHandler);
@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                         </RunConfiguration>
                                     </RunSettings>";
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
                 runSettingsXml,
                 this.runEventHandler);

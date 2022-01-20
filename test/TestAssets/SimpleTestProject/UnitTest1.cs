@@ -35,7 +35,7 @@ namespace SampleUnitTestProject
         {
 #if NETFRAMEWORK
             // current App domain should be write to file to test DisableAppDomain acceptance test.
-            var appDomainFilePath = Environment.GetEnvironmentVariable("AppDomainTestFilePath");
+            var appDomainFilePath = Environment.GetEnvironmentVariable("AppDomainTestFilePath") ?? Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
             File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: " + AppDomain.CurrentDomain.FriendlyName);
 #endif
             Assert.AreEqual(2, 3);

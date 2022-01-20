@@ -3,7 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
@@ -15,19 +15,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class CustomTestHostTests : AcceptanceTestBase
     {
-        private TestConsoleWrapperContext wrapperContext;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
         private void Setup()
         {
-            this.wrapperContext = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper?.EndSession();
         }
 
 
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.Setup();
 
             var customTestHostLauncher = new CustomTestHostLauncher();
-            this.wrapperContext.VsTestConsoleWrapper.RunTestsWithCustomTestHost(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler, customTestHostLauncher);
+            this.vstestConsoleWrapper.RunTestsWithCustomTestHost(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler, customTestHostLauncher);
 
             // Assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);

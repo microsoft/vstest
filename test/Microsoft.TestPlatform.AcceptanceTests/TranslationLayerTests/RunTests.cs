@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
     using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -20,19 +21,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunTests : AcceptanceTestBase
     {
-        private TestConsoleWrapperContext wrapperContext;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
         private void Setup()
         {
-            this.wrapperContext = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.runEventHandler = new RunEventHandler();
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper?.EndSession();
         }
 
         [TestMethod]
@@ -43,7 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
 
             // Assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
@@ -63,13 +64,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
-            this.wrapperContext.VsTestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper?.EndSession();
 
             // Assert
             Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
 
-            this.wrapperContext = null;
+            this.vstestConsoleWrapper = null;
         }
 
         [TestMethod]
@@ -80,7 +81,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = true },
@@ -104,7 +105,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = false },
@@ -133,7 +134,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             var source = new[] { this.GetAssetFullPath("SimpleTestProject3.dll") };
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 source,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
@@ -165,7 +166,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-            this.wrapperContext.VsTestConsoleWrapper.RunTests(
+            this.vstestConsoleWrapper.RunTests(
                 source,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = veryLongTestCaseFilter },

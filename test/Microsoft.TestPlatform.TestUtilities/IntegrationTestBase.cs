@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.TestUtilities
 {
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -505,9 +506,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public TestConsoleWrapperContext GetVsTestConsoleWrapper()
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out string logFileDir)
         {
-            var logFileDir = Path.Combine(GetResultsDirectory(), "VSTestConsoleWrapperLogs");
+            logFileDir = Path.Combine(GetResultsDirectory(), "VSTestConsoleWrapperLogs");
 
             if (!Directory.Exists(logFileDir))
             {
@@ -540,7 +541,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
             vstestConsoleWrapper.StartSession();
 
-            return new TestConsoleWrapperContext(vstestConsoleWrapper, logFileDir);
+            return vstestConsoleWrapper;
         }
 
         /// <summary>
