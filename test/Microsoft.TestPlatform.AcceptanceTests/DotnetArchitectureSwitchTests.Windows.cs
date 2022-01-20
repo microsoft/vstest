@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [DataRow("X86", "X64")]
         public void Use_EnvironmentVariables(string architectureFrom, string architectureTo)
         {
-            using var workSpace = new Workspace();
+            using var workSpace = new TempDirectory();
             string dotnetPath = GetDownloadedDotnetMuxerFromTools(architectureFrom);
             string dotnetPathTo = GetDownloadedDotnetMuxerFromTools(architectureTo);
             var vstestConsolePath = GetDotnetRunnerPath();

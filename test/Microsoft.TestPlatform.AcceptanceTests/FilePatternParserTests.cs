@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkOnFiles(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
             var testAssembly = this.GetSampleTestAssembly();
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, this.FrameworkArgValue,
-               runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
+               runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkOnArbitraryDepthDirectories(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
             var testAssembly = this.GetSampleTestAssembly();
             var oldAssemblyPath = Path.Combine("Debug", this.testEnvironment.TargetFramework, "SimpleTestProject.dll");
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, string.Empty,
-               runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
+               runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
             var testAssembly = this.GetSampleTestAssembly();
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, string.Empty,
-               runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
+               runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
             var testAssembly = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
             testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
@@ -98,7 +98,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                testAssembly,
                this.GetTestAdapterPath(),
                string.Empty, this.FrameworkArgValue,
-               runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
+               runnerInfo.InIsolationValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(2, 2, 2);

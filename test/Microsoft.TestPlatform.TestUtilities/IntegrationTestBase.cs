@@ -183,7 +183,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             string runSettings = "",
             Dictionary<string, string> environmentVariables = null)
         {
-            using var workspace = new Workspace();
+            using var workspace = new TempDirectory();
 
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
             this.InvokeVsTest(arguments, environmentVariables);
@@ -197,7 +197,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "", Dictionary<string, string> environmentVariables = null)
         {
-            using var workspace = new Workspace();
+            using var workspace = new TempDirectory();
 
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
             arguments = string.Concat(arguments, " /listtests");
@@ -506,17 +506,21 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out string logFileDir)
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
         {
-            logFileDir = Path.Combine(GetResultsDirectory(), "VSTestConsoleWrapperLogs");
+            logFileDir = new TempDirectory();
 
-            if (!Directory.Exists(logFileDir))
+            if (!Directory.Exists(logFileDir.Path))
             {
-                Directory.CreateDirectory(logFileDir);
+                Directory.CreateDirectory(logFileDir.Path);
             }
 
             // Directory is already unique so there is no need to have a unique file name.
-            var logFilePath = Path.Combine(logFileDir, "log.txt");
+            var logFilePath = Path.Combine(logFileDir.Path, "log.txt");
+            if (!File.Exists(logFilePath))
+            {
+                File.Create(logFilePath).Close();
+            }
 
             Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
@@ -772,26 +776,6 @@ namespace Microsoft.TestPlatform.TestUtilities
                 $"Number of {string.Join(", ", testHostProcessNames)} process created, expected: {expectedNumOfProcessCreated} actual: {processCreatedCount} {(arguments == null ? "" : "args: " + arguments)} {(runnerPath == null ? "" : "runner path: " + runnerPath)}");
         }
 
-        /// <summary>
-        /// Creates an unique temporary directory for storing test results.
-        /// </summary>
-        /// <returns>
-        /// Path of the created directory.
-        /// </returns>
-        protected internal static string GetResultsDirectory()
-        {
-            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path
-            // that is cleaned up after every job. This is preferable to use over
-            // just the normal temp.
-            var temp = GetTempPath();
-            var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
-            Directory.CreateDirectory(directoryPath);
-
-            return directoryPath;
-        }
-
-        protected static string GetTempPath() => Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
-
         protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
         {
             if (architecture != "X86" && architecture != "X64")
@@ -811,17 +795,5 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
-
-        protected internal static void TryRemoveDirectory(string directory)
-        {
-            if (Directory.Exists(directory))
-            {
-                try
-                {
-                    Directory.Delete(directory, true);
-                }
-                catch { }
-            }
-        }
     }
 }

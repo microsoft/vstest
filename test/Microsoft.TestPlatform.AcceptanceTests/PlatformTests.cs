@@ -41,18 +41,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
         {
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+                this.testEnvironment.InIsolationValue, resultsDirectory: workingDir.Path);
 
-            arguments = string.Concat(arguments, platformArg, GetDiagArg(workspace.Path));
+            arguments = string.Concat(arguments, platformArg, GetDiagArg(workingDir.Path));
             this.InvokeVsTest(arguments);
 
-            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, workspace.Path, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, workingDir.Path, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
             this.ValidateSummaryStatus(1, 1, 1);
         }
     }

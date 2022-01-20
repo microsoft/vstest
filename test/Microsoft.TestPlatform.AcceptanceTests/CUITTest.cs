@@ -28,8 +28,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-            using var workspace = new Workspace();
-            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: workspace.Path);
+            using var workingDir = new TempDirectory();
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);

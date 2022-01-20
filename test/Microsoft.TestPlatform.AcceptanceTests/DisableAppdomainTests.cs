@@ -52,20 +52,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "DisableAppDomain", "true" }
                                                  };
 
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
             var arguments = PrepareArguments(
                 testAssembly,
                 string.Empty,
-                GetRunsettingsFilePath(workspace, runConfigurationDictionary),
-                this.FrameworkArgValue, resultsDirectory: workspace.Path);
+                GetRunsettingsFilePath(workingDir, runConfigurationDictionary),
+                this.FrameworkArgValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(passedTestCount, 0, 0);
         }
 
-        private string GetRunsettingsFilePath(Workspace workspace, Dictionary<string, string> runConfigurationDictionary)
+        private string GetRunsettingsFilePath(TempDirectory workingDir, Dictionary<string, string> runConfigurationDictionary)
         {
-            var runsettingsPath = Path.Combine(workspace.Path, "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(workingDir.Path, "test_" + Guid.NewGuid() + ".runsettings");
             CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
             return runsettingsPath;
         }

@@ -24,16 +24,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-            string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workspace.Path);
+            string runSettings = this.GetRunsettingsFilePath(workingDir);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(3, 0, 0);
-            this.VaildateDataCollectorOutput(workspace);
+            this.VaildateDataCollectorOutput(workingDir);
             this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
             this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
             this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
@@ -47,10 +47,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
-            string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workspace.Path);
+            string runSettings = this.GetRunsettingsFilePath(workingDir);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workingDir.Path);
 
             this.InvokeVsTest(arguments);
 
@@ -61,9 +61,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdErrorDoesNotContains("Unable to read event log");
         }
 
-        private string GetRunsettingsFilePath()
+        private string GetRunsettingsFilePath(TempDirectory tempDirectory)
         {
-            var runsettingsPath = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
 
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunSettings>
@@ -85,10 +85,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return runsettingsPath;
         }
 
-        private void VaildateDataCollectorOutput(Workspace workspace)
+        private void VaildateDataCollectorOutput(TempDirectory workingDir)
         {
             // Verify attachments
-            var di = new DirectoryInfo(workspace.Path);
+            var di = new DirectoryInfo(workingDir.Path);
             var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
                 .OrderBy(d => d.CreationTime)
                 .Select(d => d.FullName)

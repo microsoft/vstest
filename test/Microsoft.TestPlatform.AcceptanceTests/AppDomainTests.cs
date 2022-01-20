@@ -25,28 +25,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            using var workspace = new Workspace();
-            var testAppDomainDetailFileName = Path.Combine(workspace.Path, "appdomain_test.txt");
-            var dataCollectorAppDomainDetailFileName = Path.Combine(workspace.Path, "appdomain_datacollector.txt");
+            using var workingDir = new TempDirectory();
+            var testAppDomainDetailFileName = Path.Combine(workingDir.Path, "appdomain_test.txt");
+            var dataCollectorAppDomainDetailFileName = Path.Combine(workingDir.Path, "appdomain_datacollector.txt");
 
             // Delete test output files if already exist
             File.Delete(testAppDomainDetailFileName);
             File.Delete(dataCollectorAppDomainDetailFileName);
 
-            var runsettingsFilePath = this.GetInProcDataCollectionRunsettingsFile(true);
+            var runsettingsFilePath = this.GetInProcDataCollectionRunsettingsFile(true, workingDir);
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
                 this.FrameworkArgValue,
                 runnerInfo.InIsolationValue,
-                workspace.Path);
+                workingDir.Path);
 
             // Sets the environment variables used by the test project and test data collector.
             var env = new Dictionary<string, string>
             {
-                ["AppDomainTestFilePath"] = testAppDomainDetailFileName,
-                ["AppDomainDataCollectorFilePath"] = dataCollectorAppDomainDetailFileName,
+                ["TEST_ASSET_APPDOMAIN_TEST_PATH"] = testAppDomainDetailFileName,
+                ["TEST_ASSET_APPDOMAIN_COLLECTOR_PATH"] = dataCollectorAppDomainDetailFileName,
             };
 
             this.InvokeVsTest(arguments, env);
@@ -70,9 +70,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return string.Equals(content1, content2, StringComparison.Ordinal);
         }
 
-        private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain)
+        private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain, TempDirectory tempDirectory)
         {
-            var runSettings = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+            var runSettings = Path.Combine(tempDirectory.Path, "test_" + Guid.NewGuid() + ".runsettings");
             var inprocasm = this.testEnvironment.GetTestAsset("SimpleDataCollector.dll");
 #if !NET451
             var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);

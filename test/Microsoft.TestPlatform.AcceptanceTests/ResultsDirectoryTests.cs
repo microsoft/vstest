@@ -19,13 +19,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
-            using var workspace = new Workspace();
-            var trxFilePath = Path.Combine(workspace.Path, trxFileName);
+            using var workingDir = new TempDirectory();
+            var trxFilePath = Path.Combine(workingDir.Path, trxFileName);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{workspace.Path}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{workingDir.Path}");
 
             // Delete if already exists
-            TryRemoveDirectory(workspace.Path);
+            TempDirectory.TryRemoveDirectory(workingDir.Path);
 
             this.InvokeVsTest(arguments);
 
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
-            TryRemoveDirectory(resultsDirectory);
+            TempDirectory.TryRemoveDirectory(resultsDirectory);
         }
     }
 }

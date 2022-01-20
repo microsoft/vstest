@@ -3,21 +3,18 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
 
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     [TestClass]
     public class DiscoveryTests : AcceptanceTestBase
     {
-        private readonly string dummyFilePath = Path.Combine(GetTempPath(), $"{Guid.NewGuid()}.txt");
-
         [TestMethod]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         [NetCoreTargetFrameworkDataSource]
@@ -59,25 +56,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
+            var dummyFilePath = Path.Combine(workingDir.Path, $"{Guid.NewGuid()}.txt");
 
-            try
-            {
-                AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-                var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
+            var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
-                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
-                arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
-                this.InvokeVsTest(arguments);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: workingDir.Path);
+            arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
+            this.InvokeVsTest(arguments);
 
-                this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
-                this.ExitCodeEquals(0);
-            }
-            finally
-            {
-                File.Delete(this.dummyFilePath);
-            }
+            this.ValidateFullyQualifiedDiscoveredTests(dummyFilePath, listOfTests);
+            this.ExitCodeEquals(0);
         }
 
         [TestMethod]
@@ -86,10 +77,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            using var workspace = new Workspace();
+            using var workingDir = new TempDirectory();
 
             var assetFullPath = this.GetAssetFullPath("SimpleTestProject2.dll");
-            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: workingDir.Path);
             arguments = string.Concat(arguments, " /listtests");
             arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");
             arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");

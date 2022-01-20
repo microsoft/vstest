@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
         private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private string logsDir;
+        private TempDirectory logsDir;
         private RunEventHandler runEventHandler;
 
         [TestInitialize]
@@ -37,11 +37,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestCleanup]
         public void Cleanup()
         {
-            if (this.vstestConsoleWrapper != null)
-            {
-                this.vstestConsoleWrapper?.EndSession();
-                TryRemoveDirectory(this.logsDir);
-            }
+            this.vstestConsoleWrapper?.EndSession();
+            this.logsDir?.Dispose();
         }
 
         [TestMethod]
@@ -95,7 +92,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir, testHostNames);
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir.Path, testHostNames);
         }
 
         [TestMethod]
@@ -106,7 +103,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
-            var testsettingsFile = Path.Combine(GetTempPath(), "tempsettings.testsettings");
+            using var workingDir = new TempDirectory();
+            var testsettingsFile = Path.Combine(workingDir.Path, "tempsettings.testsettings");
             string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
 
             File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
@@ -126,8 +124,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-
-            File.Delete(testsettingsFile);
         }
 
         [TestMethod]
@@ -155,7 +151,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Assert
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir, testhostProcessNames);
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir.Path, testhostProcessNames);
         }
 
         private IList<string> GetTestAssemblies()
