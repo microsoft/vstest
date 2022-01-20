@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
     using Castle.Core.Internal;
@@ -154,13 +155,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
                 Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorUris.Count);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
+                Assert.AreEqual(withInvokedDataCollectors ? 2 : 1, progressArgs.AttachmentProcessorsCount);
                 if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentAttachmentProcessorProgress);
+                    Assert.AreEqual(100, progressArgs.CurrentAttachmentProcessorProgress);
                 }
             }
 
@@ -193,6 +194,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, false, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Count());
+            Assert.IsTrue(Regex.IsMatch(runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Single(),
+                @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
+
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
             Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
@@ -204,13 +210,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
                 Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorUris.Count);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
+                Assert.AreEqual(2, progressArgs.AttachmentProcessorsCount);
                 if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 50 : 100, progressArgs.CurrentAttachmentProcessorProgress);
+                    Assert.AreEqual(100, progressArgs.CurrentAttachmentProcessorProgress);
                 }
             }
 
@@ -241,6 +247,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Count());
+            Assert.IsTrue(Regex.IsMatch(runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Single(),
+                @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
+
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
             Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
 
@@ -252,13 +263,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
+                Assert.AreEqual(2, progressArgs.AttachmentProcessorsCount);
 
-                if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 3)
+                if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentAttachmentProcessorProgress);
+                    Assert.AreEqual(100, progressArgs.CurrentAttachmentProcessorProgress);
                 }
             }
 
@@ -291,6 +302,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Count());
+            Assert.IsTrue(Regex.IsMatch(runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Single(),
+                @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
+
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
             Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
             Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments.Count);
@@ -304,13 +320,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
+                Assert.AreEqual(2, progressArgs.AttachmentProcessorsCount);
 
-                if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 3)
+                if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentAttachmentProcessorProgress);
+                    Assert.AreEqual(100, progressArgs.CurrentAttachmentProcessorProgress);
                 }
             }
 
@@ -345,6 +361,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             await this.vstestConsoleWrapper.ProcessTestRunAttachmentsAsync(runEventHandler.Attachments, runEventHandler.InvokedDataCollectors, this.GetCodeCoverageRunSettings(1, outputFormat: "Coverage"), true, true, testRunAttachmentsProcessingEventHandler, CancellationToken.None);
 
             // Assert
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.FilePath).Distinct().Count());
+            Assert.AreEqual(1, runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Count());
+            Assert.IsTrue(Regex.IsMatch(runEventHandler.InvokedDataCollectors.Select(x => x.AssemblyQualifiedName).Distinct().Single(),
+                @"Microsoft\.VisualStudio\.Coverage\.DynamicCoverageDataCollectorWithAttachmentProcessor, Microsoft\.VisualStudio\.TraceDataCollector, Version=.*, Culture=neutral, PublicKeyToken=.*"));
+
+
             testRunAttachmentsProcessingEventHandler.EnsureSuccess();
             Assert.AreEqual(1, this.testRunAttachmentsProcessingEventHandler.Attachments.Count);
             Assert.AreEqual(2, this.testRunAttachmentsProcessingEventHandler.Attachments[0].Attachments.Count);
@@ -359,13 +381,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             for (int i = 0; i < testRunAttachmentsProcessingEventHandler.ProgressArgs.Count; i++)
             {
                 VisualStudio.TestPlatform.ObjectModel.Client.TestRunAttachmentsProcessingProgressEventArgs progressArgs = testRunAttachmentsProcessingEventHandler.ProgressArgs[i];
-                Assert.AreEqual(1, progressArgs.CurrentAttachmentProcessorIndex);
+                Assert.AreEqual(i + 1, progressArgs.CurrentAttachmentProcessorIndex);
                 Assert.AreEqual("datacollector://microsoft/CodeCoverage/2.0", progressArgs.CurrentAttachmentProcessorUris.First().AbsoluteUri);
-                Assert.AreEqual(1, progressArgs.AttachmentProcessorsCount);
 
-                if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 3)
+                // We have two processor because we append always CodeCoverage attachment processor shipped with VSTest+Attachment processor shipped from code coverage repo.
+                Assert.AreEqual(2, progressArgs.AttachmentProcessorsCount);
+
+                if (testRunAttachmentsProcessingEventHandler.ProgressArgs.Count == 2)
                 {
-                    Assert.AreEqual(i == 0 ? 33 : i == 1 ? 66 : 100, progressArgs.CurrentAttachmentProcessorProgress);
+                    Assert.AreEqual(100, progressArgs.CurrentAttachmentProcessorProgress);
                 }
             }
 
