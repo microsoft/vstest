@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
@@ -15,13 +15,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestCategory("Windows-Review")]
     public class EventLogCollectorTests : AcceptanceTestBase
     {
-        private readonly string resultsDir;
-
-        public EventLogCollectorTests()
-        {
-            this.resultsDir = GetResultsDirectory();
-        }
-
         // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
         // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
         [Ignore]
@@ -31,15 +24,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
+            using var workspace = new Workspace();
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(3, 0, 0);
-            this.VaildateDataCollectorOutput();
+            this.VaildateDataCollectorOutput(workspace);
             this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
             this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
             this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
@@ -53,9 +47,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+            using var workspace = new Workspace();
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
 
@@ -90,10 +85,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return runsettingsPath;
         }
 
-        private void VaildateDataCollectorOutput()
+        private void VaildateDataCollectorOutput(Workspace workspace)
         {
             // Verify attachments
-            var di = new DirectoryInfo(this.resultsDir);
+            var di = new DirectoryInfo(workspace.Path);
             var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
                 .OrderBy(d => d.CreationTime)
                 .Select(d => d.FullName)

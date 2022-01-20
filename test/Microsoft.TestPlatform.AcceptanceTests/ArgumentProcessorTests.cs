@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -38,8 +39,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var testResults = GetResultsDirectory();
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: testResults);
+            using var workspace = new Workspace();
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: workspace.Path);
             arguments = string.Concat(arguments, " /badArgument");
 
             this.InvokeVsTest(arguments);
@@ -57,8 +58,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             //Check for message which guides using help option
             this.StdErrorContains("Please use the /help option to check the list of valid arguments");
-
-            TryRemoveDirectory(testResults);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace SimpleDataCollector
             Console.WriteLine(testSessionStartArgs.Configuration);
             File.WriteAllText(this.fileName, "TestSessionStart : " + testSessionStartArgs.Configuration + "\r\n");
 #if NETFRAMEWORK
-            var appDomainFilePath = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
+            var appDomainFilePath = Environment.GetEnvironmentVariable("AppDomainDataCollectorFilePath");
             File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: "+ AppDomain.CurrentDomain.FriendlyName);
 #endif
         }
@@ -68,7 +68,7 @@ namespace SimpleDataCollector
         /// </param>
         public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
         {
-            Console.WriteLine("TestCase Name:{0}, TestCase ID:{1}, OutCome:{2}", testCaseEndArgs.DataCollectionContext.TestCase.DisplayName, testCaseEndArgs.DataCollectionContext.TestCase.Id, testCaseEndArgs.TestOutcome);            
+            Console.WriteLine("TestCase Name:{0}, TestCase ID:{1}, OutCome:{2}", testCaseEndArgs.DataCollectionContext.TestCase.DisplayName, testCaseEndArgs.DataCollectionContext.TestCase.Id, testCaseEndArgs.TestOutcome);
             File.AppendAllText(this.fileName, "TestCaseEnd : " + testCaseEndArgs.DataCollectionContext.TestCase.DisplayName + "\r\n");
         }
 

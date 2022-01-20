@@ -18,14 +18,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
             var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
-            var arguments = PrepareArguments(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -101,16 +99,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDir);
+                runnerInfo.InIsolationValue, workspace.Path);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -119,7 +115,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
 
             string testAssemblyPath;
             // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
@@ -136,28 +132,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDir);
+                runnerInfo.InIsolationValue, workspace.Path);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         private void CppRunAllTests(string runnerFramework, string platform)
         {
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
             string assemblyRelativePathFormat =
                 @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
             var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
                 ? string.Format(assemblyRelativePathFormat, platform)
                 : string.Format(assemblyRelativePathFormat, "");
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         private void WebTestRunAllTests(string runnerFramework, string runSettingsFilePath = null, int minWebTestResultFileSizeInKB = 0)
@@ -203,19 +195,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
             string assemblyRelativePath =
                 @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDir);
+                string.Empty, this.FrameworkArgValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

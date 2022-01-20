@@ -8,27 +8,19 @@ namespace Microsoft.TestPlatform.TestUtilities
 {
     public class Workspace : IDisposable
     {
-        public Workspace(string path)
+        /// <summary>
+        /// Creates a workspace object around the given directory path. Pass null to use a temp unique directory.
+        /// </summary>
+        public Workspace(string path = null)
         {
-            Path = path;
+            Path = path ?? IntegrationTestBase.GetResultsDirectory();
         }
 
         public string Path { get; }
 
         public void Dispose()
         {
-            if (!string.IsNullOrEmpty(Path))
-            {
-                try
-                {
-                    if (Directory.Exists(Path))
-                        Directory.Delete(Path, true);
-                }
-                catch
-                {
-                    // ignore
-                }
-            }
+            IntegrationTestBase.TryRemoveDirectory(Path);
         }
 
         public DirectoryInfo CreateDirectory(string dir) => Directory.CreateDirectory(System.IO.Path.Combine(Path, dir));

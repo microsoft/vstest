@@ -3,11 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using System;
-
-    using static AcceptanceTestBase;
 
     [TestClass]
     public class MultitargetingTestHostTests : AcceptanceTestBase
@@ -21,14 +18,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
 
             var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

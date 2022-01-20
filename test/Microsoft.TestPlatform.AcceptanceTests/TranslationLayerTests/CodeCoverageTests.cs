@@ -405,6 +405,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public async Task EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
         {
             var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;

@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System.IO;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -19,18 +19,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
-            var resultsDir = GetResultsDirectory();
-            var trxFilePath = Path.Combine(resultsDir, trxFileName);
+            using var workspace = new Workspace();
+            var trxFilePath = Path.Combine(workspace.Path, trxFileName);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{workspace.Path}");
 
             // Delete if already exists
-            TryRemoveDirectory(resultsDir);
+            TryRemoveDirectory(workspace.Path);
 
             this.InvokeVsTest(arguments);
 
             Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
-            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]

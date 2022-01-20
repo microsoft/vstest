@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -27,13 +28,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var assemblyAbsolutePath = testEnvironment.GetTestAsset("CUITTestProject.dll", "net451");
-            var resultsDirectory = GetResultsDirectory();
-            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDirectory);
+            using var workspace = new Workspace();
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
-
-            TryRemoveDirectory(resultsDirectory);
         }
     }
 }

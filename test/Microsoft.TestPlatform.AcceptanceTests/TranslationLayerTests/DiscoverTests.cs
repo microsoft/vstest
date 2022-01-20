@@ -166,7 +166,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
             else
             {
-                Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
+                Assert.AreEqual(24, testCase.FirstOrDefault().LineNumber);
             }
         }
 

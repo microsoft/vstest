@@ -24,7 +24,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private TestConsoleWrapperContext wrapperContext;
         private RunEventHandler runEventHandler;
 
-        private void Setup()
+        [TestInitialize]
+        public void Setup()
         {
             this.wrapperContext = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
@@ -33,8 +34,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestCleanup]
         public void Cleanup()
         {
-            this.wrapperContext?.VsTestConsoleWrapper?.EndSession();
-            TryRemoveDirectory(this.wrapperContext.LogsDirPath);
+            if (this.wrapperContext != null)
+            {
+                this.wrapperContext.VsTestConsoleWrapper?.EndSession();
+                TryRemoveDirectory(this.wrapperContext.LogsDirPath);
+            }
         }
 
         [TestMethod]
@@ -43,7 +47,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
 
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
             this.wrapperContext.VsTestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
@@ -66,7 +69,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
 
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -100,7 +102,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            this.Setup();
 
             var testsettingsFile = Path.Combine(GetTempPath(), "tempsettings.testsettings");
             string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
@@ -132,7 +133,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
 
             var sources = new List<string>
                               {

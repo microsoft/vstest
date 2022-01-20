@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using System.IO;
@@ -22,15 +23,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // that will fail if we run the testhost.exe from the .nuget location, but will work when we run it from the output folder
             // see https://github.com/dotnet/runtime/issues/3569#issuecomment-595820524 and below for description of how it works
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
 
             // the app is published to win10-x64 because of the runtime identifier in the project
             var assemblyPath = this.BuildMultipleAssemblyPath($@"win10-x64{Path.DirectorySeparatorChar}SelfContainedAppTestProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(passedTestsCount: 1, 0, 0);
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

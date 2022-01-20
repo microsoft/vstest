@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using System;
@@ -51,22 +52,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "DisableAppDomain", "true" }
                                                  };
 
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
             var arguments = PrepareArguments(
                 testAssembly,
                 string.Empty,
-                GetRunsettingsFilePath(runConfigurationDictionary),
-                this.FrameworkArgValue, resultsDirectory: resultsDir);
+                GetRunsettingsFilePath(workspace, runConfigurationDictionary),
+                this.FrameworkArgValue, resultsDirectory: workspace.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(passedTestCount, 0, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
-        private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
+        private string GetRunsettingsFilePath(Workspace workspace, Dictionary<string, string> runConfigurationDictionary)
         {
-            var runsettingsPath = Path.Combine(GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+            var runsettingsPath = Path.Combine(workspace.Path, "test_" + Guid.NewGuid() + ".runsettings");
             CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
             return runsettingsPath;
         }

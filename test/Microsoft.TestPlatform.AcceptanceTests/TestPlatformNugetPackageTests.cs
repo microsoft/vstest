@@ -18,11 +18,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private string resultsDirectory;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext testContext)
+        public static void ClassInit(TestContext _)
         {
             var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
             var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).FirstOrDefault();
-            nugetPackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage));
+            nugetPackageFolder = Path.Combine(GetResultsDirectory(), Path.GetFileNameWithoutExtension(nugetPackage));
             ZipFile.ExtractToDirectory(nugetPackage, nugetPackageFolder);
 
             TryMoveDirectory(

@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 {
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
-    public class TestConsoleWrapperContext
+    public sealed class TestConsoleWrapperContext
     {
         public TestConsoleWrapperContext(IVsTestConsoleWrapper vsTestConsoleWrapper, string logsDirPath)
         {

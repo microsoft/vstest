@@ -3,7 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
-    using System.IO;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -41,20 +41,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
         {
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
 
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty, this.FrameworkArgValue,
-                this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+                this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
 
-            arguments = string.Concat(arguments, platformArg, GetDiagArg(resultsDir));
+            arguments = string.Concat(arguments, platformArg, GetDiagArg(workspace.Path));
             this.InvokeVsTest(arguments);
 
-            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, resultsDir, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
+            AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, workspace.Path, new[] { testhostProcessName }, arguments, this.GetConsoleRunnerPath());
             this.ValidateSummaryStatus(1, 1, 1);
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

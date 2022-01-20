@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using System;
 
     [TestClass]
     public class DebugAssertTests : AcceptanceTestBase
@@ -15,21 +14,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
         {
-            // when debugging this test in case it starts failing, be aware that the default behavior of Debug.Assert 
+            // when debugging this test in case it starts failing, be aware that the default behavior of Debug.Assert
             // is to not crash the process when we are running in debug, and debugger is attached
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new Workspace();
             var assemblyPath = this.BuildMultipleAssemblyPath("CrashingOnDebugAssertTestProject.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: workspace.Path);
             this.InvokeVsTest(arguments);
 
             // this will have failed tests when our trace listener works and crash the testhost process when it does not
             // because crashing processes is what a failed Debug.Assert does by default, unless you have a debugger attached
             this.ValidateSummaryStatus(passedTestsCount: 4, failedTestsCount: 4, 0);
             StringAssert.Contains(this.StdOut, "threw exception: Microsoft.VisualStudio.TestPlatform.TestHost.DebugAssertException:");
-
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

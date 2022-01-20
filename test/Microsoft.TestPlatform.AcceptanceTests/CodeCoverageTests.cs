@@ -43,13 +43,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestCategory("Windows-Review")]
     public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
     {
-        private readonly string resultsDirectory;
-
-        public CodeCoverageTests()
-        {
-            this.resultsDirectory = GetResultsDirectory();
-        }
-
         [TestMethod]
         [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
@@ -212,9 +205,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         private void CollectCodeCoverage(RunnerInfo runnerInfo, TestParameters testParameters)
         {
+            using var workspace = new Workspace();
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = this.CreateArguments(runnerInfo, testParameters, out var trxFilePath);
+            var arguments = this.CreateArguments(workspace, runnerInfo, testParameters, out var trxFilePath);
 
             this.InvokeVsTest(arguments);
 
@@ -223,8 +217,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testParameters.ExpectedSkippedTests,
                 testParameters.ExpectedFailedTests);
 
-            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
-            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
+            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, workspace.Path);
+            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {workspace.Path} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
             if (testParameters.RunSettingsType == TestParameters.SettingsType.XmlOutput)
@@ -247,11 +241,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             this.ValidateCoverageData(coverageDocument, testParameters.AssemblyName, testParameters.RunSettingsType != TestParameters.SettingsType.CoberturaOutput);
-
-            Directory.Delete(this.resultsDirectory, true);
         }
 
         private string CreateArguments(
+            Workspace workspace,
             RunnerInfo runnerInfo,
             TestParameters testParameters,
             out string trxFilePath)
@@ -261,14 +254,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 "artifacts", IntegrationTestEnvironment.BuildConfiguration, "Microsoft.CodeCoverage");
 
-            string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
+            string diagFileName = Path.Combine(workspace.Path, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
-                this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory);
+                this.FrameworkArgValue, runnerInfo.InIsolationValue, workspace.Path);
             arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}");
             arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
-            trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
+            trxFilePath = Path.Combine(workspace.Path, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             var defaultRunSettingsPath = Path.Combine(
