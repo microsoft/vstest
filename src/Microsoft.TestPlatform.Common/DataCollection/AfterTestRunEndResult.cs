@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
     [DataContract]
     public class AfterTestRunEndResult
     {
-        // We have more than one ctor for backward-compatibility reason but we don't want to add dependency on Newtosoft([JsonConstructor])
+        // We have more than one ctor for backward-compatibility reason but we don't want to add dependency on Newtonsoft([JsonConstructor])
         // We want to fallback to the non-public default constructor https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_ConstructorHandling.htm during deserialization
         private AfterTestRunEndResult()
         {
