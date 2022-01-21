@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
-    using System.IO;
 
     using Microsoft.TestPlatform.TestUtilities;
 

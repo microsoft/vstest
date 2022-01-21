@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.runEventHandler = new RunEventHandler();
         }
 
@@ -78,17 +78,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        }
-
-        private IList<string> GetTestAssemblies()
-        {
-            var testAssemblies = new List<string>
-                                     {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
-                                     };
-
-            return testAssemblies;
         }
     }
 }

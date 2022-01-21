@@ -17,7 +17,7 @@ namespace OutOfProcDataCollector
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
         private DataCollectionLogger logger;
-        private string tempDirectoryPath = Path.GetTempPath();
+        private readonly string tempDirectoryPath = Environment.GetEnvironmentVariable("TEST_ASSET_SAMPLE_COLLECTOR_PATH") ?? Path.GetTempPath();
 
         public override void Initialize(
             System.Xml.XmlElement configurationElement,
