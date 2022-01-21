@@ -106,7 +106,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void StartProcess(ConsoleParameters consoleParameters)
         {
             var consoleRunnerPath = GetConsoleRunner();
-            if (!File.Exists(consoleRunnerPath))
+
+            // The console runner path we retrieve might have been escaped so we need to remove the
+            // extra double quotes before testing whether the file exists.
+            if (!File.Exists(consoleRunnerPath.Trim('"')))
             {
                 throw new FileNotFoundException(string.Format(Resources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
             }
