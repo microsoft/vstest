@@ -26,8 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private TempDirectory logsDir;
         private RunEventHandler runEventHandler;
 
-        [TestInitialize]
-        public void Setup()
+        private void Setup()
         {
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out var logsDir);
             this.logsDir = logsDir;
@@ -47,6 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
 
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
             this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
@@ -69,6 +69,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
 
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -102,6 +103,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            this.Setup();
 
             using var tempDir = new TempDirectory();
             var testsettingsFile = Path.Combine(tempDir.Path, "tempsettings.testsettings");
@@ -132,6 +134,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
 
             var sources = new List<string>
                               {
