@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             {
                 if (EqtTrace.IsWarningEnabled)
                 {
-                    EqtTrace.Warning("TestRunAttachmentsProcessingManager: operation was cancelled.");
+                    EqtTrace.Warning("TestRunAttachmentsProcessingManager: Operation was cancelled.");
                 }
                 return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(true, null), attachments, stopwatch, eventHandler);
             }
@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                                 configuration = collectorConfiguration.Configuration;
                             }
 
-                            EqtTrace.Info($"TestRunAttachmentsProcessingManager: invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
+                            EqtTrace.Info($"TestRunAttachmentsProcessingManager: Invocation of data collector attachment processor '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType().AssemblyQualifiedName}' with configuration '{(configuration == null ? "null" : configuration.OuterXml)}'");
                             ICollection<AttachmentSet> processedAttachments = await dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.ProcessAttachmentSetsAsync(
                                 configuration,
                                 new Collection<AttachmentSet>(attachmentsToBeProcessed),
