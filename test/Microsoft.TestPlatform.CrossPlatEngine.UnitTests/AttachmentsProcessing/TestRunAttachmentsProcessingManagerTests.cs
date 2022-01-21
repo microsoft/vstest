@@ -46,7 +46,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
 
             mockEventSource = new Mock<ITestPlatformEventSource>();
             mockAttachmentHandler1 = new Mock<IDataCollectorAttachmentProcessor>();
+            mockAttachmentHandler1.Setup(x => x.SupportsIncrementalProcessing).Returns(true);
             mockAttachmentHandler2 = new Mock<IDataCollectorAttachmentProcessor>();
+            mockAttachmentHandler2.Setup(x => x.SupportsIncrementalProcessing).Returns(true);
             mockEventsHandler = new Mock<ITestRunAttachmentsProcessingEventsHandler>();
             mockDataCollectorAttachmentsProcessorsFactory = new Mock<IDataCollectorAttachmentsProcessorsFactory>();
 
@@ -666,8 +668,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
                 .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
                 {
-                // assert
-                if (withConfig)
+                    // assert
+                    if (withConfig)
                     {
                         Assert.IsNotNull(configurationElement);
                         Assert.AreEqual("<ConfigSample>Value</ConfigSample>", configurationElement.InnerXml);
@@ -732,8 +734,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler2.Setup(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()))
             .Returns((XmlElement configurationElement, ICollection<AttachmentSet> i1, IProgress<int> progress, IMessageLogger logger, CancellationToken cancellation) =>
             {
-            // assert
-            Assert.IsTrue(firstProcessorFailed);
+                // assert
+                Assert.IsTrue(firstProcessorFailed);
                 Assert.AreEqual(1, i1.Count);
                 Assert.AreEqual(3, i1.Single().Attachments.Count);
                 for (int i = 0; i < i1.Single().Attachments.Count; i++)
@@ -759,7 +761,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             // arrange
             List<AttachmentSet> inputAttachments = new List<AttachmentSet>
             {
-                new AttachmentSet(new Uri(uri1), "uri1_input_1")
+                new AttachmentSet(new Uri(uri1), "uri1_input_1"),
             };
             inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file1", "Sample1"));
             inputAttachments[0].Attachments.Add(UriDataAttachment.CreateFrom("file2", "Sample2"));
@@ -790,8 +792,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             {
                 try
                 {
-                // assert
-                Assert.IsTrue(firstProcessorFailed);
+                    // assert
+                    Assert.IsTrue(firstProcessorFailed);
                     Assert.AreEqual(1, i1.Count);
                     Assert.AreEqual(3, i1.Single().Attachments.Count);
                     for (int i = 0; i < i1.Single().Attachments.Count; i++)
@@ -815,6 +817,32 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestRunAttachmentsPro
             mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once());
             mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once());
             VerifyCompleteEvent(false, false, inputAttachments.ToArray());
+        }
+
+        [TestMethod]
+        public async Task ProcessTestRunAttachmentsAsync_ShouldSkipAttachmentProcessorIfDoesNotSupportIncrementalProcessing()
+        {
+            // arrange
+            List<AttachmentSet> inputAttachments = new List<AttachmentSet>
+            {
+                new AttachmentSet(new Uri(uri1), "uri1_input"),
+                new AttachmentSet(new Uri(uri2), "uri2_input")
+            };
+            mockAttachmentHandler1.Setup(x => x.SupportsIncrementalProcessing).Returns(false);
+
+            // act
+            await manager.ProcessTestRunAttachmentsAsync(Constants.EmptyRunSettings, mockRequestData.Object, inputAttachments, new InvokedDataCollector[0], mockEventsHandler.Object, cancellationTokenSource.Token);
+
+            // assert
+            // We expect that first attachment is still returned as-is because not processed.
+            VerifyCompleteEvent(false, false, inputAttachments.First());
+            mockAttachmentHandler1.Verify(h => h.GetExtensionUris(), Times.Never);
+            mockAttachmentHandler1.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            mockAttachmentHandler2.Verify(h => h.GetExtensionUris(), Times.Once);
+            mockAttachmentHandler2.Verify(h => h.ProcessAttachmentSetsAsync(It.IsAny<XmlElement>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<IProgress<int>>(), It.IsAny<IMessageLogger>(), It.IsAny<CancellationToken>()), Times.Once);
+
+            mockEventsHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
         }
 
         private void VerifyMetrics(int inputCount, int outputCount, string status = "Completed")

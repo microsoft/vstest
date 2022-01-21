@@ -109,6 +109,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
                 var dataCollectorAttachmentsProcessor = dataCollectorAttachmentsProcessors[i];
                 int attachmentsHandlerIndex = i + 1;
 
+                if (!dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.SupportsIncrementalProcessing)
+                {
+                    EqtTrace.Error($"TestRunAttachmentsProcessingManager: Non incremental attachment processors are not supported, '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType()}'");
+                    logger.SendMessage(TestMessageLevel.Error, $"Non incremental attachment processors are not supported '{dataCollectorAttachmentsProcessor.DataCollectorAttachmentProcessorInstance.GetType()}'");
+                    continue;
+                }
+
                 // We run processor code inside a try/catch because we want to continue with the others in case of failure.
                 Collection<AttachmentSet> attachmentsBackup = null;
                 try
