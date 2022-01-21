@@ -10,8 +10,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Globalization;
+    using System.IO;
     using System.Threading;
     using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
@@ -103,7 +105,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public void StartProcess(ConsoleParameters consoleParameters)
         {
-            var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
+            var consoleRunnerPath = GetConsoleRunner();
+            if (!File.Exists(consoleRunnerPath))
+            {
+                throw new FileNotFoundException(string.Format(Resources.CannotFindConsoleRunner, consoleRunnerPath), consoleRunnerPath);
+            }
+
+            var arguments = string.Join(" ", BuildArguments(consoleParameters));
+            var info = new ProcessStartInfo(consoleRunnerPath, arguments)
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -126,7 +135,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 }
             }
 #endif
-            this.process = Process.Start(info);
+            try
+            {
+                this.process = Process.Start(info);
+            }
+            catch (Win32Exception ex)
+            {
+                throw new Exception(string.Format(Resources.ProcessStartWin32Failure, consoleRunnerPath, arguments), ex);
+            }
 
             lock (syncObject)
             {
