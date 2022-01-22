@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.discoveryEventHandler = new DiscoveryEventHandler();
             this.discoveryEventHandler2 = new DiscoveryEventHandler2();
         }
@@ -163,11 +163,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Release builds optimize code, hence line numbers are different.
             if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
             {
-                Assert.AreEqual(23, testCase.FirstOrDefault().LineNumber);
+                Assert.AreEqual(25, testCase.FirstOrDefault().LineNumber);
             }
             else
             {
-                Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
+                Assert.AreEqual(24, testCase.FirstOrDefault().LineNumber);
             }
         }
 

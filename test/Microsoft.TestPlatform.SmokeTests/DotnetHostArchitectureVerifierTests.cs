@@ -20,30 +20,29 @@ namespace Microsoft.TestPlatform.SmokeTests
         [DataRow("X86")]
         public void VerifyHostArchitecture(string architecture)
         {
-            using (Workspace workSpace = new Workspace(GetResultsDirectory()))
+            using var workSpace = new TempDirectory();
+            string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
+            var vstestConsolePath = GetDotnetRunnerPath();
+            var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
+            workSpace.CopyAll(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+
+            // Patch the runner
+            string sdkVersion = GetLatestSdkVersion(dotnetPath);
+            string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
+            JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
+            patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
+            File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
+
+            var environmentVariables = new Dictionary<string, string>
             {
-                string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
-                var vstestConsolePath = GetDotnetRunnerPath();
-                var dotnetRunnerPath = workSpace.CreateDirectory("dotnetrunner");
-                workSpace.CopyAll(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)), dotnetRunnerPath);
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
+                ["ExpectedArchitecture"] = architecture
+            };
 
-                // Patch the runner
-                string sdkVersion = GetLatestSdkVersion(dotnetPath);
-                string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
-                JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
-                patchRuntimeConfig["runtimeOptions"]["framework"]["version"] = sdkVersion;
-                File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
+            this.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
 
-                var environmentVariables = new Dictionary<string, string>
-                {
-                    ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
-                    ["ExpectedArchitecture"] = architecture
-                };
-
-                this.ExecuteApplication(dotnetPath, "new mstest", out string stdOut, out string stdError, out int exitCode, environmentVariables, workSpace.Path);
-
-                // Patch test file
-                File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
+            // Patch test file
+            File.WriteAllText(Path.Combine(workSpace.Path, "UnitTest1.cs"),
 @"
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -60,9 +59,8 @@ public class UnitTest1
     }
 }");
 
-                this.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
-                Assert.AreEqual(0, exitCode, stdOut);
-            }
+            this.ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\"", out stdOut, out stdError, out exitCode, environmentVariables, workSpace.Path);
+            Assert.AreEqual(0, exitCode, stdOut);
         }
 
         private string GetLatestSdkVersion(string dotnetPath)

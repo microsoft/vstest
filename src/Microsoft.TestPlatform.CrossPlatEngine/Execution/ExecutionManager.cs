@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             this.LoadExtensions();
 
-            //unsubscrive session logger
+            //unsubscribe session logger
             this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
 
             this.testPlatformEventSource.AdapterSearchStop();

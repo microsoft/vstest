@@ -13,7 +13,14 @@
     <AssemblyName>Microsoft.TestPlatform.AcceptanceTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="TestAssets\CodeCoverageTest\" />
+    <Compile Remove="TestAssets\**" />
+    <None Remove="TestAssets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="BannedSymbols.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="BannedSymbols.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
@@ -21,6 +28,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Chutzpah" Version="$(ChutzpahAdapterVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.TestAsset.NativeCPP" Version="2.0.0" />
     <PackageReference Include="Microsoft.TestPlatform.QTools.Assets" Version="2.0.0" />
     <PackageReference Include="Procdump" Version="0.0.1" />

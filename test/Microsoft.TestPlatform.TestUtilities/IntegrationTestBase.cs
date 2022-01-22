@@ -137,9 +137,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Invokes <c>vstest.console</c> with specified arguments.
         /// </summary>
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
-        public void InvokeVsTest(string arguments)
+        public void InvokeVsTest(string arguments, Dictionary<string, string> environmentVariables = null)
         {
-            this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+            this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode, environmentVariables);
             this.FormatStandardOutCome();
         }
 
@@ -180,13 +180,13 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void InvokeVsTestForExecution(string testAssembly,
             string testAdapterPath,
             string framework,
-            string runSettings = "")
+            string runSettings = "",
+            Dictionary<string, string> environmentVariables = null)
         {
-            var resultsDir = GetResultsDirectory();
+            using var workspace = new TempDirectory();
 
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
-            this.InvokeVsTest(arguments);
-            TryRemoveDirectory(resultsDir);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
+            this.InvokeVsTest(arguments, environmentVariables);
         }
 
         /// <summary>
@@ -195,13 +195,13 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
         /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
+        public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "", Dictionary<string, string> environmentVariables = null)
         {
-            var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            using var workspace = new TempDirectory();
+
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue, resultsDirectory: workspace.Path);
             arguments = string.Concat(arguments, " /listtests");
-            this.InvokeVsTest(arguments);
-            TryRemoveDirectory(resultsDir);
+            this.InvokeVsTest(arguments, environmentVariables);
         }
 
         /// <summary>
@@ -506,17 +506,21 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper(out TempDirectory logFileDir)
         {
-            var logFileName = Path.GetFileName(Path.GetTempFileName());
-            var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
+            logFileDir = new TempDirectory();
 
-            if (!Directory.Exists(logFileDir))
+            if (!Directory.Exists(logFileDir.Path))
             {
-                Directory.CreateDirectory(logFileDir);
+                Directory.CreateDirectory(logFileDir.Path);
             }
 
-            var logFilePath = Path.Combine(logFileDir, logFileName);
+            // Directory is already unique so there is no need to have a unique file name.
+            var logFilePath = Path.Combine(logFileDir.Path, "log.txt");
+            if (!File.Exists(logFilePath))
+            {
+                File.Create(logFilePath).Close();
+            }
 
             Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
@@ -562,7 +566,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode)
+        private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
         {
             if (this.IsNetCoreRunner())
             {
@@ -571,7 +575,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             this.arguments = args;
 
-            this.ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
+            this.ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
         /// <summary>
@@ -749,25 +753,41 @@ namespace Microsoft.TestPlatform.TestUtilities
             return string.Join(" ", assertFullPaths);
         }
 
+        protected static string GetDiagArg(string rootDir)
+            => " --diag:" + Path.Combine(rootDir, "log.txt");
+
         /// <summary>
-        /// Creates an unique temporary directory for storing test results.
+        /// Counts the number of logs following the '*.host.*' pattern in the given folder.
         /// </summary>
-        /// <returns>
-        /// Path of the created directory.
-        /// </returns>
-        protected static string GetResultsDirectory()
+        protected static int CountTestHostLogs(string diagLogsDir, IEnumerable<string> testHostProcessNames)
+            => Directory.GetFiles(diagLogsDir, "*.host.*")
+                .Count(filePath =>
+                {
+                    var firstLine = File.ReadLines(filePath).FirstOrDefault();
+                    return testHostProcessNames.Any(processName =>
+                    {
+                        var parts = processName.Split('.');
+                        if (parts.Length > 2)
+                        {
+                            throw new InvalidOperationException("");
+                        }
+
+                        var hostName = parts[0];
+                        var platformName = parts.Length > 1 ? @$"\.{parts[1]}" : string.Empty;
+
+                        var isMatch = Regex.IsMatch(firstLine, @$",\s{hostName}(?:\.net\d+)?{platformName}\.(?:exe|dll),");
+                        return isMatch;
+                    });
+                });
+
+        protected static void AssertExpectedNumberOfHostProcesses(int expectedNumOfProcessCreated, string diagLogsDir, IEnumerable<string> testHostProcessNames, string arguments = null, string runnerPath = null)
         {
-            // AGENT_TEMPDIRECTORY is AzureDevops variable, which is set to path 
-            // that is cleaned up after every job. This is preferable to use over 
-            // just the normal temp. 
-            var temp = GetTempPath();
-            var directoryPath = Path.Combine(temp, Guid.NewGuid().ToString("n"));
-            Directory.CreateDirectory(directoryPath);
-
-            return directoryPath;
+            var processCreatedCount = CountTestHostLogs(diagLogsDir, testHostProcessNames);
+            Assert.AreEqual(
+                expectedNumOfProcessCreated,
+                processCreatedCount,
+                $"Number of {string.Join(", ", testHostProcessNames)} process created, expected: {expectedNumOfProcessCreated} actual: {processCreatedCount} {(arguments == null ? "" : "args: " + arguments)} {(runnerPath == null ? "" : "runner path: " + runnerPath)}");
         }
-
-        protected static string GetTempPath() => Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
 
         protected static string GetDownloadedDotnetMuxerFromTools(string architecture)
         {
@@ -788,17 +808,5 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         protected static string GetDotnetRunnerPath() => Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "netcoreapp2.1", "vstest.console.dll");
-
-        protected static void TryRemoveDirectory(string directory)
-        {
-            if (Directory.Exists(directory))
-            {
-                try
-                {
-                    Directory.Delete(directory, true);
-                }
-                catch { }
-            }
-        }
     }
 }
