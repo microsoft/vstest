@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachments
             var finalDatacollectorsAttachmentsProcessors = new List<DataCollectorAttachmentProcessor>();
             foreach (var attachementProcessor in datacollectorsAttachmentsProcessors)
             {
-                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: valid data collector attachment processor found: '{attachementProcessor.Value.Item2.GetType().AssemblyQualifiedName}'");
+                EqtTrace.Info($"DataCollectorAttachmentsProcessorsFactory: Valid data collector attachment processor found: '{attachementProcessor.Value.Item2.GetType().AssemblyQualifiedName}'");
                 finalDatacollectorsAttachmentsProcessors.Add(new DataCollectorAttachmentProcessor(attachementProcessor.Value.Item1, attachementProcessor.Value.Item2));
             }
 

@@ -23,13 +23,12 @@ namespace Microsoft.TestPlatform.SmokeTests
         [TestMethod]
         public void RunSelectedTests()
         {
-            var resultsDir = GetResultsDirectory();
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1", resultsDirectory: resultsDir);
+            using var resultsDir = new TempDirectory();
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1", resultsDirectory: resultsDir.Path);
             arguments = string.Concat(arguments, " /Tests:PassingTest");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
             this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

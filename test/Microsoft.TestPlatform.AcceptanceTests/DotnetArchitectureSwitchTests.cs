@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
+    using Microsoft.TestPlatform.TestUtilities;
 
     // This tests need specific sdks to be installed on arm machine
     // >= ARM 6.0.2xx
@@ -27,21 +28,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            privateX64Installation = Path.Combine(GetResultsDirectory(), "x64");
+            privateX64Installation = Path.Combine(new TempDirectory().Path, "x64");
             CopyAll(new DirectoryInfo(GetX64InstallationFolder), new DirectoryInfo(privateX64Installation));
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            try
-            {
-                Directory.Delete(privateX64Installation, true);
-            }
-            catch
-            {
-
-            }
+            // Remove one level up because we are targeting a sub-folder of the temp directory.
+            TempDirectory.TryRemoveDirectory(new DirectoryInfo(privateX64Installation).Parent.FullName);
         }
 
         [TestMethod]

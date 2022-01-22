@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.	
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return node.SelectSingleNode($"//{type}[@name='{name}']");
         }
 
-        protected XmlDocument GetXmlCoverage(string coverageResult)
+        protected XmlDocument GetXmlCoverage(string coverageResult, TempDirectory tempDirectory)
         {
             XmlDocument coverage = new XmlDocument();
 
@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var codeCoverageExe = this.GetCodeCoverageExePath();
-            var output = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
+            var output = Path.Combine(tempDirectory.Path, Guid.NewGuid().ToString() + ".xml");
 
             var watch = new Stopwatch();
 

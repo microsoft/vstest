@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
     using System.Collections.Generic;
     using System.Linq;
-
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -21,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.runEventHandler = new RunEventHandler();
             this.discoveryEventHandler = new DiscoveryEventHandler();
         }

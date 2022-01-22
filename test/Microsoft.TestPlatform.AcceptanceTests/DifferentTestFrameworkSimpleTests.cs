@@ -18,14 +18,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            using var tempDir = new TempDirectory();
             var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
-            var arguments = PrepareArguments(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: tempDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -66,8 +64,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource]
         public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
+            using var tempDir = new TempDirectory();
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var runSettingsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".runsettings");
+            var runSettingsFilePath = Path.Combine(tempDir.Path, Guid.NewGuid() + ".runsettings");
 
             //test the iterationCount setting for WebTestRunConfiguration in run settings
             var runSettingsXml = $@"<?xml version='1.0' encoding='utf-8'?>
@@ -101,16 +100,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var resultsDir = GetResultsDirectory();
+            using var tempDir = new TempDirectory();
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDir);
+                runnerInfo.InIsolationValue, tempDir.Path);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         [TestMethod]
@@ -119,7 +116,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var resultsDir = GetResultsDirectory();
+            using var tempDir = new TempDirectory();
 
             string testAssemblyPath;
             // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
@@ -136,28 +133,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty, this.FrameworkArgValue,
-                runnerInfo.InIsolationValue, resultsDir);
+                runnerInfo.InIsolationValue, tempDir.Path);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         private void CppRunAllTests(string runnerFramework, string platform)
         {
-            var resultsDir = GetResultsDirectory();
+            using var tempDir = new TempDirectory();
             string assemblyRelativePathFormat =
                 @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
             var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
                 ? string.Format(assemblyRelativePathFormat, platform)
                 : string.Format(assemblyRelativePathFormat, "");
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: resultsDir);
+            var arguments = PrepareArguments(assemblyAbsolutePath, string.Empty, string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue, resultsDirectory: tempDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
 
         private void WebTestRunAllTests(string runnerFramework, string runSettingsFilePath = null, int minWebTestResultFileSizeInKB = 0)
@@ -172,18 +165,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
 
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            var resultsDirectory = GetResultsDirectory();
+            using var resultsDirectory = new TempDirectory();
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                runSettingsFilePath, this.FrameworkArgValue, string.Empty, resultsDirectory);
+                runSettingsFilePath, this.FrameworkArgValue, string.Empty, resultsDirectory.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
 
             if (minWebTestResultFileSizeInKB > 0)
             {
-                var dirInfo = new DirectoryInfo(resultsDirectory);
+                var dirInfo = new DirectoryInfo(resultsDirectory.Path);
                 var webtestResultFile = "WebTest1.webtestResult";
                 var files = dirInfo.GetFiles(webtestResultFile, SearchOption.AllDirectories);
                 Assert.IsTrue(files.Length > 0, $"File {webtestResultFile} not found under results directory {resultsDirectory}");
@@ -191,8 +184,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 var fileSizeInKB = files[0].Length / 1024;
                 Assert.IsTrue(fileSizeInKB > minWebTestResultFileSizeInKB, $"Size of the file {webtestResultFile} is {fileSizeInKB} KB. It is not greater than {minWebTestResultFileSizeInKB} KB indicating iterationCount in run settings not honored.");
             }
-
-            TryRemoveDirectory(resultsDirectory);
         }
 
         private void CodedWebTestRunAllTests(string runnerFramework)
@@ -203,19 +194,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var resultsDir = GetResultsDirectory();
+            using var tempDir = new TempDirectory();
             string assemblyRelativePath =
                 @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDir);
+                string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
-
-            TryRemoveDirectory(resultsDir);
         }
     }
 }

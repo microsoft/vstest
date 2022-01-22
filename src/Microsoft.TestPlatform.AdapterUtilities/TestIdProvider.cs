@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities
             hasher.ProcessBlock(lastBlock, 0, lastBlock.Length);
             position = 0;
 
-            // We proccessed the entire string already
+            // We processed the entire string already
             if (end == bytes.Length)
             {
                 return;

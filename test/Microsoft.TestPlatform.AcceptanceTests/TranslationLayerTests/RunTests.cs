@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
             this.runEventHandler = new RunEventHandler();
         }
 
@@ -56,6 +56,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
         {
             var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
@@ -118,6 +119,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
+        //[DoNotParallelize]
         public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -142,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
                 : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 
-            Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
+            Assert.IsTrue(this.runEventHandler.Errors.Contains(errorMessage));
         }
 
         [TestMethod]

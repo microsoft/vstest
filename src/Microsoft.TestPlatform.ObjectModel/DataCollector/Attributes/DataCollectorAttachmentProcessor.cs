@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Initializes a new instance of the <see cref="DataCollectorAttachmentProcessorAttribute"/> class.
         /// </summary>
         /// <param name="type">
-        /// The type of the attachement data processor.
+        /// The type of the attachment data processor.
         /// </param>
         public DataCollectorAttachmentProcessorAttribute(Type type)
         {
