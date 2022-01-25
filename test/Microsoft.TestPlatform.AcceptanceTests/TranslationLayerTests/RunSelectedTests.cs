@@ -15,15 +15,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class RunSelectedTests : AcceptanceTestBase
 {
-    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private readonly RunEventHandler _runEventHandler;
-    private readonly DiscoveryEventHandler _discoveryEventHandler;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private RunEventHandler _runEventHandler;
+    private DiscoveryEventHandler _discoveryEventHandler;
 
     private void Setup()
     {
-        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this.runEventHandler = new RunEventHandler();
-        this.discoveryEventHandler = new DiscoveryEventHandler();
+        _vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        _runEventHandler = new RunEventHandler();
+        _discoveryEventHandler = new DiscoveryEventHandler();
     }
 
     [TestCleanup]
@@ -37,7 +37,7 @@ public class RunSelectedTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);
@@ -57,7 +57,7 @@ public class RunSelectedTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), _discoveryEventHandler);

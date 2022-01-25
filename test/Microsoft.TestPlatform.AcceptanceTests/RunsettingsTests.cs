@@ -95,7 +95,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var testhostProcessName = new[] { "testhost.x86" };
         var expectedNumOfProcessCreated = 1;
@@ -120,7 +120,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsWithoutParallelAndPlatformX86(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
         var testhostProcessNames = new[] { "testhost.x86" };
@@ -141,7 +141,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsParamsAsArguments(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
@@ -165,7 +165,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsAndRunSettingsParamsAsArguments(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var targetPlatform = "x86";
         var testhostProcessName = new[] { "testhost.x86" };
@@ -196,7 +196,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsWithParallelAndPlatformX64(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var targetPlatform = "x64";
         var testhostProcessName = new[] { "testhost" };
@@ -491,7 +491,7 @@ public class RunsettingsTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var projectName = "ProjectFileRunSettingsTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);

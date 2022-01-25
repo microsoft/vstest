@@ -19,7 +19,7 @@ public class PlatformTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var platformArg = " /Platform:x64";
         RunTestExecutionWithPlatform(platformArg, "testhost", 1);
@@ -33,7 +33,7 @@ public class PlatformTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var platformArg = " /Platform:x86";
         RunTestExecutionWithPlatform(platformArg, "testhost.x86", 1);

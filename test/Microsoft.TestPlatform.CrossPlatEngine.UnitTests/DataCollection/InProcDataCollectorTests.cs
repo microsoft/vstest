@@ -105,7 +105,7 @@ public class InProcDataCollectorTests
         _inProcDataCollector = new InProcDataCollector(
             typeInfo.Assembly.Location,
             "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-            typeof(INProcDataCollection).GetTypeInfo(),
+            typeof(InProcDataCollection).GetTypeInfo(),
             string.Empty,
             _assemblyLoadContext.Object,
             testablePlugin);

@@ -13,15 +13,15 @@ using System.Linq;
 [TestClass]
 public class LiveUnitTestingTests : AcceptanceTestBase
 {
-    private IVsTestConsoleWrapper vstestConsoleWrapper;
-    private DiscoveryEventHandler discoveryEventHandler;
-    private RunEventHandler runEventHandler;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private DiscoveryEventHandler _discoveryEventHandler;
+    private RunEventHandler _runEventHandler;
 
     public void Setup()
     {
-        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this.discoveryEventHandler = new DiscoveryEventHandler();
-        this.runEventHandler = new RunEventHandler();
+        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this._discoveryEventHandler = new DiscoveryEventHandler();
+        this._runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
@@ -36,7 +36,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -61,7 +61,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>

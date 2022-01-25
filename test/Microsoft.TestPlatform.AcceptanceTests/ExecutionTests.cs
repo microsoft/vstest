@@ -20,7 +20,7 @@ public class ExecutionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
@@ -35,12 +35,12 @@ public class ExecutionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunMultipleTestAssembliesWithoutTestAdapterPath(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-        var xunitAssemblyPath = _testEnvironment.TargetFramework.Equals("net451") ?
-            _testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
-            _testEnvironment.GetTestAsset("XUTestProject.dll");
+        var xunitAssemblyPath = testEnvironment.TargetFramework.Equals("net451") ?
+            testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
+            testEnvironment.GetTestAsset("XUTestProject.dll");
 
         assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
         InvokeVsTestForExecution(assemblyPaths, string.Empty, FrameworkArgValue, string.Empty);

@@ -23,20 +23,20 @@ using Microsoft.TestPlatform.TestUtilities;
 [Ignore("Manual tests(for now). Tests in this class need some .NET SDK global installations")]
 public class DotnetArchitectureSwitchTests : AcceptanceTestBase
 {
-    private static readonly string s_privateX64Installation;
+    private static string s_privateX64Installation;
 
     [ClassInitialize]
     public static void ClassInitialize(TestContext context)
     {
-        privateX64Installation = Path.Combine(new TempDirectory().Path, "x64");
-        CopyAll(new DirectoryInfo(GetX64InstallationFolder), new DirectoryInfo(privateX64Installation));
+        s_privateX64Installation = Path.Combine(new TempDirectory().Path, "x64");
+        CopyAll(new DirectoryInfo(GetX64InstallationFolder), new DirectoryInfo(s_privateX64Installation));
     }
 
     [ClassCleanup]
     public static void ClassCleanup()
     {
         // Remove one level up because we are targeting a sub-folder of the temp directory.
-        TempDirectory.TryRemoveDirectory(new DirectoryInfo(privateX64Installation).Parent.FullName);
+        TempDirectory.TryRemoveDirectory(new DirectoryInfo(s_privateX64Installation).Parent.FullName);
     }
 
     [TestMethod]

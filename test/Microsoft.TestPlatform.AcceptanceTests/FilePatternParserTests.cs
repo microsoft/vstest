@@ -41,8 +41,8 @@ public class FilePatternParserTests : AcceptanceTestBase
         using var tempDir = new TempDirectory();
 
         var testAssembly = GetSampleTestAssembly();
-        var oldAssemblyPath = Path.Combine("Debug", _testEnvironment.TargetFramework, "SimpleTestProject.dll");
-        var newAssemblyPath = Path.Combine("**", _testEnvironment.TargetFramework, "*TestProj*.dll");
+        var oldAssemblyPath = Path.Combine("Debug", testEnvironment.TargetFramework, "SimpleTestProject.dll");
+        var newAssemblyPath = Path.Combine("**", testEnvironment.TargetFramework, "*TestProj*.dll");
         testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
 
         var arguments = PrepareArguments(

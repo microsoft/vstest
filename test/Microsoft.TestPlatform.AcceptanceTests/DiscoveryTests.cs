@@ -35,7 +35,7 @@ public class DiscoveryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
         var listOfTests = new[] {
             "SampleUnitTestProject.UnitTest1.PassingTest",

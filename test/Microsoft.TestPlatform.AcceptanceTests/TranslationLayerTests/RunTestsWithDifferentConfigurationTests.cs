@@ -23,22 +23,22 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     private const string Netcoreapp = "netcoreapp";
     private const string Message = "VsTestConsoleWrapper does not support .Net Core Runner";
 
-    private IVsTestConsoleWrapper vstestConsoleWrapper;
-    private TempDirectory logsDir;
-    private RunEventHandler runEventHandler;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private TempDirectory _logsDir;
+    private RunEventHandler _runEventHandler;
 
     private void Setup()
     {
-        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out var logsDir);
-        this.logsDir = logsDir;
-        this.runEventHandler = new RunEventHandler();
+        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out var logsDir);
+        this._logsDir = logsDir;
+        this._runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
     public void Cleanup()
     {
-        this.vstestConsoleWrapper?.EndSession();
-        this.logsDir?.Dispose();
+        this._vstestConsoleWrapper?.EndSession();
+        this._logsDir?.Dispose();
     }
 
     [TestMethod]
@@ -46,7 +46,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var testAdapterPath = Directory.EnumerateFiles(GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
@@ -69,7 +69,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -83,18 +83,18 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
         var testHostNames = new[] { "testhost", "testhost.x86" };
         int expectedNumOfProcessCreated = 2;
 
-        this.vstestConsoleWrapper.RunTests(
+        this._vstestConsoleWrapper.RunTests(
             this.GetTestAssemblies(),
             runSettingsXml,
-            this.runEventHandler);
+            this._runEventHandler);
 
         // Assert
-        this.runEventHandler.EnsureSuccess();
-        Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
-        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir.Path, testHostNames);
+        this._runEventHandler.EnsureSuccess();
+        Assert.AreEqual(6, this._runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(2, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this._logsDir.Path, testHostNames);
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
         Setup();
 
@@ -123,10 +123,10 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(5, this.runEventHandler.TestResults.Count);
-        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-        Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        Assert.AreEqual(5, this._runEventHandler.TestResults.Count);
+        Assert.AreEqual(2, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        Assert.AreEqual(2, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+        Assert.AreEqual(1, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
     }
 
     [TestMethod]
@@ -134,7 +134,7 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithX64Source(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var sources = new List<string>
@@ -153,9 +153,9 @@ public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
             _runEventHandler);
 
         // Assert
-        Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
-        Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
-        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this.logsDir.Path, testhostProcessNames);
+        Assert.AreEqual(1, this._runEventHandler.TestResults.Count);
+        Assert.AreEqual(1, this._runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        AssertExpectedNumberOfHostProcesses(expectedNumOfProcessCreated, this._logsDir.Path, testhostProcessNames);
     }
 
     private IList<string> GetTestAssemblies()

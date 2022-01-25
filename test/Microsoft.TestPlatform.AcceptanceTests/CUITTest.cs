@@ -15,7 +15,7 @@ public class CuitTest : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void CuitRunAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         CuitRunAll(runnerInfo.RunnerFramework);
     }
 

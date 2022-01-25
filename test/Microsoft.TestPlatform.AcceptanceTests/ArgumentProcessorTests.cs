@@ -16,7 +16,7 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         InvokeVsTest(null);
 
@@ -37,7 +37,7 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);

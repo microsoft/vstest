@@ -14,7 +14,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var projectName = "SimpleTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);
@@ -34,7 +34,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
@@ -51,7 +51,7 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void PassInlineSettings(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var projectName = "ParametrizedTestProject.csproj";
         var projectPath = GetProjectFullPath(projectName);

@@ -16,7 +16,7 @@ public class ResultsDirectoryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void TrxFileShouldBeCreatedInResultsDirectory(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";
@@ -38,7 +38,7 @@ public class ResultsDirectoryTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ResultsDirectoryRelativePathShouldWork(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         var arguments = PrepareArguments(GetSampleTestAssembly(), GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue);
         var trxFileName = "TestResults.trx";

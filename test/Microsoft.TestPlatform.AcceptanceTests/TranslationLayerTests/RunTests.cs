@@ -43,7 +43,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
@@ -63,7 +63,7 @@ public class RunTests : AcceptanceTestBase
     {
         var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
 
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(GetTestAssemblies(), GetDefaultRunSettings(), _runEventHandler);
@@ -80,7 +80,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(
@@ -104,7 +104,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.RunTests(
@@ -123,7 +123,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
@@ -145,7 +145,7 @@ public class RunTests : AcceptanceTestBase
             ? $"The active test run was aborted. Reason: Test host process crashed : Process is terminated due to StackOverflowException.{Environment.NewLine}"
             : $"The active test run was aborted. Reason: Test host process crashed : Process is terminating due to StackOverflowException.{Environment.NewLine}";
 
-        Assert.IsTrue(this.runEventHandler.Errors.Contains(errorMessage));
+        Assert.IsTrue(_runEventHandler.Errors.Contains(errorMessage));
     }
 
     [TestMethod]
@@ -154,7 +154,7 @@ public class RunTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var testAssemblyName = "SimpleTestProject2.dll";

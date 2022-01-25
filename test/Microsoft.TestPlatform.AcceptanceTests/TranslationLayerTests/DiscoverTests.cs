@@ -20,15 +20,15 @@ using Moq;
 [TestClass]
 public class DiscoverTests : AcceptanceTestBase
 {
-    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private readonly DiscoveryEventHandler _discoveryEventHandler;
-    private readonly DiscoveryEventHandler2 _discoveryEventHandler2;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private DiscoveryEventHandler _discoveryEventHandler;
+    private DiscoveryEventHandler2 _discoveryEventHandler2;
 
     public void Setup()
     {
-        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this.discoveryEventHandler = new DiscoveryEventHandler();
-        this.discoveryEventHandler2 = new DiscoveryEventHandler2();
+        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this._discoveryEventHandler = new DiscoveryEventHandler();
+        this._discoveryEventHandler2 = new DiscoveryEventHandler2();
     }
 
     [TestCleanup]
@@ -42,7 +42,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         Setup();
 
@@ -57,7 +57,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(
@@ -76,7 +76,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(GetTestAssemblies(), GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, _discoveryEventHandler2);
@@ -95,7 +95,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
@@ -123,7 +123,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
@@ -150,7 +150,7 @@ public class DiscoverTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         _vstestConsoleWrapper.DiscoverTests(
@@ -187,7 +187,7 @@ public class DiscoverTests : AcceptanceTestBase
             GetAssetFullPath("SimpleTestProject2.dll")
         };
 
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var discoveredTests = new List<TestCase>();

@@ -55,7 +55,7 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollectionUsingCollectArgument(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
@@ -85,7 +85,7 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForNetCore(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.1"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
@@ -99,7 +99,7 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue, resultsDirectory: tempDir.Path);
@@ -113,7 +113,7 @@ public class DataCollectionTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAttachmentProcessor(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         using var tempDir = new TempDirectory();
         var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');

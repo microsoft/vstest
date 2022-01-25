@@ -16,13 +16,13 @@ using System.Linq;
 [TestClass]
 public class CustomTestHostTests : AcceptanceTestBase
 {
-    private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;
-    private readonly RunEventHandler _runEventHandler;
+    private IVsTestConsoleWrapper _vstestConsoleWrapper;
+    private RunEventHandler _runEventHandler;
 
     private void Setup()
     {
-        this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
-        this.runEventHandler = new RunEventHandler();
+        this._vstestConsoleWrapper = this.GetVsTestConsoleWrapper(out _);
+        this._runEventHandler = new RunEventHandler();
     }
 
     [TestCleanup]
@@ -37,7 +37,7 @@ public class CustomTestHostTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithCustomTestHostLaunch(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
         Setup();
 
         var customTestHostLauncher = new CustomTestHostLauncher();

@@ -14,7 +14,7 @@ public class ListExtensionsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
     public void ListDiscoverersShouldShowInboxDiscoverers(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         InvokeVsTest("/listDiscoverers");
 
@@ -41,7 +41,7 @@ public class ListExtensionsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
     public void ListExecutorsShouldShowInboxExecutors(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         InvokeVsTest("/listExecutors");
 
@@ -68,7 +68,7 @@ public class ListExtensionsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
     public void ListLoggersShouldShowInboxLoggers(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         InvokeVsTest("/listLoggers");
 
@@ -80,7 +80,7 @@ public class ListExtensionsTests : AcceptanceTestBase
     [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
     public void ListSettingsProvidersShouldShowInboxSettingsProviders(RunnerInfo runnerInfo)
     {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
+        SetTestEnvironment(testEnvironment, runnerInfo);
 
         InvokeVsTest("/listSettingsProviders");
 
