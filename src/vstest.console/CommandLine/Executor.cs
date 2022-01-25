@@ -117,10 +117,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             if (!isDiag)
             {
-                var diagLog = Environment.GetEnvironmentVariable("VSTEST_DIAGLOG");
-                if (!string.IsNullOrWhiteSpace(diagLog))
+                var diag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
+                var diagVerbosity = Environment.GetEnvironmentVariable("VSTEST_DIAG_VERBOSITY");
+                if (!string.IsNullOrWhiteSpace(diag))
                 {
-                    args = args.Concat(new[] { $"--diag:{diagLog}" }).ToArray();
+                    var verbosity = TraceLevel.Verbose;
+                    if (diagVerbosity != null)
+                    {
+                        if (Enum.TryParse<TraceLevel>(diagVerbosity, ignoreCase: true, out var parsedVerbosity))
+                        {
+                            verbosity = parsedVerbosity;
+                        }
+                    }
+                    args = args.Concat(new[] { $"--diag:{diag};Verbosity={verbosity}" }).ToArray();
                 }
             }
 
